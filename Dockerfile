@@ -1,6 +1,6 @@
 # This Dockerfile is used for builds on Railway. For all other purposes, use the generic `Dockerfile.dockerhub` in root dir.
 
-FROM node:22
+FROM node:24
 
 ENV NODE_ENV=production
 
