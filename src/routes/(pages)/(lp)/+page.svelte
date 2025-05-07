@@ -97,7 +97,7 @@
     </div>
   </section>
 
-  <section class="two-column" style:margin-top="4rem">
+  <section class="two-column">
     <div>
       <LpHiwEntrypoint />
     </div>
@@ -190,25 +190,34 @@
   }
 
   section.two-column {
+    margin-top: 4rem;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    align-items: stretch;
     gap: 2rem;
   }
 
   section.two-column > div {
     flex: 1 1 0;
-    min-width: 500px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   @media (max-width: 882px) {
+    section {
+      margin-top: 1rem;
+    }
+
     .bg {
       display: none;
     }
 
     .hero {
       height: 85svh;
+    }
+
+    .case-studies-wrapper {
+      gap: 1rem;
     }
 
     .case-studies .case-study {
@@ -221,6 +230,11 @@
 
     .case-studies .bg-graph-1 {
       display: none;
+    }
+
+    section.two-column {
+      flex-direction: column;
+      gap: 1rem;
     }
   }
 </style>

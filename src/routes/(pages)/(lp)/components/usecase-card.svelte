@@ -78,6 +78,10 @@
     justify-content: center;
   }
 
+  h2 {
+    white-space: nowrap;
+  }
+
   .icon {
     display: flex;
     justify-content: space-between;

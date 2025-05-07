@@ -14,7 +14,7 @@
       Achieve any funding mechanism you can dream of with our global splitting graph and powerful
       set of building blocks.
     </p>
-    <div><Button>Learn more</Button></div>
+    <div><Button href="https://docs.drips.network" target="_blank">Learn more</Button></div>
   </div>
   <Marquee gap="1rem" speed={50}>
     <DripList />
@@ -32,6 +32,7 @@
     align-items: center;
     gap: 2rem;
     padding: 2rem 0;
+    max-width: 100%;
     text-align: center;
     border-radius: 2rem 0 2rem 2rem;
     background-color: var(--color-background);

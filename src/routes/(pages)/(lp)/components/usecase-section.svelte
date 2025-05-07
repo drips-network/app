@@ -137,4 +137,10 @@
     justify-content: center;
     gap: 1rem;
   }
+
+  @media (max-width: 882px) {
+    .usecases {
+      gap: 0;
+    }
+  }
 </style>

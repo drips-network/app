@@ -3,7 +3,7 @@
 </script>
 
 <div class="section-header">
-  <div class="illus hide-mobile">
+  <div class="illus">
     <Star />
   </div>
   <h1 class="content">
@@ -20,6 +20,7 @@
     margin-bottom: 2rem;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 3rem;
   }
 
@@ -27,15 +28,24 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    height: 2rem;
   }
 
   @media (max-width: 577px) {
     .section-header {
-      justify-content: space-between;
+      gap: 0rem;
     }
 
-    .hide-mobile {
-      display: none;
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    .illus {
+      height: 1.5rem;
+    }
+
+    .section-header {
+      justify-content: space-between;
     }
   }
 </style>

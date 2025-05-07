@@ -51,7 +51,19 @@
     margin-top: 4rem;
     display: grid;
     gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 632px) {
+    footer {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1296px) {
+    footer {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   .column {
