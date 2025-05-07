@@ -119,11 +119,12 @@
   let groupPileElem: HTMLDivElement | undefined;
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
-  function alignGroupName() {
+  async function alignGroupName() {
+    await tick();
     groupNameOffset.set((groupPileElem?.offsetWidth ?? 0) + 8, { duration: 0 });
   }
 
-  // Align group name on mount and when splits change
+  // Align group name on mount, when splits change, and on a mutation of groupPileElem
   onMount(alignGroupName);
   $: split && alignGroupName();
 
