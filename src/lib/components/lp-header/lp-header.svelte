@@ -295,13 +295,12 @@
   }
 
   .mobile-menu-content {
-    padding: 1rem 1.5rem 1.75rem; /* Add padding for mobile */
+    padding: 1rem 1.5rem 1.75rem;
   }
 
   .mobile-menu-content h5 {
     margin-top: 1rem;
     margin-bottom: 0.5rem;
-    color: var(--color-foreground-secondary); /* Optional: Style title */
     font-weight: bold;
   }
 
