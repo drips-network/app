@@ -5,8 +5,8 @@
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Transactions from '$lib/components/icons/Transactions.svelte';
   import User from '$lib/components/icons/User.svelte';
-  import SolutionsDependencyTree from '$lib/components/illustrations/solutions-dependency-tree.svelte';
-  import SolutionsRecurringFunding from '$lib/components/illustrations/solutions-recurring-funding.svelte';
+  import SolutionsComposeContracts from '$lib/components/illustrations/solutions-compose-contracts.svelte';
+  import SolutionsProgrammableStreams from '$lib/components/illustrations/solutions-programmable-streams.svelte';
   import SolutionCard from '$lib/components/solutions/solution-card.svelte';
   import SolutionHeader from '$lib/components/solutions/solution-header.svelte';
   import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
@@ -28,7 +28,7 @@
 
 <SolutionCard>
   <svelte:fragment slot="illustration">
-    <SolutionsRecurringFunding />
+    <SolutionsProgrammableStreams />
   </svelte:fragment>
   <svelte:fragment slot="headline">
     Stream & split any ERC-20, to anyone and anything
@@ -52,7 +52,7 @@
 
 <SolutionCard reverse>
   <svelte:fragment slot="illustration">
-    <SolutionsDependencyTree />
+    <SolutionsComposeContracts />
   </svelte:fragment>
   <svelte:fragment slot="headline">Compose your on-chain logic with Drips</svelte:fragment>
   <svelte:fragment slot="description">
