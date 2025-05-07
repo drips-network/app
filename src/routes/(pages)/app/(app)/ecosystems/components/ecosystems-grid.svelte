@@ -1,16 +1,6 @@
-<script lang="ts" context="module">
-  // export const PROJECTS_SECTION_PROJECT_FRAGMENT = gql`
-  //   ${PROJECT_CARD_FRAGMENT}
-  //   fragment ProjectsSectionProject on Project {
-  //     ...ProjectCard
-  //   }
-  // `;
-</script>
-
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import EcosystemCard from './ecosystem-card.svelte';
-  // import { gql } from 'graphql-request';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
@@ -50,19 +40,5 @@
 
   .ecosystems-grid.ecosystems-grid--big {
     grid-template-columns: 1fr;
-  }
-
-  /* .ecosystems-grid > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(50% - 0.75rem);
-    width: calc(25% - 0.75rem);
-  } */
-
-  @media (max-width: 560px) {
-    /* .ecosystems-grid > * {
-      width: 100%;
-      max-width: 100%;
-    } */
   }
 </style>

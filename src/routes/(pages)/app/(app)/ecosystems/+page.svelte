@@ -1,25 +1,24 @@
 <script lang="ts" context="module">
-  export const PROJECTS_PAGE_PROJECT_FRAGMENT = gql`
-    ${PROJECTS_SECTION_PROJECT_FRAGMENT}
-    fragment ProjectsPageProject on Project {
-      ...ProjectsSectionProject
+  export const ECOSYSTEMS_LISTINGS_ITEM_FRAGMENT = gql`
+    fragment EcosystemsListingsItem on EcosystemMainAccount {
+      owner {
+        accountId
+        address
+      }
+      totalEarned {
+        tokenAddress
+        amount
+      }
     }
   `;
 </script>
 
+
 <script lang="ts">
-  // import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
-  // import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  // import SplittingGraph from '$lib/components/illustrations/splitting-graph.svelte';
-  // import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
-  // import CrossIcon from '$lib/components/icons/Cross.svelte';
-  // import { fade } from 'svelte/transition';
-  import { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/projects-section/projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
-  // import YourEcosystemsSection from './components/your-ecosystems-section.svelte';
   import AllEcosystemsSection from './components/all-ecosystems-section.svelte';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -56,15 +55,6 @@
       </EduCardIllustration>
     </svelte:fragment>
   </EduCard>
-  <!-- <div class="section">
-    {#if data.projects}
-      <YourEcosystemsSection
-        withClaimProjectButton
-        projects={data.projects}
-        showVisibilityToggle={true}
-      />
-    {/if}
-  </div> -->
 
   <div class="section">
     {#if data.ecosystems}
@@ -79,84 +69,4 @@
     flex-direction: column;
     gap: 2rem;
   }
-
-  /* .card {
-    background-color: var(--color-background);
-    border: 1px solid var(--color-foreground);
-    border-radius: 1rem 0 1rem 1rem;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .card:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-
-  button:disabled {
-    opacity: 0.5;
-  }
-
-  .splitting-graph-edu.card {
-    display: flex;
-    gap: 2rem;
-    padding-right: 2rem;
-    align-items: center;
-  }
-
-  .splitting-graph-edu.card .content {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    max-width: 40rem;
-    gap: 1rem;
-  }
-
-  .splitting-graph-edu.card .close-button {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    transition: background-color 0.3s;
-    border-radius: 1rem;
-  }
-
-  .splitting-graph-edu.card .close-button:focus-visible {
-    background-color: var(--color-foreground-level-2);
-  }
-
-  @media (max-width: 716px) {
-    .splitting-graph-edu.card {
-      flex-direction: column;
-    }
-
-    .splitting-graph-edu.card .illustration {
-      display: none;
-    }
-
-    .splitting-graph-edu.card .content {
-      padding: 1rem;
-    }
-  } */
-
-  /* TODO: put within educard */
-  /* .edu-card-illustration-bg {
-    position: absolute;
-    background-color: var(--color-primary-level-2);
-    top: 0;
-    width: 35%;
-    height: 50%;
-    border-radius: 0 0 1rem 1rem;
-  }
-
-  .edu-card-illustration-wrapper {
-    max-width: 16rem;
-    z-index: 1;
-  }
-
-  @media (max-width: 768px) {
-    .edu-card-illustration-bg {
-      width: 100%;
-      height: 30%;
-      border-radius: 0;
-    }
-  } */
 </style>
