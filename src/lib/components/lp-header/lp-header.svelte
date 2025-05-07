@@ -43,7 +43,6 @@
   let openMenu: string | 'all' | null = null;
   let menuXOffset: number | null = null;
 
-  // Define the types for the menu structure explicitly
   type MenuLink = { title: string; type: 'link'; href: string };
   type MenuDropdown = {
     title: string;
