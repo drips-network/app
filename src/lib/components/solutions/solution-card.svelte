@@ -1,9 +1,20 @@
 <script lang="ts">
+  import Button from '../button/button.svelte';
+  import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
+
   export let reverse = false;
+  export let illustrationPadding: string | undefined = undefined;
+
+  export let button:
+    | {
+        text: string;
+        href: string;
+      }
+    | undefined = undefined;
 </script>
 
 <div class="solution-card" class:reverse>
-  <div class="illustration">
+  <div style:padding={illustrationPadding} class="illustration">
     <slot name="illustration"></slot>
   </div>
   <div class="content">
@@ -13,6 +24,11 @@
       <div class="line-items">
         <slot name="line-items"></slot>
       </div>
+      {#if button}
+        <div>
+          <Button icon={ArrowBoxUpRight} href={button.href} target="_blank">{button.text}</Button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

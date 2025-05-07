@@ -14,6 +14,8 @@
 
 <style>
   .lp-contact-card {
+    width: 100%;
+    min-height: 20rem;
     display: flex;
     flex-direction: column;
     border-radius: 2rem 0 2rem 2rem;

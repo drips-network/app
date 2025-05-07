@@ -12,7 +12,7 @@
 </script>
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">RetroPGF Distribution</svelte:fragment>
+  <svelte:fragment slot="usecase-badge">RetroPGF Voting & Distribution</svelte:fragment>
   <svelte:fragment slot="headline">Recognize and reward impact easily</svelte:fragment>
   <svelte:fragment slot="description">
     Retroactive public goods funding is a great tool for rewarding impact, however it can be onerous
