@@ -208,18 +208,18 @@
 
   $: urlBase = chainOverride
     ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
-    : null;
+    : '';
 
   $: dripListUrl = dripList
-    ? `${urlBase ?? ''}/app/drip-lists/${dripList.account.accountId}`
+    ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
     : votingRound
-      ? `${urlBase ?? ''}/app/drip-lists/${votingRound.id}`
+      ? `${urlBase}/app/drip-lists/${votingRound.id}`
       : undefined;
 
   $: downloadableImageUrl = dripList
-    ? `${urlBase ?? ''}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+    ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
     : votingRound
-      ? `${urlBase ?? ''}/api/share-images/drip-list/${votingRound.id}.png?target=og`
+      ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
       : undefined;
 
   $: votingEnded = votingRound
