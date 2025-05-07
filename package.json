@@ -35,7 +35,7 @@
     "@graphql-codegen/typescript-operations": "^4.5.1",
     "@playwright/test": "^1.51.1",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
-    "@sveltejs/kit": "^2.5.17",
+    "@sveltejs/kit": "^2.20.8",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/svelte": "^5.1.0",
@@ -96,6 +96,7 @@
     "@web3-onboard/core": "^2.22.1",
     "@web3-onboard/injected-wallets": "^2.10.17",
     "@web3-onboard/walletconnect": "^2.5.5",
+    "bezier-easing": "^2.1.0",
     "csv-simple-parser": "^1.0.3",
     "cupertino-pane": "^1.4.21",
     "ethereum-blockies-base64": "^1.0.2",
@@ -114,6 +115,7 @@
     "sanitize-html": "^2.13.0",
     "satori": "^0.10.13",
     "satori-html": "^0.3.2",
+    "svelte-fast-marquee": "^0.8.0",
     "twemoji": "^14.0.2",
     "zod": "^3.23.8"
   },
@@ -127,6 +129,9 @@
     }
   },
   "optionalDependencies": {
+    "@esbuild/linux-arm64": "^0.25.0",
+    "@esbuild/linux-x64": "^0.25.0",
+    "@resvg/resvg-js-linux-arm64-gnu": "^2.6.2",
     "@rollup/rollup-linux-arm64-gnu": "^4.31.0",
     "@rollup/rollup-linux-x64-gnu": "^4.31.0"
   },

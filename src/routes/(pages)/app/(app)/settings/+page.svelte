@@ -15,6 +15,7 @@
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import network from '$lib/stores/wallet/network';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
 
   const { primaryColor } = themeStore;
 
@@ -182,6 +183,14 @@
   <Divider />
   <div class="section">
     <h4 class="typo-all-caps">Get in touch</h4>
+    <Setting
+      title="Discuss a funding program"
+      subtitle="Reach out to our Partnerships team if you want to use Drips to distribute funding."
+    >
+      <a class="typo-link" target="_blank" rel="noreferrer" href={INBOUND_LEAD_FORM_URL}
+        >Get in touch</a
+      >
+    </Setting>
     <Setting title="Join the discussion" subtitle="Join our Discord to chat with the team.">
       <a class="typo-link" target="_blank" rel="noreferrer" href="https://discord.gg/BakDKKDpHF"
         >Open Discord Server</a
