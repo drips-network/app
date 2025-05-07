@@ -56,7 +56,7 @@
   </svelte:fragment>
   <svelte:fragment slot="headline">Compose your on-chain logic with Drips</svelte:fragment>
   <svelte:fragment slot="description">
-    As a fully decentralized on-chain protocol, Drips can be composed with any other contract
+    As a fully decentralized on-chain protocol, Drips can be composed with any other contract.
   </svelte:fragment>
   <svelte:fragment slot="line-items">
     <SolutionLineItem icon={TokenStreams}>
@@ -644,20 +644,10 @@ contract RepoDriver is ERC677ReceiverInterface, DriverTransferUtils, Managed {
     }`}
     />
   </svelte:fragment>
-  <svelte:fragment slot="headline">Compose your on-chain logic with Drips</svelte:fragment>
+  <svelte:fragment slot="headline">Build anything you can dream of</svelte:fragment>
   <svelte:fragment slot="description">
-    As a fully decentralized on-chain protocol, Drips can be composed with any other contract
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
-    <SolutionLineItem icon={TokenStreams}>
-      Stream and split any ERC-20 directly. No need for messy wrapped tokens
-    </SolutionLineItem>
-    <SolutionLineItem icon={Transactions}>
-      Send funds to accounts and entities on Drips using standard ERC-20 transfers
-    </SolutionLineItem>
-    <SolutionLineItem icon={File}>
-      Drip Lists and Streams can be mutable and owned by Smart Contract logic
-    </SolutionLineItem>
+    Extend the Drips Protocol with custom account logic and additional off-chain funding targets
+    using our flexible Driver primitive.
   </svelte:fragment>
 </SolutionCard>
 
