@@ -90,4 +90,11 @@
       210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
       500ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root::view-transition-old(root),
+    :root::view-transition-new(root) {
+      animation: none;
+    }
+  }
 </style>
