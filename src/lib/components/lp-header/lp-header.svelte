@@ -218,7 +218,6 @@
         <NewAnimation />
         <a
           href={announcementBanner.link}
-          target="_blank"
           class="typo-text-bold"
           style:display="flex"
           style:gap="0.5rem"
