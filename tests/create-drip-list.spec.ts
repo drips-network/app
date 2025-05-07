@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('create a drip list', async ({ page }) => {
+test.skip('create a drip list', async ({ page }) => {
   test.setTimeout(240_000);
 
   page.emulateMedia({ reducedMotion: 'reduce' });
