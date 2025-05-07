@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.skip('create a drip list', async ({ page }) => {
+test('create a drip list', async ({ page }) => {
   test.setTimeout(240_000);
 
   page.emulateMedia({ reducedMotion: 'reduce' });
@@ -65,7 +65,7 @@ test.skip('create a drip list', async ({ page }) => {
   await expect(page.getByText('40%').nth(0)).toBeVisible();
 });
 
-test('create collaborative drip list', async ({ page }) => {
+test.skip('create collaborative drip list', async ({ page }) => {
   test.setTimeout(240_000);
 
   page.emulateMedia({ reducedMotion: 'reduce' });
