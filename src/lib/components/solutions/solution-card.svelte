@@ -37,6 +37,7 @@
 
   .illustration {
     position: relative;
+    height: 10000px; /* Stupid hack because Safari is being Safari */
     max-height: 30rem;
     margin-top: -2rem;
     margin-bottom: -2rem;
