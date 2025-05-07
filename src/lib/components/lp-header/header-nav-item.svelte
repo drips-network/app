@@ -1,12 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import ChevronDown from '../icons/ChevronDown.svelte';
+  import { page } from '$app/stores';
 
   export let dropdown = false;
   export let tonedDown: boolean = false;
   export let dropdownActive = false;
 
   export let href: string | null = null;
+
+  $: current = href && $page.url.pathname.includes(href);
 
   export let elem: HTMLAnchorElement | HTMLButtonElement | null = null;
 
@@ -42,7 +45,11 @@
   target={externalLink ? '_blank' : undefined}
   rel={externalLink ? 'noopener noreferrer' : undefined}
 >
-  <div class="content" bind:this={element}>
+  <div
+    class="content"
+    style:color={current ? 'var(--color-primary)' : 'var(--color-foreground)'}
+    bind:this={element}
+  >
     <slot />
   </div>
   {#if dropdown}
@@ -61,6 +68,10 @@
 
   .wrapper.toned-down {
     opacity: 0.5;
+  }
+
+  .wrapper .content {
+    transition: color 0.3s;
   }
 
   .wrapper:hover .content {
