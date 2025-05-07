@@ -1,5 +1,6 @@
 import redisSdk from 'redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+import { building } from '$app/environment';
 
 const connectionString = getOptionalEnvVar(
   'CACHE_REDIS_CONNECTION_STRING',
@@ -8,9 +9,8 @@ const connectionString = getOptionalEnvVar(
     'You may want to run a local Redis instance and set the env var to avoid GitHub rate limiting during development.',
 );
 
-export const redis = connectionString
-  ? redisSdk.createClient({ url: connectionString })
-  : undefined;
+export const redis =
+  connectionString && !building ? redisSdk.createClient({ url: connectionString }) : undefined;
 export type RedisClientType = typeof redis;
 
 redis?.on('error', (err) => {

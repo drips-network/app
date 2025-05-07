@@ -1,6 +1,6 @@
 # This Dockerfile is used for builds on Railway. For all other purposes, use the generic `Dockerfile.dockerhub` in root dir.
 
-FROM node:22
+FROM node:24
 
 ENV NODE_ENV=production
 
@@ -64,6 +64,9 @@ ARG FAKE_PINATA_URL
 ARG PUBLIC_JUNCTION_URL
 ARG PUBLIC_INTERNAL_JUNCTION_URL
 
+ARG OTEL_EXPORTER_OTLP_ENDPOINT
+ARG OTEL_SERVICE_NAME
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
@@ -97,7 +100,9 @@ RUN npm run gql:build-types
 # While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
 RUN npm run build:app
 
+RUN npm run build:telemetry
+
 EXPOSE 8080
 
 # Run the app (this is not a build command, it runs /build/index.js)
-CMD ["node", "build"]
+CMD ["node", "--require", "./build/telemetry.cjs", "build"]
