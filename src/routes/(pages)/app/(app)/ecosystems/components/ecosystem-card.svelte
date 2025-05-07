@@ -30,19 +30,16 @@
 </script>
 
 <script lang="ts">
-  // import { gql } from 'graphql-request';
-  // import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
-  // import { PROJECT_NAME_FRAGMENT } from '$lib/components/project-badge/components/project-name.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import formatNumber from '$lib/utils/format-number';
 
   export let ecosystem: LeanEcosystem;
   export let isHidden: boolean = false;
-  export let isInteractive: boolean = false;
 
   const donations: number = 186_833.91;
   const currencyFormatterShort = Intl.NumberFormat('en-US', {
@@ -61,6 +58,8 @@
       ? currencyFormatterShort.format(donations)
       : currencyFormatterLong.format(donations);
 
+  $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0)
+
   function buildEcosystemUrl(ecosystem: LeanEcosystem): string {
     return `/app/ecosystems/${ecosystem.id}`;
   }
@@ -71,7 +70,6 @@
  -->
 <a
   class="ecosystem-card-wrapper"
-  class:ecosystem-card-wrapper--interactive={isInteractive}
   href={buildEcosystemUrl(ecosystem)}
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
@@ -109,7 +107,7 @@
         <div>
           <Box style="fill: var(--color-foreground)" /><strong class="typo-text-bold"
             >Projects</strong
-          >2,618
+          >{projectsCountFormatted}
         </div>
         <div>
           <Coin style="fill: var(--color-foreground)" /><strong class="typo-text-bold">Funds</strong
@@ -230,10 +228,6 @@
 
   .cubbies > *:last-child {
     border-right: none;
-  }
-
-  .ecosystem-card-wrapper.ecosystem-card-wrapper--interactive .cubbies {
-    display: none;
   }
 
   .banner {
