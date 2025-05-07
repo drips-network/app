@@ -29,7 +29,7 @@
     Support open-source maintainers with predictable, recurring funding
   </svelte:fragment>
   <svelte:fragment slot="description">
-    Allocate revenue, stream funds, and secure your stack
+    Allocate revenue, stream funds, and secure your stack.
   </svelte:fragment>
   <svelte:fragment slot="line-items">
     <SolutionLineItem icon={TokenStreams}>

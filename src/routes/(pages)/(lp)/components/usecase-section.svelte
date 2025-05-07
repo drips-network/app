@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Splits from '$lib/components/icons/Splits.svelte';
   import FundDependenciesUsecase from './usecase-illustrations/fund-dependencies-usecase.svelte';
   import UsecaseCard from './usecase-card.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
@@ -12,13 +11,15 @@
   import StreamUsecase from './usecase-illustrations/stream-usecase.svelte';
   import EcosystemUsecase from './usecase-illustrations/ecosystem-usecase.svelte';
   import HackathonUsecase from './usecase-illustrations/hackathon-usecase.svelte';
+  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
+  import Box from '$lib/components/icons/Box.svelte';
 
   const usecaseCards: UsecaseIllustrationConfig[] = [
     {
       headline: 'Fund your dependencies',
       href: '/solutions/dependency-funding',
-      description: 'Claim your project and pay it forward to the projects that you depend on.',
-      icon: Splits,
+      description: 'Fund the critical projects you rely on by streaming funds to any GitHub repo.',
+      icon: Box,
       sparkles: [
         {
           x: '-20px',
@@ -69,7 +70,7 @@
       headline: 'Fund entire ecosystems',
       href: '/solutions/ecosystem-funding',
       description: 'Support thousands of projects and people with a single stream or donation',
-      icon: DripList,
+      icon: Ecosystem,
       sparkles: [],
       illustration: EcosystemUsecase,
       illustrationOffset: {
