@@ -1,4 +1,3 @@
-import type { HttpMethod } from '@sveltejs/kit';
 import { z, type ZodSchema } from 'zod';
 import {
   getAllResponseSchema,
@@ -9,7 +8,7 @@ import {
 import type { Ecosystem } from './schemas';
 
 async function _authenticatedCall<ST extends ZodSchema>(
-  method: HttpMethod,
+  method: 'GET' | 'POST',
   path: string,
   responseSchema: ST | undefined,
   body?: Record<string, unknown>,

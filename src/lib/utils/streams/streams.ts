@@ -70,6 +70,11 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
                       accountId
                     }
                   }
+                  ... on EcosystemMainAccount {
+                    account {
+                      accountId
+                    }
+                  }
                 }
               }
             }
