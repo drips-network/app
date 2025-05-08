@@ -82,12 +82,14 @@
     class:muted
   >
     {#if showAvatar}
-      <Avatar
-        size={currentSize}
-        bind:imgElem={avatarImgElem}
-        src={ens?.avatarUrl}
-        placeholderSrc={blockyUrl}
-      />
+      {#key ens?.avatarUrl + blockyUrl}
+        <Avatar
+          size={currentSize}
+          bind:imgElem={avatarImgElem}
+          src={ens?.avatarUrl}
+          placeholderSrc={blockyUrl}
+        />
+      {/key}
     {/if}
     {#if showIdentity}
       <div class="identity relative flex-1 min-w-0">
