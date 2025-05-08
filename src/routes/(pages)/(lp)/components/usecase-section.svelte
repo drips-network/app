@@ -101,7 +101,7 @@
         y: '0',
       },
     },
-  ];
+  ].reverse();
 
   let hoveringOverIndex = -1;
 </script>
@@ -142,6 +142,8 @@
   @media (max-width: 882px) {
     .usecases {
       gap: 0;
+      flex-direction: column;
+      align-items: center;
     }
   }
 </style>
