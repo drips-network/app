@@ -244,7 +244,7 @@
     bottom: 0;
     height: 100vh;
     background-color: var(--color-background);
-    opacity: 0.9;
+    opacity: 0;
     z-index: 50;
   }
 
