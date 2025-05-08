@@ -1,4 +1,5 @@
 <script>
+  import Coin from '$lib/components/icons/Coin.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
@@ -14,10 +15,9 @@
   <svelte:fragment slot="usecase-badge">Dependency Funding</svelte:fragment>
   <svelte:fragment slot="headline">Sustain your dependencies, sustain your project</svelte:fragment>
   <svelte:fragment slot="description">
-    Open-source software is the backbone of most projects but many of the libraries and tools we
-    rely on are critically underfunded. With Drips, you can automate funding for the software you
-    rely on, ensuring that maintainers get rewarded for their valuable work and projects remain
-    stable.
+    Open-source software is the backbone of the digital world, but many projects we rely on are
+    critically underfunded. With Drips, you can automate funding for the software you rely on,
+    ensuring that it remains stable and secure.
   </svelte:fragment>
 </SolutionHeader>
 
@@ -29,17 +29,18 @@
     Support open-source maintainers with predictable, recurring funding
   </svelte:fragment>
   <svelte:fragment slot="description">
-    Allocate revenue, stream funds, and secure your stack.
+    Drips makes it easy to fund open-source projects with predictable, recurring funding.
   </svelte:fragment>
   <svelte:fragment slot="line-items">
-    <SolutionLineItem icon={TokenStreams}>
-      Support maintainers and dependencies through recurring funding
+    <SolutionLineItem icon={Coin}>
+      Stream and split any ERC-20 token directly to any open-source GitHub repo - no ETH addresses
+      required
     </SolutionLineItem>
     <SolutionLineItem icon={DripList}>
-      Make Drip Lists with custom splits and no manual overhead
+      Create a Drip List to fund all your dependencies in one go
     </SolutionLineItem>
-    <SolutionLineItem icon={Ledger}>
-      Fund your dependencies with predictable, recurring funding
+    <SolutionLineItem icon={TokenStreams}>
+      Make one-time donations, or fund continuously with a flexible stream
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>

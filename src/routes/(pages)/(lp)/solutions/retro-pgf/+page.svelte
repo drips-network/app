@@ -15,9 +15,9 @@
   <svelte:fragment slot="usecase-badge">RetroPGF Voting & Distribution</svelte:fragment>
   <svelte:fragment slot="headline">Recognize and reward impact easily</svelte:fragment>
   <svelte:fragment slot="description">
-    Retroactive public goods funding is a great tool for rewarding impact, however it can be onerous
-    in terms of admin. Drips makes it easy to distribute RetroPGF funds efficiently, without lots of
-    manual overhead so you can focus on recognizing impact.
+    Retroactive public goods funding is a great tool for rewarding impact, but distributing funds
+    can be a headache. Drips makes it easy to distribute RetroPGF funds efficiently, without manual
+    overhead — so you can focus on recognizing impact.
   </svelte:fragment>
 </SolutionHeader>
 
