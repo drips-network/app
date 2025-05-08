@@ -17,6 +17,20 @@
       ...DripListBadge
     }
   `;
+
+  // TODO: ecosystem badge?
+  export const USER_BADGE_CELL_ECOSYSTEM_FRAGMENT = gql`
+    fragment UserBadgeCellEcosystem on EcosystemMainAccount {
+      chain
+      account {
+        accountId
+      }
+      name
+      owner {
+        address
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -27,18 +41,24 @@
   import type {
     UserBadgeCellDripListFragment,
     UserBadgeCellUserFragment,
+    UserBadgeCellEcosystemFragment,
   } from './__generated__/gql.generated';
 
-  export let userOrDripList: UserBadgeCellUserFragment | UserBadgeCellDripListFragment;
+  export let userOrDripListOrEcosystem:
+    | UserBadgeCellUserFragment
+    | UserBadgeCellDripListFragment
+    | UserBadgeCellEcosystemFragment;
 </script>
 
-{#if userOrDripList.__typename === 'DripList'}
+{#if userOrDripListOrEcosystem.__typename === 'DripList'}
   <DripListBadge
-    dripList={userOrDripList ?? undefined}
+    dripList={userOrDripListOrEcosystem ?? undefined}
     avatarSize="tiny"
     isLinked={false}
     showOwner={true}
   />
+{:else if userOrDripListOrEcosystem.__typename === 'EcosystemMainAccount'}
+  TODO
 {:else}
-  <IdentityBadge address={userOrDripList.account.address} />
+  <IdentityBadge address={userOrDripListOrEcosystem.account.address} />
 {/if}
