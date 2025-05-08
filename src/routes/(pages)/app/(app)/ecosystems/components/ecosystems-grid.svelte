@@ -5,15 +5,16 @@
   import Button from '$lib/components/button/button.svelte';
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
+  import type { EcosystemProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
 
-  export let ecosystems: LeanEcosystem[];
+  export let ecosystems: Array<[LeanEcosystem, EcosystemProfileFragment | undefined]>;
   export let big: boolean = false;
 </script>
 
 <div class="ecosystems-grid" class:ecosystems-grid--big={big}>
   {#each ecosystems.slice(-1) as ecosystem}
     <PrimaryColorThemer colorHex="#27C537">
-      <EcosystemCard {ecosystem}>
+      <EcosystemCard ecosystem={ecosystem[0]} ecosystemChainData={ecosystem[1]}>
         <svelte:fragment slot="banner">
           <AnnotationBox type="info" overlay size="small">
             We're launching ecosystems with funding from Vitalik, targeting the entire Ethereum

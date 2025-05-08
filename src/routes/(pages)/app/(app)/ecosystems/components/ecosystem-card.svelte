@@ -33,32 +33,17 @@
   import Box from '$lib/components/icons/Box.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import formatNumber from '$lib/utils/format-number';
+  import type { EcosystemProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let ecosystem: LeanEcosystem;
+  export let ecosystemChainData: EcosystemProfileFragment | undefined;
   export let isHidden: boolean = false;
 
-  const donations: number = 186_833.91;
-  const currencyFormatterShort = Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 1,
-  });
-  const currencyFormatterLong = Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-
-  $: donationsFormatted =
-    $breakpointsStore?.breakpoint === 'mobile'
-      ? currencyFormatterShort.format(donations)
-      : currencyFormatterLong.format(donations);
-
-  $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0)
+  $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
 
   function buildEcosystemUrl(ecosystem: LeanEcosystem): string {
     return `/app/ecosystems/${ecosystem.id}`;
@@ -68,10 +53,7 @@
 <!-- TODO: revise for mobile
  https://www.figma.com/design/vyI7f996JF8zwhnXwAwXdC/%F0%9F%92%A7-Drips?node-id=14154-27574&t=222o2fzNGWe88LkK-4
  -->
-<a
-  class="ecosystem-card-wrapper"
-  href={buildEcosystemUrl(ecosystem)}
->
+<a class="ecosystem-card-wrapper" href={buildEcosystemUrl(ecosystem)}>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" />
     {#if $$slots.banner}
@@ -97,7 +79,9 @@
         <!-- vitalik.eth -->
         <IdentityBadge
           disableLink
-          address="0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+          address={ecosystemChainData
+            ? ecosystemChainData.owner.address
+            : ecosystem.ownerAddress || 'TODO'}
           disableTooltip
           size="medium"
         />
@@ -109,10 +93,14 @@
             >Projects</strong
           >{projectsCountFormatted}
         </div>
-        <div>
-          <Coin style="fill: var(--color-foreground)" /><strong class="typo-text-bold">Funds</strong
-          >{donationsFormatted}
-        </div>
+        {#if ecosystemChainData}
+          <div>
+            <Coin style="fill: var(--color-foreground)" /><strong class="typo-text-bold"
+              >Funds</strong
+            >
+            <AggregateFiatEstimate amounts={ecosystemChainData?.totalEarned} />
+          </div>
+        {/if}
       </div>
     </div>
   </div>
