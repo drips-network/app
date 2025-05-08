@@ -70,7 +70,9 @@ function match<TValue extends string | number = string, TReturnValue = unknown>(
 ): TReturnValue {
   if (value in lookup) {
     const returnValue = lookup[value];
-    return typeof returnValue === 'function' ? returnValue(...args) : returnValue;
+    return typeof returnValue === 'function'
+      ? (returnValue as (...args: unknown[]) => TReturnValue)(...args)
+      : (returnValue as TReturnValue);
   }
 
   const error = new Error(
