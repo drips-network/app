@@ -55,7 +55,7 @@ export const load = async ({ fetch }) => {
       // Create a tuple with the ecosystem and its fetched details
       ecosystems.push([ecosystem, ecosystemRes.ecosystemMainAccount || undefined]);
     } else {
-      // For ecosystems without accountId, just include the ecosystem with null for the second element
+      // For ecosystems without accountId, just include the ecosystem with undefined for the second element
       ecosystems.push([ecosystem, undefined]);
     }
   }
