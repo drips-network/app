@@ -12,7 +12,7 @@
 </script>
 
 <div class="ecosystems-grid" class:ecosystems-grid--big={big}>
-  {#each ecosystems.slice(-1) as ecosystem}
+  {#each ecosystems as ecosystem}
     <PrimaryColorThemer colorHex="#27C537">
       <EcosystemCard ecosystem={ecosystem[0]} ecosystemChainData={ecosystem[1]}>
         <svelte:fragment slot="banner">
