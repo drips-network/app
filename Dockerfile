@@ -67,6 +67,11 @@ ARG PUBLIC_INTERNAL_JUNCTION_URL
 ARG OTEL_EXPORTER_OTLP_ENDPOINT
 ARG OTEL_SERVICE_NAME
 
+ARG PUBLIC_FARO_ENABLED
+ARG PUBLIC_FARO_ENVIRONMENT
+
+ARG FARO_UPLOAD_SOURCE_MAPS_KEY
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
