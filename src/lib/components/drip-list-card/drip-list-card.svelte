@@ -115,6 +115,8 @@
     type SplitsComponentSplitsReceiver,
   } from '../splits/types';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -142,6 +144,7 @@
   export let clampTitle = true;
   export let openInNewTab = false;
   export let maxSplitRows: number | undefined = undefined;
+  export let chainOverride: SupportedChain | undefined = undefined;
 
   $: dripList = data.dripList;
   $: votingRound = data.votingRound;
@@ -203,15 +206,20 @@
 
   $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
 
+  $: urlBase = chainOverride
+    ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
+    : '';
+
   $: dripListUrl = dripList
-    ? `/app/drip-lists/${dripList.account.accountId}`
+    ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
     : votingRound
-      ? `/app/drip-lists/${votingRound.id}`
+      ? `${urlBase}/app/drip-lists/${votingRound.id}`
       : undefined;
+
   $: downloadableImageUrl = dripList
-    ? `/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+    ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
     : votingRound
-      ? `/api/share-images/drip-list/${votingRound.id}.png?target=og`
+      ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
       : undefined;
 
   $: votingEnded = votingRound
@@ -325,7 +333,7 @@
                     </div>
                   {/if}
                 </div>
-                <PaddedHorizontalScroll>
+                <PaddedHorizontalScroll disableScroll={listingMode}>
                   <div
                     class="splits-component"
                     style:pointer-events={listingMode ? 'none' : undefined}
@@ -340,6 +348,7 @@
                           : undefined)}
                       groupsExpandable={!listingMode}
                       list={dripList.splits}
+                      {chainOverride}
                     />
                   </div>
                 </PaddedHorizontalScroll>

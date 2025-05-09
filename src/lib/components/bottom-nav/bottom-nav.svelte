@@ -86,6 +86,7 @@
     border-top: 1px solid var(--color-foreground);
     z-index: 100;
     padding: 0 1rem;
+    view-transition-name: bottom-nav;
   }
 
   .items {

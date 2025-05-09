@@ -14,3 +14,9 @@
 >
   <slot />
 </svg>
+
+<style>
+  svg {
+    transition: fill 0.3s;
+  }
+</style>

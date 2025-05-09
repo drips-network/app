@@ -913,7 +913,7 @@
   <image x="755.056" y="797.254" width="48" height="48" href="/assets/lp/blockie-4.png" />
   <image x="392.053" y="127.5" width="48" height="48" href="/assets/lp/ens.png" />
   <image x="859.35" y="124.78" width="48" height="48" href="/assets/lp/radworks.png" />
-  <image x="465" y="572" width="48" height="48" href="/assets/lp/octant.png" />
+  <image x="465" y="572" width="48" height="48" href="/assets/lp/octant-avatar.png" />
   <image
     x="1367.06"
     y="304.254"

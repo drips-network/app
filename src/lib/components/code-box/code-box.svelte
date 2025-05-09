@@ -13,6 +13,8 @@
   export let defaultBranch = 'main';
   export let highlight: [number | null, number | null] = [null, null];
   export let editing: boolean = false;
+  export let height: string | undefined = undefined;
+  export let width: string | undefined = undefined;
 
   let headerElem: HTMLElement | undefined;
 
@@ -48,7 +50,12 @@
     : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`;
 </script>
 
-<section class="codebox relative text-left">
+<section
+  style:height
+  style:width
+  style:overflow={height ? 'scroll' : 'hidden'}
+  class="codebox relative text-left"
+>
   <header class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">
@@ -79,7 +86,6 @@
   .codebox {
     border-radius: 1rem 0 1rem 1rem;
     box-shadow: var(--elevation-low);
-    overflow: hidden;
   }
 
   .header {
@@ -97,7 +103,7 @@
   }
 
   code {
-    white-space: pre-wrap;
+    white-space: pre;
     color: var(--color-foreground-level-6);
   }
 

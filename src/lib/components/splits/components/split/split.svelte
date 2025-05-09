@@ -19,6 +19,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import unreachable from '$lib/utils/unreachable';
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
+  import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -35,6 +36,9 @@
   export let isFirst = false;
 
   export let disableTooltip = false;
+
+  /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
+  export let chainOverride: SupportedChain | undefined = undefined;
 
   let element: HTMLDivElement;
 
@@ -98,7 +102,8 @@
           return {
             component: ProjectAvatar,
             props: {
-              project: filterCurrentChainData(s.project.chainData),
+              chainOverride,
+              project: filterCurrentChainData(s.project.chainData, undefined, chainOverride),
               outline: true,
             },
           } as ComponentAndProps;
@@ -114,11 +119,12 @@
   let groupPileElem: HTMLDivElement | undefined;
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
-  function alignGroupName() {
+  async function alignGroupName() {
+    await tick();
     groupNameOffset.set((groupPileElem?.offsetWidth ?? 0) + 8, { duration: 0 });
   }
 
-  // Align group name on mount and when splits change
+  // Align group name on mount, when splits change, and on a mutation of groupPileElem
   onMount(alignGroupName);
   $: split && alignGroupName();
 
@@ -194,7 +200,7 @@
       {:else if split.__typename === 'ProjectReceiver'}
         {@const projectReceiverChainData =
           split.__typename === 'ProjectReceiver'
-            ? filterCurrentChainData(split.project.chainData)
+            ? filterCurrentChainData(split.project.chainData, undefined, chainOverride)
             : unreachable()}
         <PrimaryColorThemer
           colorHex={isClaimed(projectReceiverChainData)
@@ -202,6 +208,7 @@
             : undefined}
         >
           <ProjectBadge
+            {chainOverride}
             tooltip={!disableTooltip}
             linkTo={disableLink ? 'nothing' : undefined}
             {linkToNewTab}

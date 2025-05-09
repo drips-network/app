@@ -139,6 +139,7 @@
   import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import network from '$lib/stores/wallet/network';
+  import { page } from '$app/stores';
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
@@ -532,21 +533,23 @@
               <div class="p-6">
                 <ProjectBadge tooltip={false} {project} />
                 <div class="pl-3.5 mt-2.5">
-                  <SplitsComponent
-                    disableLinks={false}
-                    list={[
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Maintainers',
-                        list: chainData.splits.maintainers,
-                      },
-                      {
-                        __typename: 'SplitGroup',
-                        name: 'Dependencies',
-                        list: chainData.splits.dependencies,
-                      },
-                    ]}
-                  />
+                  {#key $page.url.pathname}
+                    <SplitsComponent
+                      disableLinks={false}
+                      list={[
+                        {
+                          __typename: 'SplitGroup',
+                          name: 'Maintainers',
+                          list: chainData.splits.maintainers,
+                        },
+                        {
+                          __typename: 'SplitGroup',
+                          name: 'Dependencies',
+                          list: chainData.splits.dependencies,
+                        },
+                      ]}
+                    />
+                  {/key}
                 </div>
               </div>
             </div>

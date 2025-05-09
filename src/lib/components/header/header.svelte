@@ -146,17 +146,17 @@
       </div>
     {/if}
   </div>
-</header>
 
-{#if searchMode}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div
-    class="search-background"
-    transition:fade={{ duration: 300 }}
-    on:click={() => (searchMode = false)}
-  />
-{/if}
+  {#if searchMode}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+      class="search-background"
+      transition:fade={{ duration: 300 }}
+      on:click={() => (searchMode = false)}
+    />
+  {/if}
+</header>
 
 <style>
   header {
@@ -171,6 +171,7 @@
     justify-content: space-between;
     padding: 1rem 1.5rem;
     gap: 0.5rem;
+    view-transition-name: header;
   }
 
   .logo {

@@ -38,7 +38,11 @@
   import buildExternalUrl from '$lib/utils/build-external-url';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import { ProjectVerificationStatus, type Project } from '$lib/graphql/__generated__/base-types';
+  import {
+    ProjectVerificationStatus,
+    SupportedChain,
+    type Project,
+  } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
@@ -51,13 +55,14 @@
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
+  export let chainOverride: SupportedChain | undefined = undefined;
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
     source: { ...project.source },
     chainData: [
       {
-        chain: network.gqlName,
+        chain: chainOverride ?? network.gqlName,
         __typename: 'UnClaimedProjectData',
         verificationStatus: ProjectVerificationStatus.Unclaimed,
       },
@@ -66,7 +71,7 @@
 
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
 
-  $: chainData = filterCurrentChainData(processedProject.chainData);
+  $: chainData = filterCurrentChainData(processedProject.chainData, undefined, chainOverride);
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
@@ -87,7 +92,14 @@
         <div class="avatar-and-forge">
           {#if !forceUnclaimed && isClaimed(chainData)}
             <div>
-              <ProjectAvatar {size} project={filterCurrentChainData(unclaimedProject.chainData)} />
+              <ProjectAvatar
+                {size}
+                project={filterCurrentChainData(
+                  unclaimedProject.chainData,
+                  undefined,
+                  chainOverride,
+                )}
+              />
             </div>
           {/if}
           <div><ProjectAvatar {size} project={chainData} /></div>
