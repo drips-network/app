@@ -28,6 +28,7 @@
     "build": "npm run gql:build && npm run build:app && npm run build:telemetry"
   },
   "devDependencies": {
+    "@grafana/faro-rollup-plugin": "^0.5.1",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
     "@graphql-codegen/schema-ast": "^4.1.0",
