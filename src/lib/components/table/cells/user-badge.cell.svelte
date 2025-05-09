@@ -18,17 +18,10 @@
     }
   `;
 
-  // TODO: ecosystem badge?
   export const USER_BADGE_CELL_ECOSYSTEM_FRAGMENT = gql`
+    ${ECOSYSTEM_BADGE_FRAGMENT}
     fragment UserBadgeCellEcosystem on EcosystemMainAccount {
-      chain
-      account {
-        accountId
-      }
-      name
-      owner {
-        address
-      }
+      ...EcosystemBadge
     }
   `;
 </script>
@@ -38,6 +31,9 @@
   import DripListBadge, {
     DRIP_LIST_BADGE_FRAGMENT,
   } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import EcosystemBadge, {
+    ECOSYSTEM_BADGE_FRAGMENT,
+  } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
   import type {
     UserBadgeCellDripListFragment,
     UserBadgeCellUserFragment,
@@ -58,7 +54,12 @@
     showOwner={true}
   />
 {:else if userOrDripListOrEcosystem.__typename === 'EcosystemMainAccount'}
-  TODO
+  <EcosystemBadge
+    ecosystem={userOrDripListOrEcosystem ?? undefined}
+    avatarSize="tiny"
+    isLinked={false}
+    showOwner={true}
+  />
 {:else}
   <IdentityBadge address={userOrDripListOrEcosystem.account.address} />
 {/if}
