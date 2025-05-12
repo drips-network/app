@@ -112,7 +112,7 @@
     "jimp": "^0.22.12",
     "lodash": "^4.17.21",
     "mdsvex": "^0.11.2",
-    "meilisearch": "^0.47.0",
+    "meilisearch": "^0.50.0",
     "puppeteer": "^23.6.0",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
