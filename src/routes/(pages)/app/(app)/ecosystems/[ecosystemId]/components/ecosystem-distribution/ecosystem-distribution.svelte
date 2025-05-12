@@ -23,11 +23,15 @@
   const tableData: DistributionTableRow[] = ecosystem.graph.nodes
     .sort((a, b) => b.absoluteWeight - a.absoluteWeight)
     .slice(0, ROW_COUNT)
-    .map((node) => {
+    .reduce((memo, node) => {
+      if (node.repoName === 'root') {
+        return memo;
+      }
+
       const dependencies = ecosystem.graph.edges.filter(
         (edge) => edge.source === node.projectAccountId,
       );
-      return {
+      memo.push({
         projectProps: {
           repoOwner: node.repoOwner,
           repoName: node.repoName,
@@ -38,8 +42,10 @@
         dependenciesProps: {
           numDependencies: dependencies.length,
         },
-      };
-    });
+      });
+
+      return memo;
+    }, [] as DistributionTableRow[]);
 
   const tableColumns: ColumnDef<DistributionTableRow>[] = [
     {
