@@ -52,9 +52,7 @@
   <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
     <span>
       {#if username}
-        <span class="text-foreground-level-5">{username}/</span>
-      {/if}
-      {#if !ecosystem}
+        <span class="text-foreground-level-5">{username}/</span>{/if}{#if !ecosystem}
         <span class="animate-pulse">...</span>
       {:else if showName}
         {ecosystem.name}

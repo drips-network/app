@@ -45,6 +45,23 @@
           amount
         }
       }
+      ... on EcosystemSupport {
+        date
+        weight
+        totalSplit {
+          tokenAddress
+          amount
+        }
+        ecosystemMainAccount {
+          name
+          owner {
+            address
+          }
+          account {
+            accountId
+          }
+        }
+      }
       ... on StreamSupport {
         stream {
           ...StreamStateStream
@@ -101,6 +118,7 @@
   import { fade } from 'svelte/transition';
   import AddUnknownTokenButton from './components/add-unknown-token-button.svelte';
   import Section from '../section/section.svelte';
+  import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
 
@@ -299,7 +317,27 @@
             </svelte:fragment>
           </SupportItem>
         {/if}
-        <!-- TODO: also ecosystem support -->
+        {#if item.__typename === 'EcosystemSupport'}
+          <SupportItem
+            href="/app/ecosystems/{item.ecosystemMainAccount.account.accountId}"
+            title={{
+              component: EcosystemBadge,
+              props: {
+                isLinked: false,
+                avatarSize: 'tiny',
+                ecosystem: item.ecosystemMainAccount,
+              },
+            }}
+            subtitle={formatDate(item.date)}
+          >
+            <svelte:fragment slot="amount-value">
+              <AggregateFiatEstimate amounts={item.totalSplit} />
+            </svelte:fragment>
+            <svelte:fragment slot="amount-sub">
+              Splits {getSplitPercent(item.weight, 'pretty')} of funds
+            </svelte:fragment>
+          </SupportItem>
+        {/if}
       {/each}
     </div>
   </Section>
