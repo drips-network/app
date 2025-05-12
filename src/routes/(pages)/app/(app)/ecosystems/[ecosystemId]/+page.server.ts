@@ -1,21 +1,18 @@
 import type { PageServerLoad } from './$types';
 import * as ecosystemsApi from '$lib/utils/ecosystems';
-import { error } from '@sveltejs/kit';
 import { fetchEcosystem } from './fetch-ecosystem';
 
 export const load = (async ({ params, fetch }) => {
   const ecosystem = await ecosystemsApi.get(params.ecosystemId, fetch);
-  let ecosystemFragment = undefined;
+  // no problem if no chain data, display the undeployed ecosystem
+  let ecosystemChainData = undefined;
   if (ecosystem.accountId) {
     const ecosystemRes = await fetchEcosystem(ecosystem.accountId, fetch);
-    ecosystemFragment = ecosystemRes.ecosystemMainAccount;
-    if (!ecosystemFragment) {
-      throw error(404);
-    }
+    ecosystemChainData = ecosystemRes.ecosystemMainAccount || undefined;
   }
 
   return {
     ecosystem,
-    ecosystemFragment,
+    ecosystemChainData,
   };
 }) satisfies PageServerLoad;

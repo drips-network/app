@@ -5,4 +5,4 @@
   export let data: PageData;
 </script>
 
-<EcosytemProfile ecosystem={data.ecosystem} ecosystemFragment={data.ecosystemFragment} />
+<EcosytemProfile ecosystem={data.ecosystem} ecosystemFragment={data.ecosystemChainData} />
