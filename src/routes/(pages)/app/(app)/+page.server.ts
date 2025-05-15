@@ -92,6 +92,13 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
         ],
       }),
   },
+  300: {
+    variant: 'default',
+    loadFn: (f) =>
+      loadDefaultExplorePageData(f, {
+        featuredDripListIds: [],
+      }),
+  },
 } as const;
 
 export const load = async ({ fetch }) => {
