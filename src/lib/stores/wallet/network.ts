@@ -515,7 +515,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'ZkSync Era Sepolia',
     token: 'ETH',
     id: '0x12c',
-    rpcUrl: 'https://sepolia.era.zksync.dev',
+    rpcUrl: junctionUrl('zksync-era-sepolia'),
     icon: ZkSync,
     color: '#4E529A',
     isTestnet: true,
