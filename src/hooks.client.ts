@@ -1,22 +1,27 @@
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
-import {
-  browserProfilingIntegration,
-  handleErrorWithSentry,
-  replayIntegration,
-} from '@sentry/sveltekit';
-import * as Sentry from '@sentry/sveltekit';
+import { getWebInstrumentations, initializeFaro } from '@grafana/faro-web-sdk';
+import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
-const dsn = getOptionalEnvVar('PUBLIC_SENTRY_DSN', false, null);
+export const init = () => {
+  const FARO_ENABLED = getOptionalEnvVar('PUBLIC_FARO_ENABLED', false, null);
+  const FARO_ENVIRONMENT = getOptionalEnvVar('PUBLIC_FARO_ENVIRONMENT', false, null);
 
-if (dsn) {
-  Sentry.init({
-    dsn,
-    tracesSampleRate: 0.1,
-    profilesSampleRate: 0.1,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-    integrations: [replayIntegration(), browserProfilingIntegration()],
-  });
-}
+  if (FARO_ENABLED === 'true' && FARO_ENVIRONMENT) {
+    initializeFaro({
+      url: 'https://faro-collector-prod-eu-west-2.grafana.net/collect/0a4519657ebc92ca47d9271be5503b63',
+      app: {
+        name: 'app',
+        version: '1.0.0',
+        environment: FARO_ENVIRONMENT,
+      },
 
-export const handleError = handleErrorWithSentry();
+      instrumentations: [
+        // Mandatory, omits default instrumentations otherwise.
+        ...getWebInstrumentations(),
+
+        // Tracing package to get end-to-end visibility for HTTP requests.
+        new TracingInstrumentation(),
+      ],
+    });
+  }
+};

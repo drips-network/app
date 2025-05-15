@@ -11,6 +11,8 @@ import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
 import type { ComponentType } from 'svelte';
 import ZkSync from '$lib/components/icons/networks/ZkSync.svelte';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import { browser } from '$app/environment';
 
 export const SUPPORTED_CHAIN_IDS = [
   1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10, 300,
@@ -30,7 +32,6 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
-  fallbackRpcUrl?: string;
   icon: ComponentType;
   color: string;
   isTestnet: boolean;
@@ -76,6 +77,7 @@ export type Network = {
         rpcUrls: string[];
       }
     | undefined;
+  enableEns: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -85,6 +87,13 @@ const etherscanLinkTemplate = (txHash: string, networkName: string) =>
     ? `https://etherscan.io/tx/${txHash}`
     : `https://${networkName}.etherscan.io/tx/${txHash}`;
 
+const PUBLIC_JUNCTION_URL = getOptionalEnvVar('PUBLIC_JUNCTION_URL', true, null);
+const INTERNAL_JUNCTION_URL = getOptionalEnvVar('PUBLIC_INTERNAL_JUNCTION_URL', true, null);
+
+function junctionUrl(networkName: string) {
+  return (browser ? PUBLIC_JUNCTION_URL : INTERNAL_JUNCTION_URL) + `/${networkName}`;
+}
+
 export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
   [1]: {
     chainId: 1,
@@ -92,8 +101,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Ethereum',
     token: 'ETH',
     id: '0x1',
-    rpcUrl: `${BASE_URL}/api/rpc/alchemy/mainnet`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/infura/mainnet`,
+    rpcUrl: junctionUrl('mainnet'),
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: false,
@@ -127,6 +135,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [80002]: {
     chainId: 80002,
@@ -135,7 +144,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'MATIC',
     id: '0x13882',
     rpcUrl: `${BASE_URL}/api/rpc/infura/polygon-amoy`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/polygon-amoy`,
     icon: Polygon,
     color: '#627EEA',
     isTestnet: true,
@@ -169,6 +177,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [11155420]: {
     chainId: 11155420,
@@ -177,7 +186,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'ETH',
     id: '0xaa37dc',
     rpcUrl: `${BASE_URL}/api/rpc/infura/optimism-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/optimism-sepolia`,
     icon: Optimism,
     color: '#627EEA',
     isTestnet: true,
@@ -211,6 +219,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -218,8 +227,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Sepolia',
     token: 'ETH',
     id: '0xaa36a7',
-    rpcUrl: `${BASE_URL}/api/rpc/alchemy/sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/infura/sepolia`,
+    rpcUrl: junctionUrl('sepolia'),
     icon: Ethereum,
     color: '#627EEA',
     isTestnet: true,
@@ -253,6 +261,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: false,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [31337]: {
     chainId: 31337,
@@ -302,6 +311,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['http://localhost:8545'],
     },
+    enableEns: false,
   },
   [84532]: {
     chainId: 84532,
@@ -310,7 +320,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     token: 'ETH',
     id: '0x14a34',
     rpcUrl: `${BASE_URL}/api/rpc/infura/base-sepolia`,
-    fallbackRpcUrl: `${BASE_URL}/api/rpc/alchemy/base-sepolia`,
     icon: Base,
     color: '#627EEA',
     isTestnet: true,
@@ -344,6 +353,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gelatoRelayAvailable: true,
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
+    enableEns: true,
   },
   [314]: {
     chainId: 314,
@@ -351,7 +361,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Filecoin',
     token: 'FIL',
     id: '0x13a',
-    rpcUrl: `${BASE_URL}/api/rpc/glif/filecoin-mainnet`,
+    rpcUrl: junctionUrl('filecoin'),
     icon: Filecoin,
     color: '#0090FF',
     isTestnet: false,
@@ -397,6 +407,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'https://rpc.ankr.com/filecoin',
       ],
     },
+    enableEns: true,
   },
   [1088]: {
     chainId: 1088,
@@ -404,7 +415,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'Metis',
     token: 'METIS',
     id: '0x440',
-    rpcUrl: 'https://andromeda.metis.io/?owner=1088',
+    rpcUrl: junctionUrl('metis'),
     icon: Metis,
     color: '#00D2FF',
     isTestnet: false,
@@ -446,6 +457,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
     },
+    enableEns: true,
   },
   [10]: {
     chainId: 10,
@@ -453,7 +465,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     label: 'OP Mainnet',
     token: 'ETH',
     id: '0xa',
-    rpcUrl: 'https://mainnet.optimism.io/',
+    rpcUrl: junctionUrl('optimism'),
     icon: Optimism,
     color: '#FF0420',
     isTestnet: false,
@@ -495,6 +507,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['https://mainnet.optimism.io'],
     },
+    enableEns: true,
   },
   [300]: {
     chainId: 300,
@@ -544,6 +557,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
       rpcUrls: ['https://sepolia.era.zksync.dev'],
     },
+    enableEns: true,
   },
 };
 

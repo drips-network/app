@@ -9,8 +9,8 @@ import network from '$lib/stores/wallet/network';
 
 const fetchedDataCache = makeFetchedDataCache<UserQuery>('app-layout:user');
 
-export const load = async ({ url: { pathname }, fetch, depends }) => {
-  if (!browser) return { pathname, user: null };
+export const load = async ({ fetch, depends }) => {
+  if (!browser) return { user: null };
 
   const connectedAddress = getConnectedAddress();
 
@@ -34,8 +34,8 @@ export const load = async ({ url: { pathname }, fetch, depends }) => {
 
     fetchedDataCache.write(user);
 
-    return { user: user.userByAddress, pathname };
+    return { user: user.userByAddress };
   }
 
-  return { pathname, user: null };
+  return { user: null };
 };

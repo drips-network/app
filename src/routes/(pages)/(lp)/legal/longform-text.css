@@ -1,0 +1,27 @@
+.legal-page .content h1 {
+  margin-bottom: 2rem;
+}
+
+.legal-page .content h2,
+.legal-page .content h3 {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.legal-page .content h4 {
+  margin-bottom: 1rem;
+}
+
+.legal-page .content p,
+.legal-page .content ol {
+  margin-bottom: 1rem;
+}
+
+.legal-page .content ol li {
+  list-style: initial;
+  margin-left: 1rem;
+}
+
+.legal-page .content a {
+  text-decoration: underline;
+}

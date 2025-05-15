@@ -27,7 +27,7 @@
     >
   </div>
 {:else if !supportMenuOpen}
-  <div out:fade|global={transitions ? { duration: 300 } : { duration: 0 }} class="button-container">
+  <div out:fade={transitions ? { duration: 300 } : { duration: 0 }} class="button-container">
     <Button
       variant="primary"
       on:click={() => {
@@ -39,7 +39,7 @@
   </div>
 {:else}
   <div
-    in:fade|global={transitions ? { duration: 300, delay: 300 } : { duration: 0 }}
+    in:fade={transitions ? { duration: 300, delay: 300 } : { duration: 0 }}
     class="button-container"
   >
     {#if type === 'dripList'}

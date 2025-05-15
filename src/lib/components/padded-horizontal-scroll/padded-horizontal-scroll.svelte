@@ -1,4 +1,8 @@
-<div class="wrapper">
+<script lang="ts">
+  export let disableScroll = false;
+</script>
+
+<div class="wrapper" class:disable-scroll={disableScroll}>
   <div class="inner">
     <div class="content">
       <slot />
@@ -15,8 +19,12 @@
     position: relative;
   }
 
-  .inner {
+  .wrapper .inner {
     overflow: scroll;
+  }
+
+  .wrapper.disable-scroll .inner {
+    overflow: hidden;
   }
 
   .content {

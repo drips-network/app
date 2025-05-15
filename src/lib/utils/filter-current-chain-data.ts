@@ -18,15 +18,18 @@ export default function filterCurrentChainData<
 >(
   items: T[],
   expectedProjectStatus?: CT,
+  chainOverride?: SupportedChain,
 ): CT extends 'claimed'
   ? T & { __typename: 'ClaimedProjectData' }
   : CT extends 'unclaimed'
     ? T & { __typename: 'UnClaimedProjectData' }
     : T {
-  const filteredItems = items.filter((item) => item.chain === network.gqlName);
+  const expectedChain = chainOverride ?? network.gqlName;
+
+  const filteredItems = items.filter((item) => item.chain === expectedChain);
   const item = filteredItems[0];
 
-  assert(item, 'Expected project data for current chain');
+  assert(item, `Expected project data for chain ${expectedChain}, ${JSON.stringify(items[0])}`);
 
   if (expectedProjectStatus) {
     assert(isProjectData(item), 'Expected project data');

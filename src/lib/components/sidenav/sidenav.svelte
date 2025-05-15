@@ -75,6 +75,7 @@
     gap: 1rem;
     justify-content: space-between;
     height: 100%;
+    view-transition-name: sidenav;
   }
 
   .block {
