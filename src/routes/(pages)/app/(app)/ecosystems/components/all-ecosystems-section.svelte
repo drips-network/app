@@ -1,10 +1,10 @@
 <script lang="ts">
   import Section from '$lib/components/section/section.svelte';
   import EcosystemsGrid from './ecosystems-grid.svelte';
-  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
+  import type { EcosystemsListItem } from '$lib/utils/ecosystems/schemas';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystems: Array<[LeanEcosystem, EcosystemCardFragment | undefined]>;
+  export let ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
 
   let error = false;
 

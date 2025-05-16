@@ -5,7 +5,7 @@ import {
   createResponseSchema,
   deployResponseSchema,
 } from './schemas';
-import type { Ecosystem } from './schemas';
+import type { NewEcosystem } from './schemas';
 
 async function _authenticatedCall<ST extends ZodSchema>(
   method: 'GET' | 'POST',
@@ -45,7 +45,7 @@ export function get(id: string, fetch: typeof global.fetch) {
   return _authenticatedCall('GET', `/${id}`, getResponseSchema, undefined, fetch);
 }
 
-export function create(ecosystem: Ecosystem) {
+export function create(ecosystem: NewEcosystem) {
   return _authenticatedCall('POST', '', createResponseSchema, ecosystem);
 }
 

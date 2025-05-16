@@ -3,11 +3,11 @@
   import EcosystemCard from './ecosystem-card.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
+  import type { EcosystemsListItem } from '$lib/utils/ecosystems/schemas';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystems: Array<[LeanEcosystem, EcosystemCardFragment | undefined]>;
+  export let ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
   export let big: boolean = false;
 
   const annotation =

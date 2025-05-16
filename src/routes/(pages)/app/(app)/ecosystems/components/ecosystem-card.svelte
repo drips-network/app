@@ -18,20 +18,20 @@
   import Box from '$lib/components/icons/Box.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
-  import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
+  import type { EcosystemsListItem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import formatNumber from '$lib/utils/format-number';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { gql } from 'graphql-request';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystem: LeanEcosystem;
+  export let ecosystem: EcosystemsListItem;
   export let ecosystemChainData: EcosystemCardFragment | undefined;
   export let isHidden: boolean = false;
 
   $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
 
-  function buildEcosystemUrl(ecosystem: LeanEcosystem): string {
+  function buildEcosystemUrl(ecosystem: EcosystemsListItem): string {
     return `/app/ecosystems/${ecosystem.id}`;
   }
 </script>
