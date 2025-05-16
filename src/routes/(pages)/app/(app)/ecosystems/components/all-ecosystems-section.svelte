@@ -2,9 +2,9 @@
   import Section from '$lib/components/section/section.svelte';
   import EcosystemsGrid from './ecosystems-grid.svelte';
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
-  import type { EcosystemProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
+  import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystems: Array<[LeanEcosystem, EcosystemProfileFragment | undefined]>;
+  export let ecosystems: Array<[LeanEcosystem, EcosystemCardFragment | undefined]>;
 
   let error = false;
 

@@ -1,32 +1,17 @@
 <script lang="ts" context="module">
-  // export const PROJECT_CARD_FRAGMENT = gql`
-  //   ${PROJECT_AVATAR_FRAGMENT}
-  //   ${PROJECT_NAME_FRAGMENT}
-  //   fragment ProjectCard on Project {
-  //     ...ProjectName
-  //     isVisible
-  //     source {
-  //       forge
-  //       ownerName
-  //       repoName
-  //     }
-  //     chainData {
-  //       ... on ClaimedProjectData {
-  //         chain
-  //         owner {
-  //           accountId
-  //         }
-  //       }
-  //       ... on UnClaimedProjectData {
-  //         chain
-  //         owner {
-  //           accountId
-  //         }
-  //       }
-  //       ...ProjectAvatar
-  //     }
-  //   }
-  // `;
+  export const ECOSYTEM_CARD_FRAGMENT = gql`
+    fragment EcosystemCard on EcosystemMainAccount {
+      name
+      description
+      owner {
+        address
+      }
+      totalEarned {
+        tokenAddress
+        amount
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -36,11 +21,12 @@
   import type { LeanEcosystem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import formatNumber from '$lib/utils/format-number';
-  import type { EcosystemProfileFragment } from '../[ecosystemId]/components/__generated__/gql.generated';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import { gql } from 'graphql-request';
+  import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
   export let ecosystem: LeanEcosystem;
-  export let ecosystemChainData: EcosystemProfileFragment | undefined;
+  export let ecosystemChainData: EcosystemCardFragment | undefined;
   export let isHidden: boolean = false;
 
   $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
@@ -85,7 +71,6 @@
           disableTooltip
           size="medium"
         />
-        <span>with <span>Drips AI</span></span>
       </div>
       <div class="cubbies">
         <div>
