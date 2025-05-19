@@ -14,7 +14,7 @@ const nodeSchema = z.object({
   projectAccountId: z.string().nullable(),
   repoOwner: z.string(),
   repoName: z.string(),
-  absoluteWeight: z.number().positive(),
+  absoluteWeight: z.number().positive().or(z.literal(0)),
 });
 
 const newNodeScehma = z.object({
@@ -53,6 +53,8 @@ export const ecosystemSchema = z.object({
 export const ecosystemsListItemSchema = ecosystemSchema
   .omit({
     graph: true,
+    // TODO: should be here
+    color: true,
   })
   .extend({
     nodeCount: z.number().nullable(),
