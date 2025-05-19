@@ -67,7 +67,7 @@
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import EcosystemProfileHeader from './ecosystem-profile-header.svelte';
-  import EcosystemCardInteractive from './ecosystem-card-interactive.svelte';
+  import EcosystemCardInteractive from './ecosystem-graph-card.svelte';
   import EcosystemMetadata from './ecosystem-metadata.svelte';
   import EcosystemDistribution from './ecosystem-distribution/ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';

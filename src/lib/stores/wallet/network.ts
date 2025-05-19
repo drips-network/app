@@ -78,6 +78,7 @@ export type Network = {
       }
     | undefined;
   enableEns: boolean;
+  ecosystems: boolean;
 };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
@@ -136,6 +137,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    ecosystems: false,
   },
   [80002]: {
     chainId: 80002,
@@ -178,6 +180,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    ecosystems: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -220,6 +223,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    ecosystems: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -262,6 +266,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    ecosystems: false,
   },
   [31337]: {
     chainId: 31337,
@@ -312,6 +317,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['http://localhost:8545'],
     },
     enableEns: false,
+    ecosystems: true,
   },
   [84532]: {
     chainId: 84532,
@@ -354,6 +360,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    ecosystems: false,
   },
   [314]: {
     chainId: 314,
@@ -408,6 +415,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       ],
     },
     enableEns: true,
+    ecosystems: false,
   },
   [1088]: {
     chainId: 1088,
@@ -458,6 +466,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
     },
     enableEns: true,
+    ecosystems: false,
   },
   [10]: {
     chainId: 10,
@@ -508,6 +517,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://mainnet.optimism.io'],
     },
     enableEns: true,
+    ecosystems: true,
   },
 };
 
