@@ -1,7 +1,7 @@
 ---
 title: 'From Application to Amplification: Drips Unveils End-to-End RetroPGF Rounds'
 date: '2025-05-21' # Please update if the publishing date changes
-coverImage: '/assets/blog-images/placeholder.png'
+coverImage: '/assets/blog-images/rpgf/rpgf-cover.png'
 coverImageAlt: 'Diagram illustrating the complete RetroPGF round lifecycle managed on Drips' # Suggested placeholder
 excerpt: 'Coming soon: a full suite of tools to run RetroPGF rounds on Drips, from application intake and voting to direct-to-GitHub distribution and amplified impact through Drip Lists.'
 author: 'jason'
