@@ -81,7 +81,6 @@
         link = `/app/drip-lists/${dripList.account.accountId}`;
         break;
       case !!ecosystem:
-        // TODO: not a link to an ecosystem
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
         break;
     }
