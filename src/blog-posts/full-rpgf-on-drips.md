@@ -36,7 +36,7 @@ Attracting the right applicants is crucial. We're making the application process
 
 - **Key Features:**
   - Fully customizable application forms, including private fields for admin use.
-  - Projects can easily apply by selecting their existing Drips-claimed projects.
+  - Projects can easily apply by selecting an existing project claimed on Drips.
   - All applications are attested on-chain, ensuring transparency and security.
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-application-form.png)
