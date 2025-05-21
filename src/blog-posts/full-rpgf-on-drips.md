@@ -87,7 +87,7 @@ This new end-to-end RPGF tooling is built on the core Drips philosophy: **fundin
 
 # Coming Soon: Revolutionize Your RetroPGF Rounds
 
-We are incredibly excited to bring this comprehensive suite of RPGF tools to the Drips platform soon. Our goal is to provide the community with a powerful, user-friendly solution that not only streamlines round management but also helps maximize the positive impact of every dollar distributed.
+We are incredibly excited to bring this comprehensive suite of RPGF tools to the Drips platform soon. Our goal is to provide the community with a powerful, user-friendly solution that not only streamlines round management but also helps maximize the positive impact of all value distributed.
 
 **Interested in learning more or being among the first to use these new features for your RetroPGF round?**
 
