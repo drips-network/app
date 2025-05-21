@@ -53,8 +53,6 @@ export const ecosystemSchema = z.object({
 export const ecosystemsListItemSchema = ecosystemSchema
   .omit({
     graph: true,
-    // TODO: should be here
-    color: true,
   })
   .extend({
     nodeCount: z.number().nullable(),

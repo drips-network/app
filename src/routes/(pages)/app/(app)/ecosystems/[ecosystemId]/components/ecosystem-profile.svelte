@@ -5,6 +5,7 @@
     ${STREAM_STATE_STREAM_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment EcosystemProfile on EcosystemMainAccount {
+      chain
       account {
         accountId
         driver
@@ -19,6 +20,12 @@
       totalEarned {
         tokenAddress
         amount
+      }
+      color
+      avatar {
+        ... on EmojiAvatar {
+          emoji
+        }
       }
       support {
         ... on OneTimeDonationSupport {
@@ -86,7 +93,7 @@
   $: ecosystemSupport = ecosystemFragment?.support || [];
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
-  const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id as string)}.png`;
+  const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id)}.png`;
 
   // all nodes except the root node
   $: recipientsFormatted = formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0);
@@ -107,7 +114,7 @@
   <article class="ecosystem-profile">
     <header class="header card">
       <div>
-        <EcosystemProfileHeader {ecosystem} />
+        <EcosystemProfileHeader {ecosystem} ecosystemChainData={ecosystemFragment} />
       </div>
 
       <div class="stats">

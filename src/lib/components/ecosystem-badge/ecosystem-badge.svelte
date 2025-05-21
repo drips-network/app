@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   export const ECOSYSTEM_BADGE_FRAGMENT = gql`
+    ${ECOSYSTEM_AVATAR_FRAGMENT}
     fragment EcosystemBadge on EcosystemMainAccount {
       chain
       account {
@@ -9,6 +10,7 @@
       owner {
         address
       }
+      ...EcosystemAvatar
     }
   `;
 </script>
@@ -18,7 +20,9 @@
   import formatAddress from '$lib/utils/format-address';
   import { gql } from 'graphql-request';
   import type { EcosystemBadgeFragment } from './__generated__/gql.generated';
-  import EcosystemAvatar from '../ecosystem-avatar/ecosystem-avatar.svelte';
+  import EcosystemAvatar, {
+    ECOSYSTEM_AVATAR_FRAGMENT,
+  } from '../ecosystem-avatar/ecosystem-avatar.svelte';
 
   export let ecosystem: EcosystemBadgeFragment | undefined;
 
@@ -47,7 +51,7 @@
   class:disabled
 >
   {#if showAvatar}
-    <EcosystemAvatar size={avatarSize} {disabled} {outline} />
+    <EcosystemAvatar size={avatarSize} {ecosystem} {disabled} {outline} />
   {/if}
   <div class="name typo-text text-foreground flex-1 min-w-0 truncate">
     <span>
