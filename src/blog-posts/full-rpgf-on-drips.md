@@ -8,17 +8,17 @@ author: 'jason'
 announcementBannerCopy: 'Coming Soon: Run your entire RetroPGF round on Drips, from start to finish'
 ---
 
-# Taking RetroPGF to the Next Level: A Seamless, End-to-End Solution
+# Taking RetroPGF to the next level: A seamless, end-to-end solution
 
-Retroactive Public Goods Funding (RPGF) is a powerful mechanism to reward impactful work and foster thriving ecosystems. At Drips, we believe the process of running RPGF rounds should be as efficient and impactful as the outcomes they aim to achieve. While Drips has supported basic voting via Collaborative Drip Lists, we've heard the need for a more comprehensive solution.
+Retroactive Public Goods Funding (RPGF) is a powerful mechanism to reward impactful work and foster thriving ecosystems. At Drips, we believe the process of running RPGF rounds should be as efficient and impactful as the outcomes they aim to achieve. While Drips has supported basic voting via Collaborative Drip Lists, we've recognized the need for a more comprehensive solution.
 
 Today, we're thrilled to give you a first look at our **upcoming end-to-end functionality for running RetroPGF rounds, entirely on Drips.** This new suite of tools will empower organizers to manage every stage of their RPGF program seamlessly – from initial setup to final distribution, all while leveraging Drips' unique ability to amplify funding throughout the ecosystem.
 
-# Your RPGF Round, Streamlined: Milestones Made Easy
+# Your RPGF round, streamlined: milestones made easy
 
 We're building a comprehensive toolkit designed to simplify the complexities of RPGF rounds, allowing you to focus on what truly matters: identifying and rewarding valuable contributions. Here’s how Drips will support each key milestone:
 
-## 1. Configuring and Publishing Your Round
+## 1. Configuring and publishing your round
 
 First impressions matter. Drips will enable you to set up and launch your round with a **beautiful, shareable, and public round profile.** This profile acts as the central hub for your RPGF program, displaying all information and real-time updates.
 
@@ -30,7 +30,7 @@ First impressions matter. Drips will enable you to set up and launch your round 
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-home.png)
 
-## 2. Application Intake: Simplified and Secure
+## 2. Application intake: simplified and secure
 
 Attracting the right applicants is crucial. We're making the application process smooth for projects and highly customizable for round administrators.
 
@@ -41,7 +41,7 @@ Attracting the right applicants is crucial. We're making the application process
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-application-form.png)
 
-## 3. Application Review: Efficient and Transparent
+## 3. Application review: Efficient and transparent
 
 Managing a high volume of applications can be daunting. Drips will provide intuitive tools for admins to review submissions efficiently.
 
@@ -51,7 +51,7 @@ Managing a high volume of applications can be daunting. Drips will provide intui
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-applications.png)
 
-## 4. Voting: Empowering Badgeholders
+## 4. Voting: Empowering badgeholders
 
 The heart of any RPGF round is the voting process. We're designing an **easy-to-use voting UI** tailored for RPGF Badgeholders to cast their ballots confidently and conveniently.
 
@@ -62,7 +62,7 @@ The heart of any RPGF round is the voting process. We're designing an **easy-to-
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-voting.png)
 
-## 5. Results: Clear, Comprehensive Insights
+## 5. Results: clear, comprehensive insights
 
 Transparency in results is key to building trust. Once voting closes, admins will have full access to the data.
 
@@ -70,7 +70,7 @@ Transparency in results is key to building trust. Once voting closes, admins wil
   - View and download the full raw data of the vote as CSVs.
   - Access all individual ballots and overall vote totals per application.
 
-## 6. Distribution: Direct, Hassle-Free, and Amplified
+## 6. Distribution: Direct, hassle-Free, and amplified
 
 The final step is getting funds to the deserving projects. Drips makes this uniquely efficient and impactful.
 
@@ -79,13 +79,13 @@ The final step is getting funds to the deserving projects. Drips makes this uniq
   - **Distribute funds directly to GitHub repositories** associated with the projects – no more manually collecting and verifying countless ETH addresses.
   - Projects claim their funds on Drips and can immediately choose to **forward a percentage to other projects they depend on**, amplifying the impact of your funding round throughout the ecosystem. This is the Drips difference!
 
-# Amplify Your Impact: The Drips Ecosystem Advantage
+# Amplify your impact: The Drips ecosystem advantage
 
 This new end-to-end RPGF tooling is built on the core Drips philosophy: **funding is a catalyst, not just an endpoint.** By enabling distributions directly to projects on Drips, recipients can effortlessly share a portion of their funding with their own dependencies. This creates a virtuous cycle, ensuring that support flows deeper into the ecosystem, strengthening the often-unsung foundations that all projects rely on.
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-splitting-graph.png)
 
-# Coming Soon: Revolutionize Your RetroPGF Rounds
+# Coming soon: Revolutionize your RetroPGF rounds
 
 We are incredibly excited to bring this comprehensive suite of RPGF tools to the Drips platform soon. Our goal is to provide the community with a powerful, user-friendly solution that not only streamlines round management but also helps maximize the positive impact of all value distributed.
 
