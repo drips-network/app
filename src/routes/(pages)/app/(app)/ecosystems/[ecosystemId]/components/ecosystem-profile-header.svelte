@@ -1,10 +1,33 @@
+<script lang="ts" context="module">
+  export const PROJECT_PROFILE_HEADER_FRAGMENT = gql`
+    ${ECOSYSTEM_BADGE_FRAGMENT}
+    ${ECOSYSTEM_AVATAR_FRAGMENT}
+    fragment EcosystemProfileHeader on EcosystemMainAccount {
+      ...EcosystemBadge
+      ...EcosystemAvatar
+      name
+      description
+      owner {
+        accountId
+        address
+      }
+    }
+  `;
+</script>
+
 <script lang="ts">
   import twemoji from '$lib/utils/twemoji';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  import EcosystemAvatar from './ecosystem-avatar.svelte';
+  import EcosystemAvatar, {
+    ECOSYSTEM_AVATAR_FRAGMENT,
+  } from '$lib/components/ecosystem-avatar/ecosystem-avatar.svelte';
+  import { ECOSYSTEM_BADGE_FRAGMENT } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
+  import { gql } from 'graphql-request';
+  import type { EcosystemProfileHeaderFragment } from './__generated__/gql.generated';
 
   export let ecosystem: Ecosystem;
+  export let ecosystemChainData: EcosystemProfileHeaderFragment | undefined;
 </script>
 
 <div
@@ -14,7 +37,7 @@
     class="max-w-full flex-1 min-w-0 flex flex-col gap-2 items-center sm:flex-row sm:gap-8 sm:items-center"
   >
     <div class="avatar">
-      <EcosystemAvatar {ecosystem} size="huge" />
+      <EcosystemAvatar ecosystem={ecosystemChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{ecosystem.name}</h1>
