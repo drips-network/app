@@ -20,6 +20,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import { rpgfJwtStore } from '$lib/utils/rpgf/siwe';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -105,7 +106,7 @@ const walletStore = () => {
    * Initialize the store and restore any previously-connected,
    * cached connection.
    */
-  async function initialize(): Promise<void> {
+  async function initialize(): Promise<WalletStoreState | undefined> {
     if (!browser) return;
 
     const isSafeApp = isRunningInSafe();
@@ -125,8 +126,9 @@ const walletStore = () => {
         await connect(true, isSafeApp, { autoSelect: { label, disableModals: true } });
       }
     }
-
+    
     initialized.set(true);
+    return get(state);
   }
 
   /**
@@ -138,7 +140,7 @@ const walletStore = () => {
     initializing = false,
     isSafeApp = false,
     onboardOptions?: Parameters<typeof onboard.connectWallet>[0],
-  ): Promise<void> {
+  ): Promise<WalletStoreState | undefined> {
     if (!browser) throw new Error('Can only connect client-side');
 
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
@@ -253,6 +255,7 @@ const walletStore = () => {
     }
 
     await _setConnectedState(provider, safeInfo);
+    return get(state);
   }
 
   /**
@@ -293,6 +296,12 @@ const walletStore = () => {
   function _clear() {
     lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
+
+    // Ugly to have this cross-dependency between models, but we need to somehow clear
+    // the RPGF JWT when the wallet is disconnected.
+    rpgfJwtStore.set(null);
+
+    invalidateAll();
   }
 
   function _attachListeners(provider: EIP1193Provider): void {

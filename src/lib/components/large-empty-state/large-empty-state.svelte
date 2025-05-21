@@ -1,6 +1,7 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import Button from '../button/button.svelte';
+  import RpgfSiweButton from '../rpgf-siwe-button/rpgf-siwe-button.svelte';
 
   export let emoji: string;
   export let headline: string;
@@ -13,6 +14,7 @@
     | undefined = undefined;
   export let button: { label: string; handler: () => void } | undefined = undefined;
   export let secondaryButton: { label: string; handler: () => void } | undefined = undefined;
+  export let showSiweButton = false;
 </script>
 
 <div class="large-empty-state">
@@ -34,6 +36,9 @@
           variant={secondaryButton ? 'primary' : undefined}
           on:click={button.handler}>{button.label}</Button
         >{/if}
+        {#if showSiweButton}
+        <RpgfSiweButton></RpgfSiweButton>
+        {/if}
     </div>
   </div>
 </div>

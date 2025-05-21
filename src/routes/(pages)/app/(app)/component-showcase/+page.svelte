@@ -47,6 +47,8 @@
   import modal from '$lib/stores/modal';
   import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import { rpgfJwtStore } from '$lib/utils/rpgf/siwe';
+  import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
 
   // Button
   let disabled = false;
@@ -373,6 +375,14 @@
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>RPGF SIWE button</h2>
+  
+  <RpgfSiweButton />
+
+  <p>Current RPGF-JWT store content: {$rpgfJwtStore}</p>
+</div>
 
 <div class="showcase-item">
   <h2>Transact step</h2>
