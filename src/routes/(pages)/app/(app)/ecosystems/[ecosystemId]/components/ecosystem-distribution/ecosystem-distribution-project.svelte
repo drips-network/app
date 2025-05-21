@@ -4,5 +4,7 @@
 </script>
 
 <div class="ecosystem-distribution-project">
-  {repoOwner}/<strong class="typo-text-bold">{repoName}</strong>
+  <a target="_blank" href={`/app/projects/github/${repoOwner}/${repoName}?exact`}
+    >{repoOwner}/<strong class="typo-text-bold">{repoName}</strong></a
+  >
 </div>
