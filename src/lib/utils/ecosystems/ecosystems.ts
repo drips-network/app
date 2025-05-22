@@ -36,7 +36,6 @@ async function _authenticatedCall<ST extends ZodSchema>(
   return responseSchema.parse(parsed);
 }
 
-// chainId: ChainId;?
 export function getAll() {
   return _authenticatedCall('GET', '', getAllResponseSchema, undefined);
 }
