@@ -7,7 +7,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import twemoji from '$lib/utils/twemoji';
   import { onMount } from 'svelte';
-  import { fetchProject } from './ecosystem-graph';
+  import { fetchProject, type CustomSource } from './ecosystem-graph';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
@@ -31,6 +31,7 @@
   export let project: ProjectProfileFragment | undefined = undefined;
   export let description: string | undefined = undefined;
 
+  let canonicalRepoInfo: CustomSource;
   let loading: boolean = false;
   let error: boolean = false;
 
@@ -72,6 +73,8 @@
         loadProjectData.repoName,
         loadProjectData.forge,
       );
+      canonicalRepoInfo =
+        projectData.newRepo ?? projectData.correctCasingRepo ?? projectData.project.source;
       project = projectData.project;
       description = projectData.description;
     } catch (thrownError) {
@@ -101,7 +104,7 @@
       <div class="details">
         <h2>
           <span class="pixelated">
-            {project.source.repoName}
+            {canonicalRepoInfo.repoName}
           </span>
         </h2>
         <div>

@@ -30,16 +30,9 @@
   export let isHidden: boolean = false;
 
   $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
-
-  function buildEcosystemUrl(ecosystem: EcosystemsListItem): string {
-    return `/app/ecosystems/${ecosystem.id}`;
-  }
 </script>
 
-<!-- TODO: revise for mobile
- https://www.figma.com/design/vyI7f996JF8zwhnXwAwXdC/%F0%9F%92%A7-Drips?node-id=14154-27574&t=222o2fzNGWe88LkK-4
- -->
-<a class="ecosystem-card-wrapper" href={buildEcosystemUrl(ecosystem)}>
+<a class="ecosystem-card-wrapper" href={`/app/ecosystems/${ecosystem.id}`}>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" />
     {#if $$slots.banner}
@@ -62,12 +55,9 @@
         <p class="description">{ecosystem.description}</p>
       {/if}
       <div class="avatar">
-        <!-- vitalik.eth -->
         <IdentityBadge
           disableLink
-          address={ecosystemChainData
-            ? ecosystemChainData.owner.address
-            : ecosystem.ownerAddress || 'TODO'}
+          address={ecosystemChainData ? ecosystemChainData.owner.address : ecosystem.ownerAddress}
           disableTooltip
           size="medium"
         />
