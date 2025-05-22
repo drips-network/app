@@ -9,6 +9,14 @@ import { ensureResponseOk } from '$lib/utils/fetch';
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
 export type NodeSelectionChangedPayload = { nodeId?: string };
 
+/**
+ * Fetch the specified project from the backend.
+ *
+ * @param {String} ownerName  The owner name of the project
+ * @param {String} repoName The name of the project's repository
+ * @param {String} forge  The location of the repository
+ * @returns {Promise<{ project: Project, description: string }>} Details of the specified project.
+ */
 export async function fetchProject(
   ownerName: string,
   repoName: string,
@@ -28,6 +36,12 @@ export async function fetchProject(
   return projectData;
 }
 
+/**
+ * A function that injects the renderer (aka the Sigma instance) into the label drawing function.
+ *
+ * @param {Sigma} renderer a Sigma instance
+ * @returns {typeof drawStraightEdgeLabel} A function that draws edge labels.
+ */
 export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFunction {
   return function (...args) {
     return drawStraightEdgeLabel(renderer, ...args);
@@ -38,14 +52,16 @@ export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFu
 const LABEL_ZOOM_THRESHOLD = 2;
 
 /**
- * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
+ * Draw an edge's label approximately mid-way through an edge level with the bottom of the viewport.
  *
- * @param context
- * @param edgeData
- * @param sourceData
- * @param targetData
- * @param settings
- * @returns
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
+ *
+ * @param {Sigma} renderer The rendering Sigma context.
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {EdgeDisplayData} edgeData This particular edge's data.
+ * @param {NodeDisplayData} sourceData The data of the edge's source node.
+ * @param {NodeDisplayData} targetData THe data of the edge's target node.
+ * @param {Settings} settings The settings of the renderer
  */
 export function drawStraightEdgeLabel<
   N extends Attributes = Attributes,
@@ -153,11 +169,13 @@ export function drawStraightEdgeLabel<
 }
 
 /**
- * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-labels.ts#L16
- * @param context
- * @param data
- * @param settings
- * @returns
+ * Draw a node's selected state.
+ *
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-labels.ts#L16
+ *
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {NodeDisplayData} data This particular node's data
+ * @param {Settings} settings The renderer (Sigma) settings
  */
 export function drawDiscNodeLabel<
   N extends Attributes = Attributes,
@@ -190,9 +208,13 @@ export function drawDiscNodeLabel<
 }
 
 /**
- * https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+ * Draw a node's hovered state.
  *
- * Draw an hovered node.
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+ *
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {NodeDisplayData} data This particular node's data
+ * @param {Settings} settings The renderer (Sigma) settings
  */
 export function drawDiscNodeHover<
   N extends Attributes = Attributes,
@@ -220,8 +242,6 @@ export function drawDiscNodeHover<
   const BORDER_RADIUS = 16;
 
   if (typeof data.label === 'string') {
-    // TODO: do we care that this isn't exactly right because the
-    // last part of the label is bold?
     const textWidth = context.measureText(data.label).width,
       boxWidth = Math.round(textWidth + 2 * PADDING_X),
       boxHeight = Math.round(size + 2 * PADDING_Y);
@@ -252,7 +272,6 @@ export function drawDiscNodeHover<
     context.closePath();
     context.fill();
   } else {
-    // TODO: remove?
     context.beginPath();
     context.closePath();
     context.fill();
