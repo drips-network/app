@@ -23,6 +23,8 @@
   export let isEditable = true;
   export let canDeleteItems = true;
   export let maxItems = 200;
+  // These can't be deleted even if canDeleteItems is true
+  export let protectedItems: AccountId[] = [];
 
   export let allowDripLists = true;
   export let allowProjects = true;
@@ -215,7 +217,7 @@
             <ListEditorItemComponent
               hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
               allowEmptyPercentage={allowEmptyPercentages}
-              {canDeleteItems}
+              canDeleteItems={canDeleteItems && !protectedItems.includes(key)}
               {key}
               highlight={highlightedItemKey === key}
               {weightsMode}

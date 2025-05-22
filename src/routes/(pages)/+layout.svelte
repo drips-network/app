@@ -83,12 +83,14 @@
     animation:
       110ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
       500ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+    transform-origin: 50% 50%;
   }
 
   :root::view-transition-new(root) {
     animation:
       210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
       500ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+    transform-origin: 50% 50%;
   }
 
   @media (prefers-reduced-motion: reduce) {

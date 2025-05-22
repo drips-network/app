@@ -1,46 +1,45 @@
 <script lang="ts">
-  import type { CreateRoundDraftDto } from "$lib/utils/rpgf/schemas";
-  import { title } from "process";
-  import Label from "../icons/Label.svelte";
-  import TodoListItem from "./components/todo-list-item.svelte";
-  import Ledger from "../icons/Ledger.svelte";
-  import Calendar from "../icons/Calendar.svelte";
-  import User from "../icons/User.svelte";
-  import Button from "../button/button.svelte";
-  import Registered from "../icons/Registered.svelte";
+  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import Label from '../icons/Label.svelte';
+  import TodoListItem from './components/todo-list-item.svelte';
+  import Ledger from '../icons/Ledger.svelte';
+  import Calendar from '../icons/Calendar.svelte';
+  import User from '../icons/User.svelte';
+  import Button from '../button/button.svelte';
+  import Registered from '../icons/Registered.svelte';
+  import Proposals from '../icons/Proposals.svelte';
 
   export let draftId: string;
-  export let draft: CreateRoundDraftDto;
+  export let draft: RoundDraft;
 
   const requiredFields: (keyof typeof draft)[] = [
-    "name",
-    "urlSlug",
-    "applicationPeriodStart",
-    "applicationPeriodEnd",
-    "votingPeriodStart",
-    "votingPeriodEnd",
-    "resultsPeriodStart",
-    "applicationFormat",
-    "votingConfig",
-    "adminWalletAddresses",
+    'name',
+    'urlSlug',
+    'applicationPeriodStart',
+    'applicationPeriodEnd',
+    'votingPeriodStart',
+    'votingPeriodEnd',
+    'resultsPeriodStart',
+    'applicationFormat',
+    'votingConfig',
+    'adminWalletAddresses',
   ];
   $: requiredFieldsFilled = requiredFields.every((field) => Boolean(draft[field]));
 
   $: nameAndDescriptionDone = Boolean(draft.name);
   $: scheduleDone = Boolean(
     draft.applicationPeriodStart &&
-    draft.applicationPeriodEnd &&
-    draft.votingPeriodStart &&
-    draft.votingPeriodEnd &&
-    draft.resultsPeriodStart
+      draft.applicationPeriodEnd &&
+      draft.votingPeriodStart &&
+      draft.votingPeriodEnd &&
+      draft.resultsPeriodStart,
   );
+  $: votingConfigDone = Boolean(draft.votingConfig);
 
   // TODO(rpgf): Compare against the default application format
-  $: applicationFormCustomized = Boolean(draft.applicationFormat)
+  $: applicationFormCustomized = Boolean(draft.applicationFormat);
 
-  $: additionalAdminsConfigured = Boolean(
-    draft.adminWalletAddresses.length > 1
-  )
+  $: additionalAdminsConfigured = Boolean(draft.adminWalletAddresses.length > 1);
 
   function handlePublish() {
     // TODO(rpgf): Implement publish logic
@@ -55,13 +54,19 @@
       icon={Label}
       title="Name & Description"
       done={nameAndDescriptionDone}
-      href="/drafts/{draftId}/settings/representation"
+      href="/app/rpgf/drafts/{draftId}/settings/representation"
     />
     <TodoListItem
       icon={Calendar}
       title="Schedule"
       done={scheduleDone}
-      href="/drafts/{draftId}/settings/schedule"
+      href="/app/rpgf/drafts/{draftId}/settings/schedule"
+    />
+    <TodoListItem
+      icon={Proposals}
+      title="Badgeholders & voting"
+      done={votingConfigDone}
+      href="/app/rpgf/drafts/{draftId}/settings/voting"
     />
   </ul>
 
@@ -71,14 +76,14 @@
       icon={Ledger}
       title="Custom application form"
       done={applicationFormCustomized}
-      href="/drafts/{draftId}/settings/application-form"
+      href="/app/rpgf/drafts/{draftId}/settings/application"
       optional
     />
     <TodoListItem
       icon={User}
       title="Additional admins"
       done={additionalAdminsConfigured}
-      href="/drafts/{draftId}/settings/admins"
+      href="/app/rpgf/drafts/{draftId}/settings/admins"
       optional
     />
   </ul>

@@ -1,6 +1,8 @@
 <div class="rpgf-base-layout">
   <aside>
-    <slot name="sidebar" />
+    <div class="sidebar-inner">
+      <slot name="sidebar" />
+    </div>
   </aside>
   <div class="content">
     <slot />
@@ -20,5 +22,15 @@
 
   aside {
     grid-area: sidebar;
+    view-transition-name: rpgf-base-layout-sidebar;
+  }
+
+  .sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    position: sticky;
+    top: 6.5rem;
   }
 </style>

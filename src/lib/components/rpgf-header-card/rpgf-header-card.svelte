@@ -1,12 +1,48 @@
 <script lang="ts">
-  import type { CreateRoundDto } from "$lib/utils/rpgf/schemas";
-  import EmojiAvatar from "../emoji-avatar/emoji-avatar.svelte";
+  import { page } from '$app/stores';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import Button from '../button/button.svelte';
+  import EmojiAvatar from '../emoji-avatar/emoji-avatar.svelte';
+  import Settings from '../icons/Settings.svelte';
+  import ShareButton from '../share-button/share-button.svelte';
 
-  export let roundOrDraft: Partial<CreateRoundDto>;
+  export let isDraft = false;
+  export let roundSlugOrDraftId: string;
+  export let roundOrDraft: RoundDraft;
+
+  $: isAdmin = $walletStore.address
+    ? roundOrDraft.adminWalletAddresses?.includes($walletStore.address.toLowerCase())
+    : false;
 </script>
 
 <div class="rpgf-header-card">
-  <EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" />
+  <div><EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" /></div>
+  <div class="content">
+    <h1 class:unnamed={!roundOrDraft.name}>
+      {roundOrDraft.name ?? 'Unnamed round'}
+      {#if isDraft}
+        <span class="draft-badge typo-header-5">Draft</span>
+      {/if}
+    </h1>
+    <div class="actions">
+      <ShareButton
+        shareModalText={isDraft
+          ? 'Note that this round draft can only be viewed by the configured round admins.'
+          : ''}
+        url={$page.url.toString()}
+        buttonVariant="normal"
+      />
+      {#if isAdmin}
+        <Button
+          icon={Settings}
+          href={isDraft
+            ? `/app/rpgf/drafts/${roundSlugOrDraftId}/settings/representation`
+            : `/app/rpgf/rounds/${roundSlugOrDraftId}/settings/representation`}>Settings</Button
+        >
+      {/if}
+    </div>
+  </div>
 </div>
 
 <style>
@@ -14,5 +50,28 @@
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
     padding: 1rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .draft-badge {
+    display: inline-flex;
+    vertical-align: middle;
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    margin-left: 0.2rem;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .unnamed {
+    color: var(--color-foreground-level-5);
   }
 </style>

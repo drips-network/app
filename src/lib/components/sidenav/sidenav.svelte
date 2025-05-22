@@ -4,6 +4,7 @@
   import SidenavItem from './components/sidenav-item.svelte';
   import type { SidenavItems } from './types';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import { forceCollapsed } from './sidenav-store';
 
   export let items: {
     top: SidenavItems;
@@ -32,14 +33,14 @@
     }
   }
 
-  $: shouldShowTooltips = $breakpointsStore?.breakpoint === 'desktop';
+  $: shouldShowTooltips = $forceCollapsed || $breakpointsStore?.breakpoint === 'desktop';
 
   let hoveringOver: string | undefined = undefined;
 </script>
 
 <svelte:window on:resize={updateSelectorPos} />
 
-<nav class="sidenav">
+<nav class="sidenav" class:force-collapsed={$forceCollapsed}>
   {#each Object.values(items) as block}
     <div class="block">
       {#each block as item}
@@ -75,7 +76,6 @@
     gap: 1rem;
     justify-content: space-between;
     height: 100%;
-    view-transition-name: sidenav;
   }
 
   .block {
@@ -109,6 +109,17 @@
     background-color: var(--color-background);
     z-index: 200;
     box-shadow: var(--elevation-low);
+  }
+
+  .sidenav.force-collapsed {
+    width: 3rem;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+
+  .sidenav.force-collapsed:hover,
+  .sidenav.force-collapsed:focus-within {
+    opacity: 1;
   }
 
   @media (max-width: 1252px) {

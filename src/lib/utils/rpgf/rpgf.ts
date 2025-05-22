@@ -1,12 +1,31 @@
-import { browser } from "$app/environment";
-import { get } from "svelte/store";
-import getOptionalEnvVar from "../get-optional-env-var/public"
-import stripTrailingSlash from "../strip-trailing-slash";
-import { rpgfJwtStore } from "./siwe";
-import { createRoundDraftDtoSchema } from "./schemas";
+import { browser } from '$app/environment';
+import { get } from 'svelte/store';
+import getOptionalEnvVar from '../get-optional-env-var/public';
+import stripTrailingSlash from '../strip-trailing-slash';
+import { rpgfJwtStore } from './siwe';
+import {
+  createRoundDraftDtoSchema,
+  createRoundDtoSchema,
+  roundDraftSchema,
+  roundDraftWrapperDto,
+  type CreateRoundDto,
+  type RoundDraft,
+} from './schemas';
 
-const rpgfApiUrl = getOptionalEnvVar('PUBLIC_DRIPS_RPGF_URL', true, 'RPGF functionality doesnt work.');
-const rpgfInternalApiUrl = getOptionalEnvVar('PUBLIC_INTERNAL_DRIPS_RPGF_URL', true, 'RPGF functionality doesnt work.');
+const rpgfApiUrl = getOptionalEnvVar(
+  'PUBLIC_DRIPS_RPGF_URL',
+  true,
+  'RPGF functionality doesnt work.',
+);
+const rpgfInternalApiUrl = getOptionalEnvVar(
+  'PUBLIC_INTERNAL_DRIPS_RPGF_URL',
+  true,
+  'RPGF functionality doesnt work.',
+);
+
+export function isCompleteDraft(roundOrDraft: Partial<CreateRoundDto>) {
+  return createRoundDtoSchema.safeParse(roundOrDraft).success;
+}
 
 export async function rpgfServerCall(
   path: string,
@@ -26,8 +45,8 @@ export async function rpgfServerCall(
     method,
     headers: {
       'Content-Type': 'application/json',
-      'credentials': 'include',
-      'Authorization': jwt ? `Bearer ${jwt}` : '',
+      credentials: 'include',
+      Authorization: jwt ? `Bearer ${jwt}` : '',
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
@@ -54,7 +73,23 @@ export async function getDraft(f = fetch, id: string) {
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
 
   if (res.status === 200) {
-    const parsed = createRoundDraftDtoSchema.parse(await res.json());
+    const parsed = roundDraftSchema.parse(await res.json());
+    return parsed;
+  }
+
+  return null;
+}
+
+export async function updateDraft(f = fetch, id: string, draft: RoundDraft) {
+  // strip empty fields
+  const strippedDraft = Object.fromEntries(
+    Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
+  );
+
+  const res = await rpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
+
+  if (res.status === 200) {
+    const parsed = roundDraftWrapperDto.parse(await res.json());
     return parsed;
   }
 

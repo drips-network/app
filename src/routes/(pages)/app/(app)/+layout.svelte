@@ -15,6 +15,8 @@
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import type { LayoutData } from './$types';
+  import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
+  import HeartFace from '$lib/components/icons/HeartFace.svelte';
 
   export let data: LayoutData;
 
@@ -32,7 +34,12 @@
   }
 </script>
 
-<div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
+<div
+  class:sidenav-forced-collapsed={$forceCollapsed === true}
+  class="main"
+  class:disconnected={!$wallet.connected}
+  in:fly|global={{ duration: 300, y: 16 }}
+>
   <div class="page">
     <div class:loading={$navigating}><slot /></div>
   </div>
@@ -51,6 +58,7 @@
             { label: 'Funds', href: '/app/funds', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
             { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+            { label: 'RetroPGF', href: '/app/rpgf', icon: HeartFace },
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -122,6 +130,11 @@
     min-width: 0;
   }
 
+  .sidenav-forced-collapsed .page {
+    max-width: unset;
+    padding: 6.5rem 2.5rem 0rem 2.5rem;
+  }
+
   div {
     transition: opacity 0.3s;
   }
@@ -140,6 +153,11 @@
     width: 16rem;
     padding: 1rem;
     padding-top: 6rem;
+    view-transition-name: sidenav;
+  }
+
+  .sidenav-forced-collapsed .sidenav {
+    width: 5rem;
   }
 
   .sidenav-placeholder {
@@ -147,6 +165,10 @@
     height: 1px;
     flex-shrink: 0;
     transition: width 0.3s;
+  }
+
+  .sidenav-forced-collapsed .sidenav-placeholder {
+    width: 5rem;
   }
 
   .sidenav-placeholder.disconnected {

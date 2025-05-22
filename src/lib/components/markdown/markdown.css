@@ -1,0 +1,55 @@
+.markdown-component-content h1,
+.markdown-component-content h2,
+.markdown-component-content h3,
+.markdown-component-content h4,
+.markdown-component-content h5,
+.markdown-component-content h6 {
+  margin-top: 1.5rem;
+}
+
+.markdown-component-content p {
+  margin-top: 0.5rem;
+}
+
+.markdown-component-content h1 {
+  font-family: var(--typeface-medium);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 30px;
+  margin-top: 1rem;
+}
+
+.markdown-component-content h2 {
+  font-family: var(--typeface-medium);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.markdown-component-content h3 {
+  font-family: var(--typeface-medium);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.markdown-component-content h4 {
+  font-family: var(--typeface-medium);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22.5px;
+}
+
+.markdown-component-content ul {
+  list-style: initial;
+}
+
+.markdown-component-content li {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.markdown-component-content a {
+  color: var(--color-primary-level-6);
+  text-decoration: underline;
+}
