@@ -24,7 +24,7 @@
         forge: string;
       }
     | undefined = undefined;
-  let projectMetadata:
+  let selectedProjectMetadata:
     | {
         absoluteWeight: number;
       }
@@ -54,12 +54,13 @@
 
   async function showProjectData(nodeId: string) {
     const fullNode = getEcosystemNodeById(ecosystem, nodeId);
-    // TODO: bad, fail, but don't fully fail
     if (!fullNode) {
+      // eslint-disable-next-line no-console
+      console.error('No project data to render');
       return;
     }
 
-    projectMetadata = { absoluteWeight: fullNode.absoluteWeight };
+    selectedProjectMetadata = { absoluteWeight: fullNode.absoluteWeight };
     selectedProjectData = {
       repoOwner: fullNode.repoOwner,
       repoName: fullNode.repoName,
@@ -71,7 +72,7 @@
     const { nodeId } = event.detail;
     if (!nodeId) {
       selectedProjectData = undefined;
-      projectMetadata = undefined;
+      selectedProjectMetadata = undefined;
       return;
     }
 
@@ -114,13 +115,18 @@
     stopScroll(event);
   }
 
-  const keys: Record<number, number> = { 37: 1, 38: 1, 39: 1, 40: 1 };
+  const keys: Record<string, number> = {
+    ArrowLeft: 1,
+    ArrowUp: 1,
+    ArrowRight: 1,
+    ArrowDown: 1,
+  };
   function stopKeyScroll(event: KeyboardEvent) {
     if (!expanded) {
       return;
     }
 
-    if (keys[event.keyCode]) {
+    if (keys[event.code]) {
       stopScroll(event);
       return false;
     }
@@ -160,7 +166,10 @@
       </div>
       {#if selectedProjectData}
         <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
-          <EcosystemProjectCard loadProjectData={selectedProjectData} {projectMetadata} />
+          <EcosystemProjectCard
+            loadProjectData={selectedProjectData}
+            projectMetadata={selectedProjectMetadata}
+          />
         </div>
       {/if}
       <div class="surface bottom-right">

@@ -299,7 +299,6 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
-    /* NEW */
     justify-content: space-between;
     height: 100%;
   }

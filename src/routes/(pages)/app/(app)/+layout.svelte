@@ -71,7 +71,6 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
-      <!-- TODO: explore needs to go bye bye -->
       <BottomNav
         items={[
           { label: 'Explore', href: '/app', icon: ExploreIcon },
