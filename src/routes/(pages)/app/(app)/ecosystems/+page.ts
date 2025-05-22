@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import * as ecosystemsApi from '$lib/utils/ecosystems';
-import { fetchEcosystem } from './[ecosystemId]/fetch-ecosystem.js';
+import { fetchEcosystemChainData } from './[ecosystemId]/fetch-ecosystem.js';
 import type { EcosystemProfileFragment } from './[ecosystemId]/components/__generated__/gql.generated.js';
 
 export const load = async ({ fetch }) => {
@@ -20,7 +20,7 @@ export const load = async ({ fetch }) => {
   // Process each ecosystem
   for (const ecosystem of apiEcosystems) {
     if (ecosystem.accountId) {
-      const ecosystemRes = await fetchEcosystem(ecosystem.accountId, fetch);
+      const ecosystemRes = await fetchEcosystemChainData(ecosystem.accountId, fetch);
       // Create a tuple with the ecosystem and its fetched details
       ecosystems.push([ecosystem, ecosystemRes.ecosystemMainAccount || undefined]);
     } else {

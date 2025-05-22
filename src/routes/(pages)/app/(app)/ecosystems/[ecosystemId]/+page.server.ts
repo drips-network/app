@@ -1,13 +1,12 @@
 import type { PageServerLoad } from './$types';
-import * as ecosystemsApi from '$lib/utils/ecosystems';
-import { fetchEcosystem } from './fetch-ecosystem';
+import { fetchEcosystem, fetchEcosystemChainData } from './fetch-ecosystem';
 
 export const load = (async ({ params, fetch }) => {
-  const ecosystem = await ecosystemsApi.get(params.ecosystemId, fetch);
+  const ecosystem = await fetchEcosystem(params.ecosystemId, fetch);
   // no problem if no chain data, display the undeployed ecosystem
   let ecosystemChainData = undefined;
   if (ecosystem.accountId) {
-    const ecosystemRes = await fetchEcosystem(ecosystem.accountId, fetch);
+    const ecosystemRes = await fetchEcosystemChainData(ecosystem.accountId, fetch);
     ecosystemChainData = ecosystemRes.ecosystemMainAccount || undefined;
   }
 
