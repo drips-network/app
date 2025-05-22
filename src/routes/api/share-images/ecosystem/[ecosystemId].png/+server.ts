@@ -10,10 +10,10 @@ import { Resvg } from '@resvg/resvg-js';
 import getBackgroundImage from '../../getBackgroundImage';
 import sanitize from 'sanitize-html';
 import twemoji from '$lib/utils/twemoji';
-import * as ecosystemsApi from '$lib/utils/ecosystems';
+import { fetchEcosystem } from '../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
-  const ecosystem = await ecosystemsApi.get(params.ecosystemId, fetch);
+  const ecosystem = await fetchEcosystem(params.ecosystemId, fetch);
 
   const emoji = ecosystem.avatar
     ? sanitize(ecosystem.avatar.emoji, {
