@@ -16,7 +16,7 @@
 
 <div class="ecosystems-grid" class:ecosystems-grid--big={big}>
   {#each ecosystems as ecosystem}
-    <PrimaryColorThemer colorHex={ecosystems[0].color}>
+    <PrimaryColorThemer colorHex={ecosystem[0].color}>
       <EcosystemCard ecosystem={ecosystem[0]} ecosystemChainData={ecosystem[1]}>
         <svelte:fragment slot="banner">
           <AnnotationBox type="info" overlay size="small">
