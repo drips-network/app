@@ -74,7 +74,9 @@
       );
       project = projectData.project;
       description = projectData.description;
-    } catch {
+    } catch (thrownError) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load project', thrownError);
       error = true;
     } finally {
       loading = false;
