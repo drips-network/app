@@ -1,19 +1,13 @@
-import { error, type RequestHandler } from '@sveltejs/kit';
-// import type { PageServerLoad } from './$types';
-// import uriDecodeParams from '$lib/utils/url-decode-params';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
-// import isClaimed from '$lib/utils/project/is-claimed';
-// import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
 import { z } from 'zod';
-// import { redis } from '../../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
-// import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import { redis } from '../../../../../redis';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../../../../(pages)/app/(app)/projects/(forges)/components/project-profile/project-profile.svelte';
@@ -36,7 +30,7 @@ async function fetchDripsProject(repoUrl: string) {
     args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
   });
 
-  // TODO: should use the same cache key?
+  // cache key is shared with project page
   const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
 
   return await cached(redis, cacheKey, 172800, () =>
@@ -51,20 +45,7 @@ async function fetchDripsProject(repoUrl: string) {
   );
 }
 export const GET: RequestHandler = async ({ params, fetch }) => {
-  // export const load = (async ({ params, fetch, url }) => {
   const { githubUsername, githubRepoName } = params;
-  // try {
-  //   const p = uriDecodeParams(params);
-  //   githubRepoName = p.githubRepoName;
-  //   githubUsername = p.githubUsername;
-  // } catch {
-  //   throw error(400);
-  // }
-
-  // `exact` param disables the redirect to the "real" github repo URL.
-  // For example, after a repo has been renamed, it would usually automatically redirect
-  // to the new repo name, but it must still be possible to access the old project.
-  // const exact = url.searchParams.has('exact');
 
   // TODO; schema should be shared with endpoint that is called a little later
   const repoSchema = z.object({
@@ -91,9 +72,6 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
     throw error(404);
   }
 
-  // TODO: Do we need this?
-  // const projectChainData = filterCurrentChainData(project.chainData);
-
   const repoResJson = await repoRes.json();
 
   if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
@@ -107,18 +85,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
   }
 
   const { url: realRepoUrl } = repo;
-
   const repoUrlIsCanonical = repoUrl === realRepoUrl;
-
-  // if (!repoUrlIsCanonical) {
-  //   return redirect(301, `/app/projects/github/${repo.ownerName}/${repo.repoName}`);
-  // }
-
-  // TODO: is this really a problem here? Seems like a downstream thing
-  // if (isClaimed(projectChainData) && !projectChainData.splits) {
-  //   throw new Error('Claimed project somehow does not have splits');
-  // }
-
   // True if the repo URL is non-canonical, but only the casing is wrong
   const wrongCasing = !repoUrlIsCanonical && repoUrl.toLowerCase() === realRepoUrl.toLowerCase();
 
@@ -146,13 +113,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
       typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
     newRepo,
     correctCasingRepo,
-    blockWhileInitializing: false,
-    preservePathOnNetworkChange: true,
   };
 
-  return new Response(JSON.stringify(resBody), {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  return json(resBody);
 };

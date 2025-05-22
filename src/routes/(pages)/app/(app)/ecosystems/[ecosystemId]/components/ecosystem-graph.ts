@@ -1,13 +1,14 @@
 import type { Attributes } from 'graphology-types';
 import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/types';
 import type { Settings } from 'sigma/settings';
-import type { Project } from '$lib/graphql/__generated__/base-types';
+import type { Project, Source } from '$lib/graphql/__generated__/base-types';
 import type Sigma from 'sigma';
 import type { EdgeLabelDrawingFunction } from 'sigma/rendering';
 import { ensureResponseOk } from '$lib/utils/fetch';
 
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
 export type NodeSelectionChangedPayload = { nodeId?: string };
+export type CustomSource = Omit<Source, 'forge' | '__typename'>;
 
 /**
  * Fetch the specified project from the backend.
@@ -24,6 +25,8 @@ export async function fetchProject(
 ): Promise<{
   project: Project;
   description: string;
+  newRepo: CustomSource;
+  correctCasingRepo: CustomSource;
 }> {
   const response = await ensureResponseOk(
     fetch(
