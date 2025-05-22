@@ -4,6 +4,9 @@
       <slot name="sidebar" />
     </div>
   </aside>
+  <div class="header">
+    <slot name="header" />
+  </div>
   <div class="content">
     <slot />
   </div>
@@ -29,8 +32,22 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
     position: sticky;
     top: 6.5rem;
+  }
+
+  .header {
+    grid-area: header;
+  }
+
+  @media (max-width: 1024px) {
+    .rpgf-base-layout {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        'header'
+        'sidebar'
+        'content';
+    }
   }
 </style>

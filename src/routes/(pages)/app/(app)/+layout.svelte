@@ -153,7 +153,6 @@
     width: 16rem;
     padding: 1rem;
     padding-top: 6rem;
-    view-transition-name: sidenav;
   }
 
   .sidenav-forced-collapsed .sidenav {
@@ -164,7 +163,6 @@
     width: 16rem;
     height: 1px;
     flex-shrink: 0;
-    transition: width 0.3s;
   }
 
   .sidenav-forced-collapsed .sidenav-placeholder {
@@ -188,13 +186,17 @@
 
   @media (max-width: 768px) {
     .main {
-      overflow-x: hidden;
       gap: 0;
     }
 
     .sidenav,
     .sidenav-placeholder {
       display: none;
+    }
+
+    .sidenav-forced-collapsed .page {
+      max-width: 100vw;
+      padding: 6.5rem 1rem 0rem 1rem;
     }
 
     .page {

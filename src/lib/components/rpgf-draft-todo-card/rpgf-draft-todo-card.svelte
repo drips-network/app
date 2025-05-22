@@ -107,6 +107,7 @@
     flex-direction: column;
     gap: 1rem;
     border: 1px solid var(--color-foreground-level-3);
+    view-transition-name: draft-todo-card;
   }
 
   ul {

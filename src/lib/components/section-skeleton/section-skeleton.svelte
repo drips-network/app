@@ -109,7 +109,6 @@
 <style>
   .section-skeleton {
     position: relative;
-    /* To give the PaddedHorizontalScroll some space */
     margin: 0 -2.5rem;
     height: fit-content;
   }
@@ -153,5 +152,15 @@
     pointer-events: none;
     z-index: 1;
     border-radius: 1.25rem 0 1.25rem 1.25rem;
+  }
+
+  @media (max-width: 577px) {
+    .section-skeleton {
+      margin: 0 -1rem;
+    }
+
+    .section-skeleton .inner-wrapper {
+      padding: 0 1rem;
+    }
   }
 </style>

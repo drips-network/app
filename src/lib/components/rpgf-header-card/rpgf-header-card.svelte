@@ -68,10 +68,26 @@
   .content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
   }
 
   .unnamed {
     color: var(--color-foreground-level-5);
+  }
+
+  @media (max-width: 1024px) {
+    .rpgf-header-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      line-height: 2.25rem;
+    }
+
+    .actions {
+      align-self: flex-end;
+    }
   }
 </style>

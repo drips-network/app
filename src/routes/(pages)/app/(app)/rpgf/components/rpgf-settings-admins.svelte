@@ -5,7 +5,6 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import unreachable from '$lib/utils/unreachable';
   import ensureAtLeastOneArrayMember from '$lib/utils/ensure-at-least-one-array-member';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
@@ -45,7 +44,7 @@
     }
   }
 
-  $: ownAddress = $walletStore.address?.toLowerCase() ?? unreachable();
+  $: ownAddress = $walletStore.address?.toLowerCase();
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft>
@@ -55,7 +54,7 @@
       allowDripLists={false}
       allowProjects={false}
       weightsMode={false}
-      protectedItems={[ownAddress]}
+      protectedItems={ownAddress ? [ownAddress] : []}
     />
   </FormField>
 </RpgfSettingsForm>

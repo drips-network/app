@@ -110,4 +110,10 @@
     flex-direction: column;
     gap: 4rem;
   }
+
+  @media (max-width: 577px) {
+    .edu-carousel {
+      margin: 0 -1rem;
+    }
+  }
 </style>

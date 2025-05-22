@@ -76,6 +76,7 @@
     gap: 1rem;
     justify-content: space-between;
     height: 100%;
+    view-transition-name: sidenav;
   }
 
   .block {
@@ -112,7 +113,7 @@
   }
 
   .sidenav.force-collapsed {
-    width: 3rem;
+    /* width: 3rem; */
     opacity: 0.5;
     transition: opacity 0.3s;
   }

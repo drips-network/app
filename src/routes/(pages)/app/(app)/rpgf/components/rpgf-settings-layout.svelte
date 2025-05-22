@@ -10,6 +10,8 @@
   import User from '$lib/components/icons/User.svelte';
   import Proposals from '$lib/components/icons/Proposals.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
+  import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
+  import ScrollableTabs from '$lib/components/scrollable-tabs/scrollable-tabs.svelte';
 
   export let draftIdOrRoundSlug: string;
 
@@ -30,6 +32,10 @@
 </script>
 
 <div class="rpgf-settings-layout">
+  <div class="sidebar">
+    <RpgfDraftTodoCard draft={roundOrDraft} draftId={draftIdOrRoundSlug} />
+  </div>
+
   <div class="settings-sidenav">
     <a
       class="back"
@@ -76,6 +82,39 @@
       backgroundOnActive
     />
   </div>
+
+  <div class="tabs">
+    <ScrollableTabs
+      tabs={[
+        {
+          label: 'Representation',
+          href: `${settingsBaseUrl}/representation`,
+          icon: Label,
+        },
+        {
+          label: 'Schedule',
+          href: `${settingsBaseUrl}/schedule`,
+          icon: Calendar,
+        },
+        {
+          label: 'Admins',
+          href: `${settingsBaseUrl}/admins`,
+          icon: User,
+        },
+        {
+          label: 'Voting',
+          href: `${settingsBaseUrl}/voting`,
+          icon: Proposals,
+        },
+        {
+          label: 'Application form',
+          href: `${settingsBaseUrl}/application`,
+          icon: Ledger,
+        },
+      ]}
+    />
+  </div>
+
   <div class="content">
     <slot />
   </div>
@@ -83,9 +122,10 @@
 
 <style>
   .rpgf-settings-layout {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(auto, 13rem) 3fr;
-    grid-template-areas: 'sidenav content';
+    grid-template-columns: minmax(auto, 13rem) 3fr minmax(auto, 19rem);
+    grid-template-areas: 'sidenav content sidebar';
     gap: 3rem;
   }
 
@@ -111,5 +151,36 @@
     max-width: 64rem;
     margin: 0 auto;
     width: 100%;
+  }
+
+  .tabs {
+    display: none;
+  }
+
+  @media (max-width: 1251px) {
+    .rpgf-settings-layout {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        'todo'
+        'tabs'
+        'content';
+      gap: 2rem;
+      max-width: 100vw;
+      padding-bottom: 7rem;
+    }
+
+    .settings-sidenav {
+      display: none;
+    }
+
+    .tabs {
+      display: block;
+      position: sticky;
+      top: 4rem;
+      min-width: 0;
+      grid-area: tabs;
+      z-index: 1;
+    }
   }
 </style>
