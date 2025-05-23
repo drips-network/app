@@ -40,6 +40,13 @@
     grid-area: header;
   }
 
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    margin-top: 1rem;
+  }
+
   @media (max-width: 1024px) {
     .rpgf-base-layout {
       grid-template-columns: 1fr;

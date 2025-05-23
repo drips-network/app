@@ -39,7 +39,7 @@
           out:fade={{ duration: 250 }}
           class="placeholder-container"
           bind:this={placeholderContainerElem}
-          style:border={placeholderOutline ? '1px solid var(--color-foreground)' : ''}
+          style:border={placeholderOutline ? '1px solid var(--color-foreground-level-3)' : ''}
         >
           {#if !loaded}
             <Spinner />

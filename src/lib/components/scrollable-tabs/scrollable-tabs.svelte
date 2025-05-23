@@ -42,6 +42,8 @@
       }
     }
   }
+
+  // TODO(rpgf): Scroll to the active tab when it changes
 </script>
 
 <PaddedHorizontalScroll>
