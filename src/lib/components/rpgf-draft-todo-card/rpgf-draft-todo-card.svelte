@@ -26,7 +26,7 @@
   ];
   $: requiredFieldsFilled = requiredFields.every((field) => Boolean(draft[field]));
 
-  $: nameAndDescriptionDone = Boolean(draft.name);
+  $: nameAndDescriptionDone = Boolean(draft.name && draft.urlSlug);
   $: scheduleDone = Boolean(
     draft.applicationPeriodStart &&
       draft.applicationPeriodEnd &&

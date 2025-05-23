@@ -8,6 +8,7 @@
   export let roundOrDraft: RoundDraft;
   export let id: string;
   export let isDraft: boolean;
+  export let invalid = false;
 
   export let updatedRoundOrDraft: typeof roundOrDraft;
 
@@ -58,8 +59,11 @@
   <slot {updatedRoundOrDraft} />
 
   <div>
-    <Button variant="primary" loading={saving} on:click={handleSave} disabled={!haveFieldsChanged}
-      >Save changes</Button
+    <Button
+      variant="primary"
+      loading={saving}
+      on:click={handleSave}
+      disabled={!haveFieldsChanged || invalid}>Save changes</Button
     >
   </div>
 </div>

@@ -1,29 +1,29 @@
 import network from '$lib/stores/wallet/network';
 import { SiweMessage } from 'siwe';
 import { rpgfServerCall } from './rpgf';
-import type { JsonRpcProvider, Signer } from 'ethers';
+import type { Signer } from 'ethers';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { browser } from '$app/environment';
-import { createEventDispatcher } from 'svelte';
 
-export const rpgfJwtStore = storedWritable('rpgf-jwt', z.string().nullable(), null, !browser)
+export const rpgfJwtStore = storedWritable('rpgf-jwt', z.string().nullable(), null, !browser);
 
 async function createSiweMessage(address: string) {
-    const res = await rpgfServerCall('/auth/nonce');
+  const res = await rpgfServerCall('/auth/nonce');
 
-    const resBody = await res.json();
-    const message = new SiweMessage({
-        scheme: window.location.protocol.slice(0, -1),
-        domain: window.location.host,
-        address,
-        statement: 'Sign into Drips RPGF to manage your rounds. This is not a transaction, and no gas is required.',
-        uri: window.location.origin,
-        version: '1',
-        chainId: network.chainId,
-        nonce: resBody.nonce,
-    });
-    return message.prepareMessage();
+  const resBody = await res.json();
+  const message = new SiweMessage({
+    scheme: window.location.protocol.slice(0, -1),
+    domain: window.location.host,
+    address,
+    statement:
+      'Sign into Drips RPGF to manage your rounds. This is not a transaction, and no gas is required.',
+    uri: window.location.origin,
+    version: '1',
+    chainId: network.chainId,
+    nonce: resBody.nonce,
+  });
+  return message.prepareMessage();
 }
 
 export async function signInWithEthereum(signer: Signer) {
@@ -39,7 +39,6 @@ export async function signInWithEthereum(signer: Signer) {
 
   if (res.ok) {
     const resBody = z.object({ token: z.string() }).parse(await res.json());
-    console.log('JWT', resBody);
 
     rpgfJwtStore.set(resBody.token);
   }

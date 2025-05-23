@@ -8,6 +8,7 @@ import {
   createRoundDtoSchema,
   roundDraftSchema,
   roundDraftWrapperDto,
+  slugAvailableResponseSchema,
   type CreateRoundDto,
   type RoundDraft,
 } from './schemas';
@@ -94,4 +95,11 @@ export async function updateDraft(f = fetch, id: string, draft: RoundDraft) {
   }
 
   return null;
+}
+
+export async function checkSlugAvailability(f = fetch, slug: string) {
+  const res = await rpgfServerCall(`/rounds/check-slug/${slug}`, 'GET', undefined, f);
+
+  const { available } = slugAvailableResponseSchema.parse(await res.json());
+  return available;
 }

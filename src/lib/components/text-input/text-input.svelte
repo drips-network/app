@@ -99,6 +99,7 @@
     on:keydown
     on:keypress
     on:paste
+    on:blur
     autocomplete={autocomplete ? 'on' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}

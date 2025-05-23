@@ -239,3 +239,7 @@ export const roundDraftWrapperDto = z.object({
   chainId: z.number(),
   draft: roundDraftSchema,
 });
+
+export const slugAvailableResponseSchema = z.object({
+  available: z.boolean(),
+});

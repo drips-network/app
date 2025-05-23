@@ -217,7 +217,8 @@
             <ListEditorItemComponent
               hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
               allowEmptyPercentage={allowEmptyPercentages}
-              canDeleteItems={canDeleteItems && !protectedItems.includes(key)}
+              canDeleteItems={canDeleteItems &&
+                (protectedItems ? !protectedItems.includes(key) : true)}
               {key}
               highlight={highlightedItemKey === key}
               {weightsMode}

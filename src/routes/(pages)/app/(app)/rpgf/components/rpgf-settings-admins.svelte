@@ -48,7 +48,10 @@
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft>
-  <FormField title="Administrators">
+  <FormField
+    title="Administrators"
+    description="Administrators can edit round settings, see full applications including private data, review pending applications, and export vote data."
+  >
     <ListEditor
       bind:items={adminItems}
       allowDripLists={false}
