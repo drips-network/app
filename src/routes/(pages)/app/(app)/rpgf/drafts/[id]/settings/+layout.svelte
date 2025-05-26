@@ -5,6 +5,6 @@
   export let data;
 </script>
 
-<RpgfSettingsLayout draftIdOrRoundSlug={$page.params.id} roundOrDraft={data.draft} isDraft>
+<RpgfSettingsLayout draftIdOrRoundSlug={$page.params.id} draftWrapper={data.draftWrapper} isDraft>
   <slot />
 </RpgfSettingsLayout>

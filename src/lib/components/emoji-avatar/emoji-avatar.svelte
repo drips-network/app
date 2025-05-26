@@ -1,6 +1,6 @@
 <script lang="ts">
-  import twemoji from "$lib/utils/twemoji";
-  import Question from "../icons/Question.svelte";
+  import twemoji from '$lib/utils/twemoji';
+  import Question from '../icons/Question.svelte';
 
   export let emoji: string | undefined = undefined;
   export let color: string = 'var(--color-foreground-level-5';
@@ -21,7 +21,11 @@
   $: emojiElem = emoji ? twemoji(emoji) : undefined;
 </script>
 
-<div class="emoji-avatar" style="width: {containerSize}; height: {containerSize};" style:background-color={color}>
+<div
+  class="emoji-avatar"
+  style="width: {containerSize}; height: {containerSize};"
+  style:background-color={color}
+>
   <div class="inner">
     {#if emoji}
       {@html emojiElem}
@@ -39,6 +43,7 @@
     border-radius: 50%;
     overflow: hidden;
     position: relative;
+    user-select: none;
   }
 
   .inner {

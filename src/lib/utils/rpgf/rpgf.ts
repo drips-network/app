@@ -4,10 +4,10 @@ import getOptionalEnvVar from '../get-optional-env-var/public';
 import stripTrailingSlash from '../strip-trailing-slash';
 import { rpgfJwtStore } from './siwe';
 import {
-  createRoundDraftDtoSchema,
   createRoundDtoSchema,
-  roundDraftSchema,
+  roundAdminFieldsSchema,
   roundDraftWrapperDto,
+  roundPublicFieldsSchema,
   slugAvailableResponseSchema,
   type CreateRoundDto,
   type RoundDraft,
@@ -56,25 +56,33 @@ export async function rpgfServerCall(
     rpgfJwtStore.set(null);
   }
 
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+  }
+
   return res;
 }
 
 export async function getDrafts(f = fetch) {
   const res = await rpgfServerCall('/round-drafts', 'GET', undefined, f);
 
-  if (res.status === 200) {
-    const parsed = createRoundDraftDtoSchema.array().parse(await res.json());
-    return parsed;
-  }
+  const parsed = roundDraftWrapperDto.array().parse(await res.json());
+  return parsed;
+}
 
-  return null;
+export async function getRounds(f = fetch) {
+  const res = await rpgfServerCall('/rounds', 'GET', undefined, f);
+
+  const parsed = roundPublicFieldsSchema.array().parse(await res.json());
+  return parsed;
 }
 
 export async function getDraft(f = fetch, id: string) {
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
 
   if (res.status === 200) {
-    const parsed = roundDraftSchema.parse(await res.json());
+    const parsed = roundDraftWrapperDto.parse(await res.json());
     return parsed;
   }
 
@@ -89,12 +97,15 @@ export async function updateDraft(f = fetch, id: string, draft: RoundDraft) {
 
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
 
-  if (res.status === 200) {
-    const parsed = roundDraftWrapperDto.parse(await res.json());
-    return parsed;
-  }
+  const parsed = roundDraftWrapperDto.parse(await res.json());
+  return parsed;
+}
 
-  return null;
+export async function publishRound(f = fetch, id: string) {
+  const res = await rpgfServerCall(`/round-drafts/${id}/publish`, 'POST', undefined, f);
+
+  const parsed = roundAdminFieldsSchema.parse(await res.json());
+  return parsed;
 }
 
 export async function checkSlugAvailability(f = fetch, slug: string) {
@@ -102,4 +113,18 @@ export async function checkSlugAvailability(f = fetch, slug: string) {
 
   const { available } = slugAvailableResponseSchema.parse(await res.json());
   return available;
+}
+
+export async function getRound(f = fetch, slug: string) {
+  const res = await rpgfServerCall(`/rounds/${slug}`, 'GET', undefined, f);
+
+  const parsed = roundPublicFieldsSchema.parse(await res.json());
+  return parsed;
+}
+
+export async function getRoundAsAdmin(f = fetch, slug: string) {
+  const res = await rpgfServerCall(`/rounds/${slug}/admin`, 'GET', undefined, f);
+
+  const parsed = roundAdminFieldsSchema.parse(await res.json());
+  return parsed;
 }

@@ -152,19 +152,19 @@ export const roundPublicFieldsSchema = z.object({
   state: roundStateSchema,
   name: z.string(),
   description: z.string().nullable(),
-  applicationPeriodStart: z.date(),
-  applicationPeriodEnd: z.date(),
-  votingPeriodStart: z.date(),
-  votingPeriodEnd: z.date(),
-  resultsPeriodStart: z.date(),
+  applicationPeriodStart: z.string().pipe(z.coerce.date()),
+  applicationPeriodEnd: z.string().pipe(z.coerce.date()),
+  votingPeriodStart: z.string().pipe(z.coerce.date()),
+  votingPeriodEnd: z.string().pipe(z.coerce.date()),
+  resultsPeriodStart: z.string().pipe(z.coerce.date()),
   applicationFormat: applicationFormatSchema,
   votingConfig: z.object({
     maxVotesPerVoter: z.number().int().positive(),
     maxVotesPerProjectPerVoter: z.number().int().positive(),
   }),
   createdByUserId: z.string().uuid(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().pipe(z.coerce.date()),
+  updatedAt: z.string().pipe(z.coerce.date()),
 });
 export type RoundPublicFields = z.infer<typeof roundPublicFieldsSchema>;
 
@@ -189,21 +189,11 @@ export const createRoundDtoSchema = z.object({
     .transform((val) => val.toLowerCase()),
   chainId: z.number().int().positive(),
   description: z.string().max(10000).optional(),
-  applicationPeriodStart: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format for applicationPeriodStart',
-  }),
-  applicationPeriodEnd: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format for applicationPeriodEnd',
-  }),
-  votingPeriodStart: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format for votingPeriodStart',
-  }),
-  votingPeriodEnd: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format for votingPeriodEnd',
-  }),
-  resultsPeriodStart: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: 'Invalid date format for resultsPeriodStart',
-  }),
+  applicationPeriodStart: z.date().transform((v) => v.toISOString()),
+  applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
+  votingPeriodStart: z.date().transform((v) => v.toISOString()),
+  votingPeriodEnd: z.date().transform((v) => v.toISOString()),
+  resultsPeriodStart: z.date().transform((v) => v.toISOString()),
   applicationFormat: applicationFormatSchema,
   votingConfig: z.object({
     maxVotesPerVoter: z.number().int().positive(),
@@ -238,7 +228,12 @@ export const roundDraftWrapperDto = z.object({
   id: z.string().uuid(),
   chainId: z.number(),
   draft: roundDraftSchema,
+  validation: z.object({
+    scheduleValid: z.boolean(),
+    draftComplete: z.boolean(),
+  }),
 });
+export type RoundDraftWrapperDto = z.infer<typeof roundDraftWrapperDto>;
 
 export const slugAvailableResponseSchema = z.object({
   available: z.boolean(),

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import { type RoundDraftWrapperDto } from '$lib/utils/rpgf/schemas';
   import Label from '../icons/Label.svelte';
   import TodoListItem from './components/todo-list-item.svelte';
   import Ledger from '../icons/Ledger.svelte';
@@ -8,9 +8,16 @@
   import Button from '../button/button.svelte';
   import Registered from '../icons/Registered.svelte';
   import Proposals from '../icons/Proposals.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '../stepper/stepper.svelte';
+  import publishRpgfRoundFlowSteps from '$lib/flows/publish-rpgf-round/publish-rpgf-round-flow-steps';
+  import { matchPreset } from '$lib/utils/rpgf/application-form-presets';
 
-  export let draftId: string;
-  export let draft: RoundDraft;
+  export let draftWrapper: RoundDraftWrapperDto;
+  $: draft = draftWrapper.draft;
+  $: draftId = draftWrapper.id;
+
+  $: serverSideValidationOk = Object.values(draftWrapper.validation).every((v) => v === true);
 
   const requiredFields: (keyof typeof draft)[] = [
     'name',
@@ -37,12 +44,14 @@
   $: votingConfigDone = Boolean(draft.votingConfig);
 
   // TODO(rpgf): Compare against the default application format
-  $: applicationFormCustomized = Boolean(draft.applicationFormat);
+  $: applicationFormCustomized = draft.applicationFormat
+    ? matchPreset(draft.applicationFormat)?.slug !== 'default'
+    : false;
 
   $: additionalAdminsConfigured = Boolean(draft.adminWalletAddresses.length > 1);
 
   function handlePublish() {
-    // TODO(rpgf): Implement publish logic
+    modal.show(Stepper, undefined, publishRpgfRoundFlowSteps(draftId));
   }
 </script>
 
@@ -61,6 +70,7 @@
       title="Schedule"
       done={scheduleDone}
       href="/app/rpgf/drafts/{draftId}/settings/schedule"
+      error={!draftWrapper.validation.scheduleValid}
     />
     <TodoListItem
       icon={Proposals}
@@ -90,7 +100,7 @@
 
   <Button
     variant="primary"
-    disabled={!requiredFieldsFilled}
+    disabled={!requiredFieldsFilled || !serverSideValidationOk}
     icon={Registered}
     size="large"
     on:click={handlePublish}

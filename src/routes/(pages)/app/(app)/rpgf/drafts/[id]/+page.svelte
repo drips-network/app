@@ -13,6 +13,7 @@
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
 
   export let data;
+  $: draft = data.draftWrapper.draft;
 
   function isScheduleComplete(
     schedule: Partial<ComponentProps<RpgfScheduleCard>['schedule']>,
@@ -29,11 +30,11 @@
   let schedule: ComponentProps<RpgfScheduleCard>['schedule'];
   $: {
     const scheduleFields = {
-      applicationPeriodStart: data.draft.applicationPeriodStart,
-      applicationPeriodEnd: data.draft.applicationPeriodEnd,
-      votingPeriodStart: data.draft.votingPeriodStart,
-      votingPeriodEnd: data.draft.votingPeriodEnd,
-      resultsPeriodStart: data.draft.resultsPeriodStart,
+      applicationPeriodStart: draft.applicationPeriodStart,
+      applicationPeriodEnd: draft.applicationPeriodEnd,
+      votingPeriodStart: draft.votingPeriodStart,
+      votingPeriodEnd: draft.votingPeriodEnd,
+      resultsPeriodStart: draft.resultsPeriodStart,
     };
 
     if (isScheduleComplete(scheduleFields)) {
@@ -44,20 +45,20 @@
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
-    <RpgfDraftTodoCard draft={data.draft} draftId={$page.params.id} />
+    <RpgfDraftTodoCard draftWrapper={data.draftWrapper} />
     {#if schedule}
       <RpgfScheduleCard {schedule} />
     {/if}
   </svelte:fragment>
 
   <svelte:fragment slot="header">
-    <RpgfHeaderCard roundSlugOrDraftId={$page.params.id} isDraft roundOrDraft={data.draft} />
+    <RpgfHeaderCard roundSlugOrDraftId={$page.params.id} isDraft roundOrDraft={draft} />
   </svelte:fragment>
 
-  {#if data.draft.description}
+  {#if draft.description}
     <div style:padding="0 1rem">
       <ExpandableText>
-        <Markdown content={data.draft.description} />
+        <Markdown content={draft.description} />
       </ExpandableText>
     </div>
   {/if}

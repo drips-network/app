@@ -106,16 +106,18 @@
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft invalid={!valid}>
-  <FormField title="Votes per voter">
+  <FormField title="Votes per voter*">
     <TextInput
+      placeholder="1000"
       validationState={votesPerVoterValidationState}
       bind:value={votesPerVoter}
       variant={{ type: 'number', min: 1 }}
     />
   </FormField>
 
-  <FormField title="Maximum votes per project">
+  <FormField title="Maximum votes per project*">
     <TextInput
+      placeholder="100"
       validationState={maxVotesPerProjectValidationState}
       bind:value={maxVotesPerProject}
       variant={{ type: 'number', min: 1 }}

@@ -7,7 +7,7 @@
 
 <RpgfSettingsSchedule
   settingsFormProps={{
-    roundOrDraft: data.draft,
+    roundOrDraft: data.draftWrapper.draft,
     id: $page.params.id,
     isDraft: true,
   }}

@@ -10,6 +10,7 @@
   export let isDraft = false;
   export let roundSlugOrDraftId: string;
   export let roundOrDraft: RoundDraft;
+  export let interactive = true;
 
   $: isAdmin = $walletStore.address
     ? roundOrDraft.adminWalletAddresses?.includes($walletStore.address.toLowerCase())
@@ -25,23 +26,25 @@
         <span class="draft-badge typo-header-5">Draft</span>
       {/if}
     </h1>
-    <div class="actions">
-      <ShareButton
-        shareModalText={isDraft
-          ? 'Note that this round draft can only be viewed by the configured round admins.'
-          : ''}
-        url={$page.url.toString()}
-        buttonVariant="normal"
-      />
-      {#if isAdmin}
-        <Button
-          icon={Settings}
-          href={isDraft
-            ? `/app/rpgf/drafts/${roundSlugOrDraftId}/settings/representation`
-            : `/app/rpgf/rounds/${roundSlugOrDraftId}/settings/representation`}>Settings</Button
-        >
-      {/if}
-    </div>
+    {#if interactive}
+      <div class="actions">
+        <ShareButton
+          shareModalText={isDraft
+            ? 'Note that this round draft can only be viewed by the configured round admins.'
+            : ''}
+          url={$page.url.toString()}
+          buttonVariant="normal"
+        />
+        {#if isAdmin}
+          <Button
+            icon={Settings}
+            href={isDraft
+              ? `/app/rpgf/drafts/${roundSlugOrDraftId}/settings/representation`
+              : `/app/rpgf/rounds/${roundSlugOrDraftId}/settings/representation`}>Settings</Button
+          >
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
 

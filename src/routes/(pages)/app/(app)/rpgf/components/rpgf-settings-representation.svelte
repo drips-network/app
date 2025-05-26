@@ -8,13 +8,16 @@
   import { z } from 'zod';
   import { checkSlugAvailability } from '$lib/utils/rpgf/rpgf';
   import network from '$lib/stores/wallet/network';
+  import EmojiPicker from '$lib/components/emoji-picker/emoji-picker.svelte';
+  import RpgfHeaderCard from '$lib/components/rpgf-header-card/rpgf-header-card.svelte';
+  import ColorPicker from '$lib/components/color-picker/color-picker.svelte';
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
 
   let updatedRoundOrDraft = { ...settingsFormProps.roundOrDraft };
 
   let urlSlugInputValue = updatedRoundOrDraft.urlSlug;
-  let urlSlugValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let urlSlugValidationState: TextInputValidationState = { type: 'valid' };
 
   $: {
     if (!urlSlugInputValue) {
@@ -27,7 +30,13 @@
 
   $: {
     urlSlugInputValue;
-    urlSlugValidationState = { type: 'unvalidated' };
+
+    if (urlSlugInputValue === updatedRoundOrDraft.urlSlug) {
+      urlSlugValidationState = { type: 'valid' };
+    } else {
+      urlSlugValidationState = { type: 'unvalidated' };
+    }
+
     showUrlSuccess = false;
   }
 
@@ -75,18 +84,34 @@
     }
   }
 
-  $: valid = Boolean(
-    urlSlugValidationState.type === 'valid' &&
-      updatedRoundOrDraft.name &&
-      updatedRoundOrDraft.name.length > 0,
+  $: invalid = Boolean(
+    urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
   );
 
   let showUrlSuccess = false;
 </script>
 
-<RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft invalid={!valid}>
+<RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft {invalid}>
+  <FormField title="Preview">
+    <RpgfHeaderCard
+      interactive={false}
+      roundOrDraft={updatedRoundOrDraft}
+      roundSlugOrDraftId={settingsFormProps.id}
+    />
+  </FormField>
+
   <FormField title="Round name*">
     <TextInput bind:value={updatedRoundOrDraft.name} placeholder="My RPGF round" />
+  </FormField>
+
+  <FormField title="Emoji*">
+    <div style:border="1px solid var(--color-foreground)" style:border-radius="1rem 0 1rem 1rem">
+      <EmojiPicker bind:selectedEmoji={updatedRoundOrDraft.emoji} />
+    </div>
+  </FormField>
+
+  <FormField title="Color*">
+    <ColorPicker bind:selectedColor={updatedRoundOrDraft.color} />
   </FormField>
 
   <FormField title="URL*" disabled={urlSlugValidationState.type === 'pending'}>

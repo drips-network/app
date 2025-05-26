@@ -4,7 +4,7 @@
   import SidenavItem from '$lib/components/sidenav/components/sidenav-item.svelte';
   import { page } from '$app/stores';
   import Label from '$lib/components/icons/Label.svelte';
-  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import type { RoundDraftWrapperDto } from '$lib/utils/rpgf/schemas';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import Calendar from '$lib/components/icons/Calendar.svelte';
   import User from '$lib/components/icons/User.svelte';
@@ -16,7 +16,8 @@
   export let draftIdOrRoundSlug: string;
 
   export let isDraft: boolean;
-  export let roundOrDraft: RoundDraft;
+  export let draftWrapper: RoundDraftWrapperDto;
+  $: roundOrDraft = draftWrapper.draft;
 
   onMount(() => {
     $forceMainSidebarCollapsed = true;
@@ -33,7 +34,9 @@
 
 <div class="rpgf-settings-layout">
   <div class="sidebar">
-    <RpgfDraftTodoCard draft={roundOrDraft} draftId={draftIdOrRoundSlug} />
+    {#if isDraft}
+      <RpgfDraftTodoCard {draftWrapper} />
+    {/if}
   </div>
 
   <div class="settings-sidenav">
@@ -124,6 +127,8 @@
   .rpgf-settings-layout {
     position: relative;
     display: grid;
+    max-width: 100rem;
+    margin: 0 auto;
     grid-template-columns: minmax(auto, 13rem) 3fr minmax(auto, 19rem);
     grid-template-areas: 'sidenav content sidebar';
     gap: 3rem;
@@ -148,7 +153,8 @@
 
   .content {
     grid-area: content;
-    max-width: 64rem;
+    max-width: 48rem;
+    padding-bottom: 2rem;
     margin: 0 auto;
     width: 100%;
   }

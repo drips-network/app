@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Button from '../button/button.svelte';
 
   let expanded = false;
@@ -6,17 +7,37 @@
   function toggleExpand() {
     expanded = !expanded;
   }
+
+  let containerElem: HTMLDivElement;
+  let overflown = false;
+
+  function isOverflown() {
+    return containerElem.scrollHeight > containerElem.clientHeight;
+  }
+
+  const resizeObserver = new ResizeObserver(() => {
+    overflown = isOverflown();
+  });
+  onMount(() => {
+    overflown = isOverflown();
+    resizeObserver.observe(containerElem);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  });
 </script>
 
-<div class="expandable-text" class:expanded>
+<div bind:this={containerElem} class="expandable-text" class:expanded>
   <slot />
-  <div class="expand-button">
-    <Button on:click={toggleExpand}>
-      {expanded ? 'Show less' : 'Show more'}
-    </Button>
-  </div>
-  {#if !expanded}
-    <div class="fadeout-gradient"></div>
+  {#if overflown || expanded}
+    <div class="expand-button">
+      <Button on:click={toggleExpand}>
+        {expanded ? 'Show less' : 'Show more'}
+      </Button>
+    </div>
+    {#if !expanded}
+      <div class="fadeout-gradient"></div>
+    {/if}
   {/if}
 </div>
 
