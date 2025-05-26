@@ -1,8 +1,9 @@
 <script lang="ts">
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
+  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import type { ComponentType } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   export let icon: ComponentType;
   export let done: boolean;
@@ -15,7 +16,7 @@
   let iconFillColor: string;
   $: {
     if (error) {
-      iconFillColor = 'var(--color-negative)';
+      iconFillColor = 'var(--color-caution)';
     } else if (done) {
       iconFillColor = 'var(--color-positive-level-6)';
     } else if (optional) {
@@ -24,19 +25,34 @@
       iconFillColor = 'var(--color-foreground)';
     }
   }
+
+  function iconTransition(direction: 'in' | 'out') {
+    return {
+      y: direction === 'in' ? 8 : -8,
+      duration: 300,
+    };
+  }
 </script>
 
 <li>
   <a {href} class="todo-list-item" class:done class:error class:optional>
     <svelte:component this={icon} style="fill: {iconFillColor}" />
     <h2 class="typo-text-bold">{title}</h2>
-    {#if error}
-      <CrossCircle style="fill: {iconFillColor}" />
-    {:else if done}
-      <CheckCircle style="fill: {iconFillColor}" />
-    {:else if optional}
-      <ArrowRight style="fill: {iconFillColor}" />
-    {/if}
+    <div class="icon">
+      {#if error}
+        <div in:fly={iconTransition('in')} out:fly={iconTransition('out')}>
+          <ExclamationCircle style="fill: {iconFillColor}" />
+        </div>
+      {:else if done}
+        <div in:fly={iconTransition('in')} out:fly={iconTransition('out')}>
+          <CheckCircle style="fill: {iconFillColor}" />
+        </div>
+      {:else if optional}
+        <div in:fly={iconTransition('in')} out:fly={iconTransition('out')}>
+          <ArrowRight style="fill: {iconFillColor}" />
+        </div>
+      {/if}
+    </div>
   </a>
 </li>
 
@@ -66,10 +82,22 @@
   }
 
   .todo-list-item.error {
-    color: var(--color-negative);
+    color: var(--color-caution);
   }
 
   h2 {
     flex-grow: 1;
+  }
+
+  .icon {
+    position: relative;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .icon > div {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 </style>
