@@ -34,6 +34,17 @@
 
 <div class="rpgf-settings-layout">
   <div class="sidebar">
+    <div class="mobile-only">
+      <a
+        class="back"
+        href={isDraft
+          ? `/app/rpgf/drafts/${draftIdOrRoundSlug}`
+          : `/app/rpgf/rounds/${draftIdOrRoundSlug}`}
+      >
+        <ArrowLeft style="fill: var(--color-foreground)" />
+        <span class="typo-text-bold">{roundOrDraft.name ?? 'Unnamed round'}</span>
+      </a>
+    </div>
     {#if isDraft}
       <RpgfDraftTodoCard {draftWrapper} />
     {/if}
@@ -163,7 +174,15 @@
     display: none;
   }
 
+  .mobile-only {
+    display: none;
+  }
+
   @media (max-width: 1251px) {
+    .mobile-only {
+      display: block;
+    }
+
     .rpgf-settings-layout {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
