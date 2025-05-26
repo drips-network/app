@@ -47,7 +47,7 @@
   let lastH: number = h;
 
   // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, cuttilyDetectCollapseAndDeselectNode(), refreshGraphDebounced();
+  $: w, h, detectCollapseAndDeselectNode(), refreshGraphDebounced();
 
   interface State {
     isDragging?: boolean;
@@ -70,7 +70,7 @@
   const state: State = { searchQuery: '' };
 
   // TODO: be less cutty
-  function cuttilyDetectCollapseAndDeselectNode() {
+  function detectCollapseAndDeselectNode() {
     if (w !== lastW || h !== lastH) {
       if (w < lastW || h < lastH) {
         setSelectedNode(undefined);

@@ -17,7 +17,6 @@
 <script lang="ts">
   import Box from '$lib/components/icons/Box.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
-  import EcosystemGraph from '$lib/components/illustrations/ecosystem-graph.svelte';
   import type { EcosystemsListItem } from '$lib/utils/ecosystems/schemas';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import formatNumber from '$lib/utils/format-number';
@@ -42,7 +41,9 @@
     {/if}
     <div class="header">
       <div class="graph">
-        <EcosystemGraph />
+        <!-- TODO: replace with svg so that the nodes can take on the primary color
+         or use puppeteer to render the graph image and save it -->
+        <img src="/assets/ecosystems/ecosystem-preview.png" alt="Ecosystem preview" />
       </div>
     </div>
     <div class="details">
