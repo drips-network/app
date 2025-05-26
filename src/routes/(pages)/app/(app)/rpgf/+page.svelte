@@ -3,15 +3,15 @@
 </script>
 
 <h2>drafts</h2>
-{#each data.drafts ?? [] as draft}
-  <a href="/app/rpgf/drafts/{draft.id}" class="draft">
-    <h3>{draft.draft.name ?? 'Unnamed draft'}</h3>
+{#each data.drafts ?? [] as wrappedDraft}
+  <a href="/app/rpgf/drafts/{wrappedDraft.id}" class="draft">
+    <h3>{wrappedDraft.draft.name ?? 'Unnamed draft'}</h3>
   </a>
 {/each}
 
 <h2>rounds</h2>
-{#each data.rounds ?? [] as round}
-  <a href="/app/rpgf/rounds/{round.id}" class="draft">
-    <h3>{round.name ?? 'Unnamed round'}</h3>
+{#each data.rounds ?? [] as wrappedRound}
+  <a href="/app/rpgf/rounds/{wrappedRound.round.urlSlug}" class="draft">
+    <h3>{wrappedRound.round.name ?? 'Unnamed round'}</h3>
   </a>
 {/each}

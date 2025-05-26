@@ -9,7 +9,7 @@
   export let caption: string | undefined = undefined;
   export let textareaStyle: string | undefined = undefined;
 
-  export let value: string | undefined = undefined;
+  export let value: string | undefined | null = undefined;
   export let placeholder: string | undefined = undefined;
 
   export let validationState: TextInputValidationState = {

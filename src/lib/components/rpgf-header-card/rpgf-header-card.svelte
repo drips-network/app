@@ -1,15 +1,19 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
   import Button from '../button/button.svelte';
   import EmojiAvatar from '../emoji-avatar/emoji-avatar.svelte';
   import Settings from '../icons/Settings.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
   export let isDraft = false;
-  export let roundSlugOrDraftId: string;
-  export let roundOrDraft: RoundDraft;
+  export let roundSlugOrDraftId: string | undefined = undefined;
+  export let roundOrDraft: Pick<
+    Partial<WrappedRoundDraft['draft']>,
+    'name' | 'emoji' | 'color' | 'adminWalletAddresses'
+  >;
+
   export let interactive = true;
 
   $: isAdmin = $walletStore.address
@@ -35,7 +39,7 @@
           url={$page.url.toString()}
           buttonVariant="normal"
         />
-        {#if isAdmin}
+        {#if isAdmin && roundSlugOrDraftId}
           <Button
             icon={Settings}
             href={isDraft
@@ -56,6 +60,7 @@
     display: flex;
     gap: 2rem;
     align-items: center;
+    view-transition-name: rpgf-header-card;
   }
 
   .draft-badge {
@@ -74,8 +79,27 @@
     gap: 1rem;
   }
 
+  h1 {
+    view-transition-name: rpgf-header-card-title;
+  }
+
   .unnamed {
     color: var(--color-foreground-level-5);
+  }
+
+  :root::view-transition-old(rpgf-header-card):only-child,
+  :root::view-transition-old(rpgf-header-card-title):only-child {
+    animation:
+      110ms cubic-bezier(0.4, 0, 1, 1) both default-transition-fade-out,
+      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-to-top;
+    transform-origin: 50% 50%;
+  }
+
+  :root::view-transition-new(rpgf-header-card):only-child,
+  :root::view-transition-new(rpgf-header-card-title):only-child {
+    animation:
+      210ms cubic-bezier(0, 0, 0.2, 1) 90ms both default-transition-fade-in,
+      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-from-bottom;
   }
 
   @media (max-width: 1024px) {

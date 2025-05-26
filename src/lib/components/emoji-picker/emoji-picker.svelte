@@ -2,7 +2,7 @@
   import emoji from '$lib/utils/emoji/emoji';
   import twemoji from '$lib/utils/twemoji';
 
-  export let selectedEmoji: string;
+  export let selectedEmoji: string | undefined;
 
   export let category = 'Smileys & Emotion';
 

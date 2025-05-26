@@ -4,6 +4,6 @@
   export let data;
 </script>
 
-<RpgfSettingsLayout wrappedDraftOrRound={data.wrappedDraft}>
+<RpgfSettingsLayout wrappedDraftOrRound={data.wrappedRound}>
   <slot />
 </RpgfSettingsLayout>

@@ -7,13 +7,13 @@ export const ssr = false;
 export const load = async ({ fetch, params }) => {
   const { id } = params;
 
-  const draftWrapper = await getDraft(fetch, id);
+  const wrappedDraft = await getDraft(fetch, id);
 
-  if (!draftWrapper) {
+  if (!wrappedDraft) {
     return error(404, 'Draft not found');
   }
 
   return {
-    draftWrapper,
+    wrappedDraft,
   };
 };

@@ -1,17 +1,19 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import type { ComponentProps } from 'svelte';
-  import RpgfSettingsForm from './rpgf-settings-form.svelte';
+  import { type ComponentProps } from 'svelte';
+  import RpgfSettingsForm, { intitialSettingsState } from './rpgf-settings-form.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
   import ensureAtLeastOneArrayMember from '$lib/utils/ensure-at-least-one-array-member';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
+  $: isDraft = settingsFormProps.wrappedDraftOrRound.type === 'round-draft';
 
-  let updatedRoundOrDraft = { ...settingsFormProps.roundOrDraft };
+  let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
   let voterItems: Items = Object.fromEntries(
     updatedRoundOrDraft.votingConfig?.allowedVoters.map((address) => {
@@ -26,10 +28,11 @@
   );
 
   let votesPerVoter = updatedRoundOrDraft.votingConfig?.maxVotesPerVoter ?? undefined;
+
   let maxVotesPerProject =
     updatedRoundOrDraft.votingConfig?.maxVotesPerProjectPerVoter ?? undefined;
 
-  $: addresses = mapFilterUndefined(
+  let addresses: string[] = mapFilterUndefined(
     Object.values(voterItems).map((item) => {
       if (item.type === 'address') {
         return item.address;
@@ -81,7 +84,7 @@
         maxVotesPerProject,
     ) ||
     // If draft, allow deleting voting config
-    (settingsFormProps.isDraft &&
+    (settingsFormProps.wrappedDraftOrRound.type === 'round-draft' &&
       votesPerVoterValidationState.type === 'unvalidated' &&
       maxVotesPerProjectValidationState.type === 'unvalidated' &&
       !addresses.length);
@@ -106,7 +109,16 @@
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft invalid={!valid}>
-  <FormField title="Votes per voter*">
+  {#if !isDraft}
+    <div style:align-self="flex-start">
+      <AnnotationBox>
+        You can no longer change the votes per voter or maximum votes per project for an ongoing,
+        published round.
+      </AnnotationBox>
+    </div>
+  {/if}
+
+  <FormField title="Votes per voter*" disabled={!isDraft}>
     <TextInput
       placeholder="1000"
       validationState={votesPerVoterValidationState}
@@ -115,7 +127,7 @@
     />
   </FormField>
 
-  <FormField title="Maximum votes per project*">
+  <FormField title="Maximum votes per project*" disabled={!isDraft}>
     <TextInput
       placeholder="100"
       validationState={maxVotesPerProjectValidationState}

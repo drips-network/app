@@ -1,7 +1,7 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import type { ComponentProps } from 'svelte';
-  import RpgfSettingsForm from './rpgf-settings-form.svelte';
+  import { onMount, type ComponentProps } from 'svelte';
+  import RpgfSettingsForm, { intitialSettingsState } from './rpgf-settings-form.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import { getPresetBySlug, matchPreset, PRESETS } from '$lib/utils/rpgf/application-form-presets';
   import Ledger from '$lib/components/icons/Ledger.svelte';
@@ -9,11 +9,17 @@
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
 
-  let updatedRoundOrDraft = { ...settingsFormProps.roundOrDraft };
+  let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
-  let selectedPreset: string = updatedRoundOrDraft.applicationFormat
-    ? (matchPreset(updatedRoundOrDraft.applicationFormat)?.slug ?? 'default')
-    : 'default';
+  let selectedPreset: string;
+  onMount(() => {
+    if (updatedRoundOrDraft?.applicationFormat) {
+      const preset = matchPreset(updatedRoundOrDraft.applicationFormat);
+      selectedPreset = preset?.slug ?? '';
+    } else {
+      selectedPreset = '';
+    }
+  });
 
   $: valid = selectedPreset !== undefined;
 

@@ -13,7 +13,7 @@
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
 
   export let data;
-  $: draft = data.draftWrapper.draft;
+  $: draft = data.wrappedDraft.draft;
 
   function isScheduleComplete(
     schedule: Partial<ComponentProps<RpgfScheduleCard>['schedule']>,
@@ -45,7 +45,7 @@
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
-    <RpgfDraftTodoCard draftWrapper={data.draftWrapper} />
+    <RpgfDraftTodoCard draftWrapper={data.wrappedDraft} />
     {#if schedule}
       <RpgfScheduleCard {schedule} />
     {/if}

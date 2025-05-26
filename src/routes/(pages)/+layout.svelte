@@ -55,41 +55,17 @@
     transition: background-color 0.5s;
   }
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-
-  @keyframes fade-out {
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes slide-from-bottom {
-    from {
-      transform: translateY(30px);
-    }
-  }
-
-  @keyframes slide-to-top {
-    to {
-      transform: translateY(-30px);
-    }
-  }
-
   :root::view-transition-old(root) {
     animation:
-      110ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-top;
+      110ms cubic-bezier(0.4, 0, 1, 1) both default-transition-fade-out,
+      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-to-top;
     transform-origin: 50% 50%;
   }
 
   :root::view-transition-new(root) {
     animation:
-      210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-bottom;
+      210ms cubic-bezier(0, 0, 0.2, 1) 90ms both default-transition-fade-in,
+      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-from-bottom;
   }
 
   @media (prefers-reduced-motion: reduce) {

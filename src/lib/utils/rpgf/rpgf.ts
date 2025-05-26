@@ -5,12 +5,15 @@ import stripTrailingSlash from '../strip-trailing-slash';
 import { rpgfJwtStore } from './siwe';
 import {
   createRoundDtoSchema,
-  roundAdminFieldsSchema,
-  roundDraftWrapperDto,
-  roundPublicFieldsSchema,
   slugAvailableResponseSchema,
+  wrappedRoundAdminSchema,
+  wrappedRoundDraftSchema,
+  wrappedRoundPublicSchema,
   type CreateRoundDto,
-  type RoundDraft,
+  type PatchRoundDraftDto,
+  type WrappedRoundAdmin,
+  type WrappedRoundDraft,
+  type WrappedRoundPublic,
 } from './schemas';
 
 const rpgfApiUrl = getOptionalEnvVar(
@@ -64,32 +67,36 @@ export async function rpgfServerCall(
   return res;
 }
 
-export async function getDrafts(f = fetch) {
+export async function getDrafts(f = fetch): Promise<WrappedRoundDraft[]> {
   const res = await rpgfServerCall('/round-drafts', 'GET', undefined, f);
 
-  const parsed = roundDraftWrapperDto.array().parse(await res.json());
+  const parsed = wrappedRoundDraftSchema.array().parse(await res.json());
   return parsed;
 }
 
-export async function getRounds(f = fetch) {
+export async function getRounds(f = fetch): Promise<WrappedRoundPublic[]> {
   const res = await rpgfServerCall('/rounds', 'GET', undefined, f);
 
-  const parsed = roundPublicFieldsSchema.array().parse(await res.json());
+  const parsed = wrappedRoundPublicSchema.array().parse(await res.json());
   return parsed;
 }
 
-export async function getDraft(f = fetch, id: string) {
+export async function getDraft(f = fetch, id: string): Promise<WrappedRoundDraft | null> {
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
 
-  if (res.status === 200) {
-    const parsed = roundDraftWrapperDto.parse(await res.json());
-    return parsed;
+  if (res.status === 404) {
+    return null;
   }
 
-  return null;
+  const parsed = wrappedRoundDraftSchema.parse(await res.json());
+  return parsed;
 }
 
-export async function updateDraft(f = fetch, id: string, draft: RoundDraft) {
+export async function updateDraft(
+  f = fetch,
+  id: string,
+  draft: PatchRoundDraftDto,
+): Promise<WrappedRoundDraft> {
   // strip empty fields
   const strippedDraft = Object.fromEntries(
     Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
@@ -97,34 +104,44 @@ export async function updateDraft(f = fetch, id: string, draft: RoundDraft) {
 
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
 
-  const parsed = roundDraftWrapperDto.parse(await res.json());
+  const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
 }
 
-export async function publishRound(f = fetch, id: string) {
+export async function publishRound(f = fetch, id: string): Promise<WrappedRoundAdmin> {
   const res = await rpgfServerCall(`/round-drafts/${id}/publish`, 'POST', undefined, f);
 
-  const parsed = roundAdminFieldsSchema.parse(await res.json());
+  const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
 }
 
-export async function checkSlugAvailability(f = fetch, slug: string) {
+export async function checkSlugAvailability(f = fetch, slug: string): Promise<boolean> {
   const res = await rpgfServerCall(`/rounds/check-slug/${slug}`, 'GET', undefined, f);
 
   const { available } = slugAvailableResponseSchema.parse(await res.json());
   return available;
 }
 
-export async function getRound(f = fetch, slug: string) {
+export async function getRound(
+  f = fetch,
+  slug: string,
+): Promise<WrappedRoundAdmin | WrappedRoundPublic | null> {
   const res = await rpgfServerCall(`/rounds/${slug}`, 'GET', undefined, f);
+  const body = await res.json();
 
-  const parsed = roundPublicFieldsSchema.parse(await res.json());
-  return parsed;
+  const adminFieldsParseResult = wrappedRoundAdminSchema.safeParse(body);
+  const publicFieldsParseResult = wrappedRoundPublicSchema.safeParse(body);
+
+  return adminFieldsParseResult.data ?? publicFieldsParseResult.data ?? null;
 }
 
-export async function getRoundAsAdmin(f = fetch, slug: string) {
+export async function getRoundAsAdmin(f = fetch, slug: string): Promise<WrappedRoundAdmin | null> {
   const res = await rpgfServerCall(`/rounds/${slug}/admin`, 'GET', undefined, f);
 
-  const parsed = roundAdminFieldsSchema.parse(await res.json());
+  if (res.status === 404) {
+    return null;
+  }
+
+  const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
 }

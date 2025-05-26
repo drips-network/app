@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { type RoundDraftWrapperDto } from '$lib/utils/rpgf/schemas';
   import Label from '../icons/Label.svelte';
   import TodoListItem from './components/todo-list-item.svelte';
   import Ledger from '../icons/Ledger.svelte';
@@ -12,8 +11,9 @@
   import Stepper from '../stepper/stepper.svelte';
   import publishRpgfRoundFlowSteps from '$lib/flows/publish-rpgf-round/publish-rpgf-round-flow-steps';
   import { matchPreset } from '$lib/utils/rpgf/application-form-presets';
+  import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
 
-  export let draftWrapper: RoundDraftWrapperDto;
+  export let draftWrapper: WrappedRoundDraft;
   $: draft = draftWrapper.draft;
   $: draftId = draftWrapper.id;
 

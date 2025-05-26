@@ -1,24 +1,42 @@
+<script context="module" lang="ts">
+  export function intitialSettingsState(
+    wrappedDraftOrRound: WrappedRoundDraft | WrappedRoundAdmin,
+  ) {
+    return wrappedDraftOrRound.type === 'round-draft'
+      ? { ...wrappedDraftOrRound.draft }
+      : { ...wrappedDraftOrRound.round };
+  }
+</script>
+
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { updateDraft } from '$lib/utils/rpgf/rpgf';
-  import type { RoundDraft } from '$lib/utils/rpgf/schemas';
+  import type {
+    PatchRoundDraftDto,
+    PatchRoundDto,
+    WrappedRoundAdmin,
+    WrappedRoundDraft,
+  } from '$lib/utils/rpgf/schemas';
   import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  export let roundOrDraft: RoundDraft;
-  export let id: string;
-  export let isDraft: boolean;
+  export let wrappedDraftOrRound: WrappedRoundDraft | WrappedRoundAdmin;
+  $: draftOrRound =
+    wrappedDraftOrRound.type === 'round-draft'
+      ? wrappedDraftOrRound.draft
+      : wrappedDraftOrRound.round;
+
   export let invalid = false;
 
-  export let updatedRoundOrDraft: typeof roundOrDraft;
+  export let updatedRoundOrDraft: PatchRoundDraftDto | PatchRoundDto;
 
   $: haveFieldsChanged = false;
   $: {
     updatedRoundOrDraft;
-    haveFieldsChanged = JSON.stringify(updatedRoundOrDraft) !== JSON.stringify(roundOrDraft);
+    haveFieldsChanged = JSON.stringify(updatedRoundOrDraft) !== JSON.stringify(draftOrRound);
   }
 
   let saving = false;
@@ -48,9 +66,13 @@
     resetSuccess();
 
     try {
-      if (isDraft) {
-        await doWithErrorModal(() => updateDraft(undefined, id, updatedRoundOrDraft));
+      if (wrappedDraftOrRound.type === 'round-draft') {
+        wrappedDraftOrRound.draft.applicationPeriodEnd;
+        await doWithErrorModal(() =>
+          updateDraft(undefined, wrappedDraftOrRound.id, updatedRoundOrDraft as PatchRoundDraftDto),
+        );
       } else {
+        wrappedDraftOrRound.round.applicationPeriodEnd;
         // TODO(rpgf): update round
       }
 

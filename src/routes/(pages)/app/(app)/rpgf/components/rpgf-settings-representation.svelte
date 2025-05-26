@@ -2,8 +2,8 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import type { ComponentProps } from 'svelte';
-  import RpgfSettingsForm from './rpgf-settings-form.svelte';
+  import { type ComponentProps } from 'svelte';
+  import RpgfSettingsForm, { intitialSettingsState } from './rpgf-settings-form.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import { z } from 'zod';
   import { checkSlugAvailability } from '$lib/utils/rpgf/rpgf';
@@ -13,10 +13,12 @@
   import ColorPicker from '$lib/components/color-picker/color-picker.svelte';
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
+  $: isDraft = settingsFormProps.wrappedDraftOrRound.type === 'round-draft';
 
-  let updatedRoundOrDraft = { ...settingsFormProps.roundOrDraft };
+  let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
-  let urlSlugInputValue = updatedRoundOrDraft.urlSlug;
+  let urlSlugInputValue = updatedRoundOrDraft.urlSlug || '';
+
   let urlSlugValidationState: TextInputValidationState = { type: 'valid' };
 
   $: {
@@ -93,11 +95,7 @@
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft {invalid}>
   <FormField title="Preview">
-    <RpgfHeaderCard
-      interactive={false}
-      roundOrDraft={updatedRoundOrDraft}
-      roundSlugOrDraftId={settingsFormProps.id}
-    />
+    <RpgfHeaderCard isDraft interactive={false} roundOrDraft={updatedRoundOrDraft} />
   </FormField>
 
   <FormField title="Round name*">
@@ -114,7 +112,7 @@
     <ColorPicker bind:selectedColor={updatedRoundOrDraft.color} />
   </FormField>
 
-  <FormField title="URL*" disabled={urlSlugValidationState.type === 'pending'}>
+  <FormField title="URL*" disabled={!isDraft || urlSlugValidationState.type === 'pending'}>
     <div class="url-input">
       <span>{network.subdomain}/</span>
       <TextInput

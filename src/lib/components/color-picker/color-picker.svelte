@@ -1,7 +1,7 @@
 <script lang="ts">
   import possibleColors from '$lib/utils/project/possible-colors';
 
-  export let selectedColor: string;
+  export let selectedColor: string | undefined;
 </script>
 
 <div class="colors">

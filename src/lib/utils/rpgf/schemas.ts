@@ -143,7 +143,7 @@ const applicationFieldSchema = z.union([
 const applicationFormatSchema = z.array(applicationFieldSchema).max(50);
 export type ApplicationFormat = z.infer<typeof applicationFormatSchema>;
 
-export const roundPublicFieldsSchema = z.object({
+const roundPublicFieldsSchema = z.object({
   id: z.string().uuid(),
   chainId: z.number(),
   emoji: z.string().emoji(),
@@ -165,18 +165,34 @@ export const roundPublicFieldsSchema = z.object({
   createdByUserId: z.string().uuid(),
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()),
+  adminWalletAddresses: z.array(ethereumAddressSchema).nonempty(), // Array of wallet addresses
+  isAdmin: z.literal(false),
 });
-export type RoundPublicFields = z.infer<typeof roundPublicFieldsSchema>;
 
-export const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({
+const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({
   votingConfig: z.object({
     maxVotesPerVoter: z.number().int().positive(),
     maxVotesPerProjectPerVoter: z.number().int().positive(),
     allowedVoters: z.array(z.string()).nonempty(),
   }),
-  adminWalletAddresses: z.array(ethereumAddressSchema).nonempty(), // Array of wallet addresses
+  isAdmin: z.literal(true),
 });
-export type RoundAdminFields = z.infer<typeof roundAdminFieldsSchema>;
+
+export const wrappedRoundPublicSchema = z.object({
+  id: z.string().uuid(),
+  type: z.literal('round'),
+  chainId: z.number(),
+  round: roundPublicFieldsSchema,
+});
+export type WrappedRoundPublic = z.infer<typeof wrappedRoundPublicSchema>;
+
+export const wrappedRoundAdminSchema = z.object({
+  id: z.string().uuid(),
+  type: z.literal('round'),
+  chainId: z.number(),
+  round: roundAdminFieldsSchema,
+});
+export type WrappedRoundAdmin = z.infer<typeof wrappedRoundAdminSchema>;
 
 export const createRoundDtoSchema = z.object({
   name: z.string().min(1).max(255),
@@ -188,7 +204,7 @@ export const createRoundDtoSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'URL slug must be URL-safe')
     .transform((val) => val.toLowerCase()),
   chainId: z.number().int().positive(),
-  description: z.string().max(10000).optional(),
+  description: z.string().max(10000).nullish(),
   applicationPeriodStart: z.date().transform((v) => v.toISOString()),
   applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
   votingPeriodStart: z.date().transform((v) => v.toISOString()),
@@ -212,28 +228,43 @@ export const createRoundDraftDtoSchema = createRoundDtoSchema.partial().extend({
 });
 export type CreateRoundDraftDto = z.infer<typeof createRoundDraftDtoSchema>;
 
-export const patchRoundDtoSchema = createRoundDtoSchema.partial();
-export type PatchRoundDto = z.infer<typeof patchRoundDtoSchema>;
-
-export const roundDraftSchema = createRoundDraftDtoSchema.extend({
-  applicationPeriodStart: z.string().pipe(z.coerce.date()).optional(),
-  applicationPeriodEnd: z.string().pipe(z.coerce.date()).optional(),
-  votingPeriodStart: z.string().pipe(z.coerce.date()).optional(),
-  votingPeriodEnd: z.string().pipe(z.coerce.date()).optional(),
-  resultsPeriodStart: z.string().pipe(z.coerce.date()).optional(),
+export const patchRoundDtoSchema = createRoundDtoSchema.partial().extend({
+  applicationPeriodStart: z.date().transform((v) => v.toISOString()),
+  applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
+  votingPeriodStart: z.date().transform((v) => v.toISOString()),
+  votingPeriodEnd: z.date().transform((v) => v.toISOString()),
+  resultsPeriodStart: z.date().transform((v) => v.toISOString()),
 });
-export type RoundDraft = z.infer<typeof roundDraftSchema>;
+export type PatchRoundDto = z.input<typeof patchRoundDtoSchema>;
 
-export const roundDraftWrapperDto = z.object({
+export const wrappedRoundDraftSchema = z.object({
   id: z.string().uuid(),
+  type: z.literal('round-draft'),
   chainId: z.number(),
-  draft: roundDraftSchema,
+  draft: createRoundDraftDtoSchema.extend({
+    color: possibleColorSchema,
+    emoji: z.string().emoji(),
+    applicationPeriodStart: z.string().pipe(z.coerce.date()),
+    applicationPeriodEnd: z.string().pipe(z.coerce.date()),
+    votingPeriodStart: z.string().pipe(z.coerce.date()),
+    votingPeriodEnd: z.string().pipe(z.coerce.date()),
+    resultsPeriodStart: z.string().pipe(z.coerce.date()),
+  }),
   validation: z.object({
     scheduleValid: z.boolean(),
     draftComplete: z.boolean(),
   }),
 });
-export type RoundDraftWrapperDto = z.infer<typeof roundDraftWrapperDto>;
+export type WrappedRoundDraft = z.infer<typeof wrappedRoundDraftSchema>;
+
+export const patchRoundDraftDtoSchema = createRoundDraftDtoSchema.partial().extend({
+  applicationPeriodStart: z.date().transform((v) => v.toISOString()),
+  applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
+  votingPeriodStart: z.date().transform((v) => v.toISOString()),
+  votingPeriodEnd: z.date().transform((v) => v.toISOString()),
+  resultsPeriodStart: z.date().transform((v) => v.toISOString()),
+});
+export type PatchRoundDraftDto = z.input<typeof patchRoundDraftDtoSchema>;
 
 export const slugAvailableResponseSchema = z.object({
   available: z.boolean(),

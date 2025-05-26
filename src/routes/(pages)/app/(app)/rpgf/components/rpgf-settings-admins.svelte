@@ -1,7 +1,7 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import type { ComponentProps } from 'svelte';
-  import RpgfSettingsForm from './rpgf-settings-form.svelte';
+  import { type ComponentProps } from 'svelte';
+  import RpgfSettingsForm, { intitialSettingsState } from './rpgf-settings-form.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -10,7 +10,7 @@
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
 
-  let updatedRoundOrDraft = { ...settingsFormProps.roundOrDraft };
+  let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
   let adminItems: Items = Object.fromEntries(
     updatedRoundOrDraft.adminWalletAddresses.map((address) => {
@@ -25,22 +25,24 @@
   );
 
   $: {
-    const addresses = mapFilterUndefined(
-      Object.values(adminItems).map((item) => {
-        if (item.type === 'address') {
-          return item.address;
-        } else {
-          return undefined;
-        }
-      }),
-      (v) => v,
-    );
+    if (adminItems) {
+      const addresses = mapFilterUndefined(
+        Object.values(adminItems).map((item) => {
+          if (item.type === 'address') {
+            return item.address;
+          } else {
+            return undefined;
+          }
+        }),
+        (v) => v,
+      );
 
-    if (ensureAtLeastOneArrayMember(addresses)) {
-      updatedRoundOrDraft = {
-        ...updatedRoundOrDraft,
-        adminWalletAddresses: addresses,
-      };
+      if (ensureAtLeastOneArrayMember(addresses)) {
+        updatedRoundOrDraft = {
+          ...updatedRoundOrDraft,
+          adminWalletAddresses: addresses,
+        };
+      }
     }
   }
 

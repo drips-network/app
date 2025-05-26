@@ -6,6 +6,6 @@
 
 <RpgfSettingsSchedule
   settingsFormProps={{
-    wrappedDraftOrRound: data.wrappedDraft,
+    wrappedDraftOrRound: data.wrappedRound,
   }}
 />

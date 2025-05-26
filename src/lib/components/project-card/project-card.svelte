@@ -59,7 +59,12 @@
         : 'var(--color-foreground-level-1)'}
     />
     <div class="header">
-      <div class="avatar">
+      <div
+        class="avatar"
+        style:width="fit-content"
+        style:view-transition-name="project-avatar-{project.source.ownerName}-{project.source
+          .repoName}"
+      >
         <ProjectAvatar project={projectChainData} size="large" outline />
       </div>
     </div>

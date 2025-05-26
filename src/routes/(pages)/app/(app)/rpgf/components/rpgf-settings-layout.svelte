@@ -4,7 +4,6 @@
   import SidenavItem from '$lib/components/sidenav/components/sidenav-item.svelte';
   import { page } from '$app/stores';
   import Label from '$lib/components/icons/Label.svelte';
-  import type { RoundDraftWrapperDto } from '$lib/utils/rpgf/schemas';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import Calendar from '$lib/components/icons/Calendar.svelte';
   import User from '$lib/components/icons/User.svelte';
@@ -12,12 +11,9 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
   import ScrollableTabs from '$lib/components/scrollable-tabs/scrollable-tabs.svelte';
+  import type { WrappedRoundAdmin, WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
 
-  export let draftIdOrRoundSlug: string;
-
-  export let isDraft: boolean;
-  export let draftWrapper: RoundDraftWrapperDto;
-  $: roundOrDraft = draftWrapper.draft;
+  export let wrappedDraftOrRound: WrappedRoundAdmin | WrappedRoundDraft;
 
   onMount(() => {
     $forceMainSidebarCollapsed = true;
@@ -27,38 +23,39 @@
     };
   });
 
-  $: settingsBaseUrl = isDraft
-    ? `/app/rpgf/drafts/${draftIdOrRoundSlug}/settings`
-    : `/app/rpgf/rounds/${draftIdOrRoundSlug}/settings`;
+  $: settingsBaseUrl =
+    wrappedDraftOrRound.type === 'round-draft'
+      ? `/app/rpgf/drafts/${wrappedDraftOrRound.id}/settings`
+      : `/app/rpgf/rounds/${wrappedDraftOrRound.round.urlSlug}/settings`;
+
+  $: backLink =
+    wrappedDraftOrRound.type === 'round-draft'
+      ? `/app/rpgf/drafts/${wrappedDraftOrRound.id}`
+      : `/app/rpgf/rounds/${wrappedDraftOrRound.round.urlSlug}`;
+
+  $: name =
+    wrappedDraftOrRound.type === 'round-draft'
+      ? wrappedDraftOrRound.draft.name
+      : wrappedDraftOrRound.round.name;
 </script>
 
 <div class="rpgf-settings-layout">
   <div class="sidebar">
     <div class="mobile-only">
-      <a
-        class="back"
-        href={isDraft
-          ? `/app/rpgf/drafts/${draftIdOrRoundSlug}`
-          : `/app/rpgf/rounds/${draftIdOrRoundSlug}`}
-      >
+      <a class="back" href={backLink}>
         <ArrowLeft style="fill: var(--color-foreground)" />
-        <span class="typo-text-bold">{roundOrDraft.name ?? 'Unnamed round'}</span>
+        <span class="typo-text-bold">{name}</span>
       </a>
     </div>
-    {#if isDraft}
-      <RpgfDraftTodoCard {draftWrapper} />
+    {#if wrappedDraftOrRound.type === 'round-draft'}
+      <RpgfDraftTodoCard draftWrapper={wrappedDraftOrRound} />
     {/if}
   </div>
 
   <div class="settings-sidenav">
-    <a
-      class="back"
-      href={isDraft
-        ? `/app/rpgf/drafts/${draftIdOrRoundSlug}`
-        : `/app/rpgf/rounds/${draftIdOrRoundSlug}`}
-    >
+    <a class="back" href={backLink}>
       <ArrowLeft style="fill: var(--color-foreground)" />
-      <span class="typo-text-bold">{roundOrDraft.name ?? 'Unnamed round'}</span>
+      <span class="typo-text-bold">{name}</span>
     </a>
     <SidenavItem
       label="Representation"
