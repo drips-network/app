@@ -23,22 +23,24 @@
     activeIndex = tabs.findIndex((tab) => tab.href === $page.url.pathname);
   }
 
-  const highlightBarWidth = tweened(0, {
-    duration: 300,
-    easing: quintInOut,
-  });
-  const highlightBarLeft = tweened(0, {
-    duration: 300,
-    easing: quintInOut,
-  });
+  const highlightBarWidth = tweened(0);
+  const highlightBarLeft = tweened(0);
+
+  let firstUpdate = true;
 
   $: {
     if (activeIndex !== null) {
       const activeTab = tabElems[activeIndex];
 
       if (activeTab) {
-        highlightBarWidth.set(activeTab.offsetWidth);
-        highlightBarLeft.set(activeTab.offsetLeft);
+        const animation = firstUpdate
+          ? { duration: 0, easing: quintInOut }
+          : { duration: 300, easing: quintInOut };
+
+        highlightBarWidth.set(activeTab.offsetWidth, animation);
+        highlightBarLeft.set(activeTab.offsetLeft, animation);
+
+        firstUpdate = false;
       }
     }
   }
