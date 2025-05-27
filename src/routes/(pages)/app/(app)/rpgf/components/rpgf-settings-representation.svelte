@@ -95,7 +95,7 @@
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft {invalid}>
   <FormField title="Preview">
-    <RpgfHeaderCard isDraft interactive={false} roundOrDraft={updatedRoundOrDraft} />
+    <RpgfHeaderCard {isDraft} interactive={false} roundOrDraft={updatedRoundOrDraft} />
   </FormField>
 
   <FormField title="Round name*">
