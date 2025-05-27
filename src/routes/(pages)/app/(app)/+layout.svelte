@@ -16,6 +16,7 @@
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { LayoutData } from './$types';
+  import network from '$lib/stores/wallet/network';
 
   export let data: LayoutData;
 
@@ -52,7 +53,9 @@
             { label: 'Funds', href: '/app/funds', icon: TokenStreams },
             { label: 'Projects', href: '/app/projects', icon: Box },
             { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            { label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon },
+            ...(network.ecosystems
+              ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
+              : []),
             {
               label: 'Profile',
               href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
@@ -76,7 +79,9 @@
           { label: 'Explore', href: '/app', icon: ExploreIcon },
           { label: 'Funds', href: '/app/funds', icon: TokenStreams },
           { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon },
+          ...(network.ecosystems
+            ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
+            : []),
           { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
           {
             label: 'Profile',
