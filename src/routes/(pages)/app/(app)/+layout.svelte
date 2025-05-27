@@ -23,6 +23,21 @@
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
+  $: navItems = [
+    { label: 'Explore', href: '/app', icon: ExploreIcon },
+    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+    { label: 'Projects', href: '/app/projects', icon: Box },
+    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+    ...(network.ecosystems
+      ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
+      : []),
+    {
+      label: 'Profile',
+      href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+      icon: User,
+    },
+  ];
+
   $: {
     if ($navigating) {
       clearTimeout(loadingSpinnerTimeout);
@@ -48,20 +63,7 @@
     >
       <Sidenav
         items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            ...(network.ecosystems
-              ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
-              : []),
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
+          top: navItems,
           bottom: [
             {
               label: 'Help',
@@ -74,22 +76,7 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav
-        items={[
-          { label: 'Explore', href: '/app', icon: ExploreIcon },
-          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Box },
-          ...(network.ecosystems
-            ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
-            : []),
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-          {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: User,
-          },
-        ]}
-      />
+      <BottomNav items={navItems} />
     </div>
   {/if}
 
