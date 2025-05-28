@@ -41,7 +41,7 @@
       draft.votingPeriodEnd &&
       draft.resultsPeriodStart,
   );
-  $: votingConfigDone = Boolean(draft.votingConfig);
+  $: votingConfigDone = Boolean(draft.votingConfig && draft.votingConfig.allowedVoters.length > 0);
 
   // TODO(rpgf): Compare against the default application format
   $: applicationFormCustomized = draft.applicationFormat

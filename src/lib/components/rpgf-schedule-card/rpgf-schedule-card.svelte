@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { RoundPublicFields } from '$lib/utils/rpgf/schemas';
   import { onMount } from 'svelte';
   import ScheduleItem from './components/schedule-item.svelte';
   import { tweened } from 'svelte/motion';
   import { expoOut } from 'svelte/easing';
+  import type { WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
 
   export let schedule: Pick<
-    RoundPublicFields,
+    WrappedRoundPublic['round'],
     | 'applicationPeriodStart'
     | 'applicationPeriodEnd'
     | 'votingPeriodStart'

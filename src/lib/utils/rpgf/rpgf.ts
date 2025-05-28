@@ -4,17 +4,23 @@ import getOptionalEnvVar from '../get-optional-env-var/public';
 import stripTrailingSlash from '../strip-trailing-slash';
 import { rpgfJwtStore } from './siwe';
 import {
+  applicationSchema,
   createRoundDtoSchema,
   slugAvailableResponseSchema,
   wrappedRoundAdminSchema,
   wrappedRoundDraftSchema,
   wrappedRoundPublicSchema,
+  type Application,
+  type ApplicationFormat,
+  type CreateApplicationDto,
   type CreateRoundDto,
   type PatchRoundDraftDto,
+  type PatchRoundDto,
   type WrappedRoundAdmin,
   type WrappedRoundDraft,
   type WrappedRoundPublic,
 } from './schemas';
+import { error } from '@sveltejs/kit';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -61,7 +67,7 @@ export async function rpgfServerCall(
 
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+    throw error(res.status, `RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`);
   }
 
   return res;
@@ -81,12 +87,8 @@ export async function getRounds(f = fetch): Promise<WrappedRoundPublic[]> {
   return parsed;
 }
 
-export async function getDraft(f = fetch, id: string): Promise<WrappedRoundDraft | null> {
+export async function getDraft(f = fetch, id: string): Promise<WrappedRoundDraft> {
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
-
-  if (res.status === 404) {
-    return null;
-  }
 
   const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
@@ -138,9 +140,56 @@ export async function getRound(
 export async function getRoundAsAdmin(f = fetch, slug: string): Promise<WrappedRoundAdmin | null> {
   const res = await rpgfServerCall(`/rounds/${slug}/admin`, 'GET', undefined, f);
 
-  if (res.status === 404) {
-    return null;
-  }
+  const parsed = wrappedRoundAdminSchema.parse(await res.json());
+  return parsed;
+}
+
+export async function submitApplication(
+  f = fetch,
+  roundSlug: string,
+  application: CreateApplicationDto,
+  applicationFormat: ApplicationFormat,
+): Promise<Application> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/applications`, 'PUT', application, f);
+
+  return applicationSchema(applicationFormat).parse(await res.json());
+}
+
+export async function getApplications(
+  f = fetch,
+  roundSlug: string,
+  applicationFormat: ApplicationFormat,
+): Promise<Application[]> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/applications/`, 'GET', undefined, f);
+
+  return applicationSchema(applicationFormat)
+    .array()
+    .parse(await res.json());
+}
+
+export async function getApplication(
+  f = fetch,
+  roundSlug: string,
+  applicationFormat: ApplicationFormat,
+  applicationId: string,
+): Promise<Application> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/applications/${applicationId}`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return applicationSchema(applicationFormat).parse(await res.json());
+}
+
+export async function patchRound(f = fetch, roundSlug: string, patchRoundDto: PatchRoundDto) {
+  // strip empty fields
+  const strippedRound = Object.fromEntries(
+    Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
+  );
+
+  const res = await rpgfServerCall(`/rounds/${roundSlug}`, 'PATCH', strippedRound, f);
 
   const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;

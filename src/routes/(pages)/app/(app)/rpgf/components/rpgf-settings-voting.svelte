@@ -15,6 +15,7 @@
 
   let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
+  // TODO(rpgf): use address driver account IDs as item keys, not addresses
   let voterItems: Items = Object.fromEntries(
     updatedRoundOrDraft.votingConfig?.allowedVoters.map((address) => {
       return [
@@ -32,7 +33,7 @@
   let maxVotesPerProject =
     updatedRoundOrDraft.votingConfig?.maxVotesPerProjectPerVoter ?? undefined;
 
-  let addresses: string[] = mapFilterUndefined(
+  $: addresses = mapFilterUndefined(
     Object.values(voterItems).map((item) => {
       if (item.type === 'address') {
         return item.address;

@@ -12,6 +12,7 @@
 
   let updatedRoundOrDraft = intitialSettingsState(settingsFormProps.wrappedDraftOrRound);
 
+  // TODO(rpgf): use address driver account IDs as item keys, not addresses
   let adminItems: Items = Object.fromEntries(
     updatedRoundOrDraft.adminWalletAddresses.map((address) => {
       return [

@@ -34,9 +34,9 @@
       : `/app/rpgf/rounds/${wrappedDraftOrRound.round.urlSlug}`;
 
   $: name =
-    wrappedDraftOrRound.type === 'round-draft'
+    (wrappedDraftOrRound.type === 'round-draft'
       ? wrappedDraftOrRound.draft.name
-      : wrappedDraftOrRound.round.name;
+      : wrappedDraftOrRound.round.name) || 'Unnamed round';
 </script>
 
 <div class="rpgf-settings-layout">

@@ -2,12 +2,19 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
+  import { rpgfJwtStore } from '$lib/utils/rpgf/siwe';
 
   let description: string;
   $: {
     switch ($page.status) {
       case 404: {
-        description = 'We werenʼt able to find this round draft. You may have to authenticate first.';
+        description =
+          'We werenʼt able to find this round. You may have to sign in with your wallet first.';
+        break;
+      }
+      case 401: {
+        description =
+          'You are not authorized to view this. You may have to sign in with your wallet first.';
         break;
       }
       case 500: {
@@ -20,7 +27,7 @@
     }
   }
 
-  $: displayAuthButton = $page.status === 404;
+  $: displayAuthButton = ($page.status === 404 || $page.status === 401) && !$rpgfJwtStore;
 </script>
 
 <LargeEmptyState

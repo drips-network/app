@@ -25,7 +25,7 @@
   <div><EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" /></div>
   <div class="content">
     <h1 class:unnamed={!roundOrDraft.name}>
-      {roundOrDraft.name ?? 'Unnamed round'}
+      {roundOrDraft.name || 'Unnamed round'}
       {#if isDraft}
         <span class="draft-badge typo-header-5">Draft</span>
       {/if}

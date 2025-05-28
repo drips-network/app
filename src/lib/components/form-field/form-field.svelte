@@ -1,13 +1,35 @@
 <script lang="ts">
+  import { slide } from 'svelte/transition';
+  import AnnotationBox from '../annotation-box/annotation-box.svelte';
+  import Markdown from '../markdown/markdown.svelte';
+
   export let title: string | undefined = undefined;
   export let description: string | undefined = undefined;
+  export let descriptionMd: string | undefined = undefined;
   export let disabled = false;
   export let type: 'label' | 'div' = 'label';
+
+  export let validationState: { type: 'valid' } | { type: 'invalid'; message: string } | undefined =
+    undefined;
 </script>
 
 <svelte:element this={type} class="wrapper typo-text-bold" class:disabled>
+  {#if validationState}
+    {#if validationState.type === 'invalid'}
+      <div transition:slide={{ duration: 200 }}>
+        <AnnotationBox type="error">
+          {validationState.message}
+        </AnnotationBox>
+      </div>
+    {/if}
+  {/if}
   <div class="content"><slot /></div>
-  {#if description}<p>{description}</p>{/if}
+  <div class="description" style:color="var(--color-foreground-level-5)">
+    {#if description}<p style:color="var(--color-foreground-level-5)">{description}</p>{/if}
+    {#if descriptionMd}
+      <Markdown content={descriptionMd} />
+    {/if}
+  </div>
   {#if title}
     <div class="title">
       {title}

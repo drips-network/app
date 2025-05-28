@@ -13,7 +13,7 @@
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
-  import { updateDraft } from '$lib/utils/rpgf/rpgf';
+  import { patchRound, updateDraft } from '$lib/utils/rpgf/rpgf';
   import type {
     PatchRoundDraftDto,
     PatchRoundDto,
@@ -22,6 +22,8 @@
   } from '$lib/utils/rpgf/schemas';
   import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
+
+  // TODO(rpgf): Proper existing round editing
 
   export let wrappedDraftOrRound: WrappedRoundDraft | WrappedRoundAdmin;
   $: draftOrRound =
@@ -67,13 +69,13 @@
 
     try {
       if (wrappedDraftOrRound.type === 'round-draft') {
-        wrappedDraftOrRound.draft.applicationPeriodEnd;
         await doWithErrorModal(() =>
-          updateDraft(undefined, wrappedDraftOrRound.id, updatedRoundOrDraft as PatchRoundDraftDto),
+          updateDraft(undefined, wrappedDraftOrRound.id, updatedRoundOrDraft),
         );
       } else {
-        wrappedDraftOrRound.round.applicationPeriodEnd;
-        // TODO(rpgf): update round
+        await doWithErrorModal(() =>
+          patchRound(undefined, wrappedDraftOrRound.round.urlSlug, updatedRoundOrDraft),
+        );
       }
 
       await invalidateAll();

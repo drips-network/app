@@ -16,9 +16,9 @@
   async function handleConfirm() {
     dispatch('await', {
       promise: async () => {
-        const round = await publishRound(undefined, draftId);
+        const roundWrapper = await publishRound(undefined, draftId);
 
-        await goto(`app/rpgf/rounds/${round.urlSlug}`);
+        await goto(`/app/rpgf/rounds/${roundWrapper.round.urlSlug}`);
       },
       message: 'Publishing round...',
     });

@@ -1,4 +1,5 @@
 import z from 'zod';
+import mapFilterUndefined from '../map-filter-undefined';
 
 export const ethereumAddressSchema = z
   .string()
@@ -39,11 +40,13 @@ export const applicationMarkdownFieldSchema = z.object({
   type: z.literal('markdown'),
   content: z.string().min(1).max(50000),
 });
+export type ApplicationMarkdownField = z.infer<typeof applicationMarkdownFieldSchema>;
 
 // Displays a horizontal line in the application form
 export const applicationDividerFieldSchema = z.object({
   type: z.literal('divider'),
 });
+export type ApplicationDividerField = z.infer<typeof applicationDividerFieldSchema>;
 
 // Displays as a standard text field
 export const applicationTextFieldSchema = z.object({
@@ -54,6 +57,7 @@ export const applicationTextFieldSchema = z.object({
   label: z.string().min(1).max(255),
   descriptionMd: z.string().max(10000).optional(),
 });
+export type ApplicationTextField = z.infer<typeof applicationTextFieldSchema>;
 
 // Displays as a standard text area
 export const applicationTextAreaFieldSchema = z.object({
@@ -64,6 +68,7 @@ export const applicationTextAreaFieldSchema = z.object({
   label: z.string().min(1).max(255),
   descriptionMd: z.string().max(10000).optional(),
 });
+export type ApplicationTextAreaField = z.infer<typeof applicationTextAreaFieldSchema>;
 
 // Displays as a text field that validates for a valid URL
 export const applicationUrlFieldSchema = z.object({
@@ -74,6 +79,7 @@ export const applicationUrlFieldSchema = z.object({
   label: z.string().min(1).max(255),
   descriptionMd: z.string().max(10000).optional(),
 });
+export type ApplicationUrlField = z.infer<typeof applicationUrlFieldSchema>;
 
 // Displays as a text field that validates for a valid email
 export const applicationEmailFieldSchema = z.object({
@@ -84,6 +90,7 @@ export const applicationEmailFieldSchema = z.object({
   label: z.string().min(1).max(255),
   descriptionMd: z.string().max(10000).optional(),
 });
+export type ApplicationEmailField = z.infer<typeof applicationEmailFieldSchema>;
 
 // Allows building a list of entries, where each entry has all the fields defined in entryFields
 export const applicationListFieldSchema = z.object({
@@ -111,6 +118,7 @@ export const applicationListFieldSchema = z.object({
     ]),
   ),
 });
+export type ApplicationListField = z.infer<typeof applicationListFieldSchema>;
 
 // Displays as a ListSelect component, either multi- or single-select
 export const applicationSelectFieldSchema = z.object({
@@ -128,6 +136,7 @@ export const applicationSelectFieldSchema = z.object({
   ),
   allowMultiple: z.boolean().optional(),
 });
+export type ApplicationSelectField = z.infer<typeof applicationSelectFieldSchema>;
 
 const applicationFieldSchema = z.union([
   applicationMarkdownFieldSchema,
@@ -139,6 +148,7 @@ const applicationFieldSchema = z.union([
   applicationListFieldSchema,
   applicationSelectFieldSchema,
 ]);
+export type ApplicationField = z.infer<typeof applicationFieldSchema>;
 
 const applicationFormatSchema = z.array(applicationFieldSchema).max(50);
 export type ApplicationFormat = z.infer<typeof applicationFormatSchema>;
@@ -229,11 +239,26 @@ export const createRoundDraftDtoSchema = createRoundDtoSchema.partial().extend({
 export type CreateRoundDraftDto = z.infer<typeof createRoundDraftDtoSchema>;
 
 export const patchRoundDtoSchema = createRoundDtoSchema.partial().extend({
-  applicationPeriodStart: z.date().transform((v) => v.toISOString()),
-  applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
-  votingPeriodStart: z.date().transform((v) => v.toISOString()),
-  votingPeriodEnd: z.date().transform((v) => v.toISOString()),
-  resultsPeriodStart: z.date().transform((v) => v.toISOString()),
+  applicationPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  applicationPeriodEnd: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  votingPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  votingPeriodEnd: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  resultsPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
 });
 export type PatchRoundDto = z.input<typeof patchRoundDtoSchema>;
 
@@ -244,11 +269,11 @@ export const wrappedRoundDraftSchema = z.object({
   draft: createRoundDraftDtoSchema.extend({
     color: possibleColorSchema,
     emoji: z.string().emoji(),
-    applicationPeriodStart: z.string().pipe(z.coerce.date()),
-    applicationPeriodEnd: z.string().pipe(z.coerce.date()),
-    votingPeriodStart: z.string().pipe(z.coerce.date()),
-    votingPeriodEnd: z.string().pipe(z.coerce.date()),
-    resultsPeriodStart: z.string().pipe(z.coerce.date()),
+    applicationPeriodStart: z.string().pipe(z.coerce.date()).optional(),
+    applicationPeriodEnd: z.string().pipe(z.coerce.date()).optional(),
+    votingPeriodStart: z.string().pipe(z.coerce.date()).optional(),
+    votingPeriodEnd: z.string().pipe(z.coerce.date()).optional(),
+    resultsPeriodStart: z.string().pipe(z.coerce.date()).optional(),
   }),
   validation: z.object({
     scheduleValid: z.boolean(),
@@ -258,14 +283,118 @@ export const wrappedRoundDraftSchema = z.object({
 export type WrappedRoundDraft = z.infer<typeof wrappedRoundDraftSchema>;
 
 export const patchRoundDraftDtoSchema = createRoundDraftDtoSchema.partial().extend({
-  applicationPeriodStart: z.date().transform((v) => v.toISOString()),
-  applicationPeriodEnd: z.date().transform((v) => v.toISOString()),
-  votingPeriodStart: z.date().transform((v) => v.toISOString()),
-  votingPeriodEnd: z.date().transform((v) => v.toISOString()),
-  resultsPeriodStart: z.date().transform((v) => v.toISOString()),
+  applicationPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  applicationPeriodEnd: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  votingPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  votingPeriodEnd: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
+  resultsPeriodStart: z
+    .date()
+    .transform((v) => v.toISOString())
+    .optional(),
 });
 export type PatchRoundDraftDto = z.input<typeof patchRoundDraftDtoSchema>;
 
 export const slugAvailableResponseSchema = z.object({
   available: z.boolean(),
 });
+
+export const applicationStateSchema = z.enum(['pending', 'approved', 'rejected']);
+export type ApplicationState = z.infer<typeof applicationStateSchema>;
+
+function buildDynamicApplicatonFieldSchema(applicationFormat: ApplicationFormat) {
+  const fillableFields = applicationFormat.filter((f) => 'slug' in f);
+
+  const fields = Object.fromEntries(
+    mapFilterUndefined(fillableFields, (field) => {
+      let fieldSchema;
+
+      switch (field.type) {
+        case 'text':
+        case 'textarea':
+          fieldSchema = z.string().min(1).max(255);
+          break;
+        case 'url':
+          fieldSchema = z.string().url();
+          break;
+        case 'email':
+          fieldSchema = z.string().email();
+          break;
+        case 'list':
+          fieldSchema = z.array(z.union([z.string(), z.number()]));
+          break;
+        case 'select':
+          fieldSchema = field.allowMultiple ? z.array(z.string()) : z.string();
+          break;
+        default:
+          return undefined;
+      }
+
+      if (!fieldSchema) return undefined;
+
+      if (!field.required) fieldSchema = fieldSchema.optional();
+
+      return [field.slug, fieldSchema];
+    }),
+  );
+
+  return z.object(fields);
+}
+
+export const createApplicationDtoSchema = (applicationFormat: ApplicationFormat) =>
+  z.object({
+    projectName: z.string().min(1).max(255),
+    dripsAccountId: z.string().min(1).max(255),
+    fields: buildDynamicApplicatonFieldSchema(applicationFormat),
+  });
+export type CreateApplicationDto = z.infer<ReturnType<typeof createApplicationDtoSchema>>;
+
+export const projectChainDataSchema = z.object({
+  avatar: z.union([
+    z.object({
+      emoji: z.string(),
+    }),
+    z.object({
+      cid: z.string(),
+    }),
+  ]),
+  color: z.string(),
+  owner: z.object({
+    address: z.string(),
+  }),
+});
+export type ProjectChainData = z.infer<typeof projectChainDataSchema>;
+
+export const applicationSchema = (applicationFormat: ApplicationFormat) =>
+  z.object({
+    id: z.string(),
+    state: applicationStateSchema,
+    projectName: z.string().min(1).max(255),
+    dripsProjectDataSnapshot: projectChainDataSchema,
+    dripsAccountId: z.string().min(1).max(255),
+    submitterUserId: z.string(),
+    roundId: z.string(),
+    fields: buildDynamicApplicatonFieldSchema(applicationFormat),
+    createdAt: z.string().pipe(z.coerce.date()),
+    updatedAt: z.string().pipe(z.coerce.date()),
+  });
+export type Application = z.infer<ReturnType<typeof applicationSchema>>;
+
+export const applicationReviewDtoSchema = z.array(
+  z.object({
+    applicationId: z.string(),
+    decision: z.enum(['approve', 'reject']),
+  }),
+);
+export type ApplicationReviewDto = z.infer<typeof applicationReviewDtoSchema>;

@@ -51,6 +51,7 @@
     on:change
     on:click
     on:input
+    on:blur
     on:keydown
     on:keypress
   />
@@ -84,7 +85,7 @@
     padding: 0.75rem 0.75rem;
     width: 100%;
     height: 3rem;
-    min-height: 3rem;
+    min-height: 10rem;
     resize: none;
     transition:
       background-color 0.3s,
