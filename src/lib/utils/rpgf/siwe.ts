@@ -5,8 +5,26 @@ import type { Signer } from 'ethers';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { browser } from '$app/environment';
+import { jwtDecode } from 'jwt-decode';
 
 export const rpgfJwtStore = storedWritable('rpgf-jwt', z.string().nullable(), null, !browser);
+
+const jwtContentSchema = z.object({
+  userId: z.string(),
+  walletAddress: z.string(),
+  exp: z.number(),
+});
+export type RpgfUserData = z.infer<typeof jwtContentSchema>;
+
+export function getUserData(jwt: string | null): RpgfUserData | null {
+  if (!jwt) {
+    return null;
+  }
+
+  const content = jwtContentSchema.parse(jwtDecode(jwt));
+
+  return content;
+}
 
 async function createSiweMessage(address: string) {
   const res = await rpgfServerCall('/auth/nonce');

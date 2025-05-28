@@ -3,7 +3,9 @@ import { error } from '@sveltejs/kit';
 
 export const ssr = false;
 
-export const load = async ({ fetch, params }) => {
+export const load = async ({ fetch, params, parent }) => {
+  const { rpgfUserData } = await parent();
+
   const { slug } = params;
 
   const wrappedRound = await getRound(fetch, slug);
@@ -18,8 +20,13 @@ export const load = async ({ fetch, params }) => {
     wrappedRound.round.applicationFormat,
   );
 
+  const isRoundAdmin = rpgfUserData?.walletAddress
+    ? wrappedRound.round.adminWalletAddresses.includes(rpgfUserData?.walletAddress)
+    : false;
+
   return {
     wrappedRound,
     applications,
+    isRoundAdmin,
   };
 };

@@ -36,9 +36,9 @@
           variant={secondaryButton ? 'primary' : undefined}
           on:click={button.handler}>{button.label}</Button
         >{/if}
-        {#if showSiweButton}
-        <RpgfSiweButton></RpgfSiweButton>
-        {/if}
+      {#if showSiweButton}
+        <RpgfSiweButton on:signIn></RpgfSiweButton>
+      {/if}
     </div>
   </div>
 </div>

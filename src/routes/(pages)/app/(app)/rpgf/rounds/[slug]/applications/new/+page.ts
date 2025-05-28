@@ -14,7 +14,7 @@ export const load = async ({ fetch, url }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {
-    redirect(307, buildUrl('/app/connect', { backTo: url.pathname }));
+    redirect(307, buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }));
   }
 
   const projectsQuery = gql`

@@ -1,9 +1,8 @@
-import { rpgfJwtStore } from '$lib/utils/rpgf/siwe.js';
-import { get } from 'svelte/store';
 import { getDrafts, getRounds } from '$lib/utils/rpgf/rpgf.js';
 
-export const load = async ({ fetch }) => {
-  if (!get(rpgfJwtStore)) {
+export const load = async ({ fetch, parent }) => {
+  const { rpgfUserData } = await parent();
+  if (!rpgfUserData) {
     return {
       drafts: [],
     };

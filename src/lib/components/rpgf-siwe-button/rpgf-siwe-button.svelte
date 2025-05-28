@@ -4,10 +4,7 @@
   import type { Signer } from 'ethers';
   import Button from '../button/button.svelte';
   import Wallet from '../icons/Wallet.svelte';
-  import { createEventDispatcher } from 'svelte';
-  import { invalidate, invalidateAll } from '$app/navigation';
-
-  const dispatch = createEventDispatcher<{ signIn: void }>();
+  import { invalidateAll } from '$app/navigation';
 
   let pending = false;
 
@@ -19,6 +16,10 @@
 
       if ($walletStore.connected) {
         signer = $walletStore.signer;
+
+        await signInWithEthereum(signer);
+
+        await invalidateAll();
       } else {
         const walletState = await walletStore.connect();
 
@@ -27,10 +28,6 @@
         }
         signer = walletState.signer;
       }
-
-      await signInWithEthereum(signer);
-      
-      invalidateAll();
     } catch {
       // Handle error if needed
     } finally {
@@ -44,5 +41,5 @@
   variant="primary"
   icon={Wallet}
   disabled={Boolean($rpgfJwtStore)}
-  on:click={handleClick}>Connect wallet & Sign in</Button
+  on:click={handleClick}>{$walletStore.connected ? '' : 'Connect wallet & '}Sign in</Button
 >

@@ -11,9 +11,13 @@
 <div class="page">
   <div><Button href="/app/rpgf/rounds/{roundSlug}" icon={ArrowLeft}>Back to round</Button></div>
   <h1>Applications</h1>
-  <div class="applications-table">
-    <RpgfApplicationsTable {roundSlug} applications={data.applications} />
-  </div>
+
+  <RpgfApplicationsTable
+    userIsAdmin={data.isRoundAdmin}
+    userData={data.rpgfUserData}
+    {roundSlug}
+    applications={data.applications}
+  />
 </div>
 
 <style>
@@ -21,10 +25,5 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  .applications-table {
-    display: flex;
-    flex-direction: column;
   }
 </style>

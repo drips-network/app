@@ -14,9 +14,12 @@
   import { fade } from 'svelte/transition';
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
   import RpgfCtaCard from '$lib/components/rpgf-cta-card/rpgf-cta-card.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
 
   export let data;
   $: round = data.wrappedRound.round;
+
+  $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
 </script>
 
 <RpgfBaseLayout>
@@ -53,16 +56,30 @@
     header={{
       label: 'Applications',
       icon: Ledger,
+      actions: [
+        {
+          label: 'View all',
+          href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+          icon: ArrowRight,
+        },
+      ],
     }}
     skeleton={{
       empty: data.applications.length === 0,
       loaded: true,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No applications',
-      emptyStateText: 'There are currently no approved applications for this round.',
+      emptyStateText: `There are currently no ${!userIsAdmin ? 'approved ' : ''}applications for this round.`,
     }}
   >
-    <RpgfApplicationsTable roundSlug={round.urlSlug} applications={data.applications} />
+    <RpgfApplicationsTable
+      userData={data.rpgfUserData}
+      {userIsAdmin}
+      seperateOwnApplications
+      roundSlug={round.urlSlug}
+      applications={data.applications}
+      maxItems={10}
+    />
   </Section>
 
   <Section

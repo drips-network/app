@@ -20,7 +20,6 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
-import { rpgfJwtStore } from '$lib/utils/rpgf/siwe';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -126,7 +125,7 @@ const walletStore = () => {
         await connect(true, isSafeApp, { autoSelect: { label, disableModals: true } });
       }
     }
-    
+
     initialized.set(true);
     return get(state);
   }
@@ -273,9 +272,11 @@ const walletStore = () => {
     const accounts = await provider.listAccounts();
     const signer = await provider.getSigner();
 
+    const connectingAddress = accounts[0].address;
+
     state.set({
       connected: true,
-      address: accounts[0].address,
+      address: connectingAddress,
       dripsAccountId: (
         await executeAddressDriverReadMethod({
           functionName: 'calcAccountId',
@@ -296,10 +297,6 @@ const walletStore = () => {
   function _clear() {
     lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
-
-    // Ugly to have this cross-dependency between models, but we need to somehow clear
-    // the RPGF JWT when the wallet is disconnected.
-    rpgfJwtStore.set(null);
 
     invalidateAll();
   }

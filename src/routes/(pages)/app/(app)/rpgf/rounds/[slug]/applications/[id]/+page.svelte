@@ -17,7 +17,7 @@
     >
   </div>
   <div class="card">
-    <RpgfApplicationBadge {application} hideName size="huge" />
+    <RpgfApplicationBadge hideState {application} hideName size="huge" />
     <h1>{application.projectName}</h1>
     <ProjectBadge project={data.dripsProject} />
   </div>
