@@ -23,7 +23,10 @@ import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import filterCurrentChainData from '../filter-current-chain-data';
 import unreachable from '../unreachable';
 import network from '$lib/stores/wallet/network';
-import { populateSubAccountRepoDriverWriteTx } from '../sdk/sub-account-repo-driver/sub-account-repo-driver';
+import {
+  executeSubAccountRepoDriverReadMethod,
+  populateSubAccountRepoDriverWriteTx,
+} from '../sdk/sub-account-repo-driver/sub-account-repo-driver';
 
 interface ListEditorConfig {
   items: Items;
@@ -352,6 +355,13 @@ export default class GitProjectService {
     highLevelPercentages: { [slug: string]: number },
     maintainerListEditorConfig: ListEditorConfig,
   ) {
+    const subDriverAccountId = (
+      await executeSubAccountRepoDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [BigInt(accountId)],
+      })
+    ).toString();
+
     const receivers: (LatestVersion<
       typeof repoDriverAccountMetadataParser
     >['splits']['maintainers'][number] & { sublist: 'maintainers' })[] = [];
@@ -378,7 +388,7 @@ export default class GitProjectService {
     return {
       tx: await populateSubAccountRepoDriverWriteTx({
         functionName: 'setSplits',
-        args: [toBigInt(accountId), formatSplitReceivers(receivers)],
+        args: [toBigInt(subDriverAccountId), formatSplitReceivers(receivers)],
       }),
       receivers,
     };
@@ -463,21 +473,6 @@ export default class GitProjectService {
       receivers.push(receiver);
     }
 
-    // Adjust weights to ensure no tiny remainder
-    // const MAX_WEIGHT = 1000000;
-
-    // function adjustWeights<T extends { weight: number }>(input: T[]): T[] {
-    //   const totalWeight = input.reduce((acc, { weight }) => acc + weight, 0);
-    //   const remainder = MAX_WEIGHT - totalWeight;
-
-    //   if (remainder > 0) {
-    //     input[0].weight += remainder;
-    //   }
-
-    //   return input;
-    // }
-
-    // receivers = adjustWeights(receivers);
     this._adjustWeights(receivers);
 
     return {

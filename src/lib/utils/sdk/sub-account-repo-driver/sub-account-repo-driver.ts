@@ -14,26 +14,35 @@ import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
 import txToSafeDripsTx from '../utils/tx-to-safe-drips-tx';
 import assert from '$lib/utils/assert';
-// import unwrapEthersResult from '../utils/unwrap-ethers-result';
-// import type { UnwrappedEthersResult } from '../sdk-types';
+import unwrapEthersResult from '../utils/unwrap-ethers-result';
+import type { UnwrappedEthersResult } from '../sdk-types';
 import network from '$lib/stores/wallet/network';
 
-// export async function executeRepoDriverReadMethod<
-//   functionName extends ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>,
-//   abiFunction extends AbiFunction = ExtractAbiFunction<RepoDriverAbi, functionName>,
-// >(config: {
-//   functionName: functionName | ExtractAbiFunctionNames<RepoDriverAbi, 'pure' | 'view'>;
-//   args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
-// }): Promise<
-//   UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
-// > {
-//   const { provider } = get(wallet);
-//   const { functionName: func, args } = config;
+export async function executeSubAccountRepoDriverReadMethod<
+  functionName extends ExtractAbiFunctionNames<RepoSubAccountDriverAbi, 'pure' | 'view'>,
+  abiFunction extends AbiFunction = ExtractAbiFunction<RepoSubAccountDriverAbi, functionName>,
+>(config: {
+  functionName: functionName | ExtractAbiFunctionNames<RepoSubAccountDriverAbi, 'pure' | 'view'>;
+  args: AbiParametersToPrimitiveTypes<abiFunction['inputs'], 'inputs'>;
+}): Promise<
+  UnwrappedEthersResult<AbiParametersToPrimitiveTypes<abiFunction['outputs'], 'outputs'>>
+> {
+  const { provider } = get(wallet);
+  const { functionName: func, args } = config;
 
-//   const repoDriver = new Contract(network.contracts.REPO_DRIVER, repoDriverAbi, provider);
+  assert(
+    network.contracts.SUB_ACCOUNT_REPO_DRIVER,
+    'Sub Account Repo Driver does not exist on this network',
+  );
 
-//   return unwrapEthersResult(await repoDriver[func](...args));
-// }
+  const repoDriver = new Contract(
+    network.contracts.SUB_ACCOUNT_REPO_DRIVER,
+    repoSubAccountDriverAbi,
+    provider,
+  );
+
+  return unwrapEthersResult(await repoDriver[func](...args));
+}
 
 export async function populateSubAccountRepoDriverWriteTx<
   functionName extends ExtractAbiFunctionNames<RepoSubAccountDriverAbi, 'nonpayable' | 'payable'>,
