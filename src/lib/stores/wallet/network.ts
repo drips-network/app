@@ -58,6 +58,7 @@ export type Network = {
     REPO_DRIVER: string;
     NFT_DRIVER: string;
     NATIVE_TOKEN_UNWRAPPER: string | undefined;
+    SUB_ACCOUNT_REPO_DRIVER?: string;
   };
   /**
    * If enabled, LP, blog, and legal routes are redirected to https://drips.network/<path>.
@@ -209,6 +210,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -295,6 +297,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0x971e08fc533d2A5f228c7944E511611dA3B56B24',
       NFT_DRIVER: '0xf98e07d281Ff9b83612DBeF0A067d710716720eA',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+      SUB_ACCOUNT_REPO_DRIVER: '0xB8743C2bB8DF7399273aa7EE4cE8d4109Bec327F',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -495,6 +498,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
       NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
       NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
+      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: 'daily',
