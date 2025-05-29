@@ -24,9 +24,9 @@ import filterCurrentChainData from '../filter-current-chain-data';
 import unreachable from '../unreachable';
 import network from '$lib/stores/wallet/network';
 import {
-  executeSubAccountRepoDriverReadMethod,
-  populateSubAccountRepoDriverWriteTx,
-} from '../sdk/sub-account-repo-driver/sub-account-repo-driver';
+  executeRepoSubAccountDriverReadMethod,
+  populateRepoSubAccountDriverWriteTx,
+} from '../sdk/repo-sub-account-driver/repo-sub-account-driver';
 
 interface ListEditorConfig {
   items: Items;
@@ -356,7 +356,7 @@ export default class GitProjectService {
     maintainerListEditorConfig: ListEditorConfig,
   ) {
     const subDriverAccountId = (
-      await executeSubAccountRepoDriverReadMethod({
+      await executeRepoSubAccountDriverReadMethod({
         functionName: 'calcAccountId',
         args: [BigInt(accountId)],
       })
@@ -386,7 +386,7 @@ export default class GitProjectService {
     this._adjustWeights(receivers);
 
     return {
-      tx: await populateSubAccountRepoDriverWriteTx({
+      tx: await populateRepoSubAccountDriverWriteTx({
         functionName: 'setSplits',
         args: [toBigInt(subDriverAccountId), formatSplitReceivers(receivers)],
       }),

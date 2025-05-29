@@ -8,7 +8,7 @@ import type {
 import {
   repoSubAccountDriverAbi,
   type RepoSubAccountDriverAbi,
-} from './sub-account-repo-driver-abi';
+} from './repo-sub-account-driver-abi';
 import { Contract } from 'ethers';
 import { get } from 'svelte/store';
 import type { ContractTransaction } from 'ethers';
@@ -18,7 +18,7 @@ import unwrapEthersResult from '../utils/unwrap-ethers-result';
 import type { UnwrappedEthersResult } from '../sdk-types';
 import network from '$lib/stores/wallet/network';
 
-export async function executeSubAccountRepoDriverReadMethod<
+export async function executeRepoSubAccountDriverReadMethod<
   functionName extends ExtractAbiFunctionNames<RepoSubAccountDriverAbi, 'pure' | 'view'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<RepoSubAccountDriverAbi, functionName>,
 >(config: {
@@ -44,7 +44,7 @@ export async function executeSubAccountRepoDriverReadMethod<
   return unwrapEthersResult(await repoDriver[func](...args));
 }
 
-export async function populateSubAccountRepoDriverWriteTx<
+export async function populateRepoSubAccountDriverWriteTx<
   functionName extends ExtractAbiFunctionNames<RepoSubAccountDriverAbi, 'nonpayable' | 'payable'>,
   abiFunction extends AbiFunction = ExtractAbiFunction<RepoSubAccountDriverAbi, functionName>,
 >(config: {
