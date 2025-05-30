@@ -1,9 +1,9 @@
 ---
 title: 'Explore Berlin Like a Local — The Drips Guide to Berlin Blockchain Week'
 date: '2025-05-30'
-coverImage: '/assets/blog-images/guide-to-berlin-cover.jpg'
-coverImageAlt: 'Illustration showing funds flowing and branching out' # Slightly more descriptive alt text
-excerpt: 'Attending Blockchain Week in Berlin? Use our guide to explore the city like a local.'
+coverImage: '/assets/blog-images/guide_to_berlin_cover.jpg'
+coverImageAlt: 'The logo of the Drips Guide to Berlin'
+excerpt: 'The Drips Guide to Berlin is here in time for Blockchain Week.'
 author: 'becca'
 announcementBannerCopy: 'Attending Berlin Blockchain Week? Explore Berlin like a local with The Drips Guide to Berlin'
 ---
