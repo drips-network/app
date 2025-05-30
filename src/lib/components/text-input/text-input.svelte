@@ -157,7 +157,7 @@
     appearance: none;
     background-color: var(--color-background);
     border-radius: 2rem 0 2rem 2rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-5);
     height: 3rem;
     padding: 0.5rem 0.75rem;
     width: 100%;

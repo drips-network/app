@@ -6,6 +6,7 @@
 
   export let projectUrl: string | undefined = undefined;
   export let skipWalletConnect = false;
+  export let linkToProjectPageOnSuccess = true;
 
   let currentStepIndex = 0;
 
@@ -30,7 +31,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => myState}
-  steps={steps(myState, skipWalletConnect, true, projectUrl)}
+  steps={steps(myState, skipWalletConnect, true, projectUrl, linkToProjectPageOnSuccess)}
   minHeightPx={0}
 />
 

@@ -46,7 +46,7 @@
       : { type: 'valid' }}
 >
   <div class="list">
-    <ListSelect {items} searchable={false} />
+    <ListSelect bind:selected {items} searchable={false} />
   </div>
 </FormField>
 

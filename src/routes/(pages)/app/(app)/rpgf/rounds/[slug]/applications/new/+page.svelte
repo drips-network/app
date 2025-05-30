@@ -54,7 +54,11 @@
         component: Plus,
         props: {},
       },
-      handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
+      handler: () =>
+        modal.show(ClaimProjectStepper, undefined, {
+          skipWalletConnect: true,
+          linkToProjectPageOnSuccess: false,
+        }),
     },
   };
   let projectPickerSelected: string[] = [];
@@ -114,9 +118,10 @@
   {#if round.state === 'intake'}
     <h1>Apply to {round.name}</h1>
     <p>
-      To apply to this round, please first pick one of your existing project claimed on Drips. If
-      you haven't claimed your project, click "Claim new project" below and follow the instructions.
-      Any rewards from the round will be distributed directly to your selected project. <a
+      To apply to this round, please first pick one of your existing GitHub repository claimed on
+      Drips. If you haven't claimed your repository yet, click "Claim new project" below and follow
+      the instructions. Any rewards from the round will be distributed directly to your selected
+      project. <a
         class="typo-link"
         href="https://docs.drips.network/get-support/claim-your-repository"
         target="_blank">Learn more</a
@@ -148,7 +153,7 @@
 
     <FormField
       type="div"
-      title="Project name*"
+      title="Application name*"
       description="Give your application a memorable name that describes it well."
       disabled={!selectedProject}
     >

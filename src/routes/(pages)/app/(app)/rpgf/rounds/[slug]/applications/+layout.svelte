@@ -12,20 +12,23 @@
 
   $: decisionsStore = data.decisions;
   $: decisions = $decisionsStore;
-  
-  $: approveCount = decisions && Object.values(decisions).filter(v => v === 'approve').length;
-  $: rejectCount = decisions && Object.values(decisions).filter(v => v === 'reject').length;
-  $: hasDecisions = decisions && Object.values(decisions).filter(v => v !== null).length > 0;
+
+  $: approveCount = decisions && Object.values(decisions).filter((v) => v === 'approve').length;
+  $: rejectCount = decisions && Object.values(decisions).filter((v) => v === 'reject').length;
+  $: hasDecisions = decisions && Object.values(decisions).filter((v) => v !== null).length > 0;
 
   async function handleSubmitReviewDecisions() {
-    const mappedToDto: ApplicationReviewDto = mapFilterUndefined(Object.entries(decisions), ([applicationId, decision]) => {
-      if (decision === null) return undefined; // Skip null decisions
+    const mappedToDto: ApplicationReviewDto = mapFilterUndefined(
+      Object.entries(decisions),
+      ([applicationId, decision]) => {
+        if (decision === null) return undefined; // Skip null decisions
 
-      return {
-        applicationId,
-        decision,
-      }
-    });
+        return {
+          applicationId,
+          decision,
+        };
+      },
+    );
 
     await submitApplicationReview(undefined, data.wrappedRound.round.urlSlug, mappedToDto);
 
@@ -39,25 +42,33 @@
   <div class="sidebar">
     <div class="sidebar-inner">
       {#if data.reviewMode}
-      <div class="review-card">
-        <h5>Review applications</h5>
-        <p class="typo-text-small">
-          As an admin, you can review applications for this round.
-          Feel free to dig into the details - we'll save your decisions as you go.
-        </p>
-        <Divider />
-        <div class="decisions-count">
-          <span class="typo-text-small">Approve</span>
-          <span class="typo-text-small-bold">{approveCount}</span>
-          <span class="typo-text-small">• Reject</span>
-          <span class="typo-text-small-bold">{rejectCount}</span>
+        <div class="review-card">
+          <h5>Review applications</h5>
+          <p class="typo-text-small">
+            As an admin, you can review applications for this round. Feel free to dig into the
+            details - we'll save your decisions as you go.
+          </p>
+          <Divider />
+          <div class="decisions-count">
+            <span class="typo-text-small">Approve</span>
+            <span class="typo-text-small-bold">{approveCount}</span>
+            <span class="typo-text-small">• Reject</span>
+            <span class="typo-text-small-bold">{rejectCount}</span>
+          </div>
+          <Button
+            disabled={!hasDecisions}
+            variant="primary"
+            on:click={() => doWithErrorModal(handleSubmitReviewDecisions)}>Submit</Button
+          >
         </div>
-        <Button disabled={!hasDecisions} variant="primary" on:click={() => doWithErrorModal(handleSubmitReviewDecisions)}>Submit</Button>
-      </div>
       {/if}
 
       {#if data.voteMode}
-        <RpgfVotingCard ballot={$ballotStore} applications={data.applications} />
+        <RpgfVotingCard
+          round={data.wrappedRound.round}
+          ballot={$ballotStore}
+          applications={data.applications}
+        />
       {/if}
     </div>
   </div>
@@ -105,5 +116,4 @@
   .page {
     grid-area: page;
   }
-
 </style>

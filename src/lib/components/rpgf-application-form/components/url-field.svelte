@@ -22,6 +22,8 @@
   $: {
     if (field.required) {
       valid = hasValidUrl;
+    } else if (value !== undefined && value.trim() !== '' && !isValidUrl(value)) {
+      valid = false;
     } else {
       valid = true;
     }

@@ -7,21 +7,26 @@
 </script>
 
 <script lang="ts">
-  import type { Application, InProgressBallot } from '$lib/utils/rpgf/schemas';
+  import type {
+    Application,
+    InProgressBallot,
+    WrappedRoundAdmin,
+    WrappedRoundPublic,
+  } from '$lib/utils/rpgf/schemas';
   import type { RpgfUserData } from '$lib/utils/rpgf/siwe';
   import { writable, type Writable } from 'svelte/store';
   import ApplicationLineItem from './components/application-line-item.svelte';
 
   export let userData: RpgfUserData | null;
   export let applications: Application[];
-  export let roundSlug: string;
+  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
 
   $: ownUserId = userData?.userId;
 
   export let reviewMode = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 
-  export let voteMode: 'build-ballot' | 'assign-votes' | null = 'build-ballot';
+  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot> = writable({});
 
   export let groupBy: GroupBy;
@@ -35,7 +40,7 @@
       },
       { title: 'Approved', applications: applications.filter((app) => app.state === 'approved') },
       { title: 'Rejected', applications: applications.filter((app) => app.state === 'rejected') },
-    ];
+    ].filter((group) => group.applications.length > 0);
   } else if (groupBy === 'mine') {
     groups = [
       {
@@ -44,9 +49,7 @@
       },
       {
         title: 'Other applications',
-        applications: applications.filter((app) =>
-          app.submitterUserId !== ownUserId,
-        ),
+        applications: applications.filter((app) => app.submitterUserId !== ownUserId),
       },
     ];
   } else {
@@ -61,10 +64,10 @@
       <div class="applications-table">
         {#each group.applications as application}
           <ApplicationLineItem
-            {voteMode}
+            {voteStep}
             {ballotStore}
             {reviewMode}
-            {roundSlug}
+            {round}
             {application}
             bind:decision={decisions[application.id]}
           />

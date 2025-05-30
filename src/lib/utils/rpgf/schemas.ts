@@ -334,7 +334,9 @@ function buildDynamicApplicatonFieldSchema(applicationFormat: ApplicationFormat)
           fieldSchema = z.string().email();
           break;
         case 'list':
-          fieldSchema = z.array(z.union([z.string(), z.number()]));
+          fieldSchema = z
+            .array(z.record(z.string(), z.union([z.string(), z.number()])))
+            .max(field.maxItems);
           break;
         case 'select':
           fieldSchema = field.allowMultiple ? z.array(z.string()) : z.string();

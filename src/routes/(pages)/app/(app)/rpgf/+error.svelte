@@ -9,7 +9,7 @@
     switch ($page.status) {
       case 404: {
         description =
-          'We werenʼt able to find this round. You may have to sign in with your wallet first.';
+          'We werenʼt able to find this. You may have to sign in with your wallet first.';
         break;
       }
       case 401: {
