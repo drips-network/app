@@ -6,6 +6,13 @@
 
   function toggleExpand() {
     expanded = !expanded;
+
+    if (!expanded) {
+      // scroll to the top when collapsing
+      window.scrollTo({
+        top: containerElem.offsetTop - 80,
+      });
+    }
   }
 
   let containerElem: HTMLDivElement;

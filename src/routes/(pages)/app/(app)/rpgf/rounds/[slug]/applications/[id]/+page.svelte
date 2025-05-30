@@ -3,8 +3,10 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
+  import ApplicationDecisionButtons from '$lib/components/rpgf-applications-table/components/application-decision-buttons.svelte';
 
   export let data;
+  $: decisionsStore = data.decisions;
   $: round = data.wrappedRound.round;
   $: application = data.application;
   $: applicationFormat = round.applicationFormat.filter((f) => 'slug' in f);
@@ -18,23 +20,32 @@
   </div>
   <div class="card">
     <RpgfApplicationBadge hideState {application} hideName size="huge" />
-    <h1>{application.projectName}</h1>
+    <h1>{application.projectName} <RpgfApplicationBadge inline hideName hideAvatar {application} /></h1>
     <ProjectBadge project={data.dripsProject} />
+
+    {#if data.reviewMode && application.state === 'pending'}
+      <ApplicationDecisionButtons
+        applicationId={application.id}
+        bind:decision={$decisionsStore[application.id]}
+      />
+    {/if}
   </div>
 
   <div class="card">
     <div class="fields">
       {#each applicationFormat as field}
         {@const value = application.fields[field.slug]}
-        <div class="field">
-          <h2 class="typo-header-4">{field.label}</h2>
-          {#if field.type === 'text' || field.type === 'textarea' || field.type === 'email'}
-            <p>{value}</p>
-          {:else if field.type === 'url' && typeof value === 'string'}
-            <a class="typo-link" href={value} target="_blank" rel="noopener noreferrer">{value}</a>
-          {/if}
-          <!-- TODO(rpgf): Implement the rest of possible field types -->
-        </div>
+        {#if value}
+          <div class="field">
+            <h2 class="typo-header-4">{field.label}</h2>
+            {#if field.type === 'text' || field.type === 'textarea' || field.type === 'email'}
+              <p>{value}</p>
+            {:else if field.type === 'url' && typeof value === 'string'}
+              <a class="typo-link" href={value} target="_blank" rel="noopener noreferrer">{value}</a>
+            {/if}
+            <!-- TODO(rpgf): Implement the rest of possible field types -->
+          </div>
+        {/if}
       {/each}
     </div>
   </div>

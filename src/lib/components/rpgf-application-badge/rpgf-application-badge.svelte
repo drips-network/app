@@ -6,7 +6,9 @@
 
   export let application: Application;
   export let hideName = false;
+  export let hideAvatar = false;
   export let hideState = false;
+  export let inline = false;
   export let size: ComponentProps<ProjectAvatar>['size'] = 'small';
 
   $: projectSnapshot = application.dripsProjectDataSnapshot;
@@ -26,25 +28,27 @@
   };
 </script>
 
-<div class="rpgf-application-badge">
-  <div
-    class="avatar"
-    style:view-transition-name={viewTransitionName}
-    style:--transition-name={viewTransitionName}
-  >
-    <ProjectAvatar
-      {size}
-      project={{
-        __typename: 'ClaimedProjectData',
-        chain: network.gqlName,
-        color: projectSnapshot.color,
-        avatar:
-          'emoji' in projectSnapshot.avatar
-            ? { __typename: 'EmojiAvatar', emoji: projectSnapshot.avatar.emoji }
-            : { __typename: 'ImageAvatar', cid: projectSnapshot.avatar.cid },
-      }}
-    />
-  </div>
+<div class="rpgf-application-badge" style:display={inline ? 'inline-flex' : 'flex'}>
+  {#if !hideAvatar}
+    <div
+      class="avatar"
+      style:view-transition-name={viewTransitionName}
+      style:--transition-name={viewTransitionName}
+    >
+      <ProjectAvatar
+        {size}
+        project={{
+          __typename: 'ClaimedProjectData',
+          chain: network.gqlName,
+          color: projectSnapshot.color,
+          avatar:
+            'emoji' in projectSnapshot.avatar
+              ? { __typename: 'EmojiAvatar', emoji: projectSnapshot.avatar.emoji }
+              : { __typename: 'ImageAvatar', cid: projectSnapshot.avatar.cid },
+        }}
+      />
+    </div>
+  {/if}
 
   {#if !hideName}
     <span class="typo-text-bold">{application.projectName}</span>
@@ -67,6 +71,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    vertical-align: middle;
   }
 
   .state-badge {

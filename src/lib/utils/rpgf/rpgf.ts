@@ -12,6 +12,7 @@ import {
   wrappedRoundPublicSchema,
   type Application,
   type ApplicationFormat,
+  type ApplicationReviewDto,
   type CreateApplicationDto,
   type CreateRoundDto,
   type PatchRoundDraftDto,
@@ -21,6 +22,7 @@ import {
   type WrappedRoundPublic,
 } from './schemas';
 import { error } from '@sveltejs/kit';
+import { z } from 'zod';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -80,10 +82,10 @@ export async function getDrafts(f = fetch): Promise<WrappedRoundDraft[]> {
   return parsed;
 }
 
-export async function getRounds(f = fetch): Promise<WrappedRoundPublic[]> {
+export async function getRounds(f = fetch): Promise<(WrappedRoundPublic | WrappedRoundAdmin)[]> {
   const res = await rpgfServerCall('/rounds', 'GET', undefined, f);
 
-  const parsed = wrappedRoundPublicSchema.array().parse(await res.json());
+  const parsed = z.union([wrappedRoundPublicSchema, wrappedRoundAdminSchema]).array().parse(await res.json());
   return parsed;
 }
 
@@ -193,4 +195,17 @@ export async function patchRound(f = fetch, roundSlug: string, patchRoundDto: Pa
 
   const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
+}
+
+export async function submitApplicationReview(
+  f = fetch,
+  roundSlug: string,
+  decisions: ApplicationReviewDto,
+): Promise<void> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/applications/review`,
+    'POST',
+    decisions,
+    f,
+  );
 }

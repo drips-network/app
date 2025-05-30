@@ -193,6 +193,7 @@ export const wrappedRoundPublicSchema = z.object({
   type: z.literal('round'),
   chainId: z.number(),
   round: roundPublicFieldsSchema,
+  isVoter: z.boolean(),
 });
 export type WrappedRoundPublic = z.infer<typeof wrappedRoundPublicSchema>;
 
@@ -201,6 +202,7 @@ export const wrappedRoundAdminSchema = z.object({
   type: z.literal('round'),
   chainId: z.number(),
   round: roundAdminFieldsSchema,
+  isVoter: z.boolean(),
 });
 export type WrappedRoundAdmin = z.infer<typeof wrappedRoundAdminSchema>;
 
@@ -343,6 +345,8 @@ function buildDynamicApplicatonFieldSchema(applicationFormat: ApplicationFormat)
 
       if (!fieldSchema) return undefined;
 
+      if (field.private) fieldSchema = fieldSchema.optional();
+
       if (!field.required) fieldSchema = fieldSchema.optional();
 
       return [field.slug, fieldSchema];
@@ -398,3 +402,18 @@ export const applicationReviewDtoSchema = z.array(
   }),
 );
 export type ApplicationReviewDto = z.infer<typeof applicationReviewDtoSchema>;
+
+export const ballotSchema = z.record(z.string().uuid(), z.number().int().positive());
+export type Ballot = z.infer<typeof ballotSchema>;
+export type InProgressBallot = Record<string, number | null>;
+
+export const submitBallotDtoSchema = z.object({
+  roundId: z.string(),
+  ballot: ballotSchema,
+});
+
+export const wrappedBallotDtoSchema = z.object({
+  id: z.string().uuid(),
+  chainId: z.number(),
+  ballot: submitBallotDtoSchema,
+});

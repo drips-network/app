@@ -1,52 +1,80 @@
+<script lang="ts" context="module">
+  export enum GroupBy {
+    None = 'none',
+    Mine = 'mine',
+    State = 'state',
+  }
+</script>
+
 <script lang="ts">
-  import type { Application } from '$lib/utils/rpgf/schemas';
+  import type { Application, InProgressBallot } from '$lib/utils/rpgf/schemas';
   import type { RpgfUserData } from '$lib/utils/rpgf/siwe';
+  import { writable, type Writable } from 'svelte/store';
   import ApplicationLineItem from './components/application-line-item.svelte';
 
   export let userData: RpgfUserData | null;
-  export let userIsAdmin: boolean = false;
   export let applications: Application[];
   export let roundSlug: string;
-  export let maxItems: number | undefined = undefined;
-  export let seperateOwnApplications: boolean = true;
 
   $: ownUserId = userData?.userId;
 
-  $: ownApplications = applications.filter((app) => app.submitterUserId === ownUserId);
-  $: otherApplications = applications
-    .filter((app) => app.submitterUserId !== ownUserId)
-    .slice(0, maxItems);
+  export let reviewMode = false;
+  export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 
-  export let overflowing: boolean | undefined = undefined;
-  $: overflowing = maxItems ? otherApplications.length > maxItems : false;
+  export let voteMode: 'build-ballot' | 'assign-votes' | null = 'build-ballot';
+  export let ballotStore: Writable<InProgressBallot> = writable({});
+
+  export let groupBy: GroupBy;
+
+  let groups: { title: string | null; applications: Application[] }[] = [];
+  $: if (groupBy === 'state') {
+    groups = [
+      {
+        title: 'Pending review',
+        applications: applications.filter((app) => app.state === 'pending'),
+      },
+      { title: 'Approved', applications: applications.filter((app) => app.state === 'approved') },
+      { title: 'Rejected', applications: applications.filter((app) => app.state === 'rejected') },
+    ];
+  } else if (groupBy === 'mine') {
+    groups = [
+      {
+        title: 'Your applications',
+        applications: applications.filter((app) => app.submitterUserId === ownUserId),
+      },
+      {
+        title: 'Other applications',
+        applications: applications.filter((app) =>
+          app.submitterUserId !== ownUserId,
+        ),
+      },
+    ];
+  } else {
+    groups = [{ title: null, applications }];
+  }
 </script>
 
 <div class="wrapper">
-  {#if seperateOwnApplications && ownApplications.length > 0}
+  {#each groups as group}
     <div class="table-wrapper">
-      <h5>Your applications</h5>
+      {#if group.title}<h5>{group.title}</h5>{/if}
       <div class="applications-table">
-        {#each ownApplications as application}
-          <ApplicationLineItem {roundSlug} {application} />
+        {#each group.applications as application}
+          <ApplicationLineItem
+            {voteMode}
+            {ballotStore}
+            {reviewMode}
+            {roundSlug}
+            {application}
+            bind:decision={decisions[application.id]}
+          />
         {/each}
-        {#if applications.length === 0}
+        {#if group.applications.length === 0}
           <div class="empty">Nothing to see here</div>
         {/if}
       </div>
     </div>
-  {/if}
-
-  <div class="table-wrapper">
-    {#if seperateOwnApplications}<h5>{userIsAdmin ? 'All' : 'Approved'} applications</h5>{/if}
-    <div class="applications-table">
-      {#each otherApplications as application}
-        <ApplicationLineItem {roundSlug} {application} />
-      {/each}
-      {#if otherApplications.length === 0}
-        <div class="empty">Nothing to see here</div>
-      {/if}
-    </div>
-  </div>
+  {/each}
 </div>
 
 <style>

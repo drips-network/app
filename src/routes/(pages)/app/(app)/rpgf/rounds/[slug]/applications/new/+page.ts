@@ -10,7 +10,7 @@ import type {
   NewRpgfApplicationPageProjectsQueryVariables,
 } from './__generated__/gql.generated.js';
 
-export const load = async ({ fetch, url }) => {
+export const load = async ({ fetch, url, parent }) => {
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {

@@ -4,7 +4,7 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
-  import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
+  import RpgfApplicationsTable, { GroupBy } from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfHeaderCard from '$lib/components/rpgf-header-card/rpgf-header-card.svelte';
   import RpgfScheduleCard from '$lib/components/rpgf-schedule-card/rpgf-schedule-card.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
@@ -24,7 +24,7 @@
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
-    <RpgfCtaCard {round} />
+    <RpgfCtaCard signedIn={Boolean(data.rpgfUserData)} isRoundVoter={data.isRoundVoter} {round} />
     <RpgfScheduleCard schedule={round} />
   </svelte:fragment>
 
@@ -73,12 +73,10 @@
     }}
   >
     <RpgfApplicationsTable
+      groupBy={GroupBy.None}
       userData={data.rpgfUserData}
-      {userIsAdmin}
-      seperateOwnApplications
       roundSlug={round.urlSlug}
       applications={data.applications}
-      maxItems={10}
     />
   </Section>
 

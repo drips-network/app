@@ -1,9 +1,12 @@
 <script lang="ts">
   import type { WrappedRoundAdmin, WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
+  import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Ledger from '../icons/Ledger.svelte';
 
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let signedIn: boolean;
+  export let isRoundVoter: boolean;
   $: state = round.state;
 </script>
 
@@ -20,6 +23,37 @@
       >
         Apply
       </Button>
+    {/if}
+    {#if state === 'pending-voting'}
+      <h2 class="pixelated">Registration closed</h2>
+      <p class="typo-text">The round is no longer accepting new applications. The round admins are now reviewing submitted projects.</p>
+    {/if}
+    {#if state === 'voting'}
+      {#if !signedIn}
+        <h2 class="pixelated">Voting is open</h2>
+        <p class="typo-text">The badgeholders of this round are now voting on the applications. After votes are tallied, the results will be
+          announced.
+        </p>
+        <AnnotationBox type="info">Are you a badgeholder? Connect your wallet and sign in to submit your vote.</AnnotationBox>
+      {:else if isRoundVoter}
+        <h2 class="pixelated">Cast your ballot</h2>
+        <p class="typo-text">
+          You're a badgeholder of this round. Submit your ballot now to vote on the applications.
+        </p>
+        <Button
+          href="/app/rpgf/rounds/{round.urlSlug}/applications"
+          icon={Ledger}
+          variant="primary"
+          size="large"
+        >
+          Vote now
+        </Button>
+      {:else}
+        <h2 class="pixelated">Voting is open</h2>
+        <p class="typo-text">The badgeholders of this round are now voting on the applications. After votes are tallied, the results will be
+          announced.
+        </p>
+      {/if}
     {/if}
   </div>
 {/if}
