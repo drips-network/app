@@ -8,11 +8,11 @@ author: 'becca'
 announcementBannerCopy: 'Attending Berlin Blockchain Week? Explore Berlin like a local with The Drips Guide to Berlin'
 ---
 
-Berlin Blockchain Week is just around the corner, and we couldn’t be more excited. This city is a place the Drips team knows well and loves. We've spent a lot of time here, an **we wanted to share some of our favourite spots with everyone coming in from out of town.**
+Berlin Blockchain Week is just around the corner, and we couldn’t be more excited. This city is a place the Drips team knows well and loves. We've spent a lot of time here, and **we wanted to share some of our favourite spots with everyone coming in from out of town.**
 
 **Here it is \- [The Drips Guide to Berlin\!](https://berlin.drips.network/)**
 
-We know you’re here to build and network but that doesn’t mean you can’t enjoy all the city has to offer at the same time\! Whether you want to eat great food, knock back a few cocktails or know where to chill out — our guide has you covered. **It’s basically a cheat sheet to enjoying Berlin like a local during Blockchain Week.**
+We know you’re here to build and network but that doesn’t mean you can’t enjoy all the city has to offer at the same time. Whether you want to eat great food, knock back a few cocktails or know where to chill out — our guide has you covered. **It’s basically a cheat sheet to enjoying Berlin like a local during Blockchain Week.**
 
 Berlin Blockchain Week is also packed with **incredible events**, and a few of them are musts.
 
