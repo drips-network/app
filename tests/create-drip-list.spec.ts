@@ -7,7 +7,7 @@ test('create a drip list', async ({ page }) => {
 
   await page.goto('http://localhost:5173/app');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
-  await page.getByRole('link', { name: 'Drip Lists' }).click();
+  await page.getByTestId('sidenav-item-Drip Lists').click();
   await page.getByRole('button', { name: 'Create Drip List' }).click();
   await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
   await page.getByRole('textbox', { name: 'Title*' }).fill('E2E test list');
