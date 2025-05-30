@@ -18,11 +18,11 @@ Berlin Blockchain Week is also packed with **incredible events**, and a few of t
 
 Our top picks for the week are:
 
-[**Rad New World**](https://lu.ma/7kts2ajf) (**trust us, don’t miss this one!**)  
-[**Funding the Commons**](https://lu.ma/ftc-berlin-2025)  
-[**Protocol Berg**](https://protocol.berlin/)  
-[**Web3 Privacy Now Hackathon**](https://hackathon.web3privacy.info/)  
-[**Dappcon**](https://dappcon.io/)
+- [**Rad New World**](https://lu.ma/7kts2ajf) (**trust us, don’t miss this one!**)
+- [**Funding the Commons**](https://lu.ma/ftc-berlin-2025)
+- [**Protocol Berg**](https://protocol.berlin/)
+- [**Web3 Privacy Now Hackathon**](https://hackathon.web3privacy.info/)
+- [**Dappcon**](https://dappcon.io/)
 
 Drips will be speaking at some of these too! Come say hi, catch our talks, and hang out.
 
