@@ -8,7 +8,7 @@ services:
       - PUBLIC_NETWORK=31337
       - CACHE_REDIS_CONNECTION_STRING=redis://redis:6379
       - FAKE_PINATA_URL=http://fake-pinata:3000
-      - PUBLIC_IPFS_GATEWAY_URL=http://fake-pinata:3000
+      - PUBLIC_IPFS_GATEWAY_URL=http://localhost:3000
       - GQL_URL=http://graphql-api:8080
       - GQL_ACCESS_TOKEN=123
       - MULTIPLAYER_API_URL=http://multiplayer:5001
@@ -109,6 +109,8 @@ services:
       interval: 1s
       timeout: 30s
       retries: 5
+    ports: 
+      - '3000:3000'
 
   multiplayer:
     image: 'j537/multiplayer:${MULTIPLAYER_TAG-main}'
