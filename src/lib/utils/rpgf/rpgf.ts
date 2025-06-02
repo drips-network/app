@@ -134,7 +134,12 @@ export async function getRound(
   f = fetch,
   slug: string,
 ): Promise<WrappedRoundAdmin | WrappedRoundPublic | null> {
-  const res = await rpgfServerCall(`/rounds/${slug}`, 'GET', undefined, f);
+  const res = await rpgfServerCall(
+    `/rounds/${slug}?chainId=${network.chainId}`,
+    'GET',
+    undefined,
+    f,
+  );
   const body = await res.json();
 
   const adminFieldsParseResult = wrappedRoundAdminSchema.safeParse(body);
@@ -156,7 +161,22 @@ export async function submitApplication(
   application: CreateApplicationDto,
   applicationFormat: ApplicationFormat,
 ): Promise<Application> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/applications`, 'PUT', application, f);
+  // strip empty fields from fields
+  const strippedFields = Object.fromEntries(
+    Object.entries(application.fields).filter(
+      (v) => v[1] !== null && v[1] !== undefined && v[1] !== '',
+    ),
+  );
+
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/applications`,
+    'PUT',
+    {
+      ...application,
+      fields: strippedFields,
+    },
+    f,
+  );
 
   return applicationSchema(applicationFormat).parse(await res.json());
 }

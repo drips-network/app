@@ -13,16 +13,16 @@
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import modal from '$lib/stores/modal/index.js';
   import isClaimed from '$lib/utils/project/is-claimed.js';
-  import { submitApplication } from '$lib/utils/rpgf/rpgf';
-  import assert from '$lib/utils/assert';
-  import { goto, invalidateAll } from '$app/navigation';
-  import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
+  import { goto } from '$app/navigation';
   import storedWritable from '@efstajas/svelte-stored-writable';
   import { z } from 'zod';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal.js';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import { tick } from 'svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import submitRpgfApplicationFlowSteps from '$lib/flows/submit-rpgf-application/submit-rpgf-application-flow-steps.js';
+  import assert from '$lib/utils/assert';
 
   export let data;
 
@@ -89,7 +89,9 @@
     },
   };
   let projectPickerSelected: string[] = $fullFormData.dripsAccountId
-    ? [$fullFormData.dripsAccountId]
+    ? data.projects.find((p) => p.account.accountId === $fullFormData.dripsAccountId)
+      ? [$fullFormData.dripsAccountId]
+      : []
     : [];
   $: $fullFormData.dripsAccountId = projectPickerSelected[0];
 
@@ -125,25 +127,22 @@
     formDataValid && projectNameValidationState.type === 'valid' && $fullFormData.dripsAccountId;
 
   async function handleSubmit() {
-    doWithErrorModal(async () => {
-      const { dripsAccountId, fields, projectName } = $fullFormData;
-      assert(projectName && dripsAccountId && fields, 'Not all form data is set');
+    const { dripsAccountId, fields, projectName } = $fullFormData;
+    assert(projectName && dripsAccountId && fields, 'Not all form data is set');
 
-      const application = await submitApplication(
-        undefined,
-        round.urlSlug,
+    modal.show(
+      Stepper,
+      undefined,
+      submitRpgfApplicationFlowSteps(
         {
           projectName,
           dripsAccountId,
           fields,
         },
         round.applicationFormat,
-      );
-
-      fullFormData.clear();
-      await invalidateAll();
-      await goto(`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}`);
-    });
+        round.urlSlug,
+      ),
+    );
   }
 
   let forceRevealAllErrors = formDataHasBeenRestored;
@@ -214,7 +213,11 @@
       <div slot="action">
         <Button
           icon={Plus}
-          on:click={() => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true })}
+          on:click={() =>
+            modal.show(ClaimProjectStepper, undefined, {
+              skipWalletConnect: true,
+              linkToProjectPageOnSuccess: false,
+            })}
         >
           Claim new project
         </Button>

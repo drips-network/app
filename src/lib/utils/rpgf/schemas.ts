@@ -362,6 +362,7 @@ export const createApplicationDtoSchema = (applicationFormat: ApplicationFormat)
   z.object({
     projectName: z.string().min(1).max(255),
     dripsAccountId: z.string().min(1).max(255),
+    attestationUID: z.string().min(1).max(255).optional(),
     fields: buildDynamicApplicatonFieldSchema(applicationFormat),
   });
 export type CreateApplicationDto = z.infer<ReturnType<typeof createApplicationDtoSchema>>;

@@ -24,7 +24,7 @@
 
   let beenFocussed = false;
 
-  let selected: string[] = [];
+  let selected: string[] = value ? [value] : [];
   $: value = selected[0];
 
   $: {

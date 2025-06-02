@@ -86,6 +86,8 @@ type DripsRetroFundingConfig =
       attestationConfig:
         | {
             enabled: true;
+            easSchemaRegistryAddress: string;
+            easAddress: string;
             applicationAttestationSchemaUID: string;
             applicationReviewAttestationSchemaUID: string;
           }
@@ -282,7 +284,18 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    retroFunding: { enabled: false },
+    retroFunding: {
+      enabled: true,
+      attestationConfig: {
+        enabled: true,
+        easSchemaRegistryAddress: '0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0',
+        easAddress: '0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
+        applicationAttestationSchemaUID:
+          '0x25a8c6ffa87828916a104ebfa37aaced5c52122d6879d1edac2f883cbbb721bd',
+        applicationReviewAttestationSchemaUID:
+          '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
+      },
+    },
   },
   [31337]: {
     chainId: 31337,
@@ -335,7 +348,13 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: false,
     retroFunding: {
       enabled: true,
-      attestationConfig: { enabled: false },
+      attestationConfig: {
+        enabled: true,
+        easSchemaRegistryAddress: '0xea88c04fff67399C1605F286484698DD99C9c943',
+        easAddress: '0x81Cb1951C928eCaC93268cd45A1E6E292afA62DA',
+        applicationAttestationSchemaUID: '',
+        applicationReviewAttestationSchemaUID: '',
+      },
     },
   },
   [84532]: {
