@@ -1,7 +1,8 @@
+import network from '$lib/stores/wallet/network.js';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import buildUrl from '$lib/utils/build-url';
 import { getUserData, rpgfJwtStore } from '$lib/utils/rpgf/siwe';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
 function getSignInData() {
@@ -11,6 +12,10 @@ function getSignInData() {
 
 // TODO(rpgf): Somehow prevent this from erasing the JWT on every app init
 export const load = async ({ url }) => {
+  if (!network.retroFunding.enabled) {
+    throw error(404);
+  }
+
   const { walletAddress: rpgfWalletAddress, exp } = getSignInData() ?? {};
 
   const { address } = get(walletStore);

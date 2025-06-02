@@ -71,6 +71,7 @@
     display: flex;
     gap: 2rem;
     view-transition-name: scrollable-tabs;
+    view-transition-class: element-handover;
     background-color: var(--color-background);
     border-bottom: 1px solid var(--color-foreground-level-3);
   }

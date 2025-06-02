@@ -39,7 +39,7 @@
         modal.hide();
       }}>No, cancel</Button
     >
-    <Button loading={working} variant="primary" on:click={handleConfirm}>Yes, continue</Button>
+    <Button loading={working} variant="destructive" on:click={handleConfirm}>Yes, continue</Button>
   </div>
 </div>
 
@@ -50,7 +50,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 1rem 0;
+    padding: 2rem 0;
   }
 
   .actions {

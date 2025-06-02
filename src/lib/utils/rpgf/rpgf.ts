@@ -23,6 +23,7 @@ import {
 } from './schemas';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
+import network from '$lib/stores/wallet/network';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -76,16 +77,19 @@ export async function rpgfServerCall(
 }
 
 export async function getDrafts(f = fetch): Promise<WrappedRoundDraft[]> {
-  const res = await rpgfServerCall('/round-drafts', 'GET', undefined, f);
+  const res = await rpgfServerCall(`/round-drafts?chainId=${network.chainId}`, 'GET', undefined, f);
 
   const parsed = wrappedRoundDraftSchema.array().parse(await res.json());
   return parsed;
 }
 
 export async function getRounds(f = fetch): Promise<(WrappedRoundPublic | WrappedRoundAdmin)[]> {
-  const res = await rpgfServerCall('/rounds', 'GET', undefined, f);
+  const res = await rpgfServerCall(`/rounds?chainId=${network.chainId}`, 'GET', undefined, f);
 
-  const parsed = z.union([wrappedRoundPublicSchema, wrappedRoundAdminSchema]).array().parse(await res.json());
+  const parsed = z
+    .union([wrappedRoundPublicSchema, wrappedRoundAdminSchema])
+    .array()
+    .parse(await res.json());
   return parsed;
 }
 
@@ -202,10 +206,5 @@ export async function submitApplicationReview(
   roundSlug: string,
   decisions: ApplicationReviewDto,
 ): Promise<void> {
-  const res = await rpgfServerCall(
-    `/rounds/${roundSlug}/applications/review`,
-    'POST',
-    decisions,
-    f,
-  );
+  await rpgfServerCall(`/rounds/${roundSlug}/applications/review`, 'POST', decisions, f);
 }

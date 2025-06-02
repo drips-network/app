@@ -61,6 +61,7 @@
     gap: 2rem;
     align-items: center;
     view-transition-name: rpgf-header-card;
+    view-transition-class: element-handover;
   }
 
   .draft-badge {
@@ -81,25 +82,11 @@
 
   h1 {
     view-transition-name: rpgf-header-card-title;
+    view-transition-class: element-handover;
   }
 
   .unnamed {
     color: var(--color-foreground-level-5);
-  }
-
-  :root::view-transition-old(rpgf-header-card):only-child,
-  :root::view-transition-old(rpgf-header-card-title):only-child {
-    animation:
-      110ms cubic-bezier(0.4, 0, 1, 1) both default-transition-fade-out,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-to-top;
-    transform-origin: 50% 50%;
-  }
-
-  :root::view-transition-new(rpgf-header-card):only-child,
-  :root::view-transition-new(rpgf-header-card-title):only-child {
-    animation:
-      210ms cubic-bezier(0, 0, 0.2, 1) 90ms both default-transition-fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both default-transition-slide-from-bottom;
   }
 
   @media (max-width: 1024px) {

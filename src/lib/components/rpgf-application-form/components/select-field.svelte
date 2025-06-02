@@ -44,6 +44,9 @@
     : beenFocussed || forceRevealError
       ? { type: 'invalid', message: 'This field is required.' }
       : { type: 'valid' }}
+  privateNoticeText={field.private
+    ? 'Data in this field is private and will only be shared with the admins of the round.'
+    : undefined}
 >
   <div class="list">
     <ListSelect bind:selected {items} searchable={false} />

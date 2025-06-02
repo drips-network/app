@@ -32,6 +32,9 @@
   title={field.label + (field.required ? '*' : '')}
   descriptionMd={field.descriptionMd}
   validationState={formFieldValidationState}
+  privateNoticeText={field.private
+    ? 'Data in this field is private and will only be shared with the admins of the round.'
+    : undefined}
 >
   <TextInput bind:value on:blur={() => (beenFocussed = true)} />
 </FormField>

@@ -107,9 +107,22 @@
     gap: 0.5rem;
     flex-direction: column;
     view-transition-name: rpgf-applications-review-card;
+    view-transition-class: element-handover;
   }
 
   .page {
     grid-area: page;
+  }
+
+  @media (max-width: 1251px) {
+    .applications-layout {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      grid-template-areas: 'sidebar' 'page';
+    }
+
+    .sidebar {
+      display: none;
+    }
   }
 </style>

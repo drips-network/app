@@ -47,68 +47,69 @@
     <div class="fields">
       {#each applicationFormat as field}
         {@const value = application.fields[field.slug]}
+        {#if !field.private || data.isRoundAdmin}
+          <div class="field">
+            <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
+              {field.label}
+              {#if field.private}
+                <div style:cursor="help" style:width="fit-content">
+                  <Tooltip>
+                    <svelte:fragment slot="tooltip-content">
+                      This field is private and only visible to admins or the applicant.
+                    </svelte:fragment>
+                    <Lock />
+                  </Tooltip>
+                </div>
+              {/if}
+            </h2>
+            {#if value}
+              {#if field.type === 'text' || field.type === 'textarea' || field.type === 'email'}
+                <p>{value}</p>
+              {:else if field.type === 'url' && typeof value === 'string'}
+                <a
+                  style:width="fit-content"
+                  class="typo-link"
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer">{value}</a
+                >
+              {:else if field.type === 'select'}
+                <p>{field.options.find((o) => o.value === value)?.label ?? 'Unknown answer'}</p>
+              {:else if field.type === 'list'}
+                <Table
+                  options={{
+                    columns: field.entryFields.map((ef) => ({
+                      header: ef.label,
+                      accessorKey: ef.label,
+                      cell: (v) => (ef.type === 'url' ? LinkCell : v),
+                      enableSorting: false,
+                    })),
+                    // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
+                    data: isListValue(value)
+                      ? value.map((row) => {
+                          return Object.fromEntries(
+                            Object.entries(row).map(([label, value]) => {
+                              const fieldDef = field.entryFields.find((ef) => ef.label === label);
 
-        <div class="field">
-          <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
-            {field.label}
-            {#if field.private}
-              <div style:cursor="help" style:width="fit-content">
-                <Tooltip>
-                  <svelte:fragment slot="tooltip-content">
-                    This field is private and only visible to admins or the applicant.
-                  </svelte:fragment>
-                  <Lock />
-                </Tooltip>
-              </div>
+                              if (fieldDef?.type === 'url' && typeof value === 'string') {
+                                return [label, { href: value }];
+                              } else {
+                                return [label, value];
+                              }
+                            }),
+                          );
+                        })
+                      : [],
+                    getCoreRowModel: getCoreRowModel(),
+                  }}
+                />
+              {/if}
+            {:else}
+              <span>No answer</span>
             {/if}
-          </h2>
-          {#if value}
-            {#if field.type === 'text' || field.type === 'textarea' || field.type === 'email'}
-              <p>{value}</p>
-            {:else if field.type === 'url' && typeof value === 'string'}
-              <a
-                style:width="fit-content"
-                class="typo-link"
-                href={value}
-                target="_blank"
-                rel="noopener noreferrer">{value}</a
-              >
-            {:else if field.type === 'select'}
-              <p>{field.options.find((o) => o.value === value)?.label ?? 'Unknown answer'}</p>
-            {:else if field.type === 'list'}
-              <Table
-                options={{
-                  columns: field.entryFields.map((ef) => ({
-                    header: ef.label,
-                    accessorKey: ef.label,
-                    cell: (v) => (ef.type === 'url' ? LinkCell : v),
-                    enableSorting: false,
-                  })),
-                  // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
-                  data: isListValue(value)
-                    ? value.map((row) => {
-                        return Object.fromEntries(
-                          Object.entries(row).map(([label, value]) => {
-                            const fieldDef = field.entryFields.find((ef) => ef.label === label);
-
-                            if (fieldDef?.type === 'url' && typeof value === 'string') {
-                              return [label, { href: value }];
-                            } else {
-                              return [label, value];
-                            }
-                          }),
-                        );
-                      })
-                    : [],
-                  getCoreRowModel: getCoreRowModel(),
-                }}
-              />
-            {/if}
-          {:else}
-            <span>No answer</span>
-          {/if}
-          <!-- TODO(rpgf): Implement the rest of possible field types -->
-        </div>
+            <!-- TODO(rpgf): Implement the rest of possible field types -->
+          </div>
+        {/if}
       {/each}
     </div>
   </div>

@@ -12,15 +12,19 @@
   export let forceRevealError: boolean | undefined = undefined;
 
   export let valid: boolean = false;
-  export let value: Record<string, string | number>[] = [];
+  export let value: Record<string, string | number>[] | undefined = [];
 
   function addToValues(item: Record<string, string | number>) {
+    if (!value) {
+      value = [];
+    }
+
     value = [...value, item];
   }
 
   function deleteValue(e: Event, index: number) {
     e.stopImmediatePropagation();
-    value = value.filter((_, i) => i !== index);
+    value = (value ?? []).filter((_, i) => i !== index);
   }
 
   function handleAddItem() {
@@ -51,7 +55,7 @@
       : { type: 'valid' }}
 >
   <div class="values">
-    {#each value as item (item)}
+    {#each value ?? [] as item (item)}
       <div class="item-card">
         <div class="fields">
           {#each field.entryFields as entryField (entryField.label)}
@@ -71,14 +75,14 @@
         </div>
         <Button
           variant="ghost"
-          on:click={(e) => deleteValue(e, value.indexOf(item))}
+          on:click={(e) => (value ? deleteValue(e, value.indexOf(item)) : undefined)}
           icon={Trash}
         />
       </div>
     {/each}
   </div>
 
-  {#if value.length === 0}
+  {#if value?.length === 0}
     <p class="list-field-empty">No items added yet.</p>
   {/if}
 

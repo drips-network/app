@@ -118,30 +118,6 @@ export const FILECOIN_PRESET: CreateRoundDto['applicationFormat'] = [
     content: '### Application Profile',
   },
   {
-    type: 'text',
-    private: false,
-    required: true,
-    slug: 'project_name',
-    label: 'Project name',
-    descriptionMd: 'Name of the project',
-  },
-  {
-    type: 'url',
-    private: false,
-    required: true,
-    slug: 'project_avatar',
-    label: 'Project avatar',
-    descriptionMd: 'Link to an image with 1:1 aspect ratio & < 1mb',
-  },
-  {
-    type: 'url',
-    private: false,
-    required: true,
-    slug: 'project_background_image',
-    label: 'Project background image',
-    descriptionMd: 'Link to an image with 4:1 aspect ratio, < 1 mb',
-  },
-  {
     type: 'textarea',
     private: false,
     required: true,
@@ -157,15 +133,6 @@ export const FILECOIN_PRESET: CreateRoundDto['applicationFormat'] = [
     slug: 'project_website',
     label: 'Website for your project',
     descriptionMd: 'https://yourproject.com',
-  },
-  {
-    type: 'url',
-    private: false,
-    required: true,
-    slug: 'github_disbursement_address',
-    label: 'Github address for disbursement',
-    descriptionMd:
-      'FIL awards will be streamed to a project’s public GitHub repository via Drips. If you require guidance in creating a new repository, please look at the Application Guidelines.',
   },
   {
     type: 'divider',

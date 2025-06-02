@@ -11,6 +11,7 @@
 
   export let applicationFormat: ApplicationFormat;
   export let disabled = false;
+  export let forceRevealErrors = false;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export let data: Record<string, any> = {};
@@ -39,24 +40,28 @@
       />
     {:else if type === 'text'}
       <TextField
+        forceRevealError={forceRevealErrors}
         field={applicationField}
         bind:value={data[applicationField.slug]}
         bind:valid={fieldsValidStates[applicationField.slug]}
       />
     {:else if type === 'textarea'}
       <TextAreaField
+        forceRevealError={forceRevealErrors}
         field={applicationField}
         bind:value={data[applicationField.slug]}
         bind:valid={fieldsValidStates[applicationField.slug]}
       />
     {:else if type === 'url'}
       <UrlField
+        forceRevealError={forceRevealErrors}
         field={applicationField}
         bind:value={data[applicationField.slug]}
         bind:valid={fieldsValidStates[applicationField.slug]}
       />
     {:else if type === 'email'}
       <EmailField
+        forceRevealError={forceRevealErrors}
         field={applicationField}
         bind:value={data[applicationField.slug]}
         bind:valid={fieldsValidStates[applicationField.slug]}

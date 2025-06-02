@@ -108,6 +108,7 @@
     gap: 1rem;
     border: 1px solid var(--color-foreground-level-3);
     view-transition-name: rpgf-schedule-card;
+    view-transition-class: element-handover;
   }
 
   .items {

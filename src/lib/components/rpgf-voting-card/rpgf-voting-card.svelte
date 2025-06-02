@@ -186,6 +186,7 @@
     gap: 1rem;
     flex-direction: column;
     view-transition-name: rpgf-applications-voting-card;
+    view-transition-class: element-handover;
   }
 
   .steps {

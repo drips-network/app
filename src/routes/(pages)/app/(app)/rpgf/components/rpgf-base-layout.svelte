@@ -25,7 +25,6 @@
 
   aside {
     grid-area: sidebar;
-    view-transition-name: rpgf-base-layout-sidebar;
   }
 
   .sidebar-inner {

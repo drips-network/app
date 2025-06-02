@@ -27,6 +27,9 @@
     : beenFocussed || forceRevealError
       ? { type: 'invalid', message: 'This field is required.' }
       : { type: 'valid' }}
+  privateNoticeText={field.private
+    ? 'Data in this field is private and will only be shared with the admins of the round.'
+    : undefined}
 >
   <TextArea bind:value resizable on:blur={() => (beenFocussed = true)} />
 </FormField>

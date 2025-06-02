@@ -33,7 +33,7 @@
     <div
       class="avatar"
       style:view-transition-name={viewTransitionName}
-      style:--transition-name={viewTransitionName}
+      style:view-transition-class="element-handover"
     >
       <ProjectAvatar
         {size}

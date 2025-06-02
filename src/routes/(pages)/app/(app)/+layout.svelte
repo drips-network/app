@@ -17,6 +17,8 @@
   import type { LayoutData } from './$types';
   import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
   import HeartFace from '$lib/components/icons/HeartFace.svelte';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import network from '$lib/stores/wallet/network';
 
   export let data: LayoutData;
 
@@ -53,18 +55,23 @@
     >
       <Sidenav
         items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            { label: 'RetroPGF', href: '/app/rpgf', icon: HeartFace },
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
+          top: mapFilterUndefined(
+            [
+              { label: 'Explore', href: '/app', icon: ExploreIcon },
+              { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+              { label: 'Projects', href: '/app/projects', icon: Box },
+              { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+              network.retroFunding.enabled
+                ? { label: 'RetroPGF', href: '/app/rpgf', icon: HeartFace }
+                : undefined,
+              {
+                label: 'Profile',
+                href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
+                icon: User,
+              },
+            ],
+            (v) => v,
+          ),
           bottom: [
             {
               label: 'Help',

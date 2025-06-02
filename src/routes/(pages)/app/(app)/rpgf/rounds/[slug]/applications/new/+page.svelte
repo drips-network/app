@@ -17,12 +17,39 @@
   import assert from '$lib/utils/assert';
   import { goto, invalidateAll } from '$app/navigation';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
+  import storedWritable from '@efstajas/svelte-stored-writable';
+  import { z } from 'zod';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal.js';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import { tick } from 'svelte';
 
   export let data;
 
   $: round = data.wrappedRound.round;
   $: projects = data.projects.filter((p) => isClaimed(p.chainData[0]));
   $: applicationFormat = round.applicationFormat;
+
+  const fullFormData = storedWritable(
+    `rpgf-form-data-${data.wrappedRound.round.urlSlug}`,
+    z.object({
+      projectName: z.string().min(1).max(255).optional(),
+      dripsAccountId: z.string().min(1).optional(),
+
+      fields: z.record(z.string(), z.any()),
+    }),
+    {
+      projectName: undefined,
+      dripsAccountId: undefined,
+      fields: {},
+    },
+  );
+
+  // On load, check if the form data has been restored from local storage.
+  let formDataHasBeenRestored =
+    $fullFormData.projectName !== undefined ||
+    $fullFormData.dripsAccountId !== undefined ||
+    Object.keys($fullFormData.fields).length > 0;
 
   let projectItems: Items;
   $: projectItems = {
@@ -61,22 +88,28 @@
         }),
     },
   };
-  let projectPickerSelected: string[] = [];
-  $: selectedProject = projectPickerSelected[0];
+  let projectPickerSelected: string[] = $fullFormData.dripsAccountId
+    ? [$fullFormData.dripsAccountId]
+    : [];
+  $: $fullFormData.dripsAccountId = projectPickerSelected[0];
 
-  let projectName: string | undefined = undefined;
-  let nameAutofilled = false;
-  $: if (selectedProject && !nameAutofilled) {
-    projectName =
-      projects.find((p) => p.account.accountId === selectedProject)?.source.repoName || '';
+  let nameAutofilled = Boolean($fullFormData.projectName);
+  $: if ($fullFormData.dripsAccountId && !nameAutofilled) {
+    $fullFormData.projectName =
+      projects.find((p) => p.account.accountId === $fullFormData.dripsAccountId)?.source.repoName ||
+      '';
     nameAutofilled = true;
   }
 
   let projectNameValidationState: TextInputValidationState = { type: 'unvalidated' };
   $: {
-    if (!selectedProject) {
+    if (!$fullFormData.dripsAccountId) {
       projectNameValidationState = { type: 'unvalidated' };
-    } else if (projectName && projectName.length > 0 && projectName.length <= 255) {
+    } else if (
+      $fullFormData.projectName &&
+      $fullFormData.projectName.length > 0 &&
+      $fullFormData.projectName.length <= 255
+    ) {
       projectNameValidationState = { type: 'valid' };
     } else {
       projectNameValidationState = {
@@ -86,37 +119,74 @@
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let formData: Record<string, any> = {};
   let formDataValid = false;
 
   $: readyToSubmit =
-    formDataValid && projectNameValidationState.type === 'valid' && selectedProject;
+    formDataValid && projectNameValidationState.type === 'valid' && $fullFormData.dripsAccountId;
 
   async function handleSubmit() {
     doWithErrorModal(async () => {
-      assert(projectName, 'Project name somehow not set');
+      const { dripsAccountId, fields, projectName } = $fullFormData;
+      assert(projectName && dripsAccountId && fields, 'Not all form data is set');
 
       const application = await submitApplication(
         undefined,
         round.urlSlug,
         {
           projectName,
-          dripsAccountId: selectedProject,
-          fields: formData,
+          dripsAccountId,
+          fields,
         },
         round.applicationFormat,
       );
 
+      fullFormData.clear();
       await invalidateAll();
       await goto(`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}`);
     });
   }
+
+  let forceRevealAllErrors = formDataHasBeenRestored;
 </script>
 
 <div class="page">
+  <Button
+    icon={ArrowLeft}
+    on:click={() => {
+      goto(`/app/rpgf/rounds/${round.urlSlug}`);
+    }}
+  >
+    Back to round
+  </Button>
   {#if round.state === 'intake'}
     <h1>Apply to {round.name}</h1>
+
+    {#if formDataHasBeenRestored}
+      <div style:width="100%">
+        <AnnotationBox>
+          We restored a previously saved application draft for you.
+          <svelte:fragment slot="actions">
+            <Button
+              variant="destructive"
+              on:click={() => {
+                doWithConfirmationModal(
+                  'Are you sure you want to clear all fields? This action cannot be undone.',
+                  () => {
+                    fullFormData.clear();
+                    formDataHasBeenRestored = false;
+                    projectPickerSelected = [];
+                    forceRevealAllErrors = false;
+                  },
+                );
+              }}
+            >
+              Clear all fields
+            </Button>
+          </svelte:fragment>
+        </AnnotationBox>
+      </div>
+    {/if}
+
     <p>
       To apply to this round, please first pick one of your existing GitHub repository claimed on
       Drips. If you haven't claimed your repository yet, click "Claim new project" below and follow
@@ -155,25 +225,53 @@
       type="div"
       title="Application name*"
       description="Give your application a memorable name that describes it well."
-      disabled={!selectedProject}
+      disabled={!$fullFormData.dripsAccountId}
     >
       <TextInput
-        bind:value={projectName}
+        bind:value={$fullFormData.projectName}
         validationState={projectNameValidationState}
-        disabled={!selectedProject}
+        disabled={!$fullFormData.dripsAccountId}
       />
     </FormField>
 
     <DividerField />
 
     <RpgfApplicationForm
+      forceRevealErrors={forceRevealAllErrors}
       bind:valid={formDataValid}
-      bind:data={formData}
-      disabled={!selectedProject || projectNameValidationState.type !== 'valid'}
+      bind:data={$fullFormData.fields}
+      disabled={!$fullFormData.dripsAccountId || projectNameValidationState.type !== 'valid'}
       {applicationFormat}
     />
 
-    <div style:align-self="flex-end">
+    <div style:align-self="flex-end" style:display="flex" style:flex-wrap="wrap" style:gap="1rem">
+      {#if !formDataValid}
+        <AnnotationBox type="error">
+          Some fields are invalid or missing.
+          <svelte:fragment slot="actions">
+            <Button
+              variant="normal"
+              on:click={async () => {
+                forceRevealAllErrors = true;
+
+                // wait for the DOM to update before scrolling
+                await tick();
+
+                const errorAnchor = document.getElementById('form-field-validation-error-anchor');
+                if (errorAnchor) {
+                  errorAnchor.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }
+              }}
+            >
+              Show all errors
+            </Button>
+          </svelte:fragment>
+        </AnnotationBox>
+      {/if}
+
       <Button
         icon={Wallet}
         disabled={!readyToSubmit}
@@ -197,6 +295,7 @@
   .page {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 3rem;
     max-width: 55rem;
     margin: 0 auto;

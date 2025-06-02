@@ -64,6 +64,7 @@
         style:width="fit-content"
         style:view-transition-name="project-avatar-{project.source.ownerName}-{project.source
           .repoName}"
+        style:view-transition-class="element-handover"
       >
         <ProjectAvatar project={projectChainData} size="large" outline />
       </div>
