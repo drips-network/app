@@ -49,7 +49,7 @@
     if (voteStep !== 'assign-votes') return;
     if (!picked) return;
 
-    if (voteAmountInput == undefined) {
+    if (voteAmountInput == undefined || Number.isNaN(Number(voteAmountInput))) {
       voteAmountInputValidationState = { type: 'unvalidated' };
       $ballotStore = {
         ...$ballotStore,

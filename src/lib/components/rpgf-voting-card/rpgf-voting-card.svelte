@@ -12,6 +12,7 @@
   import CheckCircle from '../icons/CheckCircle.svelte';
   import { page } from '$app/stores';
   import Proposals from '../icons/Proposals.svelte';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
 
   export let ballot: InProgressBallot;
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
@@ -37,6 +38,14 @@
     .filter((vote) => vote !== null)
     .reduce((acc, vote) => acc + (vote ?? 0), 0);
   $: percentageOfVotesAssigned = amountOfVotesAssigned / round.votingConfig.maxVotesPerVoter;
+
+  async function handleSubmitBallot() {
+    await doWithConfirmationModal('do the thing?', async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async operation
+      return true;
+    });
+    // TODO(rpgf): Finish this flow
+  }
 </script>
 
 <div class="voting-card">
@@ -155,6 +164,10 @@
               size="large"
               icon={Proposals}
               disabled={!ballotHasEntries || amountOfVotesAssigned === 0}
+              on:click={(e) => {
+                e.preventDefault();
+                handleSubmitBallot();
+              }}
               variant="primary">Submit ballot</Button
             >
           </div>
