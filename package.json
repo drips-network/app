@@ -87,7 +87,7 @@
     "@opentelemetry/auto-instrumentations-node": "^0.58.1",
     "@opentelemetry/sdk-metrics": "^2.0.0",
     "@opentelemetry/sdk-node": "^0.200.0",
-    "@opentelemetry/sdk-trace-node": "^2.0.0",
+    "@opentelemetry/sdk-trace-node": "^2.0.1",
     "@pinata/sdk": "^2.1.0",
     "@resvg/resvg-js": "^2.6.2",
     "@safe-global/safe-apps-provider": "^0.18.3",
