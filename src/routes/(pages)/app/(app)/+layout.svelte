@@ -16,9 +16,9 @@
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import type { LayoutData } from './$types';
   import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
-  import HeartFace from '$lib/components/icons/HeartFace.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import network from '$lib/stores/wallet/network';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let data: LayoutData;
 
@@ -62,7 +62,7 @@
               { label: 'Projects', href: '/app/projects', icon: Box },
               { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
               network.retroFunding.enabled
-                ? { label: 'RetroPGF', href: '/app/rpgf', icon: HeartFace }
+                ? { label: 'RetroPGF', href: '/app/rpgf', icon: ArrowCounterClockwiseHeart }
                 : undefined,
               {
                 label: 'Profile',

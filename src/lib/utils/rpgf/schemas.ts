@@ -188,12 +188,19 @@ const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({
   isAdmin: z.literal(true),
 });
 
+export const userSchema = z.object({
+  id: z.string().uuid(),
+  walletAddress: ethereumAddressSchema,
+});
+
 export const wrappedRoundPublicSchema = z.object({
   id: z.string().uuid(),
   type: z.literal('round'),
   chainId: z.number(),
   round: roundPublicFieldsSchema,
   isVoter: z.boolean(),
+  isAdmin: z.boolean(),
+  createdBy: userSchema,
 });
 export type WrappedRoundPublic = z.infer<typeof wrappedRoundPublicSchema>;
 
@@ -203,6 +210,8 @@ export const wrappedRoundAdminSchema = z.object({
   chainId: z.number(),
   round: roundAdminFieldsSchema,
   isVoter: z.boolean(),
+  isAdmin: z.boolean(),
+  createdBy: userSchema,
 });
 export type WrappedRoundAdmin = z.infer<typeof wrappedRoundAdminSchema>;
 
@@ -281,6 +290,8 @@ export const wrappedRoundDraftSchema = z.object({
     scheduleValid: z.boolean(),
     draftComplete: z.boolean(),
   }),
+  isAdmin: z.boolean(),
+  createdBy: userSchema,
 });
 export type WrappedRoundDraft = z.infer<typeof wrappedRoundDraftSchema>;
 

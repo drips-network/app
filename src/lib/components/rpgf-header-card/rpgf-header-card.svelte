@@ -22,7 +22,12 @@
 </script>
 
 <div class="rpgf-header-card">
-  <div><EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" /></div>
+  <div
+    style:view-transition-name="rpgf-header-card-avatar-{roundSlugOrDraftId}"
+    style:view-transition-class="element-handover"
+  >
+    <EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" />
+  </div>
   <div class="content">
     <h1 class:unnamed={!roundOrDraft.name}>
       {roundOrDraft.name || 'Unnamed round'}

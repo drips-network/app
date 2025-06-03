@@ -40,7 +40,7 @@
   $: percentageOfVotesAssigned = amountOfVotesAssigned / round.votingConfig.maxVotesPerVoter;
 
   async function handleSubmitBallot() {
-    await doWithConfirmationModal('do the thing?', async () => {
+    await doWithConfirmationModal('Are you sure you want to cast your ballot?', async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async operation
       return true;
     });
