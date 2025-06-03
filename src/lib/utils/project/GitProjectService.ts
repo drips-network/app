@@ -163,11 +163,11 @@ export default class GitProjectService {
       dependencies,
     );
 
-    const {
-      tx: setSubAccountSplitsTx,
-      // TODO: do we need it?
-      // receivers: subAccountReceivers,
-    } = await this._buildSubAccountSetSplitsTx(accountId, highLevelPercentages, maintainers);
+    const { tx: setSubAccountSplitsTx } = await this._buildSubAccountSetSplitsTx(
+      accountId,
+      highLevelPercentages,
+      maintainers,
+    );
 
     const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
     assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
@@ -227,11 +227,7 @@ export default class GitProjectService {
       context.dependencySplits,
     );
 
-    const {
-      tx: setSubAccountSplitsTx,
-      // TODO: do we need it?
-      // receivers: subAccountReceivers,
-    } = await this._buildSubAccountSetSplitsTx(
+    const { tx: setSubAccountSplitsTx } = await this._buildSubAccountSetSplitsTx(
       accountId,
       context.highLevelPercentages,
       context.maintainerSplits,
@@ -326,7 +322,6 @@ export default class GitProjectService {
       );
     });
 
-    // TODO: is this the right position for setSubAccountSplitsTx?
     return Promise.all([
       setSubAccountSplitsTx,
       setSplitsTx,
