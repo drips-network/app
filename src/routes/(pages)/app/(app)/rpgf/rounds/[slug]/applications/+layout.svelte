@@ -64,7 +64,11 @@
       {/if}
 
       {#if data.voteMode}
-        <RpgfVotingCard round={data.wrappedRound.round} ballot={$ballotStore} />
+        <RpgfVotingCard
+          previouslyCastBallot={Boolean(data.existingBallot)}
+          round={data.wrappedRound.round}
+          ballot={ballotStore}
+        />
       {/if}
     </div>
   </div>

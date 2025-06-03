@@ -12,10 +12,16 @@
   import CheckCircle from '../icons/CheckCircle.svelte';
   import { page } from '$app/stores';
   import Proposals from '../icons/Proposals.svelte';
-  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import type { Writable } from 'svelte/store';
+  import modal from '$lib/stores/modal';
+  import Stepper from '../stepper/stepper.svelte';
+  import submitRpgfBallotFlowSteps from '$lib/flows/submit-rpgf-ballot/submit-rpgf-ballot-flow-steps';
 
-  export let ballot: InProgressBallot;
+  export let ballot: Writable<InProgressBallot> & {
+    clear: () => void;
+  };
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let previouslyCastBallot: boolean;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
 
@@ -32,19 +38,19 @@
     }
   }
 
-  $: ballotHasEntries = Object.keys(ballot).length > 0;
+  $: ballotHasEntries = Object.keys($ballot).length > 0;
 
-  $: amountOfVotesAssigned = Object.values(ballot)
+  $: amountOfVotesAssigned = Object.values($ballot)
     .filter((vote) => vote !== null)
-    .reduce((acc, vote) => acc + (vote ?? 0), 0);
+    .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0);
   $: percentageOfVotesAssigned = amountOfVotesAssigned / round.votingConfig.maxVotesPerVoter;
 
   async function handleSubmitBallot() {
-    await doWithConfirmationModal('Are you sure you want to cast your ballot?', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async operation
-      return true;
-    });
-    // TODO(rpgf): Finish this flow
+    modal.show(
+      Stepper,
+      undefined,
+      submitRpgfBallotFlowSteps(ballot, round.urlSlug, previouslyCastBallot),
+    );
   }
 </script>
 
@@ -124,7 +130,7 @@
 
         <div class="actions">
           <span class="typo-text" style:text-align="center"
-            >{Object.keys(ballot).length} selected</span
+            >{Object.keys($ballot).length} selected</span
           >
           <Button
             disabled={!ballotHasEntries}
@@ -147,9 +153,7 @@
       {#if voteStep === 'assign-votes'}
         <div class="description">
           <p class="typo-text-small">Assign votes to the selected applications.</p>
-          <p class="typo-text-small">
-            Once you're done, click submit to sign your ballot with your wallet and submit it.
-          </p>
+          <p class="typo-text-small">Once you're done, cast your ballot below.</p>
         </div>
 
         <div class="actions">
@@ -168,8 +172,14 @@
                 e.preventDefault();
                 handleSubmitBallot();
               }}
-              variant="primary">Submit ballot</Button
+              variant="primary"
             >
+              {#if previouslyCastBallot}
+                Confirm changes to ballot
+              {:else}
+                Submit your ballot
+              {/if}
+            </Button>
           </div>
         </div>
       {/if}

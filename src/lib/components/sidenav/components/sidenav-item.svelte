@@ -17,6 +17,7 @@
   class:background-on-active={backgroundOnActive}
   {href}
   target={external ? '_blank' : undefined}
+  on:click
 >
   <svelte:component
     this={icon}

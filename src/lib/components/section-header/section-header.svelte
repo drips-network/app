@@ -14,6 +14,8 @@
     label?: string;
     icon?: ComponentType;
     variant?: 'primary';
+    disabled?: boolean;
+    loading?: boolean;
   }[] = [];
   export let actionsDisabled = false;
 
@@ -55,7 +57,8 @@
   <div class="actions">
     {#each actions as action}
       <Button
-        disabled={actionsDisabled}
+        disabled={action.disabled || actionsDisabled}
+        loading={action.loading}
         variant={action.variant}
         icon={action.icon}
         href={action.href}

@@ -3,6 +3,7 @@ import modal from '$lib/stores/modal';
 
 export default async function doWithErrorModal<RT>(
   fn: () => RT | Promise<RT>,
+  onError?: (e: unknown) => void,
 ): Promise<Awaited<RT>> {
   try {
     return await fn();
@@ -10,6 +11,8 @@ export default async function doWithErrorModal<RT>(
     modal.show(ErrorModal, undefined, {
       message: e instanceof Error ? e.message : String(e),
     });
+
+    onError?.(e);
 
     throw e;
   }

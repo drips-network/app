@@ -43,7 +43,6 @@
   );
   $: votingConfigDone = Boolean(draft.votingConfig && draft.votingConfig.allowedVoters.length > 0);
 
-  // TODO(rpgf): Compare against the default application format
   $: applicationFormCustomized = draft.applicationFormat
     ? matchPreset(draft.applicationFormat)?.slug !== 'default'
     : false;

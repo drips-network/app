@@ -25,7 +25,12 @@
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
-    <RpgfCtaCard signedIn={Boolean(data.rpgfUserData)} isRoundVoter={data.isRoundVoter} {round} />
+    <RpgfCtaCard
+      hasExistingBallot={Boolean(data.existingBallot)}
+      signedIn={Boolean(data.rpgfUserData)}
+      isRoundVoter={data.isRoundVoter}
+      {round}
+    />
     <RpgfScheduleCard schedule={round} />
   </svelte:fragment>
 

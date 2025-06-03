@@ -349,11 +349,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: {
       enabled: true,
       attestationConfig: {
-        enabled: true,
-        easSchemaRegistryAddress: '0xea88c04fff67399C1605F286484698DD99C9c943',
-        easAddress: '0x81Cb1951C928eCaC93268cd45A1E6E292afA62DA',
-        applicationAttestationSchemaUID: '',
-        applicationReviewAttestationSchemaUID: '',
+        enabled: false,
       },
     },
   },

@@ -6,6 +6,7 @@
   import Ledger from '../icons/Ledger.svelte';
   import { z } from 'zod';
 
+  export let hasExistingBallot: boolean;
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
   export let signedIn: boolean;
   export let isRoundVoter: boolean;
@@ -30,6 +31,9 @@
     $localApplicationState.projectName !== undefined ||
     $localApplicationState.dripsAccountId !== undefined ||
     Object.keys($localApplicationState.fields).length > 0;
+
+  const inProgressBallotExists =
+    localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null;
 </script>
 
 {#if state !== 'pending-intake'}
@@ -65,20 +69,33 @@
           tallied, the results will be announced.
         </p>
         <AnnotationBox type="info"
-          >Are you a badgeholder? Connect your wallet and sign in to submit your vote.</AnnotationBox
+          >Are you a badgeholder? Connect your wallet and sign in to submit your ballot.</AnnotationBox
         >
       {:else if isRoundVoter}
         <h2 class="pixelated">Cast your ballot</h2>
         <p class="typo-text">
-          You're a badgeholder of this round. Submit your ballot now to vote on the applications.
+          You're a badgeholder of this round.
+          {#if hasExistingBallot}
+            You already submitted a ballot, but you can edit it while the round is accepting votes.
+          {:else}
+            Cast your ballot now.
+          {/if}
         </p>
         <Button
-          href="/app/rpgf/rounds/{round.urlSlug}/applications"
+          href={hasExistingBallot
+            ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot`
+            : `/app/rpgf/rounds/{round.urlSlug}/applications`}
           icon={Ledger}
           variant="primary"
           size="large"
         >
-          Vote now
+          {#if hasExistingBallot}
+            Edit your ballot
+          {:else if inProgressBallotExists}
+            Continue voting
+          {:else}
+            Vote now
+          {/if}
         </Button>
       {:else}
         <h2 class="pixelated">Voting is open</h2>

@@ -50,7 +50,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 2rem 0;
+    padding: 2rem 1rem;
   }
 
   .actions {

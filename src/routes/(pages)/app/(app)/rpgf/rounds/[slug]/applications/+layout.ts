@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 import { z } from 'zod';
 
 export const load = async ({ parent, route }) => {
-  const { isRoundAdmin, applications, wrappedRound, isRoundVoter } = await parent();
+  const { isRoundAdmin, applications, wrappedRound, isRoundVoter, existingBallot } = await parent();
 
   const reviewMode =
     route.id !== '/(pages)/app/(app)/rpgf/rounds/[slug]/applications/new' &&
@@ -19,7 +19,7 @@ export const load = async ({ parent, route }) => {
   const ballotWritable = storedWritable<InProgressBallot>(
     ballotLocalStorageKey,
     z.record(z.string(), z.number().nullable()),
-    {},
+    existingBallot?.ballot ?? {},
   );
 
   return {

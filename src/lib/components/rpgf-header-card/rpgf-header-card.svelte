@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import { deleteDraft } from '$lib/utils/rpgf/rpgf';
   import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
   import Button from '../button/button.svelte';
   import EmojiAvatar from '../emoji-avatar/emoji-avatar.svelte';
   import Settings from '../icons/Settings.svelte';
+  import Trash from '../icons/Trash.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
   export let isDraft = false;
@@ -19,6 +24,18 @@
   $: isAdmin = $walletStore.address
     ? roundOrDraft.adminWalletAddresses?.includes($walletStore.address.toLowerCase())
     : false;
+
+  function handleDeleteDraft() {
+    doWithConfirmationModal('Are you sure you want to delete this draft?', async () => {
+      if (!roundSlugOrDraftId) {
+        return;
+      }
+
+      await doWithErrorModal(() => deleteDraft(undefined, roundSlugOrDraftId));
+
+      await goto('/app/rpgf');
+    });
+  }
 </script>
 
 <div class="rpgf-header-card">
@@ -52,6 +69,9 @@
               : `/app/rpgf/rounds/${roundSlugOrDraftId}/settings/representation`}>Settings</Button
           >
         {/if}
+        {#if isAdmin && isDraft}
+          <Button variant="ghost" icon={Trash} on:click={handleDeleteDraft}>Delete draft</Button>
+        {/if}
       </div>
     {/if}
   </div>
@@ -65,8 +85,6 @@
     display: flex;
     gap: 2rem;
     align-items: center;
-    view-transition-name: rpgf-header-card;
-    view-transition-class: element-handover;
   }
 
   .draft-badge {
@@ -83,11 +101,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-
-  h1 {
-    view-transition-name: rpgf-header-card-title;
-    view-transition-class: element-handover;
   }
 
   .unnamed {

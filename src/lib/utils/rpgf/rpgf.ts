@@ -7,16 +7,20 @@ import {
   applicationSchema,
   createRoundDtoSchema,
   slugAvailableResponseSchema,
+  wrappedBallotSchema,
   wrappedRoundAdminSchema,
   wrappedRoundDraftSchema,
   wrappedRoundPublicSchema,
   type Application,
   type ApplicationFormat,
   type ApplicationReviewDto,
+  type Ballot,
   type CreateApplicationDto,
+  type CreateRoundDraftDto,
   type CreateRoundDto,
   type PatchRoundDraftDto,
   type PatchRoundDto,
+  type WrappedBallot,
   type WrappedRoundAdmin,
   type WrappedRoundDraft,
   type WrappedRoundPublic,
@@ -68,7 +72,7 @@ export async function rpgfServerCall(
     rpgfJwtStore.set(null);
   }
 
-  if (!res.ok) {
+  if (!res.ok && res.status !== 404) {
     const errorText = await res.text();
     throw error(res.status, `RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`);
   }
@@ -93,6 +97,16 @@ export async function getRounds(f = fetch): Promise<(WrappedRoundPublic | Wrappe
   return parsed;
 }
 
+export async function createDraft(
+  f = fetch,
+  draft: CreateRoundDraftDto,
+): Promise<WrappedRoundDraft> {
+  const res = await rpgfServerCall(`/round-drafts/`, 'PUT', draft, f);
+
+  const parsed = wrappedRoundDraftSchema.parse(await res.json());
+  return parsed;
+}
+
 export async function getDraft(f = fetch, id: string): Promise<WrappedRoundDraft> {
   const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
 
@@ -114,6 +128,10 @@ export async function updateDraft(
 
   const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
+}
+
+export async function deleteDraft(f = fetch, id: string): Promise<Response> {
+  return await rpgfServerCall(`/round-drafts/${id}`, 'DELETE', undefined, f);
 }
 
 export async function publishRound(f = fetch, id: string): Promise<WrappedRoundAdmin> {
@@ -227,4 +245,51 @@ export async function submitApplicationReview(
   decisions: ApplicationReviewDto,
 ): Promise<void> {
   await rpgfServerCall(`/rounds/${roundSlug}/applications/review`, 'POST', decisions, f);
+}
+
+export async function castBallot(
+  f = fetch,
+  roundSlug: string,
+  ballot: Ballot,
+): Promise<WrappedBallot> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/ballots`,
+    'PUT',
+    {
+      ballot,
+    },
+    f,
+  );
+
+  const parsed = wrappedBallotSchema.parse(await res.json());
+  return parsed;
+}
+
+export async function patchBallot(
+  f = fetch,
+  roundSlug: string,
+  updatedBallot: Ballot,
+): Promise<WrappedBallot> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/ballots/own`,
+    'PATCH',
+    {
+      ballot: updatedBallot,
+    },
+    f,
+  );
+
+  const parsed = wrappedBallotSchema.parse(await res.json());
+  return parsed;
+}
+
+export async function getOwnBallot(f = fetch, roundSlug: string): Promise<WrappedBallot | null> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots/own`, 'GET', undefined, f);
+
+  if (res.status === 404) {
+    return null;
+  }
+
+  const parsed = wrappedBallotSchema.parse(await res.json());
+  return parsed;
 }
