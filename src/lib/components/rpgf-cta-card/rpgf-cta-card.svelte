@@ -84,7 +84,7 @@
         <Button
           href={hasExistingBallot
             ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot`
-            : `/app/rpgf/rounds/{round.urlSlug}/applications`}
+            : `/app/rpgf/rounds/${round.urlSlug}/applications`}
           icon={Ledger}
           variant="primary"
           size="large"
