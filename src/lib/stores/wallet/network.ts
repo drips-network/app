@@ -449,7 +449,18 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       ],
     },
     enableEns: true,
-    retroFunding: { enabled: false },
+    retroFunding: {
+      enabled: true,
+      attestationConfig: {
+        enabled: true,
+        easAddress: '0x81Cb1951C928eCaC93268cd45A1E6E292afA62DA',
+        easSchemaRegistryAddress: '0xea88c04fff67399C1605F286484698DD99C9c943',
+        applicationAttestationSchemaUID:
+          '0x25a8c6ffa87828916a104ebfa37aaced5c52122d6879d1edac2f883cbbb721bd',
+        applicationReviewAttestationSchemaUID:
+          '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
+      },
+    },
   },
   [1088]: {
     chainId: 1088,
