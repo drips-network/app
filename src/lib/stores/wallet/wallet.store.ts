@@ -105,7 +105,7 @@ const walletStore = () => {
    * Initialize the store and restore any previously-connected,
    * cached connection.
    */
-  async function initialize(): Promise<void> {
+  async function initialize(): Promise<WalletStoreState | undefined> {
     if (!browser) return;
 
     const isSafeApp = isRunningInSafe();
@@ -127,6 +127,7 @@ const walletStore = () => {
     }
 
     initialized.set(true);
+    return get(state);
   }
 
   /**
@@ -138,7 +139,7 @@ const walletStore = () => {
     initializing = false,
     isSafeApp = false,
     onboardOptions?: Parameters<typeof onboard.connectWallet>[0],
-  ): Promise<void> {
+  ): Promise<WalletStoreState | undefined> {
     if (!browser) throw new Error('Can only connect client-side');
 
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
@@ -253,6 +254,7 @@ const walletStore = () => {
     }
 
     await _setConnectedState(provider, safeInfo);
+    return get(state);
   }
 
   /**
@@ -270,9 +272,11 @@ const walletStore = () => {
     const accounts = await provider.listAccounts();
     const signer = await provider.getSigner();
 
+    const connectingAddress = accounts[0].address;
+
     state.set({
       connected: true,
-      address: accounts[0].address,
+      address: connectingAddress,
       dripsAccountId: (
         await executeAddressDriverReadMethod({
           functionName: 'calcAccountId',
@@ -293,6 +297,8 @@ const walletStore = () => {
   function _clear() {
     lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
+
+    invalidateAll();
   }
 
   function _attachListeners(provider: EIP1193Provider): void {

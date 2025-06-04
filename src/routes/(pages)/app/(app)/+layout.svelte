@@ -15,6 +15,10 @@
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import type { LayoutData } from './$types';
+  import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import network from '$lib/stores/wallet/network';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let data: LayoutData;
 
@@ -32,7 +36,12 @@
   }
 </script>
 
-<div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
+<div
+  class:sidenav-forced-collapsed={$forceCollapsed === true}
+  class="main"
+  class:disconnected={!$wallet.connected}
+  in:fly|global={{ duration: 300, y: 16 }}
+>
   <div class="page">
     <div class:loading={$navigating}><slot /></div>
   </div>
@@ -46,17 +55,23 @@
     >
       <Sidenav
         items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
+          top: mapFilterUndefined(
+            [
+              { label: 'Explore', href: '/app', icon: ExploreIcon },
+              { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+              { label: 'Projects', href: '/app/projects', icon: Box },
+              { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+              network.retroFunding.enabled
+                ? { label: 'RetroPGF', href: '/app/rpgf', icon: ArrowCounterClockwiseHeart }
+                : undefined,
+              {
+                label: 'Profile',
+                href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
+                icon: User,
+              },
+            ],
+            (v) => v,
+          ),
           bottom: [
             {
               label: 'Help',
@@ -122,6 +137,11 @@
     min-width: 0;
   }
 
+  .sidenav-forced-collapsed .page {
+    max-width: unset;
+    padding: 6.5rem 2.5rem 0rem 2.5rem;
+  }
+
   div {
     transition: opacity 0.3s;
   }
@@ -142,11 +162,18 @@
     padding-top: 6rem;
   }
 
+  .sidenav-forced-collapsed .sidenav {
+    width: 5rem;
+  }
+
   .sidenav-placeholder {
     width: 16rem;
     height: 1px;
     flex-shrink: 0;
-    transition: width 0.3s;
+  }
+
+  .sidenav-forced-collapsed .sidenav-placeholder {
+    width: 5rem;
   }
 
   .sidenav-placeholder.disconnected {
@@ -166,13 +193,17 @@
 
   @media (max-width: 768px) {
     .main {
-      overflow-x: hidden;
       gap: 0;
     }
 
     .sidenav,
     .sidenav-placeholder {
       display: none;
+    }
+
+    .sidenav-forced-collapsed .page {
+      max-width: 100vw;
+      padding: 6.5rem 1rem 0rem 1rem;
     }
 
     .page {

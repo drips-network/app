@@ -1,0 +1,102 @@
+<script lang="ts">
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
+  import Ledger from '$lib/components/icons/Ledger.svelte';
+  import Trophy from '$lib/components/icons/Trophy.svelte';
+  import Markdown from '$lib/components/markdown/markdown.svelte';
+  import RpgfApplicationsTable, {
+    GroupBy,
+  } from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
+  import RpgfHeaderCard from '$lib/components/rpgf-header-card/rpgf-header-card.svelte';
+  import RpgfScheduleCard from '$lib/components/rpgf-schedule-card/rpgf-schedule-card.svelte';
+  import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
+  import { fade } from 'svelte/transition';
+  import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
+  import RpgfCtaCard from '$lib/components/rpgf-cta-card/rpgf-cta-card.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+
+  export let data;
+  $: round = data.wrappedRound.round;
+
+  $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
+</script>
+
+<RpgfBaseLayout>
+  <svelte:fragment slot="sidebar">
+    <RpgfCtaCard
+      hasExistingBallot={Boolean(data.existingBallot)}
+      signedIn={Boolean(data.rpgfUserData)}
+      isRoundVoter={data.isRoundVoter}
+      {round}
+    />
+    <RpgfScheduleCard schedule={round} />
+  </svelte:fragment>
+
+  <svelte:fragment slot="header">
+    <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
+      {#if !data.rpgfUserData}
+        <div transition:fade={{ duration: 300 }}>
+          <AnnotationBox type="info">
+            Sign in to Drips RPGF to view your own applications and other private data.
+            <svelte:fragment slot="actions">
+              <RpgfSiweButton />
+            </svelte:fragment>
+          </AnnotationBox>
+        </div>
+      {/if}
+    </TransitionedHeight>
+    <RpgfHeaderCard roundSlugOrDraftId={round.urlSlug} roundOrDraft={round} />
+  </svelte:fragment>
+
+  {#if round.description}
+    <div style:padding="0 1rem">
+      <ExpandableText>
+        <Markdown content={round.description} />
+      </ExpandableText>
+    </div>
+  {/if}
+
+  <Section
+    header={{
+      label: 'Applications',
+      icon: Ledger,
+      actions: [
+        {
+          label: 'View all',
+          href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+          icon: ArrowRight,
+        },
+      ],
+    }}
+    skeleton={{
+      empty: data.applications.length === 0,
+      loaded: true,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No applications',
+      emptyStateText: `There are currently no ${!userIsAdmin ? 'approved ' : ''}applications for this round.`,
+    }}
+  >
+    <RpgfApplicationsTable
+      groupBy={GroupBy.None}
+      userData={data.rpgfUserData}
+      {round}
+      applications={data.applications}
+    />
+  </Section>
+
+  <Section
+    header={{
+      label: 'Results',
+      icon: Trophy,
+    }}
+    skeleton={{
+      empty: true,
+      loaded: true,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No results',
+      emptyStateText: 'After tallying, vote results will be shown here.',
+    }}
+  />
+</RpgfBaseLayout>

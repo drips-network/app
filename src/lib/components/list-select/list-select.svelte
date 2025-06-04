@@ -185,7 +185,7 @@
   {#if listIsEmpty && showEmptyState}
     <div class="empty-state">
       <EyeClosedIcon />
-      {#if noItems}
+      {#if noItems || !searchString}
         <p class="typo-text">{emptyStateText}</p>
       {:else}
         <p class="typo-text">No matches</p>
@@ -285,7 +285,7 @@
 
   .search-bar,
   .item {
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
     display: flex;
     gap: 0.5rem;
   }

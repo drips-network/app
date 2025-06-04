@@ -15,6 +15,7 @@
   import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
 
   export let context: Writable<State>;
+  export let linkToProjectPageOnSuccess: boolean;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -70,9 +71,13 @@
   {:else}
     <h4>Congratulations!</h4>
     <p>Youʼve successfully claimed your project.</p>
-    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}
-      >View project profile</Button
-    >
+    {#if linkToProjectPageOnSuccess}
+      <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}
+        >View project profile</Button
+      >
+    {:else}
+      <Button variant="primary" on:click={() => dispatch('conclude')}>Great, continue!</Button>
+    {/if}
   {/if}
 </div>
 

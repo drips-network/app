@@ -157,6 +157,7 @@ export const steps = (
   skipWalletConnect = false,
   isModal = false,
   projectUrl: string | undefined = undefined,
+  linkToProjectPageOnSuccess = true,
 ) => [
   makeStep({
     component: ChooseNetwork,
@@ -207,6 +208,8 @@ export const steps = (
   }),
   makeStep({
     component: Success,
-    props: undefined,
+    props: {
+      linkToProjectPageOnSuccess,
+    },
   }),
 ];

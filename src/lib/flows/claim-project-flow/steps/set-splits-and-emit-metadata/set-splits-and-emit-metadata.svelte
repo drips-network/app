@@ -74,8 +74,8 @@
     const projectChainData = filterCurrentChainData(res.projectById.chainData);
 
     return (
-      (projectChainData.verificationStatus === 'PendingMetadata' ||
-        projectChainData.verificationStatus === 'OwnerUpdated') &&
+      (projectChainData.verificationStatus === 'pending_metadata' ||
+        projectChainData.verificationStatus === 'owner_updated') &&
       projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }

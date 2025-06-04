@@ -77,7 +77,27 @@ export type Network = {
       }
     | undefined;
   enableEns: boolean;
+  retroFunding: DripsRetroFundingConfig;
 };
+
+type DripsRetroFundingConfig =
+  | {
+      enabled: true;
+      attestationConfig:
+        | {
+            enabled: true;
+            easSchemaRegistryAddress: string;
+            easAddress: string;
+            applicationAttestationSchemaUID: string;
+            applicationReviewAttestationSchemaUID: string;
+          }
+        | {
+            enabled: false;
+          };
+    }
+  | {
+      enabled: false;
+    };
 
 export type ValueForEachSupportedChain<T> = Record<(typeof SUPPORTED_CHAIN_IDS)[number], T>;
 
@@ -135,6 +155,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [80002]: {
     chainId: 80002,
@@ -177,6 +198,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [11155420]: {
     chainId: 11155420,
@@ -219,6 +241,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [11155111]: {
     chainId: 11155111,
@@ -261,6 +284,18 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    retroFunding: {
+      enabled: true,
+      attestationConfig: {
+        enabled: true,
+        easSchemaRegistryAddress: '0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0',
+        easAddress: '0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
+        applicationAttestationSchemaUID:
+          '0x25a8c6ffa87828916a104ebfa37aaced5c52122d6879d1edac2f883cbbb721bd',
+        applicationReviewAttestationSchemaUID:
+          '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
+      },
+    },
   },
   [31337]: {
     chainId: 31337,
@@ -311,6 +346,12 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['http://localhost:8545'],
     },
     enableEns: false,
+    retroFunding: {
+      enabled: true,
+      attestationConfig: {
+        enabled: false,
+      },
+    },
   },
   [84532]: {
     chainId: 84532,
@@ -353,6 +394,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [314]: {
     chainId: 314,
@@ -407,6 +449,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       ],
     },
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [1088]: {
     chainId: 1088,
@@ -457,6 +500,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
     },
     enableEns: true,
+    retroFunding: { enabled: false },
   },
   [10]: {
     chainId: 10,
@@ -507,6 +551,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://mainnet.optimism.io'],
     },
     enableEns: true,
+    retroFunding: { enabled: false },
   },
 };
 

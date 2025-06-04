@@ -55,4 +55,19 @@
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
     z-index: 1;
   }
+
+  @media (max-width: 577px) {
+    .wrapper {
+      margin-left: -1rem;
+      width: calc(100% + 2rem);
+    }
+
+    .inner > .content {
+      padding: 1px 1rem; /* 1px so box-shadow outlined content is not clipped */
+    }
+
+    .gradient {
+      width: 1rem;
+    }
+  }
 </style>
