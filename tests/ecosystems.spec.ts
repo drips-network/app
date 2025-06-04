@@ -22,8 +22,39 @@ test('ecosystems donation flow', async ({ page, request }) => {
 
   page.emulateMedia({ reducedMotion: 'reduce' });
 
+  // navigate to ecosystems and check that the created ecosystem is displayed
   await page.goto('http://localhost:5173/app');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByTestId('sidenav-item-Ecosystems').click();
   await expect(page.getByRole('heading', { name: 'Ecosystems' })).toBeVisible();
+
+  // navigate to the created ecosystem
+  await page.getByRole('link', { name: 'We’re launching ecosystems' }).first().click();
+
+  // wait for ecosystem to deploy
+  let disabledSupportCard = await page.$('.become-supporter-card.disabled');
+  while (disabledSupportCard) {
+    await page.reload();
+    await page.waitForTimeout(1_000);
+    disabledSupportCard = await page.$('.become-supporter-card.disabled');
+  }
+
+  // perform a one-time donation
+  await page.getByRole('button', { name: 'Support' }).nth(0).click();
+  await page.getByRole('button', { name: 'One-time donation' }).first().click();
+  await page.getByText('Test Token').click();
+  await page.getByRole('spinbutton', { name: 'TEST Amount Max' }).click();
+  await page.getByRole('spinbutton', { name: 'TEST Amount Max' }).fill('10');
+  await page.getByRole('button', { name: 'Confirm in your wallet' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Got it' }).click();
+
+  // verify that support shows the donation
+  await expect(await page.getByText('10 TEST').nth(0)).toBeVisible();
+
+  // verify that the ecosystem support has propagated to the relevant projects.
+  const page1Promise = page.waitForEvent('popup');
+  await page.getByRole('link', { name: 'Byron/gitoxide' }).click();
+  const page1 = await page1Promise;
+  await expect(await page1.locator(`text=${createEcosystemPayload.name}`).nth(0)).toBeVisible();
 });
