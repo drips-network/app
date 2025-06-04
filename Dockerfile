@@ -72,6 +72,9 @@ ARG PUBLIC_FARO_ENVIRONMENT
 
 ARG FARO_UPLOAD_SOURCE_MAPS_KEY
 
+ARG PUBLIC_DRIPS_RPGF_URL
+ARG PUBLIC_INTERNAL_DRIPS_RPGF_URL
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
