@@ -73,6 +73,7 @@
 <style>
   form {
     display: flex;
+    width: 100%;
     flex-direction: column;
     gap: 3rem;
     transition: opacity 0.3s;
