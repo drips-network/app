@@ -28,16 +28,20 @@ test('ecosystems donation flow', async ({ page, request }) => {
   await page.getByTestId('sidenav-item-Ecosystems').click();
   await expect(page.getByRole('heading', { name: 'Ecosystems' })).toBeVisible();
 
-  // navigate to the created ecosystem
-  await page.getByRole('link', { name: 'We’re launching ecosystems' }).first().click();
-
-  // wait for ecosystem to deploy
-  let disabledSupportCard = await page.$('.become-supporter-card.disabled');
-  while (disabledSupportCard) {
-    await page.reload();
+  // .ecosystem-card .aggregate-fiat-estimate
+  let fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
+  while (!fundsDisplay) {
     await page.waitForTimeout(1_000);
-    disabledSupportCard = await page.$('.become-supporter-card.disabled');
+    await page.reload();
+    await page.getByRole('button', { name: 'Connect', exact: true }).click();
+    await page.getByTestId('sidenav-item-Ecosystems').click();
+    await page.waitForTimeout(5_000);
+    fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
+    await page.waitForTimeout(5_000);
   }
+
+  // navigate to the created ecosystem
+  await page.locator(`text=${createEcosystemPayload.name}`).nth(0).click();
 
   // perform a one-time donation
   await page.getByRole('button', { name: 'Support' }).nth(0).click();
