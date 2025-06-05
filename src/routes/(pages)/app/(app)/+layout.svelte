@@ -14,12 +14,29 @@
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
+  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { LayoutData } from './$types';
+  import network from '$lib/stores/wallet/network';
 
   export let data: LayoutData;
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  $: navItems = [
+    { label: 'Explore', href: '/app', icon: ExploreIcon },
+    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+    { label: 'Projects', href: '/app/projects', icon: Box },
+    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+    ...(network.ecosystems
+      ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
+      : []),
+    {
+      label: 'Profile',
+      href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+      icon: User,
+    },
+  ];
 
   $: {
     if ($navigating) {
@@ -46,17 +63,7 @@
     >
       <Sidenav
         items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
+          top: navItems,
           bottom: [
             {
               label: 'Help',
@@ -69,19 +76,7 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav
-        items={[
-          { label: 'Explore', href: '/app', icon: ExploreIcon },
-          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-          {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: User,
-          },
-        ]}
-      />
+      <BottomNav items={navItems} />
     </div>
   {/if}
 
