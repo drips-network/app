@@ -157,7 +157,7 @@
         icon={EyeOpen}>Reset hints</Button
       >
     </Setting>
-    {#if network.gaslessClaimAndCollect}
+    {#if network.gaslessTransactions}
       <Setting
         title="Gasless claim & collect transactions"
         subtitle="When enabled, sends transactions for claiming a project and collecting funds gaslessly using EIP-712. This isn't supported on all networks, and won't work with Safe multisigs."

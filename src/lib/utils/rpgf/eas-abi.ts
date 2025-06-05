@@ -32,6 +32,11 @@ export default [
   },
   {
     inputs: [],
+    name: 'DeadlineExpired',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'InsufficientValue',
     type: 'error',
   },
@@ -53,6 +58,11 @@ export default [
   {
     inputs: [],
     name: 'InvalidLength',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'InvalidNonce',
     type: 'error',
   },
   {
@@ -82,6 +92,11 @@ export default [
   },
   {
     inputs: [],
+    name: 'InvalidShortString',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'InvalidSignature',
     type: 'error',
   },
@@ -103,6 +118,17 @@ export default [
   {
     inputs: [],
     name: 'NotPayable',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'str',
+        type: 'string',
+      },
+    ],
+    name: 'StringTooLong',
     type: 'error',
   },
   {
@@ -134,11 +160,36 @@ export default [
       {
         indexed: true,
         internalType: 'bytes32',
-        name: 'schema',
+        name: 'schemaUID',
         type: 'bytes32',
       },
     ],
     name: 'Attested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'EIP712DomainChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'oldNonce',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newNonce',
+        type: 'uint256',
+      },
+    ],
+    name: 'NonceIncreased',
     type: 'event',
   },
   {
@@ -165,7 +216,7 @@ export default [
       {
         indexed: true,
         internalType: 'bytes32',
-        name: 'schema',
+        name: 'schemaUID',
         type: 'bytes32',
       },
     ],
@@ -215,19 +266,6 @@ export default [
     ],
     name: 'Timestamped',
     type: 'event',
-  },
-  {
-    inputs: [],
-    name: 'VERSION',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
   },
   {
     inputs: [
@@ -356,7 +394,7 @@ export default [
                 type: 'bytes32',
               },
             ],
-            internalType: 'struct EIP712Signature',
+            internalType: 'struct Signature',
             name: 'signature',
             type: 'tuple',
           },
@@ -364,6 +402,11 @@ export default [
             internalType: 'address',
             name: 'attester',
             type: 'address',
+          },
+          {
+            internalType: 'uint64',
+            name: 'deadline',
+            type: 'uint64',
           },
         ],
         internalType: 'struct DelegatedAttestationRequest',
@@ -380,6 +423,49 @@ export default [
       },
     ],
     stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'eip712Domain',
+    outputs: [
+      {
+        internalType: 'bytes1',
+        name: 'fields',
+        type: 'bytes1',
+      },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'version',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'chainId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'verifyingContract',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'salt',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'extensions',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -480,6 +566,19 @@ export default [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'getName',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'address',
@@ -565,6 +664,19 @@ export default [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'newNonce',
+        type: 'uint256',
+      },
+    ],
+    name: 'increaseNonce',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -713,7 +825,7 @@ export default [
                 type: 'bytes32',
               },
             ],
-            internalType: 'struct EIP712Signature[]',
+            internalType: 'struct Signature[]',
             name: 'signatures',
             type: 'tuple[]',
           },
@@ -721,6 +833,11 @@ export default [
             internalType: 'address',
             name: 'attester',
             type: 'address',
+          },
+          {
+            internalType: 'uint64',
+            name: 'deadline',
+            type: 'uint64',
           },
         ],
         internalType: 'struct MultiDelegatedAttestationRequest[]',
@@ -820,7 +937,7 @@ export default [
                 type: 'bytes32',
               },
             ],
-            internalType: 'struct EIP712Signature[]',
+            internalType: 'struct Signature[]',
             name: 'signatures',
             type: 'tuple[]',
           },
@@ -828,6 +945,11 @@ export default [
             internalType: 'address',
             name: 'revoker',
             type: 'address',
+          },
+          {
+            internalType: 'uint64',
+            name: 'deadline',
+            type: 'uint64',
           },
         ],
         internalType: 'struct MultiDelegatedRevocationRequest[]',
@@ -959,7 +1081,7 @@ export default [
                 type: 'bytes32',
               },
             ],
-            internalType: 'struct EIP712Signature',
+            internalType: 'struct Signature',
             name: 'signature',
             type: 'tuple',
           },
@@ -967,6 +1089,11 @@ export default [
             internalType: 'address',
             name: 'revoker',
             type: 'address',
+          },
+          {
+            internalType: 'uint64',
+            name: 'deadline',
+            type: 'uint64',
           },
         ],
         internalType: 'struct DelegatedRevocationRequest',
@@ -1015,6 +1142,19 @@ export default [
       },
     ],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'version',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
 ];

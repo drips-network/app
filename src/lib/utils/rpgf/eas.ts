@@ -5,7 +5,7 @@ import {
   type ContractTransaction,
   Interface,
   keccak256,
-  type Signer,
+  type Provider,
   toUtf8Bytes,
   TransactionReceipt,
 } from 'ethers';
@@ -33,12 +33,35 @@ function filterRelevantFields(
   );
 }
 
-export async function buildAttestApplicationTx(
-  signer: Signer,
-  recipientWalletAddress: string,
+export async function pinApplicationAttestationData(
   applicationData: CreateApplicationDto,
   applicationFormat: WrappedRoundPublic['round']['applicationFormat'],
-  roundSlug: string,
+): Promise<string> {
+  if (!network.retroFunding.enabled) {
+    throw new Error('Retro Funding is not enabled on this network');
+  }
+
+  const dataToPin = {
+    projectName: applicationData.projectName,
+    dripsAccountId: applicationData.dripsAccountId,
+    fields: filterRelevantFields(applicationData.fields, applicationFormat),
+  };
+
+  return pin(dataToPin);
+}
+
+export function applicationAttestationData(ipfsHash: string, roundSlug: string) {
+  const schemaEncoder = new SchemaEncoder('string reviewDataIpfs,string roundSlug');
+
+  return schemaEncoder.encodeData([
+    { name: 'reviewDataIpfs', value: ipfsHash, type: 'string' },
+    { name: 'roundSlug', value: roundSlug, type: 'string' },
+  ]);
+}
+
+export async function buildAttestApplicationTx(
+  recipientWalletAddress: string,
+  encodedData: string,
 ): Promise<ContractTransaction> {
   if (!network.retroFunding.enabled) {
     throw new Error('Retro Funding is not enabled on this network');
@@ -47,25 +70,9 @@ export async function buildAttestApplicationTx(
     throw new Error('Attestation is not enabled for this network');
   }
 
-  // Publish the application's public fields on IPFS
-
-  const dataToAttest = {
-    projectName: applicationData.projectName,
-    dripsAccountId: applicationData.dripsAccountId,
-    fields: filterRelevantFields(applicationData.fields, applicationFormat),
-  };
-
-  const hash = await pin(dataToAttest);
-
   // Attest the application data on EAS
 
   const { easAddress, applicationAttestationSchemaUID } = network.retroFunding.attestationConfig;
-
-  const schemaEncoder = new SchemaEncoder('string reviewDataIpfs,string roundSlug');
-  const encodedData = schemaEncoder.encodeData([
-    { name: 'reviewDataIpfs', value: hash, type: 'string' },
-    { name: 'roundSlug', value: roundSlug, type: 'string' },
-  ]);
 
   const eas = new Contract(easAddress, easAbi);
 
@@ -82,6 +89,18 @@ export async function buildAttestApplicationTx(
   });
 
   return tx;
+}
+
+export async function getNonce(provider: Provider, forAddress: string): Promise<number> {
+  if (!network.retroFunding.enabled || !network.retroFunding.attestationConfig.enabled) {
+    throw new Error('Retro Funding attestations are not enabled on this network');
+  }
+
+  const { easAddress } = network.retroFunding.attestationConfig;
+
+  const eas = new Contract(easAddress, easAbi, provider);
+
+  return Number(await eas.getNonce(forAddress));
 }
 
 enum Event {
