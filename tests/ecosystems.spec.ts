@@ -28,16 +28,16 @@ test('ecosystems donation flow', async ({ page, request }) => {
   await page.getByTestId('sidenav-item-Ecosystems').click();
   await expect(page.getByRole('heading', { name: 'Ecosystems' })).toBeVisible();
 
-  // .ecosystem-card .aggregate-fiat-estimate
+  // wait for the api to return an ecosystem that we can support
+  // by checking for the appearance of funds donated
   let fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
   while (!fundsDisplay) {
-    await page.waitForTimeout(1_000);
     await page.reload();
     await page.getByRole('button', { name: 'Connect', exact: true }).click();
     await page.getByTestId('sidenav-item-Ecosystems').click();
-    await page.waitForTimeout(5_000);
+    // NOTE: strategically placed timeout!
+    await page.waitForTimeout(1_000);
     fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
-    await page.waitForTimeout(5_000);
   }
 
   // navigate to the created ecosystem
