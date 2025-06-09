@@ -14,6 +14,7 @@ import { executeRepoDriverReadMethod } from '../sdk/repo-driver/repo-driver';
 import filterCurrentChainData from '../filter-current-chain-data';
 import type { ClaimedProjectData, Project } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
+import unreachable from '../unreachable';
 
 type AccountId = string;
 
@@ -115,9 +116,9 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
       },
       source: {
         forge: 'github',
-        repoName: forProject.source.repoName,
-        ownerName: forProject.source.ownerName,
-        url: forProject.source.url,
+        repoName: forProject.source?.repoName || unreachable(),
+        ownerName: forProject.source?.ownerName || unreachable(),
+        url: forProject.source?.url || unreachable(),
       },
       isVisible: forProject.isVisible,
       avatar:

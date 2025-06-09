@@ -122,7 +122,7 @@
   $: {
     switch (true) {
       case !!project:
-        supportUrl = project.source.url;
+        supportUrl = project.source?.url || unreachable();
         break;
       case !!dripList:
         supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;

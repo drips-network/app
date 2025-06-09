@@ -60,14 +60,16 @@
   />
   <div class="header">
     <ProjectAvatar project={chainData} size="large" outline />
-    <a
-      class="name typo-header-4"
-      href={buildProjectUrl(
-        project.source.forge,
-        project.source.ownerName,
-        project.source.repoName,
-      )}><ProjectName {project} /></a
-    >
+    {#if project.source}
+      <a
+        class="name typo-header-4"
+        href={buildProjectUrl(
+          project.source?.forge,
+          project.source?.ownerName,
+          project.source?.repoName,
+        )}><ProjectName {project} /></a
+      >
+    {/if}
     {#if isClaimed(chainData)}
       <div class="owner typo-text-small">
         <span>Owned by </span>
@@ -75,10 +77,10 @@
       </div>
     {/if}
   </div>
-  {#if project.source.url}
+  {#if project.source?.url}
     <a
       class="typo-text-small"
-      href={buildExternalUrl(project.source.url)}
+      href={buildExternalUrl(project.source?.url)}
       target="_blank"
       rel="noreferrer">View repo {SOURCE_TYPE_STRINGS[project.source.forge]}</a
     >

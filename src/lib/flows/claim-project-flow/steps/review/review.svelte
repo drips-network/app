@@ -56,7 +56,7 @@
   let fakeClaimedProject: ProjectProfileHeaderFragment;
   $: fakeClaimedProject = {
     __typename: 'Project',
-    source: { ...project.source },
+    source: project.source ? { ...project.source } : undefined,
     isVisible: true,
     chainData: [
       {

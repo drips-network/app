@@ -149,7 +149,7 @@
           <WarningIcon
             style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display: inline"
           />
-        {/if}{project.source.repoName}</span
+        {/if}{project.source?.repoName}</span
       >
     </div>
   {:else if loading}

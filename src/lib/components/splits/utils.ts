@@ -95,7 +95,7 @@ export async function mapSplitsFromMultiplayerResults(
           ): p is Extract<
             typeof p,
             { __typename: 'ClaimedProjectData' | 'UnclaimedProjectData' }
-          > => p.__typename !== 'DripList' && p.source.url === v.url,
+          > => p.__typename !== 'DripList' && p.source?.url === v.url,
         );
         if (!project) throw new Error(`Project not found for url: ${v.url}`);
 

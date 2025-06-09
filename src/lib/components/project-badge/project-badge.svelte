@@ -80,13 +80,13 @@
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="project-badge flex gap-2 items-center typo-text"
-      href={linkTo === 'project-page'
+      href={linkTo === 'project-page' && processedProject.source
         ? buildProjectUrl(
             processedProject.source.forge,
             processedProject.source.ownerName,
             processedProject.source.repoName,
           )
-        : buildExternalUrl(processedProject.source.url)}
+        : buildExternalUrl(processedProject.source?.url)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}

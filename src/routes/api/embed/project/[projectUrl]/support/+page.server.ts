@@ -14,6 +14,7 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
 import buildProjectUrl from '$lib/utils/build-project-url';
 import { getCmcPrices } from '$lib/utils/cmc';
+import unreachable from '$lib/utils/unreachable';
 
 export async function load({ url, params, fetch }): Promise<{
   supportButtonData: SupportButtonData;
@@ -73,10 +74,10 @@ export async function load({ url, params, fetch }): Promise<{
     error(404);
   }
 
-  const { forge, ownerName, repoName } = project.source;
+  const { forge, ownerName, repoName } = project.source || unreachable();
   const appProjectUrl = `${url.origin}${buildProjectUrl(forge, ownerName, repoName)}`;
 
-  const projectName = `${project.source.repoName}`;
+  const projectName = repoName;
   const projectData = filterCurrentChainData(project.chainData) as SupportButtonData['projectData'];
   // normalize totalEarned to empty array when there are no amounts
   projectData.totalEarned = projectData.totalEarned || [];

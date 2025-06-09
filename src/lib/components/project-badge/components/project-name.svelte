@@ -23,7 +23,7 @@
 </script>
 
 <span class="text-foreground-level-5 {sizeClass}"
-  >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
-    >{project.source.repoName}</span
+  >{#if showSource}{project.source?.ownerName}/{/if}<span class="text-foreground"
+    >{project.source?.repoName}</span
   ></span
 >

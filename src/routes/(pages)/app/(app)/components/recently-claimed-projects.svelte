@@ -30,7 +30,7 @@
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
 
   $: projectsWithoutJasonTests = projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
+    (p) => !p.source?.repoName.includes('drips-test-repo'),
   );
 
   $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);

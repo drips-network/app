@@ -438,11 +438,13 @@ export default class GitProjectService {
             type: 'repoDriver' as const,
             weight: scaledWeight,
             accountId: accountId,
-            source: GitProjectService.populateSource(
-              item.project.source.forge,
-              item.project.source.repoName,
-              item.project.source.ownerName,
-            ),
+            source: item.project.source
+              ? GitProjectService.populateSource(
+                  item.project.source.forge,
+                  item.project.source.repoName,
+                  item.project.source.ownerName,
+                )
+              : unreachable(),
           };
 
           receivers.push(receiver);

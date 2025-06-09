@@ -6,6 +6,8 @@ import type {
   SplitsComponentAddressReceiverFragment,
   SplitsComponentDripListReceiverFragment,
   SplitsComponentProjectReceiverFragment,
+  SplitsComponentEcosystemReceiverFragment,
+  SplitsComponentSubListReceiverFragment,
 } from './__generated__/gql.generated';
 
 export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
@@ -118,10 +120,34 @@ export const SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT = gql`
   }
 `;
 
+export const SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT = gql`
+  fragment SplitsComponentEcosystemReceiver on EcosystemMainAccountReceiver {
+    weight
+    ecosystemMainAccount {
+      account {
+        accountId
+      }
+    }
+  }
+`;
+
+export const SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT = gql`
+  fragment SplitsComponentSubListReceiver on SubListReceiver {
+    weight
+    subList {
+      account {
+        accountId
+      }
+    }
+  }
+`;
+
 export type SplitsComponentSplitsReceiver =
   | SplitsComponentAddressReceiverFragment
   | SplitsComponentDripListReceiverFragment
-  | SplitsComponentProjectReceiverFragment;
+  | SplitsComponentProjectReceiverFragment
+  | SplitsComponentEcosystemReceiverFragment
+  | SplitsComponentSubListReceiverFragment;
 
 export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
 

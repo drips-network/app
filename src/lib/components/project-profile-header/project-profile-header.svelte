@@ -56,7 +56,7 @@
       <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
-      <h1>{project.source.repoName}</h1>
+      <h1>{project.source?.repoName}</h1>
       <div style:display="flex" style:gap="0.75rem" style:flex-wrap="wrap">
         {#if isClaimed(projectChainData)}
           <IdentityBadge address={projectChainData.owner.address} />

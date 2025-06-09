@@ -14,6 +14,8 @@ import {
   dripListSchema,
   voteReceiverSchema,
   revealResultsResponseSchema,
+  ecosystemSchema,
+  subListSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -118,7 +120,11 @@ export function startVotingRound(
     signature: string;
     areVotesPrivate: boolean;
     allowedReceivers?: z.infer<
-      typeof addressSchema | typeof projectSchema | typeof dripListSchema
+      | typeof addressSchema
+      | typeof projectSchema
+      | typeof dripListSchema
+      | typeof ecosystemSchema
+      | typeof subListSchema
     >[];
   } & ({ dripListId: string } | { name: string; description?: string }),
   fetch = window.fetch,
@@ -494,7 +500,7 @@ export function mapListEditorStateToVoteReceivers(items: Items, weights: Weights
       case 'project':
         result.push({
           weight,
-          url: item.project.source.url,
+          url: item.project.source?.url || unreachable(),
           type: 'project',
         });
         break;
@@ -592,7 +598,7 @@ export async function mapVoteReceiversToListEditorConfig(
       case 'project': {
         const project = receiversData.find(
           (p): p is Extract<(typeof receiversData)[number], { __typename: 'Project' }> =>
-            p.__typename !== 'DripList' && p.source.url === receiver.url,
+            p.__typename !== 'DripList' && p.source?.url === receiver.url,
         );
         if (!project) throw new Error(`Project not found for url: ${receiver.url}`);
 

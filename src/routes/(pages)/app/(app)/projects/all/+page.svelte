@@ -97,6 +97,7 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import onClickGoto from '$lib/utils/on-click-goto';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import unreachable from '$lib/utils/unreachable';
 
   export let data: PageData;
   interface ProjectsTableRow {
@@ -199,7 +200,9 @@
     const { source } = project;
 
     onClickGoto(
-      buildProjectUrl(source.forge, source.ownerName, source.repoName, true),
+      source
+        ? buildProjectUrl(source.forge, source.ownerName, source.repoName, true)
+        : unreachable(),
       event.detail.event,
     );
   }

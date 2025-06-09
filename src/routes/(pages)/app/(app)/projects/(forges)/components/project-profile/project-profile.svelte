@@ -9,7 +9,9 @@
   import {
     EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT,
   } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
   export const PROJECT_PROFILE_FRAGMENT = gql`
@@ -20,6 +22,8 @@
     ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
@@ -66,6 +70,12 @@
               }
               ... on DripListReceiver {
                 ...EditProjectSplitsFlowDripListReceiver
+              }
+              ... on EcosystemMainAccountReceiver {
+                ...EditProjectSplitsFlowEcosystemReceiver
+              }
+              ... on SubListReceiver {
+                ...EditProjectSplitsFlowSubListReceiver
               }
             }
             maintainers {
@@ -143,6 +153,8 @@
 
   export let project: ProjectProfileFragment;
   export let description: string | undefined;
+
+  const projectSource = project.source || unreachable();
 
   interface RepoInfo {
     url: string;
@@ -243,20 +255,20 @@
     }
   }
 
-  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
+  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? projectSource;
 
   let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
-  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(projectSource.url)}.png`;
 
   $: origin = browser ? window.location.origin : '';
   $: supportButtonStepConfig = {
-    projectSourceUrl: project.source.url,
+    projectSourceUrl: projectSource.url,
     supportButtonData: {
       dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
-      projectName: project.source.repoName,
-      projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
+      projectName: projectSource.repoName,
+      projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, projectSource.ownerName, projectSource.repoName, false)}`,
       projectData: chainData as SupportButtonData['projectData'],
     },
   };
@@ -270,9 +282,8 @@
 </script>
 
 <HeadMeta
-  title="{project.source.ownerName}/{project.source.repoName}"
-  description="Support {project.source
-    .repoName} on Drips and help make Open-Source Software sustainable."
+  title="{projectSource.ownerName}/{projectSource.repoName}"
+  description="Support {projectSource.repoName} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
 />
@@ -362,9 +373,9 @@
                 $walletStore.connected
                   ? modal.show(ClaimProjectStepper, undefined, {
                       skipWalletConnect: true,
-                      projectUrl: project.source.url,
+                      projectUrl: projectSource.url,
                     })
-                  : goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                  : goto(buildUrl('/app/claim-project', { projectToAdd: projectSource.url }))}
               >Claim project</Button
             >
           </div>
@@ -387,9 +398,7 @@
   {#if !project.isVisible}
     <div class="notice">
       <AnnotationBox type="info" icon={EyeClosed}>
-        <span class="typo-text-small-bold"
-          >{project.source.ownerName}/{project.source.repoName}</span
-        >
+        <span class="typo-text-small-bold">{projectSource.ownerName}/{projectSource.repoName}</span>
         has been hidden by its owner.
         <a
           style="text-decoration: underline;"
@@ -428,8 +437,8 @@
           shareButton={{
             url: `${origin}${buildProjectUrl(
               Forge.GitHub,
-              project.source.ownerName,
-              project.source.repoName,
+              projectSource.ownerName,
+              projectSource.repoName,
               false,
             )}`,
             supportButtonOptions: supportButtonStepConfig,
@@ -509,7 +518,7 @@
                         isClaimed(chainData)
                           ? editProjectSplitsSteps(
                               project.account.accountId,
-                              project.source.url,
+                              projectSource.url,
                               chainData.splits,
                             )
                           : unreachable(),
@@ -566,7 +575,7 @@
                 unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
                 showClaimButton={repoExists}
                 on:claimButtonClick={() =>
-                  goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
+                  goto(buildUrl('/app/claim-project', { projectToAdd: projectSource.url }))}
               />
             </div>
           </SectionSkeleton>
