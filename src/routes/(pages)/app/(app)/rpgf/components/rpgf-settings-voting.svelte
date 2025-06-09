@@ -107,6 +107,16 @@
       };
     }
   }
+
+  $: wrappedDraftOrRound = settingsFormProps.wrappedDraftOrRound;
+
+  // badgeholders can not be updated if voting is already over
+  $: canUpdateBadgeholders =
+    wrappedDraftOrRound.type === 'round-draft' ||
+    !(
+      wrappedDraftOrRound.round.state === 'pending-results' ||
+      wrappedDraftOrRound.round.state === 'results'
+    );
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft invalid={!valid}>
@@ -138,7 +148,11 @@
   </FormField>
 
   <!-- TODO(rpgf): CSV Upload for badgeholders -->
-  <FormField title="Badgeholders" description="These addresses will be able to vote in the round.">
+  <FormField
+    title="Badgeholders"
+    description="These addresses will be able to vote in the round."
+    disabled={!canUpdateBadgeholders}
+  >
     <ListEditor
       bind:items={voterItems}
       allowDripLists={false}
