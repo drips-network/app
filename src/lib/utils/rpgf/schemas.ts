@@ -172,6 +172,7 @@ const roundPublicFieldsSchema = z.object({
     maxVotesPerVoter: z.number().int().positive(),
     maxVotesPerProjectPerVoter: z.number().int().positive(),
   }),
+  voterGuidelinesLink: z.string().url().nullish(),
   createdByUserId: z.string().uuid(),
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()),
@@ -231,6 +232,7 @@ export const createRoundDtoSchema = z.object({
   votingPeriodStart: z.date().transform((v) => v.toISOString()),
   votingPeriodEnd: z.date().transform((v) => v.toISOString()),
   resultsPeriodStart: z.date().transform((v) => v.toISOString()),
+  voterGuidelinesLink: z.string().url().nullish(),
   applicationFormat: applicationFormatSchema,
   votingConfig: z.object({
     maxVotesPerVoter: z.number().int().positive(),

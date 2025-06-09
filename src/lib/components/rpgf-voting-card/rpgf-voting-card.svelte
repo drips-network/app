@@ -16,6 +16,7 @@
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import submitRpgfBallotFlowSteps from '$lib/flows/submit-rpgf-ballot/submit-rpgf-ballot-flow-steps';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
@@ -24,10 +25,13 @@
   export let previouslyCastBallot: boolean;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
+  $: voterGuidelinesSeen = round.voterGuidelinesLink
+    ? $dismissablesStore.includes(guidelinesDismissbleId)
+    : true;
 
   let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   $: {
-    if (!$dismissablesStore.includes(guidelinesDismissbleId)) {
+    if (!voterGuidelinesSeen) {
       voteStep = null;
     } else if ($page.url.pathname.includes('/applications/ballot')) {
       voteStep = 'assign-votes';
@@ -71,40 +75,47 @@
   {/if}
 
   <div class="steps">
-    <div class="step">
-      <div class="step-headline" class:active={voteStep === null}>
-        <h6 class="typo-text-bold">
-          {#if voteStep === 'assign-votes' || voteStep === 'build-ballot'}
-            <CheckCircle style="fill: var(--color-primary)" />
-          {/if}
-          Step 1
-        </h6>
-        <span class="typo-text">Read guidelines</span>
+    {#if round.voterGuidelinesLink}
+      <div class="step">
+        <div class="step-headline" class:active={voteStep === null}>
+          <h6 class="typo-text-bold">
+            {#if voteStep === 'assign-votes' || voteStep === 'build-ballot'}
+              <CheckCircle style="fill: var(--color-primary)" />
+            {/if}
+            Step 1
+          </h6>
+          <span class="typo-text">Read guidelines</span>
+        </div>
+
+        {#if voteStep === null}
+          <div class="description">
+            <p class="typo-text-small">
+              Please carefully read the round's badgeholder guidelines before proceeding. These
+              guidelines outline the rules and expectations for badgeholders during the voting
+              process.
+            </p>
+          </div>
+
+          <div class="actions">
+            <Button
+              href={buildExternalUrl(round.voterGuidelinesLink)}
+              target="_blank"
+              variant="primary"
+              icon={ArrowBoxUpRight}>Voter guidelines</Button
+            >
+            <Button
+              variant="normal"
+              on:click={() => dismissablesStore.dismiss(guidelinesDismissbleId)}
+              >Confirm & continue</Button
+            >
+          </div>
+        {:else}
+          <Button variant="ghost" icon={ArrowBoxUpRight}>Review voter guidelines</Button>
+        {/if}
       </div>
 
-      {#if voteStep === null}
-        <div class="description">
-          <p class="typo-text-small">
-            Please carefully read the round's badgeholder guidelines before proceeding. These
-            guidelines outline the rules and expectations for badgeholders during the voting
-            process.
-          </p>
-        </div>
-
-        <div class="actions">
-          <Button variant="primary" icon={ArrowBoxUpRight}>Voter guidelines</Button>
-          <Button
-            variant="normal"
-            on:click={() => dismissablesStore.dismiss(guidelinesDismissbleId)}
-            >Confirm & continue</Button
-          >
-        </div>
-      {:else}
-        <Button variant="ghost" icon={ArrowBoxUpRight}>Review voter guidelines</Button>
-      {/if}
-    </div>
-
-    <Divider />
+      <Divider />
+    {/if}
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications#content-anchor">
       <div class="step-headline" class:active={voteStep === 'build-ballot'}>
@@ -112,7 +123,7 @@
           {#if voteStep === 'assign-votes'}
             <CheckCircle style="fill: var(--color-primary)" />
           {/if}
-          Step 2
+          Step {round.voterGuidelinesLink ? 2 : 1}
         </h6>
         <span class="typo-text">Pick applications</span>
       </div>
@@ -146,7 +157,7 @@
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot#content-anchor">
       <div class="step-headline" class:active={voteStep === 'assign-votes'}>
-        <h6 class="typo-text-bold">Step 3</h6>
+        <h6 class="typo-text-bold">Step {round.voterGuidelinesLink ? '3' : '2'}</h6>
         <span class="typo-text">Assign votes</span>
       </div>
 

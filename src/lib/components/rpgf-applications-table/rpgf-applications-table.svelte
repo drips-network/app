@@ -159,7 +159,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 1rem 0 1rem 1rem;
-    border: 1px solid var(--color-foreground-level-4);
+    border: 1px solid var(--color-foreground-level-3);
     overflow: hidden;
   }
 

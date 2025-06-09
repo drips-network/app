@@ -76,20 +76,6 @@
     }
   }
 
-  $: valid =
-    Boolean(
-      votesPerVoterValidationState.type === 'valid' &&
-        maxVotesPerProjectValidationState.type === 'valid' &&
-        ensureAtLeastOneArrayMember(addresses) &&
-        votesPerVoter &&
-        maxVotesPerProject,
-    ) ||
-    // If draft, allow deleting voting config
-    (settingsFormProps.wrappedDraftOrRound.type === 'round-draft' &&
-      votesPerVoterValidationState.type === 'unvalidated' &&
-      maxVotesPerProjectValidationState.type === 'unvalidated' &&
-      !addresses.length);
-
   $: {
     if (ensureAtLeastOneArrayMember(addresses) && votesPerVoter && maxVotesPerProject) {
       updatedRoundOrDraft = {
@@ -117,6 +103,49 @@
       wrappedDraftOrRound.round.state === 'pending-results' ||
       wrappedDraftOrRound.round.state === 'results'
     );
+
+  let voterGuidelinesLink = updatedRoundOrDraft.voterGuidelinesLink ?? undefined;
+
+  let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
+  $: {
+    if (!voterGuidelinesLink) {
+      voterGuidelinesLinkValidationState = { type: 'valid' };
+      updatedRoundOrDraft = {
+        ...updatedRoundOrDraft,
+        voterGuidelinesLink: undefined,
+      };
+    } else if (!/^https?:\/\//.test(voterGuidelinesLink)) {
+      voterGuidelinesLinkValidationState = {
+        type: 'invalid',
+        message: 'Must be a valid URL starting with http:// or https://',
+      };
+      updatedRoundOrDraft = {
+        ...updatedRoundOrDraft,
+        voterGuidelinesLink: undefined,
+      };
+    } else {
+      voterGuidelinesLinkValidationState = { type: 'valid' };
+      updatedRoundOrDraft = {
+        ...updatedRoundOrDraft,
+        voterGuidelinesLink: voterGuidelinesLink,
+      };
+    }
+  }
+
+  $: valid =
+    Boolean(
+      votesPerVoterValidationState.type === 'valid' &&
+        maxVotesPerProjectValidationState.type === 'valid' &&
+        ensureAtLeastOneArrayMember(addresses) &&
+        votesPerVoter &&
+        maxVotesPerProject &&
+        voterGuidelinesLinkValidationState.type === 'valid',
+    ) ||
+    // If draft, allow deleting voting config
+    (settingsFormProps.wrappedDraftOrRound.type === 'round-draft' &&
+      votesPerVoterValidationState.type === 'unvalidated' &&
+      maxVotesPerProjectValidationState.type === 'unvalidated' &&
+      !addresses.length);
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft invalid={!valid}>
@@ -129,7 +158,11 @@
     </div>
   {/if}
 
-  <FormField title="Votes per voter*" disabled={!isDraft}>
+  <FormField
+    title="Votes per voter*"
+    description="The maximum amount of votes that each badgeholder may allocate across all projects."
+    disabled={!isDraft}
+  >
     <TextInput
       placeholder="1000"
       validationState={votesPerVoterValidationState}
@@ -138,12 +171,28 @@
     />
   </FormField>
 
-  <FormField title="Maximum votes per project*" disabled={!isDraft}>
+  <FormField
+    title="Maximum votes per project*"
+    description="The maximum amount of votes any given badgeholder may allocate to a single project."
+    disabled={!isDraft}
+  >
     <TextInput
       placeholder="100"
       validationState={maxVotesPerProjectValidationState}
       bind:value={maxVotesPerProject}
       variant={{ type: 'number', min: 1 }}
+    />
+  </FormField>
+
+  <FormField
+    title="Badgeholder guidelines link"
+    description="Optionally set a link that badgeholders need to read and accept before being able to cast their ballot."
+    disabled={!canUpdateBadgeholders}
+  >
+    <TextInput
+      placeholder="1000"
+      validationState={voterGuidelinesLinkValidationState}
+      bind:value={voterGuidelinesLink}
     />
   </FormField>
 
