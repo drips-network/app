@@ -30,14 +30,15 @@ test('ecosystems donation flow', async ({ page, request }) => {
 
   // wait for the api to return an ecosystem that we can support
   // by checking for the appearance of funds donated
-  let fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
+  const fundsDisplaySelector = '.ecosystem-card .aggregate-fiat-estimate';
+  let fundsDisplay = await page.$(fundsDisplaySelector);
   while (!fundsDisplay) {
     await page.reload();
     await page.getByRole('button', { name: 'Connect', exact: true }).click();
     await page.getByTestId('sidenav-item-Ecosystems').click();
     // NOTE: strategically placed timeout!
     await page.waitForTimeout(1_000);
-    fundsDisplay = await page.$('.ecosystem-card .aggregate-fiat-estimate');
+    fundsDisplay = await page.$(fundsDisplaySelector);
   }
 
   // navigate to the created ecosystem
@@ -58,7 +59,8 @@ test('ecosystems donation flow', async ({ page, request }) => {
 
   // verify that the ecosystem support has propagated to the relevant projects.
   const page1Promise = page.waitForEvent('popup');
-  await page.getByRole('link', { name: 'Byron/gitoxide' }).click();
+  // skip root node
+  await page.getByRole('link', { name: createEcosystemPayload.graph.nodes[1].projectName }).click();
   const page1 = await page1Promise;
   await expect(await page1.locator(`text=${createEcosystemPayload.name}`).nth(0)).toBeVisible();
 });
