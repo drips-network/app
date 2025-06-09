@@ -85,7 +85,11 @@
 </script>
 
 <div class="application-line-item">
-  <a href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}">
+  <a
+    href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
+      ? '?backToBallot'
+      : ''}#content-anchor"
+  >
     <RpgfApplicationBadge {application} />
   </a>
 

@@ -51,7 +51,7 @@
   {/if}
 
   {#if !hideName}
-    <span class="typo-text-bold">{application.projectName}</span>
+    <span class="name typo-text-bold">{application.projectName}</span>
   {/if}
 
   {#if !hideState}
@@ -72,6 +72,12 @@
     align-items: center;
     gap: 0.5rem;
     vertical-align: middle;
+  }
+
+  .name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .state-badge {

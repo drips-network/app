@@ -53,15 +53,13 @@
           Apply now
         {/if}
       </Button>
-    {/if}
-    {#if state === 'pending-voting'}
+    {:else if state === 'pending-voting'}
       <h2 class="pixelated">Registration closed</h2>
       <p class="typo-text">
         The round is no longer accepting new applications. The round admins are now reviewing
         submitted projects.
       </p>
-    {/if}
-    {#if state === 'voting'}
+    {:else if state === 'voting'}
       {#if !signedIn}
         <h2 class="pixelated">Voting is open</h2>
         <p class="typo-text">
@@ -104,6 +102,14 @@
           tallied, the results will be announced.
         </p>
       {/if}
+    {:else if state === 'pending-results'}
+      <h2 class="pixelated">Tallying</h2>
+      <p class="typo-text">
+        The round admins are currently reviewing the votes and preparing the distribution.
+      </p>
+    {:else if state === 'results'}
+      <h2 class="pixelated">Round completed</h2>
+      <p class="typo-text">This round has concluded, and rewards are being paid out.</p>
     {/if}
   </div>
 {/if}

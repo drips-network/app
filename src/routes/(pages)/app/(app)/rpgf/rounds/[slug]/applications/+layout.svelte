@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll, replaceState } from '$app/navigation';
+  import { page } from '$app/stores';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import RpgfVotingCard from '$lib/components/rpgf-voting-card/rpgf-voting-card.svelte';
@@ -36,6 +37,11 @@
   }
 
   $: ballotStore = data.ballot;
+
+  // remove #content-anchor from the URL if it exists
+  $: if ($page.url.hash === '#content-anchor') {
+    replaceState($page.url.pathname + $page.url.search, $page.state);
+  }
 </script>
 
 <div class="applications-layout" class:two-column={data.reviewMode || data.voteMode}>
@@ -74,6 +80,12 @@
   </div>
 
   <div class="page">
+    <div
+      id="content-anchor"
+      style:visibility="hidden"
+      style:position="absolute"
+      style:top="-84px"
+    />
     <slot />
   </div>
 </div>
@@ -89,6 +101,10 @@
   .applications-layout.two-column {
     grid-template-columns: 1fr minmax(auto, 18rem);
     grid-template-areas: 'page sidebar';
+  }
+
+  .applications-layout:not(.two-column) .sidebar {
+    display: none;
   }
 
   .sidebar {
@@ -115,18 +131,16 @@
   }
 
   .page {
+    position: relative;
     grid-area: page;
+    max-width: calc(100vw - 2rem);
   }
 
   @media (max-width: 1251px) {
-    .applications-layout {
+    .applications-layout.two-column {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
       grid-template-areas: 'sidebar' 'page';
-    }
-
-    .sidebar {
-      display: none;
     }
   }
 </style>

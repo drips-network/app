@@ -11,6 +11,8 @@
   import LinkCell from '$lib/components/table/cells/link.cell.svelte';
   import RpgfApplicationMetricsCard from '$lib/components/rpgf-application-metrics-card/rpgf-application-metrics-card.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import { page } from '$app/stores';
+  import ShareButton from '$lib/components/share-button/share-button.svelte';
 
   export let data;
   $: decisionsStore = data.decisions;
@@ -26,13 +28,24 @@
     data.isRoundAdmin || data.application.submitterUserId === data.rpgfUserData?.userId;
 
   $: privateFieldsOmitted = applicationFormat.find((f) => f.private) && !canSeePrivateFields;
+
+  $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
 
 <div class="application">
-  <div>
-    <Button href="/app/rpgf/rounds/{round.urlSlug}/applications" icon={ArrowLeft}
-      >Back to applications</Button
+  <div class="actions">
+    <Button
+      href={backToBallot
+        ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot#content-anchor`
+        : `/app/rpgf/rounds/${round.urlSlug}/applications#content-anchor`}
+      icon={ArrowLeft}>Back to {backToBallot ? 'ballot' : 'applications'}</Button
     >
+    <ShareButton
+      url={$page.url.toString().replaceAll('?backToBallot', '').replaceAll('#content-anchor', '')}
+      shareModalText={application.state !== 'approved'
+        ? "Please note that only the applicant or round admins can see this application before it's approved."
+        : undefined}
+    />
   </div>
   <div class="card">
     <RpgfApplicationBadge hideState {application} hideName size="huge" />
@@ -53,6 +66,7 @@
   <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 
   <div class="card">
+    <h2 class="typo-header-5">Application details</h2>
     <div class="fields">
       {#if privateFieldsOmitted}
         <AnnotationBox type="info">
@@ -127,6 +141,23 @@
           </div>
         {/if}
       {/each}
+
+      <div class="field">
+        <h2 class="typo-header-4">Submitted at</h2>
+        <p>
+          {new Date(application.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </p>
+      </div>
+      <div class="field">
+        <h2 class="typo-header-4">GitHub repository</h2>
+        <ProjectBadge forceUnclaimed project={data.dripsProject} tooltip={false} />
+      </div>
     </div>
   </div>
 </div>
@@ -135,7 +166,7 @@
   .card {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
     padding: 1.5rem;
     border-radius: 1rem;
@@ -150,6 +181,13 @@
     margin: 0 auto;
   }
 
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
   .fields {
     display: flex;
     flex-direction: column;
@@ -161,5 +199,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: fit-content;
   }
 </style>

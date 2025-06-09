@@ -16,6 +16,7 @@
   import type { RpgfUserData } from '$lib/utils/rpgf/siwe';
   import { writable, type Writable } from 'svelte/store';
   import ApplicationLineItem from './components/application-line-item.svelte';
+  import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
 
   export let userData: RpgfUserData | null;
   export let applications: Application[];
@@ -57,28 +58,30 @@
   }
 </script>
 
-<div class="wrapper">
-  {#each groups as group}
-    <div class="table-wrapper">
-      {#if group.title}<h5>{group.title}</h5>{/if}
-      <div class="applications-table">
-        {#each group.applications as application}
-          <ApplicationLineItem
-            {voteStep}
-            {ballotStore}
-            {reviewMode}
-            {round}
-            {application}
-            bind:decision={decisions[application.id]}
-          />
-        {/each}
-        {#if group.applications.length === 0}
-          <div class="empty">Nothing to see here</div>
-        {/if}
+<PaddedHorizontalScroll>
+  <div class="wrapper">
+    {#each groups as group}
+      <div class="table-wrapper">
+        {#if group.title}<h5>{group.title}</h5>{/if}
+        <div class="applications-table">
+          {#each group.applications as application}
+            <ApplicationLineItem
+              {voteStep}
+              {ballotStore}
+              {reviewMode}
+              {round}
+              {application}
+              bind:decision={decisions[application.id]}
+            />
+          {/each}
+          {#if group.applications.length === 0}
+            <div class="empty">Nothing to see here</div>
+          {/if}
+        </div>
       </div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+</PaddedHorizontalScroll>
 
 <style>
   .wrapper {
