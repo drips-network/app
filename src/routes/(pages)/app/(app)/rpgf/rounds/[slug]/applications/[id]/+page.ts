@@ -8,6 +8,7 @@ import type {
   ApplicationPageDripsProjectQueryVariables,
 } from './__generated__/gql.generated.js';
 import { error } from '@sveltejs/kit';
+import { getRepoMetrics } from '$lib/utils/rpgf/oso.js';
 
 export const load = async ({ fetch, params, parent }) => {
   const { wrappedRound } = await parent();
@@ -40,8 +41,16 @@ export const load = async ({ fetch, params, parent }) => {
     throw error(404, 'Project not found');
   }
 
+  // Not awaiting this so that it gets streamed to the client
+  const osoCoreMetrics = getRepoMetrics(
+    dripsProject.source.ownerName,
+    dripsProject.source.repoName,
+    fetch,
+  );
+
   return {
     application,
     dripsProject,
+    osoCoreMetrics,
   };
 };
