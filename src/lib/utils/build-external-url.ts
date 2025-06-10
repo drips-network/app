@@ -5,7 +5,11 @@
  * @returns A link to `/external/` route, warning the user before
  * sending them off to the external page.
  */
-export default function (href: string) {
+export default function (href: string | undefined) {
+  if (!href) {
+    throw new Error('No href');
+  }
+
   const url = new URL(href);
   const encoded = encodeURIComponent(url.href);
 

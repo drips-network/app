@@ -29,6 +29,7 @@ import { populateCallerWriteTx } from '../sdk/caller/caller';
 import txToCallerCall from '../sdk/utils/tx-to-caller-call';
 import network from '$lib/stores/wallet/network';
 import calculateRandomSalt from '../calc-salt';
+import unreachable from '../unreachable';
 
 type AccountId = string;
 
@@ -233,7 +234,7 @@ export default class DripListService {
           break;
         }
         case 'project': {
-          const { forge, ownerName, repoName } = item.project.source;
+          const { forge, ownerName, repoName } = item.project.source || unreachable();
 
           const receiver = {
             type: 'repoDriver' as const,

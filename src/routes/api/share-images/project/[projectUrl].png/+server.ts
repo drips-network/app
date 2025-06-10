@@ -16,6 +16,7 @@ import sanitize from 'sanitize-html';
 import twemoji from '$lib/utils/twemoji';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import network from '$lib/stores/wallet/network';
+import unreachable from '$lib/utils/unreachable';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { projectUrl } = params;
@@ -66,7 +67,8 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
     error(404);
   }
 
-  const projectName = `${project.source.ownerName}/${project.source.repoName}`;
+  const source = project.source || unreachable();
+  const projectName = `${source.ownerName}/${source.repoName}`;
 
   const projectData = filterCurrentChainData(project.chainData);
 

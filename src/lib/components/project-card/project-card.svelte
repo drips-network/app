@@ -41,16 +41,17 @@
   import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import unreachable from '$lib/utils/unreachable';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
   let projectChainData = filterCurrentChainData(project.chainData);
+  const projectUrl = project.source
+    ? buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)
+    : unreachable();
 </script>
 
-<a
-  class="wrapper"
-  href={buildProjectUrl(project.source.forge, project.source.ownerName, project.source.repoName)}
->
+<a class="wrapper" href={projectUrl}>
   <div class="project-card" class:hidden-project={isHidden}>
     <div
       class="background"
@@ -68,7 +69,7 @@
         <div class="icon">
           <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
         </div>
-        <span class="owner-name">{project.source.ownerName}</span>
+        <span class="owner-name">{project.source?.ownerName}</span>
       </div>
       <h4 class="name"><ProjectName showSource={false} {project} /></h4>
     </div>

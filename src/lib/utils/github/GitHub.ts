@@ -41,7 +41,7 @@ export default class GitHub {
   public async getFundingJsonAddress(owner: string, repo: string): Promise<string | null> {
     const fundingJson = await this.fetchFundingJson(owner, repo);
     return (
-      fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name].ownedBy ?? null
+      fundingJson.drips?.[network.name === 'homestead' ? 'ethereum' : network.name]?.ownedBy ?? null
     );
   }
 

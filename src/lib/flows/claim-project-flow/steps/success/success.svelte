@@ -25,9 +25,9 @@
   async function viewProject() {
     loading = true;
 
-    const forge = $context.project?.source.forge;
-    const username = $context.project?.source.ownerName;
-    const repoName = $context.project?.source.repoName;
+    const forge = $context.project?.source?.forge;
+    const username = $context.project?.source?.ownerName;
+    const repoName = $context.project?.source?.repoName;
     const projectChainData = $context.project?.chainData
       ? (filterCurrentChainData($context.project.chainData) as ClaimedProjectData)
       : undefined;

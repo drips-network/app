@@ -56,6 +56,7 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
   export let chainOverride: SupportedChain | undefined = undefined;
+  export let projectNameSize: 'small' | 'medium' = 'medium';
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -79,13 +80,13 @@
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="project-badge flex gap-2 items-center typo-text"
-      href={linkTo === 'project-page'
+      href={linkTo === 'project-page' && processedProject.source
         ? buildProjectUrl(
             processedProject.source.forge,
             processedProject.source.ownerName,
             processedProject.source.repoName,
           )
-        : buildExternalUrl(processedProject.source.url)}
+        : buildExternalUrl(processedProject.source?.url)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}
@@ -106,7 +107,7 @@
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
-        <ProjectName project={processedProject} />
+        <ProjectName project={processedProject} size={projectNameSize} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon
