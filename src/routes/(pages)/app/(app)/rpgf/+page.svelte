@@ -93,7 +93,7 @@
 
   <Section
     header={{
-      label: `All rounds on ${network.name}`,
+      label: `All rounds on ${network.label}`,
       icon: ArrowCounterClockwiseHeart,
     }}
     skeleton={{

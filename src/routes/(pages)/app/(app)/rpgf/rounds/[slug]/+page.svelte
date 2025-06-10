@@ -80,6 +80,7 @@
   >
     <RpgfApplicationsTable
       groupBy={GroupBy.None}
+      searchable={false}
       userData={data.rpgfUserData}
       {round}
       applications={data.applications}

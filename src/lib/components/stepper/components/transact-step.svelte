@@ -33,8 +33,6 @@
   import predefinedDurationProgress from '$lib/components/progress-bar/predefined-duration-progress';
   import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
   import expect from '$lib/utils/expect';
-  import { Contract } from 'ethers';
-  import { callerAbi } from '$lib/utils/sdk/caller/caller-abi';
   import Gas from '$lib/components/icons/Gas.svelte';
   import Logo from '$lib/components/illustrations/logo.svelte';
 
@@ -330,59 +328,9 @@
         });
 
         if (executingTx.gasless) {
-          const domain = {
-            name: 'Caller',
-            version: '1',
-            chainId: network.chainId,
-            verifyingContract: networkConfig.contracts.CALLER,
-          };
+          const nonce = await executingTx.gasless.nonceGetter();
 
-          const types = {
-            CallSigned: [
-              {
-                name: 'sender',
-                type: 'address',
-              },
-              {
-                name: 'target',
-                type: 'address',
-              },
-              {
-                name: 'data',
-                type: 'bytes',
-              },
-              {
-                name: 'value',
-                type: 'uint256',
-              },
-              {
-                name: 'nonce',
-                type: 'uint256',
-              },
-              {
-                name: 'deadline',
-                type: 'uint256',
-              },
-            ],
-          };
-
-          const { data, to } = executingTx.transaction;
-          assert(data, 'Expected data to be defined');
-
-          const { provider } = get(walletStore);
-          const caller = new Contract(networkConfig.contracts.CALLER, callerAbi, provider);
-
-          const nonce = await caller.nonce(address);
-
-          const payload = {
-            sender: address,
-            target: to,
-            data,
-            value: 0,
-            nonce: Number(nonce),
-            // 1 hour in seconds
-            deadline: Math.floor(Date.now() / 1000) + 3600,
-          };
+          const { domain, types, payload } = executingTx.gasless.ERC2771Data(nonce);
 
           const sig = await signer.signTypedData(domain, types, payload);
 
@@ -393,12 +341,15 @@
 
           const gaslessCallRes = await fetch('/api/gasless/call', {
             method: 'POST',
-            body: JSON.stringify({
-              targetContractAddress: to,
-              callData: data,
-              payload,
-              eip712Signature: sig,
-            }),
+            body: JSON.stringify(
+              {
+                targetContractAddress: executingTx.transaction.to,
+                callData: executingTx.transaction.data,
+                payload,
+                eip712Signature: sig,
+              },
+              (key, value) => (typeof value === 'bigint' ? value.toString() : value),
+            ),
           });
           if (!gaslessCallRes.ok) {
             throw new Error(`Failed to submit gasless call: ${await gaslessCallRes.text()}`);
@@ -407,10 +358,12 @@
           const body = await gaslessCallRes.json();
           const { taskId } = body;
 
+          let gaslessTransactionHash: string | undefined;
+
           const gaslessCallExpectation = await expect(
             async () => {
               const res = await fetch(`/api/gasless/track/${taskId}`);
-              if (!res.ok) throw new Error('Failed to track gasless owner update task');
+              if (!res.ok) throw new Error('Failed to track Gelato Relay task');
 
               const { task } = await res.json();
               assert(typeof task === 'object', 'Invalid task');
@@ -418,6 +371,7 @@
               assert(typeof taskState === 'string', 'Invalid task state');
 
               if (transactionHash) {
+                gaslessTransactionHash = transactionHash;
                 updateTransactionTimelineStatus(executingTx, {
                   status: 'pending',
                   message: 'Waiting for confirmation',
@@ -445,6 +399,12 @@
             throw new Error('The gasless call did not resolve within the expected timeframe.');
           }
 
+          const { provider } = $walletStore;
+          if (gaslessTransactionHash) {
+            const receipt = await provider.getTransactionReceipt(gaslessTransactionHash);
+            if (receipt) contractReceipts.push(receipt);
+          }
+
           continue;
         }
 
@@ -460,6 +420,7 @@
         });
 
         const receipt = await txResponse.wait();
+
         if (receipt) {
           contractReceipts.push(receipt);
 
@@ -470,6 +431,9 @@
           });
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+
         const isRejection = (e as Error).message
           .toLowerCase()
           .includes('user rejected transaction');
@@ -589,6 +553,9 @@
 
       return response;
     } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+
       const isRejection = (e as Error).message.toLowerCase().includes('user rejected transaction');
 
       if (isRejection) {
@@ -716,7 +683,7 @@
           : {
               external: false,
               title: tx.title,
-              displayAsGasless: tx.gasless,
+              displayAsGasless: Boolean(tx.gasless),
               message:
                 index === 0
                   ? 'Waiting for you to confirm the transaction in your wallet'

@@ -64,7 +64,7 @@ export type Network = {
    */
   alternativeChainMode: boolean;
   gelatoRelayAvailable: boolean;
-  gaslessClaimAndCollect: boolean;
+  gaslessTransactions: boolean;
   addToWalletConfig:
     | {
         blockExplorerUrls: string[];
@@ -152,7 +152,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: false,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
@@ -195,7 +195,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
@@ -238,7 +238,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
@@ -281,7 +281,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: false,
     gelatoRelayAvailable: false,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: {
@@ -335,7 +335,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: false,
     gelatoRelayAvailable: false,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: {
       blockExplorerUrls: ['https://wikipedia.org/'],
       nativeCurrency: {
@@ -391,7 +391,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: false,
+    gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
@@ -434,7 +434,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gaslessTransactions: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://filecoin.blockscout.com/'],
       nativeCurrency: {
@@ -500,7 +500,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gaslessTransactions: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://explorer.metis.io/'],
       nativeCurrency: {
@@ -551,7 +551,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     alternativeChainMode: true,
     gelatoRelayAvailable: true,
-    gaslessClaimAndCollect: true,
+    gaslessTransactions: true,
     addToWalletConfig: {
       blockExplorerUrls: ['https://optimistic.etherscan.io/'],
       nativeCurrency: {

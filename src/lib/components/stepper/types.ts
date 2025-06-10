@@ -1,12 +1,19 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { TransactionLike } from 'ethers';
+import type { TransactionLike, TypedDataDomain, TypedDataField } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
 
 export type TransactionWrapper = {
   title: string;
   transaction: TransactionLike;
-  gasless?: boolean;
+  gasless?: {
+    nonceGetter: () => Promise<number>;
+    ERC2771Data: (nonce: number) => {
+      domain: TypedDataDomain;
+      types: Record<string, TypedDataField[]>;
+      payload: Record<string, unknown>;
+    };
+  };
   applyGasBuffer: boolean;
 };
 

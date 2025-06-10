@@ -14,6 +14,7 @@
   import type { WrappedRoundAdmin, WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
 
   export let wrappedDraftOrRound: WrappedRoundAdmin | WrappedRoundDraft;
+  $: type = wrappedDraftOrRound.type;
 
   onMount(() => {
     $forceMainSidebarCollapsed = true;
@@ -64,13 +65,15 @@
       icon={Label}
       backgroundOnActive
     />
-    <SidenavItem
-      label="Schedule"
-      href="{settingsBaseUrl}/schedule"
-      active={$page.url.pathname === `${settingsBaseUrl}/schedule`}
-      icon={Calendar}
-      backgroundOnActive
-    />
+    {#if type === 'round-draft'}
+      <SidenavItem
+        label="Schedule"
+        href="{settingsBaseUrl}/schedule"
+        active={$page.url.pathname === `${settingsBaseUrl}/schedule`}
+        icon={Calendar}
+        backgroundOnActive
+      />
+    {/if}
     <SidenavItem
       label="Admins"
       href="{settingsBaseUrl}/admins"
@@ -85,13 +88,15 @@
       icon={Proposals}
       backgroundOnActive
     />
-    <SidenavItem
-      label="Application form"
-      href="{settingsBaseUrl}/application"
-      active={$page.url.pathname === `${settingsBaseUrl}/application`}
-      icon={Ledger}
-      backgroundOnActive
-    />
+    {#if type === 'round-draft'}
+      <SidenavItem
+        label="Application form"
+        href="{settingsBaseUrl}/application"
+        active={$page.url.pathname === `${settingsBaseUrl}/application`}
+        icon={Ledger}
+        backgroundOnActive
+      />
+    {/if}
   </div>
 
   <div class="tabs">

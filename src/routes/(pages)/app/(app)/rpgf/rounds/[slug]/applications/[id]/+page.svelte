@@ -9,6 +9,10 @@
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import { getCoreRowModel } from '@tanstack/svelte-table';
   import LinkCell from '$lib/components/table/cells/link.cell.svelte';
+  import RpgfApplicationMetricsCard from '$lib/components/rpgf-application-metrics-card/rpgf-application-metrics-card.svelte';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import { page } from '$app/stores';
+  import ShareButton from '$lib/components/share-button/share-button.svelte';
 
   export let data;
   $: decisionsStore = data.decisions;
@@ -19,13 +23,29 @@
   function isListValue(value: unknown): value is { [key: string]: string | number }[] {
     return Array.isArray(value);
   }
+
+  $: canSeePrivateFields =
+    data.isRoundAdmin || data.application.submitterUserId === data.rpgfUserData?.userId;
+
+  $: privateFieldsOmitted = applicationFormat.find((f) => f.private) && !canSeePrivateFields;
+
+  $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
 
 <div class="application">
-  <div>
-    <Button href="/app/rpgf/rounds/{round.urlSlug}/applications" icon={ArrowLeft}
-      >Back to applications</Button
+  <div class="actions">
+    <Button
+      href={backToBallot
+        ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot#content-anchor`
+        : `/app/rpgf/rounds/${round.urlSlug}/applications#content-anchor`}
+      icon={ArrowLeft}>Back to {backToBallot ? 'ballot' : 'applications'}</Button
     >
+    <ShareButton
+      url={$page.url.toString().replaceAll('?backToBallot', '').replaceAll('#content-anchor', '')}
+      shareModalText={application.state !== 'approved'
+        ? "Please note that only the applicant or round admins can see this application before it's approved."
+        : undefined}
+    />
   </div>
   <div class="card">
     <RpgfApplicationBadge hideState {application} hideName size="huge" />
@@ -43,11 +63,21 @@
     {/if}
   </div>
 
+  <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
+
   <div class="card">
+    <h2 class="typo-header-5">Application details</h2>
     <div class="fields">
+      {#if privateFieldsOmitted}
+        <AnnotationBox type="info">
+          Private fields have been hidden for this application. Sign in as the applicant or a round
+          admin to view private data.
+        </AnnotationBox>
+      {/if}
+
       {#each applicationFormat as field}
-        {@const value = application.fields[field.slug]}
-        {#if !field.private || data.isRoundAdmin}
+        {#if canSeePrivateFields || !field.private}
+          {@const value = application.fields[field.slug]}
           <div class="field">
             <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
               {field.label}
@@ -111,6 +141,23 @@
           </div>
         {/if}
       {/each}
+
+      <div class="field">
+        <h2 class="typo-header-4">Submitted at</h2>
+        <p>
+          {new Date(application.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </p>
+      </div>
+      <div class="field">
+        <h2 class="typo-header-4">GitHub repository</h2>
+        <ProjectBadge forceUnclaimed project={data.dripsProject} tooltip={false} />
+      </div>
     </div>
   </div>
 </div>
@@ -119,9 +166,9 @@
   .card {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 1rem;
     border: 1px solid var(--color-foreground-level-3);
   }
@@ -132,6 +179,13 @@
     gap: 1rem;
     max-width: 45rem;
     margin: 0 auto;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
   }
 
   .fields {
@@ -145,5 +199,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: fit-content;
   }
 </style>
