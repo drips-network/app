@@ -57,3 +57,8 @@
   color: var(--color-primary-level-6);
   text-decoration: underline;
 }
+
+strong {
+  font-family: var(--typeface-medium);
+  font-weight: 500;
+}

@@ -11,7 +11,7 @@ export const DEFAULT_PRESET: CreateRoundDto['applicationFormat'] = [
   },
   {
     type: 'text',
-    private: true,
+    private: false,
     required: true,
     slug: 'description',
     label: 'Project Description',
