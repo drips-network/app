@@ -47,8 +47,8 @@
           await castBallot(undefined, roundSlug, strippedBallot);
         }
 
-        await invalidateAll();
         ballot.clear();
+        await invalidateAll();
       },
       message: 'Casting your ballot...',
     });
