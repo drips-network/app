@@ -16,12 +16,15 @@
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
   import RpgfCtaCard from '$lib/components/rpgf-cta-card/rpgf-cta-card.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data;
   $: round = data.wrappedRound.round;
 
   $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
 </script>
+
+<HeadMeta title="{round.name} | Drips" description={round.description} />
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">

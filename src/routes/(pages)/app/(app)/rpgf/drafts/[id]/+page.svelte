@@ -11,6 +11,7 @@
   import Section from '$lib/components/section/section.svelte';
   import type { ComponentProps } from 'svelte';
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data;
   $: draft = data.wrappedDraft.draft;
@@ -42,6 +43,8 @@
     }
   }
 </script>
+
+<HeadMeta title="{draft.name || 'Unnamed Draft'} | Drips" />
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
