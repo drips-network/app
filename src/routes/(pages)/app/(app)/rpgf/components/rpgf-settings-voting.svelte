@@ -190,7 +190,7 @@
     disabled={!canUpdateBadgeholders}
   >
     <TextInput
-      placeholder="1000"
+      placeholder="http://example.com/guidelines"
       validationState={voterGuidelinesLinkValidationState}
       bind:value={voterGuidelinesLink}
     />
