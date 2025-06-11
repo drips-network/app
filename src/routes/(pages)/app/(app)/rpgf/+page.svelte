@@ -58,7 +58,7 @@
   }
 </script>
 
-<HeadMeta title="Retro PGF | Drips" />
+<HeadMeta title="Retro PGF" />
 
 <div class="page">
   <Section

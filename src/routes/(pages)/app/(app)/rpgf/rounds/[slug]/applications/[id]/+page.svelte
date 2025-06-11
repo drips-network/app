@@ -33,7 +33,7 @@
   $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
 
-<HeadMeta title="{application.projectName} | {round.name} | Drips" />
+<HeadMeta title="{application.projectName} | {round.name}" />
 
 <div class="application">
   <div class="actions">

@@ -24,7 +24,7 @@
   $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
 </script>
 
-<HeadMeta title="{round.name} | Drips" description={round.description} />
+<HeadMeta title={round.name} description={round.description} />
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
