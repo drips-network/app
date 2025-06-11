@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import RpgfApplicationsTable, {
     GroupBy,
@@ -15,6 +16,8 @@
     return data.applications.find((app) => app.id === id);
   });
 </script>
+
+<HeadMeta title="Your ballot | Drips" />
 
 <div class="page">
   <div>

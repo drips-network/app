@@ -23,6 +23,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import submitRpgfApplicationFlowSteps from '$lib/flows/submit-rpgf-application/submit-rpgf-application-flow-steps.js';
   import assert from '$lib/utils/assert';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data;
 
@@ -147,6 +148,8 @@
 
   let forceRevealAllErrors = formDataHasBeenRestored;
 </script>
+
+<HeadMeta title="New application | Drips" />
 
 <div class="page">
   <Button

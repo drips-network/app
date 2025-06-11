@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import RpgfRoundCard from '$lib/components/rpgf-round-card/rpgf-round-card.svelte';
@@ -56,6 +57,8 @@
     );
   }
 </script>
+
+<HeadMeta title="Retro PGF | Drips" />
 
 <div class="page">
   <Section

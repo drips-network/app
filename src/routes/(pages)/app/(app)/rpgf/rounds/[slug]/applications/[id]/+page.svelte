@@ -13,6 +13,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   export let data;
   $: decisionsStore = data.decisions;
@@ -31,6 +32,8 @@
 
   $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
+
+<HeadMeta title="{application.projectName} | {round.name} | Drips" />
 
 <div class="application">
   <div class="actions">
