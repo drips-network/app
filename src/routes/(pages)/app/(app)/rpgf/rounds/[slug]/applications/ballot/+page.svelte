@@ -17,7 +17,7 @@
   });
 </script>
 
-<HeadMeta title="Your ballot | Drips" />
+<HeadMeta title="Your ballot" />
 
 <div class="page">
   <div>

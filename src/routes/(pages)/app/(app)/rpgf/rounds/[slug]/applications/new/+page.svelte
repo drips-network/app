@@ -149,7 +149,7 @@
   let forceRevealAllErrors = formDataHasBeenRestored;
 </script>
 
-<HeadMeta title="New application | Drips" />
+<HeadMeta title="New application" />
 
 <div class="page">
   <Button

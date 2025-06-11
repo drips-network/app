@@ -5,7 +5,7 @@
   export let data;
 </script>
 
-<HeadMeta title="Round Settings | Drips" />
+<HeadMeta title="Round Settings" />
 
 <RpgfSettingsLayout wrappedDraftOrRound={data.wrappedRound}>
   <slot />

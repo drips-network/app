@@ -44,7 +44,7 @@
   }
 </script>
 
-<HeadMeta title="{draft.name || 'Unnamed Draft'} | Drips" />
+<HeadMeta title={draft.name || 'Unnamed Draft'} />
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
