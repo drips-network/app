@@ -38,12 +38,16 @@
 
   let groups: { title: string | null; applications: Application[] }[] = [];
 
-  function populateGroups(gb: typeof groupBy, searchTerm: string | undefined | null = '') {
+  function populateGroups(
+    apps: typeof applications,
+    gb: typeof groupBy,
+    searchTerm: string | undefined | null = '',
+  ) {
     if (searchTerm) {
       groups = [
         {
           title: null,
-          applications: applications.filter((app) =>
+          applications: apps.filter((app) =>
             app.projectName.toLowerCase().includes(searchTerm.toLowerCase()),
           ),
         },
@@ -56,30 +60,30 @@
       groups = [
         {
           title: 'Pending review',
-          applications: applications.filter((app) => app.state === 'pending'),
+          applications: apps.filter((app) => app.state === 'pending'),
         },
-        { title: 'Approved', applications: applications.filter((app) => app.state === 'approved') },
-        { title: 'Rejected', applications: applications.filter((app) => app.state === 'rejected') },
+        { title: 'Approved', applications: apps.filter((app) => app.state === 'approved') },
+        { title: 'Rejected', applications: apps.filter((app) => app.state === 'rejected') },
       ].filter((group) => group.applications.length > 0);
     } else if (gb === 'mine') {
       groups = [
         {
           title: 'Your applications',
-          applications: applications.filter((app) => app.submitterUserId === ownUserId),
+          applications: apps.filter((app) => app.submitterUserId === ownUserId),
         },
         {
           title: 'Other applications',
-          applications: applications.filter((app) => app.submitterUserId !== ownUserId),
+          applications: apps.filter((app) => app.submitterUserId !== ownUserId),
         },
       ];
     } else {
-      groups = [{ title: null, applications }];
+      groups = [{ title: null, applications: apps }];
     }
   }
 
   let searchQuery = '';
 
-  $: populateGroups(groupBy, searchQuery);
+  $: populateGroups(applications, groupBy, searchQuery);
 </script>
 
 {#if searchable}
