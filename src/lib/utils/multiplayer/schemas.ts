@@ -43,6 +43,16 @@ export const dripListSchema = z.object({
   accountId: z.string(),
 });
 
+export const ecosystemSchema = z.object({
+  type: z.literal('ecosystem'),
+  accountId: z.string(),
+});
+
+export const subListSchema = z.object({
+  type: z.literal('subList'),
+  accountId: z.string(),
+});
+
 export const pendingVoteSchema = z.object({
   collaboratorAddress: z.string(),
   latestVote: z.null(),

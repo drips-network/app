@@ -119,6 +119,7 @@
   import AddUnknownTokenButton from './components/add-unknown-token-button.svelte';
   import Section from '../section/section.svelte';
   import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
 
@@ -294,7 +295,7 @@
           </SupportItem>
         {/if}
         {#if item.__typename === 'ProjectSupport'}
-          {@const source = item.project.source}
+          {@const source = item.project.source || unreachable()}
           <SupportItem
             href={buildProjectUrl(source.forge, source.ownerName, source.repoName)}
             title={{

@@ -8,6 +8,7 @@ import {
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
+  type SplitReceiver,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 import { gql } from 'graphql-request';
 import type { EditDripListFlowDripListFragment } from './__generated__/gql.generated';
@@ -39,7 +40,7 @@ export const EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT = gql`
 
 export default (dripList: EditDripListFlowDripListFragment) => {
   const state = writable({
-    listEditorConfig: mapSplitReceiversToEditorConfig(dripList.splits),
+    listEditorConfig: mapSplitReceiversToEditorConfig(dripList.splits as SplitReceiver[]),
     name: dripList.name,
     description: dripList.description || undefined,
     dripListAccountId: dripList.account.accountId,
