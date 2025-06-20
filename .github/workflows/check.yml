@@ -25,7 +25,7 @@ jobs:
       - name: Populate .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
-          # TODO: revert
+          # TODO: revert please
           envkey_PUBLIC_NETWORK: 5
           envkey_GQL_URL: https://graphql-api-app-pr-1495.up.railway.app/
           envkey_GQL_ACCESS_TOKEN: 123
