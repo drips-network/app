@@ -17,6 +17,7 @@
   import RpgfCtaCard from '$lib/components/rpgf-cta-card/rpgf-cta-card.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
 
   export let data;
   $: round = data.wrappedRound.round;
@@ -24,7 +25,7 @@
   $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
 </script>
 
-<HeadMeta title={round.name} description={round.description} />
+<HeadMeta title={round.name} description={round.description ?? undefined} />
 
 <RpgfBaseLayout>
   <svelte:fragment slot="sidebar">
@@ -90,6 +91,44 @@
     />
   </Section>
 
+  {#if data.isRoundAdmin}
+    <Section
+      header={{
+        label: 'Ballots',
+        icon: Proposals,
+        actions: [
+          {
+            label: 'View all',
+            href: `/app/rpgf/rounds/${round.urlSlug}/ballots`,
+            icon: ArrowRight,
+            disabled: !data.ballotStats || data.ballotStats.numberOfBallots === 0,
+          },
+        ],
+      }}
+      skeleton={{
+        empty: !data.ballotStats,
+        loaded: true,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No ballots yet',
+        emptyStateText:
+          'As an admin, you can see ballots as they are submitted in the voting phase.',
+      }}
+    >
+      {#if data.ballotStats}
+        <div class="ballot-stats">
+          <div class="stat">
+            <h5>Voters</h5>
+            <span class="typo-header-1">{data.ballotStats.numberOfVoters}</span>
+          </div>
+          <div class="stat">
+            <h5>Recorded Ballots</h5>
+            <span class="typo-header-1">{data.ballotStats.numberOfBallots}</span>
+          </div>
+        </div>
+      {/if}
+    </Section>
+  {/if}
+
   <Section
     header={{
       label: 'Results',
@@ -104,3 +143,11 @@
     }}
   />
 </RpgfBaseLayout>
+
+<style>
+  .ballot-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+</style>

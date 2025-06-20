@@ -2,7 +2,6 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import { redirect } from '@sveltejs/kit';
 import buildUrl from '$lib/utils/build-url';
-import getConnectedAddress from '$lib/utils/get-connected-address';
 import network from '$lib/stores/wallet/network';
 import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
 import type {
@@ -11,9 +10,9 @@ import type {
 } from './__generated__/gql.generated.js';
 
 export const load = async ({ fetch, url, parent }) => {
-  const connectedAddress = getConnectedAddress();
+  const { rpgfUserData } = await parent();
 
-  if (!connectedAddress) {
+  if (!rpgfUserData) {
     redirect(307, buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }));
   }
 
@@ -32,7 +31,7 @@ export const load = async ({ fetch, url, parent }) => {
   const res = await query<
     NewRpgfApplicationPageProjectsQuery,
     NewRpgfApplicationPageProjectsQueryVariables
-  >(projectsQuery, { address: connectedAddress, chains: [network.gqlName] }, fetch);
+  >(projectsQuery, { address: rpgfUserData.walletAddress, chains: [network.gqlName] }, fetch);
 
   return { projects: res.projects };
 };

@@ -1,4 +1,4 @@
-import { getApplications, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
+import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
 import { error } from '@sveltejs/kit';
 
 export const ssr = false;
@@ -9,6 +9,8 @@ export const load = async ({ fetch, params, parent }) => {
   const { slug } = params;
 
   const wrappedRound = await getRound(fetch, slug);
+
+  // Todo(RPGF): Parallelize fetches below
 
   if (!wrappedRound) {
     return error(404);
@@ -31,11 +33,18 @@ export const load = async ({ fetch, params, parent }) => {
     ? await getOwnBallot(fetch, wrappedRound.round.urlSlug)
     : null;
 
+  let ballotStats: Awaited<ReturnType<typeof getBallotStats>> | null = null;
+
+  if (isRoundAdmin) {
+    ballotStats = await getBallotStats(fetch, wrappedRound.round.urlSlug);
+  }
+
   return {
     wrappedRound,
     applications,
     isRoundAdmin,
     isRoundVoter,
     existingBallot,
+    ballotStats,
   };
 };

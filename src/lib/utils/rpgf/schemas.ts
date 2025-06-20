@@ -431,5 +431,6 @@ export const wrappedBallotSchema = z.object({
   id: z.string().uuid(),
   voter: userSchema,
   ballot: ballotSchema,
+  createdAt: z.string().pipe(z.coerce.date()),
 });
 export type WrappedBallot = z.infer<typeof wrappedBallotSchema>;

@@ -293,3 +293,43 @@ export async function getOwnBallot(f = fetch, roundSlug: string): Promise<Wrappe
   const parsed = wrappedBallotSchema.parse(await res.json());
   return parsed;
 }
+
+export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedBallot[]> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots`, 'GET', undefined, f);
+
+  const parsed = wrappedBallotSchema.array().parse(await res.json());
+  return parsed;
+}
+
+export async function getBallotsCsv(f = fetch, roundSlug: string): Promise<string> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots?format=csv`, 'GET', undefined, f);
+
+  if (!res.ok) {
+    throw error(res.status, `Failed to fetch ballots CSV: ${res.statusText}`);
+  }
+
+  return await res.text();
+}
+
+export async function getBallotStats(
+  f = fetch,
+  roundSlug: string,
+): Promise<{
+  numberOfVoters: number;
+  numberOfBallots: number;
+}> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots/stats`, 'GET', undefined, f);
+
+  if (!res.ok) {
+    throw error(res.status, `Failed to fetch ballot stats: ${res.statusText}`);
+  }
+
+  const data = await res.json();
+
+  return z
+    .object({
+      numberOfVoters: z.number(),
+      numberOfBallots: z.number(),
+    })
+    .parse(data);
+}
