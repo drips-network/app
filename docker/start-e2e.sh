@@ -41,7 +41,7 @@ if [ $PROD_BUILD = true ]; then
   docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
 else
   # TODO: revert
-  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true GRAPHQL_API_TAG=jason-ecosystems EVENT_PROCESSOR_TAG=ecosystems ECOSYSTEMS_TAG=staging docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true GRAPHQL_API_TAG=remove-auth-ipfs-and-make-source-non-nullable EVENT_PROCESSOR_TAG=ecosystems ECOSYSTEMS_TAG=staging docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 fi
 
 
