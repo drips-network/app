@@ -30,6 +30,11 @@ export const projectAssociatedAccountIdsQuery = gql`
                 accountId
               }
             }
+            ... on EcosystemSupport {
+              account {
+                accountId
+              }
+            }
           }
           splits {
             dependencies {
@@ -44,6 +49,16 @@ export const projectAssociatedAccountIdsQuery = gql`
                 }
               }
               ... on DripListReceiver {
+                account {
+                  accountId
+                }
+              }
+              ... on EcosystemMainAccountReceiver {
+                account {
+                  accountId
+                }
+              }
+              ... on SubListReceiver {
                 account {
                   accountId
                 }
@@ -75,6 +90,12 @@ export const projectAssociatedAccountIdsQuery = gql`
               }
             }
             ... on StreamSupport {
+              account {
+                accountId
+              }
+            }
+
+            ... on EcosystemSupport {
               account {
                 accountId
               }
@@ -113,6 +134,11 @@ export const dripListAssociatedAccountIdsQuery = gql`
             accountId
           }
         }
+        ... on EcosystemSupport {
+          account {
+            accountId
+          }
+        }
       }
       splits {
         ... on AddressReceiver {
@@ -126,6 +152,16 @@ export const dripListAssociatedAccountIdsQuery = gql`
           }
         }
         ... on DripListReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on EcosystemMainAccountReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on SubListReceiver {
           account {
             accountId
           }

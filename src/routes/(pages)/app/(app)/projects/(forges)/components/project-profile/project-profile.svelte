@@ -9,7 +9,9 @@
   import {
     EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT,
   } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
   export const PROJECT_PROFILE_FRAGMENT = gql`
@@ -20,6 +22,8 @@
     ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
@@ -66,6 +70,12 @@
               }
               ... on DripListReceiver {
                 ...EditProjectSplitsFlowDripListReceiver
+              }
+              ... on EcosystemMainAccountReceiver {
+                ...EditProjectSplitsFlowEcosystemReceiver
+              }
+              ... on SubListReceiver {
+                ...EditProjectSplitsFlowSubListReceiver
               }
             }
             maintainers {

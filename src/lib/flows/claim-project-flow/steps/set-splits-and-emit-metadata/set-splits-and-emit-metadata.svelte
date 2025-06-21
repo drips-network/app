@@ -32,6 +32,7 @@
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
   import { hexlify, toUtf8Bytes } from 'ethers';
+  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -74,8 +75,7 @@
     const projectChainData = filterCurrentChainData(res.projectById.chainData);
 
     return (
-      (projectChainData.verificationStatus === 'PendingMetadata' ||
-        projectChainData.verificationStatus === 'OwnerUpdated') &&
+      projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata &&
       projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }
