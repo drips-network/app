@@ -6,7 +6,7 @@
           "Host": "postgres",
           "Port": 5432,
           "MaintenanceDB": "postgres",
-          "Username": "user",
+          "Username": "postgres",
           "PassFile": "/pgpass",
           "SSLMode": "prefer"
       },
@@ -16,7 +16,17 @@
           "Host": "postgres-multiplayer",
           "Port": 5432,
           "MaintenanceDB": "postgres",
-          "Username": "user",
+          "Username": "postgres",
+          "PassFile": "/pgpass",
+          "SSLMode": "prefer"
+      },
+      "3": {
+          "Name": "RPGF DB",
+          "Group": "Servers",
+          "Host": "postgres-rpgf",
+          "Port": 5432,
+          "MaintenanceDB": "postgres",
+          "Username": "postgres",
           "PassFile": "/pgpass",
           "SSLMode": "prefer"
       }
