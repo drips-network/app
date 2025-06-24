@@ -205,6 +205,9 @@
     isExecutionCompleted = true;
   }
 
+  $: gaslessRelayAvailable =
+    networkConfig.gaslessTransactions && networkConfig.gelatoRelayAvailable;
+
   async function handleEoaTransactions(
     network: { chainId: number; name: string },
     address: string,
@@ -327,7 +330,7 @@
           message: 'Waiting for you to confirm in your wallet',
         });
 
-        if (executingTx.gasless) {
+        if (executingTx.gasless && gaslessRelayAvailable) {
           const nonce = await executingTx.gasless.nonceGetter();
 
           const { domain, types, payload } = executingTx.gasless.ERC2771Data(nonce);
@@ -683,7 +686,7 @@
           : {
               external: false,
               title: tx.title,
-              displayAsGasless: Boolean(tx.gasless),
+              displayAsGasless: gaslessRelayAvailable && Boolean(tx.gasless),
               message:
                 index === 0
                   ? 'Waiting for you to confirm the transaction in your wallet'

@@ -8,6 +8,7 @@ import type {
   NewRpgfApplicationPageProjectsQuery,
   NewRpgfApplicationPageProjectsQueryVariables,
 } from './__generated__/gql.generated.js';
+import { getAddress } from 'ethers';
 
 export const load = async ({ fetch, url, parent }) => {
   const { rpgfUserData } = await parent();
@@ -31,7 +32,11 @@ export const load = async ({ fetch, url, parent }) => {
   const res = await query<
     NewRpgfApplicationPageProjectsQuery,
     NewRpgfApplicationPageProjectsQueryVariables
-  >(projectsQuery, { address: rpgfUserData.walletAddress, chains: [network.gqlName] }, fetch);
+  >(
+    projectsQuery,
+    { address: getAddress(rpgfUserData.walletAddress), chains: [network.gqlName] },
+    fetch,
+  );
 
   return { projects: res.projects };
 };

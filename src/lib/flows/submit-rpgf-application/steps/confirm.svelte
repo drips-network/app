@@ -19,6 +19,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   export let context: Writable<{ applicationId: string | null }>;
   export let applicationData: CreateApplicationDto;
@@ -27,7 +28,21 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  function handleConfirm() {
+  async function sendApplication(attestationUID?: string) {
+    const application = await submitApplication(
+      undefined,
+      roundSlug,
+      {
+        ...applicationData,
+        attestationUID,
+      },
+      applicationFormat,
+    );
+
+    $context.applicationId = application.id;
+  }
+
+  function handleWithAttest() {
     dispatch(
       'transact',
       makeTransactPayload({
@@ -108,31 +123,86 @@
         after: async (receipts) => {
           const attestationUID = getUIDsFromAttestReceipt(receipts[0])[0];
 
-          const application = await submitApplication(
-            undefined,
-            roundSlug,
-            {
-              ...applicationData,
-              attestationUID,
-            },
-            applicationFormat,
-          );
-
-          $context.applicationId = application.id;
+          await sendApplication(attestationUID);
         },
       }),
     );
   }
+
+  function handleWithoutAttest() {
+    dispatch('await', {
+      promise: async () => await sendApplication(),
+      message: 'Submitting application...',
+    });
+  }
+
+  $: shouldAttest = network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled;
+
+  function handleConfirm() {
+    if (shouldAttest) {
+      handleWithAttest();
+    } else {
+      handleWithoutAttest();
+    }
+  }
 </script>
 
 <StepLayout>
-  <StepHeader
-    headline="Submit your application"
-    description="When submitting your application, public fields will be attested on-chain. All fields marked as private will only be shared with the round's organizers."
-    emoji="💦"
-  />
+  <StepHeader headline="Submit your application" emoji="🗳️" />
+  <div class="description">
+    <p>
+      Once you've submitted your application, it'll be <span class="typo-text-bold"
+        >reviewed by the round admins</span
+      >. After submission, you can check on the status of your application anytime by connecting
+      your wallet and visiting the round page.
+    </p>
+
+    <h5>How your data is handled</h5>
+    <p>
+      {#if shouldAttest}
+        Applications are <span class="typo-text-bold"
+          >attested on-chain using Ethereum Attestation Service (EAS)</span
+        >. On the next screen, you'll sign a transaction that attests the
+        <span class="typo-text-bold">public fields of your application</span>
+        on-chain. Fields marked as private will not be included, but will be
+        <span class="typo-text-bold"
+          >stored by Drips and shared exclusively with the round admins</span
+        >.
+      {:else}
+        Application fields marked as private will be <span class="typo-text-bold"
+          >stored by Drips and only shared with the round admins</span
+        >. All other fields will be <span class="typo-text-bold">publicly visible</span> on the round
+        page once your application has been reviewed and approved by the round admins.
+      {/if}
+    </p>
+
+    <p>
+      Please refer to the <a class="typo-link" href="/legal/privacy" target="_blank"
+        >Drips Privacy Policy</a
+      > for further information.
+    </p>
+  </div>
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-    <Button icon={Wallet} on:click={handleConfirm} variant="primary">Confirm in wallet</Button>
+    <Button icon={shouldAttest ? Wallet : CheckCircle} on:click={handleConfirm} variant="primary">
+      {#if shouldAttest}
+        Confirm in wallet
+      {:else}
+        Submit application
+      {/if}
+    </Button>
   </svelte:fragment>
 </StepLayout>
+
+<style>
+  .description {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .description h5 {
+    margin-top: 1rem;
+  }
+</style>
