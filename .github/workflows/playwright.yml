@@ -18,8 +18,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      # TODO: revert
-      run: GRAPHQL_API_TAG=jason-ecosystems EVENT_PROCESSOR_TAG=ecosystems ECOSYSTEMS_TAG=main npm run test:e2e:headless
+      run: npm run test:e2e:headless
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
