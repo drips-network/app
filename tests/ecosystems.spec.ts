@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import createEcosystemPayload from './create-ecosystem-payload.json' with { type: 'json' };
 
 test('ecosystems donation flow', async ({ page, request }) => {
-  test.setTimeout(480_000);
+  test.setTimeout(240_000);
 
   // create the ecosystem
   const ecosystemCreatedResponse = await request.post('http://localhost:5173/api/ecosystems', {
