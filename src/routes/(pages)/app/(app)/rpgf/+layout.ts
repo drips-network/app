@@ -21,7 +21,8 @@ export const load = async ({ url }) => {
   const { address } = get(walletStore);
 
   if (exp && exp < Date.now() / 1000) {
-    // User's sign-in is expired, so redirect to connect page
+    // User's sign-in is expired, so clear & redirect to connect page
+    rpgfJwtStore.set(null);
     return redirect(
       307,
       buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }),

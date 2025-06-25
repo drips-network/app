@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import OsoLogo from '../illustrations/oso-logo.svelte';
-  import MetricsGrid from './components/metrics-grid.svelte';
+  import MetricsGrid from '../metrics-grid/metrics-grid.svelte';
 
   export let keyMetrics: Promise<Record<string, string>>;
 
@@ -47,7 +47,7 @@
             </span>
           </div>
         {:else}
-          <MetricsGrid metricsMap={METRICS} keyMetrics={value} />
+          <MetricsGrid metricsMap={METRICS} data={value} />
         {/if}
       </div>
     {:catch}
@@ -62,7 +62,7 @@
          height of the content the same to keep the layout stable. -->
     {#await keyMetrics}
       <div class="height-placeholder" style:visibility="hidden">
-        <MetricsGrid metricsMap={METRICS} keyMetrics={{}} />
+        <MetricsGrid metricsMap={METRICS} data={{}} />
       </div>
     {/await}
   </div>

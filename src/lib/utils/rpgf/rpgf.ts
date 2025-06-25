@@ -25,7 +25,6 @@ import {
   type WrappedRoundDraft,
   type WrappedRoundPublic,
 } from './schemas';
-import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import network from '$lib/stores/wallet/network';
 
@@ -74,7 +73,9 @@ export async function rpgfServerCall(
 
   if (!res.ok && res.status !== 404) {
     const errorText = await res.text();
-    throw error(res.status, `RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+    throw new Error(
+      `${res.status} - RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`,
+    );
   }
 
   return res;
@@ -292,4 +293,44 @@ export async function getOwnBallot(f = fetch, roundSlug: string): Promise<Wrappe
 
   const parsed = wrappedBallotSchema.parse(await res.json());
   return parsed;
+}
+
+export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedBallot[]> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots`, 'GET', undefined, f);
+
+  const parsed = wrappedBallotSchema.array().parse(await res.json());
+  return parsed;
+}
+
+export async function getBallotsCsv(f = fetch, roundSlug: string): Promise<string> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots?format=csv`, 'GET', undefined, f);
+
+  if (!res.ok) {
+    throw new Error(`${res.status} - Failed to fetch ballots CSV: ${res.statusText}`);
+  }
+
+  return await res.text();
+}
+
+export async function getBallotStats(
+  f = fetch,
+  roundSlug: string,
+): Promise<{
+  numberOfVoters: number;
+  numberOfBallots: number;
+}> {
+  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots/stats`, 'GET', undefined, f);
+
+  if (!res.ok) {
+    throw new Error(`${res.status} - Failed to fetch ballot stats: ${res.statusText}`);
+  }
+
+  const data = await res.json();
+
+  return z
+    .object({
+      numberOfVoters: z.number(),
+      numberOfBallots: z.number(),
+    })
+    .parse(data);
 }

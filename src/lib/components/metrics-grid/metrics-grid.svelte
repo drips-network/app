@@ -2,12 +2,12 @@
   import { fade } from 'svelte/transition';
 
   export let metricsMap: Record<string, string>;
-  export let keyMetrics: Record<string, string>;
+  export let data: Record<string, string>;
 </script>
 
 <div class="grid">
   {#each Object.entries(metricsMap) as [key, label]}
-    {@const metricValue = keyMetrics[key]}
+    {@const metricValue = data[key]}
     <div class="metric-value">
       <span class="typo-text">{label}</span>
       <span>
