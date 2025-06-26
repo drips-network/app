@@ -17,6 +17,13 @@
       ...DripListBadge
     }
   `;
+
+  export const USER_BADGE_CELL_ECOSYSTEM_FRAGMENT = gql`
+    ${ECOSYSTEM_BADGE_FRAGMENT}
+    fragment UserBadgeCellEcosystem on EcosystemMainAccount {
+      ...EcosystemBadge
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -24,21 +31,35 @@
   import DripListBadge, {
     DRIP_LIST_BADGE_FRAGMENT,
   } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import EcosystemBadge, {
+    ECOSYSTEM_BADGE_FRAGMENT,
+  } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
   import type {
     UserBadgeCellDripListFragment,
     UserBadgeCellUserFragment,
+    UserBadgeCellEcosystemFragment,
   } from './__generated__/gql.generated';
 
-  export let userOrDripList: UserBadgeCellUserFragment | UserBadgeCellDripListFragment;
+  export let userOrDripListOrEcosystem:
+    | UserBadgeCellUserFragment
+    | UserBadgeCellDripListFragment
+    | UserBadgeCellEcosystemFragment;
 </script>
 
-{#if userOrDripList.__typename === 'DripList'}
+{#if userOrDripListOrEcosystem.__typename === 'DripList'}
   <DripListBadge
-    dripList={userOrDripList ?? undefined}
+    dripList={userOrDripListOrEcosystem ?? undefined}
+    avatarSize="tiny"
+    isLinked={false}
+    showOwner={true}
+  />
+{:else if userOrDripListOrEcosystem.__typename === 'EcosystemMainAccount'}
+  <EcosystemBadge
+    ecosystem={userOrDripListOrEcosystem ?? undefined}
     avatarSize="tiny"
     isLinked={false}
     showOwner={true}
   />
 {:else}
-  <IdentityBadge address={userOrDripList.account.address} />
+  <IdentityBadge address={userOrDripListOrEcosystem.account.address} />
 {/if}
