@@ -4,9 +4,7 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
-  import RpgfApplicationsTable, {
-    GroupBy,
-  } from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
+  import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfHeaderCard from '$lib/components/rpgf-header-card/rpgf-header-card.svelte';
   import RpgfScheduleCard from '$lib/components/rpgf-schedule-card/rpgf-schedule-card.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
@@ -82,13 +80,7 @@
       emptyStateText: `There are currently no ${!userIsAdmin ? 'approved ' : ''}applications for this round.`,
     }}
   >
-    <RpgfApplicationsTable
-      groupBy={GroupBy.None}
-      searchable={false}
-      userData={data.rpgfUserData}
-      {round}
-      applications={data.applications}
-    />
+    <RpgfApplicationsTable searchable={false} {round} applications={data.applications} />
   </Section>
 
   {#if data.isRoundAdmin}
@@ -131,15 +123,16 @@
 
   <Section
     header={{
-      label: 'Results',
+      label: 'Distribution',
       icon: Trophy,
     }}
     skeleton={{
       empty: true,
       loaded: true,
       emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No results',
-      emptyStateText: 'After tallying, vote results will be shown here.',
+      emptyStateHeadline: 'No linked Drip Lists',
+      emptyStateText:
+        'Rewards for the round will be distributed via Drip Lists, which will appear here.',
     }}
   />
 </RpgfBaseLayout>

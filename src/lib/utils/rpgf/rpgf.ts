@@ -204,12 +204,37 @@ export async function getApplications(
   f = fetch,
   roundSlug: string,
   applicationFormat: ApplicationFormat,
+  limit: number = 1000,
+  offset: number = 0,
+  sortBy: string = 'createdAt:desc',
+  filterByUserId: string | null = null,
+  filterByStatus: 'approved' | 'rejected' | 'pending' | null = null,
 ): Promise<Application[]> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/applications/`, 'GET', undefined, f);
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/applications?sort=${sortBy}&limit=${limit}&offset=${offset}${filterByUserId ? `&submitterUserId=${filterByUserId}` : ''}${filterByStatus ? `&state=${filterByStatus}` : ''}`,
+    'GET',
+    undefined,
+    f,
+  );
 
   return applicationSchema(applicationFormat)
     .array()
     .parse(await res.json());
+}
+
+export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<string> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/applications?format=csv`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  if (!res.ok) {
+    throw new Error(`${res.status} - Failed to fetch applications CSV: ${res.statusText}`);
+  }
+
+  return await res.text();
 }
 
 export async function getApplication(
