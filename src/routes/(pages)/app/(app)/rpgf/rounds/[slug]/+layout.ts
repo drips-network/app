@@ -16,12 +16,15 @@ export const load = async ({ fetch, params, parent }) => {
     return error(404);
   }
 
-  const applications = (
-    await getApplications(fetch, wrappedRound.round.urlSlug, wrappedRound.round.applicationFormat)
-  ).sort((a, b) => {
-    // Sort applications by creation date, newest first
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+  // Max 5 applications for the preview
+  const applications = await getApplications(
+    fetch,
+    wrappedRound.round.urlSlug,
+    wrappedRound.round.applicationFormat,
+    5,
+    0,
+    'createdAt:desc',
+  );
 
   const isRoundAdmin = rpgfUserData?.walletAddress
     ? wrappedRound.round.adminWalletAddresses.includes(rpgfUserData?.walletAddress)

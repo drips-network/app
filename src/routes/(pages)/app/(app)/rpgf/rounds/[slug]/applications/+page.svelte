@@ -1,53 +1,45 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import RpgfApplicationsTable, {
-    GroupBy,
-  } from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
+  import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
-  import storedWritable from '@efstajas/svelte-stored-writable';
+  import TableViewConfigurator from '$lib/components/table-view-configurator/table-view-configurator.svelte';
+  import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
+  import buildUrl from '$lib/utils/build-url.js';
+  import downloadUrl from '$lib/utils/download-url.js';
+  import { getApplicationsCsv } from '$lib/utils/rpgf/rpgf.js';
   import { fade } from 'svelte/transition';
-  import { z } from 'zod';
 
   export let data;
-  $: decisionsStore = data.decisions;
   $: ballotStore = data.ballot;
 
   $: roundSlug = data.wrappedRound.round.urlSlug;
 
-  const groupByOptions = data.isRoundAdmin
-    ? [
-        { title: 'None', value: GroupBy.None },
-        { title: 'My applications', value: GroupBy.Mine },
-        { title: 'State', value: GroupBy.State },
-      ]
-    : data.rpgfUserData
-      ? [
-          { title: 'None', value: GroupBy.None },
-          { title: 'My applications', value: GroupBy.Mine },
-        ]
-      : [{ title: 'None', value: GroupBy.None }];
+  async function handleDownload() {
+    const csvContent = await getApplicationsCsv(undefined, data.wrappedRound.round.urlSlug);
 
-  let defaultGroupBy: GroupBy = GroupBy.State;
-  if (data.voteMode) {
-    defaultGroupBy = GroupBy.State;
-  } else if (data.isRoundAdmin) {
-    defaultGroupBy = GroupBy.State;
-  } else {
-    defaultGroupBy = GroupBy.Mine;
+    downloadUrl(
+      URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' })),
+      `applications-${data.wrappedRound.round.urlSlug}.csv`,
+    );
   }
 
-  const groupBy = storedWritable<GroupBy>(
-    'applications-view-group-by',
-    z.enum([GroupBy.Mine, GroupBy.None, GroupBy.State]),
-    defaultGroupBy,
-  );
+  let selectedSortBy = data.sortByParam;
+  let selectedFilter = data.filterParam;
 
   $: {
-    if (!groupByOptions.some((option) => option.value === $groupBy)) {
-      groupBy.set(defaultGroupBy);
+    if (selectedSortBy !== data.sortByParam || selectedFilter !== data.filterParam) {
+      goto(
+        buildUrl(`/app/rpgf/rounds/${roundSlug}/applications`, {
+          sortBy: selectedSortBy,
+          filter: selectedFilter ?? '',
+        }),
+        {
+          replaceState: true,
+        },
+      );
     }
   }
 </script>
@@ -70,20 +62,29 @@
   <div class="header">
     <h1>Applications</h1>
     <div class="table-setting">
-      <span>Group by</span>
-      <Dropdown options={groupByOptions} bind:value={$groupBy} />
+      <TableViewConfigurator
+        sortByOptions={{
+          name: 'Name',
+          createdAt: 'Created at',
+        }}
+        bind:sortBy={selectedSortBy}
+        filterOptions={{
+          own: 'Only my applications',
+          pending: 'Only pending',
+        }}
+        bind:filterBy={selectedFilter}
+        onDownload={data.isRoundAdmin ? handleDownload : undefined}
+      />
     </div>
   </div>
 
   <RpgfApplicationsTable
     voteStep={data.voteMode ? 'build-ballot' : undefined}
-    bind:groupBy={$groupBy}
     reviewMode={data.reviewMode}
     bind:decisions={$decisionsStore}
-    userData={data.rpgfUserData}
     round={data.wrappedRound.round}
     {ballotStore}
-    applications={data.applications}
+    applications={data.allApplications}
   />
 </div>
 
@@ -96,6 +97,7 @@
 
   .header {
     display: flex;
+    gap: 1rem;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
@@ -106,6 +108,5 @@
     align-items: center;
     gap: 0.5rem;
     white-space: nowrap;
-    min-width: 16rem;
   }
 </style>

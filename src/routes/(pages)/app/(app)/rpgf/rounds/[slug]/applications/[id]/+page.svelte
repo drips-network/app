@@ -14,9 +14,9 @@
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
 
   export let data;
-  $: decisionsStore = data.decisions;
   $: round = data.wrappedRound.round;
   $: application = data.application;
   $: applicationFormat = round.applicationFormat.filter((f) => 'slug' in f);

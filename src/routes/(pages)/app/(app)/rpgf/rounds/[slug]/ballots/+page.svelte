@@ -7,6 +7,7 @@
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import Table from '$lib/components/table/table.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
+  import downloadUrl from '$lib/utils/download-url.js';
   import formatDate from '$lib/utils/format-date.js';
   import { getBallotsCsv } from '$lib/utils/rpgf/rpgf.js';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
@@ -58,13 +59,10 @@
   async function handleDownload() {
     const csvContent = await getBallotsCsv(undefined, data.wrappedRound.round.urlSlug);
 
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' }));
-    link.download = `ballots-${data.wrappedRound.round.urlSlug}.csv`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadUrl(
+      URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' })),
+      `ballots-${data.wrappedRound.round.urlSlug}.csv`,
+    );
   }
 </script>
 

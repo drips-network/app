@@ -1,9 +1,14 @@
 <script lang="ts">
   import { invalidateAll, replaceState } from '$app/navigation';
   import { page } from '$app/stores';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import RpgfVotingCard from '$lib/components/rpgf-voting-card/rpgf-voting-card.svelte';
+  import {
+    clearDecisions,
+    decisionsStore,
+  } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
   import { submitApplicationReview } from '$lib/utils/rpgf/rpgf.js';
@@ -11,16 +16,13 @@
 
   export let data;
 
-  $: decisionsStore = data.decisions;
-  $: decisions = $decisionsStore;
-
-  $: approveCount = decisions && Object.values(decisions).filter((v) => v === 'approve').length;
-  $: rejectCount = decisions && Object.values(decisions).filter((v) => v === 'reject').length;
-  $: hasDecisions = decisions && Object.values(decisions).filter((v) => v !== null).length > 0;
+  $: approveCount = Object.values($decisionsStore).filter((v) => v === 'approve').length;
+  $: rejectCount = Object.values($decisionsStore).filter((v) => v === 'reject').length;
+  $: hasDecisions = approveCount + rejectCount > 0;
 
   async function handleSubmitReviewDecisions() {
     const mappedToDto: ApplicationReviewDto = mapFilterUndefined(
-      Object.entries(decisions),
+      Object.entries($decisionsStore),
       ([applicationId, decision]) => {
         if (decision === null) return undefined; // Skip null decisions
 
@@ -32,6 +34,8 @@
     );
 
     await submitApplicationReview(undefined, data.wrappedRound.round.urlSlug, mappedToDto);
+
+    clearDecisions();
 
     await invalidateAll();
   }
@@ -51,16 +55,23 @@
         <div class="review-card">
           <h5>Review applications</h5>
           <p class="typo-text-small">
-            As an admin, you can review applications for this round. Feel free to dig into the
-            details - we'll save your decisions as you go.
+            As an admin, you can review applications for this round. Mark applications as approved
+            or rejected within the table and submit your decisions in bulk when you're done.
           </p>
+
+          <AnnotationBox>
+            Decisions are final and can no longer be changed once submitted.
+          </AnnotationBox>
+
           <Divider />
+
           <div class="decisions-count">
             <span class="typo-text-small">Approve</span>
             <span class="typo-text-small-bold">{approveCount}</span>
             <span class="typo-text-small">• Reject</span>
             <span class="typo-text-small-bold">{rejectCount}</span>
           </div>
+
           <Button
             disabled={!hasDecisions}
             variant="primary"

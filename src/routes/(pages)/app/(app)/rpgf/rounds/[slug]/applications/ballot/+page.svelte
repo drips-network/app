@@ -2,9 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import RpgfApplicationsTable, {
-    GroupBy,
-  } from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
+  import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 
   export let data;
@@ -31,9 +29,7 @@
 
   <RpgfApplicationsTable
     voteStep="assign-votes"
-    groupBy={GroupBy.None}
     reviewMode={false}
-    userData={data.rpgfUserData}
     round={data.wrappedRound.round}
     {ballotStore}
     applications={selectedApplications}
