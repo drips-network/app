@@ -38,6 +38,9 @@
     },
   ];
 
+  // bottom nav is mobile only and should not be crowded with profile.
+  $: bottomNavItems = navItems.slice(0, -1);
+
   $: {
     if ($navigating) {
       clearTimeout(loadingSpinnerTimeout);
@@ -76,7 +79,7 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav items={navItems} />
+      <BottomNav items={bottomNavItems} />
     </div>
   {/if}
 
