@@ -268,7 +268,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessClaimAndCollect: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    ecosystems: false,
+    ecosystems: true,
   },
   [31337]: {
     chainId: 31337,
