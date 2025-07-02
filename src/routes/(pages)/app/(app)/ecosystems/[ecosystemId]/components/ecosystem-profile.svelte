@@ -86,6 +86,7 @@
   import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import formatNumber from '$lib/utils/format-number';
+  import Developer from '$lib/components/developer-section/developer.section.svelte';
 
   export let ecosystem: Ecosystem;
   export let ecosystemFragment: EcosystemProfileFragment | undefined;
@@ -139,6 +140,7 @@
       </div>
     </header>
     <section id="graph">
+      <Developer accountId={ecosystemFragment?.account.accountId} />
       <EcosystemCardInteractive {ecosystem} />
     </section>
     <section id="metadata">
@@ -180,6 +182,12 @@
 
   section {
     grid-column: span 2;
+  }
+
+  section#graph {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
   }
 
   aside {
@@ -232,7 +240,8 @@
       height: auto;
     }
 
-    .ecosystem-profile {
+    .ecosystem-profile,
+    section#graph {
       gap: 1.5rem;
     }
 
