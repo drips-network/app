@@ -170,3 +170,52 @@ export const dripListAssociatedAccountIdsQuery = gql`
     }
   }
 `;
+
+export const ecosystemAssociatedAccountIdsQuery = gql`
+  query EcosystemAssociatedAccountIds($ecosystemAccountId: ID!, $chain: SupportedChain!) {
+    ecosystemMainAccount(id: $ecosystemAccountId, chain: $chain) {
+      owner {
+        accountId
+      }
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+        }
+        ... on StreamSupport {
+          account {
+            accountId
+          }
+        }
+      }
+      splits {
+        ... on AddressReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on ProjectReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on DripListReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on EcosystemMainAccountReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on SubListReceiver {
+          account {
+            accountId
+          }
+        }
+      }
+    }
+  }
+`;
