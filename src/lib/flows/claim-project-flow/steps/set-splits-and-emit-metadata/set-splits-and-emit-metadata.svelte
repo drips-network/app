@@ -37,12 +37,12 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  $: projectAccountId = $context.project?.account.accountId ?? unreachable();
+  $: projectSource = $context.project?.source ?? unreachable();
 
   async function checkProjectInExpectedStateForClaiming() {
     const checkProjectVerificationStatusQuery = gql`
-      query CheckProjectVerificationStatus($projectId: ID!, $chains: [SupportedChain!]) {
-        projectById(id: $projectId, chains: $chains) {
+      query CheckProjectVerificationStatus($projectUrl: String!, $chains: [SupportedChain!]) {
+        projectByUrl(url: $projectUrl, chains: $chains) {
           chainData {
             ... on UnClaimedProjectData {
               chain
@@ -67,12 +67,12 @@
       CheckProjectVerificationStatusQuery,
       CheckProjectVerificationStatusQueryVariables
     >(checkProjectVerificationStatusQuery, {
-      projectId: projectAccountId,
+      projectUrl: projectSource.url,
       chains: [network.gqlName],
     });
 
-    if (!res.projectById?.chainData) return false;
-    const projectChainData = filterCurrentChainData(res.projectById.chainData);
+    if (!res.projectByUrl?.chainData) return false;
+    const projectChainData = filterCurrentChainData(res.projectByUrl.chainData);
 
     return (
       projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata &&
