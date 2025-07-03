@@ -44,6 +44,10 @@ test('ecosystems donation flow', async ({ page, request }) => {
   // navigate to the created ecosystem
   await page.locator(`text=${createEcosystemPayload.name}`).nth(0).click();
 
+  // verify that the distribution details are correct
+  await page.waitForTimeout(1_000);
+  expect(await page.getByText('50%').count()).toBe(2);
+
   // perform a one-time donation
   await page.getByRole('button', { name: 'Support' }).nth(0).click();
   await page.getByRole('button', { name: 'One-time donation' }).first().click();
