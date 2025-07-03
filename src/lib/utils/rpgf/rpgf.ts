@@ -359,3 +359,24 @@ export async function getBallotStats(
     })
     .parse(data);
 }
+
+export async function recalculateResults(
+  f = fetch,
+  roundSlug: string,
+  method: 'avg' | 'median' | 'sum',
+): Promise<void> {
+  await rpgfServerCall(
+    `/rounds/${roundSlug}/results/recalculate?method=${method}`,
+    'POST',
+    undefined,
+    f,
+  );
+
+  return;
+}
+
+export async function publishResults(f = fetch, roundSlug: string): Promise<void> {
+  await rpgfServerCall(`/rounds/${roundSlug}/results/publish`, 'POST', undefined, f);
+
+  return;
+}

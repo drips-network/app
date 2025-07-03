@@ -66,6 +66,7 @@
         sortByOptions={{
           name: 'Name',
           createdAt: 'Created at',
+          allocation: 'Allocation amount',
         }}
         bind:sortBy={selectedSortBy}
         filterOptions={{

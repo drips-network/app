@@ -7,12 +7,19 @@ export const load = async ({ parent, route, url }) => {
   const { isRoundAdmin, applications, wrappedRound, isRoundVoter, existingBallot, rpgfUserData } =
     await parent();
 
+  // If true, display sidebar that lets admins calculate & publish results
+  const resultsMode =
+    (isRoundAdmin && wrappedRound.round.state === 'results') ||
+    wrappedRound.round.state === 'pending-results';
+
+  // If true, display sidebar that lets admins review applications
   const reviewMode =
     route.id !== '/(pages)/app/(app)/rpgf/rounds/[slug]/applications/new' &&
     isRoundAdmin &&
     applications.length > 0 &&
     (wrappedRound.round.state === 'intake' || wrappedRound.round.state === 'pending-voting');
 
+  // If true, display sidebar that lets voters vote on applications
   const voteMode = isRoundVoter && applications.length > 0 && wrappedRound.round.state === 'voting';
 
   const ballotLocalStorageKey = `in-progress-ballot-${wrappedRound.round.urlSlug}`;
@@ -43,6 +50,8 @@ export const load = async ({ parent, route, url }) => {
                 return 'createdAt:desc';
               case 'name':
                 return 'name:asc';
+              case 'allocation':
+                return 'allocation:desc';
               default:
                 return undefined;
             }
@@ -58,6 +67,7 @@ export const load = async ({ parent, route, url }) => {
     allApplications,
     sortByParam,
     filterParam,
+    resultsMode,
   };
 };
 

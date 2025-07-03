@@ -178,6 +178,8 @@ const roundPublicFieldsSchema = z.object({
   updatedAt: z.string().pipe(z.coerce.date()),
   adminWalletAddresses: z.array(ethereumAddressSchema).nonempty(), // Array of wallet addresses
   isAdmin: z.literal(false),
+  resultsCalculated: z.boolean(),
+  resultsPublished: z.boolean(),
 });
 
 const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({
@@ -406,6 +408,7 @@ export const applicationSchema = (applicationFormat: ApplicationFormat) =>
     submitterUserId: z.string(),
     roundId: z.string(),
     fields: buildDynamicApplicatonFieldSchema(applicationFormat),
+    result: z.number().nullable(),
     createdAt: z.string().pipe(z.coerce.date()),
     updatedAt: z.string().pipe(z.coerce.date()),
   });
