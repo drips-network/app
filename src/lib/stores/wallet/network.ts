@@ -317,7 +317,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         name: 'Ethereum',
         symbol: 'ETH',
       },
-      rpcUrls: ['http://localhost:8545'],
+      rpcUrls: [`${BASE_URL}/api/rpc/anvil/localtestnet`],
     },
     enableEns: false,
     ecosystems: true,
