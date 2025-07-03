@@ -29,6 +29,8 @@
       !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
+
+  $: includesResults = applications.some((a) => a.result !== null);
 </script>
 
 {#if searchable}
@@ -46,6 +48,12 @@
 <PaddedHorizontalScroll>
   <div class="wrapper">
     <div class="table-wrapper">
+      {#if includesResults}
+        <div class="applications-table-header">
+          <h5>Project name</h5>
+          <h5>Vote result</h5>
+        </div>
+      {/if}
       <div class="applications-table">
         {#each filteredApplications as application (application.id)}
           <ApplicationLineItem
@@ -93,6 +101,12 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+  }
+
+  .applications-table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.5rem;
   }
 
   .table-wrapper {

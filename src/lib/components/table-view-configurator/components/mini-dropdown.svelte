@@ -1,4 +1,4 @@
-<script lang="ts" generics="TOptions extends { [value: string]: string }">
+<script lang="ts" generics="TOptions extends { [value: string]: string | null }">
   import { fly } from 'svelte/transition';
 
   import Check from '$lib/components/icons/Check.svelte';
@@ -74,7 +74,7 @@
       aria-labelledby="select-button-{ariaSlug}"
       bind:this={dropdownElem}
     >
-      {#each Object.entries(options) as [key, label]}
+      {#each Object.entries(options).filter((v) => !!v[1]) as [key, label]}
         <li
           role="option"
           aria-selected={value === key}

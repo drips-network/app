@@ -1,6 +1,6 @@
 <script
   lang="ts"
-  generics="TSortByOptions extends { [value: string]: string }, TFilterOptions extends { [value: string]: string }"
+  generics="TSortByOptions extends { [value: string]: string | null }, TFilterOptions extends { [value: string]: string | null }"
 >
   import Download from '../icons/Download.svelte';
   import Filter from '../icons/Filter.svelte';

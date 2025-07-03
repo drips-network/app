@@ -7,6 +7,7 @@
   import Button from '../button/button.svelte';
   import Dropdown from '../dropdown/dropdown.svelte';
   import ArrowLeft from '../icons/ArrowLeft.svelte';
+  import DripList from '../icons/DripList.svelte';
 
   export let roundSlug: string;
   export let resultsCalculated: boolean;
@@ -124,9 +125,7 @@
       funds accordingly.
     </p>
 
-    <Button href={`/app/rpgf/rounds/${roundSlug}/drip-lists`} size="large" variant="primary">
-      Create Drip Lists
-    </Button>
+    <Button icon={DripList} size="large" variant="primary">Create Drip List</Button>
   {/if}
 </div>
 

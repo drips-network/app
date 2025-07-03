@@ -66,12 +66,16 @@
         sortByOptions={{
           name: 'Name',
           createdAt: 'Created at',
-          allocation: 'Allocation amount',
+          allocation:
+            data.isRoundAdmin || data.wrappedRound.round.resultsPublished
+              ? 'Allocation amount'
+              : null,
         }}
         bind:sortBy={selectedSortBy}
         filterOptions={{
-          own: 'Only my applications',
+          own: data.rpgfUserData ? 'Only my applications' : null,
           pending: 'Only pending',
+          approved: 'Only approved',
         }}
         bind:filterBy={selectedFilter}
         onDownload={data.isRoundAdmin ? handleDownload : undefined}

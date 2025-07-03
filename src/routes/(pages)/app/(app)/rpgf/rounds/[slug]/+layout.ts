@@ -23,7 +23,7 @@ export const load = async ({ fetch, params, parent }) => {
     wrappedRound.round.applicationFormat,
     5,
     0,
-    'createdAt:desc',
+    wrappedRound.round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
   );
 
   const isRoundAdmin = rpgfUserData?.walletAddress

@@ -32,8 +32,11 @@ export const load = async ({ parent, route, url }) => {
     existingBallot?.ballot ?? {},
   );
 
-  const sortByParam = url.searchParams.get('sortBy') ?? 'createdAt';
-  const filterParam = url.searchParams.get('filter');
+  const { resultsPublished } = wrappedRound.round;
+
+  const sortByParam: string =
+    url.searchParams.get('sortBy') ?? (resultsPublished ? 'allocation' : 'createdAt');
+  const filterParam: string | null = url.searchParams.get('filter');
 
   const allApplications =
     filterParam === 'own' && !rpgfUserData
@@ -57,7 +60,9 @@ export const load = async ({ parent, route, url }) => {
             }
           })(),
           filterParam === 'own' && rpgfUserData ? rpgfUserData.userId : null,
-          filterParam === 'pending' ? 'pending' : null,
+          filterParam === 'approved' || filterParam === 'rejected' || filterParam === 'pending'
+            ? filterParam
+            : undefined,
         );
 
   return {
