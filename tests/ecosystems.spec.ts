@@ -67,4 +67,5 @@ test('ecosystems donation flow', async ({ page, request }) => {
   await page.getByRole('link', { name: createEcosystemPayload.graph.nodes[1].projectName }).click();
   const page1 = await page1Promise;
   await expect(await page1.locator(`text=${createEcosystemPayload.name}`).nth(0)).toBeVisible();
+  await expect(await page1.getByText('50%')).toBeVisible();
 });
