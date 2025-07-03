@@ -157,7 +157,8 @@ export default function (
 
       after: async (receipts, { ownAccountId }) => {
         try {
-          const blockTimestamp = (await receipts[0].getBlock()).timestamp;
+          const lastReceipt = receipts[receipts.length - 1];
+          const blockTimestamp = (await lastReceipt.getBlock()).timestamp;
 
           switch (recipientType) {
             case 'Project': {
