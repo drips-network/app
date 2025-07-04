@@ -27,6 +27,14 @@
       }
     }
   `;
+  export const IDENTITY_CARD_ECOSYSTEM_FRAGMENT = gql`
+    fragment IdentityCardEcosystem on EcosystemMainAccount {
+      account {
+        accountId
+      }
+      name
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -38,6 +46,7 @@
   import type {
     IdentityCardDripListFragment,
     IdentityCardProjectFragment,
+    IdentityCardEcosystemFragment,
   } from './__generated__/gql.generated';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -46,22 +55,36 @@
   import Github from '$lib/components/icons/Github.svelte';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
+  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
 
-  // Either pass address, dripList, or project. Otherwise it will say "TBD" as a placeholder.
+  // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
   export let project: IdentityCardProjectFragment | undefined = undefined;
+  export let ecosystem: IdentityCardEcosystemFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;
 
   let avatarImgElem: HTMLImageElement | undefined;
 
-  $: link = disableLink
-    ? undefined
-    : dripList
-      ? `/app/drip-lists/${dripList.account.accountId}`
-      : `/app/${address}`;
+  let link: string | undefined;
+  $: {
+    switch (true) {
+      case disableLink:
+        link = undefined;
+        break;
+      case !!address:
+        link = `/app/${address}`;
+        break;
+      case !!dripList:
+        link = `/app/drip-lists/${dripList.account.accountId}`;
+        break;
+      case !!ecosystem:
+        link = `/app/ecosystems/${ecosystem.account.accountId}`;
+        break;
+    }
+  }
 </script>
 
 <svelte:element
@@ -97,6 +120,16 @@
             style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display: inline"
           />
         {/if}
+      </div>
+    </div>
+  {:else if ecosystem}
+    <div class="content-container" in:fade>
+      <div class="icon">
+        <EcosystemIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
+      </div>
+
+      <div>
+        <span class="typo-header-3 ellipsis">{ecosystem.name}</span>
       </div>
     </div>
   {:else if project}

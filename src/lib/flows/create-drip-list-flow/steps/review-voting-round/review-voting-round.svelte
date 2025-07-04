@@ -80,6 +80,16 @@
                       type: 'project',
                       url: v.project.source.url,
                     };
+                  case 'ecosystem':
+                    return {
+                      type: 'ecosystem',
+                      accountId: v.ecosystem.account.accountId,
+                    };
+                  case 'subList':
+                    return {
+                      type: 'subList',
+                      accountId: v.subList.account.accountId,
+                    };
                 }
               })
             : undefined,
