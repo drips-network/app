@@ -1,5 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
+  import createRpgfRoundDripListFlow from '$lib/flows/create-rpgf-round-drip-list/create-rpgf-round-drip-list-flow';
+  import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { publishResults, recalculateResults } from '$lib/utils/rpgf/rpgf';
@@ -8,6 +10,7 @@
   import Dropdown from '../dropdown/dropdown.svelte';
   import ArrowLeft from '../icons/ArrowLeft.svelte';
   import DripList from '../icons/DripList.svelte';
+  import Stepper from '../stepper/stepper.svelte';
 
   export let roundSlug: string;
   export let resultsCalculated: boolean;
@@ -125,7 +128,12 @@
       funds accordingly.
     </p>
 
-    <Button icon={DripList} size="large" variant="primary">Create Drip List</Button>
+    <Button
+      on:click={() => modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundSlug))}
+      icon={DripList}
+      size="large"
+      variant="primary">Prepare Drip List</Button
+    >
   {/if}
 </div>
 

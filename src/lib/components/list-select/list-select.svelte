@@ -117,7 +117,7 @@
     const focussedElem = document.activeElement;
 
     const visibleEls = Object.values(itemElements).filter(
-      (itemElement) => !itemElement.classList.contains('hidden'),
+      (itemElement) => !itemElement?.classList.contains('hidden'),
     );
 
     const itemElemInFocus = visibleEls.find((elem) => document.activeElement === elem);

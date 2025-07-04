@@ -8,6 +8,7 @@
   export let value: string | undefined = undefined;
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
+  export let blockInteraction: boolean = false;
 
   let items: Items;
   $: items = Object.fromEntries(
@@ -49,13 +50,13 @@
     : undefined}
 >
   <div class="list">
-    <ListSelect bind:selected {items} searchable={false} />
+    <ListSelect {blockInteraction} bind:selected {items} searchable={false} />
   </div>
 </FormField>
 
 <style>
   .list {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-4);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
   }
