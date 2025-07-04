@@ -32,8 +32,8 @@
     {/if}
   {/if}
   <div class="content"><slot /></div>
-  <div class="description" style:color="var(--color-foreground-level-5)">
-    {#if description}<p style:color="var(--color-foreground-level-5)">{description}</p>{/if}
+  <div class="description" style:color="var(--color-foreground-level-6)">
+    {#if description}<p style:color="var(--color-foreground-level-6)">{description}</p>{/if}
     {#if descriptionMd}
       <Markdown content={descriptionMd} />
     {/if}

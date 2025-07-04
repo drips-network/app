@@ -67,27 +67,26 @@
     saving = true;
     resetSuccess();
 
-    try {
-      if (wrappedDraftOrRound.type === 'round-draft') {
-        await doWithErrorModal(() =>
-          updateDraft(undefined, wrappedDraftOrRound.id, updatedRoundOrDraft),
-        );
-      } else {
-        await doWithErrorModal(() =>
-          patchRound(undefined, wrappedDraftOrRound.round.urlSlug, updatedRoundOrDraft),
-        );
-      }
-
-      await invalidateAll();
-
-      triggerSuccess();
-    } catch {
-      // TODO(rpgf): Handle error with an error modal
-      // eslint-disable-next-line no-console
-      console.error('Error saving round or draft', updatedRoundOrDraft);
-    } finally {
-      saving = false;
+    if (wrappedDraftOrRound.type === 'round-draft') {
+      await doWithErrorModal(
+        () => updateDraft(undefined, wrappedDraftOrRound.id, updatedRoundOrDraft),
+        () => {
+          saving = false;
+        },
+      );
+    } else {
+      await doWithErrorModal(
+        () => patchRound(undefined, wrappedDraftOrRound.round.urlSlug, updatedRoundOrDraft),
+        () => {
+          saving = false;
+        },
+      );
     }
+
+    await invalidateAll();
+
+    triggerSuccess();
+    saving = false;
   }
 
   $: {
@@ -132,8 +131,22 @@
   }
 
   .actions {
+    padding: 1rem;
+    margin: 0 -1rem;
+    background: var(--color-background);
     display: flex;
+    position: sticky;
+    bottom: 0;
+    width: calc(100% + 2rem);
+    border-top: 1px solid var(--color-foreground-level-3);
     align-items: center;
+    justify-content: flex-end;
     gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .actions {
+      bottom: 5rem;
+    }
   }
 </style>

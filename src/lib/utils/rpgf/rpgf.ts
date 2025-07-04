@@ -67,10 +67,6 @@ export async function rpgfServerCall(
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 
-  if (res.status === 401) {
-    rpgfJwtStore.set(null);
-  }
-
   if (!res.ok && res.status !== 404) {
     const errorText = await res.text();
     throw new Error(
@@ -358,4 +354,40 @@ export async function getBallotStats(
       numberOfBallots: z.number(),
     })
     .parse(data);
+}
+
+export async function recalculateResults(
+  f = fetch,
+  roundSlug: string,
+  method: 'avg' | 'median' | 'sum',
+): Promise<void> {
+  await rpgfServerCall(
+    `/rounds/${roundSlug}/results/recalculate?method=${method}`,
+    'POST',
+    undefined,
+    f,
+  );
+
+  return;
+}
+
+export async function publishResults(f = fetch, roundSlug: string): Promise<void> {
+  await rpgfServerCall(`/rounds/${roundSlug}/results/publish`, 'POST', undefined, f);
+
+  return;
+}
+
+export async function getDripListWeightsForRound(
+  f = fetch,
+  roundSlug: string,
+): Promise<Record<string, number>> {
+  const res = await rpgfServerCall(
+    `/rounds/${roundSlug}/results/drip-list-weights`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  const parsed = z.record(z.string(), z.number()).parse(await res.json());
+  return parsed;
 }

@@ -111,6 +111,12 @@
       />
     </div>
   {/if}
+
+  {#if application.result !== null}
+    <span class="typo-text-small-bold">
+      {application.result}
+    </span>
+  {/if}
 </div>
 
 <style>

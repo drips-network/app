@@ -128,17 +128,19 @@ export const applicationSelectFieldSchema = z.object({
   slug: z.string().min(1).max(255),
   label: z.string().min(1).max(255),
   descriptionMd: z.string().max(10000).optional(),
-  options: z.array(
-    z.object({
-      label: z.string().min(1).max(255),
-      value: z.string().min(1).max(255),
-    }),
-  ),
+  options: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(255),
+        value: z.string().min(1).max(255),
+      }),
+    )
+    .min(1),
   allowMultiple: z.boolean().optional(),
 });
 export type ApplicationSelectField = z.infer<typeof applicationSelectFieldSchema>;
 
-const applicationFieldSchema = z.union([
+export const applicationFieldSchema = z.union([
   applicationMarkdownFieldSchema,
   applicationDividerFieldSchema,
   applicationTextFieldSchema,
@@ -178,6 +180,8 @@ const roundPublicFieldsSchema = z.object({
   updatedAt: z.string().pipe(z.coerce.date()),
   adminWalletAddresses: z.array(ethereumAddressSchema).nonempty(), // Array of wallet addresses
   isAdmin: z.literal(false),
+  resultsCalculated: z.boolean(),
+  resultsPublished: z.boolean(),
 });
 
 const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({
@@ -406,6 +410,7 @@ export const applicationSchema = (applicationFormat: ApplicationFormat) =>
     submitterUserId: z.string(),
     roundId: z.string(),
     fields: buildDynamicApplicatonFieldSchema(applicationFormat),
+    result: z.number().nullable(),
     createdAt: z.string().pipe(z.coerce.date()),
     updatedAt: z.string().pipe(z.coerce.date()),
   });

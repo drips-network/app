@@ -4,7 +4,7 @@ export const DEFAULT_PRESET: CreateRoundDto['applicationFormat'] = [
   {
     type: 'markdown',
     content:
-      '# Welcome to my RPGF round!\n\nThis is a test round. Please fill out the application form below.',
+      '# Welcome to my RPGF round!\n\n Please fill out the application form below fully and truthfully.',
   },
   {
     type: 'divider',

@@ -5,6 +5,7 @@
   import Button from '../button/button.svelte';
   import Ledger from '../icons/Ledger.svelte';
   import { z } from 'zod';
+  import Trophy from '../icons/Trophy.svelte';
 
   export let hasExistingBallot: boolean;
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
@@ -56,7 +57,7 @@
     {:else if state === 'pending-voting'}
       <h2 class="pixelated">Registration closed</h2>
       <p class="typo-text">
-        The round is no longer accepting new applications. The round admins are now reviewing
+        The round is no longer accepting new applications. The round organizers are now reviewing
         submitted projects.
       </p>
     {:else if state === 'voting'}
@@ -102,14 +103,27 @@
           tallied, the results will be announced.
         </p>
       {/if}
-    {:else if state === 'pending-results'}
-      <h2 class="pixelated">Tallying</h2>
+    {:else if !round.resultsPublished}
+      <h2 class="pixelated">Pending results</h2>
       <p class="typo-text">
-        The round admins are currently reviewing the votes and preparing the distribution.
+        The round organizers are currently reviewing submitted ballots and preparing the
+        distribution.
       </p>
-    {:else if state === 'results'}
-      <h2 class="pixelated">Round completed</h2>
-      <p class="typo-text">This round has concluded, and rewards are being paid out.</p>
+    {:else if round.resultsPublished}
+      <h2 class="pixelated">Results available</h2>
+      <p class="typo-text">
+        The round's results have been published, and the distribution is being prepared by the round
+        organizers.
+      </p>
+
+      <Button
+        href="/app/rpgf/rounds/{round.urlSlug}/applications?sortBy=allocation"
+        icon={Trophy}
+        variant="primary"
+        size="large"
+      >
+        View results
+      </Button>
     {/if}
   </div>
 {/if}

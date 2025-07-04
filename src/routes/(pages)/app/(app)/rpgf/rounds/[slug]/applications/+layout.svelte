@@ -4,6 +4,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
+  import RpgfResultsCard from '$lib/components/rpgf-results-card/rpgf-results-card.svelte';
   import RpgfVotingCard from '$lib/components/rpgf-voting-card/rpgf-voting-card.svelte';
   import {
     clearDecisions,
@@ -48,11 +49,14 @@
   }
 </script>
 
-<div class="applications-layout" class:two-column={data.reviewMode || data.voteMode}>
+<div
+  class="applications-layout"
+  class:two-column={data.reviewMode || data.voteMode || data.resultsMode}
+>
   <div class="sidebar">
     <div class="sidebar-inner">
       {#if data.reviewMode}
-        <div class="review-card">
+        <div class="sidebar-card">
           <h5>Review applications</h5>
           <p class="typo-text-small">
             As an admin, you can review applications for this round. Mark applications as approved
@@ -86,6 +90,16 @@
           round={data.wrappedRound.round}
           ballot={ballotStore}
         />
+      {/if}
+
+      {#if data.resultsMode}
+        <div class="sidebar-card">
+          <RpgfResultsCard
+            resultsCalculated={data.wrappedRound.round.resultsCalculated}
+            resultsPublished={data.wrappedRound.round.resultsPublished}
+            roundSlug={data.wrappedRound.round.urlSlug}
+          />
+        </div>
       {/if}
     </div>
   </div>
@@ -130,14 +144,14 @@
     top: 6.5rem;
   }
 
-  .review-card {
+  .sidebar-card {
     padding: 1rem;
     border-radius: 1rem 0 1rem 1rem;
     box-shadow: var(--elevation-medium);
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
-    view-transition-name: rpgf-applications-review-card;
+    view-transition-name: rpgf-applications-sidebar-card;
     view-transition-class: element-handover;
   }
 
