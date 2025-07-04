@@ -21,6 +21,22 @@
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
+  $: navItems = [
+    { label: 'Explore', href: '/app', icon: ExploreIcon },
+    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+    { label: 'Projects', href: '/app/projects', icon: Box },
+    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+    ...($wallet.connected
+      ? [
+          {
+            label: 'Profile',
+            href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+            icon: User,
+          },
+        ]
+      : []),
+  ];
+
   $: {
     if ($navigating) {
       clearTimeout(loadingSpinnerTimeout);
@@ -32,60 +48,34 @@
   }
 </script>
 
-<div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
+<div class="main" in:fly|global={{ duration: 300, y: 16 }}>
   <div class="page">
     <div class:loading={$navigating}><slot /></div>
   </div>
 
-  {#if $wallet.connected}
-    <div
-      class="sidenav"
-      in:fly|global={{ duration: 300, x: -64, easing: quintOut }}
-      out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
-      data-testid="sidenav"
-    >
-      <Sidenav
-        items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
-          bottom: [
-            {
-              label: 'Help',
-              href: 'https://docs.drips.network/',
-              icon: InfoCircle,
-              external: true,
-            },
-          ],
-        }}
-      />
-    </div>
-    <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav
-        items={[
-          { label: 'Explore', href: '/app', icon: ExploreIcon },
-          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+  <div
+    class="sidenav"
+    in:fly|global={{ duration: 300, x: -64, easing: quintOut }}
+    out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
+    data-testid="sidenav"
+  >
+    <Sidenav
+      items={{
+        top: navItems,
+        bottom: [
           {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: User,
+            label: 'Help',
+            href: 'https://docs.drips.network/',
+            icon: InfoCircle,
+            external: true,
           },
-        ]}
-      />
-    </div>
-  {/if}
-
-  <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
+        ],
+      }}
+    />
+  </div>
+  <div class="bottom-nav" data-testid="bottom-nav">
+    <BottomNav items={navItems} />
+  </div>
 
   <div class="header" in:fly|global={{ duration: 300, y: 16 }}>
     <Header user={data.user} showLoadingIndicator={showLoadingSpinner} />
@@ -97,11 +87,6 @@
     display: flex;
     flex-direction: row-reverse;
     width: 100vw;
-    transition: gap 0.3s;
-  }
-
-  .main.disconnected {
-    gap: 0;
   }
 
   .header {
@@ -142,24 +127,12 @@
     padding-top: 6rem;
   }
 
-  .sidenav-placeholder {
-    width: 16rem;
-    height: 1px;
-    flex-shrink: 0;
-    transition: width 0.3s;
-  }
-
-  .sidenav-placeholder.disconnected {
-    width: 0;
-  }
-
   .bottom-nav {
     display: none;
   }
 
   @media (max-width: 1252px) {
-    .sidenav,
-    .sidenav-placeholder {
+    .sidenav {
       width: 4.5rem;
     }
   }
@@ -170,8 +143,7 @@
       gap: 0;
     }
 
-    .sidenav,
-    .sidenav-placeholder {
+    .sidenav {
       display: none;
     }
 
