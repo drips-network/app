@@ -410,7 +410,7 @@ export const applicationSchema = (applicationFormat: ApplicationFormat) =>
     submitterUserId: z.string(),
     roundId: z.string(),
     fields: buildDynamicApplicatonFieldSchema(applicationFormat),
-    result: z.number().nullable(),
+    result: z.number().nullable().optional(),
     createdAt: z.string().pipe(z.coerce.date()),
     updatedAt: z.string().pipe(z.coerce.date()),
   });
