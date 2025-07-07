@@ -26,15 +26,11 @@
     { label: 'Funds', href: '/app/funds', icon: TokenStreams },
     { label: 'Projects', href: '/app/projects', icon: Box },
     { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-    ...($wallet.connected
-      ? [
-          {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
-            icon: User,
-          },
-        ]
-      : []),
+    {
+      label: 'Profile',
+      href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+      icon: User,
+    },
   ];
 
   $: {
