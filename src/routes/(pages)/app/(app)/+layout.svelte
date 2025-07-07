@@ -1,5 +1,4 @@
 <script lang="ts">
-  import wallet from '$lib/stores/wallet/wallet.store';
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
@@ -9,7 +8,6 @@
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
   import { fly } from 'svelte/transition';
-  import ens from '$lib/stores/ens';
   import User from '$lib/components/icons/User.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
@@ -28,7 +26,7 @@
     { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
     {
       label: 'Profile',
-      href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+      href: '/app/profile',
       icon: User,
     },
   ];
