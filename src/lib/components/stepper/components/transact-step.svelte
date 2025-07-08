@@ -351,7 +351,7 @@
                 payload,
                 eip712Signature: sig,
               },
-              (key, value) => (typeof value === 'bigint' ? value.toString() : value),
+              (_, value) => (typeof value === 'bigint' ? value.toString() : value),
             ),
           });
           if (!gaslessCallRes.ok) {
@@ -901,7 +901,7 @@
 
   .timeline {
     width: 100%;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     position: relative;
   }
@@ -933,7 +933,7 @@
     background: var(--color-background);
     border-radius: 0.5rem 0 0.5rem 0.5rem;
     margin: 2.375rem 1rem 0rem 2rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .index-errored {

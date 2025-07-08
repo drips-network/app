@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
@@ -50,6 +51,16 @@
 
     listSelectAddItemInput = '';
   }
+
+  let listAddRowNameInput = '';
+  let listAddRowDataType: 'text' | 'number' | 'url' = 'text';
+
+  let maxItemsInput = '';
+  $: {
+    if ('maxItems' in fieldSettings && maxItemsInput) {
+      fieldSettings.maxItems = Number(maxItemsInput);
+    }
+  }
 </script>
 
 <div class="field-settings-modal">
@@ -60,13 +71,13 @@
     }}
   >
     {#if 'content' in fieldSettings}
-      <FormField title="Markdown content">
+      <FormField title="Markdown content*">
         <TextArea bind:value={fieldSettings.content} />
       </FormField>
     {/if}
 
     {#if 'label' in fieldSettings}
-      <FormField title="Label">
+      <FormField title="Label*">
         <TextInput bind:value={fieldSettings.label} />
       </FormField>
     {/if}
@@ -79,7 +90,7 @@
 
     {#if 'slug' in fieldSettings}
       <FormField
-        title="Slug"
+        title="Slug*"
         description="A unique identifier for this field. This is used to reference the field in CSV exports."
       >
         <TextInput bind:value={fieldSettings.slug} />
@@ -87,7 +98,7 @@
     {/if}
 
     {#if 'options' in fieldSettings}
-      <FormField title="Available options">
+      <FormField title="Available options*">
         <div class="list-select-add-item-row" style="display: flex; gap: 0.5rem;">
           <TextInput bind:value={listSelectAddItemInput} placeholder="Option text" />
           <Button
@@ -98,9 +109,9 @@
             variant="primary">Add</Button
           >
         </div>
-        <div class="list-select-options">
+        <div class="list-options">
           {#each fieldSettings.options as option, index}
-            <div class="list-select-option">
+            <div class="list-option">
               <span class="typo-text">{option.label}</span>
               <Button
                 on:click={() => {
@@ -116,6 +127,82 @@
             <p class="typo-text empty">No options added yet.</p>
           {/if}
         </div>
+      </FormField>
+    {/if}
+
+    {#if 'entryFields' in fieldSettings}
+      <FormField
+        type="div"
+        title="Entry rows*"
+        description="Define the rows that will need to be filled out for each entry in this list."
+      >
+        <div class="list-add-list-row-row" style="display: flex; gap: 0.5rem;">
+          <TextInput
+            bind:value={listAddRowNameInput}
+            placeholder="Row name (e.g. 'Name', 'Email')"
+            style="flex: 1;"
+          />
+          <div style:flex="1">
+            <Dropdown
+              bind:value={listAddRowDataType}
+              options={[
+                { title: 'Text', value: 'text' },
+                { title: 'Number', value: 'number' },
+                { title: 'URL', value: 'url' },
+              ]}
+            />
+          </div>
+          <Button
+            size="large"
+            on:click={() => {
+              if (listAddRowNameInput.trim() === '') return;
+
+              fieldSettings.entryFields = [
+                ...(fieldSettings.entryFields || []),
+                {
+                  label: listAddRowNameInput,
+                  type: listAddRowDataType,
+                },
+              ];
+              listAddRowNameInput = '';
+            }}
+            icon={CheckCircle}
+            variant="primary">Add</Button
+          >
+        </div>
+        <div class="list-options">
+          {#each fieldSettings.entryFields as entryField, index}
+            <div class="list-option">
+              <span class="typo-text">{entryField.label} ({entryField.type})</span>
+              <Button
+                on:click={() => {
+                  fieldSettings.entryFields = fieldSettings.entryFields.filter(
+                    (_, i) => i !== index,
+                  );
+                }}
+                icon={Trash}
+                variant="ghost"
+                size="small"
+              />
+            </div>
+          {/each}
+          {#if fieldSettings.entryFields.length === 0}
+            <p class="typo-text empty">No rows added yet.</p>
+          {/if}
+        </div>
+      </FormField>
+    {/if}
+
+    {#if 'maxItems' in fieldSettings}
+      <FormField
+        title="Maximum number of items*"
+        description="The maximum number of items that can be added to this field."
+      >
+        <TextInput
+          bind:value={maxItemsInput}
+          variant={{ type: 'number', min: 1 }}
+          placeholder="Maximum amount of items"
+        />
       </FormField>
     {/if}
 
@@ -171,7 +258,7 @@
     margin: 0;
   }
 
-  .list-select-options {
+  .list-options {
     border-radius: 1rem 0 1rem 1rem;
     margin-top: 1rem;
     display: flex;
@@ -179,18 +266,18 @@
     border: 1px solid var(--color-foreground-level-4);
   }
 
-  .list-select-options .list-select-option {
+  .list-options .list-option {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
   }
 
-  .list-select-options .list-select-option:not(:last-child) {
+  .list-options .list-option:not(:last-child) {
     border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
-  .list-select-options .empty {
+  .list-options .empty {
     padding: 2rem 0;
     color: var(--color-foreground-level-6);
     text-align: center;

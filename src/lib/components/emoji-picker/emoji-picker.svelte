@@ -93,7 +93,7 @@
 
   .emoji-search-input {
     height: 3rem;
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
     padding: 0 1rem 0.5rem 1rem;
     width: 100%;
     margin-top: 0.5rem;

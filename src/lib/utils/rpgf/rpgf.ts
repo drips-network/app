@@ -391,3 +391,20 @@ export async function getDripListWeightsForRound(
   const parsed = z.record(z.string(), z.number()).parse(await res.json());
   return parsed;
 }
+
+export async function linkDripListsToRound(
+  f = fetch,
+  roundSlug: string,
+  dripListAccountIds: string[],
+): Promise<void> {
+  await rpgfServerCall(
+    `/rounds/${roundSlug}/drip-lists`,
+    'PATCH',
+    {
+      dripListAccountIds,
+    },
+    f,
+  );
+
+  return;
+}

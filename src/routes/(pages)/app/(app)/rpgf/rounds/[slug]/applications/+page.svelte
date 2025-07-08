@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
@@ -43,6 +44,12 @@
     }
   }
 </script>
+
+<HeadMeta
+  title="Applications | {data.wrappedRound.round.name}"
+  description="Applications for the RetroPGF round '{data.wrappedRound.round.name}'. {data
+    .wrappedRound.round.description ?? ''}"
+/>
 
 <div class="page">
   <div><Button href="/app/rpgf/rounds/{roundSlug}" icon={ArrowLeft}>Back to round</Button></div>

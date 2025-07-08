@@ -378,7 +378,7 @@
 
 <div class="showcase-item">
   <h2>RPGF SIWE button</h2>
-  
+
   <RpgfSiweButton />
 
   <p>Current RPGF-JWT store content: {$rpgfJwtStore}</p>
@@ -798,7 +798,7 @@
     width: 32rem;
     height: 32rem;
     overflow: scroll;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
     border-radius: 0.5rem;
   }
@@ -811,7 +811,7 @@
   }
 
   .stepper-wrapper {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 0.5rem;
   }
 
