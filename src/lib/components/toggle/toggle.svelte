@@ -39,7 +39,7 @@
     width: 2.5rem;
     border-radius: 1rem 0 1rem 1rem;
     position: relative;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-3);
     transition:
       background-color 0.3s,
       box-shadow 0.2s;

@@ -16,6 +16,11 @@
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Proposals from '$lib/components/icons/Proposals.svelte';
+  import DripListsGrid from '../../../components/drip-lists-grid.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import editRpgfRoundLinkedDripListsFlow from '$lib/flows/edit-rpgf-round-linked-drip-lists/edit-rpgf-round-linked-drip-lists-flow';
+  import Pen from '$lib/components/icons/Pen.svelte';
 
   export let data;
   $: round = data.wrappedRound.round;
@@ -124,17 +129,34 @@
   <Section
     header={{
       label: 'Distribution',
+      anchorTarget: 'distribution',
       icon: Trophy,
+      actions: data.isRoundAdmin
+        ? [
+            {
+              label: 'Edit linked lists',
+              icon: Pen,
+              handler: () =>
+                modal.show(
+                  Stepper,
+                  undefined,
+                  editRpgfRoundLinkedDripListsFlow(round.urlSlug, data.linkedDripLists),
+                ),
+            },
+          ]
+        : undefined,
     }}
     skeleton={{
-      empty: true,
+      empty: data.linkedDripLists.length === 0,
       loaded: true,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No linked Drip Lists',
       emptyStateText:
         'Rewards for the round will be distributed via Drip Lists, which will appear here.',
     }}
-  />
+  >
+    <DripListsGrid dripLists={data.linkedDripLists} />
+  </Section>
 </RpgfBaseLayout>
 
 <style>

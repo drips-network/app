@@ -182,6 +182,7 @@ const roundPublicFieldsSchema = z.object({
   isAdmin: z.literal(false),
   resultsCalculated: z.boolean(),
   resultsPublished: z.boolean(),
+  linkedDripLists: z.array(z.string()),
 });
 
 const roundAdminFieldsSchema = roundPublicFieldsSchema.extend({

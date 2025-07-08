@@ -174,7 +174,7 @@
   }
 
   .item.has-bottom-border {
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   .left {

@@ -98,6 +98,7 @@
             resultsCalculated={data.wrappedRound.round.resultsCalculated}
             resultsPublished={data.wrappedRound.round.resultsPublished}
             roundSlug={data.wrappedRound.round.urlSlug}
+            roundName={data.wrappedRound.round.name}
           />
         </div>
       {/if}

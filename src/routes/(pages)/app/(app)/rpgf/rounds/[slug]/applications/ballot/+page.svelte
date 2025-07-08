@@ -11,7 +11,7 @@
   $: roundSlug = data.wrappedRound.round.urlSlug;
 
   $: selectedApplications = mapFilterUndefined(Object.keys($ballotStore), (id) => {
-    return data.applications.find((app) => app.id === id);
+    return data.allApplications.find((app) => app.id === id);
   });
 </script>
 

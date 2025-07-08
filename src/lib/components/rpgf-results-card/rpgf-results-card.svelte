@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import createRpgfRoundDripListFlow from '$lib/flows/create-rpgf-round-drip-list/create-rpgf-round-drip-list-flow';
+  import editRpgfRoundLinkedDripListsFlow from '$lib/flows/edit-rpgf-round-linked-drip-lists/edit-rpgf-round-linked-drip-lists-flow';
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
@@ -11,8 +12,10 @@
   import ArrowLeft from '../icons/ArrowLeft.svelte';
   import DripList from '../icons/DripList.svelte';
   import Stepper from '../stepper/stepper.svelte';
+  import OrDivider from './components/or-divider.svelte';
 
   export let roundSlug: string;
+  export let roundName: string;
   export let resultsCalculated: boolean;
   export let resultsPublished: boolean;
 
@@ -63,7 +66,7 @@
     );
   }
 
-  let step: 'calculate' | 'publish' | 'published';
+  let step: 'calculate' | 'publish' | 'published' | 'linked';
   if (resultsPublished) {
     step = 'published';
   } else if (resultsCalculated) {
@@ -117,6 +120,8 @@
       Publish results
     </Button>
 
+    <OrDivider />
+
     <Button icon={ArrowLeft} on:click={() => (step = 'calculate')} variant="ghost"
       >Recalculate results</Button
     >
@@ -129,10 +134,19 @@
     </p>
 
     <Button
-      on:click={() => modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundSlug))}
+      on:click={() =>
+        modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundSlug, roundName))}
       icon={DripList}
       size="large"
       variant="primary">Prepare Drip List</Button
+    >
+
+    <OrDivider />
+
+    <Button
+      on:click={() =>
+        modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundSlug, []))}
+      >Manually link Drip Lists</Button
     >
   {/if}
 </div>

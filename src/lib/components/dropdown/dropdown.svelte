@@ -121,7 +121,9 @@
         <span class="placeholder" aria-hidden="true">Select an option</span>
       </div>
     {/if}
-    <div class="chevron" class:expanded><ChevronDown style="fill: var(--color-foreground)" /></div>
+    <div class="chevron" class:expanded>
+      <ChevronDown style="fill: var(--color-foreground-level-4)" />
+    </div>
   </div>
 
   {#if expanded}
@@ -175,7 +177,7 @@
   .dropdown {
     height: 3rem;
     padding: 0.5rem 2.5rem 0.5rem 0.75rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     transition:
       border-radius 0.2s,
@@ -250,7 +252,7 @@
   }
 
   .options {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem;
     position: absolute;
     top: 3.5rem;
@@ -280,7 +282,7 @@
 
   .options > .toggle {
     padding: 0.75rem 0.75rem;
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   .options > .option {

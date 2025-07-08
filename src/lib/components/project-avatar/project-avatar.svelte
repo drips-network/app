@@ -158,6 +158,6 @@
   }
 
   .with-outline {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
   }
 </style>

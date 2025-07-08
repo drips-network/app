@@ -81,7 +81,7 @@
     gap: 0.75rem;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   .error.expanded {
@@ -97,7 +97,7 @@
   }
 
   .suberror:last-child {
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   .detail {

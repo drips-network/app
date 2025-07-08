@@ -55,7 +55,7 @@
 <style>
   .wrapper {
     width: calc(100% + 4rem);
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 2rem 0 2rem 2rem;
     margin: 2.5rem -2rem;
     padding: 0.5rem;

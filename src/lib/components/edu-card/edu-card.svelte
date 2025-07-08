@@ -33,7 +33,7 @@
 
 <style>
   .edu-card {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     display: flex;
     gap: 3rem;
