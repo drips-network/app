@@ -210,7 +210,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
-      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -254,6 +253,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+      SUB_ACCOUNT_REPO_DRIVER: '0x317400fd9dfdad78d53a34455d89beb8f03f90ee',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -498,7 +498,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
       NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
       NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
-      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: 'daily',
