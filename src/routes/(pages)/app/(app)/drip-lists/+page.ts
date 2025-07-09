@@ -25,9 +25,9 @@ const fetchedDataCache = makeFetchedDataCache<{
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
 
-  if (!connectedAddress) {
-    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
-  }
+  // if (!connectedAddress) {
+  //   throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
+  // }
 
   const dripListsPageQuery = gql`
     ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
@@ -44,14 +44,25 @@ export const load = async ({ fetch }) => {
     return locallyCached;
   }
 
+  // Oops we can't do either of these queries actually. But we also need to do a query for the
+  // featured or whatever drip lists so we know what the fuck is going on!
+  // so we just can't do this query if we're not connected to a wallet. So then, just return
+  // something like an empty array or whatever
   const [votingRounds, dripListsRes] = await Promise.all([
-    await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
+    !connectedAddress ? Promise.resolve([]) : await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
     await query<DripListsPageQuery, DripListsPageQueryVariables>(
       dripListsPageQuery,
-      { ownerAddress: connectedAddress, chains: [network.gqlName] },
+      { ownerAddress: null, chains: [network.gqlName] },
       fetch,
     ),
+    // await query<DripListsPageQuery, DripListsPageQueryVariables>(
+    //   dripListsPageQuery,
+    //   { ownerAddress: connectedAddress, chains: [network.gqlName] },
+    //   fetch,
+    // ),
   ]);
+
+  // TODO: then filter them by owner address if we've got it?
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
 
@@ -63,6 +74,17 @@ export const load = async ({ fetch }) => {
     ...v,
     splits: votingRoundsSplits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)] ?? [],
   }));
+
+  const yourDripLists = []
+  const restDripLists = []
+  for(const dripList of dripListsRes.dripLists) {
+    if (dripList.owner.address === connectedAddress) {
+      yourDripLists.push(dripList);
+      continue
+    }
+
+    restDripLists.push(dripList);
+  }
 
   fetchedDataCache.write({
     dripLists: dripListsRes.dripLists,
