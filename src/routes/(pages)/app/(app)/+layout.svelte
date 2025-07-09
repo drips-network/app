@@ -3,7 +3,6 @@
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
-
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import { quintIn, quintOut } from 'svelte/easing';
@@ -14,9 +13,9 @@
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
+  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { LayoutData } from './$types';
   import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
-  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import network from '$lib/stores/wallet/network';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
@@ -24,6 +23,27 @@
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  $: navItems = [
+    { label: 'Explore', href: '/app', icon: ExploreIcon },
+    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+    { label: 'Projects', href: '/app/projects', icon: Box },
+    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+    ...(network.retroFunding.enabled
+      ? [{ label: 'RetroPGF', href: '/app/rpgf', icon: ArrowCounterClockwiseHeart }]
+      : []),
+    ...(network.ecosystems
+      ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
+      : []),
+    {
+      label: 'Profile',
+      href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
+      icon: User,
+    },
+  ];
+
+  // bottom nav is mobile only and should not be crowded with profile.
+  $: bottomNavItems = navItems.slice(0, -1);
 
   $: {
     if ($navigating) {
@@ -55,23 +75,7 @@
     >
       <Sidenav
         items={{
-          top: mapFilterUndefined(
-            [
-              { label: 'Explore', href: '/app', icon: ExploreIcon },
-              { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-              { label: 'Projects', href: '/app/projects', icon: Box },
-              { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-              network.retroFunding.enabled
-                ? { label: 'RetroPGF', href: '/app/rpgf', icon: ArrowCounterClockwiseHeart }
-                : undefined,
-              {
-                label: 'Profile',
-                href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-                icon: User,
-              },
-            ],
-            (v) => v,
-          ),
+          top: navItems,
           bottom: [
             {
               label: 'Help',
@@ -84,19 +88,7 @@
       />
     </div>
     <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav
-        items={[
-          { label: 'Explore', href: '/app', icon: ExploreIcon },
-          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-          {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: User,
-          },
-        ]}
-      />
+      <BottomNav items={bottomNavItems} />
     </div>
   {/if}
 

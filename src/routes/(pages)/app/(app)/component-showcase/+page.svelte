@@ -121,6 +121,7 @@
         latestMetadataIpfsHash: '',
         totalEarned: [],
         withdrawableBalances: [],
+        withdrawableSubAccountBalances: [],
         support: [],
         verificationStatus: ProjectVerificationStatus.Claimed,
         owner: {
@@ -163,6 +164,7 @@
         latestMetadataIpfsHash: '',
         totalEarned: [],
         withdrawableBalances: [],
+        withdrawableSubAccountBalances: [],
         support: [],
         verificationStatus: ProjectVerificationStatus.Claimed,
 

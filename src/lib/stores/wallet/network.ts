@@ -51,12 +51,14 @@ export type Network = {
     linkTemplate: (txHash: string, networkName: string) => string;
   };
   contracts: {
+    GIVERS_REGISTRY?: string;
     ADDRESS_DRIVER: string;
     DRIPS: string;
     CALLER: string;
     REPO_DRIVER: string;
     NFT_DRIVER: string;
     NATIVE_TOKEN_UNWRAPPER: string | undefined;
+    SUB_ACCOUNT_REPO_DRIVER?: string;
   };
   /**
    * If enabled, LP, blog, and legal routes are redirected to https://drips.network/<path>.
@@ -78,6 +80,7 @@ export type Network = {
     | undefined;
   enableEns: boolean;
   retroFunding: DripsRetroFundingConfig;
+  ecosystems: boolean;
 };
 
 type DripsRetroFundingConfig =
@@ -156,6 +159,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: false,
   },
   [80002]: {
     chainId: 80002,
@@ -199,6 +203,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -227,6 +232,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xa71bdf410D48d4AA9aE1517A69D7E1Ef0c179b2B',
       NFT_DRIVER: '0xdC773a04C0D6EFdb80E7dfF961B6a7B063a28B44',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -242,6 +248,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: true,
   },
   [11155111]: {
     chainId: 11155111,
@@ -296,6 +303,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
           '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
       },
     },
+    ecosystems: true,
   },
   [31337]: {
     chainId: 31337,
@@ -324,6 +332,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0x971e08fc533d2A5f228c7944E511611dA3B56B24',
       NFT_DRIVER: '0xf98e07d281Ff9b83612DBeF0A067d710716720eA',
       NATIVE_TOKEN_UNWRAPPER: undefined,
+      SUB_ACCOUNT_REPO_DRIVER: '0xB8743C2bB8DF7399273aa7EE4cE8d4109Bec327F',
     },
     settlement: {
       nextSettlementDate: nextMainnetSettlementDate,
@@ -343,7 +352,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         name: 'Ethereum',
         symbol: 'ETH',
       },
-      rpcUrls: ['http://localhost:8545'],
+      rpcUrls: [`${BASE_URL}/api/rpc/anvil/localtestnet`],
     },
     enableEns: false,
     retroFunding: {
@@ -352,6 +361,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         enabled: false,
       },
     },
+    ecosystems: true,
   },
   [84532]: {
     chainId: 84532,
@@ -395,6 +405,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: false,
   },
   [314]: {
     chainId: 314,
@@ -461,6 +472,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
           '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
       },
     },
+    ecosystems: false,
   },
   [1088]: {
     chainId: 1088,
@@ -512,6 +524,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: false,
   },
   [10]: {
     chainId: 10,
@@ -540,6 +553,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
       NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
       NATIVE_TOKEN_UNWRAPPER: '0x64e0d60C70e9778C2E649FfBc90259C86a6Bf396',
+      SUB_ACCOUNT_REPO_DRIVER: 'TODO',
     },
     settlement: {
       nextSettlementDate: 'daily',
@@ -563,6 +577,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     enableEns: true,
     retroFunding: { enabled: false },
+    ecosystems: true,
   },
 };
 
