@@ -25,6 +25,7 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
+  import FeaturedDripListsSection from '$lib/components/featured-drip-lists-section/featured-drip-lists-section.svelte';
 
   export let data: PageData;
 
@@ -87,6 +88,7 @@
     <ProminentKeyValuePair key="Total Drips Lists">27</ProminentKeyValuePair>
     <ProminentKeyValuePair key="Total Splits">1374</ProminentKeyValuePair>
   </StatsSection>
+  <FeaturedDripListsSection />
 </div>
 
 <style>
