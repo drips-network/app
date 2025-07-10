@@ -5,9 +5,11 @@
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import EmptyState from './empty-state.svelte';
+  import DisconnectedState from './disconnected-state.svelte';
 
   export let loaded = false;
   export let empty = false;
+  export let disconnected = false;
   export let error = false;
   export let placeholderOutline = true;
   export let horizontalScroll = true;
@@ -26,6 +28,10 @@
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
+
+  export let disconnectedStateEmoji: string | undefined = '🫙';
+  export let disconnectedStateHeadline: string | undefined = 'You are disconnected';
+  export let disconnectedStateText: string | undefined = undefined;
 
   let placeholderContainerElem: HTMLDivElement;
 
@@ -60,6 +66,12 @@
                 >
               </div>
             </div>
+          {:else if disconnected}
+            <DisconnectedState
+              emoji={disconnectedStateEmoji}
+              headline={disconnectedStateHeadline}
+              text={disconnectedStateText}
+            />
           {:else if empty}
             <!-- Empty state -->
             <EmptyState

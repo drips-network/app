@@ -55,6 +55,7 @@
     : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
+  // so there is an empty state, but before there is a not connected state
 </script>
 
 <Section
@@ -62,7 +63,7 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Drip Lists',
+    label: 'Your Drip Lists',
     actionsDisabled: !dripLists,
     actions: withCreateButton
       ? [
@@ -88,6 +89,10 @@
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
     horizontalScroll: false,
+    disconnected: !$walletStore.connected,
+    disconnectedStateEmoji: '🫙',
+    disconnectedStateHeadline: 'No claimed Drip Lists',
+    disconnectedStateText: 'Your Drip Lists will show up here when your wallet is connected.',
   }}
 >
   {#if visibleDripListsAndVotingRounds}
