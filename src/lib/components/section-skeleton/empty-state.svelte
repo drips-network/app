@@ -7,7 +7,7 @@
   export let text: string | undefined = 'Please add stuff to this section to see it here.';
 </script>
 
-<div class="notice" in:fade={{ duration: 250 }}>
+<div class="notice empty-state" in:fade={{ duration: 250 }}>
   <Emoji {emoji} size="huge" />
   <div class="text-group">
     {#if headline}<p class="typo-text-small-bold">

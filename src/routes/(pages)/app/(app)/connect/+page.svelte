@@ -1,8 +1,7 @@
 <script lang="ts">
-  import ActionableEmptyState from '$lib/components/actionable-empty-state/actionable-empty-state.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import wallet from '$lib/stores/wallet/wallet.store';
   import type { PageData } from './$types';
+  import DisconnectedState from '$lib/components/section-skeleton/disconnected-state.svelte';
 
   export let data: PageData;
 
@@ -25,8 +24,4 @@
 
 <HeadMeta title="Drips" />
 
-<ActionableEmptyState
-  headline="No wallet connected"
-  description={emptyStateText}
-  button={{ label: 'Connect a wallet', handler: () => wallet.connect() }}
-/>
+<DisconnectedState headline="No wallet connected" text={emptyStateText} />
