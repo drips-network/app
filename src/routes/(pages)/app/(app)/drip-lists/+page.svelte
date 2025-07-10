@@ -23,6 +23,8 @@
   import modal from '$lib/stores/modal';
   import Plus from '$lib/components/icons/Plus.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import StatsSection from '$lib/components/stats-section/stats-section.svelte';
+  import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
 
   export let data: PageData;
 
@@ -46,7 +48,10 @@
     <svelte:fragment slot="text">
       <h1 class="pixelated">What’s a Drip List?</h1>
       <p>
-        A Drip List is a fundable list of anything that is fundable on Drips. That includes projects, users, other Drip Lists, or Ecosystems. Each recipient in the list is assigned a percentage, which determines the amount of funds that recipient receives when funds are sent to the list.
+        A Drip List is a fundable list of anything that is fundable on Drips. That includes
+        projects, users, other Drip Lists, or Ecosystems. Each recipient in the list is assigned a
+        percentage, which determines the amount of funds that recipient receives when funds are sent
+        to the list.
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
@@ -59,9 +64,8 @@
             isModal: true,
           })}>Create a Drip List</Button
       >
-      <Button
-        icon={ArrowBoxUpRight}
-        href="https://docs.drips.network/support-your-dependencies">Learn More</Button
+      <Button icon={ArrowBoxUpRight} href="https://docs.drips.network/support-your-dependencies"
+        >Learn More</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">
@@ -78,13 +82,18 @@
     withCreateButton={true}
     showVisibilityToggle={true}
   />
+  <StatsSection>
+    <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Drips Lists">27</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Splits">1374</ProminentKeyValuePair>
+  </StatsSection>
 </div>
 
 <style>
   .page {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 2rem;
   }
 
   .edu-card-illustration-bg {
