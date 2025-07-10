@@ -55,7 +55,6 @@
     : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
-  // so there is an empty state, but before there is a not connected state
 </script>
 
 <Section
