@@ -26,6 +26,9 @@
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
   import FeaturedDripListsSection from '$lib/components/featured-drip-lists-section/featured-drip-lists-section.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import DripListsGrid from '../components/drip-lists-grid.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
 
   export let data: PageData;
 
@@ -88,7 +91,22 @@
     <ProminentKeyValuePair key="Total Drips Lists">27</ProminentKeyValuePair>
     <ProminentKeyValuePair key="Total Splits">1374</ProminentKeyValuePair>
   </StatsSection>
-  <FeaturedDripListsSection />
+  <FeaturedDripListsSection dripLists={data.featuredDripLists} />
+  <Section
+    header={{
+      icon: DripListIcon,
+      label: 'Recently created Drip Lists',
+    }}
+    skeleton={{
+      loaded: true,
+      empty: !data.restDripLists?.length,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No recenltly created Drip Lists',
+      emptyStateText: 'We couldn’t find any recently created Drip Lists.',
+    }}
+  >
+    <DripListsGrid dripLists={data.restDripLists} />
+  </Section>
 </div>
 
 <style>

@@ -1,5 +1,4 @@
 import query from '$lib/graphql/dripsQL.js';
-import { redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
 import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
@@ -7,18 +6,22 @@ import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
 } from './__generated__/gql.generated';
-import buildUrl from '$lib/utils/build-url';
+// import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import network from '$lib/stores/wallet/network';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
+import fetchFeaturedDripLists from '../components/load-drip-list';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
 const fetchedDataCache = makeFetchedDataCache<{
   dripLists: DripListsPageQuery['dripLists'];
+  yourDripLists: DripListsPageQuery['dripLists'];
+  restDripLists: DripListsPageQuery['dripLists'];
+  featuredDripLists: Awaited<ReturnType<typeof fetchFeaturedDripLists>>;
   votingRounds: VotingRoundWithSplits[];
 }>('dashboard:drip-lists');
 
@@ -48,13 +51,16 @@ export const load = async ({ fetch }) => {
   // featured or whatever drip lists so we know what the fuck is going on!
   // so we just can't do this query if we're not connected to a wallet. So then, just return
   // something like an empty array or whatever
-  const [votingRounds, dripListsRes] = await Promise.all([
-    !connectedAddress ? Promise.resolve([]) : await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
-    await query<DripListsPageQuery, DripListsPageQueryVariables>(
+  const [votingRounds, dripListsRes, featuredDripLists] = await Promise.all([
+    !connectedAddress
+      ? Promise.resolve([])
+      : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
+    query<DripListsPageQuery, DripListsPageQueryVariables>(
       dripListsPageQuery,
       { ownerAddress: null, chains: [network.gqlName] },
       fetch,
     ),
+    fetchFeaturedDripLists(network.chainId, fetch),
     // await query<DripListsPageQuery, DripListsPageQueryVariables>(
     //   dripListsPageQuery,
     //   { ownerAddress: connectedAddress, chains: [network.gqlName] },
@@ -75,12 +81,12 @@ export const load = async ({ fetch }) => {
     splits: votingRoundsSplits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)] ?? [],
   }));
 
-  const yourDripLists = []
-  const restDripLists = []
-  for(const dripList of dripListsRes.dripLists) {
+  const yourDripLists = [];
+  const restDripLists = [];
+  for (const dripList of dripListsRes.dripLists) {
     if (dripList.owner.address === connectedAddress) {
       yourDripLists.push(dripList);
-      continue
+      continue;
     }
 
     restDripLists.push(dripList);
@@ -88,11 +94,17 @@ export const load = async ({ fetch }) => {
 
   fetchedDataCache.write({
     dripLists: dripListsRes.dripLists,
+    yourDripLists,
+    restDripLists,
+    featuredDripLists,
     votingRounds: votingRoundsWithSplits,
   });
 
   return {
     dripLists: dripListsRes.dripLists,
+    yourDripLists,
+    restDripLists,
+    featuredDripLists,
     votingRounds: votingRoundsWithSplits,
     preservePathOnNetworkChange: true,
   };

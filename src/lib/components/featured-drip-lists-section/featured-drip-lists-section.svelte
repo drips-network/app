@@ -4,7 +4,7 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import DripListsGrid from '../../../routes/(pages)/app/(app)/components/drip-lists-grid.svelte';
 
-  export let featuredDripLists: DripListsSectionDripListFragment[] = [];
+  export let dripLists: DripListsSectionDripListFragment[] = [];
 </script>
 
 <Section
@@ -14,11 +14,11 @@
   }}
   skeleton={{
     loaded: true,
-    empty: !featuredDripLists.length,
+    empty: !dripLists.length,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No Featured Drip Lists',
     emptyStateText: 'We couldn’t find any featured Drip Lists.',
   }}
 >
-  <DripListsGrid dripLists={featuredDripLists} />
+  <DripListsGrid {dripLists} />
 </Section>
