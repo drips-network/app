@@ -6,7 +6,6 @@ import type {
   DripListsPageQuery,
   DripListsPageQueryVariables,
 } from './__generated__/gql.generated';
-// import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
@@ -18,7 +17,6 @@ import fetchFeaturedDripLists from '../components/load-featured-drip-lists';
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
 const fetchedDataCache = makeFetchedDataCache<{
-  dripLists: DripListsPageQuery['dripLists'];
   yourDripLists: DripListsPageQuery['dripLists'];
   restDripLists: DripListsPageQuery['dripLists'];
   featuredDripLists: Awaited<ReturnType<typeof fetchFeaturedDripLists>>;
@@ -27,10 +25,6 @@ const fetchedDataCache = makeFetchedDataCache<{
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
-
-  // if (!connectedAddress) {
-  //   throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
-  // }
 
   const dripListsPageQuery = gql`
     ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
@@ -93,7 +87,6 @@ export const load = async ({ fetch }) => {
   }
 
   fetchedDataCache.write({
-    dripLists: dripListsRes.dripLists,
     yourDripLists,
     restDripLists,
     featuredDripLists,
@@ -101,8 +94,6 @@ export const load = async ({ fetch }) => {
   });
 
   return {
-    // TODO: remove
-    dripLists: dripListsRes.dripLists,
     yourDripLists,
     restDripLists,
     featuredDripLists,

@@ -8,8 +8,6 @@
 </script>
 
 <script lang="ts">
-  // import walletStore from '$lib/stores/wallet/wallet.store';
-  // import guardConnected from '$lib/utils/guard-connected';
   import DripListsSection, {
     DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT,
   } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
@@ -33,15 +31,6 @@
   export let data: PageData;
 
   $: votingRounds = data.votingRounds ?? [];
-
-  // const walletInitialized = walletStore.initialized;
-
-  // $: {
-  //   $walletStore.connected;
-  //   $walletInitialized;
-
-  //   guardConnected();
-  // }
 </script>
 
 <HeadMeta title="Drip List" />

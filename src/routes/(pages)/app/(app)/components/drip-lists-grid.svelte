@@ -31,5 +31,9 @@
     .drip-list-cards-grid {
       grid-template-columns: 1fr;
     }
+
+    .drip-list-cards-grid.minimal-grid {
+      grid-template-columns: auto auto;
+    }
   }
 </style>

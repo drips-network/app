@@ -39,4 +39,10 @@
     gap: 1.5rem;
     display: flex;
   }
+
+  @media (max-width: 767px) {
+    .stats {
+      flex-direction: column;
+    }
+  }
 </style>
