@@ -117,6 +117,8 @@
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
+  import CoinFlying from '../icons/CoinFlying.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -134,8 +136,10 @@
     );
   }
 
-  /** Minimal version w/ link to Drip List page for listing contexts */
-  export let listingMode = false;
+  // "partial" is reduced version w/ link to Drip List page for listing contexts
+  // "minimal" is similar, but further reduced to just title, owner, description,
+  //  total funded, and number of splits
+  export let variant: 'full' | 'partial' | 'minimal' = 'full';
 
   export let isHidden = false;
   export let hideTotal = false;
@@ -156,6 +160,9 @@
   $: description = (dripList?.description || votingRound?.description) ?? '';
 
   $: supportersPile = dripList && getSupportersPile(dripList.support, 'tiny');
+
+  $: isPartial = variant === 'partial';
+  $: isMinimal = variant === 'minimal';
 
   function triggerEditModal() {
     if (!dripList) return;
@@ -227,16 +234,17 @@
     : undefined;
 </script>
 
-{#if !listingMode && votingRound}
+{#if !isPartial && !isMinimal && votingRound}
   <VotingRoundNoticeCard {votingRound} />
 {/if}
 
 <svelte:element
-  this={listingMode ? 'a' : 'section'}
+  this={isPartial || isMinimal ? 'a' : 'section'}
   href={dripListUrl}
   target={openInNewTab ? '_blank' : undefined}
   class="drip-list-card rounded-drip-lg overflow-hidden shadow-low group"
   class:hidden-list={isHidden}
+  class:minimal={isMinimal}
 >
   <div class="flex flex-col gap-4">
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
@@ -244,16 +252,16 @@
         <h1
           class:line-clamp-1={clampTitle}
           class=" title rounded twemoji-text"
-          style:font-size={listingMode ? '28px' : undefined}
+          style:font-size={isPartial || isMinimal ? '28px' : undefined}
         >
           {@html twemoji(title)}
         </h1>
-        {#if listingMode && votingRound}
+        {#if isPartial && votingRound}
           <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
             {votingEnded ? 'Voting ended' : 'In voting'}
           </StatusBadge>
         {/if}
-        {#if !listingMode}
+        {#if !isPartial && !isMinimal}
           <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
@@ -270,15 +278,19 @@
         {/if}
       </div>
       {#if !hideDescription && description.length > 0}
-        <div class="description twemoji-text">
-          <TextExpandable numberOfLines={listingMode ? 2 : 4} isExpandable={!listingMode}>
+        <div class="description twemoji-text" class:typo-text-small={isMinimal}>
+          <TextExpandable
+            numberOfLines={isPartial || isMinimal ? 2 : 4}
+            isExpandable={!isPartial && !isMinimal}
+          >
             {@html twemoji(description)}
           </TextExpandable>
         </div>
       {/if}
-      {#if !listingMode}
+      {#if !isPartial}
         <div class="flex gap-2">
-          Created by <IdentityBadge
+          {#if !isMinimal}Created by
+          {/if}<IdentityBadge
             showAvatar={true}
             showIdentity={true}
             address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
@@ -288,150 +300,168 @@
       {/if}
     </header>
 
-    <section>
-      {#if !listingMode && dripList && votingRound}
-        <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
-          <TabbedBox
-            bind:activeTab
-            tabs={{
-              1: 'Current',
-              2: 'In voting',
-            }}
-            ariaLabel="Toggle list versions"
-          />
-        </div>
-      {/if}
+    {#if !isMinimal}
+      <section>
+        {#if !isPartial && dripList && votingRound}
+          <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
+            <TabbedBox
+              bind:activeTab
+              tabs={{
+                1: 'Current',
+                2: 'In voting',
+              }}
+              ariaLabel="Toggle list versions"
+            />
+          </div>
+        {/if}
 
-      <TransitionedHeight transitionHeightChanges>
-        <div class="tabs">
-          <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
-            {#if dripList}
-              <div class="flex flex-col gap-1.5">
-                <div class="totals">
-                  <div class="drip-icon">
-                    <Drip />
-                  </div>
-                  {#if !hideTotal}
-                    <div class="typo-text tabular-nums total-streamed-badge">
-                      {#if browser}
-                        <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
-                      {/if}
-                      <span class="muted">&nbsp;total</span>
+        <TransitionedHeight transitionHeightChanges>
+          <div class="tabs">
+            <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
+              {#if dripList}
+                <div class="flex flex-col gap-1.5">
+                  <div class="totals">
+                    <div class="drip-icon">
+                      <Drip />
                     </div>
-                  {/if}
-                  {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
+                    {#if !hideTotal}
+                      <div class="typo-text tabular-nums total-streamed-badge">
+                        {#if browser}
+                          <AggregateFiatEstimate
+                            supressUnknownAmountsWarning
+                            amounts={totalEarned}
+                          />
+                        {/if}
+                        <span class="muted">&nbsp;total</span>
+                      </div>
+                    {/if}
+                    {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
+                      <div
+                        in:fade={{ duration: 300 }}
+                        class="hide-on-mobile flex items-center gap-1.5 min-w-0"
+                      >
+                        <span class="typo-text-small truncate muted">Supported by</span>
+                        <Pile
+                          maxItems={3}
+                          components={supportersPile ?? []}
+                          itemsClickable={!isPartial}
+                        />
+                      </div>
+                    {/if}
+                  </div>
+                  <PaddedHorizontalScroll disableScroll={isPartial}>
                     <div
-                      in:fade={{ duration: 300 }}
-                      class="hide-on-mobile flex items-center gap-1.5 min-w-0"
+                      class="splits-component"
+                      style:pointer-events={isPartial ? 'none' : undefined}
                     >
-                      <span class="typo-text-small truncate muted">Supported by</span>
-                      <Pile
-                        maxItems={3}
-                        components={supportersPile ?? []}
-                        itemsClickable={!listingMode}
+                      <Splits
+                        disableLinks={isPartial}
+                        maxRows={maxSplitRows ??
+                          (isPartial
+                            ? dripList.description && !hideDescription
+                              ? 3
+                              : 4
+                            : undefined)}
+                        groupsExpandable={!isPartial}
+                        list={dripList.splits}
+                        {chainOverride}
                       />
                     </div>
-                  {/if}
+                  </PaddedHorizontalScroll>
                 </div>
-                <PaddedHorizontalScroll disableScroll={listingMode}>
-                  <div
-                    class="splits-component"
-                    style:pointer-events={listingMode ? 'none' : undefined}
-                  >
-                    <Splits
-                      disableLinks={listingMode}
-                      maxRows={maxSplitRows ??
-                        (listingMode
-                          ? dripList.description && !hideDescription
-                            ? 3
-                            : 4
-                          : undefined)}
-                      groupsExpandable={!listingMode}
-                      list={dripList.splits}
-                      {chainOverride}
-                    />
-                  </div>
-                </PaddedHorizontalScroll>
-              </div>
-            {/if}
-          </div>
+              {/if}
+            </div>
 
-          <div
-            class="list tab tab-2"
-            class:active-tab={activeTab === 'tab-2'}
-            class:-mt-6={!votingRound?.result}
-          >
-            {#if votingRound}
-              <div class="flex flex-col gap-1.5">
-                <div class="splits">
-                  <div class="splits-component">
-                    <VotingRoundSplits
-                      {listingMode}
-                      maxRows={listingMode ? (votingRound.description ? 3 : 4) : undefined}
-                      {votingRound}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {#if !listingMode}
-                {#if votingRound.allowedReceivers?.length && votingRound.status === 'Started'}
-                  <FormField title="Possible recipients" type="div">
-                    <ListEditor
-                      items={votingRound.allowedReceiversListEditorItems}
-                      weightsMode={false}
-                      isEditable={false}
-                    />
-                  </FormField>
-                {/if}
-
-                <VotingRoundCollaborators {votingRound} />
-
-                <VotingRoundCountdown {votingRound} on:end={invalidateAll} />
-
-                {#if isOwnVotingRound}
-                  <div class="actions">
-                    <div>
-                      <Button
-                        icon={Trash}
-                        on:click={() =>
-                          modal.show(
-                            Stepper,
-                            undefined,
-                            deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                          )}>Delete voting round</Button
-                      >
+            <div
+              class="list tab tab-2"
+              class:active-tab={activeTab === 'tab-2'}
+              class:-mt-6={!votingRound?.result}
+            >
+              {#if votingRound}
+                <div class="flex flex-col gap-1.5">
+                  <div class="splits">
+                    <div class="splits-component">
+                      <VotingRoundSplits
+                        listingMode={isPartial}
+                        maxRows={isPartial ? (votingRound.description ? 3 : 4) : undefined}
+                        {votingRound}
+                      />
                     </div>
+                  </div>
+                </div>
 
-                    {#if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
+                {#if !isPartial}
+                  {#if votingRound.allowedReceivers?.length && votingRound.status === 'Started'}
+                    <FormField title="Possible recipients" type="div">
+                      <ListEditor
+                        items={votingRound.allowedReceiversListEditorItems}
+                        weightsMode={false}
+                        isEditable={false}
+                      />
+                    </FormField>
+                  {/if}
+
+                  <VotingRoundCollaborators {votingRound} />
+
+                  <VotingRoundCountdown {votingRound} on:end={invalidateAll} />
+
+                  {#if isOwnVotingRound}
+                    <div class="actions">
                       <div>
                         <Button
-                          variant="primary"
-                          icon={Wallet}
-                          disabled={!votingRound.result}
+                          icon={Trash}
                           on:click={() =>
                             modal.show(
                               Stepper,
                               undefined,
-                              votingRound
-                                ? publishVotingRoundListFlowSteps(
-                                    votingRound.id,
-                                    votingRound.name,
-                                    votingRound.description ?? undefined,
-                                  )
-                                : unreachable(),
-                            )}>Publish Drip List</Button
+                              deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+                            )}>Delete voting round</Button
                         >
                       </div>
-                    {/if}
-                  </div>
+
+                      {#if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
+                        <div>
+                          <Button
+                            variant="primary"
+                            icon={Wallet}
+                            disabled={!votingRound.result}
+                            on:click={() =>
+                              modal.show(
+                                Stepper,
+                                undefined,
+                                votingRound
+                                  ? publishVotingRoundListFlowSteps(
+                                      votingRound.id,
+                                      votingRound.name,
+                                      votingRound.description ?? undefined,
+                                    )
+                                  : unreachable(),
+                              )}>Publish Drip List</Button
+                          >
+                        </div>
+                      {/if}
+                    </div>
+                  {/if}
                 {/if}
               {/if}
-            {/if}
+            </div>
           </div>
+        </TransitionedHeight>
+      </section>
+    {/if}
+
+    {#if isMinimal}
+      <section class="cubbies">
+        <div>
+          <CoinFlying style="fill: var(--color-foreground)" /><AggregateFiatEstimate
+            supressUnknownAmountsWarning
+            amounts={totalEarned}
+          />
         </div>
-      </TransitionedHeight>
-    </section>
+        <!-- TODO; format number -->
+        <div><DripListIcon style="fill: var(--color-foreground)" />{dripList?.splits?.length}</div>
+      </section>
+    {/if}
   </div>
 </svelte:element>
 
@@ -538,6 +568,48 @@
     gap: 0.5rem;
     justify-content: flex-end;
     margin-top: 1rem;
+  }
+
+  .cubbies {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    border-top: 1px solid var(--color-foreground-level-2);
+    position: relative;
+    left: -0.5rem;
+    width: calc(100% + 1rem);
+  }
+
+  .cubbies > * {
+    flex-grow: 1;
+    border-right: 1px solid var(--color-foreground-level-2);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 50%;
+    gap: 0.25rem;
+  }
+
+  .cubbies > *:last-child {
+    border-right: none;
+  }
+
+  .drip-list-card.minimal {
+    height: 16.5rem;
+  }
+
+  .drip-list-card.minimal > div {
+    height: 100%;
+  }
+
+  .drip-list-card.minimal header {
+    height: 100%;
+  }
+
+  .drip-list-card.minimal .description {
+    order: 3;
+    margin-top: auto;
   }
 
   @media (max-width: 768px) {

@@ -105,7 +105,7 @@
       emptyStateText: 'We couldn’t find any recently created Drip Lists.',
     }}
   >
-    <DripListsGrid dripLists={data.restDripLists} />
+    <DripListsGrid cardVariant="minimal" dripLists={data.restDripLists} />
   </Section>
 </div>
 

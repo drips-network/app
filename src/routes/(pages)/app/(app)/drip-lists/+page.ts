@@ -13,7 +13,7 @@ import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import network from '$lib/stores/wallet/network';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
-import fetchFeaturedDripLists from '../components/load-drip-list';
+import fetchFeaturedDripLists from '../components/load-featured-drip-lists';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
