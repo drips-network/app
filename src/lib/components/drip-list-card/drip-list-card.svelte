@@ -572,7 +572,6 @@
 
   .cubbies {
     display: flex;
-    gap: 0.5rem;
     align-items: center;
     border-top: 1px solid var(--color-foreground-level-2);
     position: relative;

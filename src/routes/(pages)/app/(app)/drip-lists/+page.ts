@@ -101,6 +101,7 @@ export const load = async ({ fetch }) => {
   });
 
   return {
+    // TODO: remove
     dripLists: dripListsRes.dripLists,
     yourDripLists,
     restDripLists,

@@ -33,7 +33,6 @@
   export let data: PageData;
 
   $: votingRounds = data.votingRounds ?? [];
-  $: dripLists = data.dripLists ?? [];
 
   // const walletInitialized = walletStore.initialized;
 
@@ -81,7 +80,7 @@
   </EduCard>
   <DripListsSection
     {votingRounds}
-    {dripLists}
+    dripLists={data.yourDripLists}
     showCreateNewListCard={true}
     withCreateButton={true}
     showVisibilityToggle={true}
