@@ -27,6 +27,7 @@
   import Section from '$lib/components/section/section.svelte';
   import DripListsGrid from '../components/drip-lists-grid.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let data: PageData;
 
@@ -52,7 +53,7 @@
         variant="primary"
         on:click={() =>
           modal.show(CreateDripListStepper, undefined, {
-            skipWalletConnect: true,
+            skipWalletConnect: $walletStore.connected,
             isModal: true,
           })}>Create a Drip List</Button
       >
@@ -118,7 +119,7 @@
     z-index: 1;
   }
 
-  .pixelated {
+  h1 {
     color: var(--color-foreground);
   }
 
