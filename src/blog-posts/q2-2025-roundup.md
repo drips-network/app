@@ -18,6 +18,8 @@ Let’s dive into what went down in Q2 at Drips.
 
 This quarter, we announced one of the biggest upgrades to the Drips protocol yet: **support for full retroactive public goods funding (RPGF) rounds, end-to-end**.
 
+![RPGF Home](/assets/blog-images/rpgf/rpgf-home.png)
+
 Anyone, from DAOs to foundations to ecosystem teams, will soon be able to run RPGF rounds directly on Drips. That includes:
 
 - Nomination and curation of projects
@@ -29,8 +31,6 @@ It’s all fully composable and built to be flexible, so funders can easily desi
 We’re almost finished building and this will launch very soon in Q3.
 
 [Read the full announcement →](https://www.drips.network/blog/posts/full-rpgf-on-drips)
-
-![RPGF Home](/assets/blog-images/rpgf/rpgf-home.png)
 
 ## **📍Launched: The Drips Guide to Berlin**
 
