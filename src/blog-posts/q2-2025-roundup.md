@@ -8,7 +8,7 @@ author: 'becca'
 announcementBannerCopy: 'Q2 highlights include new features and engaging with you IRL.'
 ---
 
-# **Q2 2025 Roundup: RPGF on Drips and Berlin vibes**
+# Q2 2025 Roundup: RPGF on Drips and Berlin vibes
 
 From major feature announcements to real-world conversations, Q2 was all about continuing to build and showing up IRL.
 
@@ -32,7 +32,7 @@ We’re almost finished building and this will launch very soon in Q3.
 
 [Read the full announcement →](https://www.drips.network/blog/posts/full-rpgf-on-drips)
 
-## **📍Launched: The Drips Guide to Berlin**
+# 📍Launched: The Drips Guide to Berlin
 
 To help visitors (and locals) make the most of Berlin Blockchain Week, we put together the **Drips Guide to Berlin** \- a curated microsite of the best events, venues, and spots to unwind.
 
@@ -42,7 +42,7 @@ Even though Blockchain Week is over, the site lives on\! If you’re ever in Ber
 
 ![Berlin basics on the Drips guide to Berlin](/assets/blog-images/drips-guide-to-berlin-basics.png)
 
-## **🗣️ IRL in Berlin: panels, meetups & conversations**
+# 🗣️ IRL in Berlin: panels, meetups & conversations
 
 Beyond the guide, the Drips team was on the ground throughout Berlin Blockchain Week. We participated in a number of events across the city, sharing what we’ve been building and joining conversations on the future of funding & sustainable ecosystems.
 
@@ -63,7 +63,7 @@ Pro-tip: check out Warren’s talk at Protocol Berg for a sneak peak at what els
 
 Thanks to everyone who came out, asked great questions, and helped shape the conversation. If we missed each other in Berlin, trust there will be more chances soon.
 
-## **⏭️ Looking ahead**
+# ⏭️ Looking ahead
 
 A lot of work in Q2 was building up for Q3 and we’ve got a lot to share in the coming months:
 
