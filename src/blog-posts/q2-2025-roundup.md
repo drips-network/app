@@ -48,6 +48,8 @@ Beyond the guide, the Drips team was on the ground throughout Berlin Blockchain 
 
 Whether it was speaking on panels, demoing new features, or just meeting fellow builders face to face, Berlin was a great reminder of why this work matters.
 
+![Jason speaks](/assets/blog-images/jason-speaks.jpg)
+
 Pro-tip: check out Warren’s talk at Protocol Berg for a sneak peak at what else we’ll be launching in Q3…
 
 🎤 **Talks and events we joined:**
@@ -60,8 +62,6 @@ Pro-tip: check out Warren’s talk at Protocol Berg for a sneak peak at what els
 - Dappcon
 
 Thanks to everyone who came out, asked great questions, and helped shape the conversation. If we missed each other in Berlin, trust there will be more chances soon.
-
-![Jason speaks](/assets/blog-images/jason-speaks.jpg)
 
 ## **⏭️ Looking ahead**
 
