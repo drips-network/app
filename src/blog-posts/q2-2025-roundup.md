@@ -38,7 +38,7 @@ To help visitors (and locals) make the most of Berlin Blockchain Week, we put to
 
 The guide featured the team’s top picks for the week’s most relevant events plus how to get the most of the city outside of Blockchain Week.
 
-Even though Blockchain Week is over, the site lives on\! If you’re ever in Berlin and in need of some excellent recommendations for drinks, coffee or clubbing you should start here: Berlin.drips.network
+Even though Blockchain Week is over, the site lives on\! If you’re ever in Berlin and in need of some excellent recommendations for drinks, coffee or clubbing you should start here: [berlin.drips.network](https://berlin.drips.network/)
 
 ![Berlin basics on the Drips guide to Berlin](/assets/blog-images/drips-guide-to-berlin-basics.png)
 
