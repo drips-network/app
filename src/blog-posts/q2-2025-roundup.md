@@ -16,8 +16,6 @@ Let’s dive into what went down in Q2 at Drips.
 
 **👩‍💻👨‍💻 Announced: End-to-End RPGF rounds on Drips**
 
-![RPGF Home](/assets/blog-images/rpgf/rpgf-home.png)
-
 This quarter, we announced one of the biggest upgrades to the Drips protocol yet: **support for full retroactive public goods funding (RPGF) rounds, end-to-end**.
 
 Anyone, from DAOs to foundations to ecosystem teams, will soon be able to run RPGF rounds directly on Drips. That includes:
@@ -32,9 +30,9 @@ We’re almost finished building and this will launch very soon in Q3.
 
 [Read the full announcement →](https://www.drips.network/blog/posts/full-rpgf-on-drips)
 
-## **📍Launched: The Drips Guide to Berlin**
+![RPGF Home](/assets/blog-images/rpgf/rpgf-home.png)
 
-![Berlin basics on the Drips guide to Berlin](/assets/blog-images/drips-guide-to-berlin-basics.png)
+## **📍Launched: The Drips Guide to Berlin**
 
 To help visitors (and locals) make the most of Berlin Blockchain Week, we put together the **Drips Guide to Berlin** \- a curated microsite of the best events, venues, and spots to unwind.
 
@@ -42,9 +40,9 @@ The guide featured the team’s top picks for the week’s most relevant events 
 
 Even though Blockchain Week is over, the site lives on\! If you’re ever in Berlin and in need of some excellent recommendations for drinks, coffee or clubbing you should start here: Berlin.drips.network
 
-## **🗣️ IRL in Berlin: panels, meetups & conversations**
+![Berlin basics on the Drips guide to Berlin](/assets/blog-images/drips-guide-to-berlin-basics.png)
 
-![Jason speaks](/assets/blog-images/jason-speaks.jpg)
+## **🗣️ IRL in Berlin: panels, meetups & conversations**
 
 Beyond the guide, the Drips team was on the ground throughout Berlin Blockchain Week. We participated in a number of events across the city, sharing what we’ve been building and joining conversations on the future of funding & sustainable ecosystems.
 
@@ -62,6 +60,8 @@ Pro-tip: check out Warren’s talk at Protocol Berg for a sneak peak at what els
 - Dappcon
 
 Thanks to everyone who came out, asked great questions, and helped shape the conversation. If we missed each other in Berlin, trust there will be more chances soon.
+
+![Jason speaks](/assets/blog-images/jason-speaks.jpg)
 
 ## **⏭️ Looking ahead**
 
