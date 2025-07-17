@@ -21,6 +21,12 @@
   import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import modal from '$lib/stores/modal';
+  import StatsSection from '$lib/components/stats-section/stats-section.svelte';
+  import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import BoxIcon from '$lib/components/icons/Box.svelte';
+  import RecentlyClaimedProjects from '../components/recently-claimed-projects.svelte';
+  import ProjectsGrid from '../components/projects-grid.svelte';
 
   export let data;
 </script>
@@ -59,15 +65,33 @@
     </svelte:fragment>
   </EduCard>
 
-  <div class="section">
-    {#if data.projects}
-      <ProjectsSection
-        withClaimProjectButton
-        projects={data.projects}
-        showVisibilityToggle={true}
-      />
-    {/if}
-  </div>
+  <ProjectsSection
+    withClaimProjectButton
+    projects={data.yourProjects}
+    showVisibilityToggle={true}
+  />
+
+  <StatsSection>
+    <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Claimed Projects">27</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Splits">1374</ProminentKeyValuePair>
+  </StatsSection>
+
+  <Section
+    header={{
+      icon: BoxIcon,
+      label: 'Featured projects',
+    }}
+    skeleton={{
+      loaded: true,
+    }}
+  >
+    <div class="horizontal-scroll">
+      <ProjectsGrid projects={data.featuredProjects} />
+    </div>
+  </Section>
+
+  <RecentlyClaimedProjects projects={data.restProjects} />
 </div>
 
 <style>

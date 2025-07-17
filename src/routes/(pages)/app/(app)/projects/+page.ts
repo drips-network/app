@@ -24,13 +24,31 @@ export const load = async ({ fetch }) => {
     fetchedDataCache.read() ??
     (await query<ProjectsPageQuery, ProjectsPageQueryVariables>(
       projectsQuery,
-      { address: connectedAddress, chains: [network.gqlName] },
+      { address: null, chains: [network.gqlName] },
       fetch,
     ));
 
+  // TODO: udpate cache write
   fetchedDataCache.write(res);
 
-  return { projects: res.projects, preservePathOnNetworkChange: true };
+  const yourProjects = []
+  const restProjects = []
+  for(const project of res.projects) {
+    if (project.chainData.some((chainData) => chainData.owner?.accountId === connectedAddress)) {
+      yourProjects.push(project);
+      continue
+    }
+
+    restProjects.push(project);
+  }
+
+  return {
+    projects: res.projects,
+    yourProjects,
+    restProjects,
+    featuredProjects: [],
+    preservePathOnNetworkChange: true
+  };
 };
 
 export const ssr = false;
