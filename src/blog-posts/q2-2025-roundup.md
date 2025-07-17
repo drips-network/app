@@ -2,7 +2,7 @@
 title: 'Q2 2025 Roundup: RPGF on Drips and Berlin vibes'
 date: '2025-07-17'
 coverImage: '/assets/blog-images/q2-2025-roundup.png'
-coverImageAlt: 'BVG U-Bahn (metro) train with Drips graffiti flies upwards through a circular arrow crowned with a heart.'
+coverImageAlt: 'A Berlin metro train with Drips graffiti flies upwards through a circular arrow crowned with a heart.'
 excerpt: 'From major feature announcements to real-world conversations, Q2 was all about continuing to build and showing up IRL.'
 author: 'becca'
 announcementBannerCopy: 'Q2 highlights include new features and engaging with you IRL.'
