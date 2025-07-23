@@ -47,15 +47,16 @@ describe('NftDriverMetadataManager', () => {
 
       // Assert
       expect(metadata).toEqual({
+        type: 'dripList',
         driver: 'nft',
         name: undefined,
         describes: {
           driver: 'nft',
           accountId: '1',
         },
-        isDripList: true,
         isVisible: false,
         recipients: mapFilterUndefined(context.recipients, (listProj) => ({
+          type: 'repoDriver',
           accountId: '1',
           weight: listProj.weight,
           source: 'source' in listProj ? listProj.source : unreachable(),
