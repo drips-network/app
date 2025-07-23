@@ -213,7 +213,7 @@ export default class DripListService {
 
     const projectsSplitMetadata: ReturnType<
       typeof nftDriverAccountMetadataParser.parseLatest
-    >['projects'] = [];
+    >['recipients'] = [];
 
     for (const [accountId, weight] of projectsInput) {
       const item = items[accountId];
