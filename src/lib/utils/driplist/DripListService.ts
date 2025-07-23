@@ -103,7 +103,7 @@ export default class DripListService {
     const { listTitle, listDescription, weights, items, support, latestVotingRoundId, isVisible } =
       config;
 
-    const { projectsSplitMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
+    const { recipientsMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
       weights,
       items,
     );
@@ -119,7 +119,7 @@ export default class DripListService {
 
     const ipfsHash = await this._publishMetadataToIpfs(
       listId,
-      projectsSplitMetadata,
+      recipientsMetadata,
       isVisible,
       listTitle,
       listDescription,
@@ -211,8 +211,9 @@ export default class DripListService {
 
     const receivers: SplitsReceiver[] = [];
 
-    const projectsSplitMetadata: ReturnType<
-      typeof nftDriverAccountMetadataParser.parseLatest
+    const recipientsMetadata: Extract<
+      LatestVersion<typeof nftDriverAccountMetadataParser>,
+      { type: 'dripList' }
     >['recipients'] = [];
 
     for (const [accountId, weight] of projectsInput) {
@@ -227,7 +228,7 @@ export default class DripListService {
             accountId,
           };
 
-          projectsSplitMetadata.push(receiver);
+          recipientsMetadata.push(receiver);
           receivers.push(receiver);
 
           break;
@@ -241,7 +242,7 @@ export default class DripListService {
             accountId,
           };
 
-          projectsSplitMetadata.push({
+          recipientsMetadata.push({
             ...receiver,
             source: GitProjectService.populateSource(forge, repoName, ownerName),
           });
@@ -257,7 +258,7 @@ export default class DripListService {
             accountId,
           };
 
-          projectsSplitMetadata.push(receiver);
+          recipientsMetadata.push(receiver);
           receivers.push(receiver);
 
           break;
@@ -266,7 +267,7 @@ export default class DripListService {
     }
 
     return {
-      projectsSplitMetadata,
+      recipientsMetadata,
       receivers: receivers,
     };
   }
@@ -325,7 +326,10 @@ export default class DripListService {
 
   private async _publishMetadataToIpfs(
     dripListId: string,
-    projects: LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
+    recipients: Extract<
+      LatestVersion<typeof nftDriverAccountMetadataParser>,
+      { type: 'dripList' }
+    >['recipients'],
     isVisible: boolean,
     name?: string,
     description?: string,
@@ -335,7 +339,7 @@ export default class DripListService {
 
     const dripListMetadata = this._nftDriverMetadataManager.buildAccountMetadata({
       forAccountId: dripListId,
-      projects,
+      recipients,
       name,
       description,
       latestVotingRoundId,
