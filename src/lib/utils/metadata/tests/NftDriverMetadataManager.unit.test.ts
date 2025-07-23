@@ -25,8 +25,9 @@ describe('NftDriverMetadataManager', () => {
       const context = {
         forAccountId: '1',
         isVisible: false,
-        projects: [
+        recipients: [
           {
+            type: 'repoDriver',
             weight: 1,
             accountId: '1',
             source: {
@@ -35,7 +36,10 @@ describe('NftDriverMetadataManager', () => {
               url: 'repo.com',
             },
           },
-        ] as LatestVersion<typeof nftDriverAccountMetadataParser>['projects'],
+        ] as Extract<
+          LatestVersion<typeof nftDriverAccountMetadataParser>,
+          { type: 'dripList' }
+        >['recipients'],
       };
 
       // Act
@@ -51,7 +55,7 @@ describe('NftDriverMetadataManager', () => {
         },
         isDripList: true,
         isVisible: false,
-        projects: mapFilterUndefined(context.projects, (listProj) => ({
+        recipients: mapFilterUndefined(context.recipients, (listProj) => ({
           accountId: '1',
           weight: listProj.weight,
           source: 'source' in listProj ? listProj.source : unreachable(),
