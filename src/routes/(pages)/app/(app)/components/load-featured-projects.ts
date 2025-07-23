@@ -1,11 +1,11 @@
 import type { SUPPORTED_CHAIN_IDS, ValueForEachSupportedChain } from "$lib/stores/wallet/network";
-import type { fetchProjects } from "./load-projects";
+import { fetchProjects } from "./load-projects";
 
 type FeaturedProjectConfig = {
   featuredProjectIds: string[];
 };
 
-const FEATURED_PROJECTS: ValueForEachSupportedChain<FeaturedProjectConfig> = {
+export const FEATURED_PROJECTS: ValueForEachSupportedChain<FeaturedProjectConfig> = {
   1: {
     featuredProjectIds: [
       '80927338512810702724070905882237017022089417038277884279346528518144', // svelte
@@ -34,9 +34,19 @@ const FEATURED_PROJECTS: ValueForEachSupportedChain<FeaturedProjectConfig> = {
   },
 } as const;
 
+// TODO: or we memoize the fetch projects function so that it is cached like a good boy
 export default async function fetchFeaturedProjects(
   chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
-  library: ReturnType<typeof fetchProjects>[]
+  f: typeof fetch,
+  // library: ReturnType<typeof fetchProjects>[]
 ) {
-  // console.log('TODO')
+  const featuredProjectIds = FEATURED_PROJECTS[chainId]?.featuredProjectIds;
+  if (!featuredProjectIds?.length) {
+    return []
+  }
+
+  // const defaultParameters = createFetchProjectsParameters()
+  // TODO: cache!
+  const projects = await fetchProjects(f)
+  return projects.filter((p) => featuredProjectIds.includes(p.account.accountId))
 }

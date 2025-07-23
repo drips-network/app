@@ -9,9 +9,11 @@
         forge
         ownerName
         repoName
+        url
       }
       chainData {
         ... on ClaimedProjectData {
+          description
           chain
           owner {
             accountId
@@ -31,8 +33,6 @@
 
 <script lang="ts">
   import buildProjectUrl from '$lib/utils/build-project-url';
-  import Github from '$lib/components/icons/Github.svelte';
-
   import ProjectAvatar, { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
   import ProjectName, {
     PROJECT_NAME_FRAGMENT,
@@ -41,6 +41,10 @@
   import type { ProjectCardFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import ProjectBadge from '../project-badge/project-badge.svelte';
+  import CoinFlying from '../icons/CoinFlying.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -64,13 +68,30 @@
       </div>
     </div>
     <div class="name-and-description">
+      <h2 class="name pixelated">
+        <!-- <Github style="height: 20px; fill: var(--color-foreground-level-6)" /> -->
+        <ProjectName pixelated showSource={false} {project} />
+      </h2>
       <div class="source">
-        <div class="icon">
+        <!-- <div class="icon">
           <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
-        </div>
-        <span class="owner-name">{project.source.ownerName}</span>
+        </div> -->
+        <!-- <span class="owner-name">{project.source.ownerName}</span> -->
       </div>
-      <h4 class="name"><ProjectName showSource={false} {project} /></h4>
+      <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab project={project} />
+      <!-- {#if project.chainData.description} -->
+        <p class="typo-text-small">{project.chainData.description}cute and fun</p>
+      <!-- {/if} -->
+    </div>
+    <div class="cubbies">
+      <div>
+        <CoinFlying style="fill: var(--color-foreground)" /><AggregateFiatEstimate
+          supressUnknownAmountsWarning
+          amounts={[]}
+        />
+      </div>
+      <!-- TODO; format number -->
+      <div><DripListIcon style="fill: var(--color-foreground)" />{project?.splits?.length}</div>
     </div>
   </div>
 </a>
@@ -133,6 +154,31 @@
     color: var(--color-foreground);
     opacity: 0;
     animation: fadeIn 1s ease forwards;
+  }
+
+  .cubbies {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--color-foreground-level-2);
+    position: relative;
+    left: -0.75rem;
+    top: 0.75rem;
+    width: calc(100% + 1.5rem);
+  }
+
+  .cubbies > * {
+    flex-grow: 1;
+    border-right: 1px solid var(--color-foreground-level-2);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 50%;
+    gap: 0.25rem;
+  }
+
+  .cubbies > *:last-child {
+    border-right: none;
   }
 
   @keyframes fadeIn {

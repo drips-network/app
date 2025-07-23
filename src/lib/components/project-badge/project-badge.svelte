@@ -56,6 +56,7 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
   export let chainOverride: SupportedChain | undefined = undefined;
+  export let onlyForgeAvatar = true
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -102,7 +103,9 @@
               />
             </div>
           {/if}
-          <div><ProjectAvatar {size} project={chainData} /></div>
+          {#if !onlyForgeAvatar}
+            <div><ProjectAvatar {size} project={chainData} /></div>
+          {/if}
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">

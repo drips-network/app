@@ -85,6 +85,16 @@
               <ProjectCard {project} isHidden={!project.isVisible} />
             </PrimaryColorThemer>
           </div>
+          <div>
+            <PrimaryColorThemer colorHex={projectChainData.color}>
+              <ProjectCard {project} isHidden={!project.isVisible} />
+            </PrimaryColorThemer>
+          </div>
+          <div>
+            <PrimaryColorThemer colorHex={projectChainData.color}>
+              <ProjectCard {project} isHidden={!project.isVisible} />
+            </PrimaryColorThemer>
+          </div>
         {/if}
       {/each}
     </div>
@@ -119,9 +129,11 @@
   }
 
   .projects > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(25% - 0.75rem);
+    /* flex: 1; */
+    /* min-width: 16rem; */
+    /* max-width: calc(25% - 0.75rem); */
+    width: calc(50% - 0.5rem);
+    /* width: 100%; */
   }
 
   @media (max-width: 560px) {

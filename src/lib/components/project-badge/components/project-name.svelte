@@ -15,11 +15,12 @@
   import type { ProjectNameFragment } from './__generated__/gql.generated';
 
   export let showSource = true;
+  export let pixelated = false
 
   export let project: ProjectNameFragment;
 </script>
 
-<span class="text-foreground-level-5 typo-text"
+<span class:pixelated={pixelated} class:typo-text={!pixelated} class="text-foreground-level-5"
   >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
     >{project.source.repoName}</span
   ></span
