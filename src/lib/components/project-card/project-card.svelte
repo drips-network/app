@@ -72,15 +72,15 @@
         <!-- <Github style="height: 20px; fill: var(--color-foreground-level-6)" /> -->
         <ProjectName pixelated showSource={false} {project} />
       </h2>
-      <div class="source">
-        <!-- <div class="icon">
+      <!-- <div class="source"> -->
+      <!-- <div class="icon">
           <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
         </div> -->
-        <!-- <span class="owner-name">{project.source.ownerName}</span> -->
-      </div>
-      <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab project={project} />
+      <!-- <span class="owner-name">{project.source.ownerName}</span> -->
+      <!-- </div> -->
+      <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab size="tiny" {project} />
       <!-- {#if project.chainData.description} -->
-        <p class="typo-text-small">{project.chainData.description}cute and fun</p>
+      <p class="typo-text-small line-clamp-2">{project.chainData.description}cute and fun</p>
       <!-- {/if} -->
     </div>
     <div class="cubbies">
@@ -139,16 +139,16 @@
   .name-and-description {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.75rem;
     justify-content: center;
   }
 
-  .source {
+  /* .source {
     display: flex;
     align-items: center;
     gap: 0.125rem;
     color: var(--color-foreground-level-6);
-  }
+  } */
 
   .hidden-project {
     color: var(--color-foreground);
