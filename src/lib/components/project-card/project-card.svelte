@@ -55,6 +55,7 @@
   import CoinFlying from '../icons/CoinFlying.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import ChevronRight from '../icons/ChevronRight.svelte';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -72,7 +73,9 @@
       style:background-color={isClaimed(projectChainData)
         ? 'var(--color-primary-level-2)'
         : 'var(--color-foreground-level-1)'}
-    />
+    >
+      <ChevronRight style="fill: var(--color-foreground)" />
+    </div>
     <div class="header">
       <div class="avatar">
         <ProjectAvatar project={projectChainData} size="large" outline />
@@ -97,9 +100,11 @@
         />
       </div>
       <!-- TODO; format number -->
-      <!-- TODO: don't show for unclaimed projects? -->
       {#if isClaimed(projectChainData)}
-        <div><DripListIcon style="fill: var(--color-foreground)" />{projectChainData.splits.dependencies.length}</div>
+        <div>
+          <DripListIcon style="fill: var(--color-foreground)" />{projectChainData.splits
+            .dependencies.length}
+        </div>
       {/if}
     </div>
   </div>
@@ -143,6 +148,10 @@
     width: 100%;
     height: 3rem;
     border-radius: 1rem 0 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 0.75rem;
   }
 
   .name-and-description {
