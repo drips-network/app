@@ -11,12 +11,22 @@
         repoName
         url
       }
+
       chainData {
         ... on ClaimedProjectData {
           description
           chain
           owner {
             accountId
+          }
+          totalEarned {
+            tokenAddress
+            amount
+          }
+          splits {
+            dependencies {
+              __typename
+            }
           }
         }
         ... on UnClaimedProjectData {
@@ -48,6 +58,7 @@
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
+
   let projectChainData = filterCurrentChainData(project.chainData);
 </script>
 
@@ -69,29 +80,27 @@
     </div>
     <div class="name-and-description">
       <h2 class="name pixelated">
-        <!-- <Github style="height: 20px; fill: var(--color-foreground-level-6)" /> -->
         <ProjectName pixelated showSource={false} {project} />
       </h2>
-      <!-- <div class="source"> -->
-      <!-- <div class="icon">
-          <Github style="height: 20px; fill: var(--color-foreground-level-6)" />
-        </div> -->
-      <!-- <span class="owner-name">{project.source.ownerName}</span> -->
-      <!-- </div> -->
       <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab size="tiny" {project} />
-      <!-- {#if project.chainData.description} -->
-      <p class="typo-text-small line-clamp-2">{project.chainData.description}cute and fun</p>
-      <!-- {/if} -->
+      <!-- TODO: this description is not editable or surfaced anywhere? -->
+      {#if projectChainData.description}
+        <p class="typo-text-small line-clamp-2">{projectChainData.description}cute and fun</p>
+      {/if}
     </div>
     <div class="cubbies">
       <div>
+        <!-- TODO: figure out how to display this data for unclaimed projects -->
         <CoinFlying style="fill: var(--color-foreground)" /><AggregateFiatEstimate
           supressUnknownAmountsWarning
-          amounts={[]}
+          amounts={projectChainData.totalEarned}
         />
       </div>
       <!-- TODO; format number -->
-      <div><DripListIcon style="fill: var(--color-foreground)" />{project?.splits?.length}</div>
+      <!-- TODO: don't show for unclaimed projects? -->
+      {#if isClaimed(projectChainData)}
+        <div><DripListIcon style="fill: var(--color-foreground)" />{projectChainData.splits.dependencies.length}</div>
+      {/if}
     </div>
   </div>
 </a>
