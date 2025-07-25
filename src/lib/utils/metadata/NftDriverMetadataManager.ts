@@ -19,7 +19,8 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
   }
 
   /**
-   * Ensures that ecosystem metadata is not fetched. We shouldn't be handling it at this point.
+   * Fetches NFTDriver metadata but ensures that Ecosystem metadata is not fetched. We
+   * shouldn't be handling it at this point.
    *
    * @param accountId The user ID to fetch the metadata for.
    * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
