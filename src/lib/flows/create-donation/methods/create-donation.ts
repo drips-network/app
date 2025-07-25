@@ -18,6 +18,8 @@ import type {
   ProjectOtDsQueryVariables,
   DripListOtDsQuery,
   DripListOtDsQueryVariables,
+  EcosystemOtDsQuery,
+  EcosystemOtDsQueryVariables,
 } from './__generated__/gql.generated';
 
 const projectSupportQuery = gql`
@@ -67,6 +69,22 @@ const dripListSupportQuery = gql`
   }
 `;
 
+const ecosystemSupportQuery = gql`
+  query EcosystemOTDs($accountId: ID!, $chain: SupportedChain!) {
+    ecosystemMainAccount(id: $accountId, chain: $chain) {
+      chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
+    }
+  }
+`;
+
 function checkDonation(
   ownAccountId: string,
   supportAccountId: string,
@@ -79,7 +97,7 @@ function checkDonation(
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   recipientAccountId: string,
-  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount',
+  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount' | 'EcosystemMainAccount',
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -139,7 +157,8 @@ export default function (
 
       after: async (receipts, { ownAccountId }) => {
         try {
-          const blockTimestamp = (await receipts[0].getBlock()).timestamp;
+          const lastReceipt = receipts[receipts.length - 1];
+          const blockTimestamp = (await lastReceipt.getBlock()).timestamp;
 
           switch (recipientType) {
             case 'Project': {
@@ -168,6 +187,31 @@ export default function (
               );
               break;
             }
+            case 'EcosystemMainAccount':
+              await expect(
+                () =>
+                  query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
+                    accountId: recipientAccountId,
+                    chain: network.gqlName,
+                  }),
+                (res) => {
+                  const ecoystemData = res.ecosystemMainAccount;
+                  if (!ecoystemData) return true;
+
+                  return ecoystemData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
             case 'NftDriverAccount': {
               await expect(
                 () =>
