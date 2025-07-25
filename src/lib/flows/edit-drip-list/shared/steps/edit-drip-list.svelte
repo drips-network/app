@@ -109,7 +109,7 @@
         before: async () => {
           const dripListService = await DripListService.new();
 
-          const { receivers, projectsSplitMetadata } =
+          const { receivers, recipientsMetadata } =
             await dripListService.getProjectsSplitMetadataAndReceivers(
               $state.listEditorConfig.weights,
               $state.listEditorConfig.items,
@@ -128,11 +128,15 @@
           const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
           assert(currentMetadata);
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { projects, isDripList, ...rest } = currentMetadata.data;
+
           const newMetadata: ReturnType<typeof nftDriverAccountMetadataParser.parseLatest> = {
-            ...currentMetadata.data,
+            ...rest,
+            type: 'dripList',
             name: $state.name,
             description: $state.description,
-            projects: projectsSplitMetadata,
+            recipients: recipientsMetadata,
             isVisible: $state.isVisible,
           };
 
