@@ -9,12 +9,36 @@ import type {
 } from './__generated__/gql.generated';
 import type { executeNftDriverWriteMethod } from '../sdk/nft-driver/nft-driver';
 import network from '$lib/stores/wallet/network';
+import type { AccountId } from '../common-types';
 
 export default class NftDriverMetadataManager extends MetadataManagerBase<
   typeof nftDriverAccountMetadataParser
 > {
   constructor(nftDriver?: typeof executeNftDriverWriteMethod) {
     super(nftDriverAccountMetadataParser, nftDriver);
+  }
+
+  /**
+   * Ensures that ecosystem metadata is not fetched. We shouldn't be handling it at this point.
+   *
+   * @param accountId The user ID to fetch the metadata for.
+   * @returns The latest IPFS metadata for the given user ID, or null if no metadata exists.
+   * @throws If the metadata is invalid.
+   */
+  public override async fetchAccountMetadata(
+    accountId: AccountId,
+  ): Promise<{ hash: string; data: AnyVersion<typeof nftDriverAccountMetadataParser> } | null> {
+    const metadata = await super.fetchAccountMetadata(accountId);
+
+    if (!metadata) {
+      return null;
+    }
+
+    if ('type' in metadata.data && metadata.data.type !== 'dripList') {
+      throw new Error(`Expected metadata type to be 'dripList', but got '${metadata.data.type}'.`);
+    }
+
+    return metadata;
   }
 
   public async fetchMetadataHashByAccountId(accountId: string): Promise<string | null> {
@@ -104,7 +128,8 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
 
     const newRes = result as LatestVersion<typeof nftDriverAccountMetadataParser>;
 
-    newRes.isVisible = 'isVisible' in result && typeof result.isVisible === 'boolean' ? result.isVisible : true;
+    newRes.isVisible =
+      'isVisible' in result && typeof result.isVisible === 'boolean' ? result.isVisible : true;
 
     const parsed = nftDriverAccountMetadataParser.parseLatest(newRes);
 
