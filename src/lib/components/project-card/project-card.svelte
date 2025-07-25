@@ -94,7 +94,9 @@
     <div class="cubbies">
       <div>
         <!-- TODO: figure out how to display this data for unclaimed projects -->
-        <CoinFlying style="fill: var(--color-foreground)" /><AggregateFiatEstimate
+        <CoinFlying style="fill: var(--color-foreground)" />
+        <span class="cubby-label typo-bold">Funds</span>
+        <AggregateFiatEstimate
           supressUnknownAmountsWarning
           amounts={projectChainData.totalEarned}
         />
@@ -102,8 +104,9 @@
       <!-- TODO; format number -->
       {#if isClaimed(projectChainData)}
         <div>
-          <DripListIcon style="fill: var(--color-foreground)" />{projectChainData.splits
-            .dependencies.length}
+          <DripListIcon style="fill: var(--color-foreground)" />
+          <span class="cubby-label typo-bold">Dependencies</span>
+          {projectChainData.splits.dependencies.length}
         </div>
       {/if}
     </div>
@@ -128,6 +131,8 @@
       box-shadow 0.2s,
       backgorund-color 0.2s,
       transform 0.2s;
+    container-name: wrapper;
+    container-type: inline-size;
   }
 
   .wrapper:hover:not(:active) .project-card,
@@ -161,13 +166,6 @@
     justify-content: center;
   }
 
-  /* .source {
-    display: flex;
-    align-items: center;
-    gap: 0.125rem;
-    color: var(--color-foreground-level-6);
-  } */
-
   .hidden-project {
     color: var(--color-foreground);
     opacity: 0;
@@ -199,9 +197,19 @@
     border-right: none;
   }
 
+  .cubby-label {
+    display: none;
+  }
+
   @keyframes fadeIn {
     to {
       opacity: 0.3;
+    }
+  }
+
+  @container wrapper (width > 30rem) {
+    .cubby-label {
+      display: inline;
     }
   }
 </style>
