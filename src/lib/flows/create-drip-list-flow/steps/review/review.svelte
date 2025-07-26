@@ -4,18 +4,17 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import ListIcon from '$lib/components/icons/DripList.svelte';
   import TransactionsIcon from '$lib/components/icons/Transactions.svelte';
-  import type { Writable } from 'svelte/store';
+  import { get, type Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import CoinIcon from '$lib/components/icons/Coin.svelte';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
@@ -36,19 +35,18 @@
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
+  import { buildDripListCreationTxs } from '$lib/utils/driplist/buildDripListCreationTxs';
+  import sdkStore from '$lib/stores/sdk/sdk.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
   export let connectedWalletHidden = false;
 
-  let dripListService: DripListService;
-
-  onMount(async () => {
-    dripListService = await DripListService.new();
-  });
-
   async function createDripList() {
+    const sdk = get(sdkStore).sdk;
+    if (!sdk) throw new Error('SDK not initialized');
+
     dispatch(
       'transact',
       makeTransactPayload({
@@ -57,33 +55,7 @@
           duringBefore: 'Preparing Drip List creation transactions…',
         },
         before: async () => {
-          return await dripListService.buildTransactContext({
-            listTitle: $context.dripList.title,
-            listDescription: $context.dripList.description,
-            isVisible: true,
-            weights: $context.dripList.weights,
-            items: $context.dripList.items,
-            support: (() => {
-              if ($context.selectedSupportOption === 1) {
-                return {
-                  type: 'continuous',
-                  topUpAmount:
-                    $context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable(),
-                  amountPerSec:
-                    ($context.continuousSupportConfig.streamRateValueParsed ?? unreachable()) /
-                    BigInt(2592000), // 30 days in seconds
-                  tokenAddress: $context.continuousSupportConfig.listSelected[0] ?? unreachable(),
-                };
-              } else if ($context.selectedSupportOption === 2) {
-                return {
-                  type: 'one-time',
-                  donationAmount: $context.oneTimeDonationConfig.amount ?? unreachable(),
-                  tokenAddress:
-                    $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
-                };
-              }
-            })(),
-          });
+          return await buildDripListCreationTxs($context);
         },
 
         transactions: ({ txs }) => txs,

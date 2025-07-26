@@ -31,7 +31,9 @@ export interface State {
   selectedSupportOption: 1 | 2 | undefined;
   continuousSupportConfig: {
     listSelected: string[];
+    streamRateValue?: string | undefined;
     streamRateValueParsed?: bigint | undefined;
+    topUpAmountValue?: string | undefined;
     topUpAmountValueParsed?: bigint | undefined;
   };
   oneTimeDonationConfig: {
