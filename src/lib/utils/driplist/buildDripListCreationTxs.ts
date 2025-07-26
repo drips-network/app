@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { TimeUnit, type SdkSplitsReceiver } from '@drips-network/sdk';
+import { TimeUnit } from '@drips-network/sdk';
 import type { Address } from 'viem';
 import { MaxUint256 } from 'ethers';
 import tokensStore from '$lib/stores/tokens/tokens.store';
@@ -9,10 +9,9 @@ import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import unreachable from '$lib/utils/unreachable';
 import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
-import type { Items, Weights } from '$lib/components/list-editor/types';
-import assert from '$lib/utils/assert';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
 import sdkStore from '$lib/stores/sdk/sdk.store';
+import { transformItemsToSdkReceivers } from '../transformItemsToSdkReceivers';
 
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
@@ -36,47 +35,6 @@ async function buildTokenApprovalTx(tokenAddress: string) {
     functionName: 'approve',
     args: [network.contracts.ADDRESS_DRIVER as OxString, MaxUint256],
   });
-}
-
-async function transformItemsToSdkReceivers(
-  weights: Weights,
-  items: Items,
-): Promise<SdkSplitsReceiver[]> {
-  const receivers: SdkSplitsReceiver[] = [];
-
-  for (const [accountId, weight] of Object.entries(weights)) {
-    assert(weight > 0n, 'Cannot transform item to SDK receiver: weight must be greater than 0');
-
-    const item = items[accountId];
-
-    switch (item.type) {
-      case 'address':
-        receivers.push({
-          type: 'address',
-          address: item.address as Address,
-          weight,
-        });
-        break;
-
-      case 'project':
-        receivers.push({
-          type: 'project',
-          url: item.project.source.url,
-          weight,
-        });
-        break;
-
-      case 'drip-list':
-        receivers.push({
-          type: 'drip-list',
-          accountId: BigInt(item.dripList.account.accountId),
-          weight,
-        });
-        break;
-    }
-  }
-
-  return receivers;
 }
 
 export async function buildDripListCreationTxs(context: State) {

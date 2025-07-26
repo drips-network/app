@@ -28,11 +28,7 @@
   import { createEventDispatcher } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import modal from '$lib/stores/modal';
-  import NftDriverMetadataManager from '$lib/utils/metadata/NftDriverMetadataManager';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import assert from '$lib/utils/assert';
-  import MetadataManagerBase from '$lib/utils/metadata/MetadataManagerBase';
-  import type { nftDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import DripListEditor from '$lib/components/drip-list-editor/drip-list-editor.svelte';
   import type { Writable } from 'svelte/store';
   import { gql } from 'graphql-request';
@@ -49,18 +45,10 @@
   import importFromCsvSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import type { ListEditorItem, AccountId, Weights } from '$lib/components/list-editor/types';
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import {
-    executeNftDriverWriteMethod,
-    populateNftDriverWriteTx,
-  } from '$lib/utils/sdk/nft-driver/nft-driver';
-  import { toBigInt } from 'ethers';
-  import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';
-  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
-  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
-  import { formatSplitReceivers } from '$lib/utils/sdk/utils/format-split-receivers';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$app/navigation';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
+  import { buildDripListUpdateTxs } from '$lib/utils/driplist/buildDripListUpdateTxs';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -107,69 +95,26 @@
         },
         headline: 'Edit your Drip List',
         before: async () => {
-          const dripListService = await DripListService.new();
-
-          const { receivers, recipientsMetadata } =
-            await dripListService.getProjectsSplitMetadataAndReceivers(
-              $state.listEditorConfig.weights,
-              $state.listEditorConfig.items,
-            );
-
           const listId = $state.dripListAccountId;
           assert(listId, 'Drip List account ID is not set');
 
-          const setSplitsTx = await populateNftDriverWriteTx({
-            functionName: 'setSplits',
-            args: [toBigInt(listId), formatSplitReceivers(receivers)],
-          });
-
-          const metadataManager = new NftDriverMetadataManager(executeNftDriverWriteMethod);
-
-          const currentMetadata = await metadataManager.fetchAccountMetadata(listId);
-          assert(currentMetadata);
-
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { projects, isDripList, ...rest } = currentMetadata.data;
-
-          const newMetadata: ReturnType<typeof nftDriverAccountMetadataParser.parseLatest> = {
-            ...rest,
-            type: 'dripList',
+          const updateResult = await buildDripListUpdateTxs({
+            dripListAccountId: listId,
             name: $state.name,
             description: $state.description,
-            recipients: recipientsMetadata,
             isVisible: $state.isVisible,
+            weights: $state.listEditorConfig.weights,
+            items: $state.listEditorConfig.items,
+          });
+
+          return {
+            txs: updateResult.txs,
+            accountId: listId,
+            ipfsHash: updateResult.ipfsHash,
           };
-
-          const hash = await metadataManager.pinAccountMetadata(newMetadata);
-
-          const metadataTx = await populateNftDriverWriteTx({
-            functionName: 'emitAccountMetadata',
-            args: [
-              toBigInt(listId),
-              [
-                {
-                  key: MetadataManagerBase.USER_METADATA_KEY,
-                  value: hash,
-                },
-              ].map(keyValueToMetatada),
-            ],
-          });
-
-          const tx = await populateCallerWriteTx({
-            functionName: 'callBatched',
-            args: [[setSplitsTx, metadataTx].map(txToCallerCall)],
-          });
-
-          return { tx, accountId: listId, ipfsHash: hash };
         },
 
-        transactions: ({ tx }) => [
-          {
-            transaction: tx,
-            applyGasBuffer: false,
-            title: 'Update your Drip List',
-          },
-        ],
+        transactions: ({ txs }) => txs,
 
         after: async (_, { accountId, ipfsHash }) => {
           await waitForAccountMetadata(accountId, ipfsHash, 'dripList');
