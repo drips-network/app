@@ -122,10 +122,11 @@
     createDonation(
       dispatch,
       recipientAccountId,
-      receiver.__typename,
+      receiver,
       selectedTokenAddress ?? unreachable(),
       amount ?? unreachable(),
       selectedTokenAllowance ?? unreachable(),
+      $context.amountInputValue,
     );
   }
 </script>
