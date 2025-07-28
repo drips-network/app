@@ -88,7 +88,7 @@
       <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab size="tiny" {project} />
       <!-- TODO: this description is not editable or surfaced anywhere? -->
       {#if projectChainData.description}
-        <p class="typo-text-small line-clamp-2">{projectChainData.description}cute and fun</p>
+        <p class="typo-text-small line-clamp-2">{projectChainData.description}</p>
       {/if}
     </div>
     <div class="cubbies">
@@ -180,6 +180,7 @@
     left: -0.75rem;
     top: 0.75rem;
     width: calc(100% + 1.5rem);
+    margin-top: -0.75rem;
   }
 
   .cubbies > * {

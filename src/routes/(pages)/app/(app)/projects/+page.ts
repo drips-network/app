@@ -2,7 +2,7 @@
 // import { PROJECTS_PAGE_PROJECT_FRAGMENT } from './+page.svelte';
 // import query from '$lib/graphql/dripsQL';
 // import type { ProjectsPageQuery, ProjectsPageQueryVariables } from './__generated__/gql.generated';
-import getConnectedAddress from '$lib/utils/get-connected-address';
+// import getConnectedAddress from '$lib/utils/get-connected-address';
 // import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import network from '$lib/stores/wallet/network';
 import { fetchProjects } from '../components/load-projects';
@@ -14,8 +14,8 @@ import { get } from 'svelte/store';
 // const fetchedDataCache = makeFetchedDataCache<ExploreProjectsQuery>('dashboard:projects');
 
 export const load = async ({ fetch }) => {
-  const connectedAddress = getConnectedAddress();
-  const connectedAccountId = get(walletStore).dripsAccountId
+  // const connectedAddress = getConnectedAddress();
+  const connectedAccountId = get(walletStore).dripsAccountId;
 
   // TODO: this needs to also have account info to be the same as the fetchProjects function.
   // and just like the explore page now though, we need to fetch all of these projects and
@@ -47,20 +47,21 @@ export const load = async ({ fetch }) => {
   // TODO: udpate cache write
   // fetchedDataCache.write(projects);
 
-  const featuredProjects = []
-  const yourProjects = []
-  const restProjects = []
-  for(const project of projects) {
-    console.log(project.chainData)
+  const featuredProjects = [];
+  const yourProjects = [];
+  const restProjects = [];
+  for (const project of projects) {
     // TODO: necessary? Don't we already query using the current chain?
     // const chainData = filterCurrentChainData(project.chainData)
     if (project.chainData.some((chainData) => chainData.owner?.accountId === connectedAccountId)) {
       yourProjects.push(project);
     }
 
-    if(FEATURED_PROJECTS[network.chainId]?.featuredProjectIds.includes(project.account.accountId)) {
+    if (
+      FEATURED_PROJECTS[network.chainId]?.featuredProjectIds.includes(project.account.accountId)
+    ) {
       featuredProjects.push(project);
-      continue
+      continue;
     }
 
     restProjects.push(project);
@@ -70,8 +71,8 @@ export const load = async ({ fetch }) => {
     projects,
     yourProjects,
     restProjects,
-    featuredProjects: [],
-    preservePathOnNetworkChange: true
+    featuredProjects,
+    preservePathOnNetworkChange: true,
   };
 };
 
