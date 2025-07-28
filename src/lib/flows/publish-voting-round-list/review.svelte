@@ -9,7 +9,7 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from './publish-voting-round-list-flow-steps';
-  import DripListService from '$lib/utils/driplist/DripListService';
+  import { buildVotingRoundDripListCreationTxs } from '$lib/utils/driplist/buildVotingRoundDripListCreationTxs';
   import query from '$lib/graphql/dripsQL';
   import { gql } from 'graphql-request';
   import expect from '$lib/utils/expect';
@@ -38,15 +38,12 @@
       makeTransactPayload({
         headline: 'Publish Drip List',
         before: async () => {
-          const dripListService = await DripListService.new();
-
-          return await dripListService.buildTransactContext({
-            listTitle: $context.dripListConfig.title,
-            listDescription: $context.dripListConfig.description,
+          return await buildVotingRoundDripListCreationTxs({
+            title: $context.dripListConfig.title,
+            description: $context.dripListConfig.description,
             weights: $context.dripListConfig.weights,
             items: $context.dripListConfig.items,
-            support: undefined,
-            latestVotingRoundId: votingRoundId,
+            votingRoundId: votingRoundId,
             isVisible: true,
           });
         },
