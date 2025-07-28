@@ -40,7 +40,6 @@
   $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
-  console.log('projects', projects)
 </script>
 
 <Section
@@ -54,7 +53,10 @@
           {
             label: 'Claim your project',
             icon: Plus,
-            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: $walletStore.connected }),
+            handler: () =>
+              modal.show(ClaimProjectStepper, undefined, {
+                skipWalletConnect: $walletStore.connected,
+              }),
           },
         ]
       : [],
@@ -80,16 +82,6 @@
       {#each visibleProjects as project}
         {@const projectChainData = filterCurrentChainData(project.chainData)}
         {#if isClaimed(projectChainData)}
-          <div>
-            <PrimaryColorThemer colorHex={projectChainData.color}>
-              <ProjectCard {project} isHidden={!project.isVisible} />
-            </PrimaryColorThemer>
-          </div>
-          <div>
-            <PrimaryColorThemer colorHex={projectChainData.color}>
-              <ProjectCard {project} isHidden={!project.isVisible} />
-            </PrimaryColorThemer>
-          </div>
           <div>
             <PrimaryColorThemer colorHex={projectChainData.color}>
               <ProjectCard {project} isHidden={!project.isVisible} />
@@ -129,11 +121,7 @@
   }
 
   .projects > * {
-    /* flex: 1; */
-    /* min-width: 16rem; */
-    /* max-width: calc(25% - 0.75rem); */
     width: calc(50% - 0.5rem);
-    /* width: 100%; */
   }
 
   @media (max-width: 560px) {

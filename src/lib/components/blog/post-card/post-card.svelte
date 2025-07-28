@@ -44,9 +44,9 @@
       {#if first}
         <h1>{title}</h1>
       {:else}
-        <h2 class="pixelated">{title}</h2>
+        <h1 class="pixelated">{title}</h1>
       {/if}
-      <p class="metadata typo-text-small" style:color="var(--color-foreground-level-5)">
+      <p class="metadata">
         {#if author}
           <img
             class="author-avatar"
@@ -141,7 +141,7 @@
 
   .post .cover-image {
     width: 100%;
-    height: 40vw;
+    height: 20rem;
     object-fit: cover;
   }
 
@@ -150,7 +150,7 @@
   }
 
   .post.compact .cover-image {
-    height: 20vw;
+    height: 10rem;
   }
 
   .post.first {
@@ -162,10 +162,6 @@
   }
 
   @media (min-width: 1024px) {
-    .post:not(.compact):not(.first) {
-      width: calc(50% - 1rem);
-    }
-
     .post .content {
       padding: 2rem;
     }
@@ -181,6 +177,8 @@
 
     .post.first {
       flex-direction: row-reverse;
+      /* support first row of blog posts page */
+      grid-column: span 2;
     }
 
     .post.first > * {
