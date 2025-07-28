@@ -21,12 +21,6 @@
   import Pause from '$lib/components/icons/Pause.svelte';
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
-  import { gql } from 'graphql-request';
-  import query from '$lib/graphql/dripsQL';
-  import type {
-    DripListExistsQuery,
-    DripListExistsQueryVariables,
-  } from './__generated__/gql.generated';
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import network from '$lib/stores/wallet/network';
@@ -61,26 +55,10 @@
         transactions: ({ txs }) => txs,
 
         after: async (_, { dripListId }) => {
-          const dripListExistsQuery = gql`
-            query DripListExists($id: ID!, $chain: SupportedChain!) {
-              dripList(id: $id, chain: $chain) {
-                account {
-                  accountId
-                }
-                isVisible
-              }
-            }
-          `;
-
           const tryFetchList = async (listId: string) => {
             try {
-              return await query<DripListExistsQuery, DripListExistsQueryVariables>(
-                dripListExistsQuery,
-                {
-                  id: listId,
-                  chain: network.gqlName,
-                },
-              );
+              const dripList = await sdk.dripLists.getById(BigInt(listId), network.chainId);
+              return dripList && dripList.isVisible;
             } catch {
               return false;
             }
@@ -88,8 +66,7 @@
 
           await expect(
             () => tryFetchList(dripListId),
-            (result) =>
-              typeof result === 'boolean' ? result : Boolean(result.dripList?.isVisible),
+            (result) => Boolean(result),
             120000,
             1000,
           );

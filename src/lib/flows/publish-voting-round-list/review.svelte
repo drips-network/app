@@ -10,19 +10,15 @@
   import type { Writable } from 'svelte/store';
   import type { State } from './publish-voting-round-list-flow-steps';
   import { buildVotingRoundDripListCreationTxs } from '$lib/utils/driplist/buildVotingRoundDripListCreationTxs';
-  import query from '$lib/graphql/dripsQL';
-  import { gql } from 'graphql-request';
   import expect from '$lib/utils/expect';
-  import type {
-    DripListExistsQuery,
-    DripListExistsQueryVariables,
-  } from './__generated__/gql.generated';
   import * as multiplayer from '$lib/utils/multiplayer';
   import DripList from '$lib/components/icons/DripList.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import network from '$lib/stores/wallet/network';
+  import sdkStore from '$lib/stores/sdk/sdk.store';
+  import { get } from 'svelte/store';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
@@ -59,25 +55,13 @@
         },
 
         after: async (_, { dripListId }) => {
-          const dripListExistsQuery = gql`
-            query DripListExists($id: ID!, $chain: SupportedChain!) {
-              dripList(id: $id, chain: $chain) {
-                account {
-                  accountId
-                }
-              }
-            }
-          `;
-
           const tryFetchList = async (listId: string) => {
             try {
-              return await query<DripListExistsQuery, DripListExistsQueryVariables>(
-                dripListExistsQuery,
-                {
-                  id: listId,
-                  chain: network.gqlName,
-                },
-              );
+              const sdk = get(sdkStore).sdk;
+              if (!sdk) return false;
+
+              const dripList = await sdk.dripLists.getById(BigInt(listId), network.chainId);
+              return dripList;
             } catch {
               return false;
             }
@@ -85,7 +69,7 @@
 
           await expect(
             () => tryFetchList(dripListId),
-            (result) => (typeof result === 'boolean' ? result : Boolean(result.dripList)),
+            (result) => Boolean(result),
             120000,
             1000,
           );
