@@ -2,13 +2,11 @@ import { DRIP_LIST_CARD_FRAGMENT } from '$lib/components/drip-list-card/drip-lis
 import query from '$lib/graphql/dripsQL';
 import network from '$lib/stores/wallet/network';
 import { gql } from 'graphql-request';
-import type { DripListsQuery, DripListsQueryVariables } from './__generated__/gql.generated';
+import type { AllDripListsQuery, AllDripListsQueryVariables } from './__generated__/gql.generated';
 import {
   DripListSortField,
   SortDirection,
-  type DripListSortInput,
-  type DripListWhereInput,
-  type SupportedChain,
+  type QueryDripListsArgs,
 } from '$lib/graphql/__generated__/base-types';
 
 export const DRIP_LISTS_FRAGMENT = gql`
@@ -20,37 +18,33 @@ export const DRIP_LISTS_FRAGMENT = gql`
 
 export const dripListsQuery = gql`
   ${DRIP_LISTS_FRAGMENT}
-  query DripLists(
+  query AllDripLists(
     $where: DripListWhereInput
     $sort: DripListSortInput
-    $chains: [SupportedChain!]!
+    $chains: [SupportedChain!]
+    $limit: Int
   ) {
-    dripLists(where: $where, sort: $sort, chains: $chains) {
+    dripLists(where: $where, sort: $sort, chains: $chains, limit: $limit) {
       ...DripLists
     }
   }
 `;
 
-type DripListsParameters = {
-  where: DripListWhereInput | null;
-  sort: DripListSortInput;
-  chains: SupportedChain[];
-};
-
-export function createFetchDripListsParameters(): DripListsParameters {
+export function createDefaultFetchDripListsParameters(): QueryDripListsArgs {
   return {
-    where: null,
+    where: undefined,
     sort: { direction: SortDirection.Asc, field: DripListSortField.MintedAt },
     chains: [network.gqlName],
+    limit: undefined,
   };
 }
 
-export async function fetchLists(f: typeof fetch, dripListsParameters?: DripListsParameters) {
+export async function fetchDripLists(f: typeof fetch, dripListsParameters?: QueryDripListsArgs) {
   if (!dripListsParameters) {
-    dripListsParameters = createFetchDripListsParameters();
+    dripListsParameters = createDefaultFetchDripListsParameters();
   }
 
-  const res = await query<DripListsQuery, DripListsQueryVariables>(
+  const res = await query<AllDripListsQuery, AllDripListsQueryVariables>(
     dripListsQuery,
     dripListsParameters,
     f,

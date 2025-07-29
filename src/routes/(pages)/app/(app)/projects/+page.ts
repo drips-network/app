@@ -7,9 +7,10 @@
 import network from '$lib/stores/wallet/network';
 import { fetchProjects } from '../components/load-projects';
 // import type { ExploreProjectsQuery } from '../components/__generated__/gql.generated';
-import { FEATURED_PROJECTS } from '../components/load-featured-projects';
+// import { FEATURED_PROJECTS } from '../components/load-featured-projects';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
+import EXPLORE_PAGE_CONFIG from '../components/explore-page-config';
 
 // const fetchedDataCache = makeFetchedDataCache<ExploreProjectsQuery>('dashboard:projects');
 
@@ -58,7 +59,7 @@ export const load = async ({ fetch }) => {
     }
 
     if (
-      FEATURED_PROJECTS[network.chainId]?.featuredProjectIds.includes(project.account.accountId)
+      EXPLORE_PAGE_CONFIG[network.chainId]?.featuredProjectIds?.includes(project.account.accountId)
     ) {
       featuredProjects.push(project);
       continue;
