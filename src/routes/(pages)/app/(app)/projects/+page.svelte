@@ -73,8 +73,10 @@
 
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
-    <ProminentKeyValuePair key="Claimed Projects">27</ProminentKeyValuePair>
-    <ProminentKeyValuePair key="Total Splits">1374</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Drips Lists" value={data.chainStats.dripListsCount}
+    ></ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Splits" value={data.chainStats.receiversCount}
+    ></ProminentKeyValuePair>
   </StatsSection>
 
   <Section

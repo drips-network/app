@@ -1,10 +1,15 @@
 <script lang="ts">
+  import formatNumber from '$lib/utils/format-number';
+
   export let key: string;
+  export let value: string | number | undefined = undefined;
   export let explorerItems: {
     base: string;
     dripsContract: string;
     icon: ConstructorOfATypedSvelteComponent;
   }[] = [];
+
+  $: formattedValue = typeof value === 'number' ? formatNumber(value) : value;
 </script>
 
 <div class="value-wrapper">
@@ -25,7 +30,9 @@
       </div>
     {/if}
   </div>
-  <span class="large-number pixelated"><slot /></span>
+  <span class="large-number pixelated"
+    >{#if value !== undefined}{formattedValue}{:else}<slot />{/if}</span
+  >
 </div>
 
 <style>

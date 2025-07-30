@@ -77,13 +77,10 @@
   />
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
-    <!-- TODO: format -->
-    <ProminentKeyValuePair key="Total Drips Lists"
-      >{data.chainStats.dripListsCount}</ProminentKeyValuePair
-    >
-    <ProminentKeyValuePair key="Total Splits"
-      >{data.chainStats.receiversCount}</ProminentKeyValuePair
-    >
+    <ProminentKeyValuePair key="Total Drips Lists" value={data.chainStats.dripListsCount}
+    ></ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Splits" value={data.chainStats.receiversCount}
+    ></ProminentKeyValuePair>
   </StatsSection>
   <FeaturedDripListsSection dripLists={data.featuredDripLists} />
   <Section
