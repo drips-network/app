@@ -223,7 +223,7 @@ services:
       - DB_CONNECTION_STRING=postgresql://postgres:admin@postgres-rpgf:5432/rpgf_db
       - PORT=5000
       - DRIPS_GQL_API_URL=http://graphql-api:8080
-      - DRIPS_GQL_API_ACCESS_TOKEN=123
+      - DRIPS_GQL_API_KEY=123
       - JWT_SECRET=123
       - JWT_EXPIRATION_MINUTES=60
     ports:
