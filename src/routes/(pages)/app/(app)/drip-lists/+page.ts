@@ -5,11 +5,11 @@ import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-dat
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
-import { isFeaturedDripList } from '../components/load-featured-drip-lists';
-import { fetchDripLists } from '../components/load-drip-lists';
+import fetchAndCategorizeDripLists from './components/load-drip-lists';
 import network from '$lib/stores/wallet/network';
-import type { AllDripListsQuery, ChainStatsQuery } from '../components/__generated__/gql.generated';
+import type { ChainStatsQuery } from '../components/__generated__/gql.generated';
 import fetchChainStats from '../components/load-chain-stats';
+import type { AllDripListsQuery } from './components/__generated__/gql.generated';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
@@ -30,13 +30,14 @@ export const load = async ({ fetch }) => {
     return locallyCached;
   }
 
-  const [votingRounds, allDripLists, chainStats] = await Promise.all([
-    !connectedAddress
-      ? Promise.resolve([])
-      : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
-    fetchDripLists(fetch),
-    fetchChainStats(fetch),
-  ]);
+  const [votingRounds, { featuredDripLists, yourDripLists, restDripLists }, chainStats] =
+    await Promise.all([
+      !connectedAddress
+        ? Promise.resolve([])
+        : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
+      fetchAndCategorizeDripLists(network.chainId, fetch, connectedAddress),
+      fetchChainStats(fetch),
+    ]);
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
 
@@ -48,22 +49,6 @@ export const load = async ({ fetch }) => {
     ...v,
     splits: votingRoundsSplits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)] ?? [],
   }));
-
-  const yourDripLists = [];
-  const featuredDripLists = [];
-  const restDripLists = [];
-  for (const dripList of allDripLists) {
-    if (dripList.owner.address === connectedAddress) {
-      yourDripLists.push(dripList);
-    }
-
-    if (isFeaturedDripList(network.chainId, dripList)) {
-      featuredDripLists.push(dripList);
-      continue;
-    }
-
-    restDripLists.push(dripList);
-  }
 
   fetchedDataCache.write({
     yourDripLists,

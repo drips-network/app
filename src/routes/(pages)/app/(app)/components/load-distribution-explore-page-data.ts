@@ -7,7 +7,7 @@ import {
   fetchProjects,
   fetchProjectsQuery,
 } from '../projects/components/load-projects';
-import { featuredDripListQuery, fetchList } from './load-drip-list';
+import { featuredDripListQuery, fetchList } from '../drip-lists/components/load-drip-list';
 import type { ComponentProps } from 'svelte';
 import type DistributionExplorePage from './distribution-explore-page.svelte';
 import filterFalsy from '$lib/utils/filter-falsy';

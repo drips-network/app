@@ -11,7 +11,7 @@ import {
   fetchProjects,
   fetchProjectsQuery,
 } from '../projects/components/load-projects';
-import { featuredDripListQuery, fetchList } from './load-drip-list';
+import { featuredDripListQuery, fetchList } from '../drip-lists/components/load-drip-list';
 
 export default async function loadDefaultExplorePageData(
   f: typeof fetch,
