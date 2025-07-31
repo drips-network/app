@@ -4,7 +4,7 @@ import type { EXPLORE_PAGE_VARIANT_COMPONENTS } from '../+page.svelte';
 type ExplorePageVariantComponents = typeof EXPLORE_PAGE_VARIANT_COMPONENTS;
 export type ExplorePageVariant = keyof ExplorePageVariantComponents;
 
-type ExplorePageConfig = {
+export type ExplorePageConfig = {
   variant: ExplorePageVariant;
   featuredDripListIds?: string[];
   featuredWeb3ProjectIds?: string[];
