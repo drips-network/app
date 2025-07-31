@@ -1,19 +1,16 @@
 import type { ValueForEachSupportedChain } from '$lib/stores/wallet/network';
+import type { ComponentProps } from 'svelte';
 import type { EXPLORE_PAGE_VARIANT_COMPONENTS } from '../+page.svelte';
+import type DistributionExplorePage from './distribution-explore-page.svelte';
 
 type ExplorePageVariantComponents = typeof EXPLORE_PAGE_VARIANT_COMPONENTS;
 export type ExplorePageVariant = keyof ExplorePageVariantComponents;
 
+type PageProps = ComponentProps<DistributionExplorePage>;
+
 export type ExplorePageConfig = {
   variant: ExplorePageVariant;
-  welcomeCardConfig?: {
-    title: string;
-    description: string;
-    docsButton?: {
-      label: string;
-      href: string;
-    };
-  };
+  welcomeCardConfig?: PageProps['welcomeCard'];
   showRecentProjects?: boolean;
 };
 

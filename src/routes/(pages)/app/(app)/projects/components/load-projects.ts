@@ -39,7 +39,7 @@ type ProjectsParameters = {
   chains: SupportedChain[];
 };
 
-export function createFetchProjectsParameters(): ProjectsParameters {
+export function createDefaultFetchProjectsParameters(): ProjectsParameters {
   return {
     where: { verificationStatus: ProjectVerificationStatus.Claimed },
     sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
@@ -71,7 +71,7 @@ export function createFetchProjectsParameters(): ProjectsParameters {
 // TODO: oof what a duplication!
 export async function fetchProjects(f: typeof fetch, projectsParameters?: ProjectsParameters) {
   if (!projectsParameters) {
-    projectsParameters = createFetchProjectsParameters();
+    projectsParameters = createDefaultFetchProjectsParameters();
   }
 
   const projectsRes = await query<ExploreProjectsQuery, ExploreProjectsQueryVariables>(
