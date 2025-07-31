@@ -8,12 +8,12 @@ import {
 import query from '$lib/graphql/dripsQL';
 import network, { SUPPORTED_CHAIN_IDS } from '$lib/stores/wallet/network';
 import { gql } from 'graphql-request';
+import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from '../../components/recently-claimed-projects.svelte';
 import type {
   ExploreProjectsQuery,
   ExploreProjectsQueryVariables,
 } from './__generated__/gql.generated';
-import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from './recently-claimed-projects.svelte';
-import EXPLORE_PAGE_CONFIG from './explore-page-config';
+import FEATURED_PROJECTS_CONFIG from './featured-projects-config';
 
 export const fetchProjectsQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
@@ -102,12 +102,16 @@ export async function fetchAndCategorizeProjects(
       yourProjects.push(project);
     }
 
-    if (EXPLORE_PAGE_CONFIG[chainId]?.featuredWeb3ProjectIds?.includes(project.account.accountId)) {
+    if (
+      FEATURED_PROJECTS_CONFIG[chainId]?.featuredWeb3ProjectIds?.includes(project.account.accountId)
+    ) {
       featuredWeb3Projects.push(project);
       continue;
     }
 
-    if (EXPLORE_PAGE_CONFIG[chainId]?.featuredProjectIds?.includes(project.account.accountId)) {
+    if (
+      FEATURED_PROJECTS_CONFIG[chainId]?.featuredProjectIds?.includes(project.account.accountId)
+    ) {
       featuredProjects.push(project);
       continue;
     }

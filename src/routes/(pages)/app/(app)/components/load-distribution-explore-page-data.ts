@@ -2,7 +2,11 @@ import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
 import { redis } from '../../../../api/redis';
-import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
+import {
+  createFetchProjectsParameters,
+  fetchProjects,
+  fetchProjectsQuery,
+} from '../projects/components/load-projects';
 import { featuredDripListQuery, fetchList } from './load-drip-list';
 import type { ComponentProps } from 'svelte';
 import type DistributionExplorePage from './distribution-explore-page.svelte';

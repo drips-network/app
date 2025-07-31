@@ -6,7 +6,11 @@ import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 
 import { fetchBlogPosts } from '$lib/utils/blog-posts';
-import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
+import {
+  createFetchProjectsParameters,
+  fetchProjects,
+  fetchProjectsQuery,
+} from '../projects/components/load-projects';
 import { featuredDripListQuery, fetchList } from './load-drip-list';
 
 export default async function loadDefaultExplorePageData(

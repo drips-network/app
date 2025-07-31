@@ -6,7 +6,7 @@ import fetchTlv from './components/load-tlv.js';
 import fetchPageVariant from './components/load-page-variant.js';
 import { redis } from '../../../api/redis.js';
 import fetchWelcomeCardConfig from './components/load-welcomecard-config.js';
-import { fetchAndCategorizeProjects } from './components/load-projects.js';
+import { fetchAndCategorizeProjects } from './projects/components/load-projects.js';
 
 export const load = async ({ fetch }) => {
   // TODO: don't load all this stuff for the distribution page, switch with variant

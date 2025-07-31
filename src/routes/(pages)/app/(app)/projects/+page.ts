@@ -1,5 +1,5 @@
 // import network from '$lib/stores/wallet/network';
-import { fetchAndCategorizeProjects } from '../components/load-projects';
+import { fetchAndCategorizeProjects } from './components/load-projects';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 // import EXPLORE_PAGE_CONFIG from '../components/explore-page-config';
