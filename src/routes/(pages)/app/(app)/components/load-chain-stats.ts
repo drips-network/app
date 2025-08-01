@@ -2,7 +2,7 @@ import { gql } from 'graphql-request';
 import type { ChainStatsQuery, ChainStatsQueryVariables } from './__generated__/gql.generated';
 import query from '$lib/graphql/dripsQL';
 
-const chainStatsQuery = gql`
+export const chainStatsQuery = gql`
   query ChainStats($chains: [SupportedChain!]) {
     chainStats(chains: $chains) {
       chain
