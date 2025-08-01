@@ -28,6 +28,7 @@
   import DripListsGrid from '../components/drip-lists-grid.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let data: PageData;
 
@@ -76,7 +77,13 @@
     showVisibilityToggle={true}
   />
   <StatsSection>
-    <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Donations">
+      ><AggregateFiatEstimate
+        compact
+        amounts={data.totalDrippedAmounts}
+        prices={data.totalDrippedPrices}
+      /></ProminentKeyValuePair
+    >
     <ProminentKeyValuePair key="Total Drips Lists" value={data.chainStats.dripListsCount}
     ></ProminentKeyValuePair>
     <ProminentKeyValuePair key="Total Splits" value={data.chainStats.receiversCount}

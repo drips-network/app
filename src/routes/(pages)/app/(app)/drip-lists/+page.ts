@@ -10,6 +10,10 @@ import network from '$lib/stores/wallet/network';
 import type { ChainStatsQuery } from '../components/__generated__/gql.generated';
 import fetchChainStats from '../components/load-chain-stats';
 import type { AllDripListsQuery } from './components/__generated__/gql.generated';
+import {
+  default as fetchTotalDrippedApproximation,
+  totalDrippedPrices as fetchTotalDrippedPrices,
+} from '$lib/utils/total-dripped-approx';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
@@ -19,6 +23,8 @@ const fetchedDataCache = makeFetchedDataCache<{
   featuredDripLists: AllDripListsQuery['dripLists'];
   chainStats: ChainStatsQuery['chainStats'][number];
   votingRounds: VotingRoundWithSplits[];
+  totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
+  totalDrippedAmounts: Awaited<ReturnType<typeof fetchTotalDrippedApproximation>>;
 }>('dashboard:drip-lists');
 
 export const load = async ({ fetch }) => {
@@ -30,14 +36,20 @@ export const load = async ({ fetch }) => {
     return locallyCached;
   }
 
-  const [votingRounds, { featuredDripLists, yourDripLists, restDripLists }, chainStats] =
-    await Promise.all([
-      !connectedAddress
-        ? Promise.resolve([])
-        : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
-      fetchAndCategorizeDripLists(network.chainId, fetch, connectedAddress),
-      fetchChainStats(fetch),
-    ]);
+  const totalDrippedAmounts = fetchTotalDrippedApproximation();
+  const [
+    votingRounds,
+    { featuredDripLists, yourDripLists, restDripLists },
+    chainStats,
+    totalDrippedPrices,
+  ] = await Promise.all([
+    !connectedAddress
+      ? Promise.resolve([])
+      : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
+    fetchAndCategorizeDripLists(network.chainId, fetch, connectedAddress),
+    fetchChainStats(fetch),
+    fetchTotalDrippedPrices(fetch),
+  ]);
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
 
@@ -56,6 +68,8 @@ export const load = async ({ fetch }) => {
     featuredDripLists,
     votingRounds: votingRoundsWithSplits,
     chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
   });
 
   return {
@@ -64,6 +78,8 @@ export const load = async ({ fetch }) => {
     featuredDripLists,
     votingRounds: votingRoundsWithSplits,
     chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
     preservePathOnNetworkChange: true,
   };
 };
