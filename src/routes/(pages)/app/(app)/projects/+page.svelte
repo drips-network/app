@@ -27,6 +27,7 @@
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import RecentlyClaimedProjects from '../components/recently-claimed-projects.svelte';
   import ProjectsGrid from '../components/projects-grid.svelte';
+  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let data;
 </script>
@@ -72,7 +73,13 @@
   />
 
   <StatsSection>
-    <ProminentKeyValuePair key="Total Donations">$827k</ProminentKeyValuePair>
+    <ProminentKeyValuePair key="Total Donations"
+      ><AggregateFiatEstimate
+        compact
+        amounts={data.totalDrippedAmounts}
+        prices={data.totalDrippedPrices}
+      /></ProminentKeyValuePair
+    >
     <ProminentKeyValuePair key="Total Drips Lists" value={data.chainStats.dripListsCount}
     ></ProminentKeyValuePair>
     <ProminentKeyValuePair key="Total Splits" value={data.chainStats.receiversCount}
