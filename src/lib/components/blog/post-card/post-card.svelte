@@ -46,7 +46,7 @@
       {:else}
         <h1 class="pixelated">{title}</h1>
       {/if}
-      <p class="metadata">
+      <p class="metadata" style:color="var(--color-foreground-level-5)">
         {#if author}
           <img
             class="author-avatar"
