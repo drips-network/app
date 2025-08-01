@@ -11,9 +11,9 @@
   import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
-  import ProjectsSection, {
+  import YourProjectsSection, {
     PROJECTS_SECTION_PROJECT_FRAGMENT,
-  } from '$lib/components/projects-section/projects-section.svelte';
+  } from '$lib/components/your-projects-section/your-projects-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { gql } from 'graphql-request';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
@@ -66,7 +66,7 @@
     </svelte:fragment>
   </EduCard>
 
-  <ProjectsSection
+  <YourProjectsSection
     withClaimProjectButton
     projects={data.yourProjects}
     showVisibilityToggle={true}

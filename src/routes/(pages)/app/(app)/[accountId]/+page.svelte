@@ -7,7 +7,7 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import { fade } from 'svelte/transition';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import ProjectsSection from '$lib/components/projects-section/projects-section.svelte';
+  import YourProjectsSection from '$lib/components/your-projects-section/your-projects-section.svelte';
   import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -84,7 +84,7 @@
       </header>
     </SectionSkeleton>
     <Developer accountId={data.profileData.account.accountId} />
-    <ProjectsSection
+    <YourProjectsSection
       collapsable
       collapsed={mapFilterUndefined([filterCurrentChainData(data.profileData.chainData)], (v) =>
         v === null ? undefined : v,
