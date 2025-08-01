@@ -97,8 +97,7 @@
     max-width: 75rem;
     width: 100vw;
     padding: 6.5rem 2.5rem 4rem 2.5rem;
-    margin: 0 auto;
-    min-width: 0;
+    margin: 0 auto 0 16rem;
   }
 
   div {
@@ -129,6 +128,10 @@
     .sidenav {
       width: 4.5rem;
     }
+
+    .page {
+      margin-left: 4.5rem;
+    }
   }
 
   @media (max-width: 768px) {
@@ -143,6 +146,7 @@
 
     .page {
       padding: 6rem 1rem 6rem 1rem;
+      margin-left: 0;
     }
 
     .bottom-nav {
