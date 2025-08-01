@@ -1,12 +1,12 @@
 import network from '$lib/stores/wallet/network.js';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import buildUrl from '$lib/utils/build-url';
-import { getUserData, rpgfJwtStore } from '$lib/utils/rpgf/siwe';
+import { getUserData, logOut, refreshAccessToken, rpgfAccessJwtStore } from '$lib/utils/rpgf/siwe';
 import { error, redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
 function getSignInData() {
-  const jwt = get(rpgfJwtStore);
+  const jwt = get(rpgfAccessJwtStore);
   return getUserData(jwt);
 }
 
@@ -21,12 +21,15 @@ export const load = async ({ url }) => {
   const { address } = get(walletStore);
 
   if (exp && exp < Date.now() / 1000) {
-    // User's sign-in is expired, so clear & redirect to connect page
-    rpgfJwtStore.set(null);
-    return redirect(
-      307,
-      buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }),
-    );
+    // User's sign-in is expired, so attempt refresh and if it doesn't work, redirect to connect
+    const { success } = await refreshAccessToken();
+
+    if (!success) {
+      return redirect(
+        307,
+        buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }),
+      );
+    }
   }
 
   if (address && !rpgfWalletAddress) {
@@ -38,24 +41,19 @@ export const load = async ({ url }) => {
   }
 
   if (address && rpgfWalletAddress && address.toLowerCase() !== rpgfWalletAddress.toLowerCase()) {
-    // User is signed-in with a different wallet address than the one connected, so clear sign-in and
-    // make them connect again
-    rpgfJwtStore.set(null);
+    await logOut();
+
     return redirect(
       307,
       buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }),
     );
   }
 
-  if (!address && rpgfWalletAddress) {
-    // User is signed-in to RPGF but not connected, so clear the sign-in
-    rpgfJwtStore.set(null);
-  }
-
   const updatedSignInData = getSignInData();
 
   return {
-    rpgfUserData: updatedSignInData,
+    // Only consider the user signed in if they have a wallet connected
+    rpgfUserData: address ? updatedSignInData : null,
   };
 };
 

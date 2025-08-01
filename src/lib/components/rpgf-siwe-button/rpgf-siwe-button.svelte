@@ -1,6 +1,6 @@
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { rpgfJwtStore, signInWithEthereum } from '$lib/utils/rpgf/siwe';
+  import { signInWithEthereum } from '$lib/utils/rpgf/siwe';
   import type { Signer } from 'ethers';
   import Button from '../button/button.svelte';
   import Wallet from '../icons/Wallet.svelte';
@@ -36,10 +36,6 @@
   };
 </script>
 
-<Button
-  loading={pending}
-  variant="primary"
-  icon={Wallet}
-  disabled={Boolean($rpgfJwtStore)}
-  on:click={handleClick}>{$walletStore.connected ? '' : 'Connect wallet & '}Sign in</Button
+<Button loading={pending} variant="primary" icon={Wallet} on:click={handleClick}
+  >{$walletStore.connected ? '' : 'Connect wallet & '}Sign in</Button
 >
