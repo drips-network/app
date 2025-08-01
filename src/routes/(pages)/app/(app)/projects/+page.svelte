@@ -93,6 +93,10 @@
     }}
     skeleton={{
       loaded: true,
+      empty: !data.featuredProjects.length,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No Featured Projects',
+      emptyStateText: 'We couldn’t find any featured projects.',
     }}
   >
     <div class="horizontal-scroll">
