@@ -47,13 +47,16 @@
   bind:collapsable
   header={{
     icon: Box,
-    label: 'Projects',
+    label: 'Your Projects',
     actions: withClaimProjectButton
       ? [
           {
-            label: 'Claim project',
+            label: 'Claim your project',
             icon: Plus,
-            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
+            handler: () =>
+              modal.show(ClaimProjectStepper, undefined, {
+                skipWalletConnect: $walletStore.connected,
+              }),
           },
         ]
       : [],
@@ -68,6 +71,10 @@
     emptyStateText: withClaimProjectButton
       ? 'If you develop an open-source project, click "Claim project" to get started.'
       : 'This user hasnʼt claimed any software projects yet.',
+    disconnected: !$walletStore.connected,
+    disconnectedStateEmoji: '🫙',
+    disconnectedStateHeadline: 'No claimed projects',
+    disconnectedStateText: 'Your claimed projects will show up here when your wallet is connected.',
   }}
 >
   {#if visibleProjects}
@@ -114,9 +121,7 @@
   }
 
   .projects > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(25% - 0.75rem);
+    width: calc(50% - 0.5rem);
   }
 
   @media (max-width: 560px) {

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import wallet from '$lib/stores/wallet/wallet.store';
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
@@ -9,7 +8,6 @@
   import { quintIn, quintOut } from 'svelte/easing';
   import BottomNav from '$lib/components/bottom-nav/bottom-nav.svelte';
   import { fly } from 'svelte/transition';
-  import ens from '$lib/stores/ens';
   import User from '$lib/components/icons/User.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
@@ -20,6 +18,18 @@
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  $: navItems = [
+    { label: 'Explore', href: '/app', icon: ExploreIcon },
+    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
+    { label: 'Projects', href: '/app/projects', icon: Box },
+    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+    {
+      label: 'Profile',
+      href: '/app/profile',
+      icon: User,
+    },
+  ];
 
   $: {
     if ($navigating) {
@@ -32,60 +42,34 @@
   }
 </script>
 
-<div class="main" class:disconnected={!$wallet.connected} in:fly|global={{ duration: 300, y: 16 }}>
+<div class="main" in:fly|global={{ duration: 300, y: 16 }}>
   <div class="page">
     <div class:loading={$navigating}><slot /></div>
   </div>
 
-  {#if $wallet.connected}
-    <div
-      class="sidenav"
-      in:fly|global={{ duration: 300, x: -64, easing: quintOut }}
-      out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
-      data-testid="sidenav"
-    >
-      <Sidenav
-        items={{
-          top: [
-            { label: 'Explore', href: '/app', icon: ExploreIcon },
-            { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-            { label: 'Projects', href: '/app/projects', icon: Box },
-            { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-            {
-              label: 'Profile',
-              href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-              icon: User,
-            },
-          ],
-          bottom: [
-            {
-              label: 'Help',
-              href: 'https://docs.drips.network/',
-              icon: InfoCircle,
-              external: true,
-            },
-          ],
-        }}
-      />
-    </div>
-    <div class="bottom-nav" data-testid="bottom-nav">
-      <BottomNav
-        items={[
-          { label: 'Explore', href: '/app', icon: ExploreIcon },
-          { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-          { label: 'Projects', href: '/app/projects', icon: Box },
-          { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+  <div
+    class="sidenav"
+    in:fly|global={{ duration: 300, x: -64, easing: quintOut }}
+    out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
+    data-testid="sidenav"
+  >
+    <Sidenav
+      items={{
+        top: navItems,
+        bottom: [
           {
-            label: 'Profile',
-            href: `/app/${$ens[$wallet.address]?.name ?? $wallet.address}`,
-            icon: User,
+            label: 'Help',
+            href: 'https://docs.drips.network/',
+            icon: InfoCircle,
+            external: true,
           },
-        ]}
-      />
-    </div>
-  {/if}
-
-  <div class="sidenav-placeholder" class:disconnected={!$wallet.connected} />
+        ],
+      }}
+    />
+  </div>
+  <div class="bottom-nav" data-testid="bottom-nav">
+    <BottomNav items={navItems} />
+  </div>
 
   <div class="header" in:fly|global={{ duration: 300, y: 16 }}>
     <Header user={data.user} showLoadingIndicator={showLoadingSpinner} />
@@ -97,11 +81,6 @@
     display: flex;
     flex-direction: row-reverse;
     width: 100vw;
-    transition: gap 0.3s;
-  }
-
-  .main.disconnected {
-    gap: 0;
   }
 
   .header {
@@ -118,8 +97,7 @@
     max-width: 75rem;
     width: 100vw;
     padding: 6.5rem 2.5rem 4rem 2.5rem;
-    margin: 0 auto;
-    min-width: 0;
+    margin: 0 auto 0 16rem;
   }
 
   div {
@@ -142,25 +120,17 @@
     padding-top: 6rem;
   }
 
-  .sidenav-placeholder {
-    width: 16rem;
-    height: 1px;
-    flex-shrink: 0;
-    transition: width 0.3s;
-  }
-
-  .sidenav-placeholder.disconnected {
-    width: 0;
-  }
-
   .bottom-nav {
     display: none;
   }
 
   @media (max-width: 1252px) {
-    .sidenav,
-    .sidenav-placeholder {
+    .sidenav {
       width: 4.5rem;
+    }
+
+    .page {
+      margin-left: 4.5rem;
     }
   }
 
@@ -170,13 +140,13 @@
       gap: 0;
     }
 
-    .sidenav,
-    .sidenav-placeholder {
+    .sidenav {
       display: none;
     }
 
     .page {
       padding: 6rem 1rem 6rem 1rem;
+      margin-left: 0;
     }
 
     .bottom-nav {

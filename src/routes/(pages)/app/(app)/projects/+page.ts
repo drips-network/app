@@ -1,42 +1,60 @@
-import { gql } from 'graphql-request';
-import { PROJECTS_PAGE_PROJECT_FRAGMENT } from './+page.svelte';
-import query from '$lib/graphql/dripsQL';
-import type { ProjectsPageQuery, ProjectsPageQueryVariables } from './__generated__/gql.generated';
-import { redirect } from '@sveltejs/kit';
-import buildUrl from '$lib/utils/build-url';
-import getConnectedAddress from '$lib/utils/get-connected-address';
+import { fetchAndCategorizeProjects } from './components/load-projects';
+import walletStore from '$lib/stores/wallet/wallet.store';
+import { get } from 'svelte/store';
+import type { ChainStatsQuery } from '../components/__generated__/gql.generated';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
+import fetchChainStats from '../components/load-chain-stats';
 import network from '$lib/stores/wallet/network';
+import type { ExploreProjectsQuery } from './components/__generated__/gql.generated';
+import {
+  default as fetchTotalDrippedApproximation,
+  totalDrippedPrices as fetchTotalDrippedPrices,
+} from '$lib/utils/total-dripped-approx';
 
-const fetchedDataCache = makeFetchedDataCache<ProjectsPageQuery>('dashboard:projects');
+const fetchedDataCache = makeFetchedDataCache<{
+  yourProjects: ExploreProjectsQuery['projects'];
+  restProjects: ExploreProjectsQuery['projects'];
+  featuredProjects: ExploreProjectsQuery['projects'];
+  chainStats: ChainStatsQuery['chainStats'][number];
+  totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
+  totalDrippedAmounts: Awaited<ReturnType<typeof fetchTotalDrippedApproximation>>;
+}>('dashboard:projects');
 
 export const load = async ({ fetch }) => {
-  const connectedAddress = getConnectedAddress();
+  const connectedAccountId = get(walletStore).dripsAccountId;
 
-  if (!connectedAddress) {
-    redirect(307, buildUrl('/app/connect', { backTo: '/app/projects' }));
+  const locallyCached = fetchedDataCache.read();
+
+  if (locallyCached) {
+    return locallyCached;
   }
 
-  const projectsQuery = gql`
-    ${PROJECTS_PAGE_PROJECT_FRAGMENT}
-    query ProjectsPage($address: String, $chains: [SupportedChain!]) {
-      projects(chains: $chains, where: { ownerAddress: $address }) {
-        ...ProjectsPageProject
-      }
-    }
-  `;
+  const totalDrippedAmounts = fetchTotalDrippedApproximation();
+  const [{ featuredProjects, yourProjects, restProjects }, chainStats, totalDrippedPrices] =
+    await Promise.all([
+      fetchAndCategorizeProjects(network.chainId, fetch, connectedAccountId),
+      fetchChainStats(fetch),
+      fetchTotalDrippedPrices(fetch),
+    ]);
 
-  const res =
-    fetchedDataCache.read() ??
-    (await query<ProjectsPageQuery, ProjectsPageQueryVariables>(
-      projectsQuery,
-      { address: connectedAddress, chains: [network.gqlName] },
-      fetch,
-    ));
+  fetchedDataCache.write({
+    yourProjects,
+    restProjects,
+    featuredProjects,
+    chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
+  });
 
-  fetchedDataCache.write(res);
-
-  return { projects: res.projects, preservePathOnNetworkChange: true };
+  return {
+    yourProjects,
+    restProjects,
+    featuredProjects,
+    chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
+    preservePathOnNetworkChange: true,
+  };
 };
 
 export const ssr = false;

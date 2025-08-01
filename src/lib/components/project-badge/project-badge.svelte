@@ -56,6 +56,7 @@
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
   export let chainOverride: SupportedChain | undefined = undefined;
+  export let onlyForgeAvatar = true;
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -72,13 +73,14 @@
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
 
   $: chainData = filterCurrentChainData(processedProject.chainData, undefined, chainOverride);
+  $: gap = onlyForgeAvatar ? 'gap-1' : 'gap-2';
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
-      class="project-badge flex gap-2 items-center typo-text"
+      class="project-badge flex {gap} items-center typo-text"
       href={linkTo === 'project-page'
         ? buildProjectUrl(
             processedProject.source.forge,
@@ -102,11 +104,13 @@
               />
             </div>
           {/if}
-          <div><ProjectAvatar {size} project={chainData} /></div>
+          {#if !onlyForgeAvatar}
+            <div><ProjectAvatar {size} project={chainData} /></div>
+          {/if}
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
-        <ProjectName project={processedProject} />
+        <ProjectName project={processedProject} tiny={size === 'tiny'} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon

@@ -1,10 +1,15 @@
 <script lang="ts">
   export let forceLoading = false;
   export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
+  export let compact = false;
 
   $: formattedFiatEstimate =
     typeof fiatEstimateCents === 'number'
-      ? fiatEstimateCents.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      ? fiatEstimateCents.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          ...(compact && { notation: 'compact', compactDisplay: 'short' }),
+        })
       : undefined;
 </script>
 

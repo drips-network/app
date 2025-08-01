@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
+  import { browser } from '$app/environment';
 
   export let items: BottomNavItems;
 
@@ -19,18 +20,21 @@
   let selectorOffset: number | undefined = undefined;
   let selectorWidth: number | undefined = undefined;
 
-  let resizeObserver: ResizeObserver = new ResizeObserver(() => {
-    selectorWidth = activeElem.offsetWidth + 20;
-  });
+  let resizeObserver: ResizeObserver | undefined = undefined;
 
   function updateResizeObserver(elem: HTMLElement | undefined) {
+    if (!resizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        selectorWidth = activeElem.offsetWidth + 20;
+      });
+    }
     if (!elem) return;
 
     resizeObserver.disconnect();
     resizeObserver.observe(elem);
   }
 
-  $: updateResizeObserver(activeElem);
+  $: browser && updateResizeObserver(activeElem);
 
   function updateSelectorPos() {
     if (!activeElem) return;

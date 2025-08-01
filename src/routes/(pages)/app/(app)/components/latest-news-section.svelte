@@ -33,7 +33,7 @@
 >
   <div class="posts-grid">
     {#each sortedPosts as post}
-      <PostCard newTab compact {...post} />
+      <PostCard newTab {...post} />
     {/each}
   </div>
 </Section>
@@ -41,7 +41,7 @@
 <style>
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+    grid-template-columns: auto auto;
     gap: 1rem;
     padding: 4px 2px;
   }

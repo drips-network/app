@@ -53,7 +53,7 @@
         openInNewTab
         clampTitle={false}
         hideDescription
-        listingMode={true}
+        variant="partial"
         data={{ dripList }}
         {chainOverride}
       />
