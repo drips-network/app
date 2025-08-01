@@ -47,28 +47,6 @@ export function createDefaultFetchProjectsParameters(): ProjectsParameters {
   };
 }
 
-// const fetchedDataCache = makeFetchedDataCache<ExploreProjectsQuery>('explore:projects');
-
-// export async function fetchAllProjects(f: typeof fetch) {
-// 	const cached = fetchedDataCache.read();
-// 	if (cached) {
-// 		return cached.projects;
-// 	}
-
-//   const projectsParameters = createFetchProjectsParameters();
-
-// 	const projectsRes = await query<ExploreProjectsQuery, ExploreProjectsQueryVariables>(
-// 		fetchProjectsQuery,
-// 		projectsParameters,
-// 		f
-// 	);
-
-// 	fetchedDataCache.write(projectsRes);
-
-// 	return projectsRes.projects;
-// }
-
-// TODO: oof what a duplication!
 export async function fetchProjects(f: typeof fetch, projectsParameters?: ProjectsParameters) {
   if (!projectsParameters) {
     projectsParameters = createDefaultFetchProjectsParameters();
@@ -96,8 +74,6 @@ export async function fetchAndCategorizeProjects(
   const yourProjects = [];
   const restProjects = [];
   for (const project of projects) {
-    // TODO: necessary? Don't we already query using the current chain?
-    // const chainData = filterCurrentChainData(project.chainData)
     if (project.chainData.some((chainData) => chainData.owner?.accountId === connectedAccountId)) {
       yourProjects.push(project);
     }
