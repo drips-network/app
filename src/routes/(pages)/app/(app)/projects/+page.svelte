@@ -133,6 +133,12 @@
     color: var(--color-foreground);
   }
 
-  @media (max-width: 716px) {
+  @media (max-width: 768px) {
+    .edu-card-illustration-bg {
+      width: 100%;
+      height: 30%;
+      border-radius: 0;
+      max-width: none;
+    }
   }
 </style>
