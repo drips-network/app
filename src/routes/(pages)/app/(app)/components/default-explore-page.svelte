@@ -26,20 +26,12 @@
   import DripListsGrid from './drip-lists-grid.svelte';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
-  // export let featuredProjectIds: string[] | undefined = undefined;
-  // export let featuredWeb3ProjectIds: string[] | undefined = undefined;
   export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let featuredDripLists: ExplorePageFeaturedDripListsFragment[];
   export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
   export let tlv: number;
-
-  // $: featuredWeb3Projects = projects.filter((p) =>
-  //   featuredWeb3ProjectIds?.includes(p.account.accountId),
-  // );
-
-  // $: featuredProjects = projects.filter((p) => featuredProjectIds?.includes(p.account.accountId));
 
   // 2 latest posts. Sort by date
   $: blogPosts = blogPosts

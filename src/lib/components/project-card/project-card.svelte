@@ -18,6 +18,7 @@
           chain
           owner {
             accountId
+            address
           }
           totalEarned {
             tokenAddress
@@ -86,10 +87,10 @@
         <ProjectName pixelated showSource={false} {project} />
       </h2>
       <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab size="tiny" {project} />
-      <!-- TODO: this description is not editable or surfaced anywhere? -->
-      {#if projectChainData.description}
+      <!-- TODO: Add descriptions to product cards · Issue #1579 -->
+      <!-- {#if projectChainData.description}
         <p class="typo-text-small line-clamp-2">{projectChainData.description}</p>
-      {/if}
+      {/if} -->
     </div>
     <div class="cubbies">
       <div>
