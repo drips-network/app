@@ -1,0 +1,366 @@
+<script lang="ts">
+  import EcosystemGraph from './ecosystem-graph.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import ArrowExpand from '$lib/components/icons/ArrowExpand.svelte';
+  import Minus from '$lib/components/icons/Minus.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
+  import EcosystemProjectCard from './ecosystem-project-card.svelte';
+  import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
+  import { type NodeSelectionChangedPayload } from './ecosystem-graph';
+  import { fade } from 'svelte/transition';
+  import ArrowCollapse from '$lib/components/icons/ArrowCollapse.svelte';
+
+  export let ecosystem: Ecosystem;
+
+  let ecosystemCardElement: HTMLDivElement;
+  let expanded: boolean = false;
+
+  // let the graph decide
+  let zoom: number = 1;
+  let selectedProjectData:
+    | {
+        repoOwner: string;
+        repoName: string;
+        forge: string;
+      }
+    | undefined = undefined;
+  let selectedProjectMetadata:
+    | {
+        absoluteWeight: number;
+      }
+    | undefined = undefined;
+
+  const ZOOM_INCREMENT = 0.33;
+  function zoomIn(event: MouseEvent) {
+    event.stopPropagation();
+
+    zoom = zoom + ZOOM_INCREMENT;
+  }
+
+  function zoomOut(event: MouseEvent) {
+    event.stopPropagation();
+
+    zoom = zoom - ZOOM_INCREMENT;
+  }
+
+  function getEcosystemNodeById(ecosystem: Ecosystem, nodeId: string) {
+    const { graph } = ecosystem;
+    if (!graph) {
+      return null;
+    }
+
+    return graph.nodes.find((node) => node.projectAccountId == nodeId);
+  }
+
+  async function showProjectData(nodeId: string) {
+    const fullNode = getEcosystemNodeById(ecosystem, nodeId);
+    if (!fullNode) {
+      // eslint-disable-next-line no-console
+      console.error('No project data to render');
+      return;
+    }
+
+    selectedProjectMetadata = { absoluteWeight: fullNode.absoluteWeight };
+    selectedProjectData = {
+      repoOwner: fullNode.repoOwner,
+      repoName: fullNode.repoName,
+      forge: 'github',
+    };
+  }
+
+  function handleNodeSelectionChanged(event: CustomEvent<NodeSelectionChangedPayload>) {
+    const { nodeId } = event.detail;
+    if (!nodeId) {
+      selectedProjectData = undefined;
+      selectedProjectMetadata = undefined;
+      return;
+    }
+
+    showProjectData(nodeId);
+    return;
+  }
+
+  async function handleClickExpand() {
+    if (!expanded) {
+      const clientRect = ecosystemCardElement.getBoundingClientRect();
+      ecosystemCardElement.style.width = '100vw';
+      ecosystemCardElement.style.height = '100dvh';
+      ecosystemCardElement.style.top = `${-clientRect.y}px`;
+      ecosystemCardElement.style.left = `${-clientRect.x}px`;
+    } else {
+      ecosystemCardElement.style.width = '';
+      ecosystemCardElement.style.height = '';
+      ecosystemCardElement.style.top = '';
+      ecosystemCardElement.style.left = '';
+    }
+
+    expanded = !expanded;
+  }
+
+  function stopScroll(event: WheelEvent | TouchEvent | KeyboardEvent) {
+    if (!expanded) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function stopTouchScroll(event: TouchEvent) {
+    // allow graph to be manipulated
+    if (event.target && (event.target as HTMLElement).classList.contains('sigma-mouse')) {
+      return;
+    }
+
+    stopScroll(event);
+  }
+
+  const keys: Record<string, number> = {
+    ArrowLeft: 1,
+    ArrowUp: 1,
+    ArrowRight: 1,
+    ArrowDown: 1,
+  };
+  function stopKeyScroll(event: KeyboardEvent) {
+    if (!expanded) {
+      return;
+    }
+
+    if (keys[event.code]) {
+      stopScroll(event);
+      return false;
+    }
+  }
+</script>
+
+<svelte:window on:keydown={(event) => stopKeyScroll(event)} />
+<div class="ecosystem-card-wrapper" class:expanded>
+  <div
+    class="ecosystem-card"
+    bind:this={ecosystemCardElement}
+    on:wheel={(event) => stopScroll(event)}
+    on:touchmove={(event) => stopTouchScroll(event)}
+  >
+    <div class="background" />
+    <div class="graph">
+      <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
+    </div>
+    {#if $$slots.banner}
+      <div class="banner">
+        <slot name="banner" />
+      </div>
+    {/if}
+    <div class="details">
+      <div class="surface top-left">
+        <!-- <SearchInput small placeholder="Search" /> -->
+      </div>
+      <div class="surface top-right">
+        <button class="mobile-graph-expander" on:click={handleClickExpand}></button>
+        <Button on:click={handleClickExpand}>
+          {#if expanded}
+            <ArrowCollapse style="fill: var(--color-foreground)" />Collapse
+          {:else}
+            <ArrowExpand style="fill: var(--color-foreground)" />Expand
+          {/if}
+        </Button>
+      </div>
+      {#if selectedProjectData}
+        <div class="surface bottom-left" transition:fade={{ duration: 300 }}>
+          <EcosystemProjectCard
+            loadProjectData={selectedProjectData}
+            projectMetadata={selectedProjectMetadata}
+          />
+        </div>
+      {/if}
+      <div class="surface bottom-right">
+        <Button circular on:click={(event) => zoomIn(event)}
+          ><Plus style="fill: var(--color-foreground)" /></Button
+        >
+        <Button circular on:click={(event) => zoomOut(event)}
+          ><Minus style="fill: var(--color-foreground)" /></Button
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ecosystem-card-wrapper {
+    padding: 2px 0;
+    margin: -2px 0;
+    transform: translateZ(0);
+    padding-bottom: 56.25%;
+  }
+
+  .ecosystem-card-wrapper.expanded {
+    position: relative;
+    z-index: 2;
+  }
+
+  .ecosystem-card {
+    box-shadow: var(--elevation-low);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 1rem 0.75rem 0.75rem 0.75rem;
+    position: relative;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: var(--color-background);
+  }
+
+  .ecosystem-card-wrapper.expanded .ecosystem-card {
+    border-radius: 0;
+  }
+
+  .ecosystem-card-wrapper:focus-visible {
+    outline: none;
+    background-color: var(--color-foreground-level-1);
+  }
+
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    border-radius: 1rem 0 0 0;
+    background: linear-gradient(
+      180deg,
+      var(--color-primary-level-1) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .ecosystem-card-wrapper.expanded .background {
+    border-radius: 0;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .ecosystem-card-wrapper.expanded .graph {
+    border-radius: 0;
+  }
+
+  .banner {
+    position: absolute;
+    width: calc(100% - 4rem);
+    z-index: 1;
+    left: 2rem;
+    top: 2rem;
+  }
+
+  .surface {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 20;
+  }
+
+  .surface.top-right {
+    left: auto;
+    right: 1rem;
+  }
+
+  .surface.bottom-right {
+    left: auto;
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .surface.bottom-left {
+    left: 1rem;
+    top: auto;
+    bottom: 1rem;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  .mobile-graph-expander {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .ecosystem-card-wrapper {
+      padding-bottom: 131.57%;
+    }
+
+    .surface,
+    .surface.bottom-right {
+      display: none;
+    }
+
+    .surface.bottom-left {
+      display: block;
+      top: 1.5rem;
+      bottom: auto;
+      left: 1.5rem;
+    }
+
+    .surface.top-right {
+      display: block;
+      left: 1.5rem;
+      right: auto;
+      bottom: 1.5rem;
+      top: auto;
+    }
+
+    .graph {
+      pointer-events: none;
+    }
+
+    .ecosystem-card-wrapper.expanded .graph {
+      pointer-events: all;
+    }
+
+    .ecosystem-card-wrapper.expanded .surface.bottom-right {
+      display: flex;
+    }
+
+    .mobile-graph-expander {
+      display: block;
+    }
+
+    .ecosystem-card-wrapper.expanded .mobile-graph-expander {
+      display: none;
+    }
+  }
+</style>

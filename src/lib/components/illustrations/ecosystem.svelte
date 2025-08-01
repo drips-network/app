@@ -1,0 +1,84 @@
+<svg width="314" height="314" viewBox="0 0 314 314" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M62.1753 97.5045L180.692 180.466M180.692 180.466L239.95 239.724M180.692 180.466V61.9495M180.692 180.466L251.802 121.208M180.692 180.466H97.7303M180.692 180.466L121.434 251.576"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="109.486"
+    y="239.629"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="78.2046"
+    y="168.906"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="48.0322"
+    y="83.9354"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="169.132"
+    y="47.9947"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="238.794"
+    y="109.055"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="228.312"
+    y="228.273"
+    width="23.12"
+    height="23.12"
+    rx="11.56"
+    fill="#28333D"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+  <rect
+    x="146.137"
+    y="145.911"
+    width="69.11"
+    height="69.11"
+    rx="34.555"
+    fill="#5555FF"
+    stroke="#28333D"
+    stroke-width="2"
+  />
+</svg>
+
+<style>
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
