@@ -2,6 +2,7 @@
   export const PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_NAME_FRAGMENT}
+    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment ProjectCard on Project {
       ...ProjectName
       isVisible
@@ -35,6 +36,9 @@
           owner {
             accountId
           }
+          withdrawableBalances {
+            ...MergeWithdrawableBalances
+          }
         }
         ...ProjectAvatar
       }
@@ -57,6 +61,10 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import ChevronRight from '../icons/ChevronRight.svelte';
+  import mergeWithdrawableBalances, {
+    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+  } from '$lib/utils/merge-withdrawable-balances';
+  import formatNumber from '$lib/utils/format-number';
 
   export let project: ProjectCardFragment;
   export let isHidden = false;
@@ -93,21 +101,27 @@
       {/if} -->
     </div>
     <div class="cubbies">
-      <div>
-        <!-- TODO: figure out how to display this data for unclaimed projects -->
-        <CoinFlying style="fill: var(--color-foreground)" />
-        <span class="cubby-label typo-bold">Funds</span>
-        <AggregateFiatEstimate
-          supressUnknownAmountsWarning
-          amounts={projectChainData.totalEarned}
-        />
-      </div>
-      <!-- TODO; format number -->
       {#if isClaimed(projectChainData)}
+        <div>
+          <CoinFlying style="fill: var(--color-foreground)" />
+          <span class="cubby-label typo-bold">Funds</span>
+          <AggregateFiatEstimate
+            supressUnknownAmountsWarning
+            amounts={projectChainData.totalEarned}
+          />
+        </div>
         <div>
           <DripListIcon style="fill: var(--color-foreground)" />
           <span class="cubby-label typo-bold">Dependencies</span>
-          {projectChainData.splits.dependencies.length}
+          {formatNumber(projectChainData.splits.dependencies.length)}
+        </div>
+      {:else}
+        <div>
+          <CoinFlying style="fill: var(--color-foreground)" />
+          <span class="cubby-label typo-bold">Funds</span>
+          <AggregateFiatEstimate
+            amounts={mergeWithdrawableBalances(projectChainData.withdrawableBalances)}
+          />
         </div>
       {/if}
     </div>
