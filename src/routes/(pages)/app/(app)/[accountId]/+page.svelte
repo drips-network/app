@@ -8,7 +8,7 @@
   import { fade } from 'svelte/transition';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import YourProjectsSection from '$lib/components/your-projects-section/your-projects-section.svelte';
-  import DripListsSection from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  import YourDripListsSection from '$lib/components/your-drip-lists-section/your-drip-lists-section.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
@@ -94,7 +94,7 @@
         (v) => (v === null ? undefined : v),
       )}
     />
-    <DripListsSection
+    <YourDripListsSection
       collapsable
       collapsed={[
         ...data.profileData.votingRounds,

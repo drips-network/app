@@ -8,9 +8,9 @@
 </script>
 
 <script lang="ts">
-  import DripListsSection, {
+  import YourDripListsSection, {
     DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT,
-  } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+  } from '$lib/components/your-drip-lists-section/your-drip-lists-section.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripList from '$lib/components/illustrations/drip-list.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -23,7 +23,6 @@
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
-  import FeaturedDripListsSection from '$lib/components/featured-drip-lists-section/featured-drip-lists-section.svelte';
   import Section from '$lib/components/section/section.svelte';
   import DripListsGrid from '../components/drip-lists-grid.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
@@ -31,8 +30,6 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
   export let data: PageData;
-
-  $: votingRounds = data.votingRounds ?? [];
 </script>
 
 <HeadMeta title="Drip List" />
@@ -69,13 +66,15 @@
       </div>
     </svelte:fragment>
   </EduCard>
-  <DripListsSection
-    {votingRounds}
+
+  <YourDripListsSection
+    votingRounds={data.votingRounds}
     dripLists={data.yourDripLists}
     showCreateNewListCard={true}
     withCreateButton={true}
     showVisibilityToggle={true}
   />
+
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations">
       ><AggregateFiatEstimate
@@ -89,7 +88,23 @@
     <ProminentKeyValuePair key="Total Splits" value={data.chainStats.receiversCount}
     ></ProminentKeyValuePair>
   </StatsSection>
-  <FeaturedDripListsSection dripLists={data.featuredDripLists} />
+
+  <Section
+    header={{
+      icon: DripListIcon,
+      label: 'Featured Drip Lists',
+    }}
+    skeleton={{
+      loaded: true,
+      empty: !data.featuredDripLists.length,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No Featured Drip Lists',
+      emptyStateText: 'We couldn’t find any featured Drip Lists.',
+    }}
+  >
+    <DripListsGrid dripLists={data.featuredDripLists} />
+  </Section>
+
   <Section
     header={{
       icon: DripListIcon,

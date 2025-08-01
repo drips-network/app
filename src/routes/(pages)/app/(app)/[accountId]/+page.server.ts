@@ -1,4 +1,4 @@
-import { DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT } from '$lib/components/drip-lists-section/drip-lists-section.svelte';
+import { DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT } from '$lib/components/your-drip-lists-section/your-drip-lists-section.svelte';
 import { PROJECTS_SECTION_PROJECT_FRAGMENT } from '$lib/components/your-projects-section/your-projects-section.svelte';
 import { error, redirect } from '@sveltejs/kit';
 import { gql } from 'graphql-request';
