@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 import getOptionalEnvVar from '../get-optional-env-var/public';
 import stripTrailingSlash from '../strip-trailing-slash';
-import { rpgfJwtStore } from './siwe';
+import { refreshAccessToken, rpgfAccessJwtStore } from './siwe';
 import {
   applicationSchema,
   createRoundDtoSchema,
@@ -47,6 +47,7 @@ export async function rpgfServerCall(
   path: string,
   method: string = 'GET',
   body: unknown = null,
+  headers: Record<string, string> = {},
   f = fetch,
 ) {
   if (!rpgfApiUrl || !rpgfInternalApiUrl) {
@@ -55,37 +56,69 @@ export async function rpgfServerCall(
 
   const baseUrl = stripTrailingSlash(browser ? rpgfApiUrl : rpgfInternalApiUrl);
 
-  const jwt = get(rpgfJwtStore);
-
   const res = await f(`${baseUrl}/api${path}`, {
     method,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      credentials: 'include',
-      Authorization: jwt ? `Bearer ${jwt}` : '',
+      ...headers,
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 
-  if (!res.ok && res.status !== 404) {
-    const errorText = await res.text();
-    throw new Error(
-      `${res.status} - RPGF API call failed: ${res.status} ${res.statusText} - ${errorText}`,
-    );
+  return res;
+}
+
+export async function authenticatedRpgfServerCall(
+  path: string,
+  method: string = 'GET',
+  body: unknown = null,
+  f = fetch,
+  attemptRefresh: boolean = true,
+) {
+  const accessToken = get(rpgfAccessJwtStore);
+
+  const res = await rpgfServerCall(
+    path,
+    method,
+    body,
+    {
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
+    },
+    f,
+  );
+
+  if (res.status === 401 && accessToken && attemptRefresh) {
+    // Try to refresh the access token
+    const { success } = await refreshAccessToken();
+
+    if (success) {
+      return authenticatedRpgfServerCall(path, method, body, f, false);
+    }
   }
 
   return res;
 }
 
 export async function getDrafts(f = fetch): Promise<WrappedRoundDraft[]> {
-  const res = await rpgfServerCall(`/round-drafts?chainId=${network.chainId}`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/round-drafts?chainId=${network.chainId}`,
+    'GET',
+    undefined,
+    f,
+  );
 
   const parsed = wrappedRoundDraftSchema.array().parse(await res.json());
   return parsed;
 }
 
 export async function getRounds(f = fetch): Promise<(WrappedRoundPublic | WrappedRoundAdmin)[]> {
-  const res = await rpgfServerCall(`/rounds?chainId=${network.chainId}`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/rounds?chainId=${network.chainId}`,
+    'GET',
+    undefined,
+    f,
+  );
 
   const parsed = z
     .union([wrappedRoundPublicSchema, wrappedRoundAdminSchema])
@@ -98,14 +131,14 @@ export async function createDraft(
   f = fetch,
   draft: CreateRoundDraftDto,
 ): Promise<WrappedRoundDraft> {
-  const res = await rpgfServerCall(`/round-drafts/`, 'PUT', draft, f);
+  const res = await authenticatedRpgfServerCall(`/round-drafts/`, 'PUT', draft, f);
 
   const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
 }
 
 export async function getDraft(f = fetch, id: string): Promise<WrappedRoundDraft> {
-  const res = await rpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(`/round-drafts/${id}`, 'GET', undefined, f);
 
   const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
@@ -121,25 +154,30 @@ export async function updateDraft(
     Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
 
-  const res = await rpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
+  const res = await authenticatedRpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
 
   const parsed = wrappedRoundDraftSchema.parse(await res.json());
   return parsed;
 }
 
 export async function deleteDraft(f = fetch, id: string): Promise<Response> {
-  return await rpgfServerCall(`/round-drafts/${id}`, 'DELETE', undefined, f);
+  return await authenticatedRpgfServerCall(`/round-drafts/${id}`, 'DELETE', undefined, f);
 }
 
 export async function publishRound(f = fetch, id: string): Promise<WrappedRoundAdmin> {
-  const res = await rpgfServerCall(`/round-drafts/${id}/publish`, 'POST', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/round-drafts/${id}/publish`,
+    'POST',
+    undefined,
+    f,
+  );
 
   const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
 }
 
 export async function checkSlugAvailability(f = fetch, slug: string): Promise<boolean> {
-  const res = await rpgfServerCall(`/rounds/check-slug/${slug}`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(`/rounds/check-slug/${slug}`, 'GET', undefined, f);
 
   const { available } = slugAvailableResponseSchema.parse(await res.json());
   return available;
@@ -149,7 +187,7 @@ export async function getRound(
   f = fetch,
   slug: string,
 ): Promise<WrappedRoundAdmin | WrappedRoundPublic | null> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${slug}?chainId=${network.chainId}`,
     'GET',
     undefined,
@@ -164,7 +202,7 @@ export async function getRound(
 }
 
 export async function getRoundAsAdmin(f = fetch, slug: string): Promise<WrappedRoundAdmin | null> {
-  const res = await rpgfServerCall(`/rounds/${slug}/admin`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(`/rounds/${slug}/admin`, 'GET', undefined, f);
 
   const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
@@ -183,7 +221,7 @@ export async function submitApplication(
     ),
   );
 
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/applications`,
     'PUT',
     {
@@ -206,7 +244,7 @@ export async function getApplications(
   filterByUserId: string | null = null,
   filterByStatus: 'approved' | 'rejected' | 'pending' | null = null,
 ): Promise<Application[]> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/applications?sort=${sortBy}&limit=${limit}&offset=${offset}${filterByUserId ? `&submitterUserId=${filterByUserId}` : ''}${filterByStatus ? `&state=${filterByStatus}` : ''}`,
     'GET',
     undefined,
@@ -219,7 +257,7 @@ export async function getApplications(
 }
 
 export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<string> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/applications?format=csv`,
     'GET',
     undefined,
@@ -239,7 +277,7 @@ export async function getApplication(
   applicationFormat: ApplicationFormat,
   applicationId: string,
 ): Promise<Application> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/applications/${applicationId}`,
     'GET',
     undefined,
@@ -255,7 +293,7 @@ export async function patchRound(f = fetch, roundSlug: string, patchRoundDto: Pa
     Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
 
-  const res = await rpgfServerCall(`/rounds/${roundSlug}`, 'PATCH', strippedRound, f);
+  const res = await authenticatedRpgfServerCall(`/rounds/${roundSlug}`, 'PATCH', strippedRound, f);
 
   const parsed = wrappedRoundAdminSchema.parse(await res.json());
   return parsed;
@@ -266,7 +304,12 @@ export async function submitApplicationReview(
   roundSlug: string,
   decisions: ApplicationReviewDto,
 ): Promise<void> {
-  await rpgfServerCall(`/rounds/${roundSlug}/applications/review`, 'POST', decisions, f);
+  await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/applications/review`,
+    'POST',
+    decisions,
+    f,
+  );
 }
 
 export async function castBallot(
@@ -274,7 +317,7 @@ export async function castBallot(
   roundSlug: string,
   ballot: Ballot,
 ): Promise<WrappedBallot> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots`,
     'PUT',
     {
@@ -292,7 +335,7 @@ export async function patchBallot(
   roundSlug: string,
   updatedBallot: Ballot,
 ): Promise<WrappedBallot> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots/own`,
     'PATCH',
     {
@@ -306,7 +349,12 @@ export async function patchBallot(
 }
 
 export async function getOwnBallot(f = fetch, roundSlug: string): Promise<WrappedBallot | null> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots/own`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/own`,
+    'GET',
+    undefined,
+    f,
+  );
 
   if (res.status === 404) {
     return null;
@@ -317,14 +365,24 @@ export async function getOwnBallot(f = fetch, roundSlug: string): Promise<Wrappe
 }
 
 export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedBallot[]> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots`,
+    'GET',
+    undefined,
+    f,
+  );
 
   const parsed = wrappedBallotSchema.array().parse(await res.json());
   return parsed;
 }
 
 export async function getBallotsCsv(f = fetch, roundSlug: string): Promise<string> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots?format=csv`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots?format=csv`,
+    'GET',
+    undefined,
+    f,
+  );
 
   if (!res.ok) {
     throw new Error(`${res.status} - Failed to fetch ballots CSV: ${res.statusText}`);
@@ -340,7 +398,12 @@ export async function getBallotStats(
   numberOfVoters: number;
   numberOfBallots: number;
 }> {
-  const res = await rpgfServerCall(`/rounds/${roundSlug}/ballots/stats`, 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/stats`,
+    'GET',
+    undefined,
+    f,
+  );
 
   if (!res.ok) {
     throw new Error(`${res.status} - Failed to fetch ballot stats: ${res.statusText}`);
@@ -361,7 +424,7 @@ export async function recalculateResults(
   roundSlug: string,
   method: 'avg' | 'median' | 'sum',
 ): Promise<void> {
-  await rpgfServerCall(
+  await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/results/recalculate?method=${method}`,
     'POST',
     undefined,
@@ -372,7 +435,7 @@ export async function recalculateResults(
 }
 
 export async function publishResults(f = fetch, roundSlug: string): Promise<void> {
-  await rpgfServerCall(`/rounds/${roundSlug}/results/publish`, 'POST', undefined, f);
+  await authenticatedRpgfServerCall(`/rounds/${roundSlug}/results/publish`, 'POST', undefined, f);
 
   return;
 }
@@ -381,7 +444,7 @@ export async function getDripListWeightsForRound(
   f = fetch,
   roundSlug: string,
 ): Promise<Record<string, number>> {
-  const res = await rpgfServerCall(
+  const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/results/drip-list-weights`,
     'GET',
     undefined,
@@ -397,7 +460,7 @@ export async function linkDripListsToRound(
   roundSlug: string,
   dripListAccountIds: string[],
 ): Promise<void> {
-  await rpgfServerCall(
+  await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/drip-lists`,
     'PATCH',
     {

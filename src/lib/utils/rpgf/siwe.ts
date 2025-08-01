@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { browser } from '$app/environment';
 import { jwtDecode } from 'jwt-decode';
 
-export const rpgfJwtStore = storedWritable('rpgf-jwt', z.string().nullable(), null, !browser);
+export const rpgfAccessJwtStore = storedWritable('rpgf-jwt', z.string().nullable(), null, !browser);
 
 const jwtContentSchema = z.object({
   userId: z.string(),
@@ -50,14 +50,39 @@ export async function signInWithEthereum(signer: Signer) {
   const message = await createSiweMessage(address);
   const signature = await signer.signMessage(message);
 
-  const res = await rpgfServerCall('/auth/verify', 'POST', {
-    message,
-    signature,
-  });
-
-  if (res.ok) {
-    const resBody = z.object({ token: z.string() }).parse(await res.json());
-
-    rpgfJwtStore.set(resBody.token);
+  // Also sets httponly refresh token cookie
+  const { accessToken } = await (
+    await rpgfServerCall('/auth/login', 'POST', {
+      message,
+      signature,
+    })
+  ).json();
+  if (!accessToken || typeof accessToken !== 'string') {
+    throw new Error('Failed to retrieve access token');
   }
+
+  rpgfAccessJwtStore.set(accessToken);
+}
+
+export async function refreshAccessToken(): Promise<{ success: boolean }> {
+  rpgfAccessJwtStore.set(null);
+
+  const res = await rpgfServerCall('/auth/refresh-access-token', 'POST');
+
+  if (!res.ok) {
+    return { success: false };
+  }
+
+  const { accessToken } = await res.json();
+  if (!accessToken || typeof accessToken !== 'string') {
+    return { success: false };
+  }
+
+  rpgfAccessJwtStore.set(accessToken);
+  return { success: true };
+}
+
+export async function logOut() {
+  await rpgfServerCall('/auth/logout', 'POST');
+  rpgfAccessJwtStore.set(null);
 }

@@ -1,10 +1,19 @@
+import buildUrl from '$lib/utils/build-url';
 import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 export const ssr = false;
 
-export const load = async ({ fetch, params, parent }) => {
+export const load = async ({ fetch, params, parent, url }) => {
   const { rpgfUserData } = await parent();
+
+  if (!rpgfUserData) {
+    // User is not signed in, so redirect to connect
+    return redirect(
+      307,
+      buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }),
+    );
+  }
 
   const { slug } = params;
 

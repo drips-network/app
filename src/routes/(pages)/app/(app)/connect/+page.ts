@@ -1,5 +1,5 @@
 import getConnectedAddress from '$lib/utils/get-connected-address';
-import { rpgfJwtStore } from '$lib/utils/rpgf/siwe.js';
+import { rpgfAccessJwtStore } from '$lib/utils/rpgf/siwe.js';
 import isSafePath from '$lib/utils/safe-path';
 import { redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -10,7 +10,7 @@ export const load = async ({ url }) => {
 
   const connectedAddress = getConnectedAddress();
 
-  if (connectedAddress && (!requireRpgfSignIn || (requireRpgfSignIn && get(rpgfJwtStore)))) {
+  if (connectedAddress && (!requireRpgfSignIn || (requireRpgfSignIn && get(rpgfAccessJwtStore)))) {
     if (backTo) {
       const decoded = decodeURIComponent(backTo);
       const isSafe = isSafePath(decoded);
