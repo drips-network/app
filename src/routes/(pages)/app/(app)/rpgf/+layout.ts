@@ -57,6 +57,16 @@ export const load = async ({ url, fetch }) => {
   if (loggedIn) {
     const additionalUserData = await getOwnUserData(fetch);
 
+    if (!additionalUserData) {
+      // The user's refresh & access tokens may have expired, so treat them as logged out.
+
+      await logOut();
+
+      return {
+        rpgfUserData: null,
+      };
+    }
+
     return {
       rpgfUserData: {
         ...updatedSignInData,

@@ -31,6 +31,7 @@
   emoji="💀"
   headline="Error {$page.status}"
   {description}
+  showSiweButton={$page.status === 401}
   button={{
     label: 'Go back',
     handler: () => goto('/app/rpgf'),

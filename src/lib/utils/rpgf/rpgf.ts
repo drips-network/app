@@ -27,6 +27,7 @@ import {
 } from './schemas';
 import { z } from 'zod';
 import network from '$lib/stores/wallet/network';
+import { error } from '@sveltejs/kit';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -95,6 +96,11 @@ export async function authenticatedRpgfServerCall(
     if (success) {
       return authenticatedRpgfServerCall(path, method, body, f, false);
     }
+  }
+
+  if (res.status === 401) {
+    // User needs to re-authenticate
+    throw error(401);
   }
 
   return res;
@@ -472,8 +478,16 @@ export async function linkDripListsToRound(
   return;
 }
 
-export async function getOwnUserData(f = fetch) {
+export async function getOwnUserData(f = fetch): Promise<{
+  walletAddress: string;
+  id: string;
+  whitelisted: boolean;
+} | null> {
   const res = await authenticatedRpgfServerCall('/users/me', 'GET', undefined, f);
+
+  if (res.status === 401) {
+    return null;
+  }
 
   return z
     .object({
