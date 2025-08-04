@@ -471,3 +471,15 @@ export async function linkDripListsToRound(
 
   return;
 }
+
+export async function getOwnUserData(f = fetch) {
+  const res = await authenticatedRpgfServerCall('/users/me', 'GET', undefined, f);
+
+  return z
+    .object({
+      walletAddress: z.string(),
+      id: z.string(),
+      whitelisted: z.boolean(),
+    })
+    .parse(await res.json());
+}
