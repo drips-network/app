@@ -75,7 +75,7 @@
       Ready to run your round on Drips? Reach out to the team now.
 
       <svelte:fragment slot="actions">
-        <Button variant="primary" href={INBOUND_LEAD_FORM_URL} icon={ArrowRight}>
+        <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank" icon={ArrowRight}>
           Get in touch
         </Button>
       </svelte:fragment>
