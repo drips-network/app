@@ -1,10 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import RpgfRoundCard from '$lib/components/rpgf-round-card/rpgf-round-card.svelte';
   import Section from '$lib/components/section/section.svelte';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import network from '$lib/stores/wallet/network';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import emoji from '$lib/utils/emoji/emoji.js';
@@ -14,11 +18,13 @@
   import type { PossibleColor } from '$lib/utils/rpgf/schemas.js';
 
   export let data;
-  $: ownRoundsAndDrafts = [
-    ...data.rounds.filter((round) => round.isAdmin),
-    ...data.drafts.filter((draft) => draft.isAdmin),
-  ];
-  $: otherRounds = data.rounds.filter((round) => !round.isAdmin);
+  $: ownRoundsAndDrafts = data.rpgfUserData
+    ? [
+        ...data.rounds.filter((round) => round.isAdmin),
+        ...data.drafts.filter((draft) => draft.isAdmin),
+      ]
+    : [];
+  $: otherRounds = data.rounds.filter((round) => ownRoundsAndDrafts.includes(round) === false);
 
   let loading = false;
 
@@ -61,6 +67,21 @@
 <HeadMeta title="Retro PGF" />
 
 <div class="page">
+  {#if !data.rpgfUserData?.whitelisted}
+    <AnnotationBox type="info">
+      <span class="typo-text-small-bold"
+        >Currently, only whitelisted users can create new RetroPGF rounds.</span
+      >
+      Ready to run your round on Drips? Reach out to the team now.
+
+      <svelte:fragment slot="actions">
+        <Button variant="primary" href={INBOUND_LEAD_FORM_URL} icon={ArrowRight}>
+          Get in touch
+        </Button>
+      </svelte:fragment>
+    </AnnotationBox>
+  {/if}
+
   <Section
     header={{
       label: `Your rounds`,
@@ -71,7 +92,7 @@
           icon: Plus,
           handler: handleCreateRoundDraft,
           loading,
-          disabled: !data.rpgfUserData,
+          disabled: !data.rpgfUserData?.whitelisted,
         },
       ],
     }}
@@ -94,25 +115,27 @@
     </div>
   </Section>
 
-  <Section
-    header={{
-      label: `All rounds on ${network.label}`,
-      icon: ArrowCounterClockwiseHeart,
-    }}
-    skeleton={{
-      loaded: true,
-      empty: otherRounds.length === 0,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No rounds found',
-      emptyStateText: 'There are no rounds available at the moment.',
-    }}
-  >
-    <div class="card-grid">
-      {#each otherRounds ?? [] as wrappedRound}
-        <RpgfRoundCard wrappedRoundOrDraft={wrappedRound} />
-      {/each}
-    </div>
-  </Section>
+  {#if otherRounds.length > 0}
+    <Section
+      header={{
+        label: `All rounds on ${network.label}`,
+        icon: ArrowCounterClockwiseHeart,
+      }}
+      skeleton={{
+        loaded: true,
+        empty: otherRounds.length === 0,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No rounds found',
+        emptyStateText: 'There are no rounds available at the moment.',
+      }}
+    >
+      <div class="card-grid">
+        {#each otherRounds ?? [] as wrappedRound}
+          <RpgfRoundCard wrappedRoundOrDraft={wrappedRound} />
+        {/each}
+      </div>
+    </Section>
+  {/if}
 </div>
 
 <style>
