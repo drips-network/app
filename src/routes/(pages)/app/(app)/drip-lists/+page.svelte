@@ -47,7 +47,7 @@
       <p>
         Stream any ERC-20 token to a list of individuals, Git projects, or other Drip
         Lists&mdash;weighted by their importance to you. <a
-          href="https://docs.drips.network/support-your-dependencies"
+          href="https://docs.drips.network/support-your-dependencies/overview"
           class="text-foreground-level-5 hover:text-foreground hover:underline transition duration-150 focus-visible:bg-primary-level-1 focus-visible:text-foreground focus-visible:underline px-1 py-0.5 -mx-1 rounded focus:outline-none"
           >Learn&nbsp;more</a
         >
