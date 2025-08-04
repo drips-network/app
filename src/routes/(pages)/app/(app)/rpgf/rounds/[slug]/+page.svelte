@@ -144,7 +144,7 @@
                 ),
             },
           ]
-        : undefined,
+        : [],
     }}
     skeleton={{
       empty: data.linkedDripLists.length === 0,
