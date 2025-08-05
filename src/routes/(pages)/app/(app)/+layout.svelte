@@ -83,7 +83,9 @@
 
 <div class="main" in:fly|global={{ duration: 300, y: 16 }}>
   <div class="page">
-    <div class:loading={$navigating}><slot /></div>
+    <div class="page-content">
+      <div class:loading={$navigating} class="page-content-inner"><slot /></div>
+    </div>
   </div>
 
   <div
@@ -121,10 +123,19 @@
   .page {
     position: relative;
     min-height: 100vh;
-    max-width: 75rem;
     width: 100vw;
     padding: 6.5rem 2.5rem 4rem 2.5rem;
     margin: 0 auto 0 16rem;
+  }
+
+  .page-content {
+    display: flex;
+    justify-content: center;
+  }
+
+  .page-content-inner {
+    max-width: 75rem;
+    width: 100%;
   }
 
   div {
