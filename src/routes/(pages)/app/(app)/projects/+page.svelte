@@ -111,7 +111,7 @@
   .page {
     display: flex;
     flex-direction: column;
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .edu-card-illustration-bg {
