@@ -3,8 +3,14 @@
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
   import { browser } from '$app/environment';
+  import Ellipsis from '../icons/Ellipsis.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import Overflow from './overflow.svelte';
 
   export let items: BottomNavItems;
+
+  $: bottomNavItems = items.slice(0, 4);
+  $: isOverflowing = items.length > 4;
 
   interface ItemElems {
     [href: string]: HTMLAnchorElement;
@@ -41,13 +47,17 @@
 
     selectorOffset = activeElem.offsetLeft - 10;
   }
+
+  function handleOverflowClick() {
+    cupertinoPaneStore.openSheet(Overflow, { items });
+  }
 </script>
 
 <svelte:window on:resize={updateSelectorPos} />
 
 <div class="bottom-nav">
   <div class="items">
-    {#each items as item}
+    {#each bottomNavItems as item}
       <a
         data-highlightid="bottomnav-{item.href}"
         class="item typo-text-small-bold"
@@ -66,6 +76,14 @@
         </span>
       </a>
     {/each}
+
+    {#if isOverflowing}
+      <button class="item typo-text-small-bold" on:click={handleOverflowClick}>
+        <Ellipsis style="fill: var(--color-foreground)" />
+        <span>More</span>
+      </button>
+    {/if}
+
     <div class="selector">
       {#if activeElem}
         <div

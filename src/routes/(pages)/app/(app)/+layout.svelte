@@ -19,14 +19,35 @@
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  $: navItems = [
-    { label: 'Explore', href: '/app', icon: ExploreIcon },
-    { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-    { label: 'Projects', href: '/app/projects', icon: Box },
-    { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
+  const navItems = [
+    {
+      label: 'Explore',
+      href: '/app',
+      icon: ExploreIcon,
+      description: 'Discover projects and stats across Drips.',
+    },
+    {
+      label: 'Funds',
+      href: '/app/funds',
+      icon: TokenStreams,
+      description: 'Discover or create fundable lists.',
+    },
+    {
+      label: 'Projects',
+      href: '/app/projects',
+      icon: Box,
+      description: 'Browse or claim a GitHub project.',
+    },
+    {
+      label: 'Drip Lists',
+      href: '/app/drip-lists',
+      icon: DripListIcon,
+      description: 'Discover or create fundable lists.',
+    },
     {
       label: 'Profile',
       href: '/app/profile',
+      description: 'Your stuff on Drips.',
       icon: User,
     },
   ];
