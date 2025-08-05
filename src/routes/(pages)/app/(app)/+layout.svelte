@@ -13,44 +13,62 @@
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import type { LayoutData } from './$types';
+  import Settings from '$lib/components/icons/Settings.svelte';
 
   export let data: LayoutData;
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  const navItems = [
-    {
-      label: 'Explore',
-      href: '/app',
-      icon: ExploreIcon,
-      description: 'Discover projects and stats across Drips.',
-    },
-    {
-      label: 'Funds',
-      href: '/app/funds',
-      icon: TokenStreams,
-      description: 'Discover or create fundable lists.',
-    },
-    {
-      label: 'Projects',
-      href: '/app/projects',
-      icon: Box,
-      description: 'Browse or claim a GitHub project.',
-    },
-    {
-      label: 'Drip Lists',
-      href: '/app/drip-lists',
-      icon: DripListIcon,
-      description: 'Discover or create fundable lists.',
-    },
-    {
-      label: 'Profile',
-      href: '/app/profile',
-      description: 'Your stuff on Drips.',
-      icon: User,
-    },
-  ];
+  const navItems = {
+    top: [
+      {
+        label: 'Explore',
+        href: '/app',
+        icon: ExploreIcon,
+        description: 'Discover projects and stats across Drips.',
+      },
+      {
+        label: 'Funds',
+        href: '/app/funds',
+        icon: TokenStreams,
+        description: 'Discover or create fundable lists.',
+      },
+      {
+        label: 'Projects',
+        href: '/app/projects',
+        icon: Box,
+        description: 'Browse or claim a GitHub project.',
+      },
+      {
+        label: 'Drip Lists',
+        href: '/app/drip-lists',
+        icon: DripListIcon,
+        description: 'Discover or create fundable lists.',
+      },
+      {
+        label: 'Profile',
+        href: '/app/profile',
+        description: 'Your stuff on Drips.',
+        icon: User,
+      },
+    ],
+    bottom: [
+      {
+        label: 'Settings',
+        href: '/app/settings',
+        icon: Settings,
+        description: 'Configure your Drips experience.',
+      },
+      {
+        label: 'Help',
+        href: 'https://docs.drips.network/',
+        icon: InfoCircle,
+        external: true,
+        description: 'Read the Drips documentation.',
+      },
+    ],
+  };
 
   $: {
     if ($navigating) {
@@ -74,22 +92,10 @@
     out:fly|global={{ duration: 300, x: -64, easing: quintIn }}
     data-testid="sidenav"
   >
-    <Sidenav
-      items={{
-        top: navItems,
-        bottom: [
-          {
-            label: 'Help',
-            href: 'https://docs.drips.network/',
-            icon: InfoCircle,
-            external: true,
-          },
-        ],
-      }}
-    />
+    <Sidenav items={navItems} />
   </div>
   <div class="bottom-nav" data-testid="bottom-nav">
-    <BottomNav items={navItems} />
+    <BottomNav items={[...navItems.top, ...navItems.bottom]} />
   </div>
 
   <div class="header" in:fly|global={{ duration: 300, y: 16 }}>
