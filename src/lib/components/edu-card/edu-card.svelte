@@ -76,9 +76,7 @@
       width: 100%;
       max-width: 100%;
     }
-  }
 
-  @media (max-width: 430px) {
     .buttons {
       flex-direction: column;
       align-items: start;
