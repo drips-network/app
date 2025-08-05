@@ -55,8 +55,9 @@
             isModal: true,
           })}>Create a Drip List</Button
       >
-      <Button icon={ArrowBoxUpRight} href="https://docs.drips.network/support-your-dependencies"
-        >Learn More</Button
+      <Button
+        icon={ArrowBoxUpRight}
+        href="https://docs.drips.network/support-your-dependencies/overview">Learn More</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">
