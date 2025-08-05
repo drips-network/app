@@ -73,7 +73,7 @@
       : 'This user hasnʼt claimed any software projects yet.',
     disconnected: !$walletStore.connected,
     disconnectedStateEmoji: '🫙',
-    disconnectedStateHeadline: 'No claimed projects',
+    disconnectedStateHeadline: 'Connect your wallet',
     disconnectedStateText: 'Your claimed projects will show up here when your wallet is connected.',
   }}
 >

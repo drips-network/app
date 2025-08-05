@@ -90,7 +90,7 @@
     horizontalScroll: false,
     disconnected: !$walletStore.connected,
     disconnectedStateEmoji: '🫙',
-    disconnectedStateHeadline: 'No claimed Drip Lists',
+    disconnectedStateHeadline: 'Connect your wallet',
     disconnectedStateText: 'Your Drip Lists will show up here when your wallet is connected.',
   }}
 >
