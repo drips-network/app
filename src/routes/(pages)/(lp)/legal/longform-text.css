@@ -12,16 +12,32 @@
   margin-bottom: 1rem;
 }
 
+.legal-page .content h5 {
+  font-weight: initial;
+  font-size: initial;
+  letter-spacing: initial;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+  text-transform: initial;
+}
+
 .legal-page .content p,
 .legal-page .content ol {
   margin-bottom: 1rem;
 }
 
-.legal-page .content ol li {
+.legal-page .content ol li,
+.legal-page .content ul li {
   list-style: initial;
   margin-left: 1rem;
 }
 
 .legal-page .content a {
   text-decoration: underline;
+}
+
+.legal-page ul,
+.legal-page ol {
+  list-style: initial;
+  margin-bottom: 1rem;
 }
