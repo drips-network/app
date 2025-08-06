@@ -91,21 +91,19 @@
     ></ProminentKeyValuePair>
   </StatsSection>
 
-  <Section
-    header={{
-      icon: DripListIcon,
-      label: 'Featured Drip Lists',
-    }}
-    skeleton={{
-      loaded: true,
-      empty: !data.featuredDripLists.length,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No Featured Drip Lists',
-      emptyStateText: 'We couldn’t find any featured Drip Lists.',
-    }}
-  >
-    <DripListsGrid dripLists={data.featuredDripLists} />
-  </Section>
+  {#if data.featuredDripLists.length}
+    <Section
+      header={{
+        icon: DripListIcon,
+        label: 'Featured Drip Lists',
+      }}
+      skeleton={{
+        loaded: true,
+      }}
+    >
+      <DripListsGrid dripLists={data.featuredDripLists} />
+    </Section>
+  {/if}
 
   <Section
     header={{

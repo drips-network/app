@@ -87,23 +87,21 @@
     ></ProminentKeyValuePair>
   </StatsSection>
 
-  <Section
-    header={{
-      icon: BoxIcon,
-      label: 'Featured projects',
-    }}
-    skeleton={{
-      loaded: true,
-      empty: !data.featuredProjects.length,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No Featured Projects',
-      emptyStateText: 'We couldn’t find any featured projects.',
-    }}
-  >
-    <div class="horizontal-scroll">
-      <ProjectsGrid projects={data.featuredProjects} />
-    </div>
-  </Section>
+  {#if data.featuredProjects.length}
+    <Section
+      header={{
+        icon: BoxIcon,
+        label: 'Featured projects',
+      }}
+      skeleton={{
+        loaded: true,
+      }}
+    >
+      <div class="horizontal-scroll">
+        <ProjectsGrid projects={data.featuredProjects} />
+      </div>
+    </Section>
+  {/if}
 
   <RecentlyClaimedProjects projects={data.restProjects} />
 </div>
