@@ -10,11 +10,15 @@
   <section>
     <h2>General information</h2>
     <p>
-      As the operator of the Drips Web App (<a href="https://www.drips.network/app"
-        >https://www.drips.network/app</a
+      As the operator of the Drips Web App (<a
+        href="https://www.drips.network/app"
+        target="_blank"
+        rel="noopener noreferrer">https://www.drips.network/app</a
       >), and other *.drips.network/app instances, hereinafter " Drips Web App ") as well as other
-      Drips websites (such as <a href="https://www.drips.network/">https://www.drips.network/</a>,
-      and any other *.drips.network domains, excluding the Drips Web App, hereinafter the " Drips
+      Drips websites (such as
+      <a href="https://www.drips.network/" target="_blank" rel="noopener noreferrer"
+        >https://www.drips.network/</a
+      >, and any other *.drips.network domains, excluding the Drips Web App, hereinafter the " Drips
       Website "; collectively with Drips Web App referred to as the " Drips Services "), Public
       Goods Association (hereinafter the "Association" or "we") takes the protection of personal
       data very seriously. We treat personal data confidentially, in accordance with the statutory
@@ -388,11 +392,14 @@
       We use the EU Commission's standard contractual clauses for the transfer of personal data to
       third countries (<a
         href="https://ec.europa.eu/info/sites/default/files/1_de_annexe_acte_autonome_cp_part1_v3.pdf"
-        >SCC</a
+        target="_blank"
+        rel="noopener noreferrer">SCC</a
       >) to ensure an appropriate level of protection for the recipient of the data.
     </p>
     <p>
       You have the option of accessing the SCC via the <a
+        target="_blank"
+        rel="noopener noreferrer"
         href="https://ec.europa.eu/info/sites/default/files/1_de_annexe_acte_autonome_cp_part1_v3.pdf"
         >link</a
       > provided or requesting a copy from the data protection officer.
@@ -453,10 +460,28 @@
     </p>
     <p>We use the following social media:</p>
     <ul>
-      <li>Discord</li>
-      <li>X (formerly Twitter)</li>
-      <li>Bluesky</li>
-      <li>GitHub</li>
+      <li>
+        <a href="https://discord.com/privacy" target="_blank" rel="noopener noreferrer">Discord</a>
+      </li>
+      <li>
+        <a href="https://x.com/en/privacy" target="_blank" rel="noopener noreferrer"
+          >X (formerly Twitter)</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://bsky.social/about/support/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer">Bluesky</a
+        >
+      </li>
+      <li>
+        <a
+          href="https://help.github.com/en/articles/github-privacy-statement"
+          target="_blank"
+          rel="noopener noreferrer">GitHub</a
+        >
+      </li>
     </ul>
   </section>
 
