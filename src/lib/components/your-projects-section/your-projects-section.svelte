@@ -47,7 +47,7 @@
   bind:collapsable
   header={{
     icon: Box,
-    label: 'Your Projects',
+    label: 'Your projects',
     actions: withClaimProjectButton
       ? [
           {
