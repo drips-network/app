@@ -10,7 +10,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import YourProjectsSection, {
     PROJECTS_SECTION_PROJECT_FRAGMENT,
   } from '$lib/components/your-projects-section/your-projects-section.svelte';
@@ -42,6 +41,11 @@
         Projects are GitHub repositories associated with an Ethereum address, stored in a
         FUNDING.json file. They include maintainers and dependencies, which the owner can choose to
         split a percentage of any incoming funds to.
+        <a
+          class="typo-link"
+          href="https://docs.drips.network/get-support/claim-your-repository"
+          target="_blank">Learn more</a
+        >
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
@@ -52,11 +56,6 @@
           modal.show(ClaimProjectStepper, undefined, {
             skipWalletConnect: $walletStore.connected,
           })}>Claim your project</Button
-      >
-      <Button
-        icon={ArrowBoxUpRight}
-        target="_blank"
-        href="https://docs.drips.network/get-support/claim-your-repository">Learn More</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">

@@ -76,11 +76,5 @@
       width: 100%;
       max-width: 100%;
     }
-
-    .buttons {
-      flex-direction: column;
-      align-items: start;
-      gap: 1rem;
-    }
   }
 </style>

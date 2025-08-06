@@ -20,7 +20,6 @@
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
   import modal from '$lib/stores/modal';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -43,6 +42,11 @@
         projects, users, other Drip Lists, or Ecosystems. Each recipient in the list is assigned a
         percentage, which determines the amount of funds that recipient receives when funds are sent
         to the list.
+        <a
+          class="typo-link"
+          href="https://docs.drips.network/support-your-dependencies/overview"
+          target="_blank">Learn more</a
+        >
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
@@ -54,11 +58,6 @@
             skipWalletConnect: $walletStore.connected,
             isModal: true,
           })}>Create a Drip List</Button
-      >
-      <Button
-        icon={ArrowBoxUpRight}
-        target="_blank"
-        href="https://docs.drips.network/support-your-dependencies/overview">Learn More</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">
