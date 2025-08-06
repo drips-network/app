@@ -57,6 +57,7 @@
       >
       <Button
         icon={ArrowBoxUpRight}
+        target="_blank"
         href="https://docs.drips.network/support-your-dependencies/overview">Learn More</Button
       >
     </svelte:fragment>

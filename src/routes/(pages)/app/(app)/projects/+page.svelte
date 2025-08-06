@@ -55,6 +55,7 @@
       >
       <Button
         icon={ArrowBoxUpRight}
+        target="_blank"
         href="https://docs.drips.network/get-support/claim-your-repository">Learn More</Button
       >
     </svelte:fragment>
