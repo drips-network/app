@@ -63,9 +63,10 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.75rem;
+    flex-wrap: wrap;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .edu-card {
       flex-direction: column-reverse;
       gap: 2rem;
