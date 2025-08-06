@@ -94,7 +94,15 @@
       <h2 class="name pixelated">
         <ProjectName pixelated showSource={false} {project} />
       </h2>
-      <ProjectBadge tooltip={false} linkTo="project-page" linkToNewTab size="tiny" {project} />
+      <ProjectBadge
+        forceUnclaimed
+        smallText
+        tooltip={false}
+        linkTo="project-page"
+        linkToNewTab
+        size="tiny"
+        {project}
+      />
       <!-- TODO: Add descriptions to product cards · Issue #1579 -->
       <!-- {#if projectChainData.description}
         <p class="typo-text-small line-clamp-2">{projectChainData.description}</p>

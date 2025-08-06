@@ -50,13 +50,14 @@
   export let project: ProjectBadgeFragment;
 
   export let tooltip = true;
+  /** display project as if it's unclaimed, even if it is claimed */
   export let forceUnclaimed = false;
   export let hideAvatar = false;
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
+  export let smallText = false;
   export let chainOverride: SupportedChain | undefined = undefined;
-  export let onlyForgeAvatar = true;
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -73,14 +74,13 @@
   $: processedProject = forceUnclaimed ? unclaimedProject : project;
 
   $: chainData = filterCurrentChainData(processedProject.chainData, undefined, chainOverride);
-  $: gap = onlyForgeAvatar ? 'gap-1' : 'gap-2';
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
-      class="project-badge flex {gap} items-center typo-text"
+      class="project-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
       href={linkTo === 'project-page'
         ? buildProjectUrl(
             processedProject.source.forge,
@@ -104,13 +104,11 @@
               />
             </div>
           {/if}
-          {#if !onlyForgeAvatar}
-            <div><ProjectAvatar {size} project={chainData} /></div>
-          {/if}
+          <div><ProjectAvatar {size} project={chainData} /></div>
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
-        <ProjectName project={processedProject} tiny={size === 'tiny'} />
+        <ProjectName tiny={smallText} project={processedProject} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon
