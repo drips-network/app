@@ -84,6 +84,7 @@
         modal.show(ClaimProjectStepper, undefined, {
           skipWalletConnect: true,
           linkToProjectPageOnSuccess: false,
+          skipNetworkSelection: true,
         }),
     },
   };
@@ -218,6 +219,7 @@
             modal.show(ClaimProjectStepper, undefined, {
               skipWalletConnect: true,
               linkToProjectPageOnSuccess: false,
+              skipNetworkSelection: true,
             })}
         >
           Claim new project
