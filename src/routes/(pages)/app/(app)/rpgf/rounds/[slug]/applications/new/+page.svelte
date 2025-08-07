@@ -73,8 +73,6 @@
         ];
       }),
     ),
-    // TODO(rpgf): Skip the network select screen, and don't link to new project at the end.
-    // Instead, just close the modal and invalidate the load function.
     'claim-project': {
       type: 'action',
       label: 'Claim new project',
