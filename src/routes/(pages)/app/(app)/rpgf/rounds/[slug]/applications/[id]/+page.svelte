@@ -140,7 +140,6 @@
             {:else}
               <span>No answer</span>
             {/if}
-            <!-- TODO(rpgf): Implement the rest of possible field types -->
           </div>
         {/if}
       {/each}

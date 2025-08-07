@@ -158,10 +158,12 @@ export const steps = (
   isModal = false,
   projectUrl: string | undefined = undefined,
   linkToProjectPageOnSuccess = true,
+  skipNetworkSelection = false,
 ) => [
   makeStep({
     component: ChooseNetwork,
     props: undefined,
+    condition: () => !skipNetworkSelection,
   }),
   makeStep({
     component: EnterGitUrl,
