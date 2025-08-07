@@ -9,7 +9,7 @@
   export let skipNetworkSelection = false;
   export let linkToProjectPageOnSuccess = true;
 
-  let currentStepIndex = 0;
+  let currentStepIndex = skipNetworkSelection ? 1 : 0;
 
   const myState = state();
 

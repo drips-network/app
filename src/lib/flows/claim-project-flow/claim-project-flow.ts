@@ -169,6 +169,7 @@ export const steps = (
     component: EnterGitUrl,
     props: {
       projectUrl,
+      showBackButton: !skipNetworkSelection,
     },
   }),
   ...(skipWalletConnect
