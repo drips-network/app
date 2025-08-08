@@ -138,10 +138,16 @@ type OmitContext<T> = Omit<T, 'context'>;
 export type Props<T> = T extends SvelteComponent<infer P, any, any> ? OmitContext<P> : never;
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
-export type Step<T extends SvelteComponent> = {
-  condition?: () => boolean;
+type ComponentAndProps<T extends SvelteComponent> = {
   component: Constructor<T>;
   props: PropsOrUndefined<T>;
+};
+
+export type Step<T extends SvelteComponent> = {
+  component: Constructor<T>;
+  props: PropsOrUndefined<T>;
+  condition?: () => boolean;
+  staticHeaderComponent?: ComponentAndProps<SvelteComponent>;
 };
 
 type SomeStep = <R>(step: <T extends SvelteComponent>(step: Step<T>) => R) => R;

@@ -59,7 +59,7 @@
   <StepHeader
     headline="Cast your ballot"
     description="Are you sure you want to cast your ballot now? After casting, you can view and make changes until voting for the round closes."
-    emoji="💦"
+    emoji="🗳️"
   />
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Never mind</Button>

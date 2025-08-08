@@ -285,6 +285,15 @@
   onDestroy(() => resizeObserver?.disconnect());
 </script>
 
+{#if currentStep?.staticHeaderComponent}
+  <div class="static-header">
+    <svelte:component
+      this={currentStep.staticHeaderComponent.component}
+      {...currentStep.staticHeaderComponent.props}
+    />
+  </div>
+{/if}
+
 <div
   class="wrapper w-full"
   style:height={`${$wrapperHeight}px`}
@@ -331,6 +340,14 @@
   .wrapper {
     position: relative;
     margin: 0 auto;
+  }
+
+  .static-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 5rem;
+    padding-top: 1rem;
   }
 
   .step-wrapper {

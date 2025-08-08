@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 import FetchListWeights from './fetch-list-weights.svelte';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import ReviewList from './review-list.svelte';
-import Success from './success.svelte';
+import SuccessStep from '$lib/components/success-step/success-step.svelte';
 
 export interface State {
   weights: Weights | null;
@@ -33,9 +33,13 @@ export default (roundSlug: string, roundName: string) => {
         },
       }),
       makeStep({
-        component: Success,
+        component: SuccessStep,
         props: {
-          roundSlug,
+          message:
+            'Your new Drip List has been created and linked to the round. It is now publicly visible and may be funded by anyone.',
+          action: 'link',
+          linkText: 'View your round',
+          href: () => `/app/rpgf/rounds/${roundSlug}`,
         },
       }),
     ],
