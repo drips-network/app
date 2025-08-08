@@ -1,0 +1,293 @@
+import type { Attributes } from 'graphology-types';
+import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/types';
+import type { Settings } from 'sigma/settings';
+import type { Project, Source } from '$lib/graphql/__generated__/base-types';
+import type Sigma from 'sigma';
+import type { EdgeLabelDrawingFunction } from 'sigma/rendering';
+import { ensureResponseOk } from '$lib/utils/fetch';
+
+export type LayoutMapping = { [key: string]: { x: number; y: number } };
+export type NodeSelectionChangedPayload = { nodeId?: string };
+export type CustomSource = Omit<Source, 'forge' | '__typename'>;
+
+/**
+ * Fetch the specified project from the backend.
+ *
+ * @param {String} ownerName  The owner name of the project
+ * @param {String} repoName The name of the project's repository
+ * @param {String} forge  The location of the repository
+ * @returns {Promise<{ project: Project, description: string }>} Details of the specified project.
+ */
+export async function fetchProject(
+  ownerName: string,
+  repoName: string,
+  forge: string = 'github',
+): Promise<{
+  project: Project;
+  description: string;
+  newRepo: CustomSource;
+  correctCasingRepo: CustomSource;
+}> {
+  const response = await ensureResponseOk(
+    fetch(
+      `/api/projects/${encodeURIComponent(forge)}/${encodeURIComponent(ownerName)}/${encodeURIComponent(repoName)}`,
+    ),
+  );
+
+  const projectData = await response.json();
+
+  return projectData;
+}
+
+/**
+ * A function that injects the renderer (aka the Sigma instance) into the label drawing function.
+ *
+ * @param {Sigma} renderer a Sigma instance
+ * @returns {typeof drawStraightEdgeLabel} A function that draws edge labels.
+ */
+export function createDrawStraightEdgeLabel(renderer: Sigma): EdgeLabelDrawingFunction {
+  return function (...args) {
+    return drawStraightEdgeLabel(renderer, ...args);
+  };
+}
+
+// don't show labels when zoom is less than this
+const LABEL_ZOOM_THRESHOLD = 2;
+
+/**
+ * Draw an edge's label approximately mid-way through an edge level with the bottom of the viewport.
+ *
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/edge-labels.ts
+ *
+ * @param {Sigma} renderer The rendering Sigma context.
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {EdgeDisplayData} edgeData This particular edge's data.
+ * @param {NodeDisplayData} sourceData The data of the edge's source node.
+ * @param {NodeDisplayData} targetData THe data of the edge's target node.
+ * @param {Settings} settings The settings of the renderer
+ */
+export function drawStraightEdgeLabel<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
+  renderer: Sigma,
+  context: CanvasRenderingContext2D,
+  edgeData: PartialButFor<EdgeDisplayData, 'label' | 'color' | 'size'>,
+  sourceData: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size'>,
+  targetData: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size'>,
+  settings: Settings<N, E, G>,
+): void {
+  let size = settings.edgeLabelSize;
+  const font = settings.edgeLabelFont,
+    weight = settings.edgeLabelWeight,
+    color = settings.edgeLabelColor.attribute
+      ? edgeData[settings.edgeLabelColor.attribute] || settings.edgeLabelColor.color || '#000'
+      : settings.edgeLabelColor.color;
+
+  let label = edgeData.label;
+
+  if (!label) return;
+
+  const camera = renderer.getCamera();
+  const cameraState = camera.getState();
+  if (1 / cameraState.ratio < LABEL_ZOOM_THRESHOLD) {
+    return;
+  }
+
+  size = Math.min(size * Math.pow(1 / cameraState.ratio, 1), 14);
+
+  context.fillStyle = color;
+  context.font = `${weight} ${size}px ${font}`;
+
+  // Computing positions without considering nodes sizes:
+  // Subtract borderSize to prevent label twitching when hovering on
+  // edges of selected nodes.
+  const sSize = sourceData.size - sourceData.borderSize;
+  const tSize = targetData.size - targetData.borderSize;
+  let sx = sourceData.x;
+  let sy = sourceData.y;
+  let tx = targetData.x;
+  let ty = targetData.y;
+  let cx = (sx + tx) / 2;
+  let cy = (sy + ty) / 2;
+  let dx = tx - sx;
+  let dy = ty - sy;
+  let d = Math.sqrt(dx * dx + dy * dy);
+
+  if (d < sSize + tSize) return;
+
+  // Adding nodes sizes:
+  sx += (dx * sSize) / d;
+  sy += (dy * sSize) / d;
+  tx -= (dx * tSize) / d;
+  ty -= (dy * tSize) / d;
+  cx = (sx + tx) / 2;
+  cy = (sy + ty) / 2;
+  dx = tx - sx;
+  dy = ty - sy;
+  d = Math.sqrt(dx * dx + dy * dy);
+
+  // Handling ellipsis
+  let textLength = context.measureText(label).width;
+
+  if (textLength > d) {
+    const ellipsis = '…';
+    label = label + ellipsis;
+    textLength = context.measureText(label).width;
+
+    while (textLength > d && label.length > 1) {
+      label = label.slice(0, -2) + ellipsis;
+      textLength = context.measureText(label).width;
+    }
+
+    if (label.length < 4) return;
+  }
+
+  const PADDING_X = 8;
+  const PADDING_Y = 8;
+
+  const boxWidth = textLength + 2 * PADDING_X;
+  const boxHeight = size + 2 * PADDING_Y;
+
+  context.save();
+  context.translate(cx, cy);
+
+  context.beginPath();
+  context.fillStyle = edgeData.labelBackgroundColor;
+  context.roundRect(
+    -textLength / 2 - PADDING_X,
+    -PADDING_Y / 2,
+    boxWidth,
+    boxHeight,
+    [16, 0, 16, 16],
+  );
+  context.closePath();
+  context.fill();
+
+  context.fillStyle = color;
+  context.fillText(label, -textLength / 2, edgeData.size / 2 + size);
+
+  context.restore();
+}
+
+/**
+ * Draw a node's selected state.
+ *
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-labels.ts#L16
+ *
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {NodeDisplayData} data This particular node's data
+ * @param {Settings} settings The renderer (Sigma) settings
+ */
+export function drawDiscNodeLabel<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size' | 'label' | 'color'>,
+  settings: Settings<N, E, G>,
+): void {
+  if (!data.label) return;
+
+  const size = settings.labelSize,
+    font = settings.labelFont,
+    weight = settings.labelWeight,
+    color = settings.labelColor.attribute
+      ? data[settings.labelColor.attribute] || settings.labelColor.color || '#000'
+      : settings.labelColor.color;
+
+  const labelParts = data.label.split('/');
+  const firstPart = `${labelParts[0]}/`;
+
+  context.fillStyle = color;
+  context.font = `normal ${size}px ${font}`;
+  context.fillText(firstPart, data.x + data.size + 3, data.y + size / 3);
+
+  const firstPartWidth = context.measureText(firstPart).width;
+  context.font = `${weight} ${size}px ${font}`;
+  context.fillText(labelParts[1], data.x + data.size + 3 + firstPartWidth, data.y + size / 3);
+}
+
+/**
+ * Draw a node's hovered state.
+ *
+ * @see https://github.com/jacomyal/sigma.js/blob/f5f397854b19e95d55fd0b4b9de5cdebfaa3f159/packages/sigma/src/rendering/node-hover.ts#L23
+ *
+ * @param {CanvasRenderingContext2D} context The underlying rendering context
+ * @param {NodeDisplayData} data This particular node's data
+ * @param {Settings} settings The renderer (Sigma) settings
+ */
+export function drawDiscNodeHover<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+>(
+  context: CanvasRenderingContext2D,
+  data: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size' | 'label' | 'color'>,
+  settings: Settings<N, E, G>,
+): void {
+  const size = settings.labelSize,
+    font = settings.labelFont,
+    weight = settings.labelWeight,
+    color = settings.labelColor.attribute
+      ? data[settings.labelColor.attribute] || settings.labelColor.color || '#000'
+      : settings.labelColor.color;
+
+  context.font = `${weight} ${size}px ${font}`;
+
+  const PADDING_Y = 8;
+  const PADDING_X = 8;
+  const MARGIN_X = 0;
+  const LABEL_BORDER_WIDTH = 1;
+  const BORDER_WIDTH = data.borderSize;
+  const BORDER_RADIUS = 16;
+
+  if (typeof data.label === 'string') {
+    const textWidth = context.measureText(data.label).width,
+      boxWidth = Math.round(textWidth + 2 * PADDING_X),
+      boxHeight = Math.round(size + 2 * PADDING_Y);
+
+    // draw border
+    context.beginPath();
+    context.fillStyle = color;
+    context.roundRect(
+      data.x + data.size + BORDER_WIDTH + MARGIN_X - LABEL_BORDER_WIDTH,
+      data.y - boxHeight / 2 - LABEL_BORDER_WIDTH,
+      boxWidth + LABEL_BORDER_WIDTH * 2,
+      boxHeight + LABEL_BORDER_WIDTH * 2,
+      [BORDER_RADIUS, 0, BORDER_RADIUS, BORDER_RADIUS],
+    );
+    context.closePath();
+    context.fill();
+
+    // draw label content background
+    context.beginPath();
+    context.fillStyle = data.labelBackgroundColor;
+    context.roundRect(
+      data.x + data.size + BORDER_WIDTH + MARGIN_X,
+      data.y - boxHeight / 2,
+      boxWidth,
+      boxHeight,
+      [BORDER_RADIUS, 0, BORDER_RADIUS, BORDER_RADIUS],
+    );
+    context.closePath();
+    context.fill();
+  } else {
+    context.beginPath();
+    context.closePath();
+    context.fill();
+  }
+
+  // And finally we draw the label
+  drawDiscNodeLabel(
+    context,
+    {
+      ...data,
+      // undo drawDiscNodeLabel defaults and then add our own spacing
+      x: data.x - data.size - 3 + data.size + BORDER_WIDTH + MARGIN_X + PADDING_X,
+    },
+    settings,
+  );
+}
