@@ -6,6 +6,7 @@
 
   export let skipWalletConnect = false;
   export let isModal = false;
+  export let displaySlots = false;
 
   let currentStepIndex = 0;
 
@@ -18,7 +19,7 @@
   }
 </script>
 
-{#if !skipWalletConnect}
+{#if displaySlots}
   <StandaloneFlowSlots on:edit={handleSlotEdit} {slots} />
 {/if}
 

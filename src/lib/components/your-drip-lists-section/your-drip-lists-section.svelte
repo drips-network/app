@@ -62,7 +62,7 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Drip Lists',
+    label: 'Your Drip Lists',
     actionsDisabled: !dripLists,
     actions: withCreateButton
       ? [
@@ -88,6 +88,10 @@
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
     horizontalScroll: false,
+    disconnected: !$walletStore.connected,
+    disconnectedStateEmoji: '🫙',
+    disconnectedStateHeadline: 'Connect your wallet',
+    disconnectedStateText: 'Your Drip Lists will show up here when your wallet is connected.',
   }}
 >
   {#if visibleDripListsAndVotingRounds}
@@ -104,13 +108,13 @@
         {#if list.type === 'drip-list' && matchingVotingRound}
           <DripListCard
             isHidden={!list.isVisible}
-            listingMode
+            variant="partial"
             data={{ dripList: list, votingRound: matchingVotingRound }}
           />
         {:else if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
+          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
         {:else if list.type === 'voting-round' && !dripLists.find((dl) => dl.account.accountId === list.dripListId)}
-          <DripListCard listingMode data={{ votingRound: list }} />
+          <DripListCard variant="partial" data={{ votingRound: list }} />
         {/if}
       {/each}
       {#if showCreateNewListCard}
@@ -151,7 +155,7 @@
     >
       {#each hiddenDripListsAndVotingRounds as list}
         {#if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
+          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
         {/if}
       {/each}
     </div>

@@ -25,7 +25,7 @@
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    gap: 1rem;
+    gap: 1rem 1.5rem;
     max-width: 100%;
     position: relative;
     padding: 4px;
@@ -33,13 +33,9 @@
 
   @media (max-width: 767px) {
     .projects-grid {
-      display: flex;
+      grid-template-columns: auto auto;
       gap: 1rem;
       padding: 4px;
-    }
-
-    .projects-grid > div {
-      width: 14rem;
     }
   }
 </style>

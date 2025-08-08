@@ -8,6 +8,10 @@ test('claim project flow', async ({ page }) => {
 
   await page.goto('http://localhost:5173/app');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
+
+  // wait for wallet connection
+  await expect(page.getByText('0xf3–2266').nth(0)).toBeVisible();
+
   await page.getByRole('link', { name: 'Projects' }).click();
   await page.getByRole('button', { name: 'Claim project' }).click();
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();

@@ -20,7 +20,6 @@
   import ConnectButton from '../connect-button/connect-button.svelte';
   import SearchBar from '../search-bar/search-bar.svelte';
   import DripsLogo from '$lib/components/illustrations/logo.svelte';
-  import SettingsIcon from '$lib/components/icons/Settings.svelte';
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import { fade, fly } from 'svelte/transition';
   import { quadInOut } from 'svelte/easing';
@@ -99,12 +98,6 @@
         >
           <SearchIcon style="fill: var(--color-foreground)" />
         </button>
-      {/if}
-
-      {#if !connected}
-        <a class="desktop-only header-button" href="/app/settings">
-          <SettingsIcon style="fill: var(--color-foreground)" />
-        </a>
       {/if}
 
       {#if network.displayNetworkPicker && !safeAppMode}
