@@ -14,13 +14,14 @@
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
   import type { LayoutData } from './$types';
   import Settings from '$lib/components/icons/Settings.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   export let data: LayoutData;
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  const navItems = {
+  $: navItems = {
     top: [
       {
         label: 'Explore',
@@ -48,7 +49,7 @@
       },
       {
         label: 'Profile',
-        href: '/app/profile',
+        href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
         description: 'Your stuff on Drips.',
         icon: User,
       },
