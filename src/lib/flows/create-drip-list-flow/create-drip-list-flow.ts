@@ -8,7 +8,7 @@ import Pile from '$lib/components/pile/pile.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
 import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-import Success from './steps/success/success.svelte';
+import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 import ConnectWalletStep from './steps/connect-wallet/connect-wallet.svelte';
@@ -21,6 +21,9 @@ import ConfigureVotingRound from './steps/configure-voting-round/configure-votin
 import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
 import type { AddItemError } from '$lib/components/list-editor/errors';
+import walletStore from '$lib/stores/wallet/wallet.store';
+import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+import DripList from '$lib/components/illustrations/drip-list.svelte';
 
 export interface State {
   dripList: DripListConfig;
@@ -149,12 +152,20 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
+const staticHeaderComponent = {
+  component: DripList,
+  props: {
+    strokeWidth: 6,
+  },
+};
+
 export const steps = (state: Writable<State>, skipWalletConnect = false, isModal = false) => [
   makeStep({
     component: ChooseCreationMode,
     props: {
       canCancel: isModal,
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: BuildListStep,
@@ -162,6 +173,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 1;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureVotingRound,
@@ -169,11 +181,13 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 2;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConnectWalletStep,
     props: undefined,
     condition: () => !skipWalletConnect,
+    staticHeaderComponent,
   }),
   makeStep({
     component: ChooseSupportTypeStep,
@@ -181,6 +195,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 1;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureContinuousSupportStep,
@@ -188,6 +203,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 1;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureOneTimeDonation,
@@ -195,6 +211,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 2;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ReviewStep,
@@ -204,6 +221,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 1;
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: ReviewVotingRound,
@@ -211,9 +229,30 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
     condition: () => {
       return get(state).selectedCreationMode === 2;
     },
+    staticHeaderComponent,
   }),
   makeStep({
-    component: Success,
-    props: undefined,
+    component: SuccessStep,
+    props: {
+      safeAppMode: Boolean(get(walletStore).safe),
+      message: () =>
+        get(state).selectedCreationMode === 2
+          ? 'Youʼve successfully created your new collaborative Drip List. Collaborators can start voting now.'
+          : 'Youʼve successfully created your Drip List.',
+      action: 'link',
+      linkText: 'View your Drip List',
+      href() {
+        const context = get(state);
+
+        const listId =
+          context.selectedCreationMode === 2 ? context.newVotingRoundId : context.dripListId;
+
+        return `/app/drip-lists/${listId}`;
+      },
+      onAction() {
+        // Removes the Drip List intro edu card on the Drip List page, since the user clearly knows already what a Drip List is.
+        dismissablesStore.dismiss('drip-lists-page-intro');
+      },
+    },
   }),
 ];

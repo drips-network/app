@@ -9,7 +9,6 @@ export const load = async ({ parent, route, url }) => {
 
   // If true, display sidebar that lets admins calculate & publish results
   const resultsMode =
-    wrappedRound.round.linkedDripLists.length === 0 &&
     isRoundAdmin &&
     (wrappedRound.round.state === 'results' || wrappedRound.round.state === 'pending-results');
 

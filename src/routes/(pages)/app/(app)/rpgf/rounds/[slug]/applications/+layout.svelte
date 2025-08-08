@@ -10,6 +10,7 @@
     clearDecisions,
     decisionsStore,
   } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
   import { submitApplicationReview } from '$lib/utils/rpgf/rpgf.js';
@@ -79,7 +80,11 @@
           <Button
             disabled={!hasDecisions}
             variant="primary"
-            on:click={() => doWithErrorModal(handleSubmitReviewDecisions)}>Submit</Button
+            on:click={() =>
+              doWithConfirmationModal(
+                "Are you sure you want to submit these decisions? You can't undo them later.",
+                async () => await doWithErrorModal(handleSubmitReviewDecisions),
+              )}>Submit</Button
           >
         </div>
       {/if}

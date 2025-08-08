@@ -6,11 +6,17 @@
   import StepLayout from '../step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '../stepper/types';
   import modal from '$lib/stores/modal';
+  import Confetti from 'svelte-confetti';
+  import ConfettiOnClick from '../confetti-on-click/confetti-on-click.svelte';
+  import CoinAnimation from '../coin-animation/coin-animation.svelte';
+  import ArrowRight from '../icons/ArrowRight.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let message: string | (() => string);
-  export let action: 'close' | 'hide-modal' | 'continue' = 'close';
+  export let action: 'close' | 'hide-modal' | 'continue' | 'none' | 'link' = 'close';
+  export let href: string | (() => string) = '';
+  export let linkText = 'Continue';
   export let onAction: (() => void) | undefined = undefined;
 
   export let safeAppMode = false;
@@ -34,22 +40,60 @@
       <Emoji size="huge" emoji="⏳" />
       <StepHeader
         headline="Continue in your Safe"
-        description="Please execute the proposed transaction(s) in your Safe. Once executed, check back here to see the result."
+        description="Please execute the proposed transaction(s) in your Safe. Once executed, come back to see the result."
       />
     {:else}
-      <Emoji size="huge" emoji="✅" />
+      <ConfettiOnClick alsoOnMount>
+        <svelte:fragment slot="label">
+          <CoinAnimation animateOnMount>
+            <div class="circle">
+              <Emoji size="huge" emoji="🎉" />
+            </div>
+          </CoinAnimation>
+        </svelte:fragment>
+
+        <Confetti
+          x={[-1, 1]}
+          y={[-0.25, 1]}
+          colorArray={[
+            'var(--color-primary)',
+            'var(--color-primary-level-2)',
+            'var(--color-primary-level-6)',
+          ]}
+        />
+      </ConfettiOnClick>
+
       <StepHeader
         headline="Success"
         description={typeof message === 'function' ? message() : message}
       />
     {/if}
     <svelte:fragment slot="actions">
-      <Button variant="primary" on:click={handleConfirm}
-        >{action === 'close' ? 'Got it' : 'Continue'}</Button
-      >
+      {#if action === 'link'}
+        <Button
+          variant="primary"
+          href={typeof href === 'function' ? href() : href}
+          icon={ArrowRight}
+          on:click={() => {
+            onAction?.();
+            dispatch('conclude');
+          }}
+        >
+          {linkText}
+        </Button>
+      {:else if action !== 'none'}
+        <Button variant="primary" on:click={handleConfirm}
+          >{action === 'close' ? 'Got it' : 'Continue'}</Button
+        >
+      {/if}
     </svelte:fragment>
   </StepLayout>
 </div>
 
 <style>
+  .circle {
+    padding: 1rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary-level-2);
+  }
 </style>
