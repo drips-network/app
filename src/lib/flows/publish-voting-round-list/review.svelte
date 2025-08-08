@@ -17,8 +17,7 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import network from '$lib/stores/wallet/network';
-  import sdkStore from '$lib/stores/sdk/sdk.store';
-  import { get } from 'svelte/store';
+  import { sdkManager } from '$lib/utils/sdk/sdk-manager';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
@@ -57,7 +56,7 @@
         after: async (_, { dripListId }) => {
           const tryFetchList = async (listId: string) => {
             try {
-              const sdk = get(sdkStore).sdk;
+              const sdk = sdkManager.sdk;
               if (!sdk) return false;
 
               const dripList = await sdk.dripLists.getById(BigInt(listId), network.chainId);

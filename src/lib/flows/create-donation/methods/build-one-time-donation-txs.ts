@@ -1,11 +1,10 @@
-import { get } from 'svelte/store';
 import type { Address } from 'viem';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import network from '$lib/stores/wallet/network';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
-import sdkStore from '$lib/stores/sdk/sdk.store';
+import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 import type {
   SdkEcosystemMainAccountReceiver,
   SdkReceiver,
@@ -90,7 +89,7 @@ export interface OneTimeDonationContext {
 }
 
 export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
-  const sdk = get(sdkStore).sdk;
+  const sdk = sdkManager.sdk;
   if (!sdk) throw new Error('SDK not initialized');
 
   const { tokenAddress, amount, amountInputValue, tokenAllowance, receiver } = context;

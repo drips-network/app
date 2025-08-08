@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import { TimeUnit } from '@drips-network/sdk';
 import type { Address } from 'viem';
 import { MaxUint256 } from 'ethers';
@@ -10,7 +9,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import unreachable from '$lib/utils/unreachable';
 import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
-import sdkStore from '$lib/stores/sdk/sdk.store';
+import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 import { transformItemsToSdkReceivers } from '../transformItemsToSdkReceivers';
 
 const WAITING_WALLET_ICON = {
@@ -38,7 +37,7 @@ async function buildTokenApprovalTx(tokenAddress: string) {
 }
 
 export async function buildDripListCreationTxs(context: State) {
-  const sdk = get(sdkStore).sdk;
+  const sdk = sdkManager.sdk;
   if (!sdk) throw new Error('SDK not initialized');
 
   const prepareDripListCreationResult = await sdk.dripLists.prepareCreate({

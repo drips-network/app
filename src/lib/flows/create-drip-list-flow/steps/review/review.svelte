@@ -9,7 +9,7 @@
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import ListIcon from '$lib/components/icons/DripList.svelte';
   import TransactionsIcon from '$lib/components/icons/Transactions.svelte';
-  import { get, type Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
   import unreachable from '$lib/utils/unreachable';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import tokensStore from '$lib/stores/tokens/tokens.store';
@@ -30,7 +30,7 @@
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
   import { buildDripListCreationTxs } from '$lib/utils/driplist/buildDripListCreationTxs';
-  import sdkStore from '$lib/stores/sdk/sdk.store';
+  import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -38,7 +38,7 @@
   export let connectedWalletHidden = false;
 
   async function createDripList() {
-    const sdk = get(sdkStore).sdk;
+    const sdk = sdkManager.sdk;
     if (!sdk) throw new Error('SDK not initialized');
 
     dispatch(

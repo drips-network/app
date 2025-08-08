@@ -1,8 +1,7 @@
-import { get } from 'svelte/store';
 import type { SdkSplitsReceiver } from '@drips-network/sdk';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
-import sdkStore from '$lib/stores/sdk/sdk.store';
+import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 import { transformItemsToSdkReceivers } from '../transformItemsToSdkReceivers';
 
 export interface DripListUpdateContext {
@@ -15,7 +14,7 @@ export interface DripListUpdateContext {
 }
 
 export async function buildDripListUpdateTxs(context: DripListUpdateContext) {
-  const sdk = get(sdkStore).sdk;
+  const sdk = sdkManager.sdk;
   if (!sdk) throw new Error('SDK not initialized');
 
   const dripListId = BigInt(context.dripListAccountId);

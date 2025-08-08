@@ -1,6 +1,5 @@
-import { get } from 'svelte/store';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
-import sdkStore from '$lib/stores/sdk/sdk.store';
+import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 import { transformItemsToSdkReceivers } from '../transformItemsToSdkReceivers';
 import type { Items, Weights } from '$lib/components/list-editor/types';
 
@@ -16,7 +15,7 @@ export interface VotingRoundDripListCreationContext {
 export async function buildVotingRoundDripListCreationTxs(
   context: VotingRoundDripListCreationContext,
 ) {
-  const sdk = get(sdkStore).sdk;
+  const sdk = sdkManager.sdk;
   if (!sdk) throw new Error('SDK not initialized');
 
   const prepareDripListCreationResult = await sdk.dripLists.prepareCreate({
