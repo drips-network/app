@@ -51,7 +51,7 @@
     actions: withClaimProjectButton
       ? [
           {
-            label: 'Claim your project',
+            label: 'Claim project',
             icon: Plus,
             handler: () =>
               modal.show(ClaimProjectStepper, undefined, {
