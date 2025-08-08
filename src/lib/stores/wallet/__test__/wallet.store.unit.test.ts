@@ -2,11 +2,17 @@ import { get } from 'svelte/store';
 import wallet from '../wallet.store';
 import { MockProvider } from '@rsksmart/mock-web3-provider';
 
-vi.mock('$app/environment', () => ({
-  browser: true,
-  dev: true,
-  building: false,
-}));
+vi.mock('$app/environment', async (importOriginal) => {
+  const original = await importOriginal();
+
+  if (typeof original !== 'object' || !original || !('browser' in original)) throw new Error();
+
+  return {
+    browser: original.browser,
+    dev: true,
+    building: false,
+  };
+});
 
 const TEST_ADDRESS = '0xB98bD7C7f656290071E52D1aA617D9cB4467Fd6D';
 
