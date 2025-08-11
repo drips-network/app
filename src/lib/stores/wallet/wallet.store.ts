@@ -313,10 +313,22 @@ const walletStore = () => {
         return;
       }
 
+      const currentAddress = get(state).address?.toLowerCase();
+
+      if (!currentAddress || accounts.map((v) => v.toLowerCase()).includes(currentAddress)) {
+        // Not yet connected or still connected to the same account, so no need to update the state.
+        return;
+      }
+
       window.location.reload();
     });
 
     provider.on('chainChanged', (chain) => {
+      if (get(lastConnectedWallet) === 'walletconnect') {
+        // walletconnect v2 is multi-chain, so we need to ignore chain changes.
+        return;
+      }
+
       if (chain !== network.id) {
         window.location.reload();
       }
