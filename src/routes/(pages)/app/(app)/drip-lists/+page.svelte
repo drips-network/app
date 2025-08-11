@@ -38,10 +38,9 @@
     <svelte:fragment slot="text">
       <h1 class="pixelated">What’s a Drip List?</h1>
       <p>
-        A Drip List is a fundable list of anything that is fundable on Drips. That includes
-        projects, users, other Drip Lists, or Ecosystems. Each recipient in the list is assigned a
-        percentage, which determines the amount of funds that recipient receives when funds are sent
-        to the list.
+        A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
+        address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
+        determines the amount of funds that recipient receives when funds are sent to the list.
         <a
           class="typo-link"
           href="https://docs.drips.network/support-your-dependencies/overview"
