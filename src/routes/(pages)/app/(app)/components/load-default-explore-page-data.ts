@@ -26,7 +26,7 @@ export default async function loadDefaultExplorePage(fetch: typeof global.fetch)
 
   const [
     { featuredProjects, featuredWeb3Projects, restProjects },
-    featuredDripLists,
+    { featuredDripLists },
     blogPosts,
     totalDrippedPrices,
     tlv,
