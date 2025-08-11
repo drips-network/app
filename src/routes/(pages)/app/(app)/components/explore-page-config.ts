@@ -10,7 +10,7 @@ type PageProps = ComponentProps<DistributionExplorePage>;
 
 export type ExplorePageConfig = {
   variant: ExplorePageVariant;
-  welcomeCardConfig?: PageProps['welcomeCard'];
+  welcomeCardConfig?: PageProps['welcomeCardConfig'];
   showRecentProjects?: boolean;
 };
 
