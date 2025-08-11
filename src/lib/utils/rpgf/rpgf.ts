@@ -483,7 +483,12 @@ export async function getOwnUserData(f = fetch): Promise<{
   id: string;
   whitelisted: boolean;
 } | null> {
-  const res = await authenticatedRpgfServerCall('/users/me', 'GET', undefined, f);
+  const res = await authenticatedRpgfServerCall(
+    `/users/me?chainId=${network.chainId}`,
+    'GET',
+    undefined,
+    f,
+  );
 
   if (res.status === 401) {
     return null;
