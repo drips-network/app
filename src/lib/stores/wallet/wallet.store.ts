@@ -315,7 +315,7 @@ const walletStore = () => {
 
       const currentAddress = get(state).address?.toLowerCase();
 
-      if (!currentAddress || accounts.map((v) => v.toLowerCase()).includes(currentAddress)) {
+      if (!currentAddress || accounts[0].toLowerCase() === currentAddress) {
         // Not yet connected or still connected to the same account, so no need to update the state.
         return;
       }
