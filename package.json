@@ -101,7 +101,7 @@
     "@web3-onboard/walletconnect": "^2.5.5",
     "bezier-easing": "^2.1.0",
     "csv-simple-parser": "^1.0.3",
-    "cupertino-pane": "^1.4.21",
+    "cupertino-pane": "^1.4.22",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^6.13.1",
     "fuzzysort": "^2.0.3",
