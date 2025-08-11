@@ -19,7 +19,7 @@
       </p>
       <a
         class="typo-link"
-        href="https://docs.drips.network/usage-with-a-safe"
+        href="https://docs.drips.network/advanced/usage-with-a-safe"
         target="_blank"
         rel="noreferrer">Learn more</a
       >

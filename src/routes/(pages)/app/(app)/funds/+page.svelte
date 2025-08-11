@@ -61,7 +61,9 @@
         actions: [
           {
             handler: () =>
-              window.open('https://docs.drips.network/claim-your-repository', '_blank')?.focus(),
+              window
+                .open('https://docs.drips.network/get-support/claim-your-repository', '_blank')
+                ?.focus(),
             label: 'Learn more',
             primary: true,
             icon: ArrowUp,
