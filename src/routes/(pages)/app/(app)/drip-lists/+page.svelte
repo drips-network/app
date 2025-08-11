@@ -40,7 +40,7 @@
       <p>
         A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
         address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
-        determines the amount of funds that recipient receives when funds are sent to the list.
+        determines the amount of funds they receive when funds are sent to the list.
         <a
           class="typo-link"
           href="https://docs.drips.network/support-your-dependencies/overview"
