@@ -83,6 +83,12 @@ export async function refreshAccessToken(): Promise<{ success: boolean }> {
 }
 
 export async function logOut() {
-  await rpgfServerCall('/auth/logout', 'POST');
+  try {
+    await rpgfServerCall('/auth/logout', 'POST');
+  } catch (e) {
+    /* eslint-disable-next-line no-console */
+    console.warn(`Didn't log out from RPGF, server:`, e);
+  }
+
   rpgfAccessJwtStore.set(null);
 }

@@ -20,6 +20,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import { logOut } from '$lib/utils/rpgf/siwe';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -298,6 +299,10 @@ const walletStore = () => {
     lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
 
+    // log out from RPGF if authenticated
+    logOut();
+
+    // refresh load functions
     invalidateAll();
   }
 
@@ -311,8 +316,10 @@ const walletStore = () => {
       window.location.reload();
     });
 
-    provider.on('chainChanged', () => {
-      window.location.reload();
+    provider.on('chainChanged', (chain) => {
+      if (chain !== network.id) {
+        window.location.reload();
+      }
     });
 
     provider.on('disconnect', () => {
