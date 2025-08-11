@@ -16,8 +16,7 @@ import { redis } from '../../../../api/redis.js';
 
 export default async function loadDistributionExplorePage(fetch: typeof global.fetch) {
   const currentConfig = EXPLORE_PAGE_CONFIG[network.chainId];
-  const showRecentProjects = currentConfig.showRecentProjects;
-  const welcomeCardConfig = currentConfig.welcomeCardConfig;
+  const { welcomeCardConfig, showRecentProjects } = currentConfig;
 
   const fetchProjectsParameters = createDefaultFetchProjectsParameters();
   const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[network.chainId].featuredDripListIds || [];
@@ -28,7 +27,7 @@ export default async function loadDistributionExplorePage(fetch: typeof global.f
     'explore-page',
   );
 
-  const [projects, featuredDripLists, blogPosts] = await cached(
+  const [projects, { featuredDripLists }, blogPosts] = await cached(
     redis,
     cacheKey,
     1 * 60 * 60, // 1 hr
