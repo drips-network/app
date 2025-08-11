@@ -49,6 +49,7 @@
   footer {
     width: 100%;
     margin-top: 4rem;
+    margin-bottom: 3rem;
     display: grid;
     gap: 2rem;
     grid-template-columns: 1fr;
