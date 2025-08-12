@@ -79,6 +79,18 @@ export async function fetchDripLists(f: typeof fetch, dripListsParameters?: Quer
   return res.dripLists;
 }
 
+async function fetchOwnDripLists(f: typeof fetch, connectedAddress?: string) {
+  if (!connectedAddress) {
+    return [];
+  }
+
+  const defaultParameters = createDefaultFetchDripListsParameters();
+  const parameters = Object.assign({}, defaultParameters, {
+    where: { ownerAddress: connectedAddress },
+  });
+  return fetchDripLists(f, parameters);
+}
+
 export async function fetchFeaturedDripLists(
   chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
   f: typeof fetch,
@@ -87,31 +99,22 @@ export async function fetchFeaturedDripLists(
   return Promise.all(featuredDripListIds.map(async (id) => fetchDripList(id, f)));
 }
 
-export default async function fetchAndCategorizeDripLists(
+async function fetchRecentDripLists(f: typeof fetch) {
+  const defaultParameters = createDefaultFetchDripListsParameters();
+  const parameters = Object.assign({}, defaultParameters, { limit: 8 });
+  return fetchDripLists(f, parameters);
+}
+
+export default async function fetchCategorziedDripLists(
   chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
   f: typeof fetch,
   connectedAddress?: string,
-  dripLitsParameters?: QueryDripListsArgs,
 ) {
-  const dripLists = await fetchDripLists(f, dripLitsParameters);
-
-  const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[chainId]?.featuredDripListIds ?? [];
-
-  const yourDripLists = [];
-  const featuredDripLists = [];
-  const restDripLists = [];
-  for (const dripList of dripLists) {
-    if (dripList.owner.address === connectedAddress) {
-      yourDripLists.push(dripList);
-    }
-
-    if (featuredDripListIds.includes(dripList.account.accountId)) {
-      featuredDripLists.push(dripList);
-      continue;
-    }
-
-    restDripLists.push(dripList);
-  }
+  const [yourDripLists, featuredDripLists, restDripLists] = await Promise.all([
+    fetchOwnDripLists(f, connectedAddress),
+    fetchFeaturedDripLists(chainId, f),
+    fetchRecentDripLists(f),
+  ]);
 
   return {
     featuredDripLists,

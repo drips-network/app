@@ -5,11 +5,11 @@ import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-dat
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
-import fetchAndCategorizeDripLists from './components/load-drip-lists';
+import fetchCategorziedDripLists from './components/load-drip-lists';
 import network from '$lib/stores/wallet/network';
 import type { ChainStatsQuery } from '../components/__generated__/gql.generated';
 import fetchChainStats from '../components/load-chain-stats';
-import type { AllDripListsQuery } from './components/__generated__/gql.generated';
+import type { AllDripListsQuery, DripListQuery } from './components/__generated__/gql.generated';
 import {
   default as fetchTotalDrippedApproximation,
   totalDrippedPrices as fetchTotalDrippedPrices,
@@ -20,7 +20,7 @@ type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiv
 const fetchedDataCache = makeFetchedDataCache<{
   yourDripLists: AllDripListsQuery['dripLists'];
   restDripLists: AllDripListsQuery['dripLists'];
-  featuredDripLists: AllDripListsQuery['dripLists'];
+  featuredDripLists: DripListQuery['dripList'][];
   chainStats: ChainStatsQuery['chainStats'][number];
   votingRounds: VotingRoundWithSplits[];
   totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
@@ -46,7 +46,7 @@ export const load = async ({ fetch }) => {
     !connectedAddress
       ? Promise.resolve([])
       : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
-    fetchAndCategorizeDripLists(network.chainId, fetch, connectedAddress),
+    fetchCategorziedDripLists(network.chainId, fetch, connectedAddress),
     fetchChainStats(fetch),
     fetchTotalDrippedPrices(fetch),
   ]);

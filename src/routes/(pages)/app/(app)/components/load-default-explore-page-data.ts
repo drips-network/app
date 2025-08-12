@@ -6,7 +6,7 @@ import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import cached from '$lib/utils/cache/remote/cached';
 import FEATURED_DRIP_LISTS_CONFIG from '../drip-lists/components/featured-drip-lists-config';
 import type { ExplorePageVariant } from './explore-page-config';
-import { dripListsQuery, fetchFeaturedDripLists } from '../drip-lists/components/load-drip-lists';
+import { dripListQuery, fetchFeaturedDripLists } from '../drip-lists/components/load-drip-lists';
 import {
   createDefaultFetchProjectsParameters,
   fetchAndCategorizeProjects,
@@ -19,7 +19,7 @@ export default async function loadDefaultExplorePage(fetch: typeof global.fetch)
   const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[network.chainId].featuredDripListIds || [];
 
   const cacheKey = queryCacheKey(
-    fetchProjectsQuery + dripListsQuery,
+    fetchProjectsQuery + dripListQuery,
     [Object.entries(fetchProjectsParameters), featuredDripListIds],
     'explore-page',
   );
