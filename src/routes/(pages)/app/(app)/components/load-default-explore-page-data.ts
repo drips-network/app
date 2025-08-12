@@ -6,7 +6,7 @@ import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import cached from '$lib/utils/cache/remote/cached';
 import FEATURED_DRIP_LISTS_CONFIG from '../drip-lists/components/featured-drip-lists-config';
 import type { ExplorePageVariant } from './explore-page-config';
-import fetchFeaturedDripLists, { dripListsQuery } from '../drip-lists/components/load-drip-lists';
+import { dripListsQuery, fetchFeaturedDripLists } from '../drip-lists/components/load-drip-lists';
 import {
   createDefaultFetchProjectsParameters,
   fetchAndCategorizeProjects,
@@ -26,7 +26,7 @@ export default async function loadDefaultExplorePage(fetch: typeof global.fetch)
 
   const [
     { featuredProjects, featuredWeb3Projects, restProjects },
-    { featuredDripLists },
+    featuredDripLists,
     blogPosts,
     totalDrippedPrices,
     tlv,

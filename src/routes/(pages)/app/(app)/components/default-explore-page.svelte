@@ -21,13 +21,13 @@
   import ProjectsGrid from './projects-grid.svelte';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
-  import type { DripListsFragment } from '../drip-lists/components/__generated__/gql.generated';
+  import type { DripListFragment } from '../drip-lists/components/__generated__/gql.generated';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
   export let blogPosts: z.infer<typeof postsListingSchema>;
-  export let featuredDripLists: DripListsFragment[];
+  export let featuredDripLists: DripListFragment[];
   export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
   export let tlv: number;
 

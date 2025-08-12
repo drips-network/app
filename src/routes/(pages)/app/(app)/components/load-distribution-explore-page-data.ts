@@ -5,8 +5,9 @@ import {
   fetchProjects,
   fetchProjectsQuery,
 } from '../projects/components/load-projects.js';
-import fetchFeaturedDripLists, {
+import {
   dripListsQuery,
+  fetchFeaturedDripLists,
 } from '../drip-lists/components/load-drip-lists.js';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key.js';
 import cached from '$lib/utils/cache/remote/cached.js';
@@ -27,7 +28,7 @@ export default async function loadDistributionExplorePage(fetch: typeof global.f
     'explore-page',
   );
 
-  const [projects, { featuredDripLists }, blogPosts] = await cached(
+  const [projects, featuredDripLists, blogPosts] = await cached(
     redis,
     cacheKey,
     1 * 60 * 60, // 1 hr

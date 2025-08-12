@@ -9,17 +9,31 @@ import {
 } from '$lib/graphql/__generated__/base-types';
 import type { SUPPORTED_CHAIN_IDS } from '$lib/stores/wallet/network';
 import FEATURED_DRIP_LISTS_CONFIG from './featured-drip-lists-config';
-import type { AllDripListsQuery, AllDripListsQueryVariables } from './__generated__/gql.generated';
+import type {
+  AllDripListsQuery,
+  AllDripListsQueryVariables,
+  DripListQuery,
+  DripListQueryVariables,
+} from './__generated__/gql.generated';
 
-export const DRIP_LISTS_FRAGMENT = gql`
+export const DRIP_LIST_FRAGMENT = gql`
   ${DRIP_LIST_CARD_FRAGMENT}
-  fragment DripLists on DripList {
+  fragment DripList on DripList {
     ...DripListCard
   }
 `;
 
+export const dripListQuery = gql`
+  ${DRIP_LIST_FRAGMENT}
+  query DripList($id: ID!, $chain: SupportedChain!) {
+    dripList(id: $id, chain: $chain) {
+      ...DripList
+    }
+  }
+`;
+
 export const dripListsQuery = gql`
-  ${DRIP_LISTS_FRAGMENT}
+  ${DRIP_LIST_FRAGMENT}
   query AllDripLists(
     $where: DripListWhereInput
     $sort: DripListSortInput
@@ -27,7 +41,7 @@ export const dripListsQuery = gql`
     $limit: Int
   ) {
     dripLists(where: $where, sort: $sort, chains: $chains, limit: $limit) {
-      ...DripLists
+      ...DripList
     }
   }
 `;
@@ -39,6 +53,16 @@ export function createDefaultFetchDripListsParameters(): QueryDripListsArgs {
     chains: [network.gqlName],
     limit: undefined,
   };
+}
+
+export async function fetchDripList(id: string, f: typeof fetch) {
+  const res = await query<DripListQuery, DripListQueryVariables>(
+    dripListQuery,
+    { id, chain: network.gqlName },
+    f,
+  );
+
+  return res.dripList;
 }
 
 export async function fetchDripLists(f: typeof fetch, dripListsParameters?: QueryDripListsArgs) {
@@ -53,6 +77,14 @@ export async function fetchDripLists(f: typeof fetch, dripListsParameters?: Quer
   );
 
   return res.dripLists;
+}
+
+export async function fetchFeaturedDripLists(
+  chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
+  f: typeof fetch,
+) {
+  const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[chainId]?.featuredDripListIds ?? [];
+  return Promise.all(featuredDripListIds.map(async (id) => fetchDripList(id, f)));
 }
 
 export default async function fetchAndCategorizeDripLists(
