@@ -28,8 +28,13 @@ services:
     volumes:
       - postgres-rpgf-data:/var/lib/postgresql/data
 
+  fake-pinata:
+    volumes:
+      - fake-pinata-data:/app/data
+
 volumes:
   postgres-data:
   postgres-multiplayer-data:
   postgres-rpgf-data:
   anvil-data:
+  fake-pinata-data:

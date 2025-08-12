@@ -12,6 +12,7 @@
 
 <a
   data-highlightid="sidenav-{href}"
+  data-testid="sidenav-item-{label}"
   class="sidenav-item typo-text"
   class:active
   class:background-on-active={backgroundOnActive}

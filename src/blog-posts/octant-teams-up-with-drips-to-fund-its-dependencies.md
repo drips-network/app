@@ -50,7 +50,7 @@ Explore more details on Drips and other recent news:
 
 - [Radworks' Announces $1M in Support For Builders Using Drips](https://www.drips.network/blog/posts/radworks-gives-1m-to-foss-dependencies-with-drips)
 - [Octant’s Drip list with their dependencies](https://www.drips.network/app/drip-lists/30178668158349445547603108732480118476541651095408979232800331391215)
-- [Set up your own Drip List](https://docs.drips.network/support-your-dependencies)
+- [Set up your own Drip List](https://docs.drips.network/support-your-dependencies/overview)
 - [Join the Drips Discord and get in touch](https://discord.gg/6cCKKSW2De)
 
 # About

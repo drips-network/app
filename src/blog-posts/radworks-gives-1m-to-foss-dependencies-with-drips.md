@@ -73,7 +73,7 @@ Explore more details and follow the journey of the initiative through Radworks g
 
 - [Radworks' On-chain Vote](https://www.tally.xyz/gov/radworks/proposal/16)
 - [The Governance Proposal and Full Proposal Details](https://community.radworks.org/t/submission-rgp-16-fund-radworks-dependencies-with-drips/3379)
-- [Set up your own Drip List](https://docs.drips.network/support-your-dependencies)
+- [Set up your own Drip List](https://docs.drips.network/support-your-dependencies/overview)
 - [Join the Drips Discord and get in touch](https://discord.gg/6cCKKSW2De)
 
 # About
