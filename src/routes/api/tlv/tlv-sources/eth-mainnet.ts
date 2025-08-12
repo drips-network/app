@@ -20,7 +20,7 @@ const getEthMainnetTlv: TLVSourceFn = async (f) => {
   if (!ETHERSCAN_API_KEY) return [];
 
   const dripsTokenHoldingRes = await f(
-    `https://api.etherscan.io/api?module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${ETHERSCAN_API_KEY}`,
+    `https://api.etherscan.io/v2/api?chainId=1&module=account&action=addresstokenbalance&address=0xd0Dd053392db676D57317CD4fe96Fc2cCf42D0b4&page=1&offset=100&apikey=${ETHERSCAN_API_KEY}`,
   );
   if (!dripsTokenHoldingRes.ok) {
     const errorContent = await dripsTokenHoldingRes.text();
