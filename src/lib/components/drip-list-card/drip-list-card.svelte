@@ -119,6 +119,7 @@
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import CoinFlying from '../icons/CoinFlying.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import formatNumber from '$lib/utils/format-number';
 
   export let data: {
     dripList?: DripListCardFragment | null;
@@ -233,6 +234,8 @@
   $: votingEnded = votingRound
     ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
     : undefined;
+
+  $: splitsFormatted = formatNumber(dripList?.splits?.length || 0);
 </script>
 
 {#if !isPartial && !isMinimal && votingRound}
@@ -459,8 +462,7 @@
             compact
           />
         </div>
-        <!-- TODO; format number -->
-        <div><DripListIcon style="fill: var(--color-foreground)" />{dripList?.splits?.length}</div>
+        <div><DripListIcon style="fill: var(--color-foreground)" />{splitsFormatted}</div>
       </section>
     {/if}
   </div>
