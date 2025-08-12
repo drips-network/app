@@ -18,7 +18,7 @@ import type {
 
 export const DRIP_LIST_FRAGMENT = gql`
   ${DRIP_LIST_CARD_FRAGMENT}
-  fragment DripList on DripList {
+  fragment ADripList on DripList {
     ...DripListCard
   }
 `;
@@ -27,7 +27,7 @@ export const dripListQuery = gql`
   ${DRIP_LIST_FRAGMENT}
   query DripList($id: ID!, $chain: SupportedChain!) {
     dripList(id: $id, chain: $chain) {
-      ...DripList
+      ...ADripList
     }
   }
 `;
@@ -41,7 +41,7 @@ export const dripListsQuery = gql`
     $limit: Int
   ) {
     dripLists(where: $where, sort: $sort, chains: $chains, limit: $limit) {
-      ...DripList
+      ...ADripList
     }
   }
 `;
