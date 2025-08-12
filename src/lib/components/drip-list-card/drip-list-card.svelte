@@ -456,6 +456,7 @@
           <CoinFlying style="fill: var(--color-foreground)" /><AggregateFiatEstimate
             supressUnknownAmountsWarning
             amounts={totalEarned}
+            compact
           />
         </div>
         <!-- TODO; format number -->
