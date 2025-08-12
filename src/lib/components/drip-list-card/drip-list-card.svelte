@@ -163,6 +163,7 @@
 
   $: isPartial = variant === 'partial';
   $: isMinimal = variant === 'minimal';
+  $: clampTitleClass = !clampTitle ? '' : isMinimal ? 'line-clamp-2' : 'line-clamp-1';
 
   function triggerEditModal() {
     if (!dripList) return;
@@ -250,8 +251,7 @@
     <header class="px-6 pt-6 flex flex-col gap-2 lg:gap-4">
       <div class="title-and-actions">
         <h1
-          class:line-clamp-1={clampTitle}
-          class=" title rounded twemoji-text"
+          class="{clampTitleClass} title rounded twemoji-text"
           style:font-size={isPartial || isMinimal ? '28px' : undefined}
         >
           {@html twemoji(title)}
@@ -596,6 +596,10 @@
 
   .drip-list-card.minimal {
     height: 16.5rem;
+  }
+
+  .drip-list-card.minimal .title {
+    line-height: 1.15;
   }
 
   .drip-list-card.minimal > div {
