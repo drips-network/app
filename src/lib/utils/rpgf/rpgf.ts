@@ -103,6 +103,11 @@ export async function authenticatedRpgfServerCall(
     throw error(401);
   }
 
+  if (res.status === 500) {
+    // Server error, throw a generic error
+    throw error(500, 'Unexpected server error occurred.');
+  }
+
   return res;
 }
 
