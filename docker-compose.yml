@@ -218,7 +218,7 @@ services:
   rpgf:
     image: 'j537/rpgf:${RPGF_TAG-main}'
     pull_policy: always
-    command: bash -c "deno task db:migrate && deno task configure-chain 31337 LOCALTESTNET http://localhost:8545 ; deno task start"
+    command: bash -c "deno task db:migrate && deno task configure-chain 31337 LOCALTESTNET http://localhost:8545 false; deno task start"
     environment:
       - DB_CONNECTION_STRING=postgresql://postgres:admin@postgres-rpgf:5432/rpgf_db
       - PORT=5000
