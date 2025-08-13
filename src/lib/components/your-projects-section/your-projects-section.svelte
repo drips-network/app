@@ -15,14 +15,12 @@
   import { gql } from 'graphql-request';
   import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '../icons/Plus.svelte';
-  import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { goto } from '$app/navigation';
+  import launchClaimProject from '$lib/utils/launch-claim-project';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -41,17 +39,6 @@
   $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
-
-  function launchClaimProject() {
-    if ($walletStore.connected) {
-      modal.show(ClaimProjectStepper, undefined, {
-        skipWalletConnect: true,
-      });
-      return;
-    }
-
-    goto('/app/claim-project');
-  }
 </script>
 
 <Section
@@ -65,7 +52,7 @@
           {
             label: 'Claim project',
             icon: Plus,
-            handler: launchClaimProject,
+            handler: () => launchClaimProject(),
           },
         ]
       : [],

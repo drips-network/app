@@ -9,7 +9,6 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import YourProjectsSection, {
     PROJECTS_SECTION_PROJECT_FRAGMENT,
   } from '$lib/components/your-projects-section/your-projects-section.svelte';
@@ -17,9 +16,7 @@
   import { gql } from 'graphql-request';
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import RepoGitProject from '$lib/components/illustrations/repo-git-project.svelte';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import modal from '$lib/stores/modal';
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -27,20 +24,9 @@
   import RecentlyClaimedProjects from '../components/recently-claimed-projects.svelte';
   import ProjectsGrid from '../components/projects-grid.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import { goto } from '$app/navigation';
+  import launchClaimProject from '$lib/utils/launch-claim-project';
 
   export let data;
-
-  function launchClaimProject() {
-    if ($walletStore.connected) {
-      modal.show(ClaimProjectStepper, undefined, {
-        skipWalletConnect: true,
-      });
-      return;
-    }
-
-    goto('/app/claim-project');
-  }
 </script>
 
 <HeadMeta title="Projects" />
@@ -61,7 +47,8 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button icon={Plus} variant="primary" on:click={launchClaimProject}>Claim your project</Button
+      <Button icon={Plus} variant="primary" on:click={() => launchClaimProject()}
+        >Claim your project</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">
