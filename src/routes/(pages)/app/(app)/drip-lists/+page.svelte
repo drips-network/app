@@ -27,8 +27,21 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
+  import { goto } from '$app/navigation';
 
   export let data: PageData;
+
+  function launchCreateDripList() {
+    if ($walletStore.connected) {
+      modal.show(CreateDripListStepper, undefined, {
+        skipWalletConnect: true,
+        isModal: true,
+      });
+      return;
+    }
+
+    goto('/app/funder-onboarding');
+  }
 </script>
 
 <HeadMeta title="Drip List" />
@@ -49,17 +62,8 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button
-        icon={Plus}
-        variant="primary"
-        href={!$walletStore.connected ? '/app/funder-onboarding' : undefined}
-        on:click={$walletStore.connected
-          ? () =>
-              modal.show(CreateDripListStepper, undefined, {
-                skipWalletConnect: true,
-                isModal: true,
-              })
-          : undefined}>Create a Drip List</Button
+      <Button icon={Plus} variant="primary" on:click={launchCreateDripList}
+        >Create a Drip List</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">

@@ -25,6 +25,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
+  import { goto } from '$app/navigation';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -57,10 +58,15 @@
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
 
   function launchCreateDripList() {
-    modal.show(CreateDripListStepper, undefined, {
-      skipWalletConnect: true,
-      isModal: true,
-    });
+    if ($walletStore.connected) {
+      modal.show(CreateDripListStepper, undefined, {
+        skipWalletConnect: true,
+        isModal: true,
+      });
+      return;
+    }
+
+    goto('/app/funder-onboarding');
   }
 </script>
 
@@ -76,9 +82,7 @@
           {
             label: 'Create Drip List',
             icon: Plus,
-            ...(!$walletStore.connected
-              ? { href: '/app/funder-onboarding' }
-              : { handler: launchCreateDripList }),
+            handler: launchCreateDripList,
           },
         ]
       : [],
@@ -132,12 +136,7 @@
             <h6 class="typo-text-bold">Got a new idea?</h6>
             <p>You can create as many Drip Lists as you like.</p>
             <div class="mt-2">
-              <Button
-                icon={Plus}
-                href={!$walletStore.connected ? '/app/funder-onboarding' : undefined}
-                on:click={$walletStore.connected ? launchCreateDripList : undefined}
-                >Create a new Drip List</Button
-              >
+              <Button icon={Plus} on:click={launchCreateDripList}>Create a new Drip List</Button>
             </div>
           </div>
         </div>
