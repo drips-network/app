@@ -9,7 +9,7 @@ export default function launchClaimProject(projectUrl?: string) {
   if (get(walletStore).connected) {
     modal.show(ClaimProjectStepper, undefined, {
       skipWalletConnect: true,
-      ...(projectUrl && { projectUrl }),
+      projectUrl,
     });
     return;
   }
