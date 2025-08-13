@@ -27,8 +27,20 @@
   import RecentlyClaimedProjects from '../components/recently-claimed-projects.svelte';
   import ProjectsGrid from '../components/projects-grid.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import { goto } from '$app/navigation';
 
   export let data;
+
+  function launchClaimProject() {
+    if ($walletStore.connected) {
+      modal.show(ClaimProjectStepper, undefined, {
+        skipWalletConnect: true,
+      });
+      return;
+    }
+
+    goto('/app/claim-project');
+  }
 </script>
 
 <HeadMeta title="Projects" />
@@ -49,13 +61,7 @@
       </p>
     </svelte:fragment>
     <svelte:fragment slot="buttons">
-      <Button
-        icon={Plus}
-        variant="primary"
-        on:click={() =>
-          modal.show(ClaimProjectStepper, undefined, {
-            skipWalletConnect: $walletStore.connected,
-          })}>Claim your project</Button
+      <Button icon={Plus} variant="primary" on:click={launchClaimProject}>Claim your project</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">

@@ -22,6 +22,7 @@
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { goto } from '$app/navigation';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -40,6 +41,17 @@
   $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
+
+  function launchClaimProject() {
+    if ($walletStore.connected) {
+      modal.show(ClaimProjectStepper, undefined, {
+        skipWalletConnect: true,
+      });
+      return;
+    }
+
+    goto('/app/claim-project');
+  }
 </script>
 
 <Section
@@ -53,10 +65,7 @@
           {
             label: 'Claim project',
             icon: Plus,
-            handler: () =>
-              modal.show(ClaimProjectStepper, undefined, {
-                skipWalletConnect: $walletStore.connected,
-              }),
+            handler: launchClaimProject,
           },
         ]
       : [],
