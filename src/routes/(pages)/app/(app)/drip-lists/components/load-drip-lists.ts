@@ -49,7 +49,7 @@ export const dripListsQuery = gql`
 export function createDefaultFetchDripListsParameters(): QueryDripListsArgs {
   return {
     where: undefined,
-    sort: { direction: SortDirection.Asc, field: DripListSortField.MintedAt },
+    sort: { direction: SortDirection.Desc, field: DripListSortField.MintedAt },
     chains: [network.gqlName],
     limit: undefined,
   };
