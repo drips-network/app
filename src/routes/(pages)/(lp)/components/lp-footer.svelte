@@ -84,7 +84,6 @@
   }
 
   .supported-by > .radworks-logo {
-    height: 1.4rem;
-    transform: translateY(0.15rem);
+    height: 1rem;
   }
 </style>
