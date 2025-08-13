@@ -23,9 +23,7 @@
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import modal from '$lib/stores/modal';
-  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
-  import { goto } from '$app/navigation';
+  import launchCreateDripList from '../../utils/launch-create-drip-list';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -56,18 +54,6 @@
     : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
-
-  function launchCreateDripList() {
-    if ($walletStore.connected) {
-      modal.show(CreateDripListStepper, undefined, {
-        skipWalletConnect: true,
-        isModal: true,
-      });
-      return;
-    }
-
-    goto('/app/funder-onboarding');
-  }
 </script>
 
 <Section
