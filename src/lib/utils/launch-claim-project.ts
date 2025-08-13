@@ -16,7 +16,8 @@ export default function launchClaimProject(projectUrl?: string) {
 
   const claimProjectPath = '/app/claim-project';
   if (projectUrl) {
-    return goto(buildUrl(claimProjectPath, { projectToAdd: projectUrl }));
+    goto(buildUrl(claimProjectPath, { projectToAdd: projectUrl }));
+    return;
   }
 
   goto(claimProjectPath);
