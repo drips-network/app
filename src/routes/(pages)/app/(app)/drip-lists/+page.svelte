@@ -17,16 +17,16 @@
   import EduCard from '$lib/components/edu-card/edu-card.svelte';
   import { gql } from 'graphql-request';
   import type { PageData } from './$types';
-  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
-  import modal from '$lib/stores/modal';
   import Plus from '$lib/components/icons/Plus.svelte';
   import StatsSection from '$lib/components/stats-section/stats-section.svelte';
   import ProminentKeyValuePair from '$lib/components/key-value-pair/prominent-key-value-pair.svelte';
   import Section from '$lib/components/section/section.svelte';
   import DripListsGrid from '../components/drip-lists-grid.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import modal from '$lib/stores/modal';
+  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
 
   export let data: PageData;
 </script>
@@ -52,11 +52,14 @@
       <Button
         icon={Plus}
         variant="primary"
-        on:click={() =>
-          modal.show(CreateDripListStepper, undefined, {
-            skipWalletConnect: $walletStore.connected,
-            isModal: true,
-          })}>Create a Drip List</Button
+        href={!$walletStore.connected ? '/app/funder-onboarding' : undefined}
+        on:click={$walletStore.connected
+          ? () =>
+              modal.show(CreateDripListStepper, undefined, {
+                skipWalletConnect: $walletStore.connected,
+                isModal: true,
+              })
+          : undefined}>Create a Drip List</Button
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">

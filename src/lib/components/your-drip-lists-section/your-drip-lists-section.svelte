@@ -16,8 +16,6 @@
   import Section from '../section/section.svelte';
   import Button from '../button/button.svelte';
   import Illustration from '../icons/✏️.svelte';
-  import modal from '$lib/stores/modal';
-  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
@@ -25,6 +23,8 @@
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import modal from '$lib/stores/modal';
+  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -55,6 +55,13 @@
     : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
+
+  function launchCreateDripList() {
+    modal.show(CreateDripListStepper, undefined, {
+      skipWalletConnect: false,
+      isModal: true,
+    });
+  }
 </script>
 
 <Section
@@ -69,11 +76,9 @@
           {
             label: 'Create Drip List',
             icon: Plus,
-            handler: () =>
-              modal.show(CreateDripListStepper, undefined, {
-                skipWalletConnect: $walletStore.connected,
-                isModal: true,
-              }),
+            ...(!$walletStore.connected
+              ? { href: '/app/funder-onboarding' }
+              : { handler: launchCreateDripList }),
           },
         ]
       : [],
@@ -129,13 +134,10 @@
             <div class="mt-2">
               <Button
                 icon={Plus}
-                on:click={() =>
-                  modal.show(CreateDripListStepper, undefined, {
-                    skipWalletConnect: true,
-                    isModal: true,
-                  })}
-                >Create a new Drip List
-              </Button>
+                href={!$walletStore.connected ? '/app/funder-onboarding' : undefined}
+                on:click={$walletStore.connected ? launchCreateDripList : undefined}
+                >Create a new Drip List</Button
+              >
             </div>
           </div>
         </div>
