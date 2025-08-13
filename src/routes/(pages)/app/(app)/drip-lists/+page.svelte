@@ -56,7 +56,7 @@
         on:click={$walletStore.connected
           ? () =>
               modal.show(CreateDripListStepper, undefined, {
-                skipWalletConnect: $walletStore.connected,
+                skipWalletConnect: true,
                 isModal: true,
               })
           : undefined}>Create a Drip List</Button

@@ -58,7 +58,7 @@
 
   function launchCreateDripList() {
     modal.show(CreateDripListStepper, undefined, {
-      skipWalletConnect: false,
+      skipWalletConnect: true,
       isModal: true,
     });
   }
