@@ -71,7 +71,7 @@
             icon: Plus,
             handler: () =>
               modal.show(CreateDripListStepper, undefined, {
-                skipWalletConnect: true,
+                skipWalletConnect: $walletStore.connected,
                 isModal: true,
               }),
           },
