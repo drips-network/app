@@ -10,4 +10,4 @@
 
 <HeadMeta title="Claim GitHub project" />
 
-<ClaimProjectStepper />
+<ClaimProjectStepper displaySlots />

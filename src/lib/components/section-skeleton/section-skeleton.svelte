@@ -4,9 +4,12 @@
   import Spinner from '../spinner/spinner.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
+  import EmptyState from './empty-state.svelte';
+  import DisconnectedState from './disconnected-state.svelte';
 
   export let loaded = false;
   export let empty = false;
+  export let disconnected = false;
   export let error = false;
   export let placeholderOutline = true;
   export let horizontalScroll = true;
@@ -25,6 +28,10 @@
   export let emptyStateEmoji = '👻';
   export let emptyStateHeadline: string | undefined = 'Nothing to see here';
   export let emptyStateText: string | undefined = undefined;
+
+  export let disconnectedStateEmoji: string | undefined = '🫙';
+  export let disconnectedStateHeadline: string | undefined = 'You are disconnected';
+  export let disconnectedStateText: string | undefined = undefined;
 
   let placeholderContainerElem: HTMLDivElement;
 
@@ -59,22 +66,24 @@
                 >
               </div>
             </div>
+          {:else if disconnected}
+            <DisconnectedState
+              emoji={disconnectedStateEmoji}
+              headline={disconnectedStateHeadline}
+              text={disconnectedStateText}
+            />
           {:else if empty}
             <!-- Empty state -->
-            <div class="notice" in:fade={{ duration: 250 }}>
-              <Emoji emoji={emptyStateEmoji} size="huge" />
-              <div class="text-group">
-                {#if emptyStateHeadline}<p class="typo-text-small-bold">
-                    {emptyStateHeadline}
-                  </p>{/if}
-                {#if emptyStateText}<p class="typo-text-small">{emptyStateText}</p>{/if}
-              </div>
-            </div>
+            <EmptyState
+              emoji={emptyStateEmoji}
+              headline={emptyStateHeadline}
+              text={emptyStateText}
+            />
           {/if}
         </div>
       {:else}
         <!-- Actual content -->
-        <!-- 
+        <!--
           Applying a negative margin matching the height of `placeholder-container` while it's still in the DOM
           to prevent an ugly transition glitch.
         -->

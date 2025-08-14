@@ -263,6 +263,7 @@ const walletStore = () => {
       onboard.disconnectWallet({ label: w.label });
     });
 
+    if (browser) invalidateAll();
     _clear();
   }
 

@@ -3,11 +3,15 @@
   import type { ComponentProps } from 'svelte';
 
   export let dripLists: ComponentProps<DripListCard>['data']['dripList'][];
+  export let cardVariant: ComponentProps<DripListCard>['variant'] = 'partial';
 </script>
 
-<div class="drip-list-cards-grid">
+<div class="drip-list-cards-grid" class:minimal-grid={cardVariant === 'minimal'}>
+  {#if dripLists.length === 0}
+    <p class="text-center text-muted">No Drip Lists found.</p>
+  {/if}
   {#each dripLists as dripList}
-    <DripListCard listingMode data={{ dripList: dripList }} />
+    <DripListCard variant={cardVariant} data={{ dripList: dripList }} />
   {/each}
 </div>
 
@@ -19,9 +23,17 @@
     padding: 4px 2px;
   }
 
+  .drip-list-cards-grid.minimal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  }
+
   @media (max-width: 767px) {
     .drip-list-cards-grid {
       grid-template-columns: 1fr;
+    }
+
+    .drip-list-cards-grid.minimal-grid {
+      grid-template-columns: auto auto;
     }
   }
 </style>

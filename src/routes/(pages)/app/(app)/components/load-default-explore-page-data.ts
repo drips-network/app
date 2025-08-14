@@ -1,68 +1,60 @@
-import { postsListingSchema } from '../../../../api/blog/posts/schema';
-import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
-import { redis } from '../../../../api/redis';
-import cached from '$lib/utils/cache/remote/cached';
-import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
-
+import network from '$lib/stores/wallet/network';
 import { fetchBlogPosts } from '$lib/utils/blog-posts';
-import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
-import { featuredDripListQuery, fetchList } from './load-drip-list';
+import { cachedTotalDrippedPrices } from '$lib/utils/total-dripped-approx';
+import fetchTlv from './load-tlv';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
+import cached from '$lib/utils/cache/remote/cached';
+import FEATURED_DRIP_LISTS_CONFIG from '../drip-lists/components/featured-drip-lists-config';
+import type { ExplorePageVariant } from './explore-page-config';
+import { dripListQuery, fetchFeaturedDripLists } from '../drip-lists/components/load-drip-lists';
+import {
+  createDefaultFetchProjectsParameters,
+  fetchAndCategorizeProjects,
+  fetchProjectsQuery,
+} from '../projects/components/load-projects';
+import { redis } from '../../../../api/redis';
 
-export default async function loadDefaultExplorePageData(
-  f: typeof fetch,
-  config: {
-    featuredDripListIds?: string[];
-    featuredProjectIds?: string[];
-    featuredWeb3ProjectIds?: string[];
-  } = {},
-) {
-  const { featuredDripListIds, featuredProjectIds, featuredWeb3ProjectIds } = config;
+export default async function loadDefaultExplorePage(fetch: typeof global.fetch) {
+  const fetchProjectsParameters = createDefaultFetchProjectsParameters();
+  const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[network.chainId].featuredDripListIds || [];
 
-  const fetchProjectsParameters = createFetchProjectsParameters();
   const cacheKey = queryCacheKey(
-    fetchProjectsQuery + featuredDripListQuery,
+    fetchProjectsQuery + dripListQuery,
     [Object.entries(fetchProjectsParameters), featuredDripListIds],
     'explore-page',
   );
 
-  const fetchFeaturedLists = async () => {
-    return await Promise.all((featuredDripListIds ?? []).map(async (id) => await fetchList(id, f)));
-  };
-
-  const fetchTlv = async () => {
-    const response = await f('/api/tlv');
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
-  };
-
-  const [blogPosts, projects, featuredDripLists, totalDrippedPrices, tlv] = await cached(
+  const [
+    { featuredProjects, featuredWeb3Projects, restProjects },
+    featuredDripLists,
+    blogPosts,
+    totalDrippedPrices,
+    tlv,
+  ] = await cached(
     redis,
     cacheKey,
     1 * 60 * 60, // 1 hr
     async () =>
       Promise.all([
+        fetchAndCategorizeProjects(network.chainId, fetch),
+        fetchFeaturedDripLists(network.chainId, fetch),
         fetchBlogPosts(),
-        fetchProjects(f, fetchProjectsParameters),
-        fetchFeaturedLists(),
-        cachedTotalDrippedPrices(redis, f),
-        fetchTlv(),
+        cachedTotalDrippedPrices(redis, fetch),
+        fetchTlv(fetch),
       ]),
   );
 
   return {
-    projects,
-    featuredProjectIds,
-    featuredWeb3ProjectIds,
-    blogPosts: postsListingSchema.parse(blogPosts),
-    featuredDripLists: mapFilterUndefined(featuredDripLists, (v) =>
-      v === null || v === undefined ? undefined : v,
-    ),
-    tlv,
-    totalDrippedPrices,
-    blockWhileInitializing: false,
+    variant: 'default' as ExplorePageVariant,
+    data: {
+      projects: restProjects,
+      featuredProjects,
+      featuredWeb3Projects,
+      featuredDripLists,
+      blogPosts,
+      totalDrippedPrices,
+      tlv,
+      blockWhileInitializing: false,
+    },
   };
 }

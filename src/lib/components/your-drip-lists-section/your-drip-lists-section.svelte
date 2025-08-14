@@ -16,8 +16,6 @@
   import Section from '../section/section.svelte';
   import Button from '../button/button.svelte';
   import Illustration from '../icons/✏️.svelte';
-  import modal from '$lib/stores/modal';
-  import CreateDripListStepper from '$lib/flows/create-drip-list-flow/create-drip-list-stepper.svelte';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
@@ -25,6 +23,7 @@
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import launchCreateDripList from '../../utils/launch-create-drip-list';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -62,18 +61,14 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Drip Lists',
+    label: 'Your Drip Lists',
     actionsDisabled: !dripLists,
     actions: withCreateButton
       ? [
           {
             label: 'Create Drip List',
             icon: Plus,
-            handler: () =>
-              modal.show(CreateDripListStepper, undefined, {
-                skipWalletConnect: true,
-                isModal: true,
-              }),
+            handler: launchCreateDripList,
           },
         ]
       : [],
@@ -88,6 +83,10 @@
       ? 'Create a Drip List to start supporting your dependencies'
       : 'Drip Lists enable supporting a set of open-source projects',
     horizontalScroll: false,
+    disconnected: !$walletStore.connected,
+    disconnectedStateEmoji: '🫙',
+    disconnectedStateHeadline: 'Connect your wallet',
+    disconnectedStateText: 'Your Drip Lists will show up here when your wallet is connected.',
   }}
 >
   {#if visibleDripListsAndVotingRounds}
@@ -104,13 +103,13 @@
         {#if list.type === 'drip-list' && matchingVotingRound}
           <DripListCard
             isHidden={!list.isVisible}
-            listingMode
+            variant="partial"
             data={{ dripList: list, votingRound: matchingVotingRound }}
           />
         {:else if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
+          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
         {:else if list.type === 'voting-round' && !dripLists.find((dl) => dl.account.accountId === list.dripListId)}
-          <DripListCard listingMode data={{ votingRound: list }} />
+          <DripListCard variant="partial" data={{ votingRound: list }} />
         {/if}
       {/each}
       {#if showCreateNewListCard}
@@ -123,15 +122,7 @@
             <h6 class="typo-text-bold">Got a new idea?</h6>
             <p>You can create as many Drip Lists as you like.</p>
             <div class="mt-2">
-              <Button
-                icon={Plus}
-                on:click={() =>
-                  modal.show(CreateDripListStepper, undefined, {
-                    skipWalletConnect: true,
-                    isModal: true,
-                  })}
-                >Create a new Drip List
-              </Button>
+              <Button icon={Plus} on:click={launchCreateDripList}>Create a new Drip List</Button>
             </div>
           </div>
         </div>
@@ -151,7 +142,7 @@
     >
       {#each hiddenDripListsAndVotingRounds as list}
         {#if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} listingMode data={{ dripList: list }} />
+          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
         {/if}
       {/each}
     </div>
