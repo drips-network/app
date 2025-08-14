@@ -18,7 +18,9 @@
   import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
+  export let streamRateValue: string | undefined = undefined;
   export let streamRateValueParsed: bigint | undefined = undefined;
+  export let topUpAmountValue: string | undefined = undefined;
   export let topUpAmountValueParsed: bigint | undefined = undefined;
 
   export let disabled = false;
@@ -30,21 +32,23 @@
   let tokenListSelected = selectedTokenAddress ? [selectedTokenAddress] : [];
   $: selectedTokenAddress = tokenListSelected[0];
 
-  let streamRateValue =
-    selectedTokenAddress && streamRateValueParsed
+  streamRateValue =
+    streamRateValue ??
+    (selectedTokenAddress && streamRateValueParsed
       ? formatUnits(
           streamRateValueParsed,
           (tokensStore.getByAddress(selectedTokenAddress)?.info.decimals ?? unreachable()) +
             contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
-      : '';
-  let topUpAmountValue =
-    selectedTokenAddress && topUpAmountValueParsed
+      : '');
+  topUpAmountValue =
+    topUpAmountValue ??
+    (selectedTokenAddress && topUpAmountValueParsed
       ? formatUnits(
           topUpAmountValueParsed,
           tokensStore.getByAddress(selectedTokenAddress)?.info.decimals ?? unreachable(),
         )
-      : '';
+      : '');
 
   // If top up is disabled, the token list should only show available token balances to stream.
   let tokenList: Items = {};

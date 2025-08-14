@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   import {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
@@ -29,6 +30,16 @@
       }
     }
   `;
+
+  export const CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT = gql`
+    ${DRIP_VISUAL_ECOSYSTEM_FRAGMENT}
+    fragment CreateDonationDetailsStepEcosystem on EcosystemMainAccount {
+      ...DripVisualEcosystem
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -48,6 +59,7 @@
     CreateDonationDetailsStepAddressDriverAccountFragment,
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
+    CreateDonationDetailsStepEcosystemFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -70,7 +82,8 @@
   export let receiver:
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
-    | CreateDonationDetailsStepProjectFragment;
+    | CreateDonationDetailsStepProjectFragment
+    | CreateDonationDetailsStepEcosystemFragment;
 
   let selectedTokenAllowance: bigint | undefined;
 
@@ -81,6 +94,18 @@
   $: selectedTokenAddress = $context.selectedTokenAddress?.[0];
   $: selectedToken = selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null;
 
+  let receiverTypeLabel = 'Drip List';
+  $: {
+    switch (receiver.__typename) {
+      case 'Project':
+        receiverTypeLabel = 'Drips project';
+        break;
+      case 'EcosystemMainAccount':
+        receiverTypeLabel = 'Ecosystem';
+        break;
+    }
+  }
+
   function submit() {
     let recipientAccountId: string;
     switch (receiver.__typename) {
@@ -89,6 +114,7 @@
         recipientAccountId = receiver.accountId;
         break;
       case 'Project':
+      case 'EcosystemMainAccount':
         recipientAccountId = receiver.account.accountId;
         break;
     }
@@ -96,10 +122,11 @@
     createDonation(
       dispatch,
       recipientAccountId,
-      receiver.__typename,
+      receiver,
       selectedTokenAddress ?? unreachable(),
       amount ?? unreachable(),
       selectedTokenAllowance ?? unreachable(),
+      $context.amountInputValue,
     );
   }
 </script>
@@ -132,7 +159,6 @@
   />
 
   {#if amount && selectedToken}
-    {@const receiverTypeLabel = receiver.__typename === 'Project' ? 'Drips project' : 'Drip List'}
     {@const nextSettlementDate = network.settlement.nextSettlementDate}
     <TransitionedHeight collapsed={!formValid} negativeMarginWhileCollapsed="-1rem">
       <WhatsNextSection>

@@ -21,6 +21,16 @@
             accountId
           }
         }
+        ... on EcosystemMainAccountReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on SubListReceiver {
+          account {
+            accountId
+          }
+        }
       }
     }
   `;
@@ -71,7 +81,10 @@
   } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '../../edit-members/edit-drip-list-steps';
   import type { Items, Weights } from '$lib/components/list-editor/types';
-  import { mapSplitReceiversToEditorConfig } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
+  import {
+    mapSplitReceiversToEditorConfig,
+    type SplitReceiver,
+  } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -109,7 +122,7 @@
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
     $state = {
-      listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits),
+      listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits as SplitReceiver[]),
       name: selectedDripList.name,
       description: selectedDripList.description || undefined,
       dripListAccountId: selectedDripList.account.accountId,

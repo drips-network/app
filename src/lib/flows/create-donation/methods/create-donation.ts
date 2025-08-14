@@ -3,22 +3,27 @@ import walletStore from '$lib/stores/wallet/wallet.store';
 import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
-import { toBigInt } from 'ethers';
-import type { OxString } from '$lib/utils/sdk/sdk-types';
-import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
-import { populateAddressDriverWriteTx } from '$lib/utils/sdk/address-driver/address-driver';
-import network from '$lib/stores/wallet/network';
 import expect from '$lib/utils/expect';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+import network from '$lib/stores/wallet/network';
 import type {
   ProjectOtDsQuery,
   ProjectOtDsQueryVariables,
   DripListOtDsQuery,
   DripListOtDsQueryVariables,
+  EcosystemOtDsQuery,
+  EcosystemOtDsQueryVariables,
 } from './__generated__/gql.generated';
+import type {
+  CreateDonationDetailsStepAddressDriverAccountFragment,
+  CreateDonationDetailsStepEcosystemFragment,
+  CreateDonationDetailsStepNftDriverAccountFragment,
+  CreateDonationDetailsStepProjectFragment,
+} from '../__generated__/gql.generated';
+import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
 
 const projectSupportQuery = gql`
   query ProjectOTDs($id: ID!, $chains: [SupportedChain!]!) {
@@ -67,6 +72,22 @@ const dripListSupportQuery = gql`
   }
 `;
 
+const ecosystemSupportQuery = gql`
+  query EcosystemOTDs($accountId: ID!, $chain: SupportedChain!) {
+    ecosystemMainAccount(id: $accountId, chain: $chain) {
+      chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
+    }
+  }
+`;
+
 function checkDonation(
   ownAccountId: string,
   supportAccountId: string,
@@ -79,10 +100,15 @@ function checkDonation(
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   recipientAccountId: string,
-  recipientType: 'AddressDriverAccount' | 'Project' | 'NftDriverAccount',
+  recipient:
+    | CreateDonationDetailsStepAddressDriverAccountFragment
+    | CreateDonationDetailsStepNftDriverAccountFragment
+    | CreateDonationDetailsStepProjectFragment
+    | CreateDonationDetailsStepEcosystemFragment,
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
+  amountInputValue: string,
 ) {
   dispatch(
     'transact',
@@ -93,55 +119,33 @@ export default function (
 
         assert(address, 'User is not connected to wallet');
         assert(
-          tokenAddress && amountToGive && tokenAllowance !== undefined,
+          tokenAddress && amountToGive && tokenAllowance !== undefined && amountInputValue,
           'TriggerGiveTransaction step is missing required context',
         );
 
-        const needApproval = tokenAllowance < amountToGive;
-
-        const givePopulatedTx = await populateAddressDriverWriteTx({
-          functionName: 'give',
-          args: [toBigInt(recipientAccountId), tokenAddress as OxString, amountToGive],
-        });
-
-        const approvePopulatedTx = await populateErc20WriteTx({
-          token: tokenAddress as OxString,
-          functionName: 'approve',
-          args: [network.contracts.ADDRESS_DRIVER as OxString, amountToGive],
+        const { txs } = await buildOneTimeDonationTxs({
+          tokenAddress,
+          amount: amountToGive,
+          amountInputValue,
+          tokenAllowance,
+          receiver: recipient,
         });
 
         return {
-          givePopulatedTx,
-          approvePopulatedTx,
-          needApproval,
+          txs,
           tokenAddress,
           ownAccountId,
         };
       },
 
-      transactions: ({ givePopulatedTx, approvePopulatedTx, needApproval }) => [
-        ...(needApproval
-          ? [
-              {
-                transaction: approvePopulatedTx,
-                applyGasBuffer: false,
-                title: `Approve Drips to withdraw the ERC-20`,
-              },
-            ]
-          : []),
-
-        {
-          transaction: givePopulatedTx,
-          applyGasBuffer: false,
-          title: 'Make the one-time donation',
-        },
-      ],
+      transactions: ({ txs }) => txs,
 
       after: async (receipts, { ownAccountId }) => {
         try {
-          const blockTimestamp = (await receipts[0].getBlock()).timestamp;
+          const lastReceipt = receipts[receipts.length - 1];
+          const blockTimestamp = (await lastReceipt.getBlock()).timestamp;
 
-          switch (recipientType) {
+          switch (recipient.__typename) {
             case 'Project': {
               await expect(
                 () =>
@@ -168,6 +172,31 @@ export default function (
               );
               break;
             }
+            case 'EcosystemMainAccount':
+              await expect(
+                () =>
+                  query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
+                    accountId: recipientAccountId,
+                    chain: network.gqlName,
+                  }),
+                (res) => {
+                  const ecoystemData = res.ecosystemMainAccount;
+                  if (!ecoystemData) return true;
+
+                  return ecoystemData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
             case 'NftDriverAccount': {
               await expect(
                 () =>
