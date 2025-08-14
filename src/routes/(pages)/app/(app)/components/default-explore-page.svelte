@@ -111,7 +111,7 @@
         actions: [
           {
             label: 'Explore projects',
-            href: '/app/projects/all',
+            href: '/app/projects',
             icon: Box,
           },
         ],
@@ -134,7 +134,7 @@
         actions: [
           {
             label: 'Explore Drip Lists',
-            href: '/app/drip-lists/all',
+            href: '/app/drip-lists',
             icon: DripList,
           },
         ],
@@ -154,8 +154,8 @@
         label: 'Featured web3 projects',
         actions: [
           {
-            label: 'Explore Projects',
-            href: '/app/projects/all',
+            label: 'Explore projects',
+            href: '/app/projects',
             icon: Box,
           },
         ],
