@@ -15,14 +15,16 @@
   import type { ProjectNameFragment } from './__generated__/gql.generated';
 
   export let showSource = true;
-  export let size: 'small' | 'medium' = 'medium';
+  export let pixelated = false;
+  export let tiny = false;
 
   export let project: ProjectNameFragment;
 
-  $: sizeClass = size === 'small' ? 'typo-text-small' : 'typo-text';
+  $: pixelatedClasses = pixelated ? 'pixelated' : '';
+  $: textClasses = tiny ? 'typo-text-small' : '';
 </script>
 
-<span class="text-foreground-level-5 {sizeClass}"
+<span class="text-foreground-level-5 {textClasses} {pixelatedClasses}"
   >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
     >{project.source.repoName}</span
   ></span

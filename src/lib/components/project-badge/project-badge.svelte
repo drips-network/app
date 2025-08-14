@@ -50,13 +50,14 @@
   export let project: ProjectBadgeFragment;
 
   export let tooltip = true;
+  /** display project as if it's unclaimed, even if it is claimed */
   export let forceUnclaimed = false;
   export let hideAvatar = false;
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
+  export let smallText = false;
   export let chainOverride: SupportedChain | undefined = undefined;
-  export let projectNameSize: 'small' | 'medium' = 'medium';
 
   let unclaimedProject: Project;
   $: unclaimedProject = {
@@ -79,7 +80,7 @@
   <Tooltip disabled={!tooltip}>
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
-      class="project-badge flex gap-2 items-center typo-text"
+      class="project-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
       href={linkTo === 'project-page'
         ? buildProjectUrl(
             processedProject.source.forge,
@@ -107,7 +108,7 @@
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
-        <ProjectName project={processedProject} size={projectNameSize} />
+        <ProjectName tiny={smallText} project={processedProject} />
       </div>
       {#if !project?.isVisible}
         <WarningIcon

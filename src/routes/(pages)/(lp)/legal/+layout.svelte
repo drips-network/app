@@ -1,4 +1,5 @@
 <script>
+  import LpFooter from '../components/lp-footer.svelte';
   import './longform-text.css';
 </script>
 
@@ -6,6 +7,8 @@
   <div class="content">
     <slot />
   </div>
+
+  <LpFooter />
 </div>
 
 <style>
@@ -23,6 +26,5 @@
   .content {
     max-width: 44rem;
     padding-top: 2rem;
-    padding-left: 1rem;
   }
 </style>

@@ -53,12 +53,15 @@
       fiatEstimateCents = result.fiatEstimateCents;
     }
   }
+
+  export let compact = false;
 </script>
 
 <div class="aggregate-fiat-estimate">
   <FiatEstimateValue
     forceLoading={amounts === undefined && typeof fiatEstimateCents !== 'number'}
     {fiatEstimateCents}
+    {compact}
   />
   {#if includesUnknownPrice && fiatEstimateCents !== 'pending' && !supressUnknownAmountsWarning}
     <div class="warning" transition:fade={{ duration: 100 }}>

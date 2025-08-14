@@ -1,42 +1,34 @@
-import query from '$lib/graphql/dripsQL.js';
-import { redirect } from '@sveltejs/kit';
-import { gql } from 'graphql-request';
-import { DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT } from './+page.svelte';
 import { getVotingRounds } from '$lib/utils/multiplayer';
-import type {
-  DripListsPageQuery,
-  DripListsPageQueryVariables,
-} from './__generated__/gql.generated';
-import buildUrl from '$lib/utils/build-url';
+import type {} from './__generated__/gql.generated';
 import getConnectedAddress from '$lib/utils/get-connected-address';
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-import network from '$lib/stores/wallet/network';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
+import fetchCategorziedDripLists from './components/load-drip-lists';
+import network from '$lib/stores/wallet/network';
+import type { ChainStatsQuery } from '../components/__generated__/gql.generated';
+import fetchChainStats from '../components/load-chain-stats';
+import type { AllDripListsQuery, DripListQuery } from './components/__generated__/gql.generated';
+import {
+  default as fetchTotalDrippedApproximation,
+  totalDrippedPrices as fetchTotalDrippedPrices,
+} from '$lib/utils/total-dripped-approx';
 
 type VotingRoundWithSplits = VotingRound & { splits: SplitsComponentSplitsReceiver[] };
 
 const fetchedDataCache = makeFetchedDataCache<{
-  dripLists: DripListsPageQuery['dripLists'];
+  yourDripLists: AllDripListsQuery['dripLists'];
+  restDripLists: AllDripListsQuery['dripLists'];
+  featuredDripLists: DripListQuery['dripList'][];
+  chainStats: ChainStatsQuery['chainStats'][number];
   votingRounds: VotingRoundWithSplits[];
+  totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
+  totalDrippedAmounts: Awaited<ReturnType<typeof fetchTotalDrippedApproximation>>;
 }>('dashboard:drip-lists');
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
-
-  if (!connectedAddress) {
-    throw redirect(307, buildUrl('/app/connect', { backTo: '/app/drip-lists' }));
-  }
-
-  const dripListsPageQuery = gql`
-    ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
-    query DripListsPage($ownerAddress: String, $chains: [SupportedChain!]) {
-      dripLists(chains: $chains, where: { ownerAddress: $ownerAddress }) {
-        ...DripListsPageDripList
-      }
-    }
-  `;
 
   const locallyCached = fetchedDataCache.read();
 
@@ -44,13 +36,19 @@ export const load = async ({ fetch }) => {
     return locallyCached;
   }
 
-  const [votingRounds, dripListsRes] = await Promise.all([
-    await getVotingRounds({ publisherAddress: connectedAddress }, fetch),
-    await query<DripListsPageQuery, DripListsPageQueryVariables>(
-      dripListsPageQuery,
-      { ownerAddress: connectedAddress, chains: [network.gqlName] },
-      fetch,
-    ),
+  const totalDrippedAmounts = fetchTotalDrippedApproximation();
+  const [
+    votingRounds,
+    { featuredDripLists, yourDripLists, restDripLists },
+    chainStats,
+    totalDrippedPrices,
+  ] = await Promise.all([
+    !connectedAddress
+      ? Promise.resolve([])
+      : getVotingRounds({ publisherAddress: connectedAddress }, fetch),
+    fetchCategorziedDripLists(network.chainId, fetch, connectedAddress),
+    fetchChainStats(fetch),
+    fetchTotalDrippedPrices(fetch),
   ]);
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
@@ -65,13 +63,23 @@ export const load = async ({ fetch }) => {
   }));
 
   fetchedDataCache.write({
-    dripLists: dripListsRes.dripLists,
+    yourDripLists,
+    restDripLists,
+    featuredDripLists,
     votingRounds: votingRoundsWithSplits,
+    chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
   });
 
   return {
-    dripLists: dripListsRes.dripLists,
+    yourDripLists,
+    restDripLists,
+    featuredDripLists,
     votingRounds: votingRoundsWithSplits,
+    chainStats,
+    totalDrippedPrices,
+    totalDrippedAmounts,
     preservePathOnNetworkChange: true,
   };
 };

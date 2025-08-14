@@ -50,6 +50,3 @@
     </svelte:fragment>
   </StepLayout>
 </div>
-
-<style>
-</style>

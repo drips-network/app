@@ -8,7 +8,7 @@
   <div class="column">
     <h5>Drips</h5>
     <a rel="noreferrer" target="_blank" href="https://docs.drips.network">Docs</a>
-    <a rel="noreferrer" target="_blank" href="https://github.com/dripsnetwork">Code on GitHub</a>
+    <a rel="noreferrer" target="_blank" href="https://github.com/drips-network">Code on GitHub</a>
     <a rel="noreferrer" target="_blank" href="https://github.com/drips-network/app/issues/new"
       >Report a bug</a
     >
@@ -49,6 +49,7 @@
   footer {
     width: 100%;
     margin-top: 4rem;
+    margin-bottom: 3rem;
     display: grid;
     gap: 2rem;
     grid-template-columns: 1fr;
@@ -83,7 +84,6 @@
   }
 
   .supported-by > .radworks-logo {
-    height: 1.4rem;
-    transform: translateY(0.15rem);
+    height: 1rem;
   }
 </style>

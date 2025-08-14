@@ -2,8 +2,15 @@
   import { page } from '$app/stores';
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
+  import { browser } from '$app/environment';
+  import Ellipsis from '../icons/Ellipsis.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import Overflow from './overflow.svelte';
 
   export let items: BottomNavItems;
+
+  $: bottomNavItems = items.slice(0, 4);
+  $: isOverflowing = items.length > 4;
 
   interface ItemElems {
     [href: string]: HTMLAnchorElement;
@@ -19,23 +26,30 @@
   let selectorOffset: number | undefined = undefined;
   let selectorWidth: number | undefined = undefined;
 
-  let resizeObserver: ResizeObserver = new ResizeObserver(() => {
-    selectorWidth = activeElem.offsetWidth + 20;
-  });
+  let resizeObserver: ResizeObserver | undefined = undefined;
 
   function updateResizeObserver(elem: HTMLElement | undefined) {
+    if (!resizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        selectorWidth = activeElem.offsetWidth + 20;
+      });
+    }
     if (!elem) return;
 
     resizeObserver.disconnect();
     resizeObserver.observe(elem);
   }
 
-  $: updateResizeObserver(activeElem);
+  $: browser && updateResizeObserver(activeElem);
 
   function updateSelectorPos() {
     if (!activeElem) return;
 
     selectorOffset = activeElem.offsetLeft - 10;
+  }
+
+  function handleOverflowClick() {
+    cupertinoPaneStore.openSheet(Overflow, { items });
   }
 </script>
 
@@ -43,7 +57,7 @@
 
 <div class="bottom-nav">
   <div class="items">
-    {#each items as item}
+    {#each bottomNavItems as item}
       <a
         data-highlightid="bottomnav-{item.href}"
         class="item typo-text-small-bold"
@@ -62,6 +76,14 @@
         </span>
       </a>
     {/each}
+
+    {#if isOverflowing}
+      <button class="item typo-text-small-bold" on:click={handleOverflowClick}>
+        <Ellipsis style="fill: var(--color-foreground)" />
+        <span>More</span>
+      </button>
+    {/if}
+
     <div class="selector">
       {#if activeElem}
         <div

@@ -125,7 +125,7 @@
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://docs.drips.network/claim-your-repository#settlement-of-future-funds"
+              href="https://docs.drips.network/get-support/claim-your-repository#settlement-of-future-funds"
               class="learn-more">Learn more</a
             >
           </p>

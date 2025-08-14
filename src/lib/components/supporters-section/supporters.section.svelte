@@ -303,7 +303,7 @@
               props: {
                 linkTo: 'nothing',
                 tooltip: false,
-                size: 'tiny',
+                size: 'small',
                 project: item.project,
                 maxWidth: false,
               },

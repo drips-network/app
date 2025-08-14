@@ -15,13 +15,12 @@
   import { gql } from 'graphql-request';
   import type { ProjectsSectionProjectFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
   import Plus from '../icons/Plus.svelte';
-  import modal from '$lib/stores/modal';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import launchClaimProject from '$lib/utils/launch-claim-project';
 
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
@@ -47,13 +46,13 @@
   bind:collapsable
   header={{
     icon: Box,
-    label: 'Projects',
+    label: 'Your projects',
     actions: withClaimProjectButton
       ? [
           {
             label: 'Claim project',
             icon: Plus,
-            handler: () => modal.show(ClaimProjectStepper, undefined, { skipWalletConnect: true }),
+            handler: () => launchClaimProject(),
           },
         ]
       : [],
@@ -68,6 +67,10 @@
     emptyStateText: withClaimProjectButton
       ? 'If you develop an open-source project, click "Claim project" to get started.'
       : 'This user hasnʼt claimed any software projects yet.',
+    disconnected: !$walletStore.connected,
+    disconnectedStateEmoji: '🫙',
+    disconnectedStateHeadline: 'Connect your wallet',
+    disconnectedStateText: 'Your claimed projects will show up here when your wallet is connected.',
   }}
 >
   {#if visibleProjects}
@@ -114,9 +117,7 @@
   }
 
   .projects > * {
-    flex: 1;
-    min-width: 16rem;
-    max-width: calc(25% - 0.75rem);
+    width: calc(50% - 0.5rem);
   }
 
   @media (max-width: 560px) {

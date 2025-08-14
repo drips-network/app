@@ -67,7 +67,7 @@
     height: 100%;
     width: 100%;
     position: fixed;
-    z-index: 10000;
+    z-index: 9;
     display: flex;
     top: 0;
     left: 0;
