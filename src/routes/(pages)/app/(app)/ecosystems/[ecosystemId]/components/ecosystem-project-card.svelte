@@ -108,7 +108,7 @@
           </span>
         </h2>
         <div>
-          <ProjectBadge size="tiny" {project} projectNameSize="small" />
+          <ProjectBadge size="tiny" {project} />
         </div>
         <div>
           <span class="line-clamp-2 twemoji-text">{@html twemoji(description)} </span>
