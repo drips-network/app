@@ -34,5 +34,6 @@
   .logos .image {
     height: 1.5rem;
     width: auto;
+    max-width: 6.5rem;
   }
 </style>
