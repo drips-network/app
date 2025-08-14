@@ -69,7 +69,7 @@
 
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations">
-      ><AggregateFiatEstimate
+      <AggregateFiatEstimate
         compact
         amounts={data.totalDrippedAmounts}
         prices={data.totalDrippedPrices}
