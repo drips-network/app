@@ -13,7 +13,9 @@ export const load = async ({ parent }) => {
 
   const { linkedDripLists } = wrappedRound.round;
 
-  async function fetchLists(listIds: string[]) {
+  async function fetchLists(
+    listIds: string[],
+  ): Promise<NonNullable<RpgfLinkedDripListQuery['dripList']>[]> {
     const listQuery = gql`
       ${DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT}
       query RpgfLinkedDripList($id: ID!, $chain: SupportedChain!) {
