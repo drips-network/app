@@ -55,7 +55,7 @@ printf "\n✅ The app is ready!\n"
 printf "\n🚀 Running tests..."
 
 if [ $UI = true ]; then
-  npx playwright test --ui-port 0 &
+  npx playwright test --ui-port 0 --headed &
   docker compose logs app --follow
 else
   npx playwright test

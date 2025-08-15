@@ -228,6 +228,7 @@ services:
       - DRIPS_GQL_API_KEY=123
       - JWT_SECRET=123
       - JWT_EXPIRATION_MINUTES=60
+      - ENABLE_DANGEROUS_TEST_ROUTES=true
     ports:
       - 5000:5000
     depends_on:

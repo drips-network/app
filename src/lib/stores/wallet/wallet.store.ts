@@ -368,18 +368,27 @@ const localTestnetWalletStore = () => {
   }
 
   async function connect() {
-    const signer = await provider.getSigner();
+    /** Tests will insert a hidden `span` with id "E2E_ADDRESS" into the DOM to set the address to connect to */
+    const addressToConnect =
+      document.getElementById('E2E_ADDRESS')?.textContent?.trim() ??
+      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+
+    const provider = new JsonRpcProvider(NETWORK_CONFIG[31337].rpcUrl, network, {
+      staticNetwork: true,
+    });
+
+    const signer = await provider.getSigner(addressToConnect);
 
     const ownAccountId = (
       await executeAddressDriverReadMethod({
         functionName: 'calcAccountId',
-        args: [signer.address as OxString],
+        args: [addressToConnect as OxString],
       })
     ).toString();
 
     state.set({
       connected: true,
-      address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      address: addressToConnect,
       provider,
       signer,
       network,
@@ -387,6 +396,10 @@ const localTestnetWalletStore = () => {
     });
 
     initialized.set(true);
+
+    if (browser) {
+      await invalidateAll();
+    }
   }
 
   async function disconnect() {
@@ -395,6 +408,9 @@ const localTestnetWalletStore = () => {
       network,
       provider,
     });
+
+    logOut();
+    invalidateAll();
   }
 
   return {
