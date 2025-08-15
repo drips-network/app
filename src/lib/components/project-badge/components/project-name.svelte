@@ -24,7 +24,7 @@
   $: textClasses = tiny ? 'typo-text-small' : '';
 </script>
 
-<span class="text-foreground-level-5 {textClasses} {pixelatedClasses}"
+<span class="text-foreground-level-5 {textClasses} {pixelatedClasses} line-clamp-1"
   >{#if showSource}{project.source.ownerName}/{/if}<span class="text-foreground"
     >{project.source.repoName}</span
   ></span
