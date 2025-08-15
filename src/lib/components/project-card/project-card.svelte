@@ -162,6 +162,7 @@
       transform 0.2s;
     container-name: wrapper;
     container-type: inline-size;
+    overflow: hidden;
   }
 
   .wrapper:hover:not(:active) .project-card,
