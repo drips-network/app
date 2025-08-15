@@ -147,7 +147,7 @@
   }
 
   .button .inner:not(.ghost) {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 
   .button:not(.loading) .inner.primary {

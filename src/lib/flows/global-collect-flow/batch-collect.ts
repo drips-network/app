@@ -68,6 +68,7 @@ export default function batchCollect(
         {
           transaction: tx,
           applyGasBuffer: true,
+          // TODO(rpgf): make this worky again
           gasless: get(gaslessStore),
           title: 'Collect funds',
         },

@@ -15,6 +15,10 @@
   import type { LayoutData } from './$types';
   import Settings from '$lib/components/icons/Settings.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import network from '$lib/stores/wallet/network';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let data: LayoutData;
 
@@ -22,38 +26,49 @@
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
   $: navItems = {
-    top: [
-      {
-        label: 'Explore',
-        href: '/app',
-        icon: ExploreIcon,
-        description: 'Discover projects and stats across Drips.',
-      },
-      {
-        label: 'Funds',
-        href: '/app/funds',
-        icon: TokenStreams,
-        description: 'Discover or create fundable lists.',
-      },
-      {
-        label: 'Projects',
-        href: '/app/projects',
-        icon: Box,
-        description: 'Browse or claim a GitHub project.',
-      },
-      {
-        label: 'Drip Lists',
-        href: '/app/drip-lists',
-        icon: DripListIcon,
-        description: 'Discover or create fundable lists.',
-      },
-      {
-        label: 'Profile',
-        href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
-        description: 'Your stuff on Drips.',
-        icon: User,
-      },
-    ],
+    top: mapFilterUndefined(
+      [
+        {
+          label: 'Explore',
+          href: '/app',
+          icon: ExploreIcon,
+          description: 'Discover projects and stats across Drips.',
+        },
+        {
+          label: 'Funds',
+          href: '/app/funds',
+          icon: TokenStreams,
+          description: 'Discover or create fundable lists.',
+        },
+        {
+          label: 'Projects',
+          href: '/app/projects',
+          icon: Box,
+          description: 'Browse or claim a GitHub project.',
+        },
+        {
+          label: 'Drip Lists',
+          href: '/app/drip-lists',
+          icon: DripListIcon,
+          description: 'Discover or create fundable lists.',
+        },
+        network.retroFunding.enabled
+          ? {
+              label: 'RetroPGF',
+              href: '/app/rpgf',
+              icon: ArrowCounterClockwiseHeart,
+              description: 'Run or participate in a RetroPGF round.',
+            }
+          : undefined,
+        {
+          label: 'Profile',
+          href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
+          description: 'Your stuff on Drips.',
+          icon: User,
+        },
+      ],
+      (v) => v,
+    ),
     bottom: [
       {
         label: 'Settings',
@@ -82,7 +97,11 @@
   }
 </script>
 
-<div class="main" in:fly|global={{ duration: 300, y: 16 }}>
+<div
+  class="main"
+  class:sidenav-forced-collapsed={$forceCollapsed === true}
+  in:fly|global={{ duration: 300, y: 16 }}
+>
   <div class="page">
     <div class="page-content">
       <div class:loading={$navigating} class="page-content-inner"><slot /></div>

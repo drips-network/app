@@ -14,8 +14,11 @@
     label?: string;
     icon?: ComponentType;
     variant?: 'primary';
+    disabled?: boolean;
+    loading?: boolean;
   }[] = [];
   export let actionsDisabled = false;
+  export let anchorTarget: string | undefined = undefined;
 
   export let infoTooltip: string | undefined = undefined;
 
@@ -31,6 +34,10 @@
   class:collapsed
   class:collapsable
 >
+  {#if anchorTarget}
+    <div class="anchor-target" id={anchorTarget} />
+  {/if}
+
   <div class="title">
     {#if icon}
       <div data-testid="section-icon" class="icon-wrapper">
@@ -55,7 +62,8 @@
   <div class="actions">
     {#each actions as action}
       <Button
-        disabled={actionsDisabled}
+        disabled={action.disabled || actionsDisabled}
+        loading={action.loading}
         variant={action.variant}
         icon={action.icon}
         href={action.href}
@@ -68,11 +76,23 @@
 
 <style>
   .section-header {
+    position: relative;
     display: flex;
     gap: 0.5rem;
     align-items: center;
     justify-content: space-between;
     user-select: none;
+  }
+
+  .anchor-target {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .section-header > * {

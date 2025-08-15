@@ -199,7 +199,7 @@ export default class DripListService {
         {
           title: 'Creating the Drip List',
           transaction: batch,
-          applyGasBuffer: true,
+          applyGasBuffer: support?.type === 'continuous',
         },
       ],
       dripListId: listId,

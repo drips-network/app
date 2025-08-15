@@ -18,7 +18,12 @@
   import expect from '$lib/utils/expect';
   import isClaimed from '$lib/utils/project/is-claimed';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
-  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import {
+    CallerERC2771Domain,
+    CallSignedERC2771Types,
+    getCallerNonce,
+    populateCallerWriteTx,
+  } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
@@ -178,11 +183,28 @@
         args: [0, hexlify(toUtf8Bytes(`${username}/${repoName}`)) as `0x${string}`],
       });
 
+      const { address } = $walletStore;
+      assert(address, 'Wallet address is not defined');
+
       transactions.push(
         {
           title: 'Request update of repository owner',
           transaction: ownerUpdateTx,
-          gasless: false,
+          gasless: {
+            nonceGetter: () => getCallerNonce(address),
+            ERC2771Data: (nonce) => ({
+              domain: CallerERC2771Domain,
+              types: CallSignedERC2771Types,
+              payload: {
+                sender: $walletStore.address,
+                target: ownerUpdateTx.to,
+                data: ownerUpdateTx.data,
+                value: '0',
+                nonce,
+                deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+              },
+            }),
+          },
           applyGasBuffer: false,
         },
         {
@@ -234,9 +256,28 @@
                 $context.gitUrl,
               );
 
+          const address = $walletStore.address;
+          assert(address, 'Wallet address is not defined');
+
           const setSplitsAndMetadataTransactionStep = {
             transaction: tx,
-            gasless: $gaslessStore,
+            gasless: $gaslessStore
+              ? {
+                  nonceGetter: () => getCallerNonce(address),
+                  ERC2771Data: (nonce: number) => ({
+                    domain: CallerERC2771Domain,
+                    types: CallSignedERC2771Types,
+                    payload: {
+                      sender: $walletStore.address,
+                      target: tx.to,
+                      data: tx.data,
+                      value: '0',
+                      nonce,
+                      deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+                    },
+                  }),
+                }
+              : undefined,
             applyGasBuffer: false,
             title: 'Set project splits and metadata',
           };
