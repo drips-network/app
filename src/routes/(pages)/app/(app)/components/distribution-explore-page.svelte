@@ -17,7 +17,7 @@
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
   export let featuredDripLists: ComponentProps<DripListsGrid>['dripLists'];
-  export let welcomeCard: {
+  export let welcomeCardConfig: {
     title: string;
     description: string;
     docsButton?: {
@@ -28,7 +28,7 @@
 </script>
 
 <div class="explore">
-  {#if welcomeCard}
+  {#if welcomeCardConfig}
     <div class="hero">
       <div class="welcome-card">
         <div class="illustration">
@@ -39,11 +39,11 @@
         </div>
         <div class="content">
           <div style:display="flex" style:flex-direction="column" style:gap="1rem">
-            <h1>{welcomeCard.title}</h1>
-            <p>{welcomeCard.description}</p>
+            <h1>{welcomeCardConfig.title}</h1>
+            <p>{welcomeCardConfig.description}</p>
           </div>
-          {#if welcomeCard.docsButton}
-            {@const docsButton = welcomeCard.docsButton}
+          {#if welcomeCardConfig.docsButton}
+            {@const docsButton = welcomeCardConfig.docsButton}
             <div>
               <Button href={docsButton.href} target="_blank" icon={ArrowBoxUpRight}
                 >{docsButton.label}</Button

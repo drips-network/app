@@ -47,7 +47,7 @@ test('create a drip list', async ({ page, connectedSession }) => {
     .getByTestId('item-642829559307850963015472508762062935916233390536')
     .getByRole('spinbutton')
     .press('Enter');
-  await page.getByText('0', { exact: true }).click();
+  await page.getByText('0', { exact: true }).nth(0).click();
   await page
     .getByTestId('item-80921553623925136102837120782793736893291544351678576578072673071408')
     .getByRole('spinbutton')

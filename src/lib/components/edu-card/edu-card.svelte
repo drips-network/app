@@ -13,7 +13,7 @@
     <div out:fade={{ duration: 300 }} class="edu-card">
       <div class="text">
         <slot name="text" />
-        <div class="flex gap-2">
+        <div class="buttons">
           <slot name="buttons" />
           {#if dismissableId}
             <Button
@@ -49,6 +49,7 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
+    color: var(--color-foreground-level-6);
   }
 
   .edu-card .illustration {
@@ -58,7 +59,14 @@
     align-items: center;
   }
 
-  @media (max-width: 768px) {
+  .buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1024px) {
     .edu-card {
       flex-direction: column-reverse;
       gap: 2rem;

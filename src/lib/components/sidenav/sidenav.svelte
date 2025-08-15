@@ -113,7 +113,6 @@
   }
 
   .sidenav.force-collapsed {
-    /* width: 3rem; */
     opacity: 0.5;
     transition: opacity 0.3s;
   }

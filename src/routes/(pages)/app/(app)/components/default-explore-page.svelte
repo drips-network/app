@@ -12,10 +12,7 @@
   import tickStore from '$lib/stores/tick/tick.store';
   import Box from '$lib/components/icons/Box.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
-  import type {
-    DefaultExplorePageFeaturedProjectFragment,
-    ExplorePageFeaturedDripListsFragment,
-  } from './__generated__/gql.generated';
+  import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import type { z } from 'zod';
   import type { postsListingSchema } from '../../../../api/blog/posts/schema';
   import LatestNewsSection from './latest-news-section.svelte';
@@ -24,20 +21,15 @@
   import ProjectsGrid from './projects-grid.svelte';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
+  import type { ADripListFragment } from '../drip-lists/components/__generated__/gql.generated';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
-  export let featuredProjectIds: string[] | undefined = undefined;
-  export let featuredWeb3ProjectIds: string[] | undefined = undefined;
+  export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
+  export let featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
   export let blogPosts: z.infer<typeof postsListingSchema>;
-  export let featuredDripLists: ExplorePageFeaturedDripListsFragment[];
+  export let featuredDripLists: ADripListFragment[];
   export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
   export let tlv: number;
-
-  $: featuredWeb3Projects = projects.filter((p) =>
-    featuredWeb3ProjectIds?.includes(p.account.accountId),
-  );
-
-  $: featuredProjects = projects.filter((p) => featuredProjectIds?.includes(p.account.accountId));
 
   // 2 latest posts. Sort by date
   $: blogPosts = blogPosts
@@ -111,15 +103,15 @@
     </div>
   </Section>
 
-  {#if featuredProjectIds}
+  {#if featuredProjects?.length > 0}
     <Section
       header={{
         icon: BoxIcon,
         label: 'Featured projects',
         actions: [
           {
-            label: 'See all',
-            href: '/app/projects/all',
+            label: 'Explore projects',
+            href: '/app/projects',
             icon: Box,
           },
         ],
@@ -141,8 +133,8 @@
         label: 'Featured Drip Lists',
         actions: [
           {
-            label: 'See all',
-            href: '/app/drip-lists/all',
+            label: 'Explore Drip Lists',
+            href: '/app/drip-lists',
             icon: DripList,
           },
         ],
@@ -155,15 +147,15 @@
     </Section>
   {/if}
 
-  {#if featuredWeb3ProjectIds}
+  {#if featuredWeb3Projects?.length > 0}
     <Section
       header={{
         icon: BoxIcon,
         label: 'Featured web3 projects',
         actions: [
           {
-            label: 'See all',
-            href: '/app/projects/all',
+            label: 'Explore projects',
+            href: '/app/projects',
             icon: Box,
           },
         ],

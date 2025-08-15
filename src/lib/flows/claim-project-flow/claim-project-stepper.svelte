@@ -7,6 +7,7 @@
   export let skipWalletConnect = false;
   export let skipNetworkSelection = false;
   export let linkToProjectPageOnSuccess = true;
+  export let displaySlots = false;
 
   let currentStepIndex = skipNetworkSelection ? 1 : 0;
 
@@ -19,7 +20,7 @@
   }
 </script>
 
-{#if !skipWalletConnect}
+{#if displaySlots}
   <StandaloneFlowSlots on:edit={handleSlotEdit} {slots} />
 {/if}
 

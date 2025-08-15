@@ -618,28 +618,7 @@
 <div class="showcase-item" style="max-width: 16rem">
   <h2>Project Card</h2>
   <PrimaryColorThemer colorHex="#fcc842">
-    <ProjectCard
-      project={{
-        __typename: 'Project',
-        source: SOURCE_CONFIGS.github,
-        isVisible: true,
-        chainData: [
-          {
-            chain: network.gqlName,
-            owner: {
-              __typename: 'AddressDriverAccount',
-              accountId: '0',
-            },
-            __typename: 'ClaimedProjectData',
-            avatar: {
-              __typename: 'EmojiAvatar',
-              emoji: '🚶',
-            },
-            color: '#fcc842',
-          },
-        ],
-      }}
-    />
+    <ProjectCard project={MOCK_PROJECT_2} />
   </PrimaryColorThemer>
 </div>
 

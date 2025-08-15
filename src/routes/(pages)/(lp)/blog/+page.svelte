@@ -13,17 +13,23 @@
   description="Read the latest on FOSS & Dependency Funding from the Drips team."
 />
 
-<div class="post-list">
+<div class="posts-grid">
   {#each posts as post, index}
     <PostCard {...post} first={index === 0} />
   {/each}
 </div>
 
 <style>
-  .post-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    padding-top: 1rem;
+  .posts-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    padding: 4px 2px;
+  }
+
+  @media (max-width: 767px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

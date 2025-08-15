@@ -1,49 +1,52 @@
-import cached from '$lib/utils/cache/remote/cached';
-import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
-import { fetchBlogPosts } from '../../../../../lib/utils/blog-posts';
-import { redis } from '../../../../api/redis';
-import { createFetchProjectsParameters, fetchProjects, fetchProjectsQuery } from './load-projects';
-import { featuredDripListQuery, fetchList } from './load-drip-list';
-import type { ComponentProps } from 'svelte';
-import type DistributionExplorePage from './distribution-explore-page.svelte';
-import filterFalsy from '$lib/utils/filter-falsy';
+import network from '$lib/stores/wallet/network';
+import { fetchBlogPosts } from '$lib/utils/blog-posts.js';
+import {
+  createDefaultFetchProjectsParameters,
+  fetchProjects,
+  fetchProjectsQuery,
+} from '../projects/components/load-projects.js';
+import {
+  dripListsQuery,
+  fetchFeaturedDripLists,
+} from '../drip-lists/components/load-drip-lists.js';
+import queryCacheKey from '$lib/utils/cache/remote/query-cache-key.js';
+import cached from '$lib/utils/cache/remote/cached.js';
+import FEATURED_DRIP_LISTS_CONFIG from '../drip-lists/components/featured-drip-lists-config.js';
+import EXPLORE_PAGE_CONFIG, { type ExplorePageVariant } from './explore-page-config.js';
+import { redis } from '../../../../api/redis.js';
 
-type PageProps = ComponentProps<DistributionExplorePage>;
+export default async function loadDistributionExplorePage(fetch: typeof global.fetch) {
+  const currentConfig = EXPLORE_PAGE_CONFIG[network.chainId];
+  const { welcomeCardConfig, showRecentProjects } = currentConfig;
 
-export default async function loadDistributionExplorePageData(
-  f: typeof fetch,
-  config: {
-    featuredListIds: string[];
-    welcomeCardConfig: PageProps['welcomeCard'];
-    showRecentProjects?: true;
-  },
-): Promise<PageProps> {
-  const projectsParameters = createFetchProjectsParameters();
-
-  const { featuredListIds, welcomeCardConfig, showRecentProjects } = config;
+  const fetchProjectsParameters = createDefaultFetchProjectsParameters();
+  const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[network.chainId].featuredDripListIds || [];
 
   const cacheKey = queryCacheKey(
-    fetchProjectsQuery + featuredDripListQuery,
-    [Object.entries(projectsParameters), featuredListIds],
+    fetchProjectsQuery + dripListsQuery,
+    [Object.entries(fetchProjectsParameters), featuredDripListIds],
     'explore-page',
   );
 
-  const [blogPosts, projects, featuredDripLists] = await cached(
+  const [projects, featuredDripLists, blogPosts] = await cached(
     redis,
     cacheKey,
-    6 * 60 * 60,
+    1 * 60 * 60, // 1 hr
     async () =>
       Promise.all([
+        showRecentProjects ? fetchProjects(fetch) : null,
+        fetchFeaturedDripLists(network.chainId, fetch),
         fetchBlogPosts(),
-        showRecentProjects ? fetchProjects(f, projectsParameters) : undefined,
-        await Promise.all((featuredListIds ?? []).map(async (id) => await fetchList(id, f))),
       ]),
   );
 
   return {
-    blogPosts,
-    projects,
-    featuredDripLists: filterFalsy(featuredDripLists),
-    welcomeCard: welcomeCardConfig,
+    variant: 'distribution' as ExplorePageVariant,
+    data: {
+      projects,
+      featuredDripLists,
+      blogPosts,
+      welcomeCardConfig,
+    },
   };
 }

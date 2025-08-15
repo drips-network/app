@@ -7,12 +7,12 @@ import { get } from 'svelte/store';
 export const load = async ({ url }) => {
   const backTo = url.searchParams.get('backTo');
   const requireRpgfSignIn = url.searchParams.get('requireRpgfSignIn') === 'true';
+  const decoded = decodeURIComponent(backTo || '');
 
   const connectedAddress = getConnectedAddress();
 
   if (connectedAddress && (!requireRpgfSignIn || (requireRpgfSignIn && get(rpgfAccessJwtStore)))) {
     if (backTo) {
-      const decoded = decodeURIComponent(backTo);
       const isSafe = isSafePath(decoded);
 
       if (isSafe) redirect(301, decoded);
@@ -23,6 +23,7 @@ export const load = async ({ url }) => {
 
   return {
     requireRpgfSignIn,
+    backTo: decoded,
   };
 };
 

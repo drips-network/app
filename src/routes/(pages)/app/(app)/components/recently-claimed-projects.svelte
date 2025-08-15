@@ -43,7 +43,7 @@
       label: 'Recently claimed projects',
       actions: [
         {
-          label: 'See all',
+          label: 'See all projects',
           href: '/app/projects/all',
           icon: Box,
         },

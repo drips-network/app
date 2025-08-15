@@ -1,36 +1,46 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
-  import wallet from '$lib/stores/wallet/wallet.store';
+  import type { PageData } from './$types';
+  import DisconnectedState from '$lib/components/section-skeleton/disconnected-state.svelte';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
-  export let data;
-  $: requireRpgfSignIn = data.requireRpgfSignIn;
+  export let data: PageData;
 
-  let headline: string;
-  let description: string;
+  const { backTo, requireRpgfSignIn } = data;
+
+  let emptyStateText: string;
+  let headline: string | undefined = undefined;
+  let emoji: string | undefined = undefined;
   $: {
-    if ($wallet.connected && requireRpgfSignIn) {
-      headline = 'Sign in to Drips RPGF';
-      description =
-        'Confirm your identity using your wallet to access this page. This does not require a transaction.';
-    } else {
-      headline = 'Connect to Drips';
-      description = 'Connect an Ethereum wallet to continue.';
+    switch (true) {
+      case requireRpgfSignIn && $walletStore.connected:
+        emoji = '🔐';
+        headline = `Sign in to continue`;
+        emptyStateText = `You need to sign in with your wallet to access Drips RPGF features. This does not require a transaction.`;
+        break;
+      case requireRpgfSignIn:
+        emoji = '👛';
+        headline = `No wallet connected`;
+        emptyStateText = `Connect your Ethereum wallet to access Drips RetroPGF.`;
+        break;
+      case /\/app\/funds/.test(backTo):
+        emoji = '👛';
+        headline = 'No wallet connected';
+        emptyStateText = `You don’t have a wallet connected, so there are no funds to show here.`;
+        break;
+      case /\/app\/profile/.test(backTo):
+        emoji = '👛';
+        headline = 'No wallet connected';
+        emptyStateText = `You don’t have a wallet connected, so there is no profile to show. When you connect your wallet, your projects, Drip Lists, and funds will show up here.`;
+        break;
+      default:
+        emoji = '👛';
+        headline = 'No wallet connected';
+        emptyStateText = 'Connect a wallet to continue.';
     }
   }
 </script>
 
 <HeadMeta title="Drips" />
 
-<LargeEmptyState
-  emoji="🌐"
-  {headline}
-  {description}
-  button={requireRpgfSignIn
-    ? undefined
-    : { label: 'Connect wallet', handler: () => wallet.connect() }}
-  showSiweButton={requireRpgfSignIn}
-  secondaryButton={{ label: 'Explore Drips', handler: () => goto('/app') }}
-  on:signIn={window.location.reload}
-/>
+<DisconnectedState {emoji} {headline} text={emptyStateText} {requireRpgfSignIn} />
