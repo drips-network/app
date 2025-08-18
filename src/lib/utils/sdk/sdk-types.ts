@@ -1,6 +1,7 @@
 export enum Forge {
   gitHub = 0,
   gitLab = 1,
+  orcidId = 2,
 }
 
 export type OxString = `0x${string}`;
