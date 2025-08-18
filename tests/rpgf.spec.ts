@@ -53,7 +53,9 @@ test.describe('drafts', () => {
     // double check we see the connect page instead of draft name
     await page.goto(`http://localhost:5173/app/rpgf/drafts/${draftId}`);
     await expect(page.getByText('draft visibility test')).not.toBeVisible();
-    await expect(page.getByText('Connect wallet & sign in')).toBeVisible();
+    await expect(
+      page.getByText('Connect your Ethereum wallet to access Drips RetroPGF.'),
+    ).toBeVisible();
 
     // go back to the original user
     await connectedSession.goto();

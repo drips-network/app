@@ -19,6 +19,7 @@ export class ConnectedSession {
 
   async goto() {
     await this.page.goto('http://localhost:5173/app');
+    await this.page.waitForTimeout(1000); // Reduce flakiness of first nav, for some reason
   }
 
   async connect(address = TEST_ADDRESSES[0]) {
@@ -33,6 +34,12 @@ export class ConnectedSession {
     }, address);
 
     await this.page.getByRole('button', { name: 'Connect', exact: true }).click();
+
+    // wait for first 4 and last 4 characters of address to be visible
+    const addressLocator = this.page
+      .getByText(address.slice(0, 4) + '–' + address.slice(-4), { exact: true })
+      .nth(0);
+    await addressLocator.waitFor({ state: 'visible' });
   }
 
   async disconnect() {

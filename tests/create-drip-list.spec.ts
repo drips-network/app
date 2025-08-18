@@ -154,7 +154,7 @@ test('create collaborative drip list', async ({ page }) => {
   await page.getByRole('button', { name: 'Publish Drip List' }).nth(1).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
   await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
-  await page.getByRole('link', { name: 'View your Drip List' }).click();
+  await page.getByRole('button', { name: 'Got it' }).click();
 
   await expect(page.getByText('this list is in voting').nth(0)).not.toBeVisible();
   await expect(page.getByText('Test collaborative list').nth(0)).toBeVisible();
