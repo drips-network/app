@@ -6,7 +6,12 @@ import assert from '$lib/utils/assert';
 import Emoji from '$lib/components/emoji/emoji.svelte';
 import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
 import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
-import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+import {
+  CallerERC2771Domain,
+  CallSignedERC2771Types,
+  getCallerNonce,
+  populateCallerWriteTx,
+} from '$lib/utils/sdk/caller/caller';
 import populateCreateCollectFlowTxs from '$lib/utils/sdk/address-driver/populate-create-collect-flow-txs';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import gaslessStore from '$lib/stores/gasless/gasless.store';
@@ -60,16 +65,34 @@ export default function batchCollect(
 
         return {
           tx,
+          address: userAddress,
           accountId: ownAccountId,
         };
       },
 
-      transactions: ({ tx }) => [
+      transactions: ({ tx, address }) => [
         {
           transaction: tx,
           applyGasBuffer: true,
-          // TODO(rpgf): make this worky again
-          gasless: get(gaslessStore),
+
+          gasless: get(gaslessStore)
+            ? {
+                nonceGetter: () => getCallerNonce(address),
+                ERC2771Data: (nonce) => ({
+                  domain: CallerERC2771Domain,
+                  types: CallSignedERC2771Types,
+                  payload: {
+                    sender: address,
+                    target: tx.to,
+                    data: tx.data,
+                    value: '0',
+                    nonce,
+                    deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+                  },
+                }),
+              }
+            : undefined,
+
           title: 'Collect funds',
         },
       ],
