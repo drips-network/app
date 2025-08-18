@@ -4,15 +4,14 @@ export const repoDriverAbi = [
       { internalType: 'contract Drips', name: 'drips_', type: 'address' },
       { internalType: 'address', name: 'forwarder', type: 'address' },
       { internalType: 'uint32', name: 'driverId_', type: 'uint32' },
+      {
+        internalType: 'contract IAutomate',
+        name: 'gelatoAutomate_',
+        type: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
-  },
-  { inputs: [], name: 'InvalidShortString', type: 'error' },
-  {
-    inputs: [{ internalType: 'string', name: 'str', type: 'string' }],
-    name: 'StringTooLong',
-    type: 'error',
   },
   {
     anonymous: false,
@@ -38,24 +37,12 @@ export const repoDriverAbi = [
     inputs: [
       {
         indexed: true,
-        internalType: 'contract OperatorInterface',
-        name: 'operator',
+        internalType: 'address',
+        name: 'beacon',
         type: 'address',
       },
-      {
-        indexed: true,
-        internalType: 'bytes32',
-        name: 'jobId',
-        type: 'bytes32',
-      },
-      {
-        indexed: false,
-        internalType: 'uint96',
-        name: 'defaultFee',
-        type: 'uint96',
-      },
     ],
-    name: 'AnyApiOperatorUpdated',
+    name: 'BeaconUpgraded',
     type: 'event',
   },
   {
@@ -64,11 +51,60 @@ export const repoDriverAbi = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'beacon',
+        name: 'user',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'userFundsUsed',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'commonFundsUsed',
+        type: 'uint256',
+      },
     ],
-    name: 'BeaconUpgraded',
+    name: 'GelatoFeePaid',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'contract GelatoTasksOwner',
+        name: 'gelatoTasksOwner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'taskId',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'ipfsCid',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'uint32',
+        name: 'maxRequestsPerBlock',
+        type: 'uint32',
+      },
+      {
+        indexed: false,
+        internalType: 'uint32',
+        name: 'maxRequestsPer31Days',
+        type: 'uint32',
+      },
+    ],
+    name: 'GelatoTaskUpdated',
     type: 'event',
   },
   {
@@ -110,6 +146,12 @@ export const repoDriverAbi = [
         internalType: 'bytes',
         name: 'name',
         type: 'bytes',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'payer',
+        type: 'address',
       },
     ],
     name: 'OwnerUpdateRequested',
@@ -212,6 +254,50 @@ export const repoDriverAbi = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserFundsDeposited',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address payable',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'UserFundsWithdrawn',
+    type: 'event',
+  },
+  {
     inputs: [],
     name: 'acceptAdmin',
     outputs: [],
@@ -239,21 +325,6 @@ export const repoDriverAbi = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'anyApiOperator',
-    outputs: [
-      {
-        internalType: 'contract OperatorInterface',
-        name: 'operator',
-        type: 'address',
-      },
-      { internalType: 'bytes32', name: 'jobId', type: 'bytes32' },
-      { internalType: 'uint96', name: 'defaultFee', type: 'uint96' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       { internalType: 'enum Forge', name: 'forge', type: 'uint8' },
       { internalType: 'bytes', name: 'name', type: 'bytes' },
@@ -272,6 +343,20 @@ export const repoDriverAbi = [
     name: 'collect',
     outputs: [{ internalType: 'uint128', name: 'amt', type: 'uint128' }],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'commonFunds',
+    outputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'depositUserFunds',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -307,6 +392,26 @@ export const repoDriverAbi = [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'gelatoAutomate',
+    outputs: [{ internalType: 'contract IAutomate', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'gelatoTasksOwner',
+    outputs: [
+      {
+        internalType: 'contract GelatoTasksOwner',
+        name: 'tasksOwner',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       { internalType: 'uint256', name: 'accountId', type: 'uint256' },
       { internalType: 'uint256', name: 'receiver', type: 'uint256' },
@@ -333,21 +438,6 @@ export const repoDriverAbi = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'contract OperatorInterface',
-        name: 'operator',
-        type: 'address',
-      },
-      { internalType: 'bytes32', name: 'jobId', type: 'bytes32' },
-      { internalType: 'uint96', name: 'defaultFee', type: 'uint96' },
-    ],
-    name: 'initializeAnyApiOperator',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'isPaused',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
@@ -366,30 +456,6 @@ export const repoDriverAbi = [
     name: 'isTrustedForwarder',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'linkToken',
-    outputs: [
-      {
-        internalType: 'contract LinkTokenInterface',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-      { internalType: 'bytes', name: 'data', type: 'bytes' },
-    ],
-    name: 'onTokenTransfer',
-    outputs: [],
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -440,8 +506,15 @@ export const repoDriverAbi = [
       { internalType: 'bytes', name: 'name', type: 'bytes' },
     ],
     name: 'requestUpdateOwner',
-    outputs: [{ internalType: 'uint256', name: 'accountId', type: 'uint256' }],
+    outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'requestUpdateOwnerGasPenalty',
+    outputs: [{ internalType: 'uint256', name: 'gasPenalty', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -518,25 +591,30 @@ export const repoDriverAbi = [
   },
   {
     inputs: [
+      { internalType: 'string', name: 'ipfsCid', type: 'string' },
       {
-        internalType: 'contract OperatorInterface',
-        name: 'operator',
-        type: 'address',
+        internalType: 'uint32',
+        name: 'maxRequestsPerBlock',
+        type: 'uint32',
       },
-      { internalType: 'bytes32', name: 'jobId', type: 'bytes32' },
-      { internalType: 'uint96', name: 'defaultFee', type: 'uint96' },
+      {
+        internalType: 'uint32',
+        name: 'maxRequestsPer31Days',
+        type: 'uint32',
+      },
     ],
-    name: 'updateAnyApiOperator',
+    name: 'updateGelatoTask',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'bytes32', name: 'requestId', type: 'bytes32' },
-      { internalType: 'bytes', name: 'ownerRaw', type: 'bytes' },
+      { internalType: 'uint256', name: 'accountId', type: 'uint256' },
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'address', name: 'payer', type: 'address' },
     ],
-    name: 'updateOwnerByAnyApi',
+    name: 'updateOwnerByGelato',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -568,6 +646,32 @@ export const repoDriverAbi = [
     stateMutability: 'payable',
     type: 'function',
   },
-] as const;
-
-export type RepoDriverAbi = typeof repoDriverAbi;
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'userFunds',
+    outputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+      {
+        internalType: 'address payable',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'withdrawUserFunds',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'withdrawnAmount',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  { stateMutability: 'payable', type: 'receive' },
+];
