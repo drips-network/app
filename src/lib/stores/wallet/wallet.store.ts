@@ -304,7 +304,7 @@ const walletStore = () => {
     logOut();
 
     // refresh load functions
-    invalidateAll();
+    if (browser) invalidateAll();
   }
 
   function _attachListeners(provider: EIP1193Provider): void {
@@ -411,7 +411,7 @@ const localTestnetWalletStore = () => {
     });
 
     logOut();
-    invalidateAll();
+    if (browser) invalidateAll();
   }
 
   return {
