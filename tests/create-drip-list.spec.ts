@@ -1,9 +1,13 @@
 import { test as base, expect } from '@playwright/test';
-import { ConnectedSession } from './fixtures/ConnectedSession';
+import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 
 const test = base.extend<{ connectedSession: ConnectedSession }>({
   connectedSession: async ({ page }, use) => {
-    await use(new ConnectedSession(page));
+    const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
+    await connectedSession.goto();
+    await connectedSession.connect();
+
+    await use(connectedSession);
   },
 });
 
