@@ -66,7 +66,7 @@ export class Project {
     await expect(this.page.getByText('Set project splits and metadata')).toBeVisible();
 
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 60000 });
-    await this.page.getByRole('button', { name: 'View your project' }).click();
+    await this.page.getByRole('link', { name: 'View your project' }).click();
 
     await this.page.waitForURL(
       'http://localhost:5173/app/projects/github/efstajas/drips-test-repo-10?exact',
