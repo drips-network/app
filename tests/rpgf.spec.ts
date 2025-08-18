@@ -82,6 +82,10 @@ test.describe('drafts', () => {
 
 test.describe('rounds', () => {
   test.afterEach(async ({ rpgfRound }) => {
+    if (!rpgfRound.signedIn) {
+      await rpgfRound.logIn();
+    }
+
     if (rpgfRound.published) {
       await rpgfRound.deleteRound();
     } else {
@@ -121,7 +125,6 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
 
     await rpgfRound.forceRoundIntoState('intake');
-
     await rpgfRound.logOut();
 
     await rpgfRound.applyToRound({

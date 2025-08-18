@@ -11,7 +11,7 @@ export class RpgfRound {
   public urlSlug: string | null = null;
   public published: boolean = false;
   public readonly page: Page;
-  private signedIn: boolean = false;
+  public signedIn: boolean = false;
 
   constructor(public readonly connectedSession: ConnectedSession) {
     this.page = connectedSession.page;
