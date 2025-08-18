@@ -1,6 +1,7 @@
 import { type Page, expect } from '@playwright/test';
-import { TEST_ADDRESSES, type ConnectedSession } from '../../fixtures/ConnectedSession';
+import type { ConnectedSession } from '../../fixtures/ConnectedSession';
 import type { RoundState } from '$lib/utils/rpgf/schemas';
+import type { Project } from '../../fixtures/Project';
 
 const RPGF_API_URL = 'http://localhost:5000/api';
 
@@ -9,33 +10,37 @@ export class RpgfRound {
   public name: string | null = null;
   public urlSlug: string | null = null;
   public published: boolean = false;
+  public readonly page: Page;
   private signedIn: boolean = false;
 
-  constructor(
-    public readonly page: Page,
-    public readonly connectedSession: ConnectedSession,
-  ) {}
-
-  async gotoRpgfPage() {
-    await this.page.getByTestId('sidenav-item-RetroPGF').click();
+  constructor(public readonly connectedSession: ConnectedSession) {
+    this.page = connectedSession.page;
   }
 
-  async logIn(address = TEST_ADDRESSES[0]) {
-    await this.connectedSession.goto();
-    await this.connectedSession.connect(address);
+  async gotoRpgfPage(page = this.page) {
+    await page.getByTestId('sidenav-item-RetroPGF').click();
+  }
 
-    await this.gotoRpgfPage();
+  async logIn(connectedSession = this.connectedSession) {
+    const page = connectedSession.page;
 
-    await this.page.getByRole('button', { name: 'Sign in' }).click();
+    await connectedSession.goto();
+    await connectedSession.connect();
+
+    await this.gotoRpgfPage(page);
+
+    await page.getByRole('button', { name: 'Sign in' }).click();
 
     this.signedIn = true;
   }
 
-  async logOut() {
-    await this.connectedSession.disconnect();
+  async logOut(connectedSession = this.connectedSession) {
+    const page = connectedSession.page;
+
+    await connectedSession.disconnect();
 
     // wait for connect button to be visible again
-    await this.page.getByRole('button', { name: 'Connect', exact: true }).waitFor();
+    await page.getByRole('button', { name: 'Connect', exact: true }).waitFor();
 
     this.signedIn = false;
   }
@@ -219,7 +224,7 @@ export class RpgfRound {
 
     await this.page.getByRole('link', { name: this.name }).click();
 
-    // Publish the round
+    // Publish the round0x90F79bf6EB2c4f870365E785982E1f101E93b906
     await this.page.getByRole('button', { name: 'Publish' }).click();
     await this.page.getByRole('button', { name: 'Publish round' }).nth(0).click();
     await this.page.getByRole('button', { name: 'Got it' }).click();
@@ -229,6 +234,23 @@ export class RpgfRound {
     await expect(this.page.getByRole('heading', { name: this.name })).toBeVisible();
 
     this.published = true;
+  }
+
+  async applyToRound({ withProject }: { withProject: Project }) {
+    if (!this.name) {
+      throw new Error('Draft not set. Please create a draft first.');
+    }
+
+    const page = withProject.page;
+
+    await this.logIn(withProject.connectedSession);
+    await this.gotoRpgfPage(page);
+
+    // click on the round
+    await page.getByRole('link', { name: this.name }).click();
+
+    // click on apply CTA
+    await page.getByRole('button', { name: 'Apply' }).click();
   }
 
   async forceRoundIntoState(desiredState: RoundState) {

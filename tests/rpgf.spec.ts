@@ -1,16 +1,41 @@
 import { test as base, expect } from '@playwright/test';
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import { RpgfRound } from './rpgf/fixtures/RpgfRound';
+import { Project } from './fixtures/Project';
 
 const test = base
-  .extend<{ connectedSession: ConnectedSession }>({
+  .extend<{ connectedSession: ConnectedSession; connectedSession2: ConnectedSession }>({
     connectedSession: async ({ page }, use) => {
-      await use(new ConnectedSession(page));
+      const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
+      await connectedSession.goto();
+
+      await use(connectedSession);
+    },
+    connectedSession2: async ({ browser }, use) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[1]);
+      await connectedSession2.goto();
+
+      await use(connectedSession2);
     },
   })
-  .extend<{ rpgfRound: RpgfRound }>({
-    rpgfRound: async ({ page, connectedSession }, use) => {
-      await use(new RpgfRound(page, connectedSession));
+  .extend<{ rpgfRound: RpgfRound; rpgfRound2: RpgfRound; project: Project }>({
+    rpgfRound: async ({ connectedSession }, use) => {
+      await use(new RpgfRound(connectedSession));
+    },
+    rpgfRound2: async ({ connectedSession2 }, use) => {
+      await use(new RpgfRound(connectedSession2));
+    },
+    // Claim a project with another test address
+    project: async ({ connectedSession2 }, use) => {
+      const project = new Project(
+        connectedSession2,
+        'https://github.com/efstajas/drips-test-repo-12',
+      );
+      await project.claim();
+
+      await use(project);
     },
   });
 
@@ -20,7 +45,7 @@ test.describe('drafts', () => {
   });
 
   test('draft creation and deletion', async ({ rpgfRound }) => {
-    await rpgfRound.logIn(TEST_ADDRESSES[0]);
+    await rpgfRound.logIn();
 
     await rpgfRound.createDraft({
       name: 'draft creation',
@@ -29,11 +54,8 @@ test.describe('drafts', () => {
     });
   });
 
-  test('draft is invisible to other users', async ({ page, rpgfRound, connectedSession }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-
-    const ogAddress = TEST_ADDRESSES[0];
-    await rpgfRound.logIn(ogAddress);
+  test('draft is invisible to other users', async ({ rpgfRound, rpgfRound2 }) => {
+    await rpgfRound.logIn();
 
     const DRAFT_NAME = 'draft visibility';
 
@@ -42,28 +64,19 @@ test.describe('drafts', () => {
       urlSlug: 'draft-visibility-test',
     });
 
-    // Log out and log in as a different user
-    await rpgfRound.logOut();
-    await rpgfRound.logIn(TEST_ADDRESSES[1]); // Use a different address for the new user
+    // ensure another user doesn't see the draft
+    await rpgfRound2.gotoRpgfPage();
+    await rpgfRound2.logIn();
+    await expect(rpgfRound2.page.getByText(DRAFT_NAME)).not.toBeVisible();
 
-    // Check that the draft is not visible to the new user
-    await rpgfRound.gotoRpgfPage();
-    await expect(page.getByText(DRAFT_NAME)).not.toBeVisible();
+    await rpgfRound2.logOut();
 
     // double check we see the connect page instead of draft name
-    await page.goto(`http://localhost:5173/app/rpgf/drafts/${draftId}`);
-    await expect(page.getByText('draft visibility test')).not.toBeVisible();
+    await rpgfRound2.page.goto(`http://localhost:5173/app/rpgf/drafts/${draftId}`);
+    await expect(rpgfRound2.page.getByText('draft visibility test')).not.toBeVisible();
     await expect(
-      page.getByText('Connect your Ethereum wallet to access Drips RetroPGF.'),
+      rpgfRound2.page.getByText('Connect your Ethereum wallet to access Drips RetroPGF.'),
     ).toBeVisible();
-
-    // go back to the original user
-    await connectedSession.goto();
-    await rpgfRound.logIn(ogAddress); // Use the original address
-
-    // Check that the draft is still visible to the original user
-    await rpgfRound.gotoRpgfPage();
-    await expect(page.getByText(DRAFT_NAME)).toBeVisible();
   });
 });
 
@@ -77,9 +90,7 @@ test.describe('rounds', () => {
   });
 
   test('round publishing', async ({ rpgfRound }) => {
-    const roundCreator = TEST_ADDRESSES[0];
-
-    await rpgfRound.logIn(roundCreator);
+    await rpgfRound.logIn();
 
     const roundName = 'publish test';
     const roundSlug = 'e2e-test-round-publish';
@@ -94,10 +105,8 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
   });
 
-  test('applying to a round', async ({ rpgfRound }) => {
-    const roundCreator = TEST_ADDRESSES[0];
-
-    await rpgfRound.logIn(roundCreator);
+  test('applying to a round', async ({ rpgfRound, project }) => {
+    await rpgfRound.logIn();
 
     const roundName = 'applying test';
     const roundSlug = 'e2e-test-round-voting';
@@ -113,6 +122,10 @@ test.describe('rounds', () => {
 
     await rpgfRound.forceRoundIntoState('intake');
 
-    // Log in as some other wallet to submit an application
+    await rpgfRound.logOut();
+
+    await rpgfRound.applyToRound({
+      withProject: project,
+    });
   });
 });

@@ -15,14 +15,17 @@ export const TEST_ADDRESSES = [
 ];
 
 export class ConnectedSession {
-  constructor(public readonly page: Page) {}
+  constructor(
+    public readonly page: Page,
+    public readonly address: string,
+  ) {}
 
   async goto() {
     await this.page.goto('http://localhost:5173/app');
     await this.page.waitForTimeout(1000); // Reduce flakiness of first nav, for some reason
   }
 
-  async connect(address = TEST_ADDRESSES[0]) {
+  async connect() {
     // insert hidden `span` with id E2E_ADDRESS into the DOM in order to tell
     // the local testnet wallet store which address to use
     await this.page.evaluate((addr) => {
@@ -31,13 +34,13 @@ export class ConnectedSession {
       span.id = 'E2E_ADDRESS';
       span.textContent = addr;
       document.body.appendChild(span);
-    }, address);
+    }, this.address);
 
     await this.page.getByRole('button', { name: 'Connect', exact: true }).click();
 
     // wait for first 4 and last 4 characters of address to be visible
     const addressLocator = this.page
-      .getByText(address.slice(0, 4) + '–' + address.slice(-4), { exact: true })
+      .getByText(this.address.slice(0, 4) + '–' + this.address.slice(-4), { exact: true })
       .nth(0);
     await addressLocator.waitFor({ state: 'visible' });
   }

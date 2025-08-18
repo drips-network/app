@@ -1,12 +1,25 @@
 import { type Page, expect } from '@playwright/test';
 import { execa } from 'execa';
 import { GraphQLClient } from 'graphql-request';
+import type { ConnectedSession } from './ConnectedSession';
 
 export class Project {
+  public readonly page: Page;
+  public readonly ownerAddress: string;
+
   constructor(
-    public readonly page: Page,
+    public readonly connectedSession: ConnectedSession,
     public readonly repoUrl: string,
-  ) {}
+  ) {
+    this.page = connectedSession.page;
+    const connectedAddress = connectedSession.address;
+
+    if (!connectedAddress) {
+      throw new Error('Connected session must have an address');
+    }
+
+    this.ownerAddress = connectedAddress;
+  }
 
   async goto() {
     await this.page.getByTestId('search-button').click();
@@ -19,7 +32,7 @@ export class Project {
     await this.page.getByRole('link', { name: repoUserAndName }).press('Enter');
   }
 
-  async claim(withAddress: string) {
+  async claim() {
     await this.page.getByRole('link', { name: 'Projects' }).click();
     await this.page.getByRole('button', { name: 'Claim project' }).click();
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click();
@@ -61,17 +74,17 @@ export class Project {
     const accountId = (accountIdResult as any).projectByUrl.account.accountId;
 
     // trigger the fake oracle
-    await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${withAddress}`;
+    await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${this.ownerAddress}`;
 
     await expect(this.page.getByText('Set project splits and metadata')).toBeVisible();
 
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 60000 });
     await this.page.getByRole('link', { name: 'View your project' }).click();
 
-    await this.page.waitForURL(
-      'http://localhost:5173/app/projects/github/efstajas/drips-test-repo-10?exact',
-    );
-    await expect(this.page.getByText('drips-test-repo-10').nth(0)).toBeVisible();
+    const repoName = this.repoUrl.split('/').slice(-2).join('/');
+
+    await this.page.waitForURL(`http://localhost:5173/app/projects/github/${repoName}?exact`);
+    await expect(this.page.getByText(repoName).nth(0)).toBeVisible();
     await expect(this.page.getByText('Splits', { exact: true })).toBeVisible();
   }
 }
