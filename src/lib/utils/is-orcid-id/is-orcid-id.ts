@@ -9,13 +9,13 @@
  * @param {string} orcid The ORCID iD string to validate.
  * @returns {boolean} True if the ORCID iD is valid, false otherwise.
  */
-export default function isValidOrcid(orcid: string): boolean {
-  if (typeof orcid !== 'string') {
+export default function isValidOrcidId(orcidId: string): boolean {
+  if (typeof orcidId !== 'string') {
     return false;
   }
 
   // Remove hyphens and whitespace to get the base 16 characters.
-  const baseStr: string = orcid.replace(/[-\s]/g, '');
+  const baseStr: string = orcidId.replace(/[-\s]/g, '');
 
   // An ORCID must be 16 characters long and match the pattern:
   // 15 digits followed by a final character that is a digit or 'X'.
