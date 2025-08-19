@@ -28,6 +28,7 @@ services:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
+      - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
     volumes:
     - .:/app
     - /app/node_modules/
