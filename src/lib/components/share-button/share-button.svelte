@@ -5,6 +5,7 @@
   import modal from '$lib/stores/modal';
   import shareSteps from '$lib/flows/share/share-steps';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { browser } from '$app/environment';
 
   export let text: string | undefined = undefined;
   export let url: string;
@@ -29,6 +30,8 @@
       console.error('Error preloading image', error);
     }
   }
+
+  $: browser && downloadableImageUrl && preloadImage(downloadableImageUrl);
 
   function handleClick() {
     modal.show(
