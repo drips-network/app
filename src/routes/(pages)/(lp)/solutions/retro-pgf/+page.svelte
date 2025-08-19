@@ -1,10 +1,16 @@
 <script>
   import Button from '$lib/components/button/button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import TrustedBy from '../../components/trusted-by.svelte';
   import RpgfHeaderIllustration from './components/rpgf-header-illustration.svelte';
 </script>
+
+<HeadMeta
+  title="RetroPGF"
+  description="Drips is the simplest way to reward open-source projects within your ecosystem. Drips harnesses the ability to amplify funding across any ecosystem. Now we have expanded our offer to include Retroactive Funding."
+/>
 
 <div class="hero">
   <RpgfHeaderIllustration />
@@ -16,7 +22,9 @@
 
     <p>
       Ready to launch your RPGF round with Drips?
-      <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank">Get in touch</Button>
+      <span style:padding-left="0.5rem">
+        <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank">Get in touch</Button>
+      </span>
     </p>
   </div>
 </div>
