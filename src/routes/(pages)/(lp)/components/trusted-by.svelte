@@ -6,10 +6,12 @@
   import Octant from './svgs/partner-logos/octant.svelte';
   import Radworks from './svgs/partner-logos/radworks.svelte';
   import Scroll from './svgs/partner-logos/scroll.svelte';
+
+  export let headline = 'Trusted by';
 </script>
 
 <div class="trusted-by">
-  <h5>Trusted by</h5>
+  <h5>{headline}</h5>
   <div class="logos">
     <div class="image"><Ens /></div>
     <div class="image"><FilecoinFoundation /></div>
@@ -22,6 +24,10 @@
 </div>
 
 <style>
+  .trusted-by {
+    text-align: center;
+  }
+
   .logos {
     display: flex;
     gap: 2rem;

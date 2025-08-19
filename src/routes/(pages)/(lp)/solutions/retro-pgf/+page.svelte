@@ -1,10 +1,24 @@
 <script>
+  import Button from '$lib/components/button/button.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
+  import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
+  import TrustedBy from '../../components/trusted-by.svelte';
   import RpgfHeaderIllustration from './components/rpgf-header-illustration.svelte';
 </script>
 
 <div class="hero">
   <RpgfHeaderIllustration />
+
+  <div class="divider"></div>
+
+  <div class="bottom">
+    <p>Manage your RetroPGF round from application intake to distribution.</p>
+
+    <p>
+      Ready to launch your RPGF round with Drips?
+      <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank">Get in touch</Button>
+    </p>
+  </div>
 </div>
 
 <div class="intro">
@@ -18,7 +32,7 @@
   </div>
 
   <div>
-    <h2 class="typo-text-bold">Introducing RetroPGF on Drips?</h2>
+    <h2 class="typo-text-bold">Introducing RetroPGF on Drips</h2>
     <p class="typo-text">
       It’s never been easier to run impact-based funding rounds. Drips offers the perfect solution
       for protocols looking to minimize admin overhead while maximizing transparency and downstream
@@ -38,7 +52,7 @@
   </div>
 </div>
 
-<div class="step-card">
+<section class="step-card">
   <div class="text">
     <div class="number">1</div>
 
@@ -56,10 +70,10 @@
   <div class="illustration">
     <img src="/assets/lp/rpgf/round-view.png" alt="Round view" />
   </div>
-</div>
+</section>
 
 <div class="frame">
-  <div class="step-card reverse">
+  <section class="step-card reverse">
     <div class="text">
       <div class="number">2</div>
 
@@ -80,9 +94,9 @@
     <div class="illustration">
       <img src="/assets/lp/rpgf/form-builder.png" alt="RPGF form builder" />
     </div>
-  </div>
+  </section>
 
-  <div class="step-card">
+  <section class="step-card">
     <div class="text">
       <div class="number">3</div>
 
@@ -100,10 +114,10 @@
     <div class="illustration">
       <img src="/assets/lp/rpgf/applications.png" alt="RPGF form builder" />
     </div>
-  </div>
+  </section>
 </div>
 
-<div class="step-card reverse">
+<section class="step-card reverse">
   <div class="text">
     <div class="number">4</div>
 
@@ -123,9 +137,9 @@
   <div class="illustration">
     <img src="/assets/lp/rpgf/ballot.png" alt="RPGF form builder" />
   </div>
-</div>
+</section>
 
-<div class="step-card">
+<section class="step-card">
   <div class="text">
     <div class="number">5</div>
 
@@ -148,7 +162,33 @@
   <div class="illustration">
     <img src="/assets/lp/rpgf/distribution.png" alt="RPGF form builder" />
   </div>
-</div>
+</section>
+
+<section class="partners">
+  <TrustedBy headline="Notable partners" />
+</section>
+
+<section class="get-in-touch">
+  <div class="big-headline">
+    <h1>Let's talk</h1>
+  </div>
+
+  <p>
+    Ready to launch your RetroPGF round with Drips? Our pricing is flexible and we've helped small
+    and large teams, so get in touch.
+  </p>
+
+  <div class="arrows">
+    <ArrowDown style="fill: var(--color-primary)" />
+    <ArrowDown style="fill: var(--color-primary)" />
+    <ArrowDown style="fill: var(--color-primary)" />
+    <ArrowDown style="fill: var(--color-primary)" />
+  </div>
+
+  <Button variant="primary" size="large" href={INBOUND_LEAD_FORM_URL} target="_blank">
+    Get in touch
+  </Button>
+</section>
 
 <style>
   .hero {
@@ -159,20 +199,35 @@
     background-color: var(--color-primary-level-1);
   }
 
+  .hero .divider {
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-primary-level-2);
+    margin: 2rem 0;
+  }
+
+  .hero .bottom {
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+  }
+
   .big-headline {
     margin-top: 3rem;
+    max-width: 48rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
     align-items: center;
   }
 
-  .big-headline .arrows {
+  .arrows {
     display: flex;
   }
 
   .big-headline h1 {
     font-size: 3rem;
+    text-align: center;
     line-height: 1.2;
     color: var(--color-primary);
   }
@@ -186,6 +241,11 @@
 
   .intro p {
     color: var(--color-foreground-level-6);
+  }
+
+  .intro h2 {
+    line-height: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .step-card {
@@ -241,6 +301,60 @@
     flex-direction: column;
     align-items: center;
     padding: 2rem;
+    margin: 2rem 0;
     border-radius: 2rem 0 2rem 2rem;
+  }
+
+  .partners {
+    margin-top: 2rem;
+  }
+
+  .get-in-touch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .get-in-touch p {
+    max-width: 50rem;
+    text-align: center;
+    color: var(--color-foreground-level-6);
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 1rem;
+    }
+
+    .hero .bottom,
+    .hero .divider {
+      display: none;
+    }
+
+    .intro {
+      flex-direction: column;
+    }
+    .step-card {
+      flex-direction: column-reverse;
+      align-items: center;
+      padding: 0rem;
+    }
+
+    .big-headline h1 {
+      font-size: 2.5rem;
+    }
+
+    .frame {
+      padding: 1rem;
+    }
+
+    .step-card.reverse {
+      flex-direction: column-reverse;
+    }
+
+    .step-card .illustration {
+      max-width: 100%;
+    }
   }
 </style>
