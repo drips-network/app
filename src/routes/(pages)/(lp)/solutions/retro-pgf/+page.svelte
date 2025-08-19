@@ -223,6 +223,7 @@
 
   .hero .bottom {
     display: flex;
+    align-items: center;
     gap: 2rem;
     justify-content: space-between;
   }
