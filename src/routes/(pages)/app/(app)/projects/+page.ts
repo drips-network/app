@@ -5,16 +5,16 @@ import type { ChainStatsQuery } from '../components/__generated__/gql.generated'
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import fetchChainStats from '../components/load-chain-stats';
 import network from '$lib/stores/wallet/network';
-import type { ExploreProjectsQuery } from './components/__generated__/gql.generated';
+import type { ProjectQuery } from './components/__generated__/gql.generated';
 import {
   default as fetchTotalDrippedApproximation,
   totalDrippedPrices as fetchTotalDrippedPrices,
 } from '$lib/utils/total-dripped-approx';
 
 const fetchedDataCache = makeFetchedDataCache<{
-  yourProjects: ExploreProjectsQuery['projects'];
-  restProjects: ExploreProjectsQuery['projects'];
-  featuredProjects: ExploreProjectsQuery['projects'];
+  yourProjects: ProjectQuery['projectById'][];
+  restProjects: ProjectQuery['projectById'][];
+  featuredProjects: ProjectQuery['projectById'][];
   chainStats: ChainStatsQuery['chainStats'][number];
   totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
   totalDrippedAmounts: Awaited<ReturnType<typeof fetchTotalDrippedApproximation>>;
