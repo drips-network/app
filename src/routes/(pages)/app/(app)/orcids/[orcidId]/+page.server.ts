@@ -46,3 +46,6 @@ export const load = (async ({ params, fetch }) => {
     orcidAccount,
   };
 }) satisfies PageServerLoad;
+
+// 0009-0007-5482-8654 me in prod
+// 0009-0007-1106-8413 drips.network in sandbox
