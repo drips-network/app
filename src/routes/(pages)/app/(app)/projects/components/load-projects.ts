@@ -119,11 +119,11 @@ async function fetchRecentProjects(f: typeof fetch) {
 export async function fetchAndCategorizeProjects(
   chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
   f: typeof fetch,
-  connectedAccountId?: string,
+  connectedAddress?: string,
 ) {
   const [yourProjects, { featuredProjects, featuredWeb3Projects }, restProjects] =
     await Promise.all([
-      fetchOwnProjects(f, connectedAccountId),
+      fetchOwnProjects(f, connectedAddress),
       fetchFeaturedProjects(chainId, f),
       fetchRecentProjects(f),
     ]);
