@@ -5,16 +5,16 @@ import type { ChainStatsQuery } from '../components/__generated__/gql.generated'
 import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import fetchChainStats from '../components/load-chain-stats';
 import network from '$lib/stores/wallet/network';
-import type { ProjectQuery } from './components/__generated__/gql.generated';
+import type { ExploreProjectsQuery, ProjectQuery } from './components/__generated__/gql.generated';
 import {
   default as fetchTotalDrippedApproximation,
   totalDrippedPrices as fetchTotalDrippedPrices,
 } from '$lib/utils/total-dripped-approx';
 
 const fetchedDataCache = makeFetchedDataCache<{
-  yourProjects: ProjectQuery['projectById'][];
-  restProjects: ProjectQuery['projectById'][];
-  featuredProjects: ProjectQuery['projectById'][];
+  yourProjects: ExploreProjectsQuery['projects'];
+  restProjects: ExploreProjectsQuery['projects'];
+  featuredProjects: NonNullable<ProjectQuery['projectById']>[];
   chainStats: ChainStatsQuery['chainStats'][number];
   totalDrippedPrices: Awaited<ReturnType<typeof fetchTotalDrippedPrices>>;
   totalDrippedAmounts: Awaited<ReturnType<typeof fetchTotalDrippedApproximation>>;
@@ -37,22 +37,21 @@ export const load = async ({ fetch }) => {
       fetchTotalDrippedPrices(fetch),
     ]);
 
-  fetchedDataCache.write({
+  const responsePayload = {
     yourProjects,
     restProjects,
-    featuredProjects,
+    featuredProjects: featuredProjects.filter(
+      (project): project is NonNullable<ProjectQuery['projectById']> => Boolean(project),
+    ),
     chainStats,
     totalDrippedPrices,
     totalDrippedAmounts,
-  });
+  };
+
+  fetchedDataCache.write(responsePayload);
 
   return {
-    yourProjects,
-    restProjects,
-    featuredProjects,
-    chainStats,
-    totalDrippedPrices,
-    totalDrippedAmounts,
+    ...responsePayload,
     preservePathOnNetworkChange: true,
   };
 };
