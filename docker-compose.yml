@@ -26,6 +26,7 @@ services:
       - ECOSYSTEM_API_URL=http://ecosystems:5000
       - ECOSYSTEM_API_ACCESS_TOKEN=123
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
     volumes:
     - .:/app
     - /app/node_modules/
