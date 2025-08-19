@@ -11,8 +11,19 @@ import { DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT } from '../../components
 import type {
   ExploreProjectsQuery,
   ExploreProjectsQueryVariables,
+  ProjectQuery,
+  ProjectQueryVariables,
 } from './__generated__/gql.generated';
 import FEATURED_PROJECTS_CONFIG from './featured-projects-config';
+
+export const fetchProjectQuery = gql`
+  ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
+  query Project($projectId: ID!, $chains: [SupportedChain!]) {
+    projectById(id: $projectId, chains: $chains) {
+      ...DefaultExplorePageFeaturedProject
+    }
+  }
+`;
 
 export const fetchProjectsQuery = gql`
   ${DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT}
@@ -46,6 +57,19 @@ export function createDefaultFetchProjectsParameters(): ProjectsParameters {
   };
 }
 
+export async function fetchProject(projectId: string, f: typeof fetch) {
+  const projectRes = await query<ProjectQuery, ProjectQueryVariables>(
+    fetchProjectQuery,
+    {
+      projectId: projectId,
+      chains: [network.gqlName],
+    },
+    f,
+  );
+
+  return projectRes.projectById;
+}
+
 export async function fetchProjects(f: typeof fetch, projectsParameters?: ProjectsParameters) {
   if (!projectsParameters) {
     projectsParameters = createDefaultFetchProjectsParameters();
@@ -60,39 +84,49 @@ export async function fetchProjects(f: typeof fetch, projectsParameters?: Projec
   return projectsRes.projects;
 }
 
+export async function fetchOwnProjects(f: typeof fetch, connectedAddress?: string) {
+  if (!connectedAddress) {
+    return [];
+  }
+
+  const defaultParameters = createDefaultFetchProjectsParameters();
+  const parameters = Object.assign({}, defaultParameters, {
+    where: { ownerAddress: connectedAddress },
+  });
+  return fetchProjects(f, parameters);
+}
+
+export async function fetchFeaturedProjects(
+  chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
+  f: typeof fetch,
+) {
+  const featuredProjectsIds = FEATURED_PROJECTS_CONFIG[chainId]?.featuredProjectIds ?? [];
+  const featuredWeb3ProjectsIds = FEATURED_PROJECTS_CONFIG[chainId]?.featuredWeb3ProjectIds ?? [];
+  return {
+    featuredProjects: await Promise.all(featuredProjectsIds.map(async (id) => fetchProject(id, f))),
+    featuredWeb3Projects: await Promise.all(
+      featuredWeb3ProjectsIds.map(async (id) => fetchProject(id, f)),
+    ),
+  };
+}
+
+async function fetchRecentProjects(f: typeof fetch) {
+  const defaultParameters = createDefaultFetchProjectsParameters();
+  const parameters = Object.assign({}, defaultParameters, { limit: 8 });
+  return fetchProjects(f, parameters);
+}
+
 export async function fetchAndCategorizeProjects(
   chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
   f: typeof fetch,
-  connectedAccountId?: string,
-  projectsParameters?: ProjectsParameters,
+  connectedAddress?: string,
 ) {
-  const projects = await fetchProjects(f, projectsParameters);
-
-  const featuredProjects = [];
-  const featuredWeb3Projects = [];
-  const yourProjects = [];
-  const restProjects = [];
-  for (const project of projects) {
-    if (project.chainData.some((chainData) => chainData.owner?.accountId === connectedAccountId)) {
-      yourProjects.push(project);
-    }
-
-    if (
-      FEATURED_PROJECTS_CONFIG[chainId]?.featuredWeb3ProjectIds?.includes(project.account.accountId)
-    ) {
-      featuredWeb3Projects.push(project);
-      continue;
-    }
-
-    if (
-      FEATURED_PROJECTS_CONFIG[chainId]?.featuredProjectIds?.includes(project.account.accountId)
-    ) {
-      featuredProjects.push(project);
-      continue;
-    }
-
-    restProjects.push(project);
-  }
+  const [yourProjects, { featuredProjects, featuredWeb3Projects }, restProjects] =
+    await Promise.all([
+      fetchOwnProjects(f, connectedAddress),
+      fetchFeaturedProjects(chainId, f),
+      fetchRecentProjects(f),
+    ]);
 
   return {
     featuredProjects,
