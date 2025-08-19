@@ -674,4 +674,6 @@ export const repoDriverAbi = [
     type: 'function',
   },
   { stateMutability: 'payable', type: 'receive' },
-];
+] as const;
+
+export type RepoDriverAbi = typeof repoDriverAbi;
