@@ -24,7 +24,8 @@
 </div>
 
 <style>
-  .trusted-by {
+  .trusted-by,
+  .trusted-by h5 {
     text-align: center;
   }
 
