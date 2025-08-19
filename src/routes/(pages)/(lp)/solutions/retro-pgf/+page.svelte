@@ -68,7 +68,7 @@
   </div>
 
   <div class="illustration">
-    <img src="/assets/lp/rpgf/round-view.png" alt="Round view" />
+    <img src="/assets/lp/rpgf/round-view.png" width="1278" height="795" alt="Round view" />
   </div>
 </section>
 
@@ -92,7 +92,12 @@
     </div>
 
     <div class="illustration">
-      <img src="/assets/lp/rpgf/form-builder.png" alt="RPGF form builder" />
+      <img
+        src="/assets/lp/rpgf/form-builder.png"
+        width="1073"
+        height="600"
+        alt="RPGF form builder"
+      />
     </div>
   </section>
 
@@ -112,7 +117,12 @@
     </div>
 
     <div class="illustration">
-      <img src="/assets/lp/rpgf/applications.png" alt="RPGF form builder" />
+      <img
+        src="/assets/lp/rpgf/applications.png"
+        width="1140"
+        height="697"
+        alt="Applications screen"
+      />
     </div>
   </section>
 </div>
@@ -135,7 +145,7 @@
   </div>
 
   <div class="illustration">
-    <img src="/assets/lp/rpgf/ballot.png" alt="RPGF form builder" />
+    <img src="/assets/lp/rpgf/ballot.png" width="1274" height="853" alt="Ballot in progress" />
   </div>
 </section>
 
@@ -160,7 +170,12 @@
   </div>
 
   <div class="illustration">
-    <img src="/assets/lp/rpgf/distribution.png" alt="RPGF form builder" />
+    <img
+      src="/assets/lp/rpgf/distribution.png"
+      width="1358"
+      height="1052"
+      alt="Distribution settings"
+    />
   </div>
 </section>
 
