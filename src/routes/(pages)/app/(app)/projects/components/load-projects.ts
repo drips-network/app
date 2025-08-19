@@ -52,7 +52,7 @@ type ProjectsParameters = {
 export function createDefaultFetchProjectsParameters(): ProjectsParameters {
   return {
     where: { verificationStatus: ProjectVerificationStatus.Claimed },
-    sort: { direction: SortDirection.Asc, field: ProjectSortField.ClaimedAt },
+    sort: { direction: SortDirection.Desc, field: ProjectSortField.ClaimedAt },
     chains: [network.gqlName],
   };
 }
