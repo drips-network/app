@@ -84,7 +84,7 @@
   $: updateVoteAmount(voteAmountInput);
 </script>
 
-<div class="application-line-item">
+<div class="application-line-item" data-testid="application-line-item-{application.id}">
   <a
     href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
       ? '?backToBallot'

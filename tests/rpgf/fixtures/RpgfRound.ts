@@ -19,6 +19,9 @@ export class RpgfRound {
 
   async gotoRpgfPage(page = this.page) {
     await page.getByTestId('sidenav-item-RetroPGF').click();
+
+    // wait for the URL to either be /app/rpgf or /app/connect using regex
+    await page.waitForURL(/\/app\/rpgf(\/|$)|\/app\/connect/);
   }
 
   async logIn(connectedSession = this.connectedSession) {
@@ -150,6 +153,10 @@ export class RpgfRound {
     const addField = this.page.getByPlaceholder('ETH address');
     for (const address of voterAddresses) {
       await addField.fill(address);
+
+      const addButton = this.page.getByRole('button', { name: 'Add' });
+
+      await expect(addButton).toBeEnabled();
       await this.page.getByRole('button', { name: 'Add' }).click();
 
       // wait for add field to be enabled again
@@ -233,15 +240,26 @@ export class RpgfRound {
     this.published = true;
   }
 
-  async applyToRound({ withProject }: { withProject: Project }) {
+  async applyToRound({
+    withProject,
+    applicationTitle,
+  }: {
+    withProject: Project;
+    applicationTitle?: string;
+  }) {
     if (!this.name) {
       throw new Error('Draft not set. Please create a draft first.');
     }
 
     const page = withProject.page;
 
-    await this.logIn(withProject.connectedSession);
     await this.gotoRpgfPage(page);
+
+    // if we're on the connect round, log in
+    if (page.url().includes('/app/connect')) {
+      await this.logIn(withProject.connectedSession);
+      await this.gotoRpgfPage(page);
+    }
 
     // click on the round
     await page.getByRole('link', { name: this.name }).click();
@@ -254,6 +272,9 @@ export class RpgfRound {
     await page.getByTestId(`item-${accountId}`).click();
 
     // Fill the default application form
+    if (applicationTitle) {
+      await page.locator('input[type="text"]').first().fill(applicationTitle);
+    }
     await page.getByRole('textbox', { name: 'Please consicely describe' }).fill('Test description');
     await page
       .getByRole('textbox', { name: 'Please enter your name. Legal' })
@@ -267,6 +288,67 @@ export class RpgfRound {
     await page.getByRole('button', { name: 'Submit application' }).nth(0).click();
 
     await page.getByRole('link', { name: 'View your application' }).click();
+
+    // wait until we land on application page by checking for a valid UUID in the URL
+    await page.waitForURL(
+      /\/applications\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
+    );
+
+    // parse the application ID from the URL
+    const url = page.url();
+    const urlParts = url.split('/');
+    const applicationId = urlParts[urlParts.length - 1];
+
+    return applicationId;
+  }
+
+  async approveAndDenyApplications({
+    approveApplicationIds,
+    denyApplicationIds,
+  }: {
+    approveApplicationIds: string[];
+    denyApplicationIds: string[];
+  }) {
+    if (!this.name || !this.urlSlug) {
+      throw new Error('Draft not set. Please create a draft first.');
+    }
+
+    await this.navigateToRoundOrDraft();
+
+    // Go to the applications tab
+    await this.page.getByRole('link', { name: 'View all' }).first().click();
+
+    // Approve applications
+    for (const id of approveApplicationIds) {
+      await this.page
+        .getByTestId(`application-line-item-${id}`)
+        .getByLabel('Approve application')
+        .click();
+    }
+
+    // Deny applications
+    for (const id of denyApplicationIds) {
+      await this.page
+        .getByTestId(`application-line-item-${id}`)
+        .getByLabel('Reject application')
+        .click();
+    }
+
+    // Ensure correct count of applications is displayed
+    await expect(this.page.getByRole('main')).toContainText(
+      `Approve ${approveApplicationIds.length} • Reject ${denyApplicationIds.length}`,
+    );
+
+    await this.page.getByRole('button', { name: 'Submit' }).click();
+    await this.page.getByRole('button', { name: 'Yes, continue' }).click();
+
+    // Wait for each of the application line items to reflect the new state
+    for (const id of approveApplicationIds) {
+      await expect(this.page.getByTestId(`application-line-item-${id}`)).toContainText('Approved');
+    }
+    for (const id of denyApplicationIds) {
+      await expect(this.page.getByTestId(`application-line-item-${id}`)).toContainText('Rejected');
+    }
   }
 
   async forceRoundIntoState(desiredState: RoundState) {

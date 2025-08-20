@@ -4,7 +4,12 @@ import { RpgfRound } from './rpgf/fixtures/RpgfRound';
 import { Project } from './fixtures/Project';
 
 const test = base
-  .extend<{ connectedSession: ConnectedSession; connectedSession2: ConnectedSession }>({
+  .extend<{
+    connectedSession: ConnectedSession;
+    connectedSession2: ConnectedSession;
+    connectedSession3: ConnectedSession;
+    connectedSession4: ConnectedSession;
+  }>({
     connectedSession: async ({ page }, use) => {
       const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
       await connectedSession.goto();
@@ -21,30 +26,31 @@ const test = base
 
       await use(connectedSession2);
     },
+    connectedSession3: async ({ browser }, use) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[2]);
+      await connectedSession2.goto();
+      await connectedSession2.connect();
+
+      await use(connectedSession2);
+    },
+    connectedSession4: async ({ browser }, use) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[2]);
+      await connectedSession2.goto();
+      await connectedSession2.connect();
+
+      await use(connectedSession2);
+    },
   })
-  .extend<{ rpgfRound: RpgfRound; rpgfRound2: RpgfRound; project: Project }>({
+  .extend<{ rpgfRound: RpgfRound; rpgfRound2: RpgfRound }>({
     rpgfRound: async ({ connectedSession }, use) => {
       await use(new RpgfRound(connectedSession));
     },
     rpgfRound2: async ({ connectedSession2 }, use) => {
       await use(new RpgfRound(connectedSession2));
-    },
-    // Claim a project with another test address
-    project: async ({ connectedSession2 }, use) => {
-      const project = new Project(
-        connectedSession2,
-        'https://github.com/efstajas/drips-test-repo-12',
-      );
-
-      const isClaimed = await project.checkIfClaimed();
-
-      if (isClaimed) {
-        await project.goto();
-      } else {
-        await project.claim();
-      }
-
-      await use(project);
     },
   });
 
@@ -96,7 +102,7 @@ test.describe('rounds', () => {
     }
 
     if (rpgfRound.published) {
-      // await rpgfRound.deleteRound();
+      await rpgfRound.deleteRound();
     } else {
       await rpgfRound.deleteDraft();
     }
@@ -118,8 +124,10 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
   });
 
-  test('applying to a round', async ({ rpgfRound, project }) => {
-    await rpgfRound.deleteRound();
+  test('applying to a round', async ({ rpgfRound, connectedSession2 }) => {
+    const project = new Project(connectedSession2, 'https://github.com/efstajas/drips-test-repo-2');
+    await project.claimIfUnclaimed();
+
     await rpgfRound.logIn();
 
     const roundName = 'applying test';
@@ -140,6 +148,109 @@ test.describe('rounds', () => {
 
     await rpgfRound.applyToRound({
       withProject: project,
+    });
+  });
+
+  test('application visibility, specifically private fields', async ({
+    rpgfRound,
+    connectedSession3,
+  }) => {
+    const project = new Project(connectedSession3, 'https://github.com/efstajas/drips-test-repo-3');
+    await project.claimIfUnclaimed();
+
+    await rpgfRound.logIn();
+
+    const roundName = 'application visibility test';
+    const roundSlug = 'e2e-test-round-application-visibility';
+
+    await rpgfRound.createDraft({
+      name: roundName,
+      urlSlug: roundSlug,
+      emoji: '🗳️',
+      voterAddresses: [TEST_ADDRESSES[3], TEST_ADDRESSES[4]],
+    });
+
+    await rpgfRound.publishRound();
+
+    await rpgfRound.forceRoundIntoState('intake');
+    await rpgfRound.gotoRpgfPage();
+    await rpgfRound.navigateToRoundOrDraft();
+
+    const applicationId = await rpgfRound.applyToRound({
+      withProject: project,
+      applicationTitle: 'Visibility Test Application',
+    });
+
+    // Ensure the application is invisible when logged out
+    const user2page = connectedSession3.page;
+
+    // this logs the user out
+    await connectedSession3.goto();
+
+    await rpgfRound.gotoRpgfPage(user2page);
+
+    await user2page.getByRole('link', { name: roundName }).click();
+
+    // ensure the application is not visible
+    await expect(user2page.getByText('Visibility Test Application')).not.toBeVisible();
+
+    // approve the application fromt the 1st user
+
+    await rpgfRound.approveAndDenyApplications({
+      approveApplicationIds: [applicationId],
+      denyApplicationIds: [],
+    });
+
+    // ensure the application is now visible to the 2nd user, but without private fields
+    await connectedSession3.goto();
+
+    await rpgfRound.gotoRpgfPage(user2page);
+    await user2page.getByRole('link', { name: roundName }).click();
+
+    await user2page.getByRole('link', { name: 'Visibility Test Application' }).click();
+    await user2page.waitForURL(`**/applications/${applicationId}`);
+
+    await expect(user2page.getByText('Visibility Test Application').first()).toBeVisible();
+
+    // check private field name Test Testerson is not visible
+    await expect(user2page.getByText('Test Testerson')).not.toBeVisible();
+  });
+
+  test('approving and denying applications', async ({ rpgfRound, connectedSession4 }) => {
+    const project = new Project(connectedSession4, 'https://github.com/efstajas/drips-test-repo-4');
+    await project.claimIfUnclaimed();
+
+    await rpgfRound.logIn();
+
+    const roundName = 'approving & denying test';
+    const roundSlug = 'e2e-test-round-approving-denying';
+
+    await rpgfRound.createDraft({
+      name: roundName,
+      urlSlug: roundSlug,
+      emoji: '🚔',
+      voterAddresses: [TEST_ADDRESSES[3], TEST_ADDRESSES[4]],
+    });
+
+    await rpgfRound.publishRound();
+
+    await rpgfRound.forceRoundIntoState('intake');
+    await rpgfRound.gotoRpgfPage();
+    await rpgfRound.navigateToRoundOrDraft();
+
+    const applicationId1 = await rpgfRound.applyToRound({
+      withProject: project,
+      applicationTitle: 'Test Application',
+    });
+
+    const applicationId2 = await rpgfRound.applyToRound({
+      withProject: project,
+      applicationTitle: 'Test Application 2',
+    });
+
+    await rpgfRound.approveAndDenyApplications({
+      approveApplicationIds: [applicationId1],
+      denyApplicationIds: [applicationId2],
     });
   });
 });

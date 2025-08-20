@@ -123,4 +123,14 @@ export class Project {
     await expect(this.page.getByText(repoName).nth(0)).toBeVisible();
     await expect(this.page.getByText('Splits', { exact: true })).toBeVisible();
   }
+
+  async claimIfUnclaimed() {
+    const isClaimed = await this.checkIfClaimed();
+
+    if (isClaimed) {
+      await this.goto();
+    } else {
+      await this.claim();
+    }
+  }
 }
