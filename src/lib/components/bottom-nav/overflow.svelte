@@ -16,12 +16,13 @@
       />
 
       <div class="text">
-        <span class="typo-text-bold">{item.label}</span>
+        <span class="typo-text-bold" style:color="var(--color-foreground)">{item.label}</span>
         {#if item.description}
           <span
             class="typo-text"
-            style:color={active ? 'var(--color-primary-level-5' : 'var(--color-foreground-level-6)'}
-            >{item.description}</span
+            style:color={active
+              ? 'var(--color-primary-level-6)'
+              : 'var(--color-foreground-level-6)'}>{item.description}</span
           >
         {/if}
       </div>

@@ -16,7 +16,17 @@ const OPTIMISM_BLOCKSCOUT_API_KEY = getOptionalEnvVar(
 
 const blockscoutTokensResponseSchema = z.array(
   z.object({
-    token: z.object({ address: z.string(), decimals: z.string() }),
+    token: z
+      .object({
+        address: z.string(),
+        decimals: z.string(),
+      })
+      .or(
+        z.object({
+          address_hash: z.string(),
+          decimals: z.string(),
+        }),
+      ),
     value: z.string(),
   }),
 );
@@ -55,7 +65,7 @@ async function fetchForNetwork(network: 'optimism' | 'filecoin' | 'metis', f: ty
   const dripsTokenHoldings = blockscoutTokensResponseSchema
     .parse(dripsTokenHoldingsJson)
     .map((v) => ({
-      tokenAddress: v.token.address,
+      tokenAddress: 'address_hash' in v.token ? v.token.address_hash : v.token.address,
       amount: BigInt(v.value),
       decimals: Number(v.token.decimals),
     }));
