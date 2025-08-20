@@ -52,11 +52,12 @@ until curl -I -s http://localhost:5173/api/health | grep -q "200"; do
 done
 
 printf "\n✅ The app is ready!\n"
-printf "\n🚀 Running tests..."
 
 if [ $UI = true ]; then
-  npx playwright test --ui-port 0 --headed &
+  printf "\n🚀 Starting the Playwright UI...\n"
+  npx playwright test --ui-port 0 &
   docker compose logs app --follow
 else
+  printf "\n🚀 Running tests..."
   npx playwright test
 fi
