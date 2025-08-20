@@ -4,7 +4,7 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { makeTransactPayload, type StepComponentEvents } from '$lib/components/stepper/types';
   import PenIcon from '$lib/components/icons/Pen.svelte';
   import ListIcon from '$lib/components/icons/DripList.svelte';
@@ -15,19 +15,12 @@
   import tokensStore from '$lib/stores/tokens/tokens.store';
   import CoinIcon from '$lib/components/icons/Coin.svelte';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
-  import DripListService from '$lib/utils/driplist/DripListService';
   import type { State } from '../../create-drip-list-flow';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import expect from '$lib/utils/expect';
   import Pause from '$lib/components/icons/Pause.svelte';
   import ContinuousSupportReviewCard from './components/continuous-support-review-card.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
-  import { gql } from 'graphql-request';
-  import query from '$lib/graphql/dripsQL';
-  import type {
-    DripListExistsQuery,
-    DripListExistsQueryVariables,
-  } from './__generated__/gql.generated';
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import network from '$lib/stores/wallet/network';
@@ -36,19 +29,18 @@
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
+  import { buildDripListCreationTxs } from '$lib/utils/driplist/buildDripListCreationTxs';
+  import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
   export let connectedWalletHidden = false;
 
-  let dripListService: DripListService;
-
-  onMount(async () => {
-    dripListService = await DripListService.new();
-  });
-
   async function createDripList() {
+    const sdk = sdkManager.sdk;
+    if (!sdk) throw new Error('SDK not initialized');
+
     dispatch(
       'transact',
       makeTransactPayload({
@@ -57,58 +49,16 @@
           duringBefore: 'Preparing Drip List creation transactions…',
         },
         before: async () => {
-          return await dripListService.buildTransactContext({
-            listTitle: $context.dripList.title,
-            listDescription: $context.dripList.description,
-            isVisible: true,
-            weights: $context.dripList.weights,
-            items: $context.dripList.items,
-            support: (() => {
-              if ($context.selectedSupportOption === 1) {
-                return {
-                  type: 'continuous',
-                  topUpAmount:
-                    $context.continuousSupportConfig.topUpAmountValueParsed ?? unreachable(),
-                  amountPerSec:
-                    ($context.continuousSupportConfig.streamRateValueParsed ?? unreachable()) /
-                    BigInt(2592000), // 30 days in seconds
-                  tokenAddress: $context.continuousSupportConfig.listSelected[0] ?? unreachable(),
-                };
-              } else if ($context.selectedSupportOption === 2) {
-                return {
-                  type: 'one-time',
-                  donationAmount: $context.oneTimeDonationConfig.amount ?? unreachable(),
-                  tokenAddress:
-                    $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
-                };
-              }
-            })(),
-          });
+          return await buildDripListCreationTxs($context);
         },
 
         transactions: ({ txs }) => txs,
 
         after: async (_, { dripListId }) => {
-          const dripListExistsQuery = gql`
-            query DripListExists($id: ID!, $chain: SupportedChain!) {
-              dripList(id: $id, chain: $chain) {
-                account {
-                  accountId
-                }
-                isVisible
-              }
-            }
-          `;
-
           const tryFetchList = async (listId: string) => {
             try {
-              return await query<DripListExistsQuery, DripListExistsQueryVariables>(
-                dripListExistsQuery,
-                {
-                  id: listId,
-                  chain: network.gqlName,
-                },
-              );
+              const dripList = await sdk.dripLists.getById(BigInt(listId), network.chainId);
+              return dripList && dripList.isVisible;
             } catch {
               return false;
             }
@@ -116,8 +66,7 @@
 
           await expect(
             () => tryFetchList(dripListId),
-            (result) =>
-              typeof result === 'boolean' ? result : Boolean(result.dripList?.isVisible),
+            (result) => Boolean(result),
             120000,
             1000,
           );

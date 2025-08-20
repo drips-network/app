@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { repoDriverAccountMetadataSchemaV3 } from './v3';
 
-const emojiAvatarSchema = z.object({
+export const emojiAvatarSchema = z.object({
   type: z.literal('emoji'),
   emoji: z.string(),
 });

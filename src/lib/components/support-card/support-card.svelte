@@ -35,6 +35,19 @@
       }
     }
   `;
+
+  export const SUPPORT_CARD_ECOSYSTEM_FRAGEMENT = gql`
+    fragment SupportCardEcosystem on EcosystemMainAccount {
+      name
+      account {
+        accountId
+        driver
+      }
+      owner {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -62,6 +75,7 @@
     OwnDripListsQueryVariables,
     SupportCardDripListFragment,
     SupportCardProjectFragment,
+    SupportCardEcosystemFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps, {
@@ -78,24 +92,46 @@
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
+  export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList) disabled = true;
+    if (!project && !dripList && !ecosystem) disabled = true;
   }
 
-  $: type = project ? ('project' as const) : ('dripList' as const);
+  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+
+  $: {
+    switch (true) {
+      case !!project:
+        type = 'project';
+        break;
+      case !!ecosystem:
+        type = 'ecosystem';
+        break;
+      default:
+        type = 'dripList';
+    }
+  }
 
   let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
   let supportUrl: string;
   $: {
-    if (project) {
-      supportUrl = project.source.url;
-    } else if (dripList) {
-      supportUrl = `${BASE_URL}/app/drip-lists/${dripList.account.accountId}`;
+    switch (true) {
+      case !!project:
+        supportUrl = project.source.url;
+        break;
+      case !!dripList:
+        supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
+        break;
+      case !!ecosystem:
+        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
+        break;
+      default:
+        supportUrl = '/';
     }
   }
 
@@ -151,10 +187,23 @@
   }
 
   function onClickNewStream() {
-    const accountId = dripList?.account.accountId;
+    let donationFlowStepsInput: Parameters<typeof createStreamFlowSteps>[1];
+    let hasAccountId: boolean = false;
+
+    switch (true) {
+      case !!dripList:
+        hasAccountId = !!dripList.account.accountId;
+        donationFlowStepsInput = dripList.account;
+        break;
+      case !!ecosystem:
+        hasAccountId = !!ecosystem.account.accountId;
+        donationFlowStepsInput = ecosystem;
+        break;
+    }
+
     return (
-      accountId &&
-      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, dripList?.account))
+      hasAccountId &&
+      modal.show(Stepper, undefined, createStreamFlowSteps(undefined, donationFlowStepsInput))
     );
   }
 
@@ -170,11 +219,22 @@
   }
 
   function onClickNewDonation() {
-    return modal.show(
-      Stepper,
-      undefined,
-      createDonationFlowSteps(dripList?.account ?? project ?? unreachable()),
-    );
+    let donationFlowStepsInput: Parameters<typeof createDonationFlowSteps>[0];
+    switch (true) {
+      case !!project:
+        donationFlowStepsInput = project;
+        break;
+      case !!dripList:
+        donationFlowStepsInput = dripList?.account;
+        break;
+      case !!ecosystem:
+        donationFlowStepsInput = ecosystem;
+        break;
+      default:
+        unreachable();
+    }
+
+    return modal.show(Stepper, undefined, createDonationFlowSteps(donationFlowStepsInput));
   }
 
   let supportMenuOpen = false;
@@ -204,7 +264,11 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {#if ecosystem}
+    <p>Donate once or continuously.</p>
+  {:else}
+    <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
+  {/if}
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons
@@ -235,6 +299,8 @@
     padding: 1rem;
     gap: 1rem;
     position: relative;
+    justify-content: space-between;
+    height: 100%;
   }
 
   .become-supporter-card.disabled {

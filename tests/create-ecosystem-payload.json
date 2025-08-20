@@ -1,0 +1,68 @@
+{
+  "name": "Playwright Ecosystem",
+  "description": "This is a test ecosystem.",
+  "chainId": "31337",
+  "ownerAddress": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+  "avatar": {
+    "type": "emoji",
+    "emoji": "💧"
+  },
+  "color": "#9BD226",
+  "metadata": [{
+      "icon": "Recipients",
+      "title": "MIT Licensed",
+      "text": "327",
+      "link": {
+        "href": "https://maps.app.goo.gl/cQFc5uDp1g1NQh488",
+        "label": "Castro Monte Mozinho"
+      }
+  }, {
+    "icon": "Wallet",
+    "title": "Source",
+    "text": "Based on data from",
+    "link": {
+        "href": "https://www.opensource.observer/",
+        "label": "Open Source Observer"
+    }
+  }, {
+    "icon": "Download",
+    "title": "Culinary Relations",
+    "link": {
+        "href": "https://maps.app.goo.gl/5PmHWtBCAjguoatB7",
+        "label": "Casa Da Viuva"
+    }
+  }, {
+    "icon": "Coin",
+    "title": "Fun Fact",
+    "text": "Portugal is very nice",
+    "link": {
+      "href": "https://drips.network",
+      "label": "Drips"
+    }
+  }],
+  "graph": {
+    "nodes": [
+			{
+					"projectName": "root"
+			},
+      {
+        "projectName": "Byron/gitoxide"
+      },
+      {
+        "projectName": "websockets/ws"
+      }
+    ],
+    "edges": [
+      {
+        "source": "root",
+        "target": "Byron/gitoxide",
+        "weight": 1
+      },
+      {
+        "source": "Byron/gitoxide",
+        "target": "websockets/ws",
+        "weight": 0.5
+      }
+    ]
+  }
+}

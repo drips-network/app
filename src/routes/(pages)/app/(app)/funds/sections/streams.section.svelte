@@ -6,6 +6,7 @@
     ${NAME_AND_BADGE_CELL_STREAM_FRAGMENT}
     ${USER_BADGE_CELL_USER_FRAGMENT}
     ${USER_BADGE_CELL_DRIP_LIST_FRAGMENT}
+    ${USER_BADGE_CELL_ECOSYSTEM_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment StreamsSectionStream on Stream {
       ...NameAndBadgeCellStream
@@ -15,6 +16,9 @@
         }
         ... on DripList {
           ...UserBadgeCellDripList
+        }
+        ... on EcosystemMainAccount {
+          ...UserBadgeCellEcosystem
         }
       }
       sender {
@@ -51,6 +55,7 @@
   import UserBadgeCell, {
     USER_BADGE_CELL_DRIP_LIST_FRAGMENT,
     USER_BADGE_CELL_USER_FRAGMENT,
+    USER_BADGE_CELL_ECOSYSTEM_FRAGMENT,
   } from '$lib/components/table/cells/user-badge.cell.svelte';
   import type { ComponentProps } from 'svelte';
   import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
@@ -125,7 +130,7 @@
       stream: s,
     },
     to: {
-      userOrDripList: s.receiver,
+      userOrDripListOrEcosystem: s.receiver,
     },
     token: {
       address: s.config.amountPerSecond.tokenAddress,
@@ -145,7 +150,7 @@
       stream: s,
     },
     from: {
-      userOrDripList: s.sender,
+      userOrDripListOrEcosystem: s.sender,
     },
     token: {
       address: s.config.amountPerSecond.tokenAddress,

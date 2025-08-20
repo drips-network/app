@@ -3,6 +3,7 @@ import query from '$lib/graphql/dripsQL';
 import isClaimed from '$lib/utils/project/is-claimed';
 import {
   dripListAssociatedAccountIdsQuery,
+  ecosystemAssociatedAccountIdsQuery,
   projectAssociatedAccountIdsQuery,
 } from './queries/associated-account-ids-queries';
 import { error } from '@sveltejs/kit';
@@ -10,6 +11,8 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import type {
   DripListAssociatedAccountIdsQuery,
   DripListAssociatedAccountIdsQueryVariables,
+  EcosystemAssociatedAccountIdsQuery,
+  EcosystemAssociatedAccountIdsQueryVariables,
   ProjectAssociatedAccountIdsQuery,
   ProjectAssociatedAccountIdsQueryVariables,
 } from './queries/__generated__/gql.generated';
@@ -69,29 +72,55 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
   }
 }
 
-async function invalidateDripListCache(dripListAccountId: string, client: RedisClientType) {
-  log('INVALIDATE DRIP LIST CACHE', { dripListAccountId });
+async function invalidateNftDriverCache(nftDriverAccountId: string, client: RedisClientType) {
+  log('INVALIDATE NFT DRIVER CACHE', { nftDriverAccountId });
 
   const associatedAccountIds = await query<
     DripListAssociatedAccountIdsQuery,
     DripListAssociatedAccountIdsQueryVariables
-  >(dripListAssociatedAccountIdsQuery, { dripListAccountId, chain: network.gqlName }, fetch);
+  >(
+    dripListAssociatedAccountIdsQuery,
+    { dripListAccountId: nftDriverAccountId, chain: network.gqlName },
+    fetch,
+  );
   const { dripList } = associatedAccountIds;
 
   if (dripList) {
     const accountIdsToClear = [
-      dripListAccountId,
+      nftDriverAccountId,
       dripList.owner.accountId,
       ...dripList.support.map((support) => support.account.accountId),
       ...dripList.splits.map((split) => split.account.accountId),
     ];
 
-    await Promise.all(
+    return Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
-  } else {
-    await invalidateAccountCache(dripListAccountId, client);
   }
+
+  const associatedEcosystemAccountIds = await query<
+    EcosystemAssociatedAccountIdsQuery,
+    EcosystemAssociatedAccountIdsQueryVariables
+  >(
+    ecosystemAssociatedAccountIdsQuery,
+    { ecosystemAccountId: nftDriverAccountId, chain: network.gqlName },
+    fetch,
+  );
+  const { ecosystemMainAccount } = associatedEcosystemAccountIds;
+  if (ecosystemMainAccount) {
+    const accountIdsToClear = [
+      nftDriverAccountId,
+      ecosystemMainAccount.owner.accountId,
+      ...ecosystemMainAccount.support.map((support) => support.account.accountId),
+      ...ecosystemMainAccount.splits.map((split) => split.account.accountId),
+    ];
+
+    return Promise.all(
+      accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
+    );
+  }
+
+  return invalidateAccountCache(nftDriverAccountId, client);
 }
 
 export const POST = async ({ request }) => {
@@ -127,7 +156,7 @@ export const POST = async ({ request }) => {
         case 'repo':
           return invalidateProjectCache(accountId, redis);
         case 'nft':
-          return invalidateDripListCache(accountId, redis);
+          return invalidateNftDriverCache(accountId, redis);
       }
     }),
   );

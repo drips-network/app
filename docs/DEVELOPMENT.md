@@ -1,6 +1,6 @@
 # 🤓 Development Instructions
 
-The stack for the Drips App contains a number of services, which can all be run entirely locally for development. For this, we use `docker compose`. 
+The stack for the Drips App contains a number of services, which can all be run entirely locally for development. For this, we use `docker compose`.
 
 ## 🚀 Quick Start
 
@@ -103,3 +103,4 @@ Tip: Run `npx playwright codegen http://localhost:5173` after starting the local
 ### Limitations
 
 Tests all run against the same local dev stack, which is created before tests are triggered, and destroyed afterwards. This means that separate tests need to be designed such that state changes they trigger on the local dev stack (e.g. projects being claimed, tokens being topped up, drip lists being created etc.) do not interfere with any other test.
+
