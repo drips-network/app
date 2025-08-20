@@ -12,7 +12,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Cache dependencies
@@ -26,8 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build GQL types
-        # TODO: revert
-        run: GQL_URL=https://graphql-api-app-pr-1495.up.railway.app/ GQL_ACCESS_TOKEN=123 npm run gql:build  # public access token
+        run: GQL_URL=https://drips-multichain-api.up.railway.app GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 npm run gql:build  # public access token
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
