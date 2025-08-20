@@ -1,34 +1,18 @@
 name: Run unit tests
 on:
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'The pull request number to deploy'
-        required: true
   pull_request:
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Get PR Number
-        id: get_pr
-        run: |
-          # Check if the PR number from the 'pull_request' event is available.
-          # If it is, use it. Otherwise, use the number from the manual input.
-          if [ -n "${{ github.event.pull_request.number }}" ]; then
-            PR_NUMBER="${{ github.event.pull_request.number }}"
-          else
-            PR_NUMBER="${{ github.event.inputs.pr_number }}"
-          fi
-          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
-
       - name: Check out code
         uses: actions/checkout@v2
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 20
           cache: 'npm'
 
       - name: Cache dependencies
@@ -42,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build GQL types
-        run: GQL_URL=https://graphql-api-app-pr-${{ steps.get_pr.outputs.PR_NUMBER }}.up.railway.app/ GQL_ACCESS_TOKEN=123 npm run gql:build  # public access token
+        run: GQL_URL=https://drips-multichain-api.up.railway.app GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 npm run gql:build  # public access token
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
