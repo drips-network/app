@@ -23,6 +23,10 @@ import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import filterCurrentChainData from '../filter-current-chain-data';
 import unreachable from '../unreachable';
 import network from '$lib/stores/wallet/network';
+import {
+  executeRepoSubAccountDriverReadMethod,
+  populateRepoSubAccountDriverWriteTx,
+} from '../sdk/repo-sub-account-driver/repo-sub-account-driver';
 
 interface ListEditorConfig {
   items: Items;
@@ -159,6 +163,16 @@ export default class GitProjectService {
       dependencies,
     );
 
+    const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
+
+    let setSubAccountSplitsTx: ContractTransaction | null = null;
+
+    if (repoSubAccountDriverExists) {
+      setSubAccountSplitsTx = (
+        await this._buildSubAccountSetSplitsTx(accountId, highLevelPercentages, maintainers)
+      ).tx;
+    }
+
     const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
     assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
 
@@ -186,7 +200,14 @@ export default class GitProjectService {
       args: [toBigInt(accountId), accountMetadataAsBytes],
     });
 
-    return { batch: [setSplitsTx, emitAccountMetadataTx], newMetadataHash: ipfsHash };
+    return {
+      batch: [
+        ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
+        setSplitsTx,
+        emitAccountMetadataTx,
+      ],
+      newMetadataHash: ipfsHash,
+    };
   }
 
   public async buildBatchTx(context: State): Promise<ContractTransaction[]> {
@@ -213,6 +234,20 @@ export default class GitProjectService {
       context.maintainerSplits,
       context.dependencySplits,
     );
+
+    const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
+
+    let setSubAccountSplitsTx: ContractTransaction | null = null;
+
+    if (repoSubAccountDriverExists) {
+      setSubAccountSplitsTx = (
+        await this._buildSubAccountSetSplitsTx(
+          accountId,
+          context.highLevelPercentages,
+          context.maintainerSplits,
+        )
+      ).tx;
+    }
 
     const project = {
       __typename: 'Project' as const,
@@ -303,7 +338,71 @@ export default class GitProjectService {
       );
     });
 
-    return Promise.all([setSplitsTx, emitAccountMetadataTx, ...splitTxs, ...collectTxs]);
+    return Promise.all([
+      ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
+      setSplitsTx,
+      emitAccountMetadataTx,
+      ...splitTxs,
+      ...collectTxs,
+    ]);
+  }
+
+  private _adjustWeights<T extends { weight: number }>(input: T[]): T[] {
+    // Adjust weights to ensure no tiny remainder
+    const MAX_WEIGHT = 1000000;
+
+    const totalWeight = input.reduce((acc, { weight }) => acc + weight, 0);
+    const remainder = MAX_WEIGHT - totalWeight;
+
+    if (remainder > 0) {
+      input[0].weight += remainder;
+    }
+
+    return input;
+  }
+
+  private async _buildSubAccountSetSplitsTx(
+    accountId: string,
+    highLevelPercentages: { [slug: string]: number },
+    maintainerListEditorConfig: ListEditorConfig,
+  ) {
+    const subDriverAccountId = (
+      await executeRepoSubAccountDriverReadMethod({
+        functionName: 'calcAccountId',
+        args: [BigInt(accountId)],
+      })
+    ).toString();
+
+    const receivers: (LatestVersion<
+      typeof repoDriverAccountMetadataParser
+    >['splits']['maintainers'][number] & { sublist: 'maintainers' })[] = [];
+
+    for (const [accountId, weight] of Object.entries(maintainerListEditorConfig.weights)) {
+      const scaledWeight = Math.floor(
+        Math.floor(weight * (highLevelPercentages['maintainers'] / 100)),
+      );
+
+      if (scaledWeight === 0) continue;
+
+      const receiver = {
+        sublist: 'maintainers' as const,
+        type: 'address' as const,
+        weight: scaledWeight,
+        accountId,
+      };
+
+      receivers.push(receiver);
+    }
+
+    this._adjustWeights(receivers);
+
+    return {
+      tx: await populateRepoSubAccountDriverWriteTx({
+        functionName: 'setSplits',
+        args: [toBigInt(subDriverAccountId), formatSplitReceivers(receivers)],
+      }),
+      receivers,
+    };
   }
 
   private async _buildSetSplitsTxAndMetadata(
@@ -312,7 +411,7 @@ export default class GitProjectService {
     maintainerListEditorConfig: ListEditorConfig,
     dependencyListEditorConfig: ListEditorConfig,
   ) {
-    let receivers: ((
+    const receivers: ((
       | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'][number]
       | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['dependencies'][number]
     ) & { sublist: 'dependencies' | 'maintainers' })[] = [];
@@ -385,21 +484,7 @@ export default class GitProjectService {
       receivers.push(receiver);
     }
 
-    // Adjust weights to ensure no tiny remainder
-    const MAX_WEIGHT = 1000000;
-
-    function adjustWeights<T extends { weight: number }>(input: T[]): T[] {
-      const totalWeight = input.reduce((acc, { weight }) => acc + weight, 0);
-      const remainder = MAX_WEIGHT - totalWeight;
-
-      if (remainder > 0) {
-        input[0].weight += remainder;
-      }
-
-      return input;
-    }
-
-    receivers = adjustWeights(receivers);
+    this._adjustWeights(receivers);
 
     return {
       tx: await populateRepoDriverWriteTx({

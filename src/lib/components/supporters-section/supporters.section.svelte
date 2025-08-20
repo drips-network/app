@@ -45,6 +45,23 @@
           amount
         }
       }
+      ... on EcosystemSupport {
+        date
+        weight
+        totalSplit {
+          tokenAddress
+          amount
+        }
+        ecosystemMainAccount {
+          name
+          owner {
+            address
+          }
+          account {
+            accountId
+          }
+        }
+      }
       ... on StreamSupport {
         stream {
           ...StreamStateStream
@@ -101,12 +118,14 @@
   import { fade } from 'svelte/transition';
   import AddUnknownTokenButton from './components/add-unknown-token-button.svelte';
   import Section from '../section/section.svelte';
+  import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
+  import unreachable from '$lib/utils/unreachable';
 
   export let supportItems: SupportersSectionSupportItemFragment[];
 
   export let ownerAccountId: string | undefined = undefined;
 
-  export let type: 'project' | 'dripList' | 'address';
+  export let type: 'project' | 'dripList' | 'address' | 'ecosystem';
   export let headline = 'Support';
   export let emptyStateHeadline = 'No supporters';
 
@@ -125,6 +144,9 @@
       case 'address':
         emptyStateText = `This user doesnʼt have any supporters yet.`;
         break;
+      case 'ecosystem':
+        emptyStateText = `This ecosystem doesnʼt have any supporters yet.`;
+        break;
     }
   }
 
@@ -140,6 +162,7 @@
     bind:collapsable
     header={{
       icon: Heart,
+      iconPrimary: true,
       label: headline,
       infoTooltip,
     }}
@@ -272,7 +295,7 @@
           </SupportItem>
         {/if}
         {#if item.__typename === 'ProjectSupport'}
-          {@const source = item.project.source}
+          {@const source = item.project.source || unreachable()}
           <SupportItem
             href={buildProjectUrl(source.forge, source.ownerName, source.repoName)}
             title={{
@@ -283,6 +306,27 @@
                 size: 'small',
                 project: item.project,
                 maxWidth: false,
+              },
+            }}
+            subtitle={formatDate(item.date)}
+          >
+            <svelte:fragment slot="amount-value">
+              <AggregateFiatEstimate amounts={item.totalSplit} />
+            </svelte:fragment>
+            <svelte:fragment slot="amount-sub">
+              Splits {getSplitPercent(item.weight, 'pretty')} of funds
+            </svelte:fragment>
+          </SupportItem>
+        {/if}
+        {#if item.__typename === 'EcosystemSupport'}
+          <SupportItem
+            href="/app/ecosystems/{item.ecosystemMainAccount.account.accountId}"
+            title={{
+              component: EcosystemBadge,
+              props: {
+                isLinked: false,
+                avatarSize: 'tiny',
+                ecosystem: item.ecosystemMainAccount,
               },
             }}
             subtitle={formatDate(item.date)}

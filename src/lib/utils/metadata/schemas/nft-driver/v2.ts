@@ -17,7 +17,7 @@ const repoDriverSplitReceiverSchema = z.object({
 /**
  * A splits entry that splits directly to a different Drip List.
  */
-const dripListSplitReceiverSchema = z.object({
+export const dripListSplitReceiverSchema = z.object({
   type: z.literal('dripList'),
   weight: z.number(),
   accountId: z.string(),

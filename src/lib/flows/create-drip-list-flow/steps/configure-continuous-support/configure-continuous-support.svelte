@@ -33,7 +33,9 @@
   </AnnotationBox>
   <SupportStreamEditor
     bind:formValid
+    bind:streamRateValue={$context.continuousSupportConfig.streamRateValue}
     bind:streamRateValueParsed={$context.continuousSupportConfig.streamRateValueParsed}
+    bind:topUpAmountValue={$context.continuousSupportConfig.topUpAmountValue}
     bind:topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed}
     bind:selectedTokenAddress={$context.continuousSupportConfig.listSelected[0]}
   />

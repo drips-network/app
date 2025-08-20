@@ -37,16 +37,17 @@
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
   import { hexlify, toUtf8Bytes } from 'ethers';
+  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  $: projectAccountId = $context.project?.account.accountId ?? unreachable();
+  $: projectSource = $context.project?.source ?? unreachable();
 
   async function checkProjectInExpectedStateForClaiming() {
     const checkProjectVerificationStatusQuery = gql`
-      query CheckProjectVerificationStatus($projectId: ID!, $chains: [SupportedChain!]) {
-        projectById(id: $projectId, chains: $chains) {
+      query CheckProjectVerificationStatus($projectUrl: String!, $chains: [SupportedChain!]) {
+        projectByUrl(url: $projectUrl, chains: $chains) {
           chainData {
             ... on UnClaimedProjectData {
               chain
@@ -71,16 +72,15 @@
       CheckProjectVerificationStatusQuery,
       CheckProjectVerificationStatusQueryVariables
     >(checkProjectVerificationStatusQuery, {
-      projectId: projectAccountId,
+      projectUrl: projectSource.url,
       chains: [network.gqlName],
     });
 
-    if (!res.projectById?.chainData) return false;
-    const projectChainData = filterCurrentChainData(res.projectById.chainData);
+    if (!res.projectByUrl?.chainData) return false;
+    const projectChainData = filterCurrentChainData(res.projectByUrl.chainData);
 
     return (
-      (projectChainData.verificationStatus === 'PendingMetadata' ||
-        projectChainData.verificationStatus === 'OwnerUpdated') &&
+      projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata &&
       projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }
@@ -106,7 +106,7 @@
               return true;
             case 'Cancelled':
               throw new Error(
-                'Failed to gaslessly update the repository owner on-chain. Please reach out to us on Discord.',
+                'Failed to gaslessly update the repository owner on-chain. There may be a temporary issue with our Transaction Relay provider. Please try again later.',
               );
             default:
               return false;
@@ -118,7 +118,7 @@
 
       if (gaslessOwnerUpdateExpectation.failed) {
         throw new Error(
-          "The gasless owner update transaction didn't resolve in the expected timeframe.",
+          "The gasless owner update transaction didn't resolve in the expected timeframe. There may be an issue with our Transaction Relay provider. Please try again later, or disable gasless transactions in the Drips application settings.",
         );
       }
     }
@@ -134,7 +134,9 @@
     );
 
     if (ownerIndexedExpectation.failed) {
-      throw new Error('The new owner was not indexed in the expected timeframe.');
+      throw new Error(
+        'The new owner was not indexed in the expected timeframe. There may be a temporary issue with our oracle provider. Please try again later.',
+      );
     }
   }
 

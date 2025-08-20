@@ -12,12 +12,13 @@
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
+  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { LayoutData } from './$types';
+  import network from '$lib/stores/wallet/network';
   import Settings from '$lib/components/icons/Settings.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import network from '$lib/stores/wallet/network';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let data: LayoutData;
@@ -58,6 +59,14 @@
               href: '/app/rpgf',
               icon: ArrowCounterClockwiseHeart,
               description: 'Run or participate in a RetroPGF round.',
+            }
+          : undefined,
+        network.ecosystems
+          ? {
+              label: 'Ecosystems',
+              href: '/app/ecosystems',
+              icon: EcosystemIcon,
+              description: 'Fund huge numbers of projects in one place',
             }
           : undefined,
         {
