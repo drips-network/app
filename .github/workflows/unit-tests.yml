@@ -27,7 +27,7 @@ jobs:
 
       - name: Build GQL types
         # TODO: revert
-        run: GQL_URL=https://graphql-api-app-pr-1495.up.railway.app/ GQL_ACCESS_TOKEN=123 npm run gql:build  # public access token
+        run: GQL_URL=https://graphql-api-app-pr-${{ github.event.pull_request.number }}.up.railway.app/ GQL_ACCESS_TOKEN=123 npm run gql:build  # public access token
 
       - name: Svelte Kit Sync
         run: npx svelte-kit sync
