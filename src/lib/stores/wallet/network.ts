@@ -520,7 +520,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://mainnet.optimism.io'],
     },
     enableEns: true,
-    ecosystems: true,
+    ecosystems: false,
   },
 };
 
