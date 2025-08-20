@@ -24,9 +24,6 @@ export class RpgfRound {
   async logIn(connectedSession = this.connectedSession) {
     const page = connectedSession.page;
 
-    await connectedSession.goto();
-    await connectedSession.connect();
-
     await this.gotoRpgfPage(page);
 
     await page.getByRole('button', { name: 'Sign in' }).click();
@@ -250,7 +247,26 @@ export class RpgfRound {
     await page.getByRole('link', { name: this.name }).click();
 
     // click on apply CTA
-    await page.getByRole('button', { name: 'Apply' }).click();
+    await page.getByRole('link', { name: 'Apply now' }).click();
+
+    // select the project
+    const accountId = await withProject.populateAccountId();
+    await page.getByTestId(`item-${accountId}`).click();
+
+    // Fill the default application form
+    await page.getByRole('textbox', { name: 'Please consicely describe' }).fill('Test description');
+    await page
+      .getByRole('textbox', { name: 'Please enter your name. Legal' })
+      .fill('Test Testerson');
+    await page.getByRole('textbox', { name: 'Please enter your email' }).fill('test@test.com');
+    await page
+      .getByRole('textbox', { name: 'Please enter the URL to your' })
+      .fill('https://test.com');
+
+    await page.getByRole('button', { name: 'Submit application' }).click();
+    await page.getByRole('button', { name: 'Submit application' }).nth(0).click();
+
+    await page.getByRole('link', { name: 'View your application' }).click();
   }
 
   async forceRoundIntoState(desiredState: RoundState) {

@@ -8,6 +8,7 @@ const test = base
     connectedSession: async ({ page }, use) => {
       const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
       await connectedSession.goto();
+      await connectedSession.connect();
 
       await use(connectedSession);
     },
@@ -16,6 +17,7 @@ const test = base
       const page = await context.newPage();
       const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[1]);
       await connectedSession2.goto();
+      await connectedSession2.connect();
 
       await use(connectedSession2);
     },
@@ -33,7 +35,14 @@ const test = base
         connectedSession2,
         'https://github.com/efstajas/drips-test-repo-12',
       );
-      await project.claim();
+
+      const isClaimed = await project.checkIfClaimed();
+
+      if (isClaimed) {
+        await project.goto();
+      } else {
+        await project.claim();
+      }
 
       await use(project);
     },
@@ -87,7 +96,7 @@ test.describe('rounds', () => {
     }
 
     if (rpgfRound.published) {
-      await rpgfRound.deleteRound();
+      // await rpgfRound.deleteRound();
     } else {
       await rpgfRound.deleteDraft();
     }
@@ -110,6 +119,7 @@ test.describe('rounds', () => {
   });
 
   test('applying to a round', async ({ rpgfRound, project }) => {
+    await rpgfRound.deleteRound();
     await rpgfRound.logIn();
 
     const roundName = 'applying test';
@@ -125,7 +135,8 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
 
     await rpgfRound.forceRoundIntoState('intake');
-    await rpgfRound.logOut();
+    await rpgfRound.gotoRpgfPage();
+    await rpgfRound.navigateToRoundOrDraft();
 
     await rpgfRound.applyToRound({
       withProject: project,

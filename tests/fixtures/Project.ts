@@ -6,6 +6,8 @@ import type { ConnectedSession } from './ConnectedSession';
 export class Project {
   public readonly page: Page;
   public readonly ownerAddress: string;
+  public claimed: boolean = false;
+  public accountId: string | null = null;
 
   constructor(
     public readonly connectedSession: ConnectedSession,
@@ -29,7 +31,57 @@ export class Project {
 
     const repoUserAndName = this.repoUrl.split('/').slice(-2).join('/');
 
-    await this.page.getByRole('link', { name: repoUserAndName }).press('Enter');
+    await this.page
+      .getByTestId('search-results')
+      .getByRole('link', { name: repoUserAndName })
+      .press('Enter');
+
+    // await navigation
+    await this.page.waitForURL(
+      `http://localhost:5173/app/projects/github/${repoUserAndName}?exact`,
+    );
+  }
+
+  async checkIfClaimed() {
+    await this.goto();
+
+    // wait for the repo name to appear, which is the indicator that the project page has loaded
+    const repoName = this.repoUrl.split('/').slice(-2).join('/');
+    await expect(this.page.getByText(repoName).nth(0)).toBeVisible();
+
+    // check if claim project button is visible
+    const claimButton = this.page.getByRole('button', { name: 'Claim project' });
+    const count = await claimButton.count();
+
+    this.claimed = count === 0;
+
+    return this.claimed;
+  }
+
+  async populateAccountId() {
+    const gqlClient = new GraphQLClient('http://localhost:8080', {
+      headers: {
+        Authorization: `Bearer 123`,
+      },
+    });
+
+    const accountIdResult = await gqlClient.request(`
+      query GetAccountId {
+        projectByUrl(url: "${this.repoUrl}", chains: [LOCALTESTNET]) {
+          account {
+            accountId
+          }
+        }
+      }`);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.accountId = (accountIdResult as any).projectByUrl.account.accountId;
+
+    if (!this.accountId) {
+      throw new Error(`Account ID not found for project ${this.repoUrl}`);
+    }
+
+    return this.accountId;
   }
 
   async claim() {
@@ -55,23 +107,7 @@ export class Project {
       timeout: 60_000,
     });
 
-    const gqlClient = new GraphQLClient('http://localhost:8080', {
-      headers: {
-        Authorization: `Bearer 123`,
-      },
-    });
-
-    const accountIdResult = await gqlClient.request(`
-      query GetAccountId {
-        projectByUrl(url: "${this.repoUrl}", chains: [LOCALTESTNET]) {
-          account {
-            accountId
-          }
-        }
-      }`);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const accountId = (accountIdResult as any).projectByUrl.account.accountId;
+    const accountId = await this.populateAccountId();
 
     // trigger the fake oracle
     await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${this.ownerAddress}`;

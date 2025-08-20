@@ -153,6 +153,7 @@
         in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
         out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
         class="results"
+        data-testid="search-results"
       >
         <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
       </div>
