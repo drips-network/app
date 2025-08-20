@@ -28,6 +28,7 @@ import {
 import { z } from 'zod';
 import network from '$lib/stores/wallet/network';
 import { error } from '@sveltejs/kit';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -77,7 +78,7 @@ export async function authenticatedRpgfServerCall(
   f = fetch,
   attemptRefresh: boolean = true,
 ) {
-  const accessToken = get(rpgfAccessJwtStore);
+  const accessToken = get(walletStore).connected ? get(rpgfAccessJwtStore) : null;
 
   const res = await rpgfServerCall(
     path,
