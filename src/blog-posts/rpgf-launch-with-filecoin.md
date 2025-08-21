@@ -23,11 +23,11 @@ This collaboration fits our shared belief that **funding is a catalyst, not just
 This launch reflects what we’ve been building toward: a **comprehensive toolkit** that simplifies the complexities of RPGF rounds so you can focus on what truly matters \- **identifying and rewarding valuable contributions**.
 
 - **Full round management**: Applications → review → voting → payouts all in one place
-- **Direct repo payouts**: distribute funds straight to **GitHub repositories**; no address collection needed
-- **Customizable applications**: flexible forms with support for **private admin fields**
-- **On-chain attestations**: applications and rewards attested on-chain for maximum transparency
-- **Great UX**: clear, focused flows for applicants and badgeholders
-- **Amplify the impact**: winners can immediately choose to forward a percentage to other projects they depend on with built-in Dependency Funding
+- **Direct repo payouts**: Distribute funds straight to **GitHub repositories**; no address collection needed
+- **Customizable applications**: Flexible forms with support for **private admin fields**
+- **On-chain attestations**: Applications and rewards attested on-chain for maximum transparency
+- **Great UX**: Clear, focused flows for applicants and badgeholders
+- **Amplify the impact**: Winners can choose to automatically forward a percentage to other projects they depend on with built-in Dependency Funding
 
 ![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-home.png)
 
