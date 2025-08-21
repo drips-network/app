@@ -10,6 +10,8 @@ announcementBannerCopy: 'Launching RetroPGF on Drips with Filecoin'
 
 It’s here\! Your solution for **end-to-end RetroPGF on Drips**. It’s never been easier to run impact-based funding rounds: publish a round, collect and review applications, run badgeholder voting, export results, and **pay winners directly to GitHub repositories** all in one place.
 
+![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-home.png)
+
 ## **Kicking things off with Filecoin**
 
 We’re thrilled to announce that **Filecoin** will be the first team to run a RetroPGF round on Drips. Their upcoming **FIL RetroPGF Round 3** is a landmark moment \- **585,000 FIL (over $1M)** \- will be distributed to the most impactful applicants, with a clear focus on credible processes, real users, and measurable, on-chain impact.
