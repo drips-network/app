@@ -42,7 +42,7 @@
 
   $: elevated = $scroll.pos > 16;
 
-  export let showLoadingIndicator = true;
+  export let showLoadingIndicator = false;
 
   let searchMode = false;
 
@@ -59,15 +59,15 @@
       <div class="logo flex items-center pb-px">
         <DripsLogo />
       </div>
-      {#if showLoadingIndicator}
-        <div
-          in:fly|global={{ duration: 300, y: -16 }}
-          out:fly|global={{ duration: 300, y: 16 }}
-          class="loading-indicator"
-        >
-          <Spinner />
-        </div>
-      {/if}
+
+      <div
+        in:fly|global={{ duration: 300, y: -16 }}
+        out:fly|global={{ duration: 300, y: 16 }}
+        class="loading-indicator"
+        class:loading={showLoadingIndicator}
+      >
+        <Spinner />
+      </div>
     </a>
   {/if}
   {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
@@ -165,6 +165,17 @@
     padding: 1rem 1.5rem;
     gap: 0.5rem;
     view-transition-name: header;
+  }
+
+  .loading-indicator {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .loading-indicator.loading {
+    visibility: visible;
+    opacity: 1;
   }
 
   .logo {
