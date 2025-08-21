@@ -1,7 +1,7 @@
 import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fetchOrcid, fetchOrcidChainData, orcidIdToAccountId } from './components/fetch-orcid';
+import { fetchOrcid, fetchOrcidChainData } from './components/fetch-orcid';
 
 export const load = (async ({ params, fetch }) => {
   // TODO: allow fetching of account id or orcid!
@@ -17,8 +17,14 @@ export const load = (async ({ params, fetch }) => {
     return error(404);
   }
 
-  const accountId = await orcidIdToAccountId(params.orcidId);
-  const orcidChainData = await fetchOrcidChainData(String(accountId), fetch);
+  // TODO: I think there's a problem here, I thought we were supposed to fetch the orcid
+  // by accountId... We will probably want to support urls that include accountid as well.
+  // const accountId = await orcidIdToAccountId(params.orcidId);
+  let orcidChainData = undefined;
+  const orcidGqlResponse = await fetchOrcidChainData(params.orcidId, fetch);
+  if (orcidGqlResponse.orcidAccountById) {
+    orcidChainData = orcidGqlResponse.orcidAccountById;
+  }
 
   return {
     orcid,
