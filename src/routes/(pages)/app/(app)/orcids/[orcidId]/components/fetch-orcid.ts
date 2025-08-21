@@ -10,6 +10,7 @@ import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-dri
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { PUBLIC_ORCID_API_URL } from '$env/static/public';
+import { OrcidApiResponseSchema } from '$lib/utils/orcids/schemas';
 
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
@@ -32,9 +33,10 @@ export async function fetchOrcid(orcidId: string, fetch: typeof global.fetch) {
     return null;
   }
 
-  // TODO: parse valid response
+  const responseJson = await orcidResponse.json();
+  const orcid = OrcidApiResponseSchema.parse(responseJson);
 
-  return orcidResponse.json();
+  return orcid;
 }
 
 const getOrcidQuery = gql`
