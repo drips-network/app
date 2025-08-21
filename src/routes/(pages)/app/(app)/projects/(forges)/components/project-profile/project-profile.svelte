@@ -258,7 +258,7 @@
   let splitsSectionSkeleton: SectionSkeleton | undefined;
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
-  const imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+  $: imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
 
   $: origin = browser ? window.location.origin : '';
   $: supportButtonStepConfig = {
