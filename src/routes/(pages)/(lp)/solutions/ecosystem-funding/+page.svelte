@@ -1,4 +1,5 @@
 <script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import User from '$lib/components/icons/User.svelte';
@@ -9,6 +10,11 @@
   import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
 </script>
+
+<HeadMeta
+  title="Ecosystem funding"
+  description="Drips is the simplest way to fund your ecosystem. Distribute funding across your ecosystem, reward contributors, and power continuous funding flows."
+/>
 
 <SolutionHeader>
   <svelte:fragment slot="usecase-badge">Ecosystem funding</svelte:fragment>

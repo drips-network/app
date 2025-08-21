@@ -1,5 +1,6 @@
 <script>
   import CodeBox from '$lib/components/code-box/code-box.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import File from '$lib/components/icons/File.svelte';
   import Splits from '$lib/components/icons/Splits.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
@@ -13,6 +14,11 @@
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
   import LpContactCard from '../../components/lp-contact-card.svelte';
 </script>
+
+<HeadMeta
+  title="Programmable cashflow"
+  description="Drips is the simplest way to achieve complex funding flows. Stream and split any ERC-20, to anyone and anything."
+/>
 
 <SolutionHeader>
   <svelte:fragment slot="usecase-badge">Programmable cashflow</svelte:fragment>

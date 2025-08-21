@@ -1,4 +1,5 @@
 <script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import Github from '$lib/components/icons/Github.svelte';
   import GnosisSafe from '$lib/components/icons/GnosisSafe.svelte';
@@ -11,6 +12,11 @@
   import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
 </script>
+
+<HeadMeta
+  title="Hackathons"
+  description="Drips is the simplest way to run hackathons, from voting on winners to distributing prizes. Simplify your hackathon logistics and reward contributions transparently."
+/>
 
 <SolutionHeader>
   <svelte:fragment slot="usecase-badge">Hackathons</svelte:fragment>
