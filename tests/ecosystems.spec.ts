@@ -1,7 +1,21 @@
-import { test, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import createEcosystemPayload from './create-ecosystem-payload.json' with { type: 'json' };
+import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 
-test('ecosystems donation flow', async ({ page, request }) => {
+const test = base.extend<{
+  connectedSession: ConnectedSession;
+}>({
+  connectedSession: async ({ page }, use) => {
+    const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
+    await connectedSession.goto();
+    await connectedSession.connect();
+
+    await use(connectedSession);
+  },
+});
+
+test('ecosystems donation flow', async ({ connectedSession, request }) => {
+  const { page } = connectedSession;
   test.setTimeout(240_000);
 
   // create the ecosystem
@@ -20,11 +34,6 @@ test('ecosystems donation flow', async ({ page, request }) => {
   );
   expect(ecosystemDeployedResponse.ok()).toBeTruthy();
 
-  page.emulateMedia({ reducedMotion: 'reduce' });
-
-  // navigate to ecosystems and check that the created ecosystem is displayed
-  await page.goto('http://localhost:5173/app');
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByTestId('sidenav-item-Ecosystems').click();
   await expect(page.getByRole('heading', { name: 'Ecosystems' })).toBeVisible();
 

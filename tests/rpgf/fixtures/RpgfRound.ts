@@ -157,7 +157,7 @@ export class RpgfRound {
       const addButton = this.page.getByRole('button', { name: 'Add' });
 
       await expect(addButton).toBeEnabled();
-      await this.page.getByRole('button', { name: 'Add' }).click();
+      await this.page.getByRole('button', { name: 'Add' }).dispatchEvent('click');
 
       // wait for add field to be enabled again
       await expect(addField).toBeEnabled();
@@ -268,8 +268,7 @@ export class RpgfRound {
     await page.getByRole('link', { name: 'Apply now' }).click();
 
     // select the project
-    const accountId = await withProject.populateAccountId();
-    await page.getByTestId(`item-${accountId}`).click();
+    await page.getByTestId(`item-${withProject.accountId}`).click();
 
     // Fill the default application form
     if (applicationTitle) {

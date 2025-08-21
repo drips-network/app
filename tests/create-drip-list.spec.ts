@@ -78,8 +78,6 @@ test('create a drip list', async ({ page, connectedSession }) => {
 test('create collaborative drip list', async ({ page }) => {
   test.setTimeout(240_000);
 
-  page.emulateMedia({ reducedMotion: 'reduce' });
-
   await page.goto('http://localhost:5173/app');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByTestId('sidenav-item-Drip Lists').click();

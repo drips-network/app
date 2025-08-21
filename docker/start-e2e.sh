@@ -43,6 +43,7 @@ else
   docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 fi
 
+rm -rf ./test-data/project-states.json
 
 printf "⏳ Waiting for the app to start..."
 

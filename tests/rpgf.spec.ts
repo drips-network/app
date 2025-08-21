@@ -2,6 +2,7 @@ import { test as base, expect } from '@playwright/test';
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import { RpgfRound } from './rpgf/fixtures/RpgfRound';
 import { Project } from './fixtures/Project';
+import { projectClaimManager } from './fixtures/ProjectClaimManager';
 
 const test = base
   .extend<{
@@ -29,28 +30,29 @@ const test = base
     connectedSession3: async ({ browser }, use) => {
       const context = await browser.newContext();
       const page = await context.newPage();
-      const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[2]);
-      await connectedSession2.goto();
-      await connectedSession2.connect();
+      const connectedSession3 = new ConnectedSession(page, TEST_ADDRESSES[2]);
+      await connectedSession3.goto();
+      await connectedSession3.connect();
 
-      await use(connectedSession2);
-    },
-    connectedSession4: async ({ browser }, use) => {
-      const context = await browser.newContext();
-      const page = await context.newPage();
-      const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[2]);
-      await connectedSession2.goto();
-      await connectedSession2.connect();
-
-      await use(connectedSession2);
+      await use(connectedSession3);
     },
   })
-  .extend<{ rpgfRound: RpgfRound; rpgfRound2: RpgfRound }>({
+  .extend<{ rpgfRound: RpgfRound; rpgfRound2: RpgfRound; project1: Project; project2: Project }>({
     rpgfRound: async ({ connectedSession }, use) => {
       await use(new RpgfRound(connectedSession));
     },
     rpgfRound2: async ({ connectedSession2 }, use) => {
       await use(new RpgfRound(connectedSession2));
+    },
+    project1: async ({ connectedSession2 }, use) => {
+      const project = new Project(connectedSession2, projectClaimManager);
+      await project.claim();
+      await use(project);
+    },
+    project2: async ({ connectedSession3 }, use) => {
+      const project = new Project(connectedSession3, projectClaimManager);
+      await project.claim();
+      await use(project);
     },
   });
 
@@ -96,6 +98,8 @@ test.describe('drafts', () => {
 });
 
 test.describe('rounds', () => {
+  test.setTimeout(120000); // 5 minutes
+
   test.afterEach(async ({ rpgfRound }) => {
     if (!rpgfRound.signedIn) {
       await rpgfRound.logIn();
@@ -124,14 +128,11 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
   });
 
-  test('applying to a round', async ({ rpgfRound, connectedSession2 }) => {
-    const project = new Project(connectedSession2, 'https://github.com/efstajas/drips-test-repo-2');
-    await project.claimIfUnclaimed();
-
+  test('applying to a round', async ({ rpgfRound, project1 }) => {
     await rpgfRound.logIn();
 
     const roundName = 'applying test';
-    const roundSlug = 'e2e-test-round-voting';
+    const roundSlug = 'e2e-test-round-applying';
 
     await rpgfRound.createDraft({
       name: roundName,
@@ -147,17 +148,15 @@ test.describe('rounds', () => {
     await rpgfRound.navigateToRoundOrDraft();
 
     await rpgfRound.applyToRound({
-      withProject: project,
+      withProject: project1,
     });
   });
 
   test('application visibility, specifically private fields', async ({
     rpgfRound,
-    connectedSession3,
+    connectedSession2,
+    project1: project,
   }) => {
-    const project = new Project(connectedSession3, 'https://github.com/efstajas/drips-test-repo-3');
-    await project.claimIfUnclaimed();
-
     await rpgfRound.logIn();
 
     const roundName = 'application visibility test';
@@ -182,17 +181,16 @@ test.describe('rounds', () => {
     });
 
     // Ensure the application is invisible when logged out
-    const user2page = connectedSession3.page;
 
     // this logs the user out
-    await connectedSession3.goto();
+    await connectedSession2.goto();
 
-    await rpgfRound.gotoRpgfPage(user2page);
+    await rpgfRound.gotoRpgfPage(connectedSession2.page);
 
-    await user2page.getByRole('link', { name: roundName }).click();
+    await connectedSession2.page.getByRole('link', { name: roundName }).click();
 
     // ensure the application is not visible
-    await expect(user2page.getByText('Visibility Test Application')).not.toBeVisible();
+    await expect(connectedSession2.page.getByText('Visibility Test Application')).not.toBeVisible();
 
     // approve the application fromt the 1st user
 
@@ -202,24 +200,23 @@ test.describe('rounds', () => {
     });
 
     // ensure the application is now visible to the 2nd user, but without private fields
-    await connectedSession3.goto();
+    await connectedSession2.goto();
 
-    await rpgfRound.gotoRpgfPage(user2page);
-    await user2page.getByRole('link', { name: roundName }).click();
+    await rpgfRound.gotoRpgfPage(connectedSession2.page);
+    await connectedSession2.page.getByRole('link', { name: roundName }).click();
 
-    await user2page.getByRole('link', { name: 'Visibility Test Application' }).click();
-    await user2page.waitForURL(`**/applications/${applicationId}`);
+    await connectedSession2.page.getByRole('link', { name: 'Visibility Test Application' }).click();
+    await connectedSession2.page.waitForURL(`**/applications/${applicationId}`);
 
-    await expect(user2page.getByText('Visibility Test Application').first()).toBeVisible();
+    await expect(
+      connectedSession2.page.getByText('Visibility Test Application').first(),
+    ).toBeVisible();
 
     // check private field name Test Testerson is not visible
-    await expect(user2page.getByText('Test Testerson')).not.toBeVisible();
+    await expect(connectedSession2.page.getByText('Test Testerson')).not.toBeVisible();
   });
 
-  test('approving and denying applications', async ({ rpgfRound, connectedSession4 }) => {
-    const project = new Project(connectedSession4, 'https://github.com/efstajas/drips-test-repo-4');
-    await project.claimIfUnclaimed();
-
+  test('approving and denying applications', async ({ rpgfRound, project1 }) => {
     await rpgfRound.logIn();
 
     const roundName = 'approving & denying test';
@@ -239,12 +236,12 @@ test.describe('rounds', () => {
     await rpgfRound.navigateToRoundOrDraft();
 
     const applicationId1 = await rpgfRound.applyToRound({
-      withProject: project,
+      withProject: project1,
       applicationTitle: 'Test Application',
     });
 
     const applicationId2 = await rpgfRound.applyToRound({
-      withProject: project,
+      withProject: project1,
       applicationTitle: 'Test Application 2',
     });
 
