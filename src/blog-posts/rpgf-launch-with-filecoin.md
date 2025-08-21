@@ -3,7 +3,7 @@ title: 'Launching RetroPGF on Drips with Filecoin'
 date: '2025-08-25'
 coverImage: '/assets/blog-images/rpgf/rpgf-cover.png'
 coverImageAlt: 'An abstract illustration of the RetroPGF public goods funding mechanism.'
-excerpt: ¨Our new end-to-end tooling RetroPGF solution is going live with Filecoin's largest round to date."
+excerpt: Our new end-to-end tooling RetroPGF solution is going live with Filecoin's largest round to date.
 author: 'becca'
 announcementBannerCopy: 'Launching RetroPGF on Drips with Filecoin'
 ---
