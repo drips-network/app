@@ -11,6 +11,7 @@ import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { PUBLIC_ORCID_API_URL } from '$env/static/public';
 import { OrcidApiResponseSchema } from '$lib/utils/orcids/schemas';
+import Orcid from '$lib/utils/orcids/entities';
 
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
@@ -36,7 +37,7 @@ export async function fetchOrcid(orcidId: string, fetch: typeof global.fetch) {
   const responseJson = await orcidResponse.json();
   const orcid = OrcidApiResponseSchema.parse(responseJson);
 
-  return orcid;
+  return new Orcid(orcid);
 }
 
 const getOrcidQuery = gql`
@@ -48,7 +49,7 @@ const getOrcidQuery = gql`
   }
 `;
 
-export async function fetchOrcidChainData(accountId: string, fetch: typeof global.fetch) {
+export async function fetchOrcidAccount(accountId: string, fetch: typeof global.fetch) {
   return query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
     getOrcidQuery,
     {

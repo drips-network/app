@@ -48,6 +48,25 @@
       }
     }
   `;
+
+  export const SUPPORT_CARD_ORCID_FRAGEMENT = gql`
+    fragment SupportCardOrcid on OrcidAccount {
+      source {
+        url
+      }
+      account {
+        accountId
+        driver
+      }
+      chainData {
+        ... on ClaimedOrcidAccountData {
+          linkedTo {
+            accountId
+          }
+        }
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -76,6 +95,7 @@
     SupportCardDripListFragment,
     SupportCardProjectFragment,
     SupportCardEcosystemFragment,
+    SupportCardOrcidFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps, {
@@ -89,19 +109,22 @@
   import awaitStoreValue from '$lib/utils/await-store-value';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import getLastPathSegment from '$lib/utils/get-last-path-segment';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
   export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
+  export let orcid: SupportCardOrcidFragment | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList && !ecosystem) disabled = true;
+    if (!project && !dripList && !ecosystem && !orcid) disabled = true;
   }
 
-  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+  let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' = 'dripList';
 
   $: {
     switch (true) {
@@ -110,6 +133,9 @@
         break;
       case !!ecosystem:
         type = 'ecosystem';
+        break;
+      case !!orcid:
+        type = 'orcid';
         break;
       default:
         type = 'dripList';
@@ -130,6 +156,11 @@
       case !!ecosystem:
         supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
+      case !!orcid: {
+        const orcidId = getLastPathSegment(orcid?.source.url ?? '')
+        supportUrl = `${BASE_URL}${orcidId ? buildOrcidUrl(orcidId) : ''}`;
+        break;
+      }
       default:
         supportUrl = '/';
     }
@@ -199,6 +230,10 @@
         hasAccountId = !!ecosystem.account.accountId;
         donationFlowStepsInput = ecosystem;
         break;
+      case !!orcid:
+        hasAccountId = !!orcid.account.accountId;
+        donationFlowStepsInput = orcid;
+        break;
     }
 
     return (
@@ -229,6 +264,9 @@
         break;
       case !!ecosystem:
         donationFlowStepsInput = ecosystem;
+        break;
+      case !!orcid:
+        donationFlowStepsInput = orcid;
         break;
       default:
         unreachable();
