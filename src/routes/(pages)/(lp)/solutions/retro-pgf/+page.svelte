@@ -171,7 +171,7 @@
     <ul>
       <li class="typo-text">Automatically generate Drip Lists based on round results</li>
       <li class="typo-text">
-        Pay out funds directly to GitHub repositories - no ETH address needed
+        Send rewards directly to GitHub repositories - no ETH address needed
       </li>
       <li class="typo-text">Built-in dependency splitting amplifies the impact of your round</li>
     </ul>
