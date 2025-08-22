@@ -8,8 +8,6 @@ author: 'becca'
 announcementBannerCopy: Launching RetroPGF on Drips with Filecoin
 ---
 
-# Launching RetroPGF on Drips with Filecoin
-
 It’s here\! Your solution for **end-to-end RetroPGF on Drips**. It’s never been easier to run impact-based funding rounds: publish a round, collect and review applications, run badgeholder voting, export results, and **reward winners directly to GitHub repositories** all in one place.
 
 ## Kicking things off with Filecoin
