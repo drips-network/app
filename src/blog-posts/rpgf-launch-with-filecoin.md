@@ -37,6 +37,6 @@ Altogether this streamlines round management and maximizes the positive impact o
 
 Filecoin’s Round 3 sets a high bar for impact-based funding and we’re proud it’s happening on Drips.
 
-Ready to run your next RPGF round? [**Get in touch\!**](https://discord.com/channels/@me/1070670773884309575/1408426949470195904) We’re looking forward to helping more teams ship rounds soon. There’s also more info [here](https://www.drips.network/solutions/retro-pgf) on the benefits of our comprehensive solution.
+Ready to run your next RPGF round? [**Get in touch\!**](https://drips-network.notion.site/1e4c52c9599781b5a0aeca3e8eb1b3e4) We’re looking forward to helping more teams ship rounds soon. There’s also more info [here](https://www.drips.network/solutions/retro-pgf) on the benefits of our comprehensive solution.
 
 For updates as Round 3 goes live, follow [@FILRetroPGF](https://x.com/FILRetroPGF) or join their [Telegram group](https://t.me/+haan_QdnllYyZmE1). You can always catch the latest from us on [Bluesky](https://bsky.app/profile/drips.network) & [X](https://x.com/dripsnetwork).
