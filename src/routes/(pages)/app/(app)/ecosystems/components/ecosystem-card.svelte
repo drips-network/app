@@ -31,7 +31,11 @@
   $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
 </script>
 
-<a class="ecosystem-card-wrapper" href={`/app/ecosystems/${ecosystem.id}`}>
+<a
+  data-testid="ecosystem-card-{ecosystem.id}"
+  class="ecosystem-card-wrapper"
+  href={`/app/ecosystems/${ecosystem.id}`}
+>
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background" />
     {#if $$slots.banner}

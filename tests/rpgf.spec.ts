@@ -3,6 +3,7 @@ import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import { RpgfRound } from './rpgf/fixtures/RpgfRound';
 import { Project } from './fixtures/Project';
 import { projectClaimManager } from './fixtures/ProjectClaimManager';
+import workerUniqueString from './utils/worker-unique-string';
 
 const test = base
   .extend<{
@@ -57,28 +58,30 @@ const test = base
   });
 
 test.describe('drafts', () => {
+  test.setTimeout(120000); // 5 minutes
+
   test.afterEach(async ({ rpgfRound }) => {
     await rpgfRound.deleteDraft();
   });
 
-  test('draft creation and deletion', async ({ rpgfRound }) => {
+  test('draft creation and deletion', async ({ rpgfRound }, testInfo) => {
     await rpgfRound.logIn();
 
     await rpgfRound.createDraft({
-      name: 'draft creation',
-      urlSlug: 'e2e-test-round',
+      name: workerUniqueString(testInfo, 'draft creation'),
+      urlSlug: workerUniqueString(testInfo, 'e2e-test-round'),
       emoji: '🍝',
     });
   });
 
-  test('draft is invisible to other users', async ({ rpgfRound, rpgfRound2 }) => {
+  test('draft is invisible to other users', async ({ rpgfRound, rpgfRound2 }, testInfo) => {
     await rpgfRound.logIn();
 
-    const DRAFT_NAME = 'draft visibility';
+    const DRAFT_NAME = workerUniqueString(testInfo, 'draft visibility');
 
     const draftId = await rpgfRound.createDraft({
       name: DRAFT_NAME,
-      urlSlug: 'draft-visibility-test',
+      urlSlug: workerUniqueString(testInfo, 'draft-visibility-test'),
     });
 
     // ensure another user doesn't see the draft
@@ -112,11 +115,11 @@ test.describe('rounds', () => {
     }
   });
 
-  test('round publishing', async ({ rpgfRound }) => {
+  test('round publishing', async ({ rpgfRound }, testInfo) => {
     await rpgfRound.logIn();
 
-    const roundName = 'publish test';
-    const roundSlug = 'e2e-test-round-publish';
+    const roundName = workerUniqueString(testInfo, 'publish test');
+    const roundSlug = workerUniqueString(testInfo, 'e2e-test-round-publish');
 
     await rpgfRound.createDraft({
       name: roundName,
@@ -128,11 +131,11 @@ test.describe('rounds', () => {
     await rpgfRound.publishRound();
   });
 
-  test('applying to a round', async ({ rpgfRound, project1 }) => {
+  test('applying to a round', async ({ rpgfRound, project1 }, testInfo) => {
     await rpgfRound.logIn();
 
-    const roundName = 'applying test';
-    const roundSlug = 'e2e-test-round-applying';
+    const roundName = workerUniqueString(testInfo, 'applying test');
+    const roundSlug = workerUniqueString(testInfo, 'e2e-test-round-applying');
 
     await rpgfRound.createDraft({
       name: roundName,
@@ -156,11 +159,11 @@ test.describe('rounds', () => {
     rpgfRound,
     connectedSession2,
     project1: project,
-  }) => {
+  }, testInfo) => {
     await rpgfRound.logIn();
 
-    const roundName = 'application visibility test';
-    const roundSlug = 'e2e-test-round-application-visibility';
+    const roundName = workerUniqueString(testInfo, 'application visibility test');
+    const roundSlug = workerUniqueString(testInfo, 'e2e-test-round-application-visibility');
 
     await rpgfRound.createDraft({
       name: roundName,
@@ -216,11 +219,11 @@ test.describe('rounds', () => {
     await expect(connectedSession2.page.getByText('Test Testerson')).not.toBeVisible();
   });
 
-  test('approving and denying applications', async ({ rpgfRound, project1 }) => {
+  test('approving and denying applications', async ({ rpgfRound, project1 }, testInfo) => {
     await rpgfRound.logIn();
 
-    const roundName = 'approving & denying test';
-    const roundSlug = 'e2e-test-round-approving-denying';
+    const roundName = workerUniqueString(testInfo, 'approving & denying test');
+    const roundSlug = workerUniqueString(testInfo, 'e2e-test-round-approving-denying');
 
     await rpgfRound.createDraft({
       name: roundName,
