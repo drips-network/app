@@ -17,72 +17,67 @@
   import network from '$lib/stores/wallet/network';
   import Settings from '$lib/components/icons/Settings.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
+  import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let data: LayoutData;
 
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  // $: navItems = [
-  //   { label: 'Explore', href: '/app', icon: ExploreIcon },
-  //   { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-  //   { label: 'Projects', href: '/app/projects', icon: Box },
-  //   { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-  //   ...(network.ecosystems
-  //     ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
-  //     : []),
-  //   {
-  //     label: 'Profile',
-  //     href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
-  //     icon: User,
-  //   },
-  // ];
-
-  // bottom nav is mobile only and should not be crowded with profile.
-  // $: bottomNavItems = navItems.slice(0, -1);
   $: navItems = {
-    top: [
-      {
-        label: 'Explore',
-        href: '/app',
-        icon: ExploreIcon,
-        description: 'Discover projects and stats across Drips.',
-      },
-      {
-        label: 'Funds',
-        href: '/app/funds',
-        icon: TokenStreams,
-        description: 'Discover or create fundable lists.',
-      },
-      {
-        label: 'Projects',
-        href: '/app/projects',
-        icon: Box,
-        description: 'Browse or claim a GitHub project.',
-      },
-      {
-        label: 'Drip Lists',
-        href: '/app/drip-lists',
-        icon: DripListIcon,
-        description: 'Discover or create fundable lists.',
-      },
-      ...(network.ecosystems
-        ? [
-            {
+    top: mapFilterUndefined(
+      [
+        {
+          label: 'Explore',
+          href: '/app',
+          icon: ExploreIcon,
+          description: 'Discover projects and stats across Drips.',
+        },
+        {
+          label: 'Funds',
+          href: '/app/funds',
+          icon: TokenStreams,
+          description: 'Discover or create fundable lists.',
+        },
+        {
+          label: 'Projects',
+          href: '/app/projects',
+          icon: Box,
+          description: 'Browse or claim a GitHub project.',
+        },
+        {
+          label: 'Drip Lists',
+          href: '/app/drip-lists',
+          icon: DripListIcon,
+          description: 'Discover or create fundable lists.',
+        },
+        network.retroFunding.enabled
+          ? {
+              label: 'RetroPGF',
+              href: '/app/rpgf',
+              icon: ArrowCounterClockwiseHeart,
+              description: 'Run or participate in a RetroPGF round.',
+            }
+          : undefined,
+        network.ecosystems
+          ? {
               label: 'Ecosystems',
               href: '/app/ecosystems',
               icon: EcosystemIcon,
               description: 'Fund huge numbers of projects in one place',
-            },
-          ]
-        : []),
-      {
-        label: 'Profile',
-        href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
-        description: 'Your stuff on Drips.',
-        icon: User,
-      },
-    ],
+            }
+          : undefined,
+        {
+          label: 'Profile',
+          href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
+          description: 'Your stuff on Drips.',
+          icon: User,
+        },
+      ],
+      (v) => v,
+    ),
     bottom: [
       {
         label: 'Settings',
@@ -111,7 +106,11 @@
   }
 </script>
 
-<div class="main" in:fly|global={{ duration: 300, y: 16 }}>
+<div
+  class="main"
+  class:sidenav-forced-collapsed={$forceCollapsed === true}
+  in:fly|global={{ duration: 300, y: 16 }}
+>
   <div class="page">
     <div class="page-content">
       <div class:loading={$navigating} class="page-content-inner"><slot /></div>

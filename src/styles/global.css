@@ -51,3 +51,27 @@ body {
   transform: scale(0.9);
   transition-duration: 0.1s;
 }
+
+@keyframes default-transition-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes default-transition-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes default-transition-slide-from-bottom {
+  from {
+    transform: translateY(30px);
+  }
+}
+
+@keyframes default-transition-slide-to-top {
+  to {
+    transform: translateY(-30px);
+  }
+}

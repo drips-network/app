@@ -13,7 +13,7 @@
   }
 
   export let disabled = false;
-  export let value: string;
+  export let value: string | undefined;
   export let toggleValue = false;
   export let noBorder = false;
   export let options: Option[];
@@ -21,6 +21,7 @@
   export let toggle: { label: string } | undefined = undefined;
 
   $: selectedOptionIndex = options.findIndex((o) => o.value === value);
+  let selectedOption: Option | undefined;
   $: selectedOption = options[selectedOptionIndex];
 
   let wrapperElem: HTMLDivElement;
@@ -100,21 +101,29 @@
     on:click={disabled ? undefined : handleWrapperClick}
     data-testid="dropdown"
   >
-    {#if selectedOption.iconUrl}<img
-        src={selectedOption.iconUrl}
-        alt="{selectedOption.title} icon"
-      />{/if}
-    <div class="title" data-testid="title-field">
-      {#key selectedOption.title}
-        <span class="value" in:fly={{ y: 10, duration: 200 }} out:fly={{ y: -10, duration: 200 }}>
+    {#if selectedOption}
+      {#if selectedOption.iconUrl}<img
+          src={selectedOption.iconUrl}
+          alt="{selectedOption.title} icon"
+        />{/if}
+      <div class="title" data-testid="title-field">
+        {#key selectedOption.title}
+          <span class="value" in:fly={{ y: 10, duration: 200 }} out:fly={{ y: -10, duration: 200 }}>
+            {selectedOption.title}
+          </span>
+        {/key}
+        <span class="placeholder" aria-hidden="true">
           {selectedOption.title}
         </span>
-      {/key}
-      <span class="placeholder" aria-hidden="true">
-        {selectedOption.title}
-      </span>
+      </div>
+    {:else}
+      <div class="title" data-testid="title-field">
+        <span class="placeholder" aria-hidden="true">Select an option</span>
+      </div>
+    {/if}
+    <div class="chevron" class:expanded>
+      <ChevronDown style="fill: var(--color-foreground-level-4)" />
     </div>
-    <div class="chevron" class:expanded><ChevronDown style="fill: var(--foreground)" /></div>
   </div>
 
   {#if expanded}
@@ -168,7 +177,7 @@
   .dropdown {
     height: 3rem;
     padding: 0.5rem 2.5rem 0.5rem 0.75rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     transition:
       border-radius 0.2s,
@@ -243,7 +252,7 @@
   }
 
   .options {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem;
     position: absolute;
     top: 3.5rem;
@@ -273,7 +282,7 @@
 
   .options > .toggle {
     padding: 0.75rem 0.75rem;
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   .options > .option {

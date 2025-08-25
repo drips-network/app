@@ -17,7 +17,7 @@
     overflow: hidden;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid var(--color-foreground);
+    border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
   h1 {

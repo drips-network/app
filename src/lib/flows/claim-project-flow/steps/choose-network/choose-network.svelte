@@ -85,7 +85,7 @@
   }
 
   .networks .network label {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     padding: 1rem;
     min-height: 8rem;
     display: flex;

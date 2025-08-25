@@ -78,7 +78,7 @@
 <style>
   .segmented-control {
     position: relative;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     padding: 0.25rem;
     border-radius: 2rem 0 2rem 2rem;
     z-index: 0;

@@ -37,6 +37,14 @@ export default [
       'svelte/no-at-html-tags': 'off',
       // Temporary fix for missing support of `generics` attribute in svelte-eslint-parser
       'no-undef': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 ];
