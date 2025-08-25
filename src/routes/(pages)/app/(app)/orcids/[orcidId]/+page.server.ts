@@ -46,7 +46,7 @@ export const load = (async ({ params, fetch }) => {
   }
 
   return {
-    orcid,
+    orcid: orcid.toJSON(),
     orcidAccount,
   };
 }) satisfies PageServerLoad;

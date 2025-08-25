@@ -80,7 +80,6 @@
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
-
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
@@ -145,7 +144,7 @@
     </section>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard orcid={chainData} />
+        <SupportCard orcid={orcidAccount} />
       </div>
     </aside>
   </article>
