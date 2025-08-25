@@ -31,4 +31,11 @@ export default class Orcid {
     const urlObj = this.data.person["researcher-urls"]?.["researcher-url"].find(ru => ru["url-name"] === CLAIMING_URL_NAME);
     return urlObj?.url?.value ?? '';
   }
+
+  toJSON() {
+    return {
+      __class: 'Orcid', // A unique identifier for the reviver
+      data: this.data,  // The raw data needed for the constructor
+    };
+  }
 }
