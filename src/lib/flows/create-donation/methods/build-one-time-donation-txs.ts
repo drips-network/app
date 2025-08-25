@@ -11,13 +11,21 @@ import type {
   SdkProjectReceiver,
   SdkAddressReceiver,
   SdkDripListReceiver,
+
 } from '@drips-network/sdk';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepEcosystemFragment,
+  CreateDonationDetailsStepOrcidFragment
 } from '../__generated__/gql.generated';
+
+// TODO: integrate into SDK
+type SdkOrcidReceiver = {
+    type: 'orcid-account';
+    accountId: bigint;
+};
 
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
@@ -44,7 +52,8 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment,
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment
 ): SdkReceiver {
   switch (receiver.__typename) {
     case 'AddressDriverAccount':
@@ -71,6 +80,12 @@ function transformReceiverToSdkReceiver(
         accountId: BigInt(receiver.account.accountId),
       } as SdkEcosystemMainAccountReceiver;
 
+    case 'OrcidAccount':
+      return {
+        type: 'orcid-account',
+        accountId: BigInt(receiver.account.accountId),
+      } as SdkOrcidReceiver;
+
     default:
       throw new Error(`Unsupported receiver type: ${(receiver as any).__typename}`); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
@@ -85,7 +100,8 @@ export interface OneTimeDonationContext {
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 }
 
 export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
