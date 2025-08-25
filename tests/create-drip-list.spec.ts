@@ -14,10 +14,9 @@ const test = base.extend<{ connectedSession: ConnectedSession }>({
 test('create a drip list', async ({ page, connectedSession }) => {
   test.setTimeout(240_000);
 
-  await connectedSession.goto();
+  await page.goto('http://localhost:5173/app/drip-lists');
   await connectedSession.connect();
 
-  await page.getByTestId('sidenav-item-Drip Lists').click();
   await page.getByRole('button', { name: 'Create Drip List' }).click();
   await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
   await page.getByRole('textbox', { name: 'Title*' }).fill('E2E test list');
