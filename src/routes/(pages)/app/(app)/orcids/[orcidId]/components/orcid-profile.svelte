@@ -74,6 +74,11 @@
   import Button from '$lib/components/button/button.svelte';
   import Registered from '$lib/components/icons/Registered.svelte';
   import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
+  import SectionHeader from '$lib/components/section-header/section-header.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
+  import UnclaimedOrcidCard from './unclaimed-orcid-card.svelte';
+  import { goto } from '$app/navigation';
+  import buildUrl from '$lib/utils/build-url';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -171,12 +176,93 @@
       </div>
     </header>
 
+      {#if isClaimed(chainData)}
+        <!-- <section id="splits" class="app-section">
+          <SectionHeader
+            icon={DripList}
+            label="Splits"
+            actions={isOwnProject
+              ? [
+                  {
+                    handler: () =>
+                      isClaimed(chainData) &&
+                      modal.show(
+                        Stepper,
+                        undefined,
+                        isClaimed(chainData)
+                          ? editProjectSplitsSteps(
+                              project.account.accountId,
+                              project.source.url,
+                              chainData.splits,
+                            )
+                          : unreachable(),
+                      ),
+                    label: 'Edit',
+                    icon: Pen,
+                  },
+                ]
+              : []}
+          />
+          <SectionSkeleton
+            bind:this={splitsSectionSkeleton}
+            loaded={true}
+            empty={chainData.splits.maintainers.length === 0 &&
+              chainData.splits.dependencies.length === 0}
+            emptyStateHeadline="No splits"
+            emptyStateEmoji="🫧"
+            emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
+          >
+            <div class="card">
+              <div class="p-6">
+                <ProjectBadge tooltip={false} {project} />
+                <div class="pl-3.5 mt-2.5">
+                  {#key $page.url.pathname}
+                    <SplitsComponent
+                      disableLinks={false}
+                      list={[
+                        {
+                          __typename: 'SplitGroup',
+                          name: 'Maintainers',
+                          list: chainData.splits.maintainers,
+                        },
+                        {
+                          __typename: 'SplitGroup',
+                          name: 'Dependencies',
+                          list: chainData.splits.dependencies,
+                        },
+                      ]}
+                    />
+                  {/key}
+                </div>
+              </div>
+            </div>
+          </SectionSkeleton>
+        </section> -->
+      {:else if chainData.withdrawableBalances.length > 0}
+        <section class="app-section">
+          <SectionHeader icon={Wallet} label="Claimable funds" />
+          <SectionSkeleton loaded={true}>
+            <div class="unclaimed-funds-section">
+              <UnclaimedOrcidCard
+                {orcidAccount}
+                unclaimedTokensExpandable={false}
+                unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
+                showClaimButton={!isClaimed(chainData)}
+                on:claimButtonClick={() =>
+                  goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
+              />
+            </div>
+          </SectionSkeleton>
+        </section>
+      {/if}
+
     <section id="support">
       <Developer accountId={orcidAccount?.account.accountId} />
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
         supportItems={orcidSupport}
+        iconPrimary={false}
       />
     </section>
     <aside>
