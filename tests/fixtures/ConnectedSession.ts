@@ -46,7 +46,8 @@ export class ConnectedSession {
   }
 
   async disconnect() {
-    await this.page.locator('.identity-badge').first().click();
-    await this.page.getByRole('button', { name: 'Disconnect' }).click();
+    // Currently, connected state is not persisted in local env, so we can just reload the
+    // page to "disconnect"
+    await this.page.reload();
   }
 }
