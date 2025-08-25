@@ -81,7 +81,6 @@ test('create collaborative drip list', async ({ page, connectedSession }) => {
   await connectedSession.connect();
 
   await page.getByRole('button', { name: 'Create Drip List' }).click();
-  await page.getByRole('button', { name: 'Create Drip List' }).click();
   await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
   await page.getByRole('textbox', { name: 'Title*' }).fill('Test collaborative list');
   await page.getByRole('textbox', { name: 'Title*' }).press('Tab');
