@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  // import { page } from '$app/state';
   import type { AnnouncementBannerConfig } from '$lib/components/lp-header/lp-header.svelte';
   import LpHeader from '$lib/components/lp-header/lp-header.svelte';
   import type { PageData } from './$types';
+  import NavProgressBar from '$lib/components/nav-progress-bar/nav-progress-bar.svelte';
 
   // Doing something rather wonky here. `data` is the PageData of the current page, which
   // may be any of the pages this layout applies for.
@@ -32,6 +32,8 @@
     }
   }
 </script>
+
+<NavProgressBar color="var(--color-primary)" />
 
 <LpHeader announcementBanner={announcementBannerConfig} />
 <slot></slot>

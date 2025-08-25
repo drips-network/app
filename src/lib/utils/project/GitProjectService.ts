@@ -163,11 +163,15 @@ export default class GitProjectService {
       dependencies,
     );
 
-    const { tx: setSubAccountSplitsTx } = await this._buildSubAccountSetSplitsTx(
-      accountId,
-      highLevelPercentages,
-      maintainers,
-    );
+    const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
+
+    let setSubAccountSplitsTx: ContractTransaction | null = null;
+
+    if (repoSubAccountDriverExists) {
+      setSubAccountSplitsTx = (
+        await this._buildSubAccountSetSplitsTx(accountId, highLevelPercentages, maintainers)
+      ).tx;
+    }
 
     const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
     assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
@@ -197,7 +201,11 @@ export default class GitProjectService {
     });
 
     return {
-      batch: [setSubAccountSplitsTx, setSplitsTx, emitAccountMetadataTx],
+      batch: [
+        ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
+        setSplitsTx,
+        emitAccountMetadataTx,
+      ],
       newMetadataHash: ipfsHash,
     };
   }
@@ -227,11 +235,19 @@ export default class GitProjectService {
       context.dependencySplits,
     );
 
-    const { tx: setSubAccountSplitsTx } = await this._buildSubAccountSetSplitsTx(
-      accountId,
-      context.highLevelPercentages,
-      context.maintainerSplits,
-    );
+    const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
+
+    let setSubAccountSplitsTx: ContractTransaction | null = null;
+
+    if (repoSubAccountDriverExists) {
+      setSubAccountSplitsTx = (
+        await this._buildSubAccountSetSplitsTx(
+          accountId,
+          context.highLevelPercentages,
+          context.maintainerSplits,
+        )
+      ).tx;
+    }
 
     const project = {
       __typename: 'Project' as const,
@@ -323,7 +339,7 @@ export default class GitProjectService {
     });
 
     return Promise.all([
-      setSubAccountSplitsTx,
+      ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
       setSplitsTx,
       emitAccountMetadataTx,
       ...splitTxs,

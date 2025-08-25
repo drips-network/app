@@ -1,4 +1,5 @@
 <script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
@@ -10,6 +11,11 @@
   import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
 </script>
+
+<HeadMeta
+  title="Dependency Funding"
+  description="Drips is the simplest way to fund your dependencies. Sustain your open-source dependencies with predictable, recurring funding."
+/>
 
 <SolutionHeader>
   <svelte:fragment slot="usecase-badge">Dependency Funding</svelte:fragment>
