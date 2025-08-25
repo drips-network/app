@@ -311,6 +311,10 @@
         <div>
           <OrcidAvatar size="large" outline />
         </div>
+      {:else if orcid}
+        <div>
+          <OrcidAvatar size="large" outline />
+        </div>
       {/if}
     </div>
   </div>
