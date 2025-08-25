@@ -25,14 +25,15 @@
   } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
-  import isClaimed from '$lib/utils/orcids/is-claimed';
   import OrcidAvatar from './orcid-avatar.svelte';
   import OrcidName from './orcid-name.svelte';
   import type { OrcidBadgeFragment } from './__generated__/gql.generated';
+  import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
+  import CopyIcon from '$lib/components/icons/Copy.svelte';
+  import { fade } from 'svelte/transition';
 
   export let orcid: OrcidBadgeFragment;
 
@@ -45,6 +46,10 @@
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
   export let smallText = false;
   export let chainOverride: SupportedChain | undefined = undefined;
+  export let outlined: boolean = false;
+  export let copyable: boolean = false;
+
+  let copySuccess = false
 
   let unclaimedOrcid: OrcidBadgeFragment;
   $: unclaimedOrcid = {
@@ -60,8 +65,15 @@
 
   $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;
 
-  $: chainData = filterCurrentChainData(processedOrcid.chainData, undefined, chainOverride);
   $: orcidId = getLastPathSegment(processedOrcid.source.url)
+
+  async function copyClipboard(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    await navigator.clipboard.writeText(orcidId ?? '');
+    copySuccess = true;
+    setTimeout(() => (copySuccess = false), 1000);
+  }
 </script>
 
 <PrimaryColorThemer colorHex={undefined}>
@@ -69,6 +81,7 @@
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="orcid-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
+      class:outlined={outlined}
       href={linkTo === 'orcid-page' && orcidId
         ? buildOrcidUrl(orcidId)
         : buildExternalUrl(processedOrcid.source.url)}
@@ -76,19 +89,27 @@
     >
       {#if !hideAvatar}
         <div class="avatar-and-forge">
-          {#if !forceUnclaimed && isClaimed(chainData)}
-            <div>
-              <OrcidAvatar
-                {size}
-              />
-            </div>
-          {/if}
           <div><OrcidAvatar {size} /></div>
         </div>
       {/if}
       <div class="name flex-1 min-w-0 truncate">
         <OrcidName tiny={smallText} orcid={processedOrcid} />
       </div>
+      {#if copyable}
+        <div class="copy">
+          <button on:click={copyClipboard}>
+            {#if copySuccess}
+              <span transition:fade={{ duration: 200 }}>
+                <CheckIcon style="fill: var(--color-foreground)" />
+              </span>
+            {:else}
+              <span transition:fade={{ duration: 200 }}>
+                <CopyIcon style="fill: var(--color-foreground)" />
+              </span>
+            {/if}
+          </button>
+        </div>
+      {/if}
     </svelte:element>
     <svelte:fragment slot="tooltip-content">
       <OrcidTooltip orcid={processedOrcid} />
@@ -117,5 +138,29 @@
 
   .avatar-and-forge > *:nth-child(2) {
     margin-left: -0.75rem;
+  }
+
+  .orcid-badge.outlined {
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+    display: inline-flex;
+  }
+
+  .copy {
+    display: flex;
+    align-items: center;
+  }
+
+  .copy button {
+    height: 1rem;
+    width: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .copy button > * {
+    position: absolute;
   }
 </style>

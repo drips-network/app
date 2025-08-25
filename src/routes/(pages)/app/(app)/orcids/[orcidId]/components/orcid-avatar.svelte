@@ -16,24 +16,32 @@
     huge: '8rem',
   };
   $: containerSize = CONTAINER_SIZES[size];
+
+  $: dimensionCss = {
+    tiny: '100%',
+    small: '65%',
+    medium: '65%',
+    large: '65%',
+    huge: '50%',
+  }[size];
 </script>
 
 <div
-  class="wrapper overflow-hidden select-none relative flex-shrink-0 rounded-full flex items-center justify-center"
+  class="wrapper overflow-hidden select-none relative flex-shrink-0 rounded-full flex items-center justify-center size-{size}"
   style="width: {containerSize}; height: {containerSize}"
   class:with-outline={outline}
   class:disabled
 >
   <OrcidIcon
     style="
-      width: min(80%, 3rem);
-      height: min(80%, 3rem);
-      fill: {disabled ? 'var(--color-foreground-level-6)' : 'var(--color-foreground-level-5)'};"
+      width: {dimensionCss};
+      height: {dimensionCss};
+      fill: {disabled ? 'var(--color-foreground-level-6)' : 'var(--color-foreground)'};"
   />
 </div>
 
 <style>
-  .wrapper {
+  .wrapper:not(.size-tiny) {
     background-color: var(--color-foreground-level-2);
   }
 
