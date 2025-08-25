@@ -189,6 +189,10 @@
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 
+  .button .inner.muted {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
+  }
+
   .button:not(.loading) .inner.primary {
     background-color: var(--color-primary);
   }
