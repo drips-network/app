@@ -15,7 +15,7 @@ export default class Orcid {
 
   get name(): string {
     const name = this.data.person.name
-    return name['credit-name']?.value ?? ''
+    return name['given-names']?.value || name['credit-name']?.value || name['family-name']?.value || ''
   }
 
   get bio(): string {
