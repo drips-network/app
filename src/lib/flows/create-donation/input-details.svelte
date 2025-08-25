@@ -4,6 +4,7 @@
     DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
+    DRIP_VISUAL_ORCID_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   export const CREATE_DONATION_DETAILS_STEP_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
@@ -40,6 +41,16 @@
       }
     }
   `;
+
+  export const CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT = gql`
+    ${DRIP_VISUAL_ORCID_FRAGMENT}
+    fragment CreateDonationDetailsStepOrcid on OrcidAccount {
+      ...DripVisualOrcid
+      account {
+        accountId
+      }
+    }
+  `
 </script>
 
 <script lang="ts">
@@ -60,6 +71,7 @@
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
     CreateDonationDetailsStepEcosystemFragment,
+    CreateDonationDetailsStepOrcidFragment
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -83,7 +95,8 @@
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 
   let selectedTokenAllowance: bigint | undefined;
 
@@ -103,6 +116,9 @@
       case 'EcosystemMainAccount':
         receiverTypeLabel = 'Ecosystem';
         break;
+      case 'OrcidAccount':
+        receiverTypeLabel = 'ORCID';
+        break;
     }
   }
 
@@ -115,6 +131,7 @@
         break;
       case 'Project':
       case 'EcosystemMainAccount':
+      case 'OrcidAccount':
         recipientAccountId = receiver.account.accountId;
         break;
     }

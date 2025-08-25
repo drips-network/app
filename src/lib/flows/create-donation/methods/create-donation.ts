@@ -7,6 +7,7 @@ import expect from '$lib/utils/expect';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import filterOrcidCurrentChainData from '$lib//utils/orcids/filter-current-chain-data';
 import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 import network from '$lib/stores/wallet/network';
 import type {
@@ -16,12 +17,15 @@ import type {
   DripListOtDsQueryVariables,
   EcosystemOtDsQuery,
   EcosystemOtDsQueryVariables,
+  OrcidOtDsQuery,
+  OrcidOtDsQueryVariables,
 } from './__generated__/gql.generated';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
+  CreateDonationDetailsStepOrcidFragment
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
 
@@ -88,6 +92,37 @@ const ecosystemSupportQuery = gql`
   }
 `;
 
+const orcidSupportQuery = gql`
+  query OrcidOTDs($accountId: ID!, $chains: [SupportedChain!]) {
+    orcidAccountById(id: $accountId, chains: $chains) {
+      chainData {
+        ... on ClaimedOrcidAccountData {
+          chain
+          support {
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
+              date
+            }
+          }
+        }
+        ... on UnClaimedOrcidAccountData {
+          chain
+          support {
+            ... on OneTimeDonationSupport {
+              account {
+                accountId
+              }
+              date
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 function checkDonation(
   ownAccountId: string,
   supportAccountId: string,
@@ -104,7 +139,8 @@ export default function (
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment,
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment,
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -184,6 +220,31 @@ export default function (
                   if (!ecoystemData) return true;
 
                   return ecoystemData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            // TODO: Verify!
+            case 'OrcidAccount':
+              await expect(
+                () =>
+                  query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
+                    accountId: recipientAccountId,
+                    chains: [network.gqlName],
+                  }),
+                (res) => {
+                  const orcidData = res.orcidAccountById;
+                  if (!orcidData) return true;
+                  return filterOrcidCurrentChainData(orcidData.chainData).support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,

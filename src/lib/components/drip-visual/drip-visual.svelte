@@ -46,6 +46,13 @@
       ...IdentityCardEcosystem
     }
   `;
+
+  export const DRIP_VISUAL_ORCID_FRAGMENT = gql`
+    ${IDENTITY_CARD_ORCID_FRAGMENT}
+    fragment DripVisualOrcid on OrcidAccount {
+      ...IdentityCardOrcid
+    }
+  `
 </script>
 
 <script lang="ts">
@@ -60,6 +67,7 @@
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
     IDENTITY_CARD_ECOSYSTEM_FRAGMENT,
     IDENTITY_CARD_PROJECT_FRAGMENT,
+    IDENTITY_CARD_ORCID_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
