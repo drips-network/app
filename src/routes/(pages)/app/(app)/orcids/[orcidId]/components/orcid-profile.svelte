@@ -69,6 +69,11 @@
   import OrcidProfileHeader, { ORCID_PROFILE_HEADER_FRAGMENT } from './orcid-profile-header.svelte';
   import isClaimed from '$lib/utils/orcids/is-claimed';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import network from '$lib/stores/wallet/network';
+  import Button from '$lib/components/button/button.svelte';
+  import Registered from '$lib/components/icons/Registered.svelte';
+  import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -79,7 +84,11 @@
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
   $: chainData = filterCurrentChainData(orcidAccount.chainData);
   $: orcidSupport = chainData?.support || [];
-  $: origin = typeof window !== 'undefined' && window ? window.location.origin : 'https://drips.network';
+
+  function launchClaimOrcid() {
+    // eslint-disable-next-line no-console
+    console.log('Launch claim ORCID flow');
+  }
 </script>
 
 <HeadMeta
@@ -94,11 +103,43 @@
 </svelte:head>
 
 <PrimaryColorThemer colorHex={undefined}>
+  {#if !isClaimed(chainData)}
+    <div class="notice">
+      <AnnotationBox type="info">
+        {#if chainData.withdrawableBalances.length > 0}This ORCID iD has <span
+            class="typo-text-small-bold"
+            ><AggregateFiatEstimate
+              amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
+            /></span
+          > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This
+          ORCID iD is unclaimed on {network.label}, but can still receive funds that the owner can
+          collect later.{/if}
+        <svelte:fragment slot="actions">
+          <div class="flex gap-3">
+            <CopyLinkButton
+              url={buildOrcidUrl(orcid.id, { absolute: true })}
+              variant="ghost"
+            />
+            <Button
+              size="small"
+              icon={Registered}
+              variant="primary"
+              on:click={() => launchClaimOrcid()}>Claim ORCID iD</Button
+            >
+          </div>
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
+  {/if}
+
   <article class="orcid-profile">
     <header class="header card">
       <div>
-        <OrcidProfileHeader {orcid} {orcidAccount}                     shareButton={{
-            url: `${origin}${buildOrcidUrl(orcid.id)}`,
+        <OrcidProfileHeader
+          {orcid}
+          {orcidAccount}
+          shareButton={{
+            url: buildOrcidUrl(orcid.id, { absolute: true }),
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }} />
       </div>
@@ -129,11 +170,9 @@
         {/if}
       </div>
     </header>
-    <section id="graph">
-      <Developer accountId={orcidAccount?.account.accountId} />
-    </section>
 
     <section id="support">
+      <Developer accountId={orcidAccount?.account.accountId} />
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
@@ -161,16 +200,6 @@
 
   .orcid-profile > * {
     max-width: 100%;
-  }
-
-  section {
-    grid-column: span 2;
-  }
-
-  section#graph {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
   }
 
   aside {
@@ -214,6 +243,10 @@
     height: 100%;
   }
 
+  .notice {
+    margin-bottom: 2rem;
+  }
+
   @media (max-width: 1080px) {
     .header {
       margin-bottom: 0;
@@ -223,8 +256,7 @@
       height: auto;
     }
 
-    .orcid-profile,
-    section#graph {
+    .orcid-profile {
       gap: 1.5rem;
     }
 
