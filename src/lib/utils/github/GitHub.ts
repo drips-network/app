@@ -87,11 +87,15 @@ export default class GitHub {
     const fundingJsonOwner = await this.getFundingJsonAddress(owner, repo);
 
     if (!fundingJsonOwner) {
-      throw new Error('Invalid FUNDING.json file. Does it exist?');
+      throw new Error(
+        'Unable to find FUNDING.json file. If you just added it, it may take a few moments for GitHub to process your changes, so please try again in a minute.',
+      );
     }
 
     if (fundingJsonOwner.toLowerCase() !== expectedAddress?.toLowerCase()) {
-      throw new Error('Invalid FUNDING.json file. Does it have the correct Ethereum address?');
+      throw new Error(
+        'Expected Ethereum address not found in FUNDING.json. If you just edited the file, it may take a few moments for GitHub to process your changes, so please try again in a minute.',
+      );
     }
   }
 }

@@ -101,7 +101,7 @@
               return true;
             case 'Cancelled':
               throw new Error(
-                'Failed to gaslessly update the repository owner on-chain. Please reach out to us on Discord.',
+                'Failed to gaslessly update the repository owner on-chain. There may be a temporary issue with our Transaction Relay provider. Please try again later.',
               );
             default:
               return false;
@@ -113,7 +113,7 @@
 
       if (gaslessOwnerUpdateExpectation.failed) {
         throw new Error(
-          "The gasless owner update transaction didn't resolve in the expected timeframe.",
+          "The gasless owner update transaction didn't resolve in the expected timeframe. There may be an issue with our Transaction Relay provider. Please try again later, or disable gasless transactions in the Drips application settings.",
         );
       }
     }
@@ -129,7 +129,9 @@
     );
 
     if (ownerIndexedExpectation.failed) {
-      throw new Error('The new owner was not indexed in the expected timeframe.');
+      throw new Error(
+        'The new owner was not indexed in the expected timeframe. There may be a temporary issue with our oracle provider. Please try again later.',
+      );
     }
   }
 

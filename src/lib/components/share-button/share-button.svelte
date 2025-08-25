@@ -1,10 +1,11 @@
 <script lang="ts">
   import ShareIcon from '$lib/components/icons/Sharrow.svelte';
   import Button from '../button/button.svelte';
-  import { onMount, type ComponentProps } from 'svelte';
+  import { type ComponentProps } from 'svelte';
   import modal from '$lib/stores/modal';
   import shareSteps from '$lib/flows/share/share-steps';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import { browser } from '$app/environment';
 
   export let text: string | undefined = undefined;
   export let url: string;
@@ -30,6 +31,8 @@
     }
   }
 
+  $: browser && downloadableImageUrl && preloadImage(downloadableImageUrl);
+
   function handleClick() {
     modal.show(
       Stepper,
@@ -43,12 +46,6 @@
       }),
     );
   }
-
-  onMount(() => {
-    if (downloadableImageUrl) {
-      preloadImage(downloadableImageUrl);
-    }
-  });
 </script>
 
 <Button {disabled} variant={buttonVariant} on:click={handleClick}>
