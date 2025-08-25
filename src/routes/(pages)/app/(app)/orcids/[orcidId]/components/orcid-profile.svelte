@@ -58,33 +58,28 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  // import EcosystemProfileHeader from './orcid-profile-header.svelte';
-  // import EcosystemCardInteractive from './ecosystem-graph-card.svelte';
-  // import EcosystemMetadata from './ecosystem-metadata.svelte';
-  // import EcosystemDistribution from './ecosystem-distribution/ecosystem-distribution.svelte';
   import SupportersSection from '$lib/components/supporters-section/supporters.section.svelte';
-  // import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { OrcidProfileFragment } from './__generated__/gql.generated';
   import getSupportersPile from '$lib/components/drip-list-card/methods/get-supporters-pile';
   import Pile from '$lib/components/pile/pile.svelte';
-  // import { STREAM_STATE_STREAM_FRAGMENT } from '$lib/utils/stream-state';
-  // import { CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  // import formatNumber from '$lib/utils/format-number';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import type Orcid from '$lib/utils/orcids/entities';
   import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import OrcidProfileHeader, { ORCID_PROFILE_HEADER_FRAGMENT } from './orcid-profile-header.svelte';
   import isClaimed from '$lib/utils/orcids/is-claimed';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
+  // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
   $: chainData = filterCurrentChainData(orcidAccount.chainData);
   $: orcidSupport = chainData?.support || [];
+  $: origin = typeof window !== 'undefined' && window ? window.location.origin : 'https://drips.network';
 </script>
 
 <HeadMeta
@@ -102,7 +97,10 @@
   <article class="orcid-profile">
     <header class="header card">
       <div>
-        <OrcidProfileHeader {orcid} {orcidAccount} />
+        <OrcidProfileHeader {orcid} {orcidAccount}                     shareButton={{
+            url: `${origin}${buildOrcidUrl(orcid.id)}`,
+            downloadableImageUrl: `${imageBaseUrl}?target=og`,
+          }} />
       </div>
 
       <div class="stats">
