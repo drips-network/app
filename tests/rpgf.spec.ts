@@ -58,7 +58,9 @@ const test = base
   });
 
 test.describe('drafts', () => {
-  test.setTimeout(120000); // 5 minutes
+  test.beforeEach(() => {
+    test.setTimeout(120000); // 5 minutes
+  });
 
   test.afterEach(async ({ rpgfRound }) => {
     await rpgfRound.deleteDraft();
@@ -101,7 +103,9 @@ test.describe('drafts', () => {
 });
 
 test.describe('rounds', () => {
-  test.setTimeout(120000); // 5 minutes
+  test.beforeEach(() => {
+    test.setTimeout(120000); // 5 minutes
+  });
 
   test.afterEach(async ({ rpgfRound }) => {
     if (!rpgfRound.signedIn) {
