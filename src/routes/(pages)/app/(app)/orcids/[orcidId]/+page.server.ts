@@ -1,7 +1,7 @@
 import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fetchOrcid, fetchOrcidAccount } from './components/fetch-orcid';
+import { fetchOrcid, fetchOrcidAccount, orcidIdToAccountId } from './components/fetch-orcid';
 import network from '$lib/stores/wallet/network';
 import type { OrcidProfileFragment } from './components/__generated__/gql.generated';
 
@@ -17,7 +17,6 @@ export const load = (async ({ params, fetch }) => {
 
   // TODO: I think there's a problem here, I thought we were supposed to fetch the orcid
   // by accountId... We will probably want to support urls that include accountid as well.
-  // const accountId = await orcidIdToAccountId(params.orcidId);
   let orcidAccount = undefined;
   const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
   if (orcidGqlResponse.orcidAccountById) {
@@ -25,12 +24,12 @@ export const load = (async ({ params, fetch }) => {
   }
 
   if (!orcidAccount) {
+    const accountId = await orcidIdToAccountId(params.orcidId);
     orcidAccount = {
       __typename: 'OrcidAccount',
       account: {
         __typename: 'RepoDriverAccount',
-        // TODO: could theoretically calculate this
-        accountId: '0',
+        accountId: String(accountId),
         driver: 'REPO' as const,
       },
       source: { __typename: 'OrcidSource', url: orcid.url },
