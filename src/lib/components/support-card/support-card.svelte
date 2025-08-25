@@ -111,6 +111,7 @@
   import network from '$lib/stores/wallet/network';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import getLastPathSegment from '$lib/utils/get-last-path-segment';
+  import OrcidAvatar from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
@@ -297,6 +298,10 @@
       {#if project}
         <div>
           <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" />
+        </div>
+      {:else if orcid}
+        <div>
+          <OrcidAvatar size="large" outline />
         </div>
       {/if}
     </div>
