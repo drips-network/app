@@ -19,8 +19,7 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher, type ComponentProps } from 'svelte';
-  import Pen from '$lib/components/icons/Pen.svelte';
+  import { type ComponentProps } from 'svelte';
   import { gql } from 'graphql-request';
   import type { OrcidProfileHeaderFragment } from './__generated__/gql.generated';
   import twemoji from '$lib/utils/twemoji';
@@ -29,22 +28,14 @@
   import OrcidAvatar from './orcid-avatar.svelte';
   import type Orcid from '$lib/utils/orcids/entities';
   import isClaimed from '$lib/utils/orcids/is-claimed';
-  import Button from '$lib/components/button/button.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  // import CopyLinkButton from '$lib/components/copy-link-button/copy-link-button.svelte';
-  // import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
-  // import { browser } from '$app/environment';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileHeaderFragment;
-  export let editButton: string | undefined = undefined;
   export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
 
   $: orcidChainData = filterCurrentChainData(orcidAccount.chainData);
-  // $: currentDomain = browser && window ? window.location.origin : '';
-
-  const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
@@ -66,25 +57,14 @@
           <IdentityBadge address={orcidChainData.headerLinkedTo.address} />
         {/if}
         <OrcidBadge size="tiny" orcid={orcidAccount} forceUnclaimed tooltip={false} linkTo="external-url" outlined copyable/>
-        <!-- <CopyLinkButton url={`${currentDomain}${buildOrcidUrl(orcid.id)}`} variant="muted" /> -->
+        {#if shareButton}
+          <ShareButton buttonVariant="muted" {...shareButton} />
+        {/if}
       </div>
     </div>
-    {#if editButton || shareButton}
-      <div class="actions">
-        {#if shareButton}
-          <ShareButton buttonVariant="normal" {...shareButton} />
-        {/if}
-        {#if editButton}
-          <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
-        {/if}
-      </div>
-    {/if}
   </div>
 </div>
 
 <style>
-  .actions {
-    display: flex;
-    gap: 1rem;
-  }
+
 </style>
