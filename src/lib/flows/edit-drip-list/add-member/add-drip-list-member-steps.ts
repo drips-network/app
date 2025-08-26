@@ -6,11 +6,12 @@ import EditDripListStep, {
   EDIT_DRIP_LIST_STEP_PROJECT_TO_ADD_FRAGMENT,
 } from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import SelectDripList, {
+import SelectDripList from './steps/select-drip-list.svelte';
+import {
   SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
   SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
   SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
-} from './steps/select-drip-list.svelte';
+} from '../fragments';
 import assert from '$lib/utils/assert';
 import unreachable from '$lib/utils/unreachable';
 import { gql } from 'graphql-request';
