@@ -52,7 +52,7 @@
     fragment DripVisualOrcid on OrcidAccount {
       ...IdentityCardOrcid
     }
-  `
+  `;
 </script>
 
 <script lang="ts">
@@ -80,6 +80,7 @@
     DripVisualProjectFragment,
     DripVisualUserFragment,
     DripVisualEcosystemFragment,
+    DripVisualOrcidFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
@@ -92,6 +93,7 @@
     | DripVisualDripListFragment
     | DripVisualUserFragment
     | DripVisualEcosystemFragment
+    | DripVisualOrcidFragment
     | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;
