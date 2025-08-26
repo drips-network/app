@@ -59,6 +59,11 @@ const config = defineConfig({
       'node-fetch': 'isomorphic-fetch',
     },
   },
+  ...(process.env.NODE_ENV === 'development' && {
+    server: {
+      allowedHosts: true,
+    },
+  }),
 });
 
 export default config;
