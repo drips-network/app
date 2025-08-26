@@ -10,12 +10,13 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
-  import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
+  import type { ListEditorItem } from '$lib/components/list-editor/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
   import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
   import { DEFAULT_CSV_HEADERS, DEFAULT_MAX_ENTRIES } from './import-from-csv-steps';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_DECIMALS = 4;
@@ -26,6 +27,7 @@
   export let allowProjects: boolean = true;
   export let allowAddresses: boolean = true;
   export let allowDripLists: boolean = true;
+  export let allowOrcids: boolean = true;
   // csvHeaders[0] should always be an address
   export let csvHeaders: Array<string> = DEFAULT_CSV_HEADERS;
   export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
@@ -89,6 +91,7 @@
           allowProjects,
           allowAddresses,
           allowDripLists,
+          allowOrcids,
         });
 
         // assume header, skip it
@@ -226,6 +229,3 @@
     >
   </svelte:fragment>
 </StepLayout>
-
-<style>
-</style>
