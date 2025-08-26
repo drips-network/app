@@ -63,6 +63,11 @@ export const projectAssociatedAccountIdsQuery = gql`
                   accountId
                 }
               }
+              ... on OrcidReceiver {
+                account {
+                  accountId
+                }
+              }
             }
             maintainers {
               account {
@@ -94,7 +99,6 @@ export const projectAssociatedAccountIdsQuery = gql`
                 accountId
               }
             }
-
             ... on EcosystemSupport {
               account {
                 accountId
@@ -166,6 +170,11 @@ export const dripListAssociatedAccountIdsQuery = gql`
             accountId
           }
         }
+        ... on OrcidReceiver {
+          account {
+            accountId
+          }
+        }
       }
     }
   }
@@ -211,6 +220,11 @@ export const ecosystemAssociatedAccountIdsQuery = gql`
           }
         }
         ... on SubListReceiver {
+          account {
+            accountId
+          }
+        }
+        ... on OrcidReceiver {
           account {
             accountId
           }
