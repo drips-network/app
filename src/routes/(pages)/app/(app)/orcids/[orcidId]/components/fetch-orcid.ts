@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { ORCID_PROFILE_FRAGMENT } from './orcid-profile.svelte';
+import { ORCID_PROFILE_FRAGMENT } from './orcid-profile-fragments';
 import network from '$lib/stores/wallet/network';
 import query from '$lib/graphql/dripsQL';
 import type {

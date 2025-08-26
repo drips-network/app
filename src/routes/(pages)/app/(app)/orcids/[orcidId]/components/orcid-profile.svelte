@@ -1,57 +1,3 @@
-<script lang="ts" context="module">
-  // TODO: may have to differentiate these
-  import { SUPPORTER_PILE_FRAGMENT } from '$lib/components/drip-list-card/methods/get-supporters-pile';
-  import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
-  import mergeWithdrawableBalances, { MERGE_WITHDRAWABLE_BALANCES_FRAGMENT } from '$lib/utils/merge-withdrawable-balances';
-  import { gql } from 'graphql-request';
-
-  export const ORCID_PROFILE_FRAGMENT = gql`
-    ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
-    ${SUPPORTER_PILE_FRAGMENT}
-    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-    ${ORCID_PROFILE_HEADER_FRAGMENT}
-    fragment OrcidProfile on OrcidAccount {
-      ...OrcidProfileHeader
-      account {
-        accountId
-        driver
-      }
-      source {
-        url
-      }
-      chainData {
-        ... on UnClaimedOrcidAccountData {
-          chain
-          linkedTo {
-            accountId
-          }
-          support {
-            ...SupportersSectionSupportItem
-            ...SupporterPile
-          }
-          withdrawableBalances {
-            ...MergeWithdrawableBalances
-          }
-        }
-        ... on ClaimedOrcidAccountData {
-          chain
-          maybeLinkedTo: linkedTo {
-            accountId
-          }
-          support {
-            ...SupportersSectionSupportItem
-            ...SupporterPile
-          }
-          totalEarned {
-            tokenAddress
-            amount
-          }
-        }
-      }
-    }
-  `;
-</script>
-
 <script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
@@ -66,7 +12,7 @@
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import type Orcid from '$lib/utils/orcids/entities';
   import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
-  import OrcidProfileHeader, { ORCID_PROFILE_HEADER_FRAGMENT } from './orcid-profile-header.svelte';
+  import OrcidProfileHeader from './orcid-profile-header.svelte';
   import isClaimed from '$lib/utils/orcids/is-claimed';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
@@ -79,6 +25,7 @@
   import UnclaimedOrcidCard from './unclaimed-orcid-card.svelte';
   import { goto } from '$app/navigation';
   import buildUrl from '$lib/utils/build-url';
+  import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -116,15 +63,12 @@
             ><AggregateFiatEstimate
               amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
             /></span
-          > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This
-          ORCID iD is unclaimed on {network.label}, but can still receive funds that the owner can
-          collect later.{/if}
+          > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This ORCID
+          iD is unclaimed on {network.label}, but can still receive funds that the owner can collect
+          later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <CopyLinkButton
-              url={buildOrcidUrl(orcid.id, { absolute: true })}
-              variant="ghost"
-            />
+            <CopyLinkButton url={buildOrcidUrl(orcid.id, { absolute: true })} variant="ghost" />
             <Button
               size="small"
               icon={Registered}
@@ -146,7 +90,8 @@
           shareButton={{
             url: buildOrcidUrl(orcid.id, { absolute: true }),
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
-          }} />
+          }}
+        />
       </div>
 
       <div class="stats">
@@ -159,7 +104,9 @@
         {:else if chainData.withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
             <KeyValuePair key="Donations">
-              <AggregateFiatEstimate  amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)} />
+              <AggregateFiatEstimate
+                amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
+              />
             </KeyValuePair>
           </div>
         {/if}
@@ -176,8 +123,8 @@
       </div>
     </header>
 
-      {#if isClaimed(chainData)}
-        <!-- <section id="splits" class="app-section">
+    {#if isClaimed(chainData)}
+      <!-- <section id="splits" class="app-section">
           <SectionHeader
             icon={DripList}
             label="Splits"
@@ -238,23 +185,23 @@
             </div>
           </SectionSkeleton>
         </section> -->
-      {:else if chainData.withdrawableBalances.length > 0}
-        <section class="app-section">
-          <SectionHeader icon={Wallet} label="Claimable funds" />
-          <SectionSkeleton loaded={true}>
-            <div class="unclaimed-funds-section">
-              <UnclaimedOrcidCard
-                {orcidAccount}
-                unclaimedTokensExpandable={false}
-                unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
-                showClaimButton={!isClaimed(chainData)}
-                on:claimButtonClick={() =>
-                  goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
-              />
-            </div>
-          </SectionSkeleton>
-        </section>
-      {/if}
+    {:else if chainData.withdrawableBalances.length > 0}
+      <section class="app-section">
+        <SectionHeader icon={Wallet} label="Claimable funds" />
+        <SectionSkeleton loaded={true}>
+          <div class="unclaimed-funds-section">
+            <UnclaimedOrcidCard
+              {orcidAccount}
+              unclaimedTokensExpandable={false}
+              unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
+              showClaimButton={!isClaimed(chainData)}
+              on:claimButtonClick={() =>
+                goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
+            />
+          </div>
+        </SectionSkeleton>
+      </section>
+    {/if}
 
     <section id="support">
       <Developer accountId={orcidAccount?.account.accountId} />
