@@ -47,6 +47,27 @@ export const SPLITS_COMPONENT_DRIP_LIST_FRAGMENT = gql`
   }
 `;
 
+// export const SPLITS_COMPONENT_ORCID_FRAGMENT = gql`
+//   ${PROJECT_BADGE_FRAGMENT}
+//   fragment SplitsComponentProject on Project {
+//     ...ProjectBadge
+//     source {
+//       repoName
+//       ownerName
+//     }
+//     isVisible
+//     chainData {
+//       ... on ClaimedProjectData {
+//         chain
+//         owner {
+//           address
+//         }
+//         color
+//       }
+//     }
+//   }
+// `;
+
 export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
   ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
   fragment SplitsComponentProjectReceiver on ProjectReceiver {
