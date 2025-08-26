@@ -8,6 +8,7 @@ import type {
   SplitsComponentProjectReceiverFragment,
   SplitsComponentEcosystemReceiverFragment,
   SplitsComponentSubListReceiverFragment,
+  SplitsComponentOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 
 export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
@@ -90,6 +91,27 @@ export const SPLITS_COMPONENT_DRIP_LIST_FRAGMENT = gql`
   }
 `;
 
+// export const SPLITS_COMPONENT_ORCID_FRAGMENT = gql`
+//   ${PROJECT_BADGE_FRAGMENT}
+//   fragment SplitsComponentProject on Project {
+//     ...ProjectBadge
+//     source {
+//       repoName
+//       ownerName
+//     }
+//     isVisible
+//     chainData {
+//       ... on ClaimedProjectData {
+//         chain
+//         owner {
+//           address
+//         }
+//         color
+//       }
+//     }
+//   }
+// `;
+
 export const SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT = gql`
   ${SPLITS_COMPONENT_PROJECT_FRAGMENT}
   fragment SplitsComponentProjectReceiver on ProjectReceiver {
@@ -142,12 +164,24 @@ export const SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT = gql`
   }
 `;
 
+export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
+  fragment SplitsComponentOrcidReceiver on OrcidReceiver {
+    weight
+    linkedIdentity {
+      account {
+        accountId
+      }
+    }
+  }
+`;
+
 export type SplitsComponentSplitsReceiver =
   | SplitsComponentAddressReceiverFragment
   | SplitsComponentDripListReceiverFragment
   | SplitsComponentProjectReceiverFragment
   | SplitsComponentEcosystemReceiverFragment
-  | SplitsComponentSubListReceiverFragment;
+  | SplitsComponentSubListReceiverFragment
+  | SplitsComponentOrcidReceiverFragment;
 
 export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
 
