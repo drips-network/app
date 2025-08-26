@@ -73,9 +73,6 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
-  import editDripListSteps, {
-    EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT,
-  } from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import ShareButton from '../share-button/share-button.svelte';
   import AggregateFiatEstimate from '../aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -130,6 +127,8 @@
   import CoinFlying from '../icons/CoinFlying.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import formatNumber from '$lib/utils/format-number';
+  import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
+  import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/fragments';
 
   export let data: {
     dripList?: DripListCardFragment | null;
