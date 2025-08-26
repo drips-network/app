@@ -97,8 +97,6 @@ export type ListEditorItem =
   | SubListItem
   | OrcidItem;
 
-// export type AccountId = string;
-
 export type Items = Record<AccountId, ListEditorItem>;
 export type Weights = Record<AccountId, number>;
 
