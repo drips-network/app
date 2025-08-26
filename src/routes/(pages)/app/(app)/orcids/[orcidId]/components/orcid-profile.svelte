@@ -26,6 +26,7 @@
   import { goto } from '$app/navigation';
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
+  import type { SupportCardOrcidFragment } from '$lib/components/support-card/__generated__/gql.generated';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -36,6 +37,25 @@
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
   $: chainData = filterCurrentChainData(orcidAccount.chainData);
   $: orcidSupport = chainData?.support || [];
+
+  // Transform OrcidProfileFragment to SupportCardOrcidFragment
+  $: supportCardOrcidData = {
+    __typename: 'OrcidAccount' as const,
+    source: orcidAccount.source,
+    account: orcidAccount.account,
+    chainData: orcidAccount.chainData.map((data) => {
+      if (data.__typename === 'ClaimedOrcidAccountData') {
+        return {
+          __typename: 'ClaimedOrcidAccountData' as const,
+          linkedTo: data.maybeLinkedTo,
+        };
+      } else {
+        return {
+          __typename: 'UnClaimedOrcidAccountData' as const,
+        };
+      }
+    }),
+  } satisfies SupportCardOrcidFragment;
 
   function launchClaimOrcid() {
     // eslint-disable-next-line no-console
@@ -152,7 +172,7 @@
     </section>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard orcid={orcidAccount} />
+        <SupportCard orcid={supportCardOrcidData} />
       </div>
     </aside>
   </article>
