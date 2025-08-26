@@ -55,7 +55,7 @@
   $: validInput =
     (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
-    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
+    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)) ||
     (allowOrcids && isValidOrcidId(inputValue));
 
   function createInvalidMessage(type: string, value: string): string {
