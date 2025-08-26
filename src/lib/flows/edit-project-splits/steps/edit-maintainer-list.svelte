@@ -20,6 +20,7 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
