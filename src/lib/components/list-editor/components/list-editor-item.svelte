@@ -6,6 +6,7 @@
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
+  import OrcidBadge from '../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 
   const dispatch = createEventDispatcher<{
     editPercentage: number;
@@ -111,6 +112,8 @@
         />
       {:else if item.type === 'drip-list'}
         <DripListBadge linkToNewTab dripList={item.dripList} />
+      {:else if item.type === 'orcid'}
+        <OrcidBadge linkToNewTab orcid={item.orcid} />
       {/if}
     </div>
   </div>
