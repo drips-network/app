@@ -11,21 +11,22 @@ import type {
   SdkProjectReceiver,
   SdkAddressReceiver,
   SdkDripListReceiver,
-
 } from '@drips-network/sdk';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepEcosystemFragment,
-  CreateDonationDetailsStepOrcidFragment
+  CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 
 // TODO: integrate into SDK
 type SdkOrcidReceiver = {
-    type: 'orcid-account';
-    accountId: bigint;
+  type: 'orcid-account';
+  accountId: bigint;
 };
+
+type SdkReceiverWithOrcid = SdkReceiver | SdkOrcidReceiver;
 
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
@@ -53,8 +54,8 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
     | CreateDonationDetailsStepEcosystemFragment
-    | CreateDonationDetailsStepOrcidFragment
-): SdkReceiver {
+    | CreateDonationDetailsStepOrcidFragment,
+): SdkReceiverWithOrcid {
   switch (receiver.__typename) {
     case 'AddressDriverAccount':
       return {
@@ -119,7 +120,8 @@ export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
     amount: amountInputValue,
     erc20: tokenAddress as Address,
     tokenDecimals: token.info.decimals,
-    receiver: sdkReceiver,
+    // TODO: integrate SdkOrcidReceiver into SDK
+    receiver: sdkReceiver as SdkReceiver,
   });
 
   const txs = [
