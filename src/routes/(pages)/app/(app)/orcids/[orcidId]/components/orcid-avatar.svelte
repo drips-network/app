@@ -19,7 +19,7 @@
 
   $: dimensionCss = {
     tiny: '100%',
-    small: '65%',
+    small: '100%',
     medium: '65%',
     large: '65%',
     huge: '50%',
@@ -41,7 +41,7 @@
 </div>
 
 <style>
-  .wrapper:not(.size-tiny) {
+  .wrapper:not(.size-tiny, .size-small) {
     background-color: var(--color-foreground-level-2);
   }
 
@@ -53,4 +53,3 @@
     border: 1px solid var(--color-foreground);
   }
 </style>
-
