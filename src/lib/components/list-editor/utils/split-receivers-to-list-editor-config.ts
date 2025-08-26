@@ -2,6 +2,7 @@ import { gql } from 'graphql-request';
 import {
   LIST_EDITOR_DRIP_LIST_FRAGMENT,
   LIST_EDITOR_ECOSYSTEM_FRAGMENT,
+  // LIST_EDITOR_ORCID_FRAGMENT,
   LIST_EDITOR_PROJECT_FRAGMENT,
   LIST_EDITOR_SUB_LIST_FRAGMENT,
   type ListEditorItem,
@@ -81,6 +82,19 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
     }
   }
 `;
+
+// export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
+//   ${LIST_EDITOR_ORCID_FRAGMENT}
+//   fragment SplitReceiversToListEditorConfigOrcidReceiver on OrcidReceiver {
+//     weight
+//     orcidAccount {
+//       ...ListEditorOrcid
+//       account {
+//         accountId
+//       }
+//     }
+//   }
+// `;
 
 // cannot yet split to an ecosystem
 export type SplitReceiver =
