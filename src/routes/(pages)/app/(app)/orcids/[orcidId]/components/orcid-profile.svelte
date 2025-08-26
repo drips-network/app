@@ -123,69 +123,7 @@
       </div>
     </header>
 
-    {#if isClaimed(chainData)}
-      <!-- <section id="splits" class="app-section">
-          <SectionHeader
-            icon={DripList}
-            label="Splits"
-            actions={isOwnProject
-              ? [
-                  {
-                    handler: () =>
-                      isClaimed(chainData) &&
-                      modal.show(
-                        Stepper,
-                        undefined,
-                        isClaimed(chainData)
-                          ? editProjectSplitsSteps(
-                              project.account.accountId,
-                              project.source.url,
-                              chainData.splits,
-                            )
-                          : unreachable(),
-                      ),
-                    label: 'Edit',
-                    icon: Pen,
-                  },
-                ]
-              : []}
-          />
-          <SectionSkeleton
-            bind:this={splitsSectionSkeleton}
-            loaded={true}
-            empty={chainData.splits.maintainers.length === 0 &&
-              chainData.splits.dependencies.length === 0}
-            emptyStateHeadline="No splits"
-            emptyStateEmoji="🫧"
-            emptyStateText="This project isnʼt sharing incoming funds with any maintainers or dependencies."
-          >
-            <div class="card">
-              <div class="p-6">
-                <ProjectBadge tooltip={false} {project} />
-                <div class="pl-3.5 mt-2.5">
-                  {#key $page.url.pathname}
-                    <SplitsComponent
-                      disableLinks={false}
-                      list={[
-                        {
-                          __typename: 'SplitGroup',
-                          name: 'Maintainers',
-                          list: chainData.splits.maintainers,
-                        },
-                        {
-                          __typename: 'SplitGroup',
-                          name: 'Dependencies',
-                          list: chainData.splits.dependencies,
-                        },
-                      ]}
-                    />
-                  {/key}
-                </div>
-              </div>
-            </div>
-          </SectionSkeleton>
-        </section> -->
-    {:else if chainData.withdrawableBalances.length > 0}
+    {#if !isClaimed(chainData) && chainData.withdrawableBalances.length > 0}
       <section class="app-section">
         <SectionHeader icon={Wallet} label="Claimable funds" />
         <SectionSkeleton loaded={true}>
