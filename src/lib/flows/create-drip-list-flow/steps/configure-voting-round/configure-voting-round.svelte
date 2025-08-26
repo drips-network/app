@@ -13,10 +13,11 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import type { ListEditorItem } from '$lib/components/list-editor/types';
   import { AddItemError } from '$lib/components/list-editor/errors';
   import { slide } from 'svelte/transition';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -39,6 +40,7 @@
         allowProjects: false,
         allowAddresses: true,
         allowDripLists: false,
+        allowOrcids: false,
         csvMaxEntries: 5000,
         csvHeaders: ['collaborator'],
         exampleTableData: mapFilterUndefined(

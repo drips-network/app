@@ -16,8 +16,9 @@
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import type { ListEditorItem } from '$lib/components/list-editor/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -57,6 +58,7 @@
         ),
         allowProjects: false,
         allowDripLists: false,
+        allowOrcids: false,
         addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
           context.update((c) => {
             c.maintainerSplits.items = {

@@ -1,7 +1,8 @@
 import { makeStep } from '$lib/components/stepper/types';
 import Upload from './upload.svelte';
-import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+import type { ListEditorItem } from '$lib/components/list-editor/types';
 import type { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
+import type { AccountId } from '$lib/utils/common-types';
 
 type UploadProps = {
   headline: string;
@@ -9,6 +10,7 @@ type UploadProps = {
   allowProjects?: boolean;
   allowAddresses?: boolean;
   allowDripLists?: boolean;
+  allowOrcids?: boolean;
   csvHeaders?: Array<string>;
   csvMaxEntries?: number;
   exampleTableHeaders?: Array<string> | undefined;
