@@ -4,6 +4,10 @@ import { fetchOrcid, fetchOrcidAccount } from '../../../../../../lib/utils/orcid
 import Orcid from '$lib/utils/orcids/entities';
 import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
+/**
+ * 0009-0007-5482-8654 me in ORCID prod
+ * 0009-0007-1106-8413 drips.network in ORCID sandbox
+ */
 export const load = (async ({ params, fetch }) => {
   if (!isValidOrcidId(params.orcidId)) {
     return error(400, 'Invalid ORCID iD');
@@ -46,6 +50,3 @@ export const load = (async ({ params, fetch }) => {
     orcidAccount,
   };
 }) satisfies PageServerLoad;
-
-// 0009-0007-5482-8654 me in prod
-// 0009-0007-1106-8413 drips.network in sandbox
