@@ -14,8 +14,9 @@
   import importFromCSVSteps, {
     WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import type { ListEditorItem } from '$lib/components/list-editor/types';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
