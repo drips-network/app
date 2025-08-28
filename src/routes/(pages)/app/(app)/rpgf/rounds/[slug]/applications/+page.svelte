@@ -43,12 +43,15 @@
       );
     }
   }
+  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.urlSlug)}.png`;
 </script>
 
 <HeadMeta
   title="Applications | {data.wrappedRound.round.name}"
   description="Applications for the RetroPGF round '{data.wrappedRound.round.name}'. {data
     .wrappedRound.round.description ?? ''}"
+  image="{imageBaseUrl}?target=og"
+  twitterImage="{imageBaseUrl}?target=twitter"
 />
 
 <div class="page">

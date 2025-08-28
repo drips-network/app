@@ -64,6 +64,9 @@
             : ''}
           url={$page.url.toString()}
           buttonVariant="normal"
+          downloadableImageUrl={!isDraft && roundSlugOrDraftId
+            ? `/api/share-images/rpgf-round/${encodeURIComponent(roundSlugOrDraftId)}.png?target=og`
+            : undefined}
         />
         {#if isAdmin && roundSlugOrDraftId}
           <Button
