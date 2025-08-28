@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import Button from '../button/button.svelte';
+  import { browser } from '$app/environment';
 
   let expanded = false;
 
@@ -22,14 +23,16 @@
     return containerElem.scrollHeight > containerElem.clientHeight;
   }
 
-  const resizeObserver = new ResizeObserver(() => {
-    overflown = isOverflown();
-  });
+  const resizeObserver = browser
+    ? new ResizeObserver(() => {
+        overflown = isOverflown();
+      })
+    : null;
   onMount(() => {
     overflown = isOverflown();
-    resizeObserver.observe(containerElem);
+    resizeObserver?.observe(containerElem);
     return () => {
-      resizeObserver.disconnect();
+      resizeObserver?.disconnect();
     };
   });
 </script>

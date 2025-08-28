@@ -6,6 +6,7 @@
   import Ledger from '../icons/Ledger.svelte';
   import { z } from 'zod';
   import Trophy from '../icons/Trophy.svelte';
+  import { browser } from '$app/environment';
 
   export let hasExistingBallot: boolean;
   export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
@@ -26,6 +27,7 @@
       dripsAccountId: undefined,
       fields: {},
     },
+    !browser,
   );
 
   $: localApplicationDraftExists =
@@ -33,8 +35,9 @@
     $localApplicationState.dripsAccountId !== undefined ||
     Object.keys($localApplicationState.fields).length > 0;
 
-  const inProgressBallotExists =
-    localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null;
+  const inProgressBallotExists = browser
+    ? localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null
+    : false;
 </script>
 
 {#if state !== 'pending-intake'}

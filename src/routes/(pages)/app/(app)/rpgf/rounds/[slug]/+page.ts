@@ -39,5 +39,5 @@ export const load = async ({ parent }) => {
     );
   }
 
-  return { linkedDripLists: await fetchLists(linkedDripLists) };
+  return { linkedDripLists: await fetchLists(linkedDripLists), blockWhileInitializing: false };
 };

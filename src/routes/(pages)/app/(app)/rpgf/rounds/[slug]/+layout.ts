@@ -1,8 +1,6 @@
 import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
 import { error } from '@sveltejs/kit';
 
-export const ssr = false;
-
 export const load = async ({ fetch, params, parent }) => {
   const { rpgfUserData } = await parent();
 
