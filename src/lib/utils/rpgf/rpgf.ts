@@ -162,9 +162,12 @@ export async function updateDraft(
   draft: PatchRoundDraftDto,
 ): Promise<WrappedRoundDraft> {
   // strip empty fields
-  const strippedDraft = Object.fromEntries(
+  const strippedDraft: PatchRoundDraftDto = Object.fromEntries(
     Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
+
+  // ...except customAvatarCid, which can be null
+  strippedDraft.customAvatarCid = draft.customAvatarCid ?? null;
 
   const res = await authenticatedRpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
 
@@ -304,6 +307,9 @@ export async function patchRound(f = fetch, roundSlug: string, patchRoundDto: Pa
   const strippedRound = Object.fromEntries(
     Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
+
+  //...except customAvatarCid, which can be null
+  strippedRound.customAvatarCid = patchRoundDto.customAvatarCid ?? null;
 
   const res = await authenticatedRpgfServerCall(`/rounds/${roundSlug}`, 'PATCH', strippedRound, f);
 

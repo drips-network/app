@@ -7,7 +7,7 @@
   import { deleteDraft } from '$lib/utils/rpgf/rpgf';
   import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
   import Button from '../button/button.svelte';
-  import EmojiAvatar from '../emoji-avatar/emoji-avatar.svelte';
+  import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import Settings from '../icons/Settings.svelte';
   import Trash from '../icons/Trash.svelte';
   import ShareButton from '../share-button/share-button.svelte';
@@ -16,7 +16,7 @@
   export let roundSlugOrDraftId: string | undefined = undefined;
   export let roundOrDraft: Pick<
     Partial<WrappedRoundDraft['draft']>,
-    'name' | 'emoji' | 'color' | 'adminWalletAddresses'
+    'name' | 'emoji' | 'color' | 'adminWalletAddresses' | 'customAvatarCid'
   >;
 
   export let interactive = true;
@@ -43,7 +43,11 @@
     style:view-transition-name="rpgf-header-card-avatar-{roundSlugOrDraftId}"
     style:view-transition-class="element-handover"
   >
-    <EmojiAvatar emoji={roundOrDraft.emoji} color={roundOrDraft.color} size="huge" />
+    <EmojiOrIpfsAvatar
+      emoji={roundOrDraft.emoji}
+      ipfsCid={roundOrDraft.customAvatarCid ?? undefined}
+      size="huge"
+    />
   </div>
   <div class="content">
     <h1 class:unnamed={!roundOrDraft.name}>

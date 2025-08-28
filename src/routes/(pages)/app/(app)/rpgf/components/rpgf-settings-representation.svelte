@@ -11,6 +11,8 @@
   import EmojiPicker from '$lib/components/emoji-picker/emoji-picker.svelte';
   import RpgfHeaderCard from '$lib/components/rpgf-header-card/rpgf-header-card.svelte';
   import ColorPicker from '$lib/components/color-picker/color-picker.svelte';
+  import TabbedBox from '$lib/components/tabbed-box/tabbed-box.svelte';
+  import CustomAvatarUpload from '$lib/components/custom-avatar-upload/custom-avatar-upload.svelte';
 
   export let settingsFormProps: Omit<ComponentProps<RpgfSettingsForm>, 'updatedRoundOrDraft'>;
   $: isDraft = settingsFormProps.wrappedDraftOrRound.type === 'round-draft';
@@ -91,6 +93,28 @@
   );
 
   let showUrlSuccess = false;
+
+  let activeAvatarTab: 'tab-1' | 'tab-2' = updatedRoundOrDraft.customAvatarCid ? 'tab-2' : 'tab-1';
+
+  $: {
+    if (activeAvatarTab === 'tab-1') {
+      updatedRoundOrDraft = {
+        ...updatedRoundOrDraft,
+        customAvatarCid: null,
+      };
+    }
+  }
+
+  function handleAvatarUploaded(e: CustomEvent<{ ipfsCid: string }>) {
+    if (activeAvatarTab !== 'tab-2') {
+      return;
+    }
+
+    updatedRoundOrDraft = {
+      ...updatedRoundOrDraft,
+      customAvatarCid: e.detail.ipfsCid,
+    };
+  }
 </script>
 
 <RpgfSettingsForm {...settingsFormProps} bind:updatedRoundOrDraft {invalid}>
@@ -103,12 +127,14 @@
   </FormField>
 
   <FormField title="Emoji*">
-    <div
-      style:border="1px solid var(--color-foreground-level-3)"
-      style:border-radius="1rem 0 1rem 1rem"
-    >
-      <EmojiPicker bind:selectedEmoji={updatedRoundOrDraft.emoji} />
-    </div>
+    <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
+      <svelte:fragment slot="tab-1">
+        <EmojiPicker bind:selectedEmoji={updatedRoundOrDraft.emoji} />
+      </svelte:fragment>
+      <svelte:fragment slot="tab-2">
+        <CustomAvatarUpload on:uploaded={handleAvatarUploaded} />
+      </svelte:fragment>
+    </TabbedBox>
   </FormField>
 
   <FormField title="Color*">

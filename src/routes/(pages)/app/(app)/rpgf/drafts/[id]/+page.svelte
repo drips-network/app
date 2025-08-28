@@ -12,6 +12,7 @@
   import type { ComponentProps } from 'svelte';
   import RpgfBaseLayout from '../../components/rpgf-base-layout.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
 
   export let data;
   $: draft = data.wrappedDraft.draft;
@@ -46,67 +47,69 @@
 
 <HeadMeta title={draft.name || 'Unnamed Draft'} />
 
-<RpgfBaseLayout>
-  <svelte:fragment slot="sidebar">
-    <RpgfDraftTodoCard draftWrapper={data.wrappedDraft} />
-    {#if schedule}
-      <RpgfScheduleCard {schedule} />
+<PrimaryColorThemer colorHex={draft.color}>
+  <RpgfBaseLayout>
+    <svelte:fragment slot="sidebar">
+      <RpgfDraftTodoCard draftWrapper={data.wrappedDraft} />
+      {#if schedule}
+        <RpgfScheduleCard {schedule} />
+      {/if}
+    </svelte:fragment>
+
+    <svelte:fragment slot="header">
+      <RpgfHeaderCard roundSlugOrDraftId={$page.params.id} isDraft roundOrDraft={draft} />
+    </svelte:fragment>
+
+    {#if draft.description}
+      <div style:padding="0 1rem">
+        <ExpandableText>
+          <Markdown content={draft.description} />
+        </ExpandableText>
+      </div>
     {/if}
-  </svelte:fragment>
 
-  <svelte:fragment slot="header">
-    <RpgfHeaderCard roundSlugOrDraftId={$page.params.id} isDraft roundOrDraft={draft} />
-  </svelte:fragment>
+    <Section
+      header={{
+        label: 'Applications',
+        icon: Ledger,
+      }}
+      skeleton={{
+        empty: true,
+        loaded: true,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No applications',
+        emptyStateText:
+          'Anyone will be able to submit their applications during the application period.',
+      }}
+    />
 
-  {#if draft.description}
-    <div style:padding="0 1rem">
-      <ExpandableText>
-        <Markdown content={draft.description} />
-      </ExpandableText>
-    </div>
-  {/if}
+    <Section
+      header={{
+        label: 'Results',
+        icon: Trophy,
+      }}
+      skeleton={{
+        empty: true,
+        loaded: true,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No results',
+        emptyStateText: 'After tallying, vote results will be shown here.',
+      }}
+    />
 
-  <Section
-    header={{
-      label: 'Applications',
-      icon: Ledger,
-    }}
-    skeleton={{
-      empty: true,
-      loaded: true,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No applications',
-      emptyStateText:
-        'Anyone will be able to submit their applications during the application period.',
-    }}
-  />
-
-  <Section
-    header={{
-      label: 'Results',
-      icon: Trophy,
-    }}
-    skeleton={{
-      empty: true,
-      loaded: true,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No results',
-      emptyStateText: 'After tallying, vote results will be shown here.',
-    }}
-  />
-
-  <Section
-    header={{
-      label: 'Distribution',
-      icon: DripList,
-    }}
-    skeleton={{
-      empty: true,
-      loaded: true,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No Drip Lists',
-      emptyStateText:
-        'Once you create one or more Drip Lists to distribute funds for this round, they will be shown here.',
-    }}
-  />
-</RpgfBaseLayout>
+    <Section
+      header={{
+        label: 'Distribution',
+        icon: DripList,
+      }}
+      skeleton={{
+        empty: true,
+        loaded: true,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No Drip Lists',
+        emptyStateText:
+          'Once you create one or more Drip Lists to distribute funds for this round, they will be shown here.',
+      }}
+    />
+  </RpgfBaseLayout>
+</PrimaryColorThemer>

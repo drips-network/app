@@ -25,5 +25,5 @@ export default function getContrastColor(forColor: string): 'black' | 'white' {
   const { r, g, b, a } = color;
   const brightness = r * 0.299 + g * 0.587 + b * 0.114 + (1 - a) * 255;
 
-  return brightness > 186 ? 'black' : 'white';
+  return brightness > 170 ? 'black' : 'white';
 }
