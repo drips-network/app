@@ -93,7 +93,7 @@
           .repoName}"
         style:view-transition-class="element-handover"
       >
-        <ProjectAvatar project={projectChainData} size="large" outline />
+        <ProjectAvatar project={projectChainData} size="large" />
       </div>
     </div>
     <div class="name-and-description">
