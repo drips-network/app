@@ -43,7 +43,7 @@
       );
     }
   }
-  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.urlSlug)}.png`;
+  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(roundSlug)}.png`;
 </script>
 
 <HeadMeta
