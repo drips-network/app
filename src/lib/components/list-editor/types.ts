@@ -54,7 +54,7 @@ type ProjectItem = BaseItem & {
   project: ListEditorProjectFragment;
 };
 
-type DripListItem = BaseItem & {
+export type DripListItem = BaseItem & {
   type: 'drip-list';
   dripList: ListEditorDripListFragment;
 };

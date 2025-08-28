@@ -15,6 +15,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
+  import { isHttpError } from '@sveltejs/kit';
 
   const dispatch = createEventDispatcher<{ result: Result }>();
 
@@ -40,7 +41,17 @@
       */
       await Promise.all([promise(updateFn), new Promise((resolve) => setTimeout(resolve, 600))]);
     } catch (e) {
-      const error = e instanceof Error ? e : new Error('Failed to resolve promise');
+      let error: Error;
+
+      if (e instanceof Error) {
+        error = e;
+      } else if (typeof e === 'string') {
+        error = new Error(e);
+      } else if (isHttpError(e)) {
+        error = new Error(e.body.message);
+      } else {
+        error = new Error('An unknown error occurred');
+      }
 
       // eslint-disable-next-line no-console
       console.error(e);

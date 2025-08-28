@@ -14,8 +14,8 @@
 
 <style>
   .wrapper {
-    width: calc(100% + 5rem);
-    margin-left: -2.5rem;
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
     position: relative;
   }
 
@@ -33,7 +33,7 @@
 
   .inner > .content {
     min-width: 100%;
-    padding: 1px 2.5rem; /* 1px so box-shadow outlined content is not clipped */
+    padding: 1px 1rem; /* 1px so box-shadow outlined content is not clipped */
     width: fit-content;
   }
 
@@ -41,7 +41,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 2rem;
+    width: 1rem;
   }
 
   .gradient.left-edge {
@@ -54,5 +54,20 @@
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
     z-index: 1;
+  }
+
+  @media (max-width: 577px) {
+    .wrapper {
+      margin-left: -1rem;
+      width: calc(100% + 2rem);
+    }
+
+    .inner > .content {
+      padding: 1px 1rem; /* 1px so box-shadow outlined content is not clipped */
+    }
+
+    .gradient {
+      width: 1rem;
+    }
   }
 </style>

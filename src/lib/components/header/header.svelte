@@ -13,6 +13,8 @@
       }
     }
   `;
+
+  export const hideElevation = writable(false);
 </script>
 
 <script lang="ts">
@@ -35,12 +37,13 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import { writable } from 'svelte/store';
 
   export let user: HeaderUserFragment | null;
 
   $: chainData = user?.chainData ? filterCurrentChainData(user.chainData) : undefined;
 
-  $: elevated = $scroll.pos > 16;
+  $: elevated = !$hideElevation && $scroll.pos > 16;
 
   export let showLoadingIndicator = false;
 
@@ -60,12 +63,7 @@
         <DripsLogo />
       </div>
 
-      <div
-        in:fly|global={{ duration: 300, y: -16 }}
-        out:fly|global={{ duration: 300, y: 16 }}
-        class="loading-indicator"
-        class:loading={showLoadingIndicator}
-      >
+      <div class="loading-indicator" class:loading={showLoadingIndicator}>
         <Spinner />
       </div>
     </a>
