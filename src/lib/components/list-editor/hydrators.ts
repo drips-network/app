@@ -14,9 +14,9 @@ import type {
   GetOrcidQuery,
   GetOrcidQueryVariables,
 } from './__generated__/gql.generated';
-import { isAddress } from 'ethers';
 import network from '$lib/stores/wallet/network';
 import { fetchOrcid, orcidIdToAccountId } from '../../utils/orcids/fetch-orcid';
+import { calcAccountId } from '$lib/utils/sdk/address-driver/calc-account-id';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
@@ -116,24 +116,6 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
     orcid: orcidAccount,
   };
 };
-
-function calcAccountId(addr: string): bigint {
-  if (!isAddress(addr)) {
-    throw new Error('Invalid Ethereum address format');
-  }
-
-  const driverId = 0;
-
-  const addrBigInt = BigInt(addr);
-
-  // Shift left by 224 bits to make space for the address
-  let accountId = BigInt(driverId) << 224n;
-
-  // Combine the shifted driverId and the address BigInt
-  accountId |= addrBigInt;
-
-  return accountId;
-}
 
 export const getAddress = async (address: string): Promise<RecipientResult> => {
   try {

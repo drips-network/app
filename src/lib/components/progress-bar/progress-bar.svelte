@@ -14,9 +14,14 @@
     progressFn: ProgressFn;
     updateFrequencyMs?: number;
     errorMessage?: string | undefined;
+    centeredProgressText?: boolean;
   }
+  // export let progressFn: ProgressFn;
+  // export let updateFrequencyMs = 10;
+  // export let errorMessage: string | undefined = undefined;
+  // export let centeredProgressText = true;
 
-  let { progressFn, updateFrequencyMs = 10, errorMessage = undefined }: Props = $props();
+  let { progressFn, updateFrequencyMs = 10, errorMessage = undefined, centeredProgressText = true }: Props = $props();
 
   let interval: ReturnType<typeof setInterval> | undefined = $state();
 
@@ -86,13 +91,18 @@
       {/if}
     </div>
   </div>
+
   {#if remainingText || done}
     <p
       style:margin-top="0.25rem"
+      style:width="100%"
       style:min-height="2rem"
       style:display="flex"
+      style:text-align={centeredProgressText ? 'center' : 'left'}
+      style:justify-content={centeredProgressText ? 'center' : 'flex-start'}
       style:align-items="center"
       style:gap="0.125rem"
+      style:font-feature-settings="'tnum'"
       class="typo-text"
       style:color={textColor}
       transition:slide={{ duration: 300 }}
@@ -112,7 +122,11 @@
 
 <style>
   .progress-bar-wrapper {
+    min-width: 16rem;
     color: var(--color-foreground-level-6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .progress-bar-container {

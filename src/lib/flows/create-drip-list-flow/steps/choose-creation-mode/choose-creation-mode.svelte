@@ -15,15 +15,20 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   interface Props {
     context: Writable<State>;
     canCancel?: boolean;
+    blueprintMode?: boolean;
   }
+  // export let context: Writable<State>;
+  // export let canCancel = false;
+  // export let blueprintMode = false;
 
-  let { context, canCancel = false }: Props = $props();
+  let { context, canCancel = false, blueprintMode = false }: Props = $props();
 
   let textAreaValidationState: TextInputValidationState = $derived(
     !$context.dripList.description
@@ -46,6 +51,13 @@
   headline="Create a Drip List"
   description="Choose your new list's name and description, and decide how you'd like to add recipients."
 >
+  {#if blueprintMode}
+    <AnnotationBox type="info">
+      You are creating a Drip List based on an externally-created blueprint. You can review the
+      recipients of your Drip List in the next step.
+    </AnnotationBox>
+  {/if}
+
   <FormField title="Title*">
     <TextInput bind:value={$context.dripList.title} />
   </FormField>
@@ -57,48 +69,52 @@
       validationState={textAreaValidationState}
     />
   </FormField>
-  <FormField title="Recipients*">
-    <TwoBigOptions
-      bind:selected={$context.selectedCreationMode}
-      option1={{
-        emoji: '🧐',
-        title: 'Choose by yourself',
-        attributes: [
-          {
-            icon: DripList,
-            text: 'Decide on recipients yourself',
-          },
-          {
-            icon: TokenStreams,
-            text: 'Still publicly available for donations',
-          },
-          {
-            icon: Proposals,
-            text: 'Decide to collaborate anytime later',
-          },
-        ],
-      }}
-      option2={{
-        emoji: '👪',
-        title: 'Collaborate on recipients',
-        attributes: [
-          {
-            icon: DripList,
-            text: 'Invite collaborators to decide together',
-          },
-          {
-            icon: Proposals,
-            text: 'Set a voting period',
-          },
-          {
-            icon: ArrowUp,
-            text: 'Publish your list after voting',
-          },
-        ],
-      }}
-    />
-  </FormField>
-  {#snippet actions()}
+
+  {#if !blueprintMode}
+    <FormField title="Recipients*">
+      <TwoBigOptions
+        bind:selected={$context.selectedCreationMode}
+        option1={{
+          emoji: '🧐',
+          title: 'Choose by yourself',
+          attributes: [
+            {
+              icon: DripList,
+              text: 'Decide on recipients yourself',
+            },
+            {
+              icon: TokenStreams,
+              text: 'Still publicly available for donations',
+            },
+            {
+              icon: Proposals,
+              text: 'Decide to collaborate anytime later',
+            },
+          ],
+        }}
+        option2={{
+          emoji: '👪',
+          title: 'Collaborate on recipients',
+          attributes: [
+            {
+              icon: DripList,
+              text: 'Invite collaborators to decide together',
+            },
+            {
+              icon: Proposals,
+              text: 'Set a voting period',
+            },
+            {
+              icon: ArrowUp,
+              text: 'Publish your list after voting',
+            },
+          ],
+        }}
+      />
+    </FormField>
+  {/if}
+
+  <svelte:fragment slot="actions">
     {#if canCancel}
       <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     {/if}

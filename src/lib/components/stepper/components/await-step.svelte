@@ -16,6 +16,8 @@
   import { createEventDispatcher, onMount, type Component } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
   import { isHttpError } from '@sveltejs/kit';
+  import type { ProgressFn } from '$lib/components/progress-bar/progress-bar.svelte';
+  import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
 
   const dispatch = createEventDispatcher<{ result: Result }>();
 
@@ -25,6 +27,10 @@
     link?: { url: string; label: string } | undefined;
     icon?: { component: Component; props: Record<string, unknown> } | undefined;
     promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+    progressBar?: {
+      progressFn: ProgressFn;
+      centeredProgressText?: boolean;
+    } | undefined;
   }
 
   let {
@@ -33,7 +39,24 @@
     link = $bindable(),
     icon = $bindable(),
     promise,
+    progressBar = $bindable(),
   }: Props = $props();
+
+
+  const dispatch = createEventDispatcher<{ result: Result }>();
+
+  // export let message: string;
+  // export let subtitle: string | undefined = undefined;
+  // export let link: { url: string; label: string } | undefined = undefined;
+  // export let icon: { component: ComponentType; props: Record<string, unknown> } | undefined =
+  //   undefined;
+  // export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  // export let progressBar:
+  //   | {
+  //       progressFn: ProgressFn;
+  //       centeredProgressText?: boolean;
+  //     }
+  //   | undefined = undefined;
 
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;
@@ -87,6 +110,11 @@
   {/if}
   <p>{message}</p>
   {#if subtitle}<p class="subtitle typo-text-small">{subtitle}</p>{/if}
+
+  {#if progressBar}
+    <ProgressBar {...progressBar} />
+  {/if}
+
   {#if link}
     <a class="typo-link" href={link.url} target="_blank" rel="noreferrer">{link.label}</a>
   {/if}
