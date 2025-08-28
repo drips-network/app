@@ -15,6 +15,7 @@
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let data;
   $: round = data.wrappedRound.round;
@@ -145,6 +146,16 @@
       {/each}
 
       <div class="field">
+        <h2 class="typo-header-4">GitHub repository</h2>
+        <ProjectBadge size="tiny" forceUnclaimed project={data.dripsProject} tooltip={false} />
+      </div>
+
+      <div class="field">
+        <h2 class="typo-header-4">Submitted by</h2>
+        <IdentityBadge address={application.submitter.walletAddress} />
+      </div>
+
+      <div class="field">
         <h2 class="typo-header-4">Submitted at</h2>
         <p>
           {new Date(application.createdAt).toLocaleDateString('en-US', {
@@ -155,10 +166,6 @@
             minute: '2-digit',
           })}
         </p>
-      </div>
-      <div class="field">
-        <h2 class="typo-header-4">GitHub repository</h2>
-        <ProjectBadge forceUnclaimed project={data.dripsProject} tooltip={false} />
       </div>
     </div>
   </div>
