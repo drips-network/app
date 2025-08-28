@@ -63,12 +63,7 @@
         <DripsLogo />
       </div>
 
-      <div
-        in:fly|global={{ duration: 300, y: -16 }}
-        out:fly|global={{ duration: 300, y: 16 }}
-        class="loading-indicator"
-        class:loading={showLoadingIndicator}
-      >
+      <div class="loading-indicator" class:loading={showLoadingIndicator}>
         <Spinner />
       </div>
     </a>

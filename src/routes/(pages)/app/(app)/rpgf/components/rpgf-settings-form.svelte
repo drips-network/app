@@ -12,6 +12,7 @@
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { patchRound, updateDraft } from '$lib/utils/rpgf/rpgf';
   import type {
@@ -104,23 +105,25 @@
   });
 </script>
 
-<div class="rpgf-settings-form">
-  <slot {updatedRoundOrDraft} />
+<PrimaryColorThemer colorHex={updatedRoundOrDraft.color}>
+  <div class="rpgf-settings-form">
+    <slot {updatedRoundOrDraft} />
 
-  <div class="actions">
-    {#if success}
-      <div in:fly={{ y: 8, duration: 300 }} out:fly={{ y: -8, duration: 300 }}>
-        <CheckCircle style="fill: var(--color-positive)" />
-      </div>
-    {/if}
-    <Button
-      variant="primary"
-      loading={saving}
-      on:click={handleSave}
-      disabled={!haveFieldsChanged || invalid}>Save changes</Button
-    >
+    <div class="actions">
+      {#if success}
+        <div in:fly={{ y: 8, duration: 300 }} out:fly={{ y: -8, duration: 300 }}>
+          <CheckCircle style="fill: var(--color-positive)" />
+        </div>
+      {/if}
+      <Button
+        variant="primary"
+        loading={saving}
+        on:click={handleSave}
+        disabled={!haveFieldsChanged || invalid}>Save changes</Button
+      >
+    </div>
   </div>
-</div>
+</PrimaryColorThemer>
 
 <style>
   .rpgf-settings-form {

@@ -5,7 +5,7 @@
     WrappedRoundDraft,
     WrappedRoundPublic,
   } from '$lib/utils/rpgf/schemas';
-  import EmojiAvatar from '../emoji-avatar/emoji-avatar.svelte';
+  import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
@@ -47,7 +47,11 @@
         style:view-transition-name="rpgf-header-card-avatar-{roundSlugOrDraftId}"
         style:view-transition-class="element-handover"
       >
-        <EmojiAvatar emoji={draftOrRound.emoji} color={draftOrRound.color} size="large" />
+        <EmojiOrIpfsAvatar
+          emoji={draftOrRound.emoji}
+          ipfsCid={draftOrRound.customAvatarCid ?? undefined}
+          size="large"
+        />
       </div>
       <h2 class="pixelated">{draftOrRound.name ?? 'Unnamed draft'}</h2>
       <IdentityBadge address={wrappedRoundOrDraft.createdBy.walletAddress} />

@@ -28,6 +28,7 @@ import {
 import { z } from 'zod';
 import network from '$lib/stores/wallet/network';
 import { error } from '@sveltejs/kit';
+import walletStore from '$lib/stores/wallet/wallet.store';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -77,7 +78,7 @@ export async function authenticatedRpgfServerCall(
   f = fetch,
   attemptRefresh: boolean = true,
 ) {
-  const accessToken = get(rpgfAccessJwtStore);
+  const accessToken = get(walletStore).connected ? get(rpgfAccessJwtStore) : null;
 
   const res = await rpgfServerCall(
     path,
@@ -161,9 +162,12 @@ export async function updateDraft(
   draft: PatchRoundDraftDto,
 ): Promise<WrappedRoundDraft> {
   // strip empty fields
-  const strippedDraft = Object.fromEntries(
+  const strippedDraft: PatchRoundDraftDto = Object.fromEntries(
     Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
+
+  // ...except customAvatarCid, which can be null
+  strippedDraft.customAvatarCid = draft.customAvatarCid ?? null;
 
   const res = await authenticatedRpgfServerCall(`/round-drafts/${id}`, 'PATCH', strippedDraft, f);
 
@@ -303,6 +307,9 @@ export async function patchRound(f = fetch, roundSlug: string, patchRoundDto: Pa
   const strippedRound = Object.fromEntries(
     Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
   );
+
+  //...except customAvatarCid, which can be null
+  strippedRound.customAvatarCid = patchRoundDto.customAvatarCid ?? null;
 
   const res = await authenticatedRpgfServerCall(`/rounds/${roundSlug}`, 'PATCH', strippedRound, f);
 

@@ -159,6 +159,7 @@ const roundPublicFieldsSchema = z.object({
   id: z.string().uuid(),
   chainId: z.number(),
   emoji: z.string().emoji(),
+  customAvatarCid: z.string().nullable(),
   color: possibleColorSchema,
   urlSlug: z.string().transform((val) => val.toLowerCase()),
   state: roundStateSchema,
@@ -224,6 +225,7 @@ export type WrappedRoundAdmin = z.infer<typeof wrappedRoundAdminSchema>;
 export const createRoundDtoSchema = z.object({
   name: z.string().min(1).max(255),
   emoji: z.string().emoji(),
+  customAvatarCid: z.string().min(1).max(255).nullable(),
   color: possibleColorSchema,
   urlSlug: z
     .string()
@@ -414,6 +416,9 @@ export const applicationSchema = (applicationFormat: ApplicationFormat) =>
     result: z.number().nullable().optional(),
     createdAt: z.string().pipe(z.coerce.date()),
     updatedAt: z.string().pipe(z.coerce.date()),
+    submitter: z.object({
+      walletAddress: ethereumAddressSchema,
+    }),
   });
 export type Application = z.infer<ReturnType<typeof applicationSchema>>;
 

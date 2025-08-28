@@ -9,6 +9,12 @@ html.smoothscroll {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html.smoothscroll {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   -webkit-tap-highlight-color: transparent;
   text-wrap: pretty;

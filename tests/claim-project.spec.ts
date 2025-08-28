@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import { Project } from './fixtures/Project';
+import { projectClaimManager } from './fixtures/ProjectClaimManager';
 
 const test = base.extend<{ connectedSession: ConnectedSession; project: Project }>({
   connectedSession: async ({ page }, use) => {
@@ -11,7 +12,7 @@ const test = base.extend<{ connectedSession: ConnectedSession; project: Project 
     await use(connectedSession);
   },
   project: async ({ connectedSession }, use) => {
-    await use(new Project(connectedSession, 'https://github.com/efstajas/drips-test-repo-10'));
+    await use(new Project(connectedSession, projectClaimManager));
   },
 });
 
