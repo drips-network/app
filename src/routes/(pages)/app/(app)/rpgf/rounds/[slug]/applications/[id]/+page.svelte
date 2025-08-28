@@ -16,6 +16,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   export let data;
   $: round = data.wrappedRound.round;
@@ -103,7 +104,7 @@
                 <a
                   style:width="fit-content"
                   class="typo-link"
-                  href={value}
+                  href={buildExternalUrl(value)}
                   target="_blank"
                   rel="noopener noreferrer">{value}</a
                 >
@@ -126,7 +127,7 @@
                               const fieldDef = field.entryFields.find((ef) => ef.label === label);
 
                               if (fieldDef?.type === 'url' && typeof value === 'string') {
-                                return [label, { href: value }];
+                                return [label, { href: buildExternalUrl(value) }];
                               } else {
                                 return [label, value];
                               }
