@@ -27,9 +27,16 @@
   $: round = data.wrappedRound.round;
 
   $: userIsAdmin = round.adminWalletAddresses.includes(data.rpgfUserData?.walletAddress || '');
+
+  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.urlSlug)}.png`;
 </script>
 
-<HeadMeta title={round.name} description={round.description ?? undefined} />
+<HeadMeta
+  title={round.name}
+  description={round.description ?? undefined}
+  image="{imageBaseUrl}?target=og"
+  twitterImage="{imageBaseUrl}?target=twitter"
+/>
 
 <PrimaryColorThemer colorHex={round.color}>
   <RpgfBaseLayout>

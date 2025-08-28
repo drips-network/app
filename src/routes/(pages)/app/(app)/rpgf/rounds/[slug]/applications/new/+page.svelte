@@ -148,7 +148,7 @@
   let forceRevealAllErrors = formDataHasBeenRestored;
 </script>
 
-<HeadMeta title="New application" />
+<HeadMeta title="Apply to {round.name}" />
 
 <div class="page">
   <Button

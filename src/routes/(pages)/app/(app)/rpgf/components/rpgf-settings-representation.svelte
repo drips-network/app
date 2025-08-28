@@ -126,7 +126,7 @@
     <TextInput bind:value={updatedRoundOrDraft.name} placeholder="My RPGF round" />
   </FormField>
 
-  <FormField title="Emoji*">
+  <FormField title="Avatar*">
     <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
       <svelte:fragment slot="tab-1">
         <EmojiPicker bind:selectedEmoji={updatedRoundOrDraft.emoji} />
