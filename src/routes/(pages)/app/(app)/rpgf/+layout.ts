@@ -79,5 +79,3 @@ export const load = async ({ url, fetch }) => {
     };
   }
 };
-
-export const ssr = false;
