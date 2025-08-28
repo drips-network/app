@@ -39,9 +39,9 @@ export LOCAL_GID=$(id -g)
 
 # TODO: REMOVE!
 if [ $PROD_BUILD = true ]; then
-  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true GRAPHQL_API_TAG=jason-ecosystems EVENT_PROCESSOR_TAG=ecosystems docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true CONTRACTS_TAG=igor-orcid docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
 else
-  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true GRAPHQL_API_TAG=jason-ecosystems EVENT_PROCESSOR_TAG=ecosystems docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true CONTRACTS_TAG=igor-orcid docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 fi
 
 
