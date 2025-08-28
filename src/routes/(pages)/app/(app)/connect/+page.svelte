@@ -16,12 +16,12 @@
       case requireRpgfSignIn && $walletStore.connected:
         emoji = '🔐';
         headline = `Sign in to continue`;
-        emptyStateText = `You need to sign in with your wallet to access Drips RPGF features. This does not require a transaction.`;
+        emptyStateText = `You need to sign in with your wallet to access RetroPGF on Drips features. This does not require a transaction.`;
         break;
       case requireRpgfSignIn:
         emoji = '👛';
         headline = `No wallet connected`;
-        emptyStateText = `Connect your Ethereum wallet to access Drips RetroPGF.`;
+        emptyStateText = `Connect your Ethereum wallet to access RetroPGF on Drips.`;
         break;
       case /\/app\/funds/.test(backTo):
         emoji = '👛';

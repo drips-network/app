@@ -97,7 +97,7 @@ test.describe('drafts', () => {
     await rpgfRound2.page.goto(`http://localhost:5173/app/rpgf/drafts/${draftId}`);
     await expect(rpgfRound2.page.getByText('draft visibility test')).not.toBeVisible();
     await expect(
-      rpgfRound2.page.getByText('Connect your Ethereum wallet to access Drips RetroPGF.'),
+      rpgfRound2.page.getByText('Connect your Ethereum wallet to access RetroPGF on Drips.'),
     ).toBeVisible();
   });
 });
