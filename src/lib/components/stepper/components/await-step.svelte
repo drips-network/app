@@ -15,6 +15,8 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
+  import type { ProgressFn } from '$lib/components/progress-bar/progress-bar.svelte';
+  import ProgressBar from '$lib/components/progress-bar/progress-bar.svelte';
 
   const dispatch = createEventDispatcher<{ result: Result }>();
 
@@ -24,6 +26,12 @@
   export let icon: { component: ComponentType; props: Record<string, unknown> } | undefined =
     undefined;
   export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  export let progressBar:
+    | {
+        progressFn: ProgressFn;
+        centeredProgressText?: boolean;
+      }
+    | undefined = undefined;
 
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;
@@ -67,6 +75,11 @@
   {/if}
   <p>{message}</p>
   {#if subtitle}<p class="subtitle typo-text-small">{subtitle}</p>{/if}
+
+  {#if progressBar}
+    <ProgressBar {...progressBar} />
+  {/if}
+
   {#if link}
     <a class="typo-link" href={link.url} target="_blank" rel="noreferrer">{link.label}</a>
   {/if}

@@ -21,6 +21,8 @@ import ConfigureVotingRound from './steps/configure-voting-round/configure-votin
 import type { Items } from '$lib/components/list-editor/types';
 import ReviewVotingRound from './steps/review-voting-round/review-voting-round.svelte';
 import type { AddItemError } from '$lib/components/list-editor/errors';
+import type { Blueprint } from '../../../routes/api/list-blueprints/blueprintSchema';
+import PopulateBlueprint from './steps/populate-blueprint/populate-blueprint.svelte';
 
 export interface State {
   dripList: DripListConfig;
@@ -151,11 +153,34 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
-export const steps = (state: Writable<State>, skipWalletConnect = false, isModal = false) => [
+export const steps = (
+  state: Writable<State>,
+  skipWalletConnect = false,
+  isModal = false,
+  blueprintOrBlueprintError:
+    | {
+        blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined;
+      }
+    | {
+        blueprint: Blueprint;
+      }
+    | undefined,
+) => [
+  ...(blueprintOrBlueprintError
+    ? [
+        makeStep({
+          component: PopulateBlueprint,
+          props: {
+            blueprintOrBlueprintError,
+          },
+        }),
+      ]
+    : []),
   makeStep({
     component: ChooseCreationMode,
     props: {
       canCancel: isModal,
+      blueprintMode: !!blueprintOrBlueprintError,
     },
   }),
   makeStep({
