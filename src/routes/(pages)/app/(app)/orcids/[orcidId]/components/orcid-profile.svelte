@@ -27,6 +27,7 @@
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
   import type { SupportCardOrcidFragment } from '$lib/components/support-card/__generated__/gql.generated';
+  import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -57,9 +58,10 @@
     }),
   } satisfies SupportCardOrcidFragment;
 
-  function launchClaimOrcid() {
+  function claimOrcid() {
     // eslint-disable-next-line no-console
     console.log('Launch claim ORCID flow');
+    launchClaimOrcid(orcidAccount.source.url)
   }
 </script>
 
@@ -93,7 +95,7 @@
               size="small"
               icon={Registered}
               variant="primary"
-              on:click={() => launchClaimOrcid()}>Claim ORCID iD</Button
+              on:click={claimOrcid}>Claim ORCID iD</Button
             >
           </div>
         </svelte:fragment>
