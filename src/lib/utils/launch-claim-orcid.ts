@@ -1,0 +1,24 @@
+import walletStore from '$lib/stores/wallet/wallet.store';
+import modal from '$lib/stores/modal';
+import ClaimOrcidStepper from '$lib/flows/claim-orcid-flow/claim-orcid-stepper.svelte';
+import { goto } from '$app/navigation';
+import { get } from 'svelte/store';
+import buildUrl from './build-url';
+
+export default function launchClaimOrcid(orcidUrl?: string) {
+  if (get(walletStore).connected) {
+    modal.show(ClaimOrcidStepper, undefined, {
+      skipWalletConnect: true,
+      orcidUrl,
+    });
+    return;
+  }
+
+  const claimOrcidPath = '/app/claim-orcid';
+  if (orcidUrl) {
+    goto(buildUrl(claimOrcidPath, { orcidUrl }));
+    return;
+  }
+
+  goto(claimOrcidPath);
+}
