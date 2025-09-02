@@ -1,0 +1,329 @@
+<script lang="ts" context="module">
+  import { gql } from 'graphql-request';
+
+  export const ENTER_GIT_URL_STEP_ORCID_FRAGMENT = gql`
+    ${UNCLAIMED_ORCID_CARD_FRAGMENT}
+    fragment EnterGitUrlStepOrcid on OrcidAccount {
+      ...UnclaimedOrcidCard
+      account {
+        accountId
+      }
+      chainData {
+        ... on UnClaimedOrcidAccountData {
+          linkedTo {
+            address
+          }
+          withdrawableBalances {
+            tokenAddress
+          }
+        }
+      }
+    }
+  `;
+</script>
+
+<script lang="ts">
+  import TextInput from '$lib/components/text-input/text-input.svelte';
+  import type { Writable } from 'svelte/store';
+  import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import { CLAIM_ORCID_FLOW_ORCID_FRAGMENT, type State } from '../../claim-orcid-flow';
+  import LinkIcon from '$lib/components/icons/Link.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import ArrowRightIcon from '$lib/components/icons/ArrowRight.svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+  import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
+  import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
+  import seededRandomElement from '$lib/utils/seeded-random-element';
+  import { page } from '$app/stores';
+  import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
+  import query from '$lib/graphql/dripsQL';
+  import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import possibleColors from '$lib/utils/project/possible-colors';
+  import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
+  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import network from '$lib/stores/wallet/network';
+  // import type { GetRepoResponse } from '../../../../../routes/api/github/[repoUrl]/+server';
+  // import isClaimed from '$lib/utils/project/is-claimed';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import modal from '$lib/stores/modal';
+  import { loadFundingInfo } from './enter-git-url';
+  import { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
+  // import { fetchOrcid as fetchOrcidProfile } from '$lib/api/orcid/fetch-orcid';
+  import getLastPathSegment from '$lib/utils/get-last-path-segment';
+  import { fetchOrcid } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
+
+  export let context: Writable<State>;
+  export let orcidUrl: string | undefined = undefined;
+
+  const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  let validationState: TextInputValidationState = { type: 'unvalidated' };
+
+  $: formValid = validationState.type === 'valid';
+
+  const { searchParams } = $page.url;
+  const orcidToAdd = orcidUrl ?? searchParams.get('orcidUrl') ?? undefined;
+
+  onMount(() => {
+    if (orcidToAdd) {
+      $context.gitUrl = orcidToAdd;
+      fetchOrcidProfile();
+    }
+  });
+
+  // let claimingRenamedRepoOriginalName: string | undefined;
+
+  const projectQuery = gql`
+    ${CLAIM_ORCID_FLOW_ORCID_FRAGMENT}
+    query Project($url: String!, $chains: [SupportedChain!]) {
+      projectByUrl(url: $url, chains: $chains) {
+        ...ClaimProjectFlowProject
+      }
+    }
+  `;
+
+  class InvalidUrlError extends Error {}
+
+  // function fixGitUrlFormat(gitUrl: string) {
+  //   let enteredUrlFixedFormat = gitUrl;
+
+  //   enteredUrlFixedFormat = enteredUrlFixedFormat.trim();
+
+  //   // format URL with "https://" (add, or replace "http://" since API error)
+  //   if (!/^https:\/\//.test(enteredUrlFixedFormat)) {
+  //     enteredUrlFixedFormat = 'https://' + enteredUrlFixedFormat.replace(/^http:\/\//, '');
+  //   }
+
+  //   // if url ends with /, remove it
+  //   if (enteredUrlFixedFormat.endsWith('/')) {
+  //     enteredUrlFixedFormat = enteredUrlFixedFormat.slice(0, -1);
+  //   }
+
+  //   return enteredUrlFixedFormat;
+  // }
+
+  // async function fetchRepoFromGitHub(gitUrl: string): Promise<GetRepoResponse> {
+  //   const repoInfoRes = await fetch(`/api/github/${encodeURIComponent(gitUrl)}`);
+
+  //   if (!repoInfoRes.ok) {
+  //     throw new InvalidUrlError(
+  //       'Repo not found. Make sure you enter a link to a public GitHub repository.',
+  //     );
+  //   }
+
+  //   return await repoInfoRes.json();
+  // }
+
+  // async function normalizeGitUrl(
+  //   gitUrl: string,
+  //   repoInfo: GetRepoResponse,
+  // ): Promise<{ result: string; newRepoName?: string }> {
+  //   const { url: realUrl } = repoInfo;
+
+  //   if (realUrl === gitUrl) {
+  //     // Everything checks out.
+  //     return { result: gitUrl };
+  //   }
+
+  //   if (realUrl.toLowerCase() === gitUrl.toLowerCase()) {
+  //     // The casing is different. Normally, it should correct the casing, except in rare cases
+  //     // where the wrongly-cased project actually has some funds on Drips. This can happen if a split
+  //     // to the project was established before the Drips app properly fixed casing of projects.
+
+  //     const wronglyCasedProject = (
+  //       await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
+  //         url: gitUrl,
+  //       })
+  //     ).projectByUrl?.chainData;
+
+  //     if (!wronglyCasedProject) {
+  //       return { result: realUrl };
+  //     }
+
+  //     const wronglyCasedProjectChainData = filterCurrentChainData(wronglyCasedProject);
+  //     if (isClaimed(wronglyCasedProjectChainData)) {
+  //       return { result: realUrl };
+  //     }
+
+  //     const wronglyCasedProjectHasFunds =
+  //       wronglyCasedProjectChainData.withdrawableBalances.length > 0;
+
+  //     return wronglyCasedProjectHasFunds ? { result: gitUrl } : { result: realUrl };
+  //   }
+
+  //   // The URL is different. Can happen if the repo was renamed on GitHub. In this case, we want to let
+  //   // the user claim the "old" project, but warn them about it.
+  //   return { result: gitUrl, newRepoName: `${repoInfo.ownerName}/${repoInfo.repoName}` };
+  // }
+
+  async function fetchOrcidProfile() {
+    $context.linkedToRepo = false;
+
+    try {
+      validationState = { type: 'pending' };
+
+      // const fixedGitUrl = fixGitUrlFormat($context.gitUrl);
+
+      // const repoInfo = await fetchRepoFromGitHub(fixedGitUrl);
+      const orcidId = getLastPathSegment($context.gitUrl || '');
+      if(!orcidId) {
+        throw new InvalidUrlError('Invalid ORCID iD URL');
+      }
+
+      const orcidInfo = await fetchOrcid(orcidId, fetch)
+      if(!orcidInfo) {
+        throw new InvalidUrlError('ORCID iD not found');
+      }
+
+      // const { result, newRepoName } = await normalizeGitUrl(fixedGitUrl, repoInfo);
+
+      // $context.gitUrl = result;
+      // if (newRepoName) claimingRenamedRepoOriginalName = newRepoName;
+
+      $context.orcidMetadata = orcidInfo
+
+      const response = await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
+        url: $context.gitUrl,
+        chains: [network.gqlName],
+      });
+
+      const project = response.projectByUrl;
+
+      if (!project) {
+        throw new InvalidUrlError("Repo doesn't exist or is private");
+      }
+
+      const projectChainData = filterCurrentChainData(project.chainData);
+
+      if (projectChainData.__typename === 'ClaimedProjectData') {
+        throw new InvalidUrlError('Project already claimed');
+      }
+
+      if (
+        projectChainData.__typename === 'UnClaimedProjectData' &&
+        projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
+      ) {
+        // The correct owner was already set previously for whatever reason. We can skip updating the owner.
+        $context.isPartiallyClaimed = true;
+      }
+
+      $context.project = project;
+
+      $context.avatar = {
+        type: 'emoji',
+        emoji: seededRandomElement(possibleRandomEmoji, project.account.accountId),
+      };
+      $context.projectColor = seededRandomElement(possibleColors, project.account.accountId);
+
+      validationState = { type: 'valid' };
+    } catch (error: unknown) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof InvalidUrlError) {
+        validationState = { type: 'invalid', message: error.message };
+      } else {
+        validationState = {
+          type: 'invalid',
+          message: 'An unexpected error occured. There may be more details in the console.',
+        };
+      }
+    }
+  }
+
+  function clearProject() {
+    $context.orcidAccount = undefined;
+    $context.linkedToRepo = false;
+    $context.isPartiallyClaimed = false;
+    $context.orcidMetadata = undefined;
+
+    // claimingRenamedRepoOriginalName = undefined;
+
+    validationState = { type: 'unvalidated' };
+  }
+
+  function submitInput() {
+    if (isSupportedGitUrl($context.gitUrl)) {
+      fetchOrcidProfile();
+    } else if (isValidGitUrl($context.gitUrl) && !isSupportedGitUrl($context.gitUrl)) {
+      validationState = { type: 'invalid', message: 'Unsupported URL' };
+    }
+  }
+
+  $: inputSubmittable =
+    isSupportedGitUrl($context.gitUrl) &&
+    validationState.type !== 'valid' &&
+    validationState.type !== 'pending';
+
+  async function onPaste() {
+    // need to wait some time for value to be available ¯\_(ツ)_/¯
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    submitInput();
+  }
+
+  function goForward() {
+    dispatch('await', {
+      message: 'Gathering project information…',
+      promise: () => {
+        return loadFundingInfo(context);
+      },
+    });
+  }
+
+  onMount(() => {
+    modal.setWarnOnNavigate(true);
+  });
+</script>
+
+<StandaloneFlowStepLayout
+  headline="Claim your ORCID iD"
+  description="Enter your identity’s URL to see if it has claimable funds and start the registration."
+>
+  <TextInput
+    bind:value={$context.gitUrl}
+    icon={LinkIcon}
+    placeholder="Paste your GitHub project URL"
+    disabled={validationState.type === 'valid' || validationState.type === 'pending'}
+    {validationState}
+    showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
+    on:clear={clearProject}
+    on:keydown={(e) => e.key === 'Enter' && submitInput()}
+    on:paste={onPaste}
+  />
+  {#if $context.project && validationState.type === 'valid'}
+    <UnclaimedProjectCard
+      project={$context.project}
+      projectMetadata={$context.projectMetadata}
+      claimableTokensKey="Claimable tokens"
+    />
+    {#if claimingRenamedRepoOriginalName}
+      <AnnotationBox>
+        You're claiming a project that has been renamed to {claimingRenamedRepoOriginalName.replace(
+          'https://github.com/',
+          '',
+        )} on GitHub. Please ensure that the repository URL you entered matches the old name of your
+        repo exactly (including casing), and validate that any funds you're expecting to claim are displayed
+        above.
+      </AnnotationBox>
+    {/if}
+  {/if}
+  <svelte:fragment slot="actions">
+    {#if formValid}
+      <Button icon={ArrowRightIcon} variant="primary" on:click={goForward}>Continue</Button>
+    {:else}
+      <Button
+        disabled={!inputSubmittable}
+        icon={MagnifyingGlass}
+        variant="primary"
+        on:click={() => submitInput()}>Search</Button
+      >
+    {/if}
+  </svelte:fragment>
+  <svelte:fragment slot="left-actions">
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+  </svelte:fragment>
+</StandaloneFlowStepLayout>
