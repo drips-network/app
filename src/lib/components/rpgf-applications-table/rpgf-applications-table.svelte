@@ -1,20 +1,17 @@
 <script lang="ts">
-  import type {
-    Application,
-    InProgressBallot,
-    WrappedRoundAdmin,
-    WrappedRoundPublic,
-  } from '$lib/utils/rpgf/schemas';
   import { writable, type Writable } from 'svelte/store';
   import ApplicationLineItem from './components/application-line-item.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import MagnifyingGlass from '../icons/MagnifyingGlass.svelte';
   import Cross from '../icons/Cross.svelte';
+  import type { ListingApplication } from '$lib/utils/rpgf/types/application';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
 
   export let searchable = true;
 
-  export let applications: Application[];
-  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let applications: ListingApplication[];
+  export let round: Round;
 
   export let reviewMode = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
@@ -30,7 +27,7 @@
     );
   });
 
-  $: includesResults = applications.some((a) => a.result !== null);
+  $: includesResults = applications.some((a) => a.allocation !== null);
 </script>
 
 {#if searchable}

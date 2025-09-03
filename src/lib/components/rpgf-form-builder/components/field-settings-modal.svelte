@@ -8,10 +8,10 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import modal from '$lib/stores/modal';
-  import { applicationFieldSchema, type ApplicationFormat } from '$lib/utils/rpgf/schemas';
+  import { applicationFieldSchema, type ApplicationFormFields } from '$lib/utils/rpgf/types/application';
 
-  export let fieldSettings: ApplicationFormat[number];
-  export let onSave: (field: ApplicationFormat[number]) => void;
+  export let fieldSettings: ApplicationFormFields[number];
+  export let onSave: (field: ApplicationFormFields[number]) => void;
   export let unavailableSlugs: string[];
 
   let valid: boolean;

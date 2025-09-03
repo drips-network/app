@@ -14,17 +14,12 @@
   import emoji from '$lib/utils/emoji/emoji.js';
   import possibleColors from '$lib/utils/project/possible-colors.js';
   import { DEFAULT_PRESET } from '$lib/utils/rpgf/application-form-presets.js';
-  import { createDraft } from '$lib/utils/rpgf/rpgf.js';
+  import { createRound } from '$lib/utils/rpgf/rpgf.js';
   import type { PossibleColor } from '$lib/utils/rpgf/schemas.js';
 
   export let data;
-  $: ownRoundsAndDrafts = data.rpgfUserData
-    ? [
-        ...data.rounds.filter((round) => round.isAdmin),
-        ...data.drafts.filter((draft) => draft.isAdmin),
-      ]
-    : [];
-  $: otherRounds = data.rounds.filter((round) => ownRoundsAndDrafts.includes(round) === false);
+  $: ownRoundsAndDrafts = data.own ?? [];
+  $: otherRounds = data.rounds ?? [];
 
   let loading = false;
 
@@ -45,15 +40,26 @@
           Math.floor(Math.random() * possibleColors.length)
         ] as PossibleColor;
 
-        const draft = await createDraft(undefined, {
-          chainId: network.chainId,
+        const draft = await createRound(undefined, {
+          draft: true,
           emoji: randomEmoji,
+          chainId: network.chainId,
           color: randomColor,
-          adminWalletAddresses: [data.rpgfUserData.walletAddress ?? ''],
-          applicationFormat: DEFAULT_PRESET,
+          name: null,
+          customAvatarCid: null,
+          urlSlug: null,
+          description: null,
+          applicationPeriodStart: null,
+          applicationPeriodEnd: null,
+          votingPeriodStart: null,
+          votingPeriodEnd: null,
+          resultsPeriodStart: null,
+          maxVotesPerVoter: null,
+          maxVotesPerProjectPerVoter: null,
+          voterGuidelinesLink: null,
         });
 
-        await goto(`/app/rpgf/drafts/${draft.id}`);
+        // await goto(`/app/rpgf/drafts/${draft.id}`);
 
         loading = false;
       },
@@ -109,8 +115,8 @@
     }}
   >
     <div class="card-grid">
-      {#each ownRoundsAndDrafts ?? [] as wrappedRoundOrDraft}
-        <RpgfRoundCard {wrappedRoundOrDraft} />
+      {#each ownRoundsAndDrafts ?? [] as round}
+        <RpgfRoundCard {round} />
       {/each}
     </div>
   </Section>
@@ -130,8 +136,8 @@
       }}
     >
       <div class="card-grid">
-        {#each otherRounds ?? [] as wrappedRound}
-          <RpgfRoundCard wrappedRoundOrDraft={wrappedRound} />
+        {#each otherRounds ?? [] as round}
+          <RpgfRoundCard {round} />
         {/each}
       </div>
     </Section>

@@ -31,7 +31,7 @@
   export let inputStyle: string | undefined = undefined;
   export let style: string | undefined = undefined;
 
-  export let value: string | number | undefined = undefined;
+  export let value: string | number | null | undefined = undefined;
   export let placeholder: string | undefined = undefined;
 
   export let hint: string | undefined = undefined;

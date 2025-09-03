@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { WrappedRoundAdmin, WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
   import storedWritable from '@efstajas/svelte-stored-writable';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
@@ -7,12 +6,13 @@
   import { z } from 'zod';
   import Trophy from '../icons/Trophy.svelte';
   import { browser } from '$app/environment';
+  import type { Round } from '$lib/utils/rpgf/types/round';
 
   export let hasExistingBallot: boolean;
-  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let round: Round;
   export let signedIn: boolean;
-  export let isRoundVoter: boolean;
   $: state = round.state;
+  $: isRoundVoter = round.isVoter;
 
   const localApplicationState = storedWritable(
     `rpgf-form-data-${round.urlSlug}`,
@@ -40,7 +40,7 @@
     : false;
 </script>
 
-{#if state !== 'pending-intake'}
+{#if state && state !== 'pending-intake'}
   <div class="card">
     {#if state === 'intake'}
       <h2 class="pixelated">Apply to this round</h2>
