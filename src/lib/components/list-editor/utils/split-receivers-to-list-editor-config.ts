@@ -12,7 +12,9 @@ import type {
   SplitReceiversToListEditorConfigProjectReceiverFragment,
   SplitReceiversToListEditorConfigEcosystemReceiverFragment,
   SplitReceiversToListEditorConfigSubListReceiverFragment,
+  SplitReceiversToListEditorConfigOrcidReceiverFragment,
 } from './__generated__/gql.generated';
+import network from '$lib/stores/wallet/network';
 
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT = gql`
   ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
@@ -82,13 +84,27 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
   }
 `;
 
+// TODO: theoretically would use ${LIST_EDITOR_ORCID_FRAGMENT} here, but OrcidReceiver
+// does not link a OrcidAccount, but a LinkedIdentity, which is a pointer to an OrcidAccount.
+export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
+  fragment SplitReceiversToListEditorConfigOrcidReceiver on OrcidReceiver {
+    weight
+    linkedIdentity {
+      account {
+        accountId
+      }
+    }
+  }
+`;
+
 // cannot yet split to an ecosystem
 export type SplitReceiver =
   | SplitReceiversToListEditorConfigAddressReceiverFragment
   | SplitReceiversToListEditorConfigDripListReceiverFragment
   | SplitReceiversToListEditorConfigProjectReceiverFragment
   | SplitReceiversToListEditorConfigEcosystemReceiverFragment
-  | SplitReceiversToListEditorConfigSubListReceiverFragment;
+  | SplitReceiversToListEditorConfigSubListReceiverFragment
+  | SplitReceiversToListEditorConfigOrcidReceiverFragment;
 
 function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
   switch (input.__typename) {
@@ -102,6 +118,25 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
       return { type: 'ecosystem', ecosystem: input.ecosystemMainAccount };
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
+    case 'OrcidReceiver':
+      // TODO: fetch the orcid by accountId to get full details?
+      return {
+        type: 'orcid',
+        orcid: {
+          ...input.linkedIdentity,
+          __typename: 'OrcidAccount',
+          source: {
+            __typename: 'OrcidSource',
+            url: 'TODO',
+          },
+          chainData: [
+            {
+              chain: network.gqlName,
+              __typename: 'UnClaimedOrcidAccountData',
+            },
+          ],
+        },
+      };
   }
 }
 
@@ -117,6 +152,8 @@ function extractAccountId(input: SplitReceiver) {
       return input.ecosystemMainAccount.account.accountId;
     case 'SubListReceiver':
       return input.subList.account.accountId;
+    case 'OrcidReceiver':
+      return input.linkedIdentity.account.accountId;
   }
 }
 

@@ -1,6 +1,7 @@
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import type { SdkSplitsReceiver } from '@drips-network/sdk';
 import assert from '$lib/utils/assert';
+import getLastPathSegment from './get-last-path-segment';
 
 export async function transformItemsToSdkReceivers(
   weights: Weights,
@@ -34,6 +35,16 @@ export async function transformItemsToSdkReceivers(
         receivers.push({
           type: 'drip-list',
           accountId: BigInt(item.dripList.account.accountId),
+          weight,
+        });
+        break;
+
+      case 'orcid':
+        // TODO: rely on account id? Use URL to be congruent with project?
+        receivers.push({
+          type: 'orcid',
+          // accountId: BigInt(item.orcid.account.accountId),
+          orcid: getLastPathSegment(item.orcid.source.url),
           weight,
         });
         break;

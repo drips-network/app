@@ -17,7 +17,16 @@ import type {
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepEcosystemFragment,
+  CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
+
+// TODO: integrate into SDK
+type SdkOrcidReceiver = {
+  type: 'orcid-account';
+  accountId: bigint;
+};
+
+type SdkReceiverWithOrcid = SdkReceiver | SdkOrcidReceiver;
 
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
@@ -44,8 +53,9 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment,
-): SdkReceiver {
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment,
+): SdkReceiverWithOrcid {
   switch (receiver.__typename) {
     case 'AddressDriverAccount':
       return {
@@ -71,6 +81,12 @@ function transformReceiverToSdkReceiver(
         accountId: BigInt(receiver.account.accountId),
       } as SdkEcosystemMainAccountReceiver;
 
+    case 'OrcidAccount':
+      return {
+        type: 'orcid-account',
+        accountId: BigInt(receiver.account.accountId),
+      } as SdkOrcidReceiver;
+
     default:
       throw new Error(`Unsupported receiver type: ${(receiver as any).__typename}`); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
@@ -85,7 +101,8 @@ export interface OneTimeDonationContext {
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 }
 
 export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
@@ -103,7 +120,8 @@ export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
     amount: amountInputValue,
     erc20: tokenAddress as Address,
     tokenDecimals: token.info.decimals,
-    receiver: sdkReceiver,
+    // TODO: integrate SdkOrcidReceiver into SDK
+    receiver: sdkReceiver as SdkReceiver,
   });
 
   const txs = [

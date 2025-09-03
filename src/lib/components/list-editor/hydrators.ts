@@ -1,5 +1,5 @@
 import query from '../../graphql/dripsQL';
-import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT } from './types';
+import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT, LIST_EDITOR_ORCID_FRAGMENT } from './types';
 import { gql } from 'graphql-request';
 import type { RecipientResult } from './types';
 import type {
@@ -7,9 +7,13 @@ import type {
   GetDripListQueryVariables,
   GetProjectQuery,
   GetProjectQueryVariables,
+  GetOrcidQuery,
+  GetOrcidQueryVariables,
 } from './__generated__/gql.generated';
 import { isAddress } from 'ethers';
 import network from '$lib/stores/wallet/network';
+import ListEditor from './list-editor.svelte';
+import { fetchOrcid, orcidIdToAccountId } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
@@ -60,6 +64,57 @@ export const getProject = async (url: string): Promise<RecipientResult> => {
   return {
     accountId: res.project.account.accountId,
     project: res.project,
+  };
+};
+
+export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
+  const res = await query<GetOrcidQuery, GetOrcidQueryVariables>(
+    gql`
+      ${LIST_EDITOR_ORCID_FRAGMENT}
+      query GetOrcid($accountId: ID!, $chains: [SupportedChain!]) {
+        orcidAccountById(id: $accountId, chains: $chains) {
+          ...ListEditorOrcid
+          account {
+            accountId
+          }
+        }
+      }
+    `,
+    // TODO: yes, for now it is fetched with the actual ORCID iD
+    { accountId: orcidId, chains: [network.gqlName] },
+  );
+
+  let orcidAccount = res.orcidAccountById
+  // We don't know about it internally, let's construct a minimal OrcidAccount object
+  // to mimic it.
+  if (!orcidAccount) {
+    // Get the ORCID profile
+    const orcid = await fetchOrcid(orcidId, fetch);
+    // If we can't fetch the ORCID profile, we're out of luck
+    if (!orcid) {
+      return null
+    }
+
+    const accountId = await orcidIdToAccountId(orcidId);
+    orcidAccount = {
+      __typename: 'OrcidAccount',
+      account: {
+        __typename: 'RepoDriverAccount',
+        accountId: String(accountId),
+      },
+      source: { __typename: 'OrcidSource', url: orcid.url },
+      chainData: [
+        {
+          chain: network.gqlName,
+          __typename: 'UnClaimedOrcidAccountData',
+        },
+      ],
+    } as NonNullable<GetOrcidQuery['orcidAccountById']>;
+  }
+
+  return {
+    accountId: orcidAccount.account.accountId,
+    orcid: orcidAccount,
   };
 };
 
