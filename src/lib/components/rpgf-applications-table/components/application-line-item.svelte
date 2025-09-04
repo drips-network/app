@@ -1,20 +1,17 @@
 <script lang="ts">
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
-  import type {
-    Application,
-    InProgressBallot,
-    WrappedRoundAdmin,
-    WrappedRoundPublic,
-  } from '$lib/utils/rpgf/schemas';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import type { Writable } from 'svelte/store';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
+  import type { ListingApplication } from '$lib/utils/rpgf/types/application';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
 
-  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
-  export let application: Application;
+  export let round: Round;
+  export let application: ListingApplication;
 
   export let reviewMode: boolean;
   export let decision: ComponentProps<ApplicationDecisionButtons>['decision'] = null;
@@ -64,10 +61,10 @@
         ...$ballotStore,
         [application.id]: null,
       };
-    } else if (Number(voteAmountInput) > round.votingConfig.maxVotesPerProjectPerVoter) {
+    } else if (Number(voteAmountInput) > (round.maxVotesPerProjectPerVoter ?? 0)) {
       voteAmountInputValidationState = {
         type: 'invalid',
-        message: `Vote amount must not exceed ${round.votingConfig.maxVotesPerProjectPerVoter}.`,
+        message: `Vote amount must not exceed ${round.maxVotesPerProjectPerVoter}.`,
       };
       $ballotStore = {
         ...$ballotStore,
@@ -107,14 +104,14 @@
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
         variant={{ type: 'number', min: 0 }}
-        placeholder="0-{round.votingConfig.maxVotesPerProjectPerVoter}"
+        placeholder="0-{round.maxVotesPerProjectPerVoter}"
       />
     </div>
   {/if}
 
-  {#if application.result !== null}
+  {#if application.allocation !== null}
     <span class="typo-text-small-bold">
-      {application.result}
+      {application.allocation}
     </span>
   {/if}
 </div>

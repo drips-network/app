@@ -1,31 +1,26 @@
 <script lang="ts">
-  import type { WrappedRoundAdmin, WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
   import storedWritable from '@efstajas/svelte-stored-writable';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Ledger from '../icons/Ledger.svelte';
-  import { z } from 'zod';
   import Trophy from '../icons/Trophy.svelte';
   import { browser } from '$app/environment';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import { createApplicationDtoSchema } from '$lib/utils/rpgf/types/application';
 
   export let hasExistingBallot: boolean;
-  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let round: Round;
   export let signedIn: boolean;
-  export let isRoundVoter: boolean;
   $: state = round.state;
+  $: isRoundVoter = round.isVoter;
 
   const localApplicationState = storedWritable(
     `rpgf-form-data-${round.urlSlug}`,
-    z.object({
-      projectName: z.string().min(1).max(255).optional(),
-      dripsAccountId: z.string().min(1).optional(),
-
-      fields: z.record(z.string(), z.any()),
-    }),
+    createApplicationDtoSchema.partial(),
     {
       projectName: undefined,
       dripsAccountId: undefined,
-      fields: {},
+      answers: [],
     },
     !browser,
   );
@@ -33,14 +28,14 @@
   $: localApplicationDraftExists =
     $localApplicationState.projectName !== undefined ||
     $localApplicationState.dripsAccountId !== undefined ||
-    Object.keys($localApplicationState.fields).length > 0;
+    ($localApplicationState.answers?.length ?? 0) > 0;
 
   const inProgressBallotExists = browser
     ? localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null
     : false;
 </script>
 
-{#if state !== 'pending-intake'}
+{#if state && state !== 'pending-intake'}
   <div class="card">
     {#if state === 'intake'}
       <h2 class="pixelated">Apply to this round</h2>

@@ -10,7 +10,7 @@ export interface State {
   items: Items | null;
 }
 
-export default (roundSlug: string, roundName: string) => {
+export default (roundId: string, roundName: string) => {
   const state = writable<State>({
     weights: null,
     items: null,
@@ -22,13 +22,13 @@ export default (roundSlug: string, roundName: string) => {
       makeStep({
         component: FetchListWeights,
         props: {
-          roundSlug,
+          roundId,
         },
       }),
       makeStep({
         component: ReviewList,
         props: {
-          roundSlug,
+          roundId,
           roundName,
         },
       }),
@@ -39,7 +39,7 @@ export default (roundSlug: string, roundName: string) => {
             'Your new Drip List has been created and linked to the round. It is now publicly visible and may be funded by anyone.',
           action: 'link',
           linkText: 'View your round',
-          href: () => `/app/rpgf/rounds/${roundSlug}`,
+          href: () => `/app/rpgf/rounds/${roundId}`,
         },
       }),
     ],

@@ -13,12 +13,12 @@ import { getRound } from '$lib/utils/rpgf/rpgf';
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { roundSlug } = params;
 
-  const wrappedRound = await getRound(fetch, roundSlug);
-  if (!wrappedRound) {
+  const round = await getRound(fetch, roundSlug);
+  if (!round) {
     return error(404, 'Round not found');
   }
-
-  const { emoji, customAvatarCid, color, name } = wrappedRound.round;
+ 
+  const { emoji, customAvatarCid, color, name } = round;
 
   const target = url.searchParams.get('target');
 

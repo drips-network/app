@@ -11,10 +11,10 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
   import ScrollableTabs from '$lib/components/scrollable-tabs/scrollable-tabs.svelte';
-  import type { WrappedRoundAdmin, WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
+  import type { Round } from '$lib/utils/rpgf/types/round';
 
-  export let wrappedDraftOrRound: WrappedRoundAdmin | WrappedRoundDraft;
-  $: type = wrappedDraftOrRound.type;
+  export let round: Round;
+  export let amountOfVoters: number;
 
   onMount(() => {
     $forceMainSidebarCollapsed = true;
@@ -24,20 +24,11 @@
     };
   });
 
-  $: settingsBaseUrl =
-    wrappedDraftOrRound.type === 'round-draft'
-      ? `/app/rpgf/drafts/${wrappedDraftOrRound.id}/settings`
-      : `/app/rpgf/rounds/${wrappedDraftOrRound.round.urlSlug}/settings`;
+  $: settingsBaseUrl = `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}/settings`;
 
-  $: backLink =
-    wrappedDraftOrRound.type === 'round-draft'
-      ? `/app/rpgf/drafts/${wrappedDraftOrRound.id}`
-      : `/app/rpgf/rounds/${wrappedDraftOrRound.round.urlSlug}`;
+  $: backLink = `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}`;
 
-  $: name =
-    (wrappedDraftOrRound.type === 'round-draft'
-      ? wrappedDraftOrRound.draft.name
-      : wrappedDraftOrRound.round.name) || 'Unnamed round';
+  $: name = round.name ?? 'Unnamed round';
 </script>
 
 <div class="rpgf-settings-layout">
@@ -48,8 +39,11 @@
         <span class="typo-text-bold">{name}</span>
       </a>
     </div>
-    {#if wrappedDraftOrRound.type === 'round-draft'}
-      <RpgfDraftTodoCard draftWrapper={wrappedDraftOrRound} />
+    {#if !round.published}
+      <RpgfDraftTodoCard
+        {round}
+        {amountOfVoters}
+      />
     {/if}
   </div>
 
@@ -65,7 +59,7 @@
       icon={Label}
       backgroundOnActive
     />
-    {#if type === 'round-draft'}
+    {#if !round.published}
       <SidenavItem
         label="Schedule"
         href="{settingsBaseUrl}/schedule"
@@ -88,9 +82,9 @@
       icon={Proposals}
       backgroundOnActive
     />
-    {#if type === 'round-draft'}
+    {#if !round.published}
       <SidenavItem
-        label="Application form"
+        label="Applications"
         href="{settingsBaseUrl}/application"
         active={$page.url.pathname === `${settingsBaseUrl}/application`}
         icon={Ledger}
@@ -123,7 +117,7 @@
           icon: Proposals,
         },
         {
-          label: 'Application form',
+          label: 'Applications',
           href: `${settingsBaseUrl}/application`,
           icon: Ledger,
         },
@@ -140,7 +134,7 @@
   .rpgf-settings-layout {
     position: relative;
     display: grid;
-    max-width: 100rem;
+    max-width: 112rem;
     margin: 0 auto;
     grid-template-columns: minmax(auto, 13rem) 3fr minmax(auto, 19rem);
     grid-template-areas: 'sidenav content sidebar';

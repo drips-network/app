@@ -9,33 +9,45 @@ import {
   toUtf8Bytes,
   TransactionReceipt,
 } from 'ethers';
-import type { CreateApplicationDto, WrappedRoundPublic } from './schemas';
 import mapFilterUndefined from '../map-filter-undefined';
 import { pin } from '../ipfs';
 import easAbi from './eas-abi';
+import type { ApplicationFormFields, CreateApplicationDto } from './types/application';
 
 function filterRelevantFields(
-  applicationDataFields: CreateApplicationDto['fields'],
-  applicationFormat: WrappedRoundPublic['round']['applicationFormat'],
-) {
-  return Object.fromEntries(
-    mapFilterUndefined(applicationFormat, (field) => {
-      if (!('slug' in field)) {
-        // field doesn't have any data
-        return undefined;
-      }
-      if (field.private) {
-        // field is private, we don't want to include it in the attestation
-        return undefined;
-      }
-      return [field.slug, applicationDataFields[field.slug]];
-    }),
-  );
+  applicationDataFields: CreateApplicationDto['answers'],
+  fields: ApplicationFormFields,
+): CreateApplicationDto['answers'] {
+  return mapFilterUndefined(fields, (field) => {
+    const slug = 'slug' in field ? field.slug : null;
+    const fieldId = 'id' in field ? field.id : null;
+
+    if (!fieldId) {
+      throw new Error('Field is missing id');
+    }
+
+    if (!slug) {
+      // field doesn't have any data
+      return undefined;
+    }
+    if ('private' in field && field.private) {
+      // field is private, we don't want to include it in the attestation
+      return undefined;
+    }
+
+    const submittedField = applicationDataFields.find((f) => f.fieldId === fieldId);
+
+    if (!submittedField) {
+      throw new Error(`Fillable field ${fieldId} is missing`);
+    }
+
+    return submittedField;
+  });
 }
 
 export async function pinApplicationAttestationData(
   applicationData: CreateApplicationDto,
-  applicationFormat: WrappedRoundPublic['round']['applicationFormat'],
+  formFields: ApplicationFormFields,
 ): Promise<string> {
   if (!network.retroFunding.enabled) {
     throw new Error('Retro Funding is not enabled on this network');
@@ -44,7 +56,7 @@ export async function pinApplicationAttestationData(
   const dataToPin = {
     projectName: applicationData.projectName,
     dripsAccountId: applicationData.dripsAccountId,
-    fields: filterRelevantFields(applicationData.fields, applicationFormat),
+    fields: filterRelevantFields(applicationData.answers, formFields),
   };
 
   return pin(dataToPin);

@@ -1,10 +1,10 @@
 <script lang="ts">
   import network from '$lib/stores/wallet/network';
-  import type { Application } from '$lib/utils/rpgf/schemas';
   import type { ComponentProps } from 'svelte';
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
+  import type { ListingApplication } from '$lib/utils/rpgf/types/application';
 
-  export let application: Application;
+  export let application: ListingApplication;
   export let hideName = false;
   export let hideAvatar = false;
   export let hideState = false;
@@ -15,13 +15,13 @@
 
   $: viewTransitionName = `rpgf-application-avatar-${application.id}`;
 
-  const stateMap: Record<Application['state'], string> = {
+  const stateMap: Record<ListingApplication['state'], string> = {
     pending: 'Pending review',
     approved: 'Approved',
     rejected: 'Rejected',
   };
 
-  const stateColors: Record<Application['state'], string> = {
+  const stateColors: Record<ListingApplication['state'], string> = {
     pending: '--color-caution',
     approved: '--color-positive',
     rejected: '--color-negative',

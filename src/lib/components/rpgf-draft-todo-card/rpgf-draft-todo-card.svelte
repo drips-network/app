@@ -10,47 +10,24 @@
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import publishRpgfRoundFlowSteps from '$lib/flows/publish-rpgf-round/publish-rpgf-round-flow-steps';
-  import { matchPreset } from '$lib/utils/rpgf/application-form-presets';
-  import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import Link from '../icons/Link.svelte';
 
-  export let draftWrapper: WrappedRoundDraft;
-  $: draft = draftWrapper.draft;
-  $: draftId = draftWrapper.id;
+  export let round: Round;
+  export let amountOfVoters: number
 
-  $: serverSideValidationOk = Object.values(draftWrapper.validation).every((v) => v === true);
-
-  const requiredFields: (keyof typeof draft)[] = [
-    'name',
-    'urlSlug',
-    'applicationPeriodStart',
-    'applicationPeriodEnd',
-    'votingPeriodStart',
-    'votingPeriodEnd',
-    'resultsPeriodStart',
-    'applicationFormat',
-    'votingConfig',
-    'adminWalletAddresses',
-  ];
-  $: requiredFieldsFilled = requiredFields.every((field) => Boolean(draft[field]));
-
-  $: nameAndDescriptionDone = Boolean(draft.name && draft.urlSlug);
+  $: nameAndDescriptionDone = Boolean(round.name && round.urlSlug);
   $: scheduleDone = Boolean(
-    draft.applicationPeriodStart &&
-      draft.applicationPeriodEnd &&
-      draft.votingPeriodStart &&
-      draft.votingPeriodEnd &&
-      draft.resultsPeriodStart,
+    round.applicationPeriodStart &&
+      round.applicationPeriodEnd &&
+      round.votingPeriodStart &&
+      round.votingPeriodEnd &&
+      round.resultsPeriodStart,
   );
-  $: votingConfigDone = Boolean(draft.votingConfig && draft.votingConfig.allowedVoters.length > 0);
-
-  $: applicationFormCustomized = draft.applicationFormat
-    ? matchPreset(draft.applicationFormat)?.slug !== 'default'
-    : false;
-
-  $: additionalAdminsConfigured = Boolean(draft.adminWalletAddresses.length > 1);
+  $: votingConfigDone = Boolean(round.maxVotesPerProjectPerVoter && round.maxVotesPerVoter);
 
   function handlePublish() {
-    modal.show(Stepper, undefined, publishRpgfRoundFlowSteps(draftId));
+    modal.show(Stepper, undefined, publishRpgfRoundFlowSteps(round.id));
   }
 </script>
 
@@ -60,46 +37,59 @@
   <ul>
     <TodoListItem
       icon={Label}
-      title="Name & Description"
+      title="Name & URL"
       done={nameAndDescriptionDone}
-      href="/app/rpgf/drafts/{draftId}/settings/representation"
+      href="/app/rpgf/rounds/{round.id}/settings/representation"
     />
     <TodoListItem
       icon={Calendar}
       title="Schedule"
       done={scheduleDone}
-      href="/app/rpgf/drafts/{draftId}/settings/schedule"
-      error={!draftWrapper.validation.scheduleValid}
+      href="/app/rpgf/rounds/{round.id}/settings/schedule"
+      error={scheduleDone && !round.validation?.scheduleValid}
     />
     <TodoListItem
       icon={Proposals}
-      title="Badgeholders & voting"
+      title="Voting configuration"
       done={votingConfigDone}
-      href="/app/rpgf/drafts/{draftId}/settings/voting"
+      href="/app/rpgf/rounds/{round.id}/settings/voting"
+    />
+    <TodoListItem
+      icon={User}
+      title="Badgeholder list"
+      done={amountOfVoters > 0}
+      href="/app/rpgf/rounds/{round.id}/settings/voting"
+    />
+    <TodoListItem
+      icon={Ledger}
+      title="Application form"
+      done={round.validation?.applicationFormValid ?? false}
+      href="/app/rpgf/rounds/{round.id}/settings/application"
     />
   </ul>
 
   <h2 class="typo-header-5" style:margin-top="1rem">Optional</h2>
   <ul style:margin-bottom="0.5rem">
     <TodoListItem
-      icon={Ledger}
-      title="Custom application form"
-      done={applicationFormCustomized}
-      href="/app/rpgf/drafts/{draftId}/settings/application"
+      icon={Link}
+      title="Voter guidelines link"
+      done={Boolean(round.voterGuidelinesLink)}
+      href="/app/rpgf/rounds/{round.id}/settings/voting"
       optional
     />
+
     <TodoListItem
       icon={User}
       title="Additional admins"
-      done={additionalAdminsConfigured}
-      href="/app/rpgf/drafts/{draftId}/settings/admins"
+      done={round.adminCount ? round.adminCount > 1 : false}
+      href="/app/rpgf/rounds/{round.id}/settings/admins"
       optional
     />
   </ul>
 
   <Button
     variant="primary"
-    disabled={!requiredFieldsFilled || !serverSideValidationOk}
+    disabled={!round.validation?.readyToPublish}
     icon={Registered}
     size="large"
     on:click={handlePublish}

@@ -1,29 +1,14 @@
 <script lang="ts">
-  import type {
-    RoundState,
-    WrappedRoundAdmin,
-    WrappedRoundDraft,
-    WrappedRoundPublic,
-  } from '$lib/utils/rpgf/schemas';
+  import type { Round, RoundState } from '$lib/utils/rpgf/types/round';
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
-  export let wrappedRoundOrDraft: WrappedRoundPublic | WrappedRoundAdmin | WrappedRoundDraft;
-  $: url =
-    wrappedRoundOrDraft.type === 'round-draft'
-      ? `/app/rpgf/drafts/${wrappedRoundOrDraft.id}`
-      : `/app/rpgf/rounds/${wrappedRoundOrDraft.round.urlSlug}`;
+  export let round: Round;
 
-  $: draftOrRound =
-    wrappedRoundOrDraft.type === 'round-draft'
-      ? wrappedRoundOrDraft.draft
-      : wrappedRoundOrDraft.round;
+  $: url = `/app/rpgf/rounds/${round.urlSlug ?? round.id}`;
 
-  $: roundSlugOrDraftId =
-    wrappedRoundOrDraft.type === 'round-draft'
-      ? wrappedRoundOrDraft.id
-      : wrappedRoundOrDraft.round.urlSlug;
+  $: roundSlugOrDraftId = round.urlSlug ?? round.id;
 
   const stateLabels: Record<RoundState, string> = {
     'pending-intake': 'Pending intake',
@@ -34,13 +19,10 @@
     results: 'Results available',
   };
 
-  $: stateLabel =
-    wrappedRoundOrDraft.type === 'round-draft'
-      ? 'Draft'
-      : stateLabels[wrappedRoundOrDraft.round.state];
+  $: stateLabel = !round.state ? 'Draft' : stateLabels[round.state];
 </script>
 
-<PrimaryColorThemer colorHex={draftOrRound.color}>
+<PrimaryColorThemer colorHex={round.color}>
   <a class="rpgf-round-card" href={url}>
     <div class="card-content">
       <div
@@ -48,13 +30,13 @@
         style:view-transition-class="element-handover"
       >
         <EmojiOrIpfsAvatar
-          emoji={draftOrRound.emoji}
-          ipfsCid={draftOrRound.customAvatarCid ?? undefined}
+          emoji={round.emoji}
+          ipfsCid={round.customAvatarCid ?? undefined}
           size="large"
         />
       </div>
-      <h2 class="pixelated">{draftOrRound.name ?? 'Unnamed draft'}</h2>
-      <IdentityBadge address={wrappedRoundOrDraft.createdBy.walletAddress} />
+      <h2 class="pixelated">{round.name ?? 'Unnamed round'}</h2>
+      <IdentityBadge address={round.createdByUser.walletAddress} />
     </div>
     <div class="details">
       <span class="typo-text-bold">{stateLabel}</span>

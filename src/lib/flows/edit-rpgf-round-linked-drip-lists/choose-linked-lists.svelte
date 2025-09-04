@@ -16,7 +16,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let linkedDripLists: DripListItem['dripList'][];
-  export let roundSlug: string;
+  export let roundId: string;
 
   let items: Items = Object.fromEntries(
     linkedDripLists.map((dripList) => [
@@ -32,10 +32,10 @@
     dispatch('await', {
       message: 'Updating linked Drip Lists…',
       promise: async () => {
-        await linkDripListsToRound(undefined, roundSlug, Object.keys(items));
+        await linkDripListsToRound(undefined, roundId, Object.keys(items));
         await invalidateAll();
 
-        await goto(`/app/rpgf/rounds/${roundSlug}#distribution`);
+        await goto(`/app/rpgf/rounds/${roundId}#distribution`);
 
         modal.hide();
       },

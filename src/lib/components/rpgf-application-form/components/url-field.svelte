@@ -1,13 +1,23 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import type { ApplicationUrlField } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationUrlAnswerDto,
+    ApplicationUrlField,
+  } from '$lib/utils/rpgf/types/application';
   import type { ComponentProps } from 'svelte';
 
   export let field: ApplicationUrlField;
-  export let value: string | undefined = undefined;
+  export let answer: ApplicationUrlAnswerDto | undefined = undefined;
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
+
+  let value: string | undefined = answer?.value;
+  $: if (value)
+    answer = {
+      fieldId: field.id,
+      value: value,
+    };
 
   function isValidUrl(url: string): boolean {
     try {

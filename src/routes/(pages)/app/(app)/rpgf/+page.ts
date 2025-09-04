@@ -1,10 +1,10 @@
-import { getDrafts, getRounds } from '$lib/utils/rpgf/rpgf.js';
+import { getRounds } from '$lib/utils/rpgf/rpgf.js';
 
 export const load = async ({ fetch, parent }) => {
   const { rpgfUserData } = await parent();
 
   return {
-    drafts: rpgfUserData ? await getDrafts(fetch) : [],
+    own: rpgfUserData ? await getRounds(fetch, true) : null,
     rounds: await getRounds(fetch),
   };
 };

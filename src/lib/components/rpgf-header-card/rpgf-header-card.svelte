@@ -1,37 +1,23 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
-  import { deleteDraft } from '$lib/utils/rpgf/rpgf';
-  import type { WrappedRoundDraft } from '$lib/utils/rpgf/schemas';
+  import { deleteRound } from '$lib/utils/rpgf/rpgf';
+  import type { Round } from '$lib/utils/rpgf/types/round';
   import Button from '../button/button.svelte';
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import Settings from '../icons/Settings.svelte';
   import Trash from '../icons/Trash.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
-  export let isDraft = false;
-  export let roundSlugOrDraftId: string | undefined = undefined;
-  export let roundOrDraft: Pick<
-    Partial<WrappedRoundDraft['draft']>,
-    'name' | 'emoji' | 'color' | 'adminWalletAddresses' | 'customAvatarCid'
-  >;
+  export let round: Round;
 
   export let interactive = true;
 
-  $: isAdmin = $walletStore.address
-    ? roundOrDraft.adminWalletAddresses?.includes($walletStore.address.toLowerCase())
-    : false;
-
   function handleDeleteDraft() {
-    doWithConfirmationModal('Are you sure you want to delete this draft?', async () => {
-      if (!roundSlugOrDraftId) {
-        return;
-      }
-
-      await doWithErrorModal(() => deleteDraft(undefined, roundSlugOrDraftId));
+    doWithConfirmationModal('Are you sure you want to delete this round?', async () => {
+      await doWithErrorModal(() => deleteRound(undefined, round.id));
 
       await goto('/app/rpgf');
     });
@@ -40,43 +26,41 @@
 
 <div class="rpgf-header-card">
   <div
-    style:view-transition-name="rpgf-header-card-avatar-{roundSlugOrDraftId}"
+    style:view-transition-name="rpgf-header-card-avatar-{round.id}"
     style:view-transition-class="element-handover"
   >
     <EmojiOrIpfsAvatar
-      emoji={roundOrDraft.emoji}
-      ipfsCid={roundOrDraft.customAvatarCid ?? undefined}
+      emoji={round.emoji}
+      ipfsCid={round.customAvatarCid ?? undefined}
       size="huge"
     />
   </div>
   <div class="content">
-    <h1 class:unnamed={!roundOrDraft.name}>
-      {roundOrDraft.name || 'Unnamed round'}
-      {#if isDraft}
+    <h1 class:unnamed={!round.name}>
+      {round.name || 'Unnamed round'}
+      {#if !round.published}
         <span class="draft-badge typo-header-5">Draft</span>
       {/if}
     </h1>
     {#if interactive}
       <div class="actions">
         <ShareButton
-          shareModalText={isDraft
+          shareModalText={!round.published
             ? 'Note that this round draft can only be viewed by the configured round admins.'
             : ''}
           url={$page.url.toString()}
           buttonVariant="normal"
-          downloadableImageUrl={!isDraft && roundSlugOrDraftId
-            ? `/api/share-images/rpgf-round/${encodeURIComponent(roundSlugOrDraftId)}.png?target=og`
+          downloadableImageUrl={round.published
+            ? `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png?target=og`
             : undefined}
         />
-        {#if isAdmin && roundSlugOrDraftId}
+        {#if round.isAdmin}
           <Button
             icon={Settings}
-            href={isDraft
-              ? `/app/rpgf/drafts/${roundSlugOrDraftId}/settings/representation`
-              : `/app/rpgf/rounds/${roundSlugOrDraftId}/settings/representation`}>Settings</Button
+            href={`/app/rpgf/rounds/${round.urlSlug ?? round.id}/settings/representation`}>Settings</Button
           >
         {/if}
-        {#if isAdmin && isDraft}
+        {#if round.isAdmin && !round.published}
           <Button variant="ghost" icon={Trash} on:click={handleDeleteDraft}>Delete draft</Button>
         {/if}
       </div>

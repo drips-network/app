@@ -27,7 +27,7 @@ services:
       - ECOSYSTEM_API_ACCESS_TOKEN=123
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5000
-      - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://localhost:5000
+      - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
     volumes:
     - .:/app
     - /app/node_modules/

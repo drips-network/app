@@ -5,26 +5,44 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import modal from '$lib/stores/modal';
-  import type { ApplicationListField } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationListAnswerDto,
+    ApplicationListField,
+  } from '$lib/utils/rpgf/types/application';
+  import unreachable from '$lib/utils/unreachable';
   import ListFieldAddItemModal from './list-field-add-item-modal.svelte';
+  import assert from '$lib/utils/assert';
 
   export let field: ApplicationListField;
+  $: if (!field.id) throw new Error('Field id is required');
+
   export let forceRevealError: boolean | undefined = undefined;
 
   export let valid: boolean = false;
-  export let value: Record<string, string | number>[] | undefined = [];
+  export let answer: ApplicationListAnswerDto | undefined = undefined;
 
   function addToValues(item: Record<string, string | number>) {
-    if (!value) {
-      value = [];
+    if (!answer) {
+      answer = {
+        fieldId: field.id ?? unreachable(),
+        value: [],
+      };
     }
 
-    value = [...value, item];
+    answer = {
+      ...answer,
+      value: [...answer.value, item],
+    };
   }
 
   function deleteValue(e: Event, index: number) {
     e.stopImmediatePropagation();
-    value = (value ?? []).filter((_, i) => i !== index);
+    assert(answer);
+
+    answer = {
+      ...answer,
+      value: answer.value.filter((_, i) => i !== index),
+    };
   }
 
   function handleAddItem() {
@@ -55,7 +73,7 @@
       : { type: 'valid' }}
 >
   <div class="values">
-    {#each value ?? [] as item (item)}
+    {#each answer?.value ?? [] as item (item)}
       <div class="item-card">
         <div class="fields">
           {#each field.entryFields as entryField (entryField.label)}
@@ -75,14 +93,14 @@
         </div>
         <Button
           variant="ghost"
-          on:click={(e) => (value ? deleteValue(e, value.indexOf(item)) : undefined)}
+          on:click={(e) => (answer ? deleteValue(e, answer.value.indexOf(item)) : undefined)}
           icon={Trash}
         />
       </div>
     {/each}
   </div>
 
-  {#if value?.length === 0}
+  {#if answer?.value.length === 0}
     <p class="list-field-empty">No items added yet.</p>
   {/if}
 

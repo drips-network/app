@@ -3,31 +3,45 @@
   import ScheduleItem from './components/schedule-item.svelte';
   import { tweened } from 'svelte/motion';
   import { expoOut } from 'svelte/easing';
-  import type { WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
+  import type { Round } from '$lib/utils/rpgf/types/round';
 
-  export let schedule: Pick<
-    WrappedRoundPublic['round'],
-    | 'applicationPeriodStart'
-    | 'applicationPeriodEnd'
-    | 'votingPeriodStart'
-    | 'votingPeriodEnd'
-    | 'resultsPeriodStart'
-  >;
+  export let round: Round;
 
-  $: timeline = [
-    { date: schedule.applicationPeriodStart, title: 'Registration' },
-    { date: schedule.applicationPeriodEnd, title: 'Review' },
-    { date: schedule.votingPeriodStart, title: 'Voting' },
-    { date: schedule.votingPeriodEnd, title: 'Tallying' },
-    { date: schedule.resultsPeriodStart, title: 'Distribution' },
-  ];
+  $: schedule =
+    (round.applicationPeriodStart &&
+      round.applicationPeriodEnd &&
+      round.votingPeriodStart &&
+      round.votingPeriodEnd &&
+      round.resultsPeriodStart && {
+        applicationPeriodStart: new Date(round.applicationPeriodStart),
+        applicationPeriodEnd: new Date(round.applicationPeriodEnd),
+        votingPeriodStart: new Date(round.votingPeriodStart),
+        votingPeriodEnd: new Date(round.votingPeriodEnd),
+        resultsPeriodStart: new Date(round.resultsPeriodStart),
+      }) ||
+    null;
+
+  $: timeline = schedule
+    ? [
+        { date: schedule.applicationPeriodStart, title: 'Registration' },
+        { date: schedule.applicationPeriodEnd, title: 'Review' },
+        { date: schedule.votingPeriodStart, title: 'Voting' },
+        { date: schedule.votingPeriodEnd, title: 'Tallying' },
+        { date: schedule.resultsPeriodStart, title: 'Distribution' },
+      ]
+    : null;
+
   let activeItemIndex: number;
   $: {
-    const nextItem = timeline.findIndex((item) => new Date(item.date) > now);
-    if (nextItem === -1) {
-      activeItemIndex = timeline.length - 1;
+    if (!timeline) {
+      activeItemIndex = -1;
     } else {
-      activeItemIndex = nextItem - 1;
+      const nextItem = timeline.findIndex((item) => new Date(item.date) > now);
+      if (nextItem === -1) {
+        activeItemIndex = timeline.length - 1;
+      } else {
+        activeItemIndex = nextItem - 1;
+      }
     }
   }
 
@@ -73,31 +87,33 @@
   }
 </script>
 
-<div class="rpgf-schedule-card">
-  <h2 class="typo-header-5">Schedule</h2>
-  <div class="items">
-    {#if now < schedule.applicationPeriodStart}<div class="spacer" />{/if}
-    {#each timeline as { title, date }, i}
-      <ScheduleItem
-        bind:elem={timeItems[i]}
-        {title}
-        {date}
-        isActive={i === activeItemIndex}
-        isDone={i < activeItemIndex}
-        until={timeline[i + 1]?.date}
-      />
-    {/each}
-    <div class="timeline" bind:this={timelineElem}>
-      <div class="line" />
-      <div
-        class="circle"
-        class:visible={updatedOnce}
-        style:transform="translateY({$timelineCircleOffsetY}px)"
-        bind:this={timelineCircle}
-      />
+{#if timeline && schedule}
+  <div class="rpgf-schedule-card">
+    <h2 class="typo-header-5">Schedule</h2>
+    <div class="items">
+      {#if now < schedule.applicationPeriodStart}<div class="spacer" />{/if}
+      {#each timeline as { title, date }, i}
+        <ScheduleItem
+          bind:elem={timeItems[i]}
+          {title}
+          {date}
+          isActive={i === activeItemIndex}
+          isDone={i < activeItemIndex}
+          until={timeline[i + 1]?.date}
+        />
+      {/each}
+      <div class="timeline" bind:this={timelineElem}>
+        <div class="line" />
+        <div
+          class="circle"
+          class:visible={updatedOnce}
+          style:transform="translateY({$timelineCircleOffsetY}px)"
+          bind:this={timelineCircle}
+        />
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style>
   .rpgf-schedule-card {
