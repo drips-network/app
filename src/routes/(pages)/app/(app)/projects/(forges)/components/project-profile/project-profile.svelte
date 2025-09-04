@@ -37,6 +37,12 @@
       account {
         accountId
       }
+      repoMetadata {
+        description
+        forksCount
+        stargazersCount
+        defaultBranch
+      }
       chainData {
         ...SplitsComponentProjectSplits
         ... on UnClaimedProjectData {

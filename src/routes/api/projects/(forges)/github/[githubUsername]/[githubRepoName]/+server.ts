@@ -2,7 +2,6 @@ import { error, json, type RequestHandler } from '@sveltejs/kit';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
-import { z } from 'zod';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
@@ -44,45 +43,41 @@ async function fetchDripsProject(repoUrl: string) {
     ),
   );
 }
-export const GET: RequestHandler = async ({ params, fetch }) => {
+export const GET: RequestHandler = async ({ params }) => {
   const { githubUsername, githubRepoName } = params;
-
-  // TODO; schema should be shared with endpoint that is called a little later
-  const repoSchema = z.object({
-    url: z.string(),
-    description: z.string().nullable(),
-    repoName: z.string(),
-    ownerName: z.string(),
-    forksCount: z.number(),
-    stargazersCount: z.number(),
-    defaultBranch: z.string(),
-  });
-
-  let repo: z.infer<typeof repoSchema>;
 
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
-  const [repoRes, projectRes] = await Promise.all([
-    fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
-    fetchDripsProject(repoUrl),
-  ]);
+  const projectRes = await fetchDripsProject(repoUrl);
 
   const project = projectRes.projectByUrl;
   if (!project) {
     throw error(404);
   }
 
-  const repoResJson = await repoRes.json();
-
-  if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
+  if (!project.repoMetadata) {
     throw error(404);
   }
 
-  try {
-    repo = repoSchema.parse(repoResJson);
-  } catch {
-    throw error(500, 'Unable to fetch repo info from GitHub / cache');
-  }
+  type Repo = {
+    url: string;
+    description: string | null;
+    repoName: string;
+    ownerName: string;
+    forksCount: number;
+    stargazersCount: number;
+    defaultBranch: string;
+  };
+
+  const repo: Repo = {
+    url: project.source.url,
+    description: project.repoMetadata.description ?? null,
+    repoName: project.source.repoName,
+    ownerName: project.source.ownerName,
+    forksCount: project.repoMetadata.forksCount,
+    stargazersCount: project.repoMetadata.stargazersCount,
+    defaultBranch: project.repoMetadata.defaultBranch,
+  };
 
   const { url: realRepoUrl } = repo;
   const repoUrlIsCanonical = repoUrl === realRepoUrl;
@@ -109,8 +104,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
   const resBody = {
     project,
-    description:
-      typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
+    description: repo.description,
     newRepo,
     correctCasingRepo,
   };
