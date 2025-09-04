@@ -54,7 +54,7 @@
 
         await invalidateAll();
 
-        await dispatch('conclude');
+        dispatch('conclude');
       },
     });
   }
@@ -68,7 +68,12 @@
   {/if}
 
   <FormField title="Name*" disabled={!canCreateCategory}>
-    <TextInput validationState={nameValidationState} placeholder="On-chain infrastructure" bind:value={nameValue} disabled={!canCreateCategory} />
+    <TextInput
+      validationState={nameValidationState}
+      placeholder="On-chain infrastructure"
+      bind:value={nameValue}
+      disabled={!canCreateCategory}
+    />
   </FormField>
 
   <FormField
