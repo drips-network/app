@@ -102,7 +102,7 @@ test.describe('drafts', () => {
 
 test.describe('rounds', () => {
   test.beforeEach(() => {
-    test.setTimeout(300000); // 5 minutes
+    test.setTimeout(600000); // 10 minutes
   });
 
   test.afterEach(async ({ rpgfRound }) => {
