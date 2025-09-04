@@ -13,9 +13,8 @@
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import emoji from '$lib/utils/emoji/emoji.js';
   import possibleColors from '$lib/utils/project/possible-colors.js';
-  import { DEFAULT_PRESET } from '$lib/utils/rpgf/application-form-presets.js';
   import { createRound } from '$lib/utils/rpgf/rpgf.js';
-  import type { PossibleColor } from '$lib/utils/rpgf/schemas.js';
+  import type { PossibleColor } from '$lib/utils/rpgf/types/round.js';
 
   export let data;
   $: ownRoundsAndDrafts = data.own ?? [];
@@ -40,7 +39,7 @@
           Math.floor(Math.random() * possibleColors.length)
         ] as PossibleColor;
 
-        const draft = await createRound(undefined, {
+        const round = await createRound(undefined, {
           draft: true,
           emoji: randomEmoji,
           chainId: network.chainId,
@@ -59,7 +58,7 @@
           voterGuidelinesLink: null,
         });
 
-        // await goto(`/app/rpgf/drafts/${draft.id}`);
+        await goto(`/app/rpgf/rounds/${round.id}`);
 
         loading = false;
       },

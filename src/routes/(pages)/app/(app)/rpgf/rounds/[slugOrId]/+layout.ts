@@ -1,11 +1,7 @@
-import { dev } from '$app/environment';
 import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
 import { error, redirect } from '@sveltejs/kit';
 
-// TODO(rpgf): remove
-export const ssr = !dev;
-
-export const load = async ({ fetch, params, parent, url }) => {
+export const load = async ({ fetch, params, url }) => {
   const { slugOrId } = params;
 
   const round = await getRound(fetch, slugOrId);
@@ -34,9 +30,7 @@ export const load = async ({ fetch, params, parent, url }) => {
     round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
   );
 
-  const existingBallot = round.isVoter
-    ? await getOwnBallot(fetch, round.id)
-    : null;
+  const existingBallot = round.isVoter ? await getOwnBallot(fetch, round.id) : null;
 
   let ballotStats: Awaited<ReturnType<typeof getBallotStats>> | null = null;
 

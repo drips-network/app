@@ -35,7 +35,7 @@
           size="large"
         />
       </div>
-      <h2 class="pixelated">{round.name ?? 'Unnamed draft'}</h2>
+      <h2 class="pixelated">{round.name ?? 'Unnamed round'}</h2>
       <IdentityBadge address={round.createdByUser.walletAddress} />
     </div>
     <div class="details">

@@ -11,14 +11,9 @@ import { error } from '@sveltejs/kit';
 import { getRepoMetrics } from '$lib/utils/rpgf/oso.js';
 
 export const load = async ({ fetch, params, parent }) => {
-  const { wrappedRound } = await parent();
+  const { round } = await parent();
 
-  const application = await getApplication(
-    fetch,
-    wrappedRound.round.urlSlug,
-    wrappedRound.round.applicationFormat,
-    params.id,
-  );
+  const application = await getApplication(fetch, round.id, params.id);
 
   const dripsProjectQuery = gql`
     ${PROJECT_BADGE_FRAGMENT}

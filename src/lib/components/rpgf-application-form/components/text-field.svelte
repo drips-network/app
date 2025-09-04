@@ -1,12 +1,22 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import type { ApplicationTextField } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationTextAnswerDto,
+    ApplicationTextField,
+  } from '$lib/utils/rpgf/types/application';
 
   export let field: ApplicationTextField;
-  export let value: string | undefined = undefined;
+  export let answer: ApplicationTextAnswerDto | undefined = undefined;
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
+
+  let value: string | undefined = answer?.value;
+  $: if (value)
+    answer = {
+      fieldId: field.id,
+      value: value,
+    };
 
   $: {
     if (field.required) {

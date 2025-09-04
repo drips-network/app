@@ -16,17 +16,17 @@
   import ComponentWrapper from './components/component-wrapper.svelte';
   import FieldSettingsModal from './components/field-settings-modal.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
-  import type { ApplicationFormFields } from '$lib/utils/rpgf/types/application';
+  import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
 
-  export let fields: ApplicationFormFields = [];
+  export let fields: ApplicationFieldDto[] = [];
 
   let applicationFormatWithKeys = fields.map((field) => ({
     ...field,
     key: `${crypto.randomUUID()}`,
   }));
-  $: fields = applicationFormatWithKeys.map<ApplicationFormFields[number]>((field) => {
+  $: fields = applicationFormatWithKeys.map<ApplicationFieldDto>((field) => {
     // Remove the key from the field
-    const newField: ApplicationFormFields[number] & { key?: string } = { ...field };
+    const newField: ApplicationFieldDto & { key?: string } = { ...field };
     delete newField.key;
 
     return newField;

@@ -1,9 +1,9 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import type { ApplicationListField } from '$lib/utils/rpgf/schemas';
   import Button from '$lib/components/button/button.svelte';
   import modal from '$lib/stores/modal';
+  import type { ApplicationListField } from '$lib/utils/rpgf/types/application';
 
   export let formFields: ApplicationListField['entryFields'];
   export let addToValuesFn: (item: Record<string, string | number>) => void;

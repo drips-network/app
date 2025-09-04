@@ -14,7 +14,8 @@
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
   import { submitApplicationReview } from '$lib/utils/rpgf/rpgf.js';
-  import type { ApplicationReviewDto } from '$lib/utils/rpgf/schemas.js';
+  import type { ApplicationReviewDto } from '$lib/utils/rpgf/types/application.js';
+  import unreachable from '$lib/utils/unreachable.js';
 
   export let data;
 
@@ -35,7 +36,7 @@
       },
     );
 
-    await submitApplicationReview(undefined, data.wrappedRound.round.urlSlug, mappedToDto);
+    await submitApplicationReview(undefined, data.round.id, mappedToDto);
 
     clearDecisions();
 
@@ -92,7 +93,7 @@
       {#if data.voteMode}
         <RpgfVotingCard
           previouslyCastBallot={Boolean(data.existingBallot)}
-          round={data.wrappedRound.round}
+          round={data.round}
           ballot={ballotStore}
         />
       {/if}
@@ -100,10 +101,10 @@
       {#if data.resultsMode}
         <div class="sidebar-card">
           <RpgfResultsCard
-            resultsCalculated={data.wrappedRound.round.resultsCalculated}
-            resultsPublished={data.wrappedRound.round.resultsPublished}
-            roundSlug={data.wrappedRound.round.urlSlug}
-            roundName={data.wrappedRound.round.name}
+            resultsCalculated={data.round.resultsCalculated}
+            resultsPublished={data.round.resultsPublished}
+            roundId={data.round.id}
+            roundName={data.round.name ?? unreachable()}
           />
         </div>
       {/if}

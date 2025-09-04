@@ -11,7 +11,7 @@ export type SubmitBallotDto = {
 
 export const wrappedBallotSchema = z.object({
   id: z.string().uuid(),
-  voter: userSchema,
+  user: userSchema,
   ballot: ballotSchema,
   createdAt: z.string().pipe(z.coerce.date()),
 });

@@ -4,7 +4,7 @@
   import ArrowUp from '$lib/components/icons/ArrowUp.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
-  import type { ApplicationFormat } from '$lib/utils/rpgf/schemas';
+  import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
   import { createEventDispatcher, type ComponentType } from 'svelte';
 
   export const dispatch = createEventDispatcher<{
@@ -15,7 +15,7 @@
   }>();
 
   export let component: ComponentType;
-  export let fieldProp: ApplicationFormat[number];
+  export let fieldProp: ApplicationFieldDto;
 </script>
 
 <div class="component-wrapper">

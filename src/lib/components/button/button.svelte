@@ -21,7 +21,7 @@
   export let circular: boolean = false;
 
   //** in case props must be passed as object */
-  export let onClick: () => void | undefined = undefined;
+  export let onClick: (() => void) | undefined = undefined;
 
   $: isDisabled = disabled || loading;
 

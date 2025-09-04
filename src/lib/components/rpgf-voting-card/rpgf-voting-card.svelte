@@ -1,10 +1,5 @@
 <script lang="ts">
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
-  import type {
-    InProgressBallot,
-    WrappedRoundAdmin,
-    WrappedRoundPublic,
-  } from '$lib/utils/rpgf/schemas';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Divider from '../divider/divider.svelte';
@@ -17,11 +12,14 @@
   import Stepper from '../stepper/stepper.svelte';
   import submitRpgfBallotFlowSteps from '$lib/flows/submit-rpgf-ballot/submit-rpgf-ballot-flow-steps';
   import buildExternalUrl from '$lib/utils/build-external-url';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import unreachable from '$lib/utils/unreachable';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
-  export let round: WrappedRoundPublic['round'] | WrappedRoundAdmin['round'];
+  export let round: Round;
   export let previouslyCastBallot: boolean;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
@@ -47,14 +45,10 @@
   $: amountOfVotesAssigned = Object.values($ballot)
     .filter((vote) => vote !== null)
     .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0);
-  $: percentageOfVotesAssigned = amountOfVotesAssigned / round.votingConfig.maxVotesPerVoter;
+  $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
 
   async function handleSubmitBallot() {
-    modal.show(
-      Stepper,
-      undefined,
-      submitRpgfBallotFlowSteps(ballot, round.urlSlug, previouslyCastBallot),
-    );
+    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round, previouslyCastBallot));
   }
 </script>
 
@@ -169,7 +163,7 @@
 
         <div class="actions">
           <span class="typo-text" style:text-align="center">
-            {amountOfVotesAssigned} of {round.votingConfig.maxVotesPerVoter} votes assigned
+            {amountOfVotesAssigned} of {round.maxVotesPerVoter} votes assigned
           </span>
           <div class="assignment-progress-bar">
             <div class="progress-bar" style:width="{percentageOfVotesAssigned * 100}%"></div>

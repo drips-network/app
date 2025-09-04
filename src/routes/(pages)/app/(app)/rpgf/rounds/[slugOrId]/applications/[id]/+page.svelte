@@ -19,18 +19,11 @@
   import buildExternalUrl from '$lib/utils/build-external-url';
 
   export let data;
-  $: round = data.wrappedRound.round;
+  $: round = data.round;
   $: application = data.application;
-  $: applicationFormat = round.applicationFormat.filter((f) => 'slug' in f);
-
-  function isListValue(value: unknown): value is { [key: string]: string | number }[] {
-    return Array.isArray(value);
-  }
 
   $: canSeePrivateFields =
-    data.isRoundAdmin || data.application.submitterUserId === data.rpgfUserData?.userId;
-
-  $: privateFieldsOmitted = applicationFormat.find((f) => f.private) && !canSeePrivateFields;
+    round.isAdmin || data.application.submitter.id === data.rpgfUserData?.userId;
 
   $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
@@ -73,77 +66,80 @@
   <div class="card">
     <h2 class="typo-header-5">Application details</h2>
     <div class="fields">
-      {#if privateFieldsOmitted}
+      {#if !canSeePrivateFields}
         <AnnotationBox type="info">
-          Private fields have been hidden for this application. Sign in as the applicant or a round
-          admin to view private data.
+          Private fields may have been hidden for this application. Sign in as the applicant or a
+          round admin to view private data.
         </AnnotationBox>
       {/if}
 
-      {#each applicationFormat as field}
-        {#if canSeePrivateFields || !field.private}
-          {@const value = application.fields[field.slug]}
-          <div class="field">
-            <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
-              {field.label}
-              {#if field.private}
-                <div style:cursor="help" style:width="fit-content">
-                  <Tooltip>
-                    <svelte:fragment slot="tooltip-content">
-                      This field is private and only visible to admins or the applicant.
-                    </svelte:fragment>
-                    <Lock />
-                  </Tooltip>
-                </div>
-              {/if}
-            </h2>
-            {#if value}
-              {#if field.type === 'text' || field.type === 'textarea' || field.type === 'email'}
-                <p>{value}</p>
-              {:else if field.type === 'url' && typeof value === 'string'}
-                <a
-                  style:width="fit-content"
-                  class="typo-link"
-                  href={buildExternalUrl(value)}
-                  target="_blank"
-                  rel="noopener noreferrer">{value}</a
-                >
-              {:else if field.type === 'select'}
-                <p>{field.options.find((o) => o.value === value)?.label ?? 'Unknown answer'}</p>
-              {:else if field.type === 'list'}
-                <Table
-                  options={{
-                    columns: field.entryFields.map((ef) => ({
-                      header: ef.label,
-                      accessorKey: ef.label,
-                      cell: (v) => (ef.type === 'url' ? LinkCell : v),
-                      enableSorting: false,
-                    })),
-                    // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
-                    data: isListValue(value)
-                      ? value.map((row) => {
-                          return Object.fromEntries(
-                            Object.entries(row).map(([label, value]) => {
-                              const fieldDef = field.entryFields.find((ef) => ef.label === label);
+      <div class="field">
+        <h2 class="typo-header-4">Category</h2>
+        <p>{application.category.name}</p>
+      </div>
 
-                              if (fieldDef?.type === 'url' && typeof value === 'string') {
-                                return [label, { href: buildExternalUrl(value) }];
-                              } else {
-                                return [label, value];
-                              }
-                            }),
-                          );
-                        })
-                      : [],
-                    getCoreRowModel: getCoreRowModel(),
-                  }}
-                />
-              {/if}
-            {:else}
-              <span>No answer</span>
+      {#each application.answers as answer}
+        <div class="field">
+          <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
+            {answer.field.label}
+            {#if answer.field.private}
+              <div style:cursor="help" style:width="fit-content">
+                <Tooltip>
+                  <svelte:fragment slot="tooltip-content">
+                    This field is private and only visible to admins or the applicant.
+                  </svelte:fragment>
+                  <Lock />
+                </Tooltip>
+              </div>
             {/if}
-          </div>
-        {/if}
+          </h2>
+
+          {#if answer.type === 'text' || answer.type === 'textarea'}
+            <p>{answer.text}</p>
+          {:else if answer.type === 'email'}
+            <p>{answer.email}</p>
+          {:else if answer.type === 'url'}
+            <a
+              style:width="fit-content"
+              class="typo-link"
+              href={buildExternalUrl(answer.url)}
+              target="_blank"
+              rel="noopener noreferrer">{answer.url}</a
+            >
+          {:else if answer.type === 'select'}
+            {#each answer.selected as selected}
+              <p>
+                {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
+              </p>
+            {/each}
+          {:else if answer.type === 'list'}
+            <Table
+              options={{
+                columns: answer.field.entryFields.map((ef) => ({
+                  header: ef.label,
+                  accessorKey: ef.label,
+                  cell: (v) => (ef.type === 'url' ? LinkCell : v),
+                  enableSorting: false,
+                })),
+                // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
+                data: answer.entries.map((row) => {
+                  return Object.fromEntries(
+                    Object.entries(row).map(([label, value]) => {
+                      const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
+
+                      if (fieldDef?.type === 'url' && typeof value === 'string') {
+                        return [label, { href: buildExternalUrl(value) }];
+                      } else {
+                        return [label, value];
+                      }
+                    }),
+                  );
+                }),
+                getCoreRowModel: getCoreRowModel(),
+              }}
+            />
+          {/if}
+        </div>
       {/each}
 
       <div class="field">

@@ -23,10 +23,10 @@
 
   $: tableData = data.ballots.map<BallotTableRow>((ballot) => ({
     voter: {
-      address: ballot.voter.walletAddress,
+      address: ballot.user.walletAddress,
     },
     submittedAt: formatDate(ballot.createdAt),
-    votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.wrappedRound.round.votingConfig.maxVotesPerVoter}`,
+    votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
   }));
 
   const tableColumns: ColumnDef<BallotTableRow>[] = [
@@ -57,22 +57,20 @@
   };
 
   async function handleDownload() {
-    const csvContent = await getBallotsCsv(undefined, data.wrappedRound.round.urlSlug);
+    const csvContent = await getBallotsCsv(undefined, data.round.id);
 
     downloadUrl(
       URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' })),
-      `ballots-${data.wrappedRound.round.urlSlug}.csv`,
+      `ballots-${data.round.urlSlug}.csv`,
     );
   }
 </script>
 
-<HeadMeta title="Ballots | {data.wrappedRound.round.name}" />
+<HeadMeta title="Ballots | {data.round.name}" />
 
 <div class="page">
   <div>
-    <Button href="/app/rpgf/rounds/{data.wrappedRound.round.urlSlug}" icon={ArrowLeft}>
-      Back to round
-    </Button>
+    <Button href="/app/rpgf/rounds/{data.round.urlSlug}" icon={ArrowLeft}>Back to round</Button>
   </div>
 
   <div class="header">

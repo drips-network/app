@@ -26,7 +26,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let roundName: string;
-  export let roundSlug: string;
+  export let roundId: string;
   export let context: Writable<State>;
 
   function handlePublish() {
@@ -88,7 +88,7 @@
           );
 
           try {
-            await linkDripListsToRound(undefined, roundSlug, [dripListId]);
+            await linkDripListsToRound(undefined, roundId, [dripListId]);
           } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);

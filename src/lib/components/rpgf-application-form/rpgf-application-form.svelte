@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { ApplicationFormat } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationAnswerDto,
+    ApplicationFormFields,
+  } from '$lib/utils/rpgf/types/application';
   import DividerField from './components/divider-field.svelte';
   import EmailField from './components/email-field.svelte';
   import ListField from './components/list-field.svelte';
@@ -9,12 +12,25 @@
   import TextField from './components/text-field.svelte';
   import UrlField from './components/url-field.svelte';
 
-  export let applicationFormat: ApplicationFormat;
+  export let fields: ApplicationFormFields;
   export let disabled = false;
   export let forceRevealErrors = false;
 
+  export let answers: ApplicationAnswerDto = [];
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export let data: Record<string, any> = {};
+  let internalAnswers: Record<string, any> = answers.reduce(
+    (acc, answer) => {
+      acc[answer.fieldId] = answer;
+      return acc;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    },
+    {} as Record<string, any>,
+  );
+
+  $: {
+    answers = Object.values(internalAnswers).filter((a) => a !== undefined);
+  }
 
   let fieldsValidStates: Record<string, boolean> = {};
 
@@ -23,7 +39,7 @@
 </script>
 
 <form class:disabled>
-  {#each applicationFormat as applicationField}
+  {#each fields as applicationField}
     {@const type = applicationField.type}
 
     {#if type === 'divider'}
@@ -31,40 +47,40 @@
     {:else if type === 'markdown'}
       <MarkdownField field={applicationField} />
     {:else if type === 'list'}
-      <ListField field={applicationField} bind:value={data[applicationField.slug]} />
+      <ListField field={applicationField} bind:answer={internalAnswers[applicationField.id]} />
     {:else if type === 'select'}
       <SelectField
         field={applicationField}
-        bind:value={data[applicationField.slug]}
-        bind:valid={fieldsValidStates[applicationField.slug]}
+        bind:answer={internalAnswers[applicationField.id]}
+        bind:valid={fieldsValidStates[applicationField.id]}
       />
     {:else if type === 'text'}
       <TextField
         forceRevealError={forceRevealErrors}
         field={applicationField}
-        bind:value={data[applicationField.slug]}
-        bind:valid={fieldsValidStates[applicationField.slug]}
+        bind:answer={internalAnswers[applicationField.id]}
+        bind:valid={fieldsValidStates[applicationField.id]}
       />
     {:else if type === 'textarea'}
       <TextAreaField
         forceRevealError={forceRevealErrors}
         field={applicationField}
-        bind:value={data[applicationField.slug]}
-        bind:valid={fieldsValidStates[applicationField.slug]}
+        bind:answer={internalAnswers[applicationField.id]}
+        bind:valid={fieldsValidStates[applicationField.id]}
       />
     {:else if type === 'url'}
       <UrlField
         forceRevealError={forceRevealErrors}
         field={applicationField}
-        bind:value={data[applicationField.slug]}
-        bind:valid={fieldsValidStates[applicationField.slug]}
+        bind:answer={internalAnswers[applicationField.id]}
+        bind:valid={fieldsValidStates[applicationField.id]}
       />
     {:else if type === 'email'}
       <EmailField
         forceRevealError={forceRevealErrors}
         field={applicationField}
-        bind:value={data[applicationField.slug]}
-        bind:valid={fieldsValidStates[applicationField.slug]}
+        bind:answer={internalAnswers[applicationField.id]}
+        bind:valid={fieldsValidStates[applicationField.id]}
       />
     {/if}
   {/each}

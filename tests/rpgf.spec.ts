@@ -93,12 +93,10 @@ test.describe('drafts', () => {
 
     await rpgfRound2.logOut();
 
-    // double check we see the connect page instead of draft name
-    await rpgfRound2.page.goto(`http://localhost:5173/app/rpgf/drafts/${draftId}`);
+    // double check we see the 404 page instead of draft name
+    await rpgfRound2.page.goto(`http://localhost:5173/app/rpgf/rounds/${draftId}`);
     await expect(rpgfRound2.page.getByText('draft visibility test')).not.toBeVisible();
-    await expect(
-      rpgfRound2.page.getByText('Connect your Ethereum wallet to access RetroPGF on Drips.'),
-    ).toBeVisible();
+    await expect(rpgfRound2.page.getByText('Error 404')).toBeVisible();
   });
 });
 

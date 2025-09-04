@@ -14,8 +14,6 @@
   import modal from '$lib/stores/modal/index.js';
   import isClaimed from '$lib/utils/project/is-claimed.js';
   import { goto } from '$app/navigation';
-  import storedWritable from '@efstajas/svelte-stored-writable';
-  import { z } from 'zod';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal.js';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -24,33 +22,65 @@
   import submitRpgfApplicationFlowSteps from '$lib/flows/submit-rpgf-application/submit-rpgf-application-flow-steps.js';
   import assert from '$lib/utils/assert';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { getLocallyStoredApplication } from './locally-stored-application';
 
   export let data;
 
-  $: round = data.wrappedRound.round;
+  const fullFormData = getLocallyStoredApplication(data.round.id);
+
+  $: round = data.round;
+  $: categories = data.categories;
+  $: forms = data.applicationForms;
   $: projects = data.projects.filter((p) => isClaimed(p.chainData[0]));
-  $: applicationFormat = round.applicationFormat;
 
-  const fullFormData = storedWritable(
-    `rpgf-form-data-${data.wrappedRound.round.urlSlug}`,
-    z.object({
-      projectName: z.string().min(1).max(255).optional(),
-      dripsAccountId: z.string().min(1).optional(),
-
-      fields: z.record(z.string(), z.any()),
+  let categoryItems: Items;
+  $: categoryItems = Object.fromEntries(
+    categories.map((category) => {
+      return [
+        category.id,
+        {
+          type: 'selectable',
+          label: category.name,
+          searchString: [category.name, category.description || ''],
+        },
+      ];
     }),
-    {
-      projectName: undefined,
-      dripsAccountId: undefined,
-      fields: {},
-    },
   );
+
+  let selectedCategoryId: string[];
+
+  if ($fullFormData.categoryId) {
+    selectedCategoryId = [$fullFormData.categoryId];
+  } else {
+    selectedCategoryId = data.categories.length > 0 ? [data.categories[0].id] : [];
+  }
+
+  $: $fullFormData.categoryId = selectedCategoryId[0];
+
+  $: selectedCategory = selectedCategoryId.length
+    ? categories.find((c) => c.id === selectedCategoryId[0])
+    : null;
+  $: {
+    if (selectedCategoryId.length && !selectedCategory) {
+      throw new Error('Selected category not found');
+    }
+  }
+
+  $: selectedForm = selectedCategory
+    ? forms.find((form) => form.id === selectedCategory.applicationForm.id)
+    : null;
+  $: {
+    if (selectedCategory && !selectedForm) {
+      throw new Error('Selected form not found');
+    }
+  }
 
   // On load, check if the form data has been restored from local storage.
   let formDataHasBeenRestored =
     $fullFormData.projectName !== undefined ||
     $fullFormData.dripsAccountId !== undefined ||
-    Object.keys($fullFormData.fields).length > 0;
+    $fullFormData.categoryId !== undefined ||
+    Object.keys($fullFormData.answersByCategory).length > 0;
 
   let projectItems: Items;
   $: projectItems = {
@@ -127,8 +157,14 @@
     formDataValid && projectNameValidationState.type === 'valid' && $fullFormData.dripsAccountId;
 
   async function handleSubmit() {
-    const { dripsAccountId, fields, projectName } = $fullFormData;
-    assert(projectName && dripsAccountId && fields, 'Not all form data is set');
+    const { dripsAccountId, answersByCategory, projectName } = $fullFormData;
+    assert(
+      projectName && dripsAccountId && answersByCategory && selectedForm && selectedCategory,
+      'Not all form data is set',
+    );
+
+    const answers = answersByCategory[selectedCategory.id];
+    assert(answers, 'No answers for selected category');
 
     modal.show(
       Stepper,
@@ -137,10 +173,11 @@
         {
           projectName,
           dripsAccountId,
-          fields,
+          answers,
+          categoryId: selectedCategory.id,
         },
-        round.applicationFormat,
-        round.urlSlug,
+        selectedForm.fields,
+        round.id,
       ),
     );
   }
@@ -204,7 +241,7 @@
       title="Drips project*"
       description="Select one of your claimed projects to apply to the round with."
     >
-      <div class="project-picker">
+      <div class="list-select-wrapper min-height">
         <ListSelect
           bind:selected={projectPickerSelected}
           searchable
@@ -242,52 +279,69 @@
 
     <DividerField />
 
-    <RpgfApplicationForm
-      forceRevealErrors={forceRevealAllErrors}
-      bind:valid={formDataValid}
-      bind:data={$fullFormData.fields}
+    <FormField
+      type="div"
+      title="Application category*"
+      description="Select the category that best fits your project. Your selection will determine which questions you need to answer in the next step."
       disabled={!$fullFormData.dripsAccountId || projectNameValidationState.type !== 'valid'}
-      {applicationFormat}
-    />
+    >
+      <div class="list-select-wrapper">
+        <ListSelect bind:selected={selectedCategoryId} items={categoryItems} searchable={false} />
+      </div>
+    </FormField>
 
-    <div style:align-self="flex-end" style:display="flex" style:flex-wrap="wrap" style:gap="1rem">
-      {#if !formDataValid}
-        <AnnotationBox type="error">
-          Some fields are invalid or missing.
-          <svelte:fragment slot="actions">
-            <Button
-              variant="normal"
-              on:click={async () => {
-                forceRevealAllErrors = true;
+    <DividerField />
 
-                // wait for the DOM to update before scrolling
-                await tick();
+    {#if selectedForm && selectedCategory}
+      {#key selectedForm.id}
+        <RpgfApplicationForm
+          forceRevealErrors={forceRevealAllErrors}
+          bind:valid={formDataValid}
+          bind:answers={$fullFormData.answersByCategory[selectedCategory.id]}
+          disabled={!$fullFormData.dripsAccountId || projectNameValidationState.type !== 'valid'}
+          fields={selectedForm.fields}
+        />
+      {/key}
 
-                const errorAnchor = document.getElementById('form-field-validation-error-anchor');
-                if (errorAnchor) {
-                  errorAnchor.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }
-              }}
-            >
-              Show all errors
-            </Button>
-          </svelte:fragment>
-        </AnnotationBox>
-      {/if}
+      <div style:align-self="flex-end" style:display="flex" style:flex-wrap="wrap" style:gap="1rem">
+        {#if !formDataValid}
+          <AnnotationBox type="error">
+            Some fields are invalid or missing.
+            <svelte:fragment slot="actions">
+              <Button
+                variant="normal"
+                on:click={async () => {
+                  forceRevealAllErrors = true;
 
-      <Button
-        icon={Wallet}
-        disabled={!readyToSubmit}
-        on:click={handleSubmit}
-        variant="primary"
-        size="large"
-      >
-        Submit application
-      </Button>
-    </div>
+                  // wait for the DOM to update before scrolling
+                  await tick();
+
+                  const errorAnchor = document.getElementById('form-field-validation-error-anchor');
+                  if (errorAnchor) {
+                    errorAnchor.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }
+                }}
+              >
+                Show all errors
+              </Button>
+            </svelte:fragment>
+          </AnnotationBox>
+        {/if}
+
+        <Button
+          icon={Wallet}
+          disabled={!readyToSubmit}
+          on:click={handleSubmit}
+          variant="primary"
+          size="large"
+        >
+          Submit application
+        </Button>
+      </div>
+    {/if}
   {:else}
     <!-- TODO(rpgf): Make this pretty -->
     <div class="flex flex-col items-center justify-center h-full">
@@ -307,10 +361,13 @@
     margin: 0 auto;
   }
 
-  .project-picker {
-    min-height: 14rem;
+  .list-select-wrapper {
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
+  }
+
+  .list-select-wrapper.min-height {
+    min-height: 14rem;
   }
 </style>

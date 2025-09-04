@@ -74,10 +74,7 @@
         sortByOptions={{
           name: 'Name',
           createdAt: 'Created at',
-          allocation:
-            round.isAdmin || round.resultsPublished
-              ? 'Allocation amount'
-              : null,
+          allocation: round.isAdmin || round.resultsPublished ? 'Allocation amount' : null,
         }}
         bind:sortBy={selectedSortBy}
         filterOptions={{
@@ -86,7 +83,7 @@
           approved: 'Only approved',
         }}
         bind:filterBy={selectedFilter}
-        onDownload={round.isAdmin ? handleDownload : undefined}
+        onDownload={handleDownload}
       />
     </div>
   </div>

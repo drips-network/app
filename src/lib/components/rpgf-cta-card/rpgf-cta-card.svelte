@@ -3,10 +3,10 @@
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Ledger from '../icons/Ledger.svelte';
-  import { z } from 'zod';
   import Trophy from '../icons/Trophy.svelte';
   import { browser } from '$app/environment';
   import type { Round } from '$lib/utils/rpgf/types/round';
+  import { createApplicationDtoSchema } from '$lib/utils/rpgf/types/application';
 
   export let hasExistingBallot: boolean;
   export let round: Round;
@@ -16,16 +16,11 @@
 
   const localApplicationState = storedWritable(
     `rpgf-form-data-${round.urlSlug}`,
-    z.object({
-      projectName: z.string().min(1).max(255).optional(),
-      dripsAccountId: z.string().min(1).optional(),
-
-      fields: z.record(z.string(), z.any()),
-    }),
+    createApplicationDtoSchema.partial(),
     {
       projectName: undefined,
       dripsAccountId: undefined,
-      fields: {},
+      answers: [],
     },
     !browser,
   );
@@ -33,7 +28,7 @@
   $: localApplicationDraftExists =
     $localApplicationState.projectName !== undefined ||
     $localApplicationState.dripsAccountId !== undefined ||
-    Object.keys($localApplicationState.fields).length > 0;
+    ($localApplicationState.answers?.length ?? 0) > 0;
 
   const inProgressBallotExists = browser
     ? localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null

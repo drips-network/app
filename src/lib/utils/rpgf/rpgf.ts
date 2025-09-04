@@ -7,8 +7,27 @@ import { z } from 'zod';
 import network from '$lib/stores/wallet/network';
 import { error } from '@sveltejs/kit';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { roundSchema, slugAvailableResponseSchema, type CreateRoundDto, type PatchRoundDto, type Round } from './types/round';
-import { applicationCategorySchema, applicationFormSchema, applicationSchema, listingApplicationSchema, type Application, type ApplicationCategory, type ApplicationForm, type ApplicationReviewDto, type CreateApplicationCategoryDto, type CreateApplicationDto, type CreateApplicationFormDto, type ListingApplication } from './types/application';
+import {
+  roundSchema,
+  slugAvailableResponseSchema,
+  type CreateRoundDto,
+  type PatchRoundDto,
+  type Round,
+} from './types/round';
+import {
+  applicationCategorySchema,
+  applicationFormSchema,
+  applicationSchema,
+  listingApplicationSchema,
+  type Application,
+  type ApplicationCategory,
+  type ApplicationForm,
+  type ApplicationReviewDto,
+  type CreateApplicationCategoryDto,
+  type CreateApplicationDto,
+  type CreateApplicationFormDto,
+  type ListingApplication,
+} from './types/application';
 import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
 
@@ -108,21 +127,14 @@ export async function getRounds(f = fetch, own = false): Promise<Round[]> {
   return parsed;
 }
 
-export async function createRound(
-  f = fetch,
-  draft: CreateRoundDto,
-): Promise<Round> {
+export async function createRound(f = fetch, draft: CreateRoundDto): Promise<Round> {
   const res = await authenticatedRpgfServerCall(`/rounds`, 'PUT', draft, f);
 
   const parsed = roundSchema.parse(await res.json());
   return parsed;
 }
 
-export async function updateRound(
-  f = fetch,
-  id: string,
-  draft: PatchRoundDto,
-): Promise<Round> {
+export async function updateRound(f = fetch, id: string, draft: PatchRoundDto): Promise<Round> {
   // strip empty fields
   const strippedDraft: PatchRoundDto = Object.fromEntries(
     Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
@@ -142,12 +154,7 @@ export async function deleteRound(f = fetch, id: string): Promise<Response> {
 }
 
 export async function publishRound(f = fetch, id: string): Promise<Round> {
-  const res = await authenticatedRpgfServerCall(
-    `/rounds/${id}/publish`,
-    'POST',
-    undefined,
-    f,
-  );
+  const res = await authenticatedRpgfServerCall(`/rounds/${id}/publish`, 'POST', undefined, f);
 
   const parsed = roundSchema.parse(await res.json());
   return parsed;
@@ -160,10 +167,7 @@ export async function checkSlugAvailability(f = fetch, slug: string): Promise<bo
   return available;
 }
 
-export async function getRound(
-  f = fetch,
-  slug: string,
-): Promise<Round | null> {
+export async function getRound(f = fetch, slug: string): Promise<Round | null> {
   const res = await authenticatedRpgfServerCall(
     `/rounds/${slug}?chainId=${network.chainId}`,
     'GET',
@@ -171,7 +175,7 @@ export async function getRound(
     f,
   );
   const body = await res.json();
-  
+
   if (res.status === 404) {
     return null;
   }
@@ -263,12 +267,7 @@ export async function submitApplicationReview(
   roundId: string,
   decisions: ApplicationReviewDto,
 ): Promise<void> {
-  await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/applications/review`,
-    'POST',
-    decisions,
-    f,
-  );
+  await authenticatedRpgfServerCall(`/rounds/${roundId}/applications/review`, 'POST', decisions, f);
 }
 
 export async function castBallot(
@@ -380,11 +379,11 @@ export async function getBallotStats(
 
 export async function recalculateResults(
   f = fetch,
-  roundSlug: string,
+  roundId: string,
   method: 'avg' | 'median' | 'sum',
 ): Promise<void> {
   await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/results/recalculate?method=${method}`,
+    `/rounds/${roundId}/results/recalculate?method=${method}`,
     'POST',
     undefined,
     f,
@@ -393,18 +392,18 @@ export async function recalculateResults(
   return;
 }
 
-export async function publishResults(f = fetch, roundSlug: string): Promise<void> {
-  await authenticatedRpgfServerCall(`/rounds/${roundSlug}/results/publish`, 'POST', undefined, f);
+export async function publishResults(f = fetch, roundId: string): Promise<void> {
+  await authenticatedRpgfServerCall(`/rounds/${roundId}/results/publish`, 'POST', undefined, f);
 
   return;
 }
 
 export async function getDripListWeightsForRound(
   f = fetch,
-  roundSlug: string,
+  roundId: string,
 ): Promise<Record<string, number>> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/results/drip-list-weights`,
+    `/rounds/${roundId}/results/drip-list-weights`,
     'GET',
     undefined,
     f,
@@ -416,11 +415,11 @@ export async function getDripListWeightsForRound(
 
 export async function linkDripListsToRound(
   f = fetch,
-  roundSlug: string,
+  roundId: string,
   dripListAccountIds: string[],
 ): Promise<void> {
   await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/drip-lists`,
+    `/rounds/${roundId}/drip-lists`,
     'PATCH',
     {
       dripListAccountIds,
@@ -457,12 +456,7 @@ export async function getOwnUserData(f = fetch): Promise<{
 }
 
 export async function getRoundAdmins(f = fetch, roundId: string): Promise<RpgfUser[]> {
-  const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/admins`,
-    'GET',
-    undefined,
-    f,
-  );
+  const res = await authenticatedRpgfServerCall(`/rounds/${roundId}/admins`, 'GET', undefined, f);
 
   return userSchema.array().parse(await res.json());
 }
@@ -485,12 +479,7 @@ export async function setRoundAdmins(
 }
 
 export async function getRoundVoters(f = fetch, roundId: string): Promise<RpgfUser[]> {
-  const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/voters`,
-    'GET',
-    undefined,
-    f,
-  );
+  const res = await authenticatedRpgfServerCall(`/rounds/${roundId}/voters`, 'GET', undefined, f);
 
   return userSchema.array().parse(await res.json());
 }
@@ -556,10 +545,7 @@ export async function deleteApplicationCategory(
   return;
 }
 
-export async function getApplicationForms(
-  f = fetch,
-  roundId: string,
-): Promise<ApplicationForm[]> {
+export async function getApplicationForms(f = fetch, roundId: string): Promise<ApplicationForm[]> {
   const res = await authenticatedRpgfServerCall(
     `/rounds/${roundId}/application-forms`,
     'GET',

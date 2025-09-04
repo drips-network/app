@@ -8,8 +8,6 @@
   export let data;
   $: ballotStore = data.ballot;
 
-  $: roundSlug = data.wrappedRound.round.urlSlug;
-
   $: selectedApplications = mapFilterUndefined(Object.keys($ballotStore), (id) => {
     return data.allApplications.find((app) => app.id === id);
   });
@@ -19,7 +17,7 @@
 
 <div class="page">
   <div>
-    <Button href="/app/rpgf/rounds/{roundSlug}/applications" icon={ArrowLeft}
+    <Button href="/app/rpgf/rounds/{data.round.urlSlug}/applications" icon={ArrowLeft}
       >Back to applications</Button
     >
   </div>
@@ -30,7 +28,7 @@
   <RpgfApplicationsTable
     voteStep="assign-votes"
     reviewMode={false}
-    round={data.wrappedRound.round}
+    round={data.round}
     {ballotStore}
     applications={selectedApplications}
   />
