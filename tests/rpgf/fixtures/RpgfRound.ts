@@ -1,7 +1,7 @@
 import { type Page, expect } from '@playwright/test';
 import type { ConnectedSession } from '../../fixtures/ConnectedSession';
-import type { RoundState } from '$lib/utils/rpgf/schemas';
 import type { Project } from '../../fixtures/Project';
+import type { RoundState } from '$lib/utils/rpgf/types/round';
 
 const RPGF_API_URL = 'http://localhost:5000/api';
 
@@ -67,6 +67,11 @@ export class RpgfRound {
       votesPerVoter: 1000,
       maximumVotesPerProject: 100,
     },
+    categories = [
+      {
+        name: 'Default',
+      },
+    ],
   }: {
     name: string;
     description?: string;
@@ -85,6 +90,9 @@ export class RpgfRound {
       maximumVotesPerProject: number;
       badgeholderGuidelinesLink?: string;
     };
+    categories?: {
+      name: string;
+    }[];
   }): Promise<string> {
     this.name = name;
     this.urlSlug = urlSlug;
@@ -96,7 +104,11 @@ export class RpgfRound {
     await this.gotoRpgfPage();
 
     await this.page.getByRole('button', { name: 'New round' }).click();
-    await expect(this.page.getByText('Unnamed round')).toBeVisible();
+
+    await this.page.waitForURL('**/app/rpgf/rounds/*');
+
+    // Page title and header meta
+    await expect(this.page.getByText('Unnamed round')).toHaveCount(2);
 
     await this.page.getByRole('link', { name: 'Settings' }).nth(0).click();
     await this.page.getByRole('textbox', { name: 'Round name*' }).click();
@@ -167,8 +179,99 @@ export class RpgfRound {
       await this.page.getByRole('button', { name: 'Save changes' }).click();
     }
 
+    // Configure application forms
+
+    if (categories.length > 0) {
+      await this.page.getByTestId('sidenav-item-Applications').click();
+      await this.page.getByRole('button', { name: 'Create new form' }).click();
+      await this.page.getByRole('textbox', { name: 'Enter a unique name for this' }).click();
+      await this.page.getByRole('textbox', { name: 'Enter a unique name for this' }).click();
+      await this.page
+        .getByRole('textbox', { name: 'Enter a unique name for this' })
+        .fill('Default form');
+      await this.page.getByRole('button', { name: 'Create form' }).click();
+
+      await this.page.getByRole('button', { name: 'Add first field' }).click();
+      await this.page.getByRole('button', { name: 'Text Area A multi-line text' }).click();
+      await this.page.getByRole('textbox', { name: 'Label*' }).fill('Description');
+      await this.page
+        .getByRole('textbox', { name: 'A unique identifier for this' })
+        .fill('description');
+      await this.page
+        .getByRole('textbox', { name: 'Description (Markdown)' })
+        .fill('Please consicely describe your project');
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .locator('div')
+        .nth(1)
+        .click();
+      await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+      await this.page.locator('.add-item-row > .button').click();
+      await this.page.getByRole('button', { name: 'Text Field A single-line text' }).click();
+      await this.page.getByRole('textbox', { name: 'Label*' }).fill('Name');
+      await this.page
+        .getByRole('textbox', { name: 'Description (Markdown)' })
+        .fill('Please enter your name.');
+      await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('name');
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .locator('div')
+        .nth(1)
+        .click();
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Private field' })
+        .locator('div')
+        .first()
+        .click();
+      await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+      await this.page.locator('div:nth-child(2) > .add-item-row > .button').click();
+      await this.page.getByRole('button', { name: 'URL Field A field for' }).click();
+      await this.page.getByRole('textbox', { name: 'Label*' }).fill('Website');
+      await this.page
+        .getByRole('textbox', { name: 'Description (Markdown)' })
+        .fill('Please enter the URL to your website.');
+      await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('web');
+      await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+      await this.page.locator('div:nth-child(3) > .add-item-row > .button').click();
+      await this.page.getByRole('button', { name: 'Email Field A field for' }).click();
+      await this.page.getByRole('textbox', { name: 'Label*' }).fill('Email');
+      await this.page
+        .getByRole('textbox', { name: 'Description (Markdown)' })
+        .fill('Please enter your email');
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .locator('div')
+        .first()
+        .click();
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Private field' })
+        .locator('div')
+        .nth(1)
+        .click();
+      await this.page.locator('form div').filter({ hasText: 'Save' }).first().click();
+      await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).click();
+      await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('email');
+      await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+
+      await this.page.getByRole('button', { name: 'Save changes' }).click();
+      await this.page.waitForTimeout(1000);
+      await this.page.getByTestId('sidenav-item-Applications').click();
+      await this.page.getByRole('button', { name: 'Add category' }).click();
+      await this.page.getByRole('textbox', { name: 'Name*' }).fill('Default');
+      await this.page.getByTestId('dropdown').click();
+      await this.page.getByRole('option', { name: 'Default form ' }).click();
+      await this.page.getByRole('button', { name: 'Create category' }).click();
+    }
+
     // Go back to draft page
     await this.page.getByRole('link', { name }).click();
+
+    await this.page.waitForURL('**/app/rpgf/rounds/*');
 
     // return the last part of the URL as the draft ID
     const url = this.page.url();
@@ -189,10 +292,10 @@ export class RpgfRound {
 
     // Find the draft by name
     const draftLocator = this.page.getByRole('link', { name: this.name });
-    await expect(draftLocator).toBeVisible();
+    await expect(draftLocator.nth(0)).toBeVisible();
 
     // Click on the draft to open it
-    await draftLocator.click();
+    await draftLocator.nth(0).click();
   }
 
   async deleteDraft() {
@@ -274,10 +377,9 @@ export class RpgfRound {
     if (applicationTitle) {
       await page.locator('input[type="text"]').first().fill(applicationTitle);
     }
+
     await page.getByRole('textbox', { name: 'Please consicely describe' }).fill('Test description');
-    await page
-      .getByRole('textbox', { name: 'Please enter your name. Legal' })
-      .fill('Test Testerson');
+    await page.getByRole('textbox', { name: 'Please enter your name.' }).fill('Test Testerson');
     await page.getByRole('textbox', { name: 'Please enter your email' }).fill('test@test.com');
     await page
       .getByRole('textbox', { name: 'Please enter the URL to your' })

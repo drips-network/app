@@ -1,15 +1,12 @@
 <script lang="ts">
   import modal from '$lib/stores/modal';
-  import type { ApplicationFormat } from '$lib/utils/rpgf/schemas';
+  import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
   import FieldSettingsModal from './field-settings-modal.svelte';
 
-  export let onAdd: (field: ApplicationFormat[number]) => void;
+  export let onAdd: (field: ApplicationFieldDto) => void;
   export let unavailableSlugs: string[];
 
-  const DEFAULT_FIELD_SETTINGS: Record<
-    ApplicationFormat[number]['type'],
-    ApplicationFormat[number]
-  > = {
+  const DEFAULT_FIELD_SETTINGS: Record<ApplicationFieldDto['type'], ApplicationFieldDto> = {
     markdown: {
       type: 'markdown',
       content: '',
@@ -71,7 +68,7 @@
   } as const;
 
   const FIELD_TYPES: Record<
-    ApplicationFormat[number]['type'],
+    ApplicationFieldDto['type'],
     { friendlyName: string; description: string }
   > = {
     markdown: {
@@ -110,7 +107,7 @@
   } as const;
 
   function handleAdd(type: string) {
-    const defaultSettings = DEFAULT_FIELD_SETTINGS[type as ApplicationFormat[number]['type']];
+    const defaultSettings = DEFAULT_FIELD_SETTINGS[type as ApplicationFieldDto['type']];
 
     if (type === 'divider') {
       onAdd(defaultSettings);

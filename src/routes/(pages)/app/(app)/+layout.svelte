@@ -163,7 +163,7 @@
   }
 
   .page-content-inner {
-    max-width: 75rem;
+    max-width: 80rem;
     width: 100%;
   }
 

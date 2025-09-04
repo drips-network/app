@@ -14,7 +14,7 @@
   import Stepper from '../stepper/stepper.svelte';
   import OrDivider from './components/or-divider.svelte';
 
-  export let roundSlug: string;
+  export let roundId: string;
   export let roundName: string;
   export let resultsCalculated: boolean;
   export let resultsPublished: boolean;
@@ -28,7 +28,7 @@
         if (loading) return;
         loading = true;
 
-        await recalculateResults(undefined, roundSlug, calcMethod as 'avg' | 'median' | 'sum');
+        await recalculateResults(undefined, roundId, calcMethod as 'avg' | 'median' | 'sum');
 
         await invalidateAll();
 
@@ -51,7 +51,7 @@
             if (loading) return;
             loading = true;
 
-            await publishResults(undefined, roundSlug);
+            await publishResults(undefined, roundId);
             await invalidateAll();
 
             loading = false;
@@ -135,7 +135,7 @@
 
     <Button
       on:click={() =>
-        modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundSlug, roundName))}
+        modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundId, roundName))}
       icon={DripList}
       size="large"
       variant="primary">Prepare Drip List</Button
@@ -144,8 +144,7 @@
     <OrDivider />
 
     <Button
-      on:click={() =>
-        modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundSlug, []))}
+      on:click={() => modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundId, []))}
       >Manually link Drip Lists</Button
     >
   {/if}

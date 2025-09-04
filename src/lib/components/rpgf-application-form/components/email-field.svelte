@@ -1,13 +1,25 @@
 <script lang="ts">
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import type { ApplicationEmailField } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationEmailAnswerDto,
+    ApplicationEmailField,
+  } from '$lib/utils/rpgf/types/application';
   import type { ComponentProps } from 'svelte';
 
   export let field: ApplicationEmailField;
-  export let value: string | undefined = undefined;
+  export let answer: ApplicationEmailAnswerDto | undefined = undefined;
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
+
+  let value: string | undefined = answer?.value;
+
+  $: if (value) {
+    answer = {
+      fieldId: field.id,
+      value: value,
+    };
+  }
 
   $: hasValidEmail =
     value !== undefined && value.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);

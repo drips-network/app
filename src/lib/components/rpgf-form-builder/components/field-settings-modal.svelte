@@ -8,10 +8,13 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import modal from '$lib/stores/modal';
-  import { applicationFieldSchema, type ApplicationFormat } from '$lib/utils/rpgf/schemas';
+  import {
+    applicationFieldDtoSchema,
+    type ApplicationFieldDto,
+  } from '$lib/utils/rpgf/types/application';
 
-  export let fieldSettings: ApplicationFormat[number];
-  export let onSave: (field: ApplicationFormat[number]) => void;
+  export let fieldSettings: ApplicationFieldDto;
+  export let onSave: (field: ApplicationFieldDto) => void;
   export let unavailableSlugs: string[];
 
   let valid: boolean;
@@ -21,7 +24,7 @@
       slug: 'slug' in fieldSettings ? fieldSettings.slug.toLowerCase().trim() : '',
     };
 
-    const parseResult = applicationFieldSchema.safeParse(normalizedFieldSettings);
+    const parseResult = applicationFieldDtoSchema.safeParse(normalizedFieldSettings);
 
     const slugUnavailable =
       'slug' in normalizedFieldSettings &&

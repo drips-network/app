@@ -1,13 +1,16 @@
 import { makeStep } from '$lib/components/stepper/types';
-import type { CreateApplicationDto, WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
 import { get, writable } from 'svelte/store';
 import Confirm from './steps/confirm.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { invalidateAll } from '$app/navigation';
+import type {
+  ApplicationFormFields,
+  CreateApplicationDto,
+} from '$lib/utils/rpgf/types/application';
 
 export default (
   applicationData: CreateApplicationDto,
-  applicationFormat: WrappedRoundPublic['round']['applicationFormat'],
+  formFields: ApplicationFormFields,
   roundSlug: string,
 ) => {
   const context = writable<{ applicationId: string | null }>({
@@ -20,8 +23,8 @@ export default (
       makeStep({
         component: Confirm,
         props: {
+          formFields,
           applicationData,
-          applicationFormat,
           roundSlug,
         },
       }),

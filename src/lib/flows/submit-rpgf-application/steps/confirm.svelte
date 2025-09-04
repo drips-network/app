@@ -14,30 +14,28 @@
     pinApplicationAttestationData,
   } from '$lib/utils/rpgf/eas';
   import { submitApplication } from '$lib/utils/rpgf/rpgf';
-  import type { CreateApplicationDto, WrappedRoundPublic } from '$lib/utils/rpgf/schemas';
   import { getUIDsFromAttestReceipt, ZERO_BYTES32 } from '@ethereum-attestation-service/eas-sdk';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import type {
+    ApplicationFormFields,
+    CreateApplicationDto,
+  } from '$lib/utils/rpgf/types/application';
 
   export let context: Writable<{ applicationId: string | null }>;
   export let applicationData: CreateApplicationDto;
-  export let applicationFormat: WrappedRoundPublic['round']['applicationFormat'];
+  export let formFields: ApplicationFormFields;
   export let roundSlug: string;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function sendApplication(attestationUID?: string) {
-    const application = await submitApplication(
-      undefined,
-      roundSlug,
-      {
-        ...applicationData,
-        attestationUID,
-      },
-      applicationFormat,
-    );
+    const application = await submitApplication(undefined, roundSlug, {
+      ...applicationData,
+      attestationUID,
+    });
 
     $context.applicationId = application.id;
   }
@@ -54,7 +52,7 @@
             throw new Error('Wallet not connected');
           }
 
-          const ipfsHash = await pinApplicationAttestationData(applicationData, applicationFormat);
+          const ipfsHash = await pinApplicationAttestationData(applicationData, formFields);
 
           const attestationData = applicationAttestationData(ipfsHash, roundSlug);
 

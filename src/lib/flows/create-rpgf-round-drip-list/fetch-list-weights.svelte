@@ -10,13 +10,13 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  export let roundSlug: string;
+  export let roundId: string;
 
   onMount(() => {
     dispatch('await', {
       message: 'Fetching list weights and project data. This may take a moment…',
       promise: async () => {
-        const calculatedWeights = await getDripListWeightsForRound(undefined, roundSlug);
+        const calculatedWeights = await getDripListWeightsForRound(undefined, roundId);
 
         if (Object.keys(calculatedWeights).length > 199) {
           throw new Error(

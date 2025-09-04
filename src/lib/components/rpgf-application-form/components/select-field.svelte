@@ -2,10 +2,13 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
-  import type { ApplicationSelectField } from '$lib/utils/rpgf/schemas';
+  import type {
+    ApplicationSelectAnswerDto,
+    ApplicationSelectField,
+  } from '$lib/utils/rpgf/types/application';
 
   export let field: ApplicationSelectField;
-  export let value: string | undefined = undefined;
+  export let answer: ApplicationSelectAnswerDto | undefined = undefined;
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
   export let blockInteraction: boolean = false;
@@ -25,12 +28,15 @@
 
   let beenFocussed = false;
 
-  let selected: string[] = value ? [value] : [];
-  $: value = selected[0];
+  let selected: string[] = answer ? [...answer.value] : [];
+  $: answer = {
+    fieldId: field.id,
+    value: selected,
+  };
 
   $: {
     if (field.required) {
-      valid = value !== undefined && value.trim() !== '';
+      valid = answer !== undefined && answer.value.length > 0;
     } else {
       valid = true;
     }

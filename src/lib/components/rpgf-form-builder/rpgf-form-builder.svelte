@@ -1,7 +1,6 @@
 <script lang="ts">
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
-  import type { ApplicationFormat } from '$lib/utils/rpgf/schemas';
   import { flip } from 'svelte/animate';
   import Button from '../button/button.svelte';
   import Plus from '../icons/Plus.svelte';
@@ -17,16 +16,17 @@
   import ComponentWrapper from './components/component-wrapper.svelte';
   import FieldSettingsModal from './components/field-settings-modal.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+  import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
 
-  export let applicationFormat: ApplicationFormat = [];
+  export let fields: ApplicationFieldDto[] = [];
 
-  let applicationFormatWithKeys = applicationFormat.map((field) => ({
+  let applicationFormatWithKeys = fields.map((field) => ({
     ...field,
     key: `${crypto.randomUUID()}`,
   }));
-  $: applicationFormat = applicationFormatWithKeys.map<ApplicationFormat[number]>((field) => {
+  $: fields = applicationFormatWithKeys.map<ApplicationFieldDto>((field) => {
     // Remove the key from the field
-    const newField: ApplicationFormat[number] & { key?: string } = { ...field };
+    const newField: ApplicationFieldDto & { key?: string } = { ...field };
     delete newField.key;
 
     return newField;
@@ -63,7 +63,7 @@
 
   function editItem(index: number) {
     modal.show(FieldSettingsModal, undefined, {
-      fieldSettings: applicationFormat[index],
+      fieldSettings: fields[index],
       onSave: (field) => {
         applicationFormatWithKeys[index] = {
           ...field,
