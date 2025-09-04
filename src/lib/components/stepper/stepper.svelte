@@ -81,6 +81,14 @@
 
     const direction = by > 0 ? 'forward' : 'backward';
 
+    const goingTo = nextValidStepIndex(currentStepIndex + by, direction);
+
+    // if there is no step to go to, conclude
+    if (!resolvedSteps[goingTo]) {
+      handleConclusion();
+      return;
+    }
+
     currentStepIndex = nextValidStepIndex(currentStepIndex + by, direction);
 
     // Wait for the old step to be fully out of view and unmounted.
