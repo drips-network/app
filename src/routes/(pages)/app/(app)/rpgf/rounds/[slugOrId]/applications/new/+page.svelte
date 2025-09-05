@@ -346,7 +346,6 @@
       </div>
     {/if}
   {:else}
-    <!-- TODO(rpgf): Make this pretty -->
     <div class="flex flex-col items-center justify-center h-full">
       <h1 class="text-2xl font-bold">Applications for this round are not open</h1>
       <p class="text-lg"></p>
