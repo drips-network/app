@@ -1,38 +1,37 @@
 <script lang="ts">
-  import { invalidateAll } from "$app/navigation";
-  import Button from "$lib/components/button/button.svelte";
-  import ArrowLeft from "$lib/components/icons/ArrowLeft.svelte";
-  import RpgfFormBuilder from "$lib/components/rpgf-form-builder/rpgf-form-builder.svelte";
-  import { updateApplicationForm } from "$lib/utils/rpgf/rpgf.js";
-  import RpgfSettingsForm from "../../../../../../components/rpgf-settings-form.svelte";
+  import { invalidate } from '$app/navigation';
+  import Button from '$lib/components/button/button.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import RpgfFormBuilder from '$lib/components/rpgf-form-builder/rpgf-form-builder.svelte';
+  import { updateApplicationForm } from '$lib/utils/rpgf/rpgf.js';
+  import RpgfSettingsForm from '../../../../../../components/rpgf-settings-form.svelte';
 
   export let data;
-  let updatedFields = [ ...data.form.fields ];
+  let updatedFields = [...data.form.fields];
 
   async function saveHandler() {
-    await updateApplicationForm(
-      undefined,
-      data.round.id,
-      data.form.id,
-      {
-        ...data.form,
-        fields: updatedFields,
-      }
-    )
+    await updateApplicationForm(undefined, data.round.id, data.form.id, {
+      ...data.form,
+      fields: updatedFields,
+    });
 
-    await invalidateAll();
+    await invalidate('rpgf:round:applications:categories-and-forms');
   }
 </script>
 
 <RpgfSettingsForm round={data.round} {saveHandler}>
   <div class="form-header">
-    <Button icon={ArrowLeft} circular href="/app/rpgf/rounds/{data.round.published ? data.round.urlSlug : data.round.id}/settings/application" />
+    <Button
+      icon={ArrowLeft}
+      circular
+      href="/app/rpgf/rounds/{data.round.published
+        ? data.round.urlSlug
+        : data.round.id}/settings/application"
+    />
     <h2>{data.form.name}</h2>
   </div>
 
-  <RpgfFormBuilder
-    bind:fields={updatedFields}
-  />
+  <RpgfFormBuilder bind:fields={updatedFields} />
 </RpgfSettingsForm>
 
 <style>

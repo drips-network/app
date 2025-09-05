@@ -14,33 +14,22 @@
   let now = new Date();
 
   $: changesMade =
-    updatedRound.applicationPeriodStart?.getTime() !== data.round.applicationPeriodStart?.getTime() ||
+    updatedRound.applicationPeriodStart?.getTime() !==
+      data.round.applicationPeriodStart?.getTime() ||
     updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
     updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
     updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
     updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime();
 
   async function saveHandler() {
-    await updateRound(
-      undefined,
-      data.round.id,
-      {
-        applicationPeriodStart: updatedRound.applicationPeriodStart,
-        applicationPeriodEnd: updatedRound.applicationPeriodEnd,
-        votingPeriodStart: updatedRound.votingPeriodStart,
-        votingPeriodEnd: updatedRound.votingPeriodEnd,
-        resultsPeriodStart: updatedRound.resultsPeriodStart,
-      },
-    )
+    await updateRound(undefined, data.round.id, {
+      applicationPeriodStart: updatedRound.applicationPeriodStart,
+      applicationPeriodEnd: updatedRound.applicationPeriodEnd,
+      votingPeriodStart: updatedRound.votingPeriodStart,
+      votingPeriodEnd: updatedRound.votingPeriodEnd,
+      resultsPeriodStart: updatedRound.resultsPeriodStart,
+    });
   }
-
-
-  $: console.log({
-    updatedRound,
-    round: data.round,
-    changesMade
-  })
-
 </script>
 
 <RpgfSettingsForm round={data.round} saveEnabled={changesMade} {saveHandler}>

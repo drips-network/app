@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
@@ -48,7 +48,7 @@
       });
     }
 
-    await invalidateAll();
+    await invalidate('rpgf:round');
 
     triggerSuccess();
     saving = false;

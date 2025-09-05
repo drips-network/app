@@ -198,8 +198,16 @@ const walletStore = () => {
         await provider.send('wallet_switchEthereumChain', [
           { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
         ]);
+
+        // Recreate provider to avoid network change issue with MetaMask
+        const wallets = onboard.state.get().wallets;
+        const newProvider = new BrowserProvider(wallets[0].provider);
+
         // Network is already added, we can proceed.
-        await _setConnectedState(provider, safeInfo);
+        await _setConnectedState(newProvider, safeInfo);
+
+        return get(state);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         // Error code 4902 means that the network is not added to the wallet.

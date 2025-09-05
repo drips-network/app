@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Check from '$lib/components/icons/Check.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -48,7 +48,7 @@
         }
 
         ballot.clear();
-        await invalidateAll();
+        await invalidate('rpgf:round');
       },
       message: 'Casting your ballot...',
     });

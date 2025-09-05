@@ -40,10 +40,7 @@
       </a>
     </div>
     {#if !round.published}
-      <RpgfDraftTodoCard
-        {round}
-        {amountOfVoters}
-      />
+      <RpgfDraftTodoCard {round} {amountOfVoters} />
     {/if}
   </div>
 
@@ -82,15 +79,13 @@
       icon={Proposals}
       backgroundOnActive
     />
-    {#if !round.published}
-      <SidenavItem
-        label="Applications"
-        href="{settingsBaseUrl}/application"
-        active={$page.url.pathname === `${settingsBaseUrl}/application`}
-        icon={Ledger}
-        backgroundOnActive
-      />
-    {/if}
+    <SidenavItem
+      label="Applications"
+      href="{settingsBaseUrl}/application"
+      active={$page.url.pathname === `${settingsBaseUrl}/application`}
+      icon={Ledger}
+      backgroundOnActive
+    />
   </div>
 
   <div class="tabs">
