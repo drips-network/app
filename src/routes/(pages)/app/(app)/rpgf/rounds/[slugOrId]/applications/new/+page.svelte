@@ -234,7 +234,7 @@
       the instructions. Any rewards from the round will be distributed directly to your selected
       project. <a
         class="typo-link"
-        href="https://docs.drips.network/get-support/claim-your-repository"
+        href="https://docs.drips.network/rpgf/apply-to-a-round#before-you-apply-your-drips-project"
         target="_blank">Learn more</a
       >
     </p>
@@ -346,7 +346,6 @@
       </div>
     {/if}
   {:else}
-    <!-- TODO(rpgf): Make this pretty -->
     <div class="flex flex-col items-center justify-center h-full">
       <h1 class="text-2xl font-bold">Applications for this round are not open</h1>
       <p class="text-lg"></p>
