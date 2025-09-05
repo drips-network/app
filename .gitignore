@@ -23,3 +23,5 @@ schema.graphql
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/test-data/*
+!/test-data/.gitkeep

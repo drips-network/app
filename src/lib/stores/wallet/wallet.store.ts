@@ -20,6 +20,7 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
 import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import { logOut } from '$lib/utils/rpgf/siwe';
 
 const appsSdk = new SafeAppsSDK();
 
@@ -105,7 +106,7 @@ const walletStore = () => {
    * Initialize the store and restore any previously-connected,
    * cached connection.
    */
-  async function initialize(): Promise<void> {
+  async function initialize(): Promise<WalletStoreState | undefined> {
     if (!browser) return;
 
     const isSafeApp = isRunningInSafe();
@@ -127,6 +128,7 @@ const walletStore = () => {
     }
 
     initialized.set(true);
+    return get(state);
   }
 
   /**
@@ -138,7 +140,7 @@ const walletStore = () => {
     initializing = false,
     isSafeApp = false,
     onboardOptions?: Parameters<typeof onboard.connectWallet>[0],
-  ): Promise<void> {
+  ): Promise<WalletStoreState | undefined> {
     if (!browser) throw new Error('Can only connect client-side');
 
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
@@ -196,8 +198,16 @@ const walletStore = () => {
         await provider.send('wallet_switchEthereumChain', [
           { chainId: `0x${DEFAULT_NETWORK.chainId.toString(16)}` },
         ]);
+
+        // Recreate provider to avoid network change issue with MetaMask
+        const wallets = onboard.state.get().wallets;
+        const newProvider = new BrowserProvider(wallets[0].provider);
+
         // Network is already added, we can proceed.
-        await _setConnectedState(provider, safeInfo);
+        await _setConnectedState(newProvider, safeInfo);
+
+        return get(state);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         // Error code 4902 means that the network is not added to the wallet.
@@ -253,6 +263,7 @@ const walletStore = () => {
     }
 
     await _setConnectedState(provider, safeInfo);
+    return get(state);
   }
 
   /**
@@ -271,9 +282,11 @@ const walletStore = () => {
     const accounts = await provider.listAccounts();
     const signer = await provider.getSigner();
 
+    const connectingAddress = accounts[0].address;
+
     state.set({
       connected: true,
-      address: accounts[0].address,
+      address: connectingAddress,
       dripsAccountId: (
         await executeAddressDriverReadMethod({
           functionName: 'calcAccountId',
@@ -294,6 +307,12 @@ const walletStore = () => {
   function _clear() {
     lastConnectedWallet.clear();
     state.set(INITIAL_STATE);
+
+    // log out from RPGF if authenticated
+    logOut();
+
+    // refresh load functions
+    if (browser) invalidateAll();
   }
 
   function _attachListeners(provider: EIP1193Provider): void {
@@ -303,11 +322,25 @@ const walletStore = () => {
         return;
       }
 
+      const currentAddress = get(state).address?.toLowerCase();
+
+      if (!currentAddress || accounts[0].toLowerCase() === currentAddress) {
+        // Not yet connected or still connected to the same account, so no need to update the state.
+        return;
+      }
+
       window.location.reload();
     });
 
-    provider.on('chainChanged', () => {
-      window.location.reload();
+    provider.on('chainChanged', (chain) => {
+      if (get(lastConnectedWallet) === 'walletconnect') {
+        // walletconnect v2 is multi-chain, so we need to ignore chain changes.
+        return;
+      }
+
+      if (chain !== network.id) {
+        window.location.reload();
+      }
     });
 
     provider.on('disconnect', () => {
@@ -344,18 +377,27 @@ const localTestnetWalletStore = () => {
   }
 
   async function connect() {
-    const signer = await provider.getSigner();
+    /** Tests will insert a hidden `span` with id "E2E_ADDRESS" into the DOM to set the address to connect to */
+    const addressToConnect =
+      document.getElementById('E2E_ADDRESS')?.textContent?.trim() ??
+      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
+
+    const provider = new JsonRpcProvider(NETWORK_CONFIG[31337].rpcUrl, network, {
+      staticNetwork: true,
+    });
+
+    const signer = await provider.getSigner(addressToConnect);
 
     const ownAccountId = (
       await executeAddressDriverReadMethod({
         functionName: 'calcAccountId',
-        args: [signer.address as OxString],
+        args: [addressToConnect as OxString],
       })
     ).toString();
 
     state.set({
       connected: true,
-      address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      address: addressToConnect,
       provider,
       signer,
       network,
@@ -363,6 +405,10 @@ const localTestnetWalletStore = () => {
     });
 
     initialized.set(true);
+
+    if (browser) {
+      await invalidateAll();
+    }
   }
 
   async function disconnect() {
@@ -371,6 +417,9 @@ const localTestnetWalletStore = () => {
       network,
       provider,
     });
+
+    logOut();
+    if (browser) invalidateAll();
   }
 
   return {
