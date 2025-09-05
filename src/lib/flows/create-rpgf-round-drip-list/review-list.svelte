@@ -116,7 +116,13 @@
       Weights are calculated as percentages with a precision of 0.0001% based on the fraction of the
       total votes allocated to every particular project.
     </p>
-    <!-- TODO(rpgf): Add a learn more link to docs -->
+    <svelte:fragment slot="actions">
+      <Button
+        variant="ghost"
+        href="https://docs.drips.network/rpgf/administering-your-round#automatically-preparing-a-drip-list"
+        target="_blank">Learn more</Button
+      >
+    </svelte:fragment>
   </AnnotationBox>
 
   <ListEditor
