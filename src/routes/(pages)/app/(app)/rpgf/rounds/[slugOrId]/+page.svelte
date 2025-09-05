@@ -49,10 +49,7 @@
       {/if}
 
       {#if !round.published}
-        <RpgfDraftTodoCard
-          {round}
-          amountOfVoters={data.ballotStats?.numberOfVoters ?? 0}
-        />
+        <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
       {/if}
       <RpgfScheduleCard {round} />
     </svelte:fragment>
@@ -90,6 +87,7 @@
             label: 'View all',
             href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
             icon: ArrowRight,
+            disabled: !round.published,
           },
         ],
       }}
@@ -152,6 +150,7 @@
               {
                 label: 'Edit linked lists',
                 icon: Pen,
+                disabled: !round.published,
                 handler: () =>
                   modal.show(
                     Stepper,
