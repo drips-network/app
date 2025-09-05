@@ -16,8 +16,7 @@
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { deleteApplicationCategory, deleteApplicationForm } from '$lib/utils/rpgf/rpgf';
-  import { round } from 'lodash';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidate } from '$app/navigation';
 
   export let data;
 
@@ -36,16 +35,17 @@
       circular: true,
       icon: Trash,
       ariaLabel: 'Delete category',
+      // If round is published, mandate at least one category
+      disabled: data.round.published && data.applicationCategories.length <= 1,
       onClick: () => {
         doWithConfirmationModal(
           'Are you sure you want to delete this category? This action cannot be undone.',
-          () => doWithErrorModal(
-            async () => {
+          () =>
+            doWithErrorModal(async () => {
               await deleteApplicationCategory(undefined, data.round.id, cat.id);
-              await invalidateAll();
-            }
-          )
-        )
+              await invalidate('rpgf:round:applications:categories-and-forms');
+            }),
+        );
       },
     },
   }));
@@ -90,13 +90,12 @@
       onClick: () => {
         doWithConfirmationModal(
           'Are you sure you want to delete this form? This action cannot be undone.',
-          () => doWithErrorModal(
-            async () => {
+          () =>
+            doWithErrorModal(async () => {
               await deleteApplicationForm(undefined, data.round.id, form.id);
-              await invalidateAll();
-            }
-          )
-        )
+              await invalidate('rpgf:round:applications:categories-and-forms');
+            }),
+        );
       },
     },
     editButton: {

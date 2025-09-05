@@ -7,7 +7,7 @@
   import modal from '$lib/stores/modal';
   import { createEventDispatcher } from 'svelte';
   import { publishRound } from '$lib/utils/rpgf/rpgf';
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -17,6 +17,8 @@
     dispatch('await', {
       promise: async () => {
         const round = await publishRound(undefined, draftId);
+
+        await invalidate('rpgf:rounds');
 
         await goto(`/app/rpgf/rounds/${round.urlSlug}`);
       },

@@ -53,10 +53,9 @@ export async function pinApplicationAttestationData(
     throw new Error('Retro Funding is not enabled on this network');
   }
 
-  const dataToPin = {
-    projectName: applicationData.projectName,
-    dripsAccountId: applicationData.dripsAccountId,
-    fields: filterRelevantFields(applicationData.answers, formFields),
+  const dataToPin: CreateApplicationDto = {
+    ...applicationData,
+    answers: filterRelevantFields(applicationData.answers, formFields),
   };
 
   return pin(dataToPin);

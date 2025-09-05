@@ -1,6 +1,8 @@
 import { getRounds } from '$lib/utils/rpgf/rpgf.js';
 
-export const load = async ({ fetch, parent }) => {
+export const load = async ({ fetch, parent, depends }) => {
+  depends('rpgf:rounds');
+
   const { rpgfUserData } = await parent();
 
   return {

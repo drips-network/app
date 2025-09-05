@@ -19,10 +19,10 @@
     <meta property="og:title" content={fullTitle} />
     <meta name="twitter:title" content={fullTitle} />
   {/if}
-  <meta name="description" content={description.substring(0, 160)} />
+  <meta name="description" content={description?.substring(0, 160)} />
   <meta property="og:image" content="https://{$page.url.host}{image}" />
-  <meta property="og:description" content={description.substring(0, 160)} />
-  <meta name="twitter:description" content={description.substring(0, 160)} />
+  <meta property="og:description" content={description?.substring(0, 160)} />
+  <meta name="twitter:description" content={description?.substring(0, 160)} />
   <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
   <meta name="twitter:card" content={twitterCardType} />
   <meta name="twitter:site" content="@dripsnetwork" />

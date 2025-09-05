@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
@@ -8,7 +9,6 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { createApplicationCategory } from '$lib/utils/rpgf/rpgf';
   import type { ApplicationCategory, ApplicationForm } from '$lib/utils/rpgf/types/application';
   import unreachable from '$lib/utils/unreachable';
@@ -52,7 +52,7 @@
           applicationFormId: assignedFormId ?? unreachable(),
         });
 
-        await invalidateAll();
+        await invalidate('rpgf:round');
 
         dispatch('conclude');
       },

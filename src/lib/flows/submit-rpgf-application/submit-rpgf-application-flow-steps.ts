@@ -2,7 +2,7 @@ import { makeStep } from '$lib/components/stepper/types';
 import { get, writable } from 'svelte/store';
 import Confirm from './steps/confirm.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
-import { invalidateAll } from '$app/navigation';
+import { invalidate } from '$app/navigation';
 import type {
   ApplicationFormFields,
   CreateApplicationDto,
@@ -37,7 +37,7 @@ export default (
           linkText: 'View your application',
           href: () => `/app/rpgf/rounds/${roundSlug}/applications/${get(context).applicationId}`,
           onAction() {
-            invalidateAll();
+            invalidate('rpgf:round');
 
             // Delete the in-progress application from localstorage
             localStorage.removeItem(`rpgf-form-data-${roundSlug}`);

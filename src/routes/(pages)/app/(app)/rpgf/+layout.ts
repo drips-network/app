@@ -11,7 +11,9 @@ function getSignInData() {
   return getUserData(jwt);
 }
 
-export const load = async ({ url, fetch }) => {
+export const load = async ({ url, fetch, depends }) => {
+  depends('rpgf:auth');
+
   if (!network.retroFunding.enabled) {
     throw error(404);
   }

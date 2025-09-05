@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { createApplicationForm } from '$lib/utils/rpgf/rpgf';
   import { createEventDispatcher } from 'svelte';
 
@@ -36,10 +34,10 @@
       promise: async () => {
         const createdForm = await createApplicationForm(undefined, roundId, {
           name: nameValue,
-          fields: []
+          fields: [],
         });
 
-        await invalidateAll();
+        await invalidate('rpgf:round');
         dispatch('conclude');
         await goto(`/app/rpgf/rounds/${roundId}/settings/application/forms/${createdForm.id}`);
       },
@@ -55,9 +53,7 @@
     <TextInput placeholder="Default form" bind:value={nameValue} />
   </FormField>
 
-  <AnnotationBox type="info">
-    You can add fields to the form after creating it.
-  </AnnotationBox>
+  <AnnotationBox type="info">You can add fields to the form after creating it.</AnnotationBox>
 
   <svelte:fragment slot="actions">
     <Button

@@ -1,7 +1,9 @@
 import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
 import { error, redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch, params, url }) => {
+export const load = async ({ fetch, params, url, depends }) => {
+  depends('rpgf:round');
+
   const { slugOrId } = params;
 
   const round = await getRound(fetch, slugOrId);
