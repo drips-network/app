@@ -59,6 +59,9 @@ const config = defineConfig({
       'node-fetch': 'isomorphic-fetch',
     },
   },
+  server: {
+    allowedHosts: ['app'],
+  },
 });
 
 export default config;
