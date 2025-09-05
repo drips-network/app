@@ -1,9 +1,10 @@
 <script lang="ts">
   export let disableScroll = false;
+  export let innerElem: HTMLDivElement | undefined = undefined;
 </script>
 
 <div class="wrapper" class:disable-scroll={disableScroll}>
-  <div class="inner">
+  <div class="inner" bind:this={innerElem}>
     <div class="content">
       <slot />
     </div>

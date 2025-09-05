@@ -39,9 +39,11 @@
         <span class="typo-text-bold">{name}</span>
       </a>
     </div>
-    {#if !round.published}
-      <RpgfDraftTodoCard {round} {amountOfVoters} />
-    {/if}
+    <div class="desktop-only">
+      {#if !round.published}
+        <RpgfDraftTodoCard {round} {amountOfVoters} />
+      {/if}
+    </div>
   </div>
 
   <div class="settings-sidenav">
@@ -169,16 +171,24 @@
     display: none;
   }
 
+  .sidebar {
+    view-transition-name: rpgf-settings-sidebar;
+  }
+
   @media (max-width: 1251px) {
     .mobile-only {
       display: block;
+    }
+
+    .desktop-only {
+      display: none;
     }
 
     .rpgf-settings-layout {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
       grid-template-areas:
-        'todo'
+        'sidebar'
         'tabs'
         'content';
       gap: 2rem;
