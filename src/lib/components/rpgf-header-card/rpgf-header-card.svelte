@@ -57,11 +57,14 @@
         {#if round.isAdmin}
           <Button
             icon={Settings}
-            href={`/app/rpgf/rounds/${round.urlSlug ?? round.id}/settings/representation`}>Settings</Button
+            href={`/app/rpgf/rounds/${round.urlSlug ?? round.id}/settings/representation`}
+            >Settings</Button
           >
         {/if}
         {#if round.isAdmin && !round.published}
-          <Button variant="ghost" icon={Trash} on:click={handleDeleteDraft}>Delete draft</Button>
+          <Button variant="destructive" icon={Trash} on:click={handleDeleteDraft}
+            >Delete draft</Button
+          >
         {/if}
       </div>
     {/if}
@@ -110,6 +113,9 @@
     }
 
     .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       align-self: flex-end;
     }
   }

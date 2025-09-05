@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import { type ComponentType } from 'svelte';
+  import { tick, type ComponentType } from 'svelte';
 
   export type Tab = {
     href: string;
@@ -16,6 +16,7 @@
 
   export let tabs: Tab[];
 
+  let wrapperElem: HTMLDivElement;
   let tabElems: HTMLAnchorElement[] = [];
   let activeIndex: number | null = null;
 
@@ -45,15 +46,39 @@
     }
   }
 
-  // TODO(rpgf): Scroll to the active tab when it changes
+  async function scrollTabIntoView(index: number) {
+    await tick();
+    const tab = tabElems[index];
+    if (tab) {
+      wrapperElem.scrollTo({
+        left: tab.offsetLeft - wrapperElem.offsetWidth / 2 + tab.offsetWidth / 2,
+        behavior: 'smooth',
+      });
+    }
+  }
+  $: {
+    if (activeIndex !== null) {
+      scrollTabIntoView(activeIndex);
+    }
+  }
 </script>
 
-<PaddedHorizontalScroll>
+<PaddedHorizontalScroll bind:innerElem={wrapperElem}>
   <div class="scrollable-tabs">
     <div style:position="absolute" style:top="-4rem" id="scrollable-tabs-anchor" />
     {#each tabs as { href, icon, label }, i}
-      <a bind:this={tabElems[i]} href="{href}#scrollable-tabs-anchor" class="tab">
-        <div class="icon"><svelte:component this={icon} /></div>
+      <a
+        bind:this={tabElems[i]}
+        {href}
+        class="tab"
+        style:color="var(--color-{i === activeIndex ? 'primary-level-6' : 'foreground'})"
+      >
+        <div class="icon">
+          <svelte:component
+            this={icon}
+            style="fill: var(--color-{i === activeIndex ? 'primary-level-6' : 'foreground'})"
+          />
+        </div>
         {label}
       </a>
     {/each}
@@ -74,6 +99,7 @@
     view-transition-class: element-handover;
     background-color: var(--color-background);
     border-bottom: 1px solid var(--color-foreground-level-3);
+    scroll-behavior: initial;
   }
 
   a {
@@ -82,6 +108,7 @@
     gap: 0.5rem;
     padding: 1rem 0;
     white-space: nowrap;
+    transition: color 0.3s;
   }
 
   .highlight-bar {
