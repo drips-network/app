@@ -106,7 +106,7 @@
     align-items: center;
     background-color: var(--color-background);
     border-top: 1px solid var(--color-foreground-level-3);
-    z-index: 100;
+    z-index: 8;
     padding: 0 1rem;
     view-transition-name: bottom-nav;
   }
