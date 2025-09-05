@@ -78,9 +78,10 @@
         }}
         bind:sortBy={selectedSortBy}
         filterOptions={{
-          own: data.rpgfUserData ? 'Only my applications' : null,
-          pending: 'Only pending',
-          approved: 'Only approved',
+          own: data.rpgfUserData ? 'My applications' : null,
+          pending: 'Pending',
+          approved: 'Approved',
+          ...Object.fromEntries(data.categories.map((cat) => [`cat-${cat.id}`, cat.name])),
         }}
         bind:filterBy={selectedFilter}
         onDownload={handleDownload}

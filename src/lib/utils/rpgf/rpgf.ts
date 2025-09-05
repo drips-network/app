@@ -206,9 +206,14 @@ export async function getApplications(
   sortBy: string = 'createdAt:desc',
   filterByUserId: string | null = null,
   filterByStatus: 'approved' | 'rejected' | 'pending' | null = null,
+  filterByCategoryId: string | null = null,
 ): Promise<ListingApplication[]> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/applications?sort=${sortBy}&limit=${limit}&offset=${offset}${filterByUserId ? `&submitterUserId=${filterByUserId}` : ''}${filterByStatus ? `&state=${filterByStatus}` : ''}`,
+    `/rounds/${roundId}/applications?sort=${sortBy}&limit=${limit}&offset=${offset}${
+      filterByUserId ? `&submitterUserId=${filterByUserId}` : ''
+    }${filterByStatus ? `&state=${filterByStatus}` : ''}${
+      filterByCategoryId ? `&categoryId=${filterByCategoryId}` : ''
+    }`,
     'GET',
     undefined,
     f,

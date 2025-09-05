@@ -60,6 +60,7 @@ export const load = async ({ parent, route, url, depends }) => {
           filterParam === 'approved' || filterParam === 'rejected' || filterParam === 'pending'
             ? filterParam
             : undefined,
+          filterParam?.startsWith('cat-') ? filterParam.replaceAll('cat-', '') : undefined,
         );
 
   // If true, display sidebar that lets admins review applications
