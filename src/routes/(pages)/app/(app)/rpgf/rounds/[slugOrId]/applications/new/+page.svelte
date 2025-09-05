@@ -164,7 +164,10 @@
     );
 
     const answers = answersByCategory[selectedCategory.id];
-    assert(answers, 'No answers for selected category');
+
+    if (!answers && selectedForm.fields.length > 0) {
+      throw new Error('No answers found for selected category');
+    }
 
     modal.show(
       Stepper,
