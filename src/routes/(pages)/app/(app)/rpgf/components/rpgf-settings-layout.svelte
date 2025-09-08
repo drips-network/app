@@ -88,6 +88,13 @@
       icon={Ledger}
       backgroundOnActive
     />
+    <SidenavItem
+      label="Audit log"
+      href="{settingsBaseUrl}/audit-log"
+      active={$page.url.pathname === `${settingsBaseUrl}/audit-log`}
+      icon={Ledger}
+      backgroundOnActive
+    />
   </div>
 
   <div class="tabs">
@@ -116,6 +123,11 @@
         {
           label: 'Applications',
           href: `${settingsBaseUrl}/application`,
+          icon: Ledger,
+        },
+        {
+          label: 'Audit log',
+          href: `${settingsBaseUrl}/audit-log`,
           icon: Ledger,
         },
       ]}

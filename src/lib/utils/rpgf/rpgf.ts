@@ -30,6 +30,7 @@ import {
 } from './types/application';
 import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
+import { auditLogSchema, type AuditLog } from './types/auditLog';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -624,4 +625,25 @@ export async function updateApplicationForm(
   );
 
   return applicationFormSchema.parse(await res.json());
+}
+
+export async function getAuditLog(
+  f = fetch,
+  roundId: string,
+): Promise<{
+  logs: AuditLog[];
+}> {
+  const res = await authenticatedRpgfServerCall(
+    // No pagination for now, fetch up to 1000 entries
+    `/rounds/${roundId}/audit-logs?limit=1000`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return z
+    .object({
+      logs: auditLogSchema.array(),
+    })
+    .parse(await res.json());
 }
