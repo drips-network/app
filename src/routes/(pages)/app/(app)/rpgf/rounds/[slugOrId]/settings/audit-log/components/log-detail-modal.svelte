@@ -7,14 +7,18 @@
 </script>
 
 <div class="log-detail-modal">
-  {#each Object.entries(payload) as [key, value]}
-    {#if Boolean(value)}
-      <div class="field">
-        <div class="key">{key}</div>
-        <div class="value">{JSON.stringify(value)}</div>
-      </div>
-    {/if}
-  {/each}
+  {#if payload}
+    {#each Object.entries(payload) as [key, value]}
+      {#if Boolean(value)}
+        <div class="field">
+          <div class="key">{key}</div>
+          <div class="value">{JSON.stringify(value)}</div>
+        </div>
+      {/if}
+    {/each}
+  {:else}
+    <div>No additional details</div>
+  {/if}
 </div>
 
 <style>
