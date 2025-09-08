@@ -19,7 +19,7 @@
     round_published: 'Round published',
     round_deleted: 'Round deleted',
     application_submitted: 'Application submitted',
-    applications_reviewed: 'Applications reviewed',
+    application_reviewed: 'Applications reviewed',
     ballot_submitted: 'Ballot submitted',
     ballot_updated: 'Ballot updated',
     results_calculated: 'Results calculated',

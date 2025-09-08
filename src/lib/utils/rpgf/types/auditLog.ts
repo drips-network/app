@@ -10,7 +10,7 @@ export const auditLogActionSchema = z.enum([
   'round_published',
   'round_deleted',
   'application_submitted',
-  'applications_reviewed',
+  'application_reviewed',
   'ballot_submitted',
   'ballot_updated',
   'results_calculated',
@@ -86,7 +86,7 @@ export const auditLogSchema = z.discriminatedUnion('action', [
     payload: applicationSubmittedPayloadSchema,
   }),
   baseAuditLogSchema.extend({
-    action: z.literal(auditLogActionSchema.enum.applications_reviewed),
+    action: z.literal(auditLogActionSchema.enum.application_reviewed),
     payload: applicationsReviewedPayloadSchema,
   }),
   baseAuditLogSchema.extend({
