@@ -1,10 +1,9 @@
 <script>
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
-  import { fly } from 'svelte/transition';
 </script>
 
-<div class="flow-base-layout" in:fly|global={{ duration: 300, y: 16 }}>
+<div class="flow-base-layout">
   <a href="/" class="logo">
     <DripsLogo />
   </a>

@@ -201,7 +201,7 @@
               {@const amount = item.amount}
               {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
               {#if token}
-                <div in:fade|global={{ duration: 300 }}>
+                <div in:fade={{ duration: 300 }}>
                   {formatTokenAmount(
                     {
                       tokenAddress: amount.tokenAddress,
@@ -259,7 +259,7 @@
                 $tokensStore &&
                 tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
               {#if token}
-                <div in:fade|global={{ duration: 300 }}>
+                <div in:fade={{ duration: 300 }}>
                   {STREAM_STATE_LABELS[streamState(stream)]} · {formatAmtPerSec(
                     BigInt(stream.config.amountPerSecond.amount),
                     token.info.decimals,

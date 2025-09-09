@@ -108,8 +108,8 @@
   </TransitionedHeight>
   {#if highlit}
     <div
-      in:scale|global={{ duration: 300, start: 0.9 }}
-      out:scale|global={{ duration: 300, start: 1.05 }}
+      in:scale={{ duration: 300, start: 0.9 }}
+      out:scale={{ duration: 300, start: 1.05 }}
       class="highlight-overlay"
     />
   {/if}

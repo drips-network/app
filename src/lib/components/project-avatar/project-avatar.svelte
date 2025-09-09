@@ -25,7 +25,6 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import Question from '$lib/components/icons/Question.svelte';
   import Spinner from '../spinner/spinner.svelte';
-  import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
   import twemoji from '$lib/utils/twemoji';
   import type { ProjectAvatarFragment } from './__generated__/gql.generated';
@@ -92,11 +91,10 @@
     style="width: {containerSize}; height: {containerSize}"
     class:with-outline={outline}
   >
-    {#if customImageLoading}
-      <div class="loading-state" transition:fade|global={{ duration: 300 }}>
-        <Spinner />
-      </div>
-    {/if}
+    <div class="loading-state" class:visible={customImageLoading}>
+      <Spinner />
+    </div>
+
     {#if isClaimed(project)}
       {#if pendingAvatar}
         <div class="project-avatar">
@@ -141,6 +139,7 @@
 
   .loading-state {
     position: absolute;
+    opacity: 0;
     top: 0;
     left: 0;
     height: 100%;
@@ -148,6 +147,11 @@
     display: grid;
     place-items: center;
     background-color: var(--color-foreground-level-2);
+  }
+
+  .loading-state.visible {
+    opacity: 1;
+    transition: opacity 0.3s;
   }
 
   .project-avatar {
