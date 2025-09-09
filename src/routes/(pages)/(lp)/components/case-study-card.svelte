@@ -29,7 +29,7 @@
   <div class="left">
     <div class="description typo-text">
       <div class="logo-wrapper">
-        <CoinAnimation playSound><img src={logoSrc} alt={logoAlt} /></CoinAnimation>
+        <CoinAnimation playSound><img src={logoSrc} alt={logoAlt} loading="lazy" /></CoinAnimation>
       </div>
       <h3 class="typo-header-1">{orgName}</h3>
       <p>{description}</p>
@@ -37,7 +37,7 @@
     {#if blogPost}
       <a class="typo-text-small" href={`/blog/posts/${blogPost.slug}`} target="_blank">
         <div>
-          <img src={blogPost.coverImage} alt={blogPost.coverImageAlt} />
+          <img src={blogPost.coverImage} alt={blogPost.coverImageAlt} loading="lazy" />
           {blogPost.title}
         </div>
         <ChevronRight style="fill: var(--color-foreground)" />

@@ -18,15 +18,29 @@
       alt="Drip List"
       height="234px"
       width="314px"
+      loading="lazy"
     />
     <img
       src="/assets/lp/hiw-marquee/identity-card.png"
       alt="Identity"
       height="234px"
       width="314px"
+      loading="lazy"
     />
-    <img src="/assets/lp/hiw-marquee/orcid-card.png" alt="ORCID" height="234px" width="314px" />
-    <img src="/assets/lp/hiw-marquee/project-card.png" alt="Project" height="234px" width="314px" />
+    <img
+      src="/assets/lp/hiw-marquee/orcid-card.png"
+      alt="ORCID"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
+    <img
+      src="/assets/lp/hiw-marquee/project-card.png"
+      alt="Project"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
   </Marquee>
 </div>
 

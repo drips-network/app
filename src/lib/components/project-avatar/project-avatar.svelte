@@ -109,6 +109,7 @@
             on:load={() => (customImageLoading = false)}
             src="/api/custom-avatars/{project.avatar.cid}?size={imageSize}"
             alt="project avatar"
+            loading="lazy"
           />
         </div>
       {:else if emojiElem}
