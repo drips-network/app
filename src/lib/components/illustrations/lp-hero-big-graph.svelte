@@ -11,7 +11,7 @@
     'xmlns:xlink': 'http://www.w3.org/1999/xlink',
   }}
 >
-  {@html `<rect
+  <rect
     x="1145.55"
     y="496.75"
     width="47"
@@ -930,5 +930,5 @@
   <image x="593.056" y="724.254" width="24" height="24" href="/twemoji/1f330.svg" />
   <image x="207.056" y="723.254" width="24" height="24" href="/twemoji/1f414.svg" />
   <image x="719.056" y="616.254" width="24" height="24" href="/twemoji/1f330.svg" />
-  <image x="1185.06" y="187.254" width="24" height="24" href="/twemoji/1f4c0.svg" />`}
+  <image x="1185.06" y="187.254" width="24" height="24" href="/twemoji/1f4c0.svg" />
 </AnimateDripOnSvgPaths>
