@@ -85,7 +85,7 @@
               ... on SubListReceiver {
                 ...EditProjectSplitsFlowSubListReceiver
               }
-              ... on OrcidReceiver {
+              ... on LinkedIdentityReceiver {
                 ...EditProjectSplitsFlowOrcidReceiver
               }
             }
