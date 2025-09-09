@@ -4,7 +4,7 @@ import Jimp from 'jimp';
 
 export const GET = async ({ params, fetch, url }) => {
   const { cid } = params;
-  const sizeParam = url.searchParams.get('size') || '500';
+  const sizeParam = url.searchParams.get('size') || '64';
   const size = parseInt(sizeParam, 10);
 
   if (size > 1000) {
