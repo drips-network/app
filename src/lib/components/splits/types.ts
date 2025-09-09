@@ -136,11 +136,14 @@ export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
   }
 `;
 export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
-  fragment SplitsComponentOrcidReceiver on OrcidReceiver {
+  fragment SplitsComponentOrcidReceiver on LinkedIdentityReceiver {
     weight
     linkedIdentity {
-      account {
-        accountId
+      ... on OrcidLinkedIdentity {
+        account {
+          accountId
+        }
+        orcid
       }
     }
   }

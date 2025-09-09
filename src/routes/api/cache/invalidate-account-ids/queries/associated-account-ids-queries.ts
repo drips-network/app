@@ -63,7 +63,7 @@ export const projectAssociatedAccountIdsQuery = gql`
                   accountId
                 }
               }
-              ... on OrcidReceiver {
+              ... on LinkedIdentityReceiver {
                 account {
                   accountId
                 }
@@ -170,7 +170,7 @@ export const dripListAssociatedAccountIdsQuery = gql`
             accountId
           }
         }
-        ... on OrcidReceiver {
+        ... on LinkedIdentityReceiver {
           account {
             accountId
           }
@@ -224,7 +224,7 @@ export const ecosystemAssociatedAccountIdsQuery = gql`
             accountId
           }
         }
-        ... on OrcidReceiver {
+        ... on LinkedIdentityReceiver {
           account {
             accountId
           }
