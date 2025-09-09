@@ -147,11 +147,11 @@
     display: grid;
     place-items: center;
     background-color: var(--color-foreground-level-2);
+    transition: opacity 0.3s;
   }
 
   .loading-state.visible {
     opacity: 1;
-    transition: opacity 0.3s;
   }
 
   .project-avatar {
