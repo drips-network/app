@@ -29,7 +29,7 @@ export const EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT = gql`
       ... on ProjectReceiver {
         ...SplitReceiversToListEditorConfigProjectReceiver
       }
-      ... on OrcidReceiver {
+      ... on LinkedIdentityReceiver {
         ...SplitReceiversToListEditorConfigOrcidReceiver
       }
     }
@@ -68,7 +68,7 @@ export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
           accountId
         }
       }
-      ... on OrcidReceiver {
+      ... on LinkedIdentityReceiver {
         account {
           accountId
         }
