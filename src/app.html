@@ -1,7 +1,8 @@
 <!doctype html>
 <html class="smoothscroll" lang="en">
   <head>
-    <script>
+    <script data-cfasync="false">
+      // Prevent FARTS (Flash of inAccurate coloR ThemeS)
       (function () {
         try {
           const themePreference = localStorage.getItem('theme')?.replaceAll('"', '');
