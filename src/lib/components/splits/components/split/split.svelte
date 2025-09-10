@@ -20,6 +20,7 @@
   import unreachable from '$lib/utils/unreachable';
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -215,6 +216,10 @@
             project={split.project}
           />
         </PrimaryColorThemer>
+      {:else if split.__typename === 'LinkedIdentityReceiver'}
+        <!-- For now a hack since OrcidBadge needs an `OrcidAccount` which does not exist on `LinkedIdentityReceiver` ☹️ -->
+        <OrcidAvatar />
+        {split.linkedIdentity.orcid}
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"
@@ -334,7 +339,8 @@
   }
 
   .arrow .percentage.is-nested {
-    background: linear-gradient(45deg, var(--color-primary-level-2), var(--color-primary-level-2)),
+    background:
+      linear-gradient(45deg, var(--color-primary-level-2), var(--color-primary-level-2)),
       linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
@@ -343,11 +349,8 @@
   }
 
   .draft .arrow .percentage.is-nested {
-    background: linear-gradient(
-        45deg,
-        var(--color-foreground-level-2),
-        var(--color-foreground-level-2)
-      ),
+    background:
+      linear-gradient(45deg, var(--color-foreground-level-2), var(--color-foreground-level-2)),
       linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
