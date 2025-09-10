@@ -20,6 +20,7 @@
   import unreachable from '$lib/utils/unreachable';
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -216,6 +217,10 @@
             project={split.project}
           />
         </PrimaryColorThemer>
+      {:else if split.__typename === 'LinkedIdentityReceiver'}
+        <!-- For now a hack since OrcidBadge needs an `OrcidAccount` which does not exist on `LinkedIdentityReceiver` ☹️ -->
+        <OrcidAvatar />
+        {split.linkedIdentity.orcid}
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"
