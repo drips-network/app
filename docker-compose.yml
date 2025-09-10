@@ -88,6 +88,8 @@ services:
       - PRETEND_ALL_REPOS_EXIST=false
       - IPFS_GATEWAY_URL=http://fake-pinata:3000
       - DRIPS_API_KEY=123
+      - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - REDIS_URL=redis://redis:6379
     ports:
       - '8080:8080'
     depends_on:

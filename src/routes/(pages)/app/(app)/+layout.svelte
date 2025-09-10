@@ -39,7 +39,7 @@
           label: 'Funds',
           href: '/app/funds',
           icon: TokenStreams,
-          description: 'Discover or create fundable lists.',
+          description: 'Manage your balances and streams.',
         },
         {
           label: 'Projects',

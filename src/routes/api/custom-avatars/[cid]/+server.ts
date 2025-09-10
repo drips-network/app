@@ -2,8 +2,14 @@ import { fetchIpfs } from '$lib/utils/ipfs.js';
 import { error } from '@sveltejs/kit';
 import Jimp from 'jimp';
 
-export const GET = async ({ params, fetch }) => {
+export const GET = async ({ params, fetch, url }) => {
   const { cid } = params;
+  const sizeParam = url.searchParams.get('size') || '64';
+  const size = parseInt(sizeParam, 10);
+
+  if (size > 1000) {
+    throw error(400, 'Size too large');
+  }
 
   const file = await fetchIpfs(cid, fetch);
   const blob = await file.arrayBuffer();
@@ -21,12 +27,12 @@ export const GET = async ({ params, fetch }) => {
     throw new Error('Invalid image format');
   }
 
-  const resized = image.cover(1000, 1000);
+  const resized = image.cover(size, size);
 
   return new Response(await resized.getBufferAsync(Jimp.MIME_PNG), {
     headers: {
       'content-type': 'image/png',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=31536000',
     },
   });
 };

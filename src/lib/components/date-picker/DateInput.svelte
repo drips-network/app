@@ -211,7 +211,7 @@
       class="picker"
       class:visible
       class:above={showAbove}
-      transition:flyAutoPosition|global
+      transition:flyAutoPosition
       bind:this={pickerElement}
     >
       <DateTimePicker

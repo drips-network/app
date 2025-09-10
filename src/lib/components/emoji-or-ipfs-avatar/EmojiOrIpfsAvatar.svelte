@@ -3,7 +3,6 @@
   import { onMount, type ComponentType } from 'svelte';
   import Question from '../icons/Question.svelte';
   import Spinner from '../spinner/spinner.svelte';
-  import { fade } from 'svelte/transition';
 
   export let emoji: string | undefined = undefined;
   export let ipfsCid: string | undefined = undefined;
@@ -26,6 +25,17 @@
     huge: '8rem',
   };
   $: containerSize = CONTAINER_SIZES[size];
+
+  const IMAGE_SIZES = {
+    micro: 32,
+    tiny: 48,
+    small: 64,
+    medium: 96,
+    large: 128,
+    xlarge: 192,
+    huge: 256,
+  };
+  $: imageSize = IMAGE_SIZES[size];
 
   $: emojiElem = emoji ? twemoji(emoji) : undefined;
 
@@ -52,17 +62,15 @@
   style:background-color={outline ? 'var(--color-primary)' : 'var(--color-foreground-level-2)'}
   class:with-outline={outline}
 >
-  {#if customImageLoading}
-    <div class="loading-state" transition:fade={{ duration: 300 }}>
-      <Spinner />
-    </div>
-  {/if}
+  <div class="loading-state" class:visible={customImageLoading}>
+    <Spinner />
+  </div>
 
   {#if ipfsCid}
     <img
       bind:this={customImageEl}
       on:load={() => (customImageLoading = false)}
-      src="/api/custom-avatars/{ipfsCid}"
+      src="/api/custom-avatars/{ipfsCid}?size={imageSize}"
       alt="project avatar"
       style:height="100%"
     />
@@ -94,6 +102,7 @@
 
   .loading-state {
     position: absolute;
+    opacity: 0;
     top: 0;
     left: 0;
     height: 100%;
@@ -101,6 +110,11 @@
     display: grid;
     place-items: center;
     background-color: var(--color-foreground-level-2);
+    transition: opacity 0.3s;
+  }
+
+  .loading-state.visible {
+    opacity: 1;
   }
 
   .emoji-wrapper {

@@ -142,16 +142,16 @@
     {#if searchOpen}
       <div
         class="hint typo-text-small"
-        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
-        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+        in:fly={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly={{ duration: 200, y: 8, easing: sineIn }}
       >
         <InfoCircle /> Paste a GitHub URL to jump to that project
       </div>
     {/if}
     {#if searchOpen && searchTerm}
       <div
-        in:fly|global={{ duration: 200, y: 8, easing: sineOut }}
-        out:fly|global={{ duration: 200, y: 8, easing: sineIn }}
+        in:fly={{ duration: 200, y: 8, easing: sineOut }}
+        out:fly={{ duration: 200, y: 8, easing: sineIn }}
         class="results"
         data-testid="search-results"
       >

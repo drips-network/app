@@ -1,10 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Marquee from 'svelte-fast-marquee';
-  import DripList from './svgs/drip-list.svelte';
-  import Address from './svgs/address.svelte';
-  import Orcid from './svgs/orcid.svelte';
-  import ProjectCard from './svgs/project-card.svelte';
 </script>
 
 <div class="lp-hiw-entrypoint">
@@ -17,10 +13,34 @@
     <div><Button href="https://docs.drips.network" target="_blank">Learn more</Button></div>
   </div>
   <Marquee gap="1rem" speed={50}>
-    <DripList />
-    <Address />
-    <Orcid />
-    <ProjectCard />
+    <img
+      src="/assets/lp/hiw-marquee/drip-list-card.png"
+      alt="Drip List"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
+    <img
+      src="/assets/lp/hiw-marquee/identity-card.png"
+      alt="Identity"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
+    <img
+      src="/assets/lp/hiw-marquee/orcid-card.png"
+      alt="ORCID"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
+    <img
+      src="/assets/lp/hiw-marquee/project-card.png"
+      alt="Project"
+      height="234px"
+      width="314px"
+      loading="lazy"
+    />
   </Marquee>
 </div>
 

@@ -6,7 +6,6 @@ import { gql } from 'graphql-request';
 import type { ProjectByUrlQuery, ProjectByUrlQueryVariables } from './__generated__/gql.generated';
 import isClaimed from '$lib/utils/project/is-claimed';
 import { PROJECT_PROFILE_FRAGMENT } from '../../../components/project-profile/project-profile.svelte';
-import { z } from 'zod';
 import { redis } from '../../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
@@ -48,7 +47,7 @@ async function fetchDripsProject(repoUrl: string) {
   );
 }
 
-export const load = (async ({ params, fetch, url }) => {
+export const load = (async ({ params, url }) => {
   let githubUsername, githubRepoName: string;
   try {
     const p = uriDecodeParams(params);
@@ -63,22 +62,19 @@ export const load = (async ({ params, fetch, url }) => {
   // to the new repo name, but it must still be possible to access the old project.
   const exact = url.searchParams.has('exact');
 
-  const repoSchema = z.object({
-    url: z.string(),
-    description: z.string().nullable(),
-    repoName: z.string(),
-    ownerName: z.string(),
-    forksCount: z.number(),
-    stargazersCount: z.number(),
-    defaultBranch: z.string(),
-  });
+  type Repo = {
+    url: string;
+    description: string | null;
+    repoName: string;
+    ownerName: string;
+    forksCount: number;
+    stargazersCount: number;
+    defaultBranch: string;
+  };
 
   const repoUrl = `https://github.com/${githubUsername}/${githubRepoName}`;
 
-  const [repoRes, projectRes] = await Promise.all([
-    fetch(`/api/github/${encodeURIComponent(repoUrl)}`),
-    fetchDripsProject(repoUrl),
-  ]);
+  const projectRes = await fetchDripsProject(repoUrl);
 
   const project = projectRes.projectByUrl;
   if (!project) {
@@ -87,25 +83,28 @@ export const load = (async ({ params, fetch, url }) => {
 
   const projectChainData = filterCurrentChainData(project.chainData);
 
-  const repoResJson = await repoRes.json();
-
   const repoClaimed = isClaimed(projectChainData);
   const repoHasSupport = projectChainData.support.length > 0;
 
   let repoExists = true;
-  let repo: z.infer<typeof repoSchema> | undefined;
+  let repo: Repo | undefined;
 
-  if ('message' in repoResJson && repoResJson.message === 'Error: 404') {
+  if (project.repoMetadata) {
+    repo = {
+      url: project.source.url,
+      description: project.repoMetadata.description ?? null,
+      repoName: project.source.repoName,
+      ownerName: project.source.ownerName,
+      forksCount: project.repoMetadata.forksCount,
+      stargazersCount: project.repoMetadata.stargazersCount,
+      defaultBranch: project.repoMetadata.defaultBranch,
+    };
+  } else {
+    // Repo doesn't exist or metadata unavailable
     if (!repoClaimed && !repoHasSupport) {
       throw error(404);
     } else {
       repoExists = false;
-    }
-  } else {
-    try {
-      repo = repoSchema.parse(repoResJson);
-    } catch {
-      throw error(500, 'Unable to fetch repo info from GitHub / cache');
     }
   }
 
@@ -150,8 +149,7 @@ export const load = (async ({ params, fetch, url }) => {
 
   return {
     project,
-    description:
-      typeof repoResJson.description === 'string' ? (repoResJson.description as string) : undefined,
+    description: repo?.description ?? undefined,
     newRepo,
     repoExists,
     correctCasingRepo,

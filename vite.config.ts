@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+import { visualizer } from 'rollup-plugin-visualizer';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 import faroUploader from '@grafana/faro-rollup-plugin';
@@ -23,6 +23,7 @@ const config = defineConfig({
           gzipContents: true,
         })
       : undefined,
+    visualizer(),
   ],
   test: {
     // Jest like globals

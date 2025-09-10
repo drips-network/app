@@ -25,3 +25,5 @@ schema.graphql
 /playwright/.cache/
 /test-data/*
 !/test-data/.gitkeep
+
+/stats.html
