@@ -40,11 +40,9 @@ export async function transformItemsToSdkReceivers(
         break;
 
       case 'orcid':
-        // TODO: rely on account id? Use URL to be congruent with project?
         receivers.push({
           type: 'orcid',
-          // accountId: BigInt(item.orcid.account.accountId),
-          orcid: getLastPathSegment(item.orcid.source.url),
+          orcidId: getLastPathSegment(item.orcid.source.url) as string,
           weight,
         });
         break;
