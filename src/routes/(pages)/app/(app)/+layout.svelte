@@ -23,23 +23,6 @@
   let showLoadingSpinner = false;
   let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  // $: navItems = [
-  //   { label: 'Explore', href: '/app', icon: ExploreIcon },
-  //   { label: 'Funds', href: '/app/funds', icon: TokenStreams },
-  //   { label: 'Projects', href: '/app/projects', icon: Box },
-  //   { label: 'Drip Lists', href: '/app/drip-lists', icon: DripListIcon },
-  //   ...(network.ecosystems
-  //     ? [{ label: 'Ecosystems', href: '/app/ecosystems', icon: EcosystemIcon }]
-  //     : []),
-  //   {
-  //     label: 'Profile',
-  //     href: `/app/${$ens[$wallet.address as string]?.name ?? $wallet.address}`,
-  //     icon: User,
-  //   },
-  // ];
-
-  // bottom nav is mobile only and should not be crowded with profile.
-  // $: bottomNavItems = navItems.slice(0, -1);
   $: navItems = {
     top: [
       {
@@ -52,7 +35,7 @@
         label: 'Funds',
         href: '/app/funds',
         icon: TokenStreams,
-        description: 'Discover or create fundable lists.',
+        description: 'Manage your balances and streams.',
       },
       {
         label: 'Projects',

@@ -87,11 +87,14 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
 // TODO: theoretically would use ${LIST_EDITOR_ORCID_FRAGMENT} here, but OrcidReceiver
 // does not link a OrcidAccount, but a LinkedIdentity, which is a pointer to an OrcidAccount.
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
-  fragment SplitReceiversToListEditorConfigOrcidReceiver on OrcidReceiver {
+  fragment SplitReceiversToListEditorConfigOrcidReceiver on LinkedIdentityReceiver {
     weight
     linkedIdentity {
-      account {
-        accountId
+      ... on OrcidLinkedIdentity {
+        account {
+          accountId
+        }
+        orcid
       }
     }
   }
@@ -118,8 +121,8 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
       return { type: 'ecosystem', ecosystem: input.ecosystemMainAccount };
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
-    case 'OrcidReceiver':
-      // TODO: fetch the orcid by accountId to get full details?
+    case 'LinkedIdentityReceiver':
+      // TODO: Do we need to be making this whole entity?
       return {
         type: 'orcid',
         orcid: {
@@ -127,7 +130,7 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
           __typename: 'OrcidAccount',
           source: {
             __typename: 'OrcidSource',
-            url: 'TODO',
+            url: `/${input.linkedIdentity.orcid}`,
           },
           chainData: [
             {
@@ -152,7 +155,7 @@ function extractAccountId(input: SplitReceiver) {
       return input.ecosystemMainAccount.account.accountId;
     case 'SubListReceiver':
       return input.subList.account.accountId;
-    case 'OrcidReceiver':
+    case 'LinkedIdentityReceiver':
       return input.linkedIdentity.account.accountId;
   }
 }

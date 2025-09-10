@@ -126,7 +126,7 @@
 >
   <div class="top">
     <div class="left">
-      <button class="hamburger" on:click={handleHamburgerClick}>
+      <button class="hamburger" on:click={handleHamburgerClick} aria-label="Toggle menu">
         {#if openMenu === 'all'}
           <div out:fly={{ duration: 300, y: -4 }} in:fly={{ duration: 300, y: 4 }}><Cross /></div>
         {:else}

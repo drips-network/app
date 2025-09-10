@@ -39,6 +39,12 @@
       account {
         accountId
       }
+      repoMetadata {
+        description
+        forksCount
+        stargazersCount
+        defaultBranch
+      }
       chainData {
         ...SplitsComponentProjectSplits
         ... on UnClaimedProjectData {
@@ -79,7 +85,7 @@
               ... on SubListReceiver {
                 ...EditProjectSplitsFlowSubListReceiver
               }
-              ... on OrcidReceiver {
+              ... on LinkedIdentityReceiver {
                 ...EditProjectSplitsFlowOrcidReceiver
               }
             }

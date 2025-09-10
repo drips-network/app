@@ -40,7 +40,7 @@
         ... on SubListReceiver {
           ...SplitsComponentSubListReceiver
         }
-        ... on OrcidReceiver {
+        ... on LinkedIdentityReceiver {
           ...SplitsComponentOrcidReceiver
         }
       }
