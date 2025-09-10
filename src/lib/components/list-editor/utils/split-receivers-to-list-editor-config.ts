@@ -121,8 +121,8 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
       return { type: 'ecosystem', ecosystem: input.ecosystemMainAccount };
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
-    case 'OrcidReceiver':
-      // TODO: fetch the orcid by accountId to get full details?
+    case 'LinkedIdentityReceiver':
+      // TODO: Do we need to be making this whole entity?
       return {
         type: 'orcid',
         orcid: {
@@ -130,7 +130,7 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
           __typename: 'OrcidAccount',
           source: {
             __typename: 'OrcidSource',
-            url: 'TODO',
+            url: `/${input.linkedIdentity.orcid}`,
           },
           chainData: [
             {
@@ -155,7 +155,7 @@ function extractAccountId(input: SplitReceiver) {
       return input.ecosystemMainAccount.account.accountId;
     case 'SubListReceiver':
       return input.subList.account.accountId;
-    case 'OrcidReceiver':
+    case 'LinkedIdentityReceiver':
       return input.linkedIdentity.account.accountId;
   }
 }
