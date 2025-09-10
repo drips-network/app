@@ -1,7 +1,8 @@
 <!doctype html>
 <html class="smoothscroll" lang="en">
   <head>
-    <script>
+    <script data-cfasync="false">
+      // Prevent FARTS (Flash of inAccurate coloR ThemeS)
       (function () {
         try {
           const themePreference = localStorage.getItem('theme')?.replaceAll('"', '');
@@ -34,7 +35,7 @@
       type="font/woff2"
       crossorigin
     />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="" />
     <script defer data-domain="drips.network" src="https://plausible.io/js/script.js"></script>
     %sveltekit.head%

@@ -7,6 +7,9 @@ export default (...args: Parameters<typeof twemoji.parse>) => {
 
   return twemoji.parse(sanitize(args[0].toString(), { allowedTags: [] }), {
     ...options,
+    attributes: () => ({
+      loading: 'lazy',
+    }),
     base: BASE_URL,
     folder: '/twemoji',
     ext: '.svg',

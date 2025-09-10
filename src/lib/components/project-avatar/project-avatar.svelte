@@ -49,6 +49,17 @@
   };
   $: containerSize = CONTAINER_SIZES[size];
 
+  const IMAGE_SIZES = {
+    micro: 32,
+    tiny: 48,
+    small: 64,
+    medium: 96,
+    large: 128,
+    xlarge: 192,
+    huge: 256,
+  };
+  $: imageSize = IMAGE_SIZES[size];
+
   $: emojiElem =
     isClaimed(project) && project.avatar.__typename === 'EmojiAvatar'
       ? twemoji(project.avatar.emoji)
@@ -96,8 +107,9 @@
           <img
             bind:this={customImageEl}
             on:load={() => (customImageLoading = false)}
-            src="/api/custom-avatars/{project.avatar.cid}"
+            src="/api/custom-avatars/{project.avatar.cid}?size={imageSize}"
             alt="project avatar"
+            loading="lazy"
           />
         </div>
       {:else if emojiElem}
