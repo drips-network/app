@@ -32,6 +32,13 @@ services:
     volumes:
     - .:/app
     - /app/node_modules/
+    # *) Uncomment the following line and save this file
+    # - ./node_modules/@drips-network/sdk:/app/node_modules/@drips-network/sdk
+    # *) Build the SDK locally, then run
+    # npm link ../path/to/sdk
+    # *) And start the local docker environment with
+    # CONTRACTS_TAG=igor-orcid GRAPHQL_API_TAG=refactor-linked-identities npm run dev:docker
+
     ports:
     - 5173:5173
     depends_on:
