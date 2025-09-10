@@ -11,6 +11,7 @@ import type {
   SdkProjectReceiver,
   SdkAddressReceiver,
   SdkDripListReceiver,
+  SdkOrcidReceiver,
 } from '@drips-network/sdk';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
@@ -19,14 +20,6 @@ import type {
   CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
-
-// TODO: integrate into SDK
-type SdkOrcidReceiver = {
-  type: 'orcid-account';
-  accountId: bigint;
-};
-
-type SdkReceiverWithOrcid = SdkReceiver | SdkOrcidReceiver;
 
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
@@ -55,7 +48,7 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepProjectFragment
     | CreateDonationDetailsStepEcosystemFragment
     | CreateDonationDetailsStepOrcidFragment,
-): SdkReceiverWithOrcid {
+): SdkReceiver {
   switch (receiver.__typename) {
     case 'AddressDriverAccount':
       return {
