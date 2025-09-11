@@ -8,6 +8,8 @@
       ...OrcidTooltip
       chain
       orcid
+      isClaimed
+      isLinked
     }
   `;
 </script>
@@ -20,7 +22,6 @@
   import network from '$lib/stores/wallet/network';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidAvatar from './orcid-avatar.svelte';
   import OrcidName from './orcid-name.svelte';
@@ -47,24 +48,18 @@
 
   let unclaimedOrcid: OrcidBadgeFragment;
   $: unclaimedOrcid = {
-    __typename: 'OrcidAccount',
-    source: { ...orcid.source },
-    chainData: [
-      {
-        chain: chainOverride ?? network.gqlName,
-        __typename: 'UnClaimedOrcidAccountData',
-      },
-    ],
+    ...orcid,
+    chain: chainOverride ?? network.gqlName,
+    isClaimed: false,
+    isLinked: false
   } as OrcidBadgeFragment;
 
   $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;
 
-  $: orcidId = getLastPathSegment(processedOrcid.source.url)
-
   async function copyClipboard(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-    await navigator.clipboard.writeText(orcidId ?? '');
+    await navigator.clipboard.writeText(orcid.orcid);
     copySuccess = true;
     setTimeout(() => (copySuccess = false), 1000);
   }
@@ -76,9 +71,9 @@
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="orcid-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
       class:outlined={outlined}
-      href={linkTo === 'orcid-page' && orcidId
-        ? buildOrcidUrl(orcidId)
-        : buildExternalUrl(processedOrcid.source.url)}
+      href={linkTo === 'orcid-page'
+        ? buildOrcidUrl(orcid.orcid)
+        : buildExternalUrl(orcid.orcid)}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}

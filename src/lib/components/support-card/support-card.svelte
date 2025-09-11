@@ -104,7 +104,6 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import OrcidAvatar from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
 
   export let project: SupportCardProjectFragment | undefined = undefined;
@@ -151,11 +150,9 @@
       case !!ecosystem:
         supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
-      case !!orcid: {
-        const orcidId = getLastPathSegment(orcid?.source.url ?? '')
-        supportUrl = `${BASE_URL}${orcidId ? buildOrcidUrl(orcidId) : ''}`;
+      case !!orcid:
+        supportUrl = `${BASE_URL}${buildOrcidUrl(orcid.orcid)}`;
         break;
-      }
       default:
         supportUrl = '/';
     }

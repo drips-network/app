@@ -116,7 +116,7 @@
       case 'EcosystemMainAccount':
         receiverTypeLabel = 'Ecosystem';
         break;
-      case 'OrcidAccount':
+      case 'OrcidLinkedIdentity':
         receiverTypeLabel = 'ORCID';
         break;
     }
@@ -131,7 +131,7 @@
         break;
       case 'Project':
       case 'EcosystemMainAccount':
-      case 'OrcidAccount':
+      case 'OrcidLinkedIdentity':
         recipientAccountId = receiver.account.accountId;
         break;
     }

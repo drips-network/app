@@ -30,22 +30,15 @@ export const load = (async ({ params, fetch }) => {
   if (!orcidAccount) {
     const accountId = await orcidIdToAccountId(params.orcidId);
     orcidAccount = {
-      __typename: 'OrcidAccount',
+      __typename: 'OrcidLinkedIdentity',
       account: {
         __typename: 'RepoDriverAccount',
         accountId: String(accountId),
         driver: 'REPO' as const,
       },
-      source: { __typename: 'OrcidSource', url: orcid.url },
-      chainData: [
-        {
-          chain: network.gqlName,
-          __typename: 'UnClaimedOrcidAccountData',
-          linkedTo: null,
-          support: [],
-          withdrawableBalances: [],
-        },
-      ],
+      orcid: orcid.id,
+      isClaimed: false,
+      isLinked: false
     } as OrcidProfileFragment;
   }
 
