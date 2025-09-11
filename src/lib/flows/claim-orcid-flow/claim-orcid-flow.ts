@@ -1,4 +1,8 @@
-import { get, writable, type Writable } from 'svelte/store';
+import {
+  // get,
+  writable,
+  type Writable
+} from 'svelte/store';
 import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
@@ -9,17 +13,17 @@ import AddEthereumAddress, {
   ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT,
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import ProjectSlot from './slots/orcid-slot.svelte';
-import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
-import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
-import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
+// import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
+// import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
+// import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
 import Review, { REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT } from './steps/review/review.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
-import LinkedProject from './slots/linked-orcid.svelte';
+import LinkedOrcid from './slots/linked-orcid.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
-import type { ClaimProjectFlowOrcidFragment } from './__generated__/gql.generated';
-import type { Items, Weights } from '$lib/components/list-editor/types';
+import type { ClaimOrcidFlowOrcidFragment } from './__generated__/gql.generated';
+// import type { Items, Weights } from '$lib/components/list-editor/types';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 // import type { FundingJson } from '$lib/utils/github/GitHub';
 // import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
@@ -30,44 +34,44 @@ export const CLAIM_ORCID_FLOW_ORCID_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_ORCID_FRAGMENT}
   ${ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT}
   ${REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT}
-  fragment ClaimOrcidFlowOrcid on Orcid Account {
+  fragment ClaimOrcidFlowOrcid on OrcidAccount {
     ...EnterGitUrlStepOrcid
     ...AddEthereumAddressStepOrcid
     ...ReviewStepUnclaimedOrcid
-    isVisible
   }
 `;
-
-interface ListEditorConfig {
-  items: Items;
-  weights: Weights;
-}
-
-type ProjectMetadata = {
-  starCount: number;
-  forkCount: number;
-  description?: string | undefined;
-  defaultBranch: string | undefined;
-}
 
 type OrcidMetadata = Orcid
 
 export interface State {
+  // giturl or ORCID
+  claimableId: string;
+  claimableAccount: ClaimOrcidFlowOrcidFragment | undefined;
+  claimableMetadata: OrcidMetadata | undefined;
+  claimableContext: Record<string, unknown>| undefined;
+
+  linkedToClaimable: boolean;
+  gaslessOwnerUpdateTaskId: string | undefined;
+  isPartiallyClaimed: boolean;
+
+  // or this is part of a project's claimableContext
+  recipientErrors: Array<AddItemError>;
+
   // aka linked to ORCID profile?
-  linkedToRepo: boolean;
+  // linkedToRepo: boolean;
   // aka ORCID profile URL?
   // entityUrl: string;
-  gitUrl: string;
-  isPartiallyClaimed: boolean;
+  // gitUrl: string;
+  // isPartiallyClaimed: boolean;
   // entityAccount
-  orcidAccount: ClaimProjectFlowOrcidFragment | undefined;
+  // orcidAccount: ClaimProjectFlowOrcidFragment | undefined;
   // entityMetadata:;
-  orcidMetadata: OrcidMetadata | undefined;
+  // orcidMetadata: OrcidMetadata | undefined;
   // highLevelPercentages: { [key: string]: number };
   // maintainerSplits: ListEditorConfig;
   // dependencySplits: ListEditorConfig;
   // dependenciesAutoImported: boolean;
-  gaslessOwnerUpdateTaskId: string | undefined;
+  // gaslessOwnerUpdateTaskId: string | undefined;
   // avatar:
   //   | {
   //       type: 'emoji';
@@ -83,38 +87,42 @@ export interface State {
   //   object: FundingJson;
   //   highlight: TemplateHighlight;
   // };
-  recipientErrors: Array<AddItemError>;
+  // recipientErrors: Array<AddItemError>;
 }
 
 export const state = () =>
   writable<State>({
     isPartiallyClaimed: false,
-    linkedToRepo: false,
-    gitUrl: '',
-    orcidAccount: undefined,
-    orcidMetadata: undefined,
-    // highLevelPercentages: { maintainers: 60, dependencies: 40 },
-    // maintainerSplits: {
-    //   items: {},
-    //   weights: {},
-    // },
-    // dependencySplits: {
-    //   items: {},
-    //   weights: {},
-    // },
-    // dependenciesAutoImported: false,
+    linkedToClaimable: false,
+    claimableId: '',
+    claimableAccount: undefined,
+    claimableMetadata: undefined,
+    claimableContext: undefined,
     gaslessOwnerUpdateTaskId: undefined,
-    // avatar: {
-    //   type: 'emoji',
-    //   emoji: '💧',
-    // },
-    // projectColor: '#000000',
-    // funding: {
-    //   json: '{}',
-    //   object: {},
-    //   highlight: [null, null],
-    // },
     recipientErrors: [],
+
+    // claimableContext: {
+    //   highLevelPercentages: { maintainers: 60, dependencies: 40 },
+    //   maintainerSplits: {
+    //     items: {},
+    //     weights: {},
+    //   },
+    //   dependencySplits: {
+    //     items: {},
+    //     weights: {},
+    //   },
+    //   dependenciesAutoImported: false,
+    //   avatar: {
+    //     type: 'emoji',
+    //     emoji: '💧',
+    //   },
+    //   projectColor: '#000000',
+    //   funding: {
+    //     json: '{}',
+    //     object: {},
+    //     highlight: [null, null],
+    //   },
+    // },
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
@@ -122,7 +130,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     leftComponent: {
       component: ProjectSlot,
       props: {
-        orcidAccount: state.orcidAccount,
+        orcidAccount: state.claimableAccount,
       },
     },
     editStepIndex: 0,
@@ -133,10 +141,10 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
       component: WalletSlot,
       props: {},
     },
-    editStepIndex: state.linkedToRepo ? undefined : 1,
-    rightComponent: state.linkedToRepo
+    editStepIndex: state.linkedToClaimable ? undefined : 1,
+    rightComponent: state.linkedToClaimable
       ? {
-          component: LinkedProject,
+          component: LinkedOrcid,
           props: {},
         }
       : undefined,
@@ -164,8 +172,7 @@ export const steps = (
   state: Writable<State>,
   skipWalletConnect = false,
   isModal = false,
-  orcidUrl: string | undefined = undefined,
-  // projectUrl: string | undefined = undefined,
+  claimableId: string | undefined = undefined,
 ) => [
   makeStep({
     component: ChooseNetwork,
@@ -174,7 +181,7 @@ export const steps = (
   makeStep({
     component: EnterGitUrl,
     props: {
-      orcidUrl,
+      orcidId: claimableId,
     },
   }),
   ...(skipWalletConnect
