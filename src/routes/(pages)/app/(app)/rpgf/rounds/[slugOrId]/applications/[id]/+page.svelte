@@ -19,6 +19,7 @@
   import buildExternalUrl from '$lib/utils/build-external-url';
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
   import RpgfApplicationDetailsCard from '$lib/components/rpgf-application-details-card/rpgf-application-details-card.svelte';
+  import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
 
   export let data;
   $: round = data.round;
@@ -47,6 +48,17 @@
         : undefined}
     />
   </div>
+
+  {#if !data.rpgfUserData}
+    <AnnotationBox type="info">
+      Sign in as the applicant or a round admin to see private fields, identity verification status,
+      and more.
+      <svelte:fragment slot="actions">
+        <RpgfSiweButton />
+      </svelte:fragment>
+    </AnnotationBox>
+  {/if}
+
   <div class="card">
     <RpgfApplicationBadge hideState {application} hideName size="huge" />
     <h1>
