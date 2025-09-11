@@ -9,7 +9,7 @@
   export let caption: string | undefined = undefined;
   export let textareaStyle: string | undefined = undefined;
 
-  export let value: string | undefined = undefined;
+  export let value: string | undefined | null = undefined;
   export let placeholder: string | undefined = undefined;
 
   export let validationState: TextInputValidationState = {
@@ -51,6 +51,7 @@
     on:change
     on:click
     on:input
+    on:blur
     on:keydown
     on:keypress
   />
@@ -79,12 +80,12 @@
   textarea {
     background-color: var(--color-background);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-5);
     box-sizing: border-box;
     padding: 0.75rem 0.75rem;
     width: 100%;
     height: 3rem;
-    min-height: 3rem;
+    min-height: 10rem;
     resize: none;
     transition:
       background-color 0.3s,

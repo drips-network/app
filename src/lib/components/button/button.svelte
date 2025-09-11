@@ -20,6 +20,9 @@
   export let justify: 'left' | 'right' | 'center' = 'center';
   export let circular: boolean = false;
 
+  //** in case props must be passed as object */
+  export let onClick: (() => void) | undefined = undefined;
+
   $: isDisabled = disabled || loading;
 
   let el: HTMLButtonElement | HTMLAnchorElement;
@@ -53,6 +56,7 @@
   disabled={isDisabled}
   aria-disabled={isDisabled}
   on:click
+  on:click={onClick}
   data-testid={dataTestId}
   on:mouseenter|stopPropagation
   on:mouseleave|stopPropagation
@@ -149,7 +153,7 @@
   }
 
   .button .inner:not(.ghost) {
-    box-shadow: 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 
   .button:not(.loading) .inner.primary {

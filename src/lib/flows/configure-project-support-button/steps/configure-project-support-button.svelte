@@ -193,7 +193,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 1rem 0px 1rem 1rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     background-color: var(--color-foreground-level-1);
     color: var(--color-background);
     height: 120px;

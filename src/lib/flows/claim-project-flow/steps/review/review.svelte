@@ -220,7 +220,7 @@
             >
           {:else if hasCollectableAmount}
             <WhatsNextItem icon={SplitsIcon}
-              >Claimable funds will be<span class="typo-text-bold"
+              >Claimable funds will be <span class="typo-text-bold"
                 >collected directly to your connected wallet</span
               > as shown above.</WhatsNextItem
             >

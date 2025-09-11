@@ -59,7 +59,7 @@
       : 'var(--color-foreground-level-1)'}
   />
   <div class="header">
-    <ProjectAvatar project={chainData} size="large" outline />
+    <ProjectAvatar project={chainData} size="large" />
     <a
       class="name typo-header-4"
       href={buildProjectUrl(

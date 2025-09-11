@@ -1,12 +1,19 @@
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
-import type { TransactionLike } from 'ethers';
+import type { TransactionLike, TypedDataDomain, TypedDataField } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
 
 export type TransactionWrapper = {
   title: string;
   transaction: TransactionLike;
-  gasless?: boolean;
+  gasless?: {
+    nonceGetter: () => Promise<number>;
+    ERC2771Data: (nonce: number) => {
+      domain: TypedDataDomain;
+      types: Record<string, TypedDataField[]>;
+      payload: Record<string, unknown>;
+    };
+  };
   applyGasBuffer: boolean;
 };
 
@@ -131,10 +138,16 @@ type OmitContext<T> = Omit<T, 'context'>;
 export type Props<T> = T extends SvelteComponent<infer P, any, any> ? OmitContext<P> : never;
 export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
-export type Step<T extends SvelteComponent> = {
-  condition?: () => boolean;
+type ComponentAndProps<T extends SvelteComponent> = {
   component: Constructor<T>;
   props: PropsOrUndefined<T>;
+};
+
+export type Step<T extends SvelteComponent> = {
+  component: Constructor<T>;
+  props: PropsOrUndefined<T>;
+  condition?: () => boolean;
+  staticHeaderComponent?: ComponentAndProps<SvelteComponent>;
 };
 
 type SomeStep = <R>(step: <T extends SvelteComponent>(step: Step<T>) => R) => R;

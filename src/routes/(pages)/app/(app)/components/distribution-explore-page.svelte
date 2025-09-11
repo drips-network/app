@@ -107,7 +107,7 @@
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     padding: 0 1rem 1rem 1rem;
     border-radius: 2rem 0 2rem 2rem;
     overflow: hidden;
@@ -136,7 +136,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     box-sizing: border-box;
   }
 
