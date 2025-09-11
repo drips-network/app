@@ -42,7 +42,7 @@ export const CREATE_DONATION_FLOW_ECOSYSTEM_FRAGMENT = gql`
 
 export const CREATE_DONATION_FLOW_ORCID_FRAGMENT = gql`
   ${CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT}
-  fragment CreateDonationFlowOrcid on OrcidAccount {
+  fragment CreateDonationFlowOrcid on OrcidLinkedIdentity {
     ...CreateDonationDetailsStepOrcid
   }
 `;
