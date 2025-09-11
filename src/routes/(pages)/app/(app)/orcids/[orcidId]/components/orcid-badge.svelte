@@ -16,9 +16,7 @@
 
 <script lang="ts">
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import {
-    SupportedChain,
-  } from '$lib/graphql/__generated__/base-types';
+  import { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
@@ -44,14 +42,14 @@
   export let outlined: boolean = false;
   export let copyable: boolean = false;
 
-  let copySuccess = false
+  let copySuccess = false;
 
   let unclaimedOrcid: OrcidBadgeFragment;
   $: unclaimedOrcid = {
     ...orcid,
     chain: chainOverride ?? network.gqlName,
     isClaimed: false,
-    isLinked: false
+    isLinked: false,
   } as OrcidBadgeFragment;
 
   $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;
@@ -70,10 +68,10 @@
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="orcid-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
-      class:outlined={outlined}
+      class:outlined
       href={linkTo === 'orcid-page'
         ? buildOrcidUrl(orcid.orcid)
-        : buildExternalUrl(buildOrcidUrl(orcid.orcid, { external: true}))}
+        : buildExternalUrl(buildOrcidUrl(orcid.orcid, { external: true }))}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}
