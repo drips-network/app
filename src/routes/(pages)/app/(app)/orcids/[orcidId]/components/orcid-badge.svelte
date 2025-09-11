@@ -73,7 +73,7 @@
       class:outlined={outlined}
       href={linkTo === 'orcid-page'
         ? buildOrcidUrl(orcid.orcid)
-        : buildExternalUrl(orcid.orcid)}
+        : buildExternalUrl(buildOrcidUrl(orcid.orcid, { external: true}))}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}

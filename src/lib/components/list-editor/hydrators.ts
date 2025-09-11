@@ -81,7 +81,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
       }
     `,
     // TODO: yes, for now it is fetched with the actual ORCID iD
-    { orcid, chain: network.gqlName },
+    { orcid: orcidId, chain: network.gqlName },
   );
 
   let orcidAccount = res.orcidLinkedIdentityByOrcid
@@ -97,18 +97,15 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
 
     const accountId = await orcidIdToAccountId(orcidId);
     orcidAccount = {
-      __typename: 'OrcidAccount',
+      __typename: 'OrcidLinkedIdentity',
       account: {
         __typename: 'RepoDriverAccount',
         accountId: String(accountId),
       },
-      source: { __typename: 'OrcidSource', url: orcid.url },
-      chainData: [
-        {
-          chain: network.gqlName,
-          __typename: 'UnClaimedOrcidAccountData',
-        },
-      ],
+      chain: network.gqlName,
+      orcid: orcid.id,
+      isClaimed: false,
+      isLinked: false,
     } as NonNullable<GetOrcidQuery['orcidLinkedIdentityByOrcid']>;
   }
 
