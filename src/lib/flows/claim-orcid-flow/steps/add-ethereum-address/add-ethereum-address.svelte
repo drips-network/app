@@ -1,9 +1,7 @@
 <script lang="ts" context="module">
   export const ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT = gql`
-    fragment AddEthereumAddressStepOrcid on OrcidAccount {
-      source {
-        url
-      }
+    fragment AddEthereumAddressStepOrcid on OrcidLinkedIdentity {
+      orcid
     }
   `;
 </script>
