@@ -66,7 +66,6 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidIcon from '$lib/components/icons/Orcid.svelte';
 
@@ -96,11 +95,9 @@
         break;
       case !!ecosystem:
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
-      // eslint-disable-next-line no-fallthrough
-      case !!orcid: {
-        const orcidId = getLastPathSegment(orcid?.source.url ?? '') || ''
-        link = buildOrcidUrl(orcidId)
-      }
+        break
+      case !!orcid:
+        link = buildOrcidUrl(orcid.orcid)
     }
   }
 </script>
@@ -177,7 +174,7 @@
       </div>
 
       <div>
-        <span class="typo-header-3 ellipsis">{getLastPathSegment(orcid.source.url)}</span>
+        <span class="typo-header-3 ellipsis">{orcid.orcid}</span>
       </div>
     </div>
   {:else if loading}

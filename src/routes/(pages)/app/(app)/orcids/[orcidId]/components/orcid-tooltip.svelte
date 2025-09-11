@@ -8,6 +8,8 @@
       owner {
         address
       }
+      isClaimed
+      isLinked
     }
   `;
 </script>
@@ -16,49 +18,40 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import type { OrcidTooltipFragment } from './__generated__/gql.generated';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
-  import isClaimed from '$lib/utils/orcids/is-claimed';
   import OrcidAvatar from './orcid-avatar.svelte';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidName from './orcid-name.svelte';
+  import { PUBLIC_ORCID_API_URL } from '$env/static/public';
 
   export let orcid: OrcidTooltipFragment;
-
-  $: chainData = filterCurrentChainData(orcid.chainData);
-  $: orcidId = getLastPathSegment(orcid.source.url)
 </script>
 
 <div class="project-tooltip">
   <div
     class="background"
-    style:background-color={isClaimed(chainData)
+    style:background-color={orcid.isClaimed
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
   />
   <div class="header">
     <OrcidAvatar size="large" outline />
-    {#if orcidId}
-      <a
-        class="name typo-header-4"
-        href={buildOrcidUrl(orcidId)}><OrcidName {orcid} /></a
-      >
-    {/if}
-    {#if isClaimed(chainData)}
+    <a
+      class="name typo-header-4"
+      href={buildOrcidUrl(orcid.orcid)}><OrcidName {orcid} /></a
+    >
+    {#if orcid.owner}
       <div class="owner typo-text-small">
         <span>Owned by </span>
-        <IdentityBadge linkToNewTab address={chainData.tooltipLinkedTo.address} disableTooltip size="small" />
+        <IdentityBadge linkToNewTab address={orcid.owner.address} disableTooltip size="small" />
       </div>
     {/if}
   </div>
-  {#if orcid.source.url}
-    <a
-      class="typo-text-small"
-      href={buildExternalUrl(orcid.source.url)}
-      target="_blank"
-      rel="noreferrer">View ORCID</a
-    >
-  {/if}
+  <a
+    class="typo-text-small"
+    href={buildExternalUrl(`${PUBLIC_ORCID_API_URL}/${orcid}`)}
+    target="_blank"
+    rel="noreferrer">View ORCID</a
+  >
 </div>
 
 <style>

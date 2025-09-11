@@ -11,9 +11,7 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
   import type Orcid from '$lib/utils/orcids/entities';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import OrcidProfileHeader from './orcid-profile-header.svelte';
-  import isClaimed from '$lib/utils/orcids/is-claimed';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import network from '$lib/stores/wallet/network';
@@ -26,43 +24,25 @@
   import { goto } from '$app/navigation';
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
-  import type { SupportCardOrcidFragment } from '$lib/components/support-card/__generated__/gql.generated';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
+  import type { MergeWithdrawableBalancesFragment } from '$lib/utils/__generated__/gql.generated';
+  import type { Amount } from '$lib/graphql/__generated__/base-types';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
+  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
+  let totalEarned: Amount[] = []
 
   // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
-  $: chainData = filterCurrentChainData(orcidAccount.chainData);
-  $: orcidSupport = chainData?.support || [];
-
-  // Transform OrcidProfileFragment to SupportCardOrcidFragment
-  $: supportCardOrcidData = {
-    __typename: 'OrcidAccount' as const,
-    source: orcidAccount.source,
-    account: orcidAccount.account,
-    chainData: orcidAccount.chainData.map((data) => {
-      if (data.__typename === 'ClaimedOrcidAccountData') {
-        return {
-          __typename: 'ClaimedOrcidAccountData' as const,
-          linkedTo: data.maybeLinkedTo,
-        };
-      } else {
-        return {
-          __typename: 'UnClaimedOrcidAccountData' as const,
-        };
-      }
-    }),
-  } satisfies SupportCardOrcidFragment;
+  $: orcidSupport = [];
 
   function claimOrcid() {
     // eslint-disable-next-line no-console
     console.log('Launch claim ORCID flow');
-    launchClaimOrcid(getLastPathSegment(orcidAccount.source.url))
+    launchClaimOrcid(orcid.id)
   }
 </script>
 
@@ -78,13 +58,13 @@
 </svelte:head>
 
 <PrimaryColorThemer colorHex={undefined}>
-  {#if !isClaimed(chainData)}
+  {#if !orcidAccount.isClaimed}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if chainData.withdrawableBalances.length > 0}This ORCID iD has <span
+        {#if withdrawableBalances.length > 0}This ORCID iD has <span
             class="typo-text-small-bold"
             ><AggregateFiatEstimate
-              amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
+              amounts={mergeWithdrawableBalances(withdrawableBalances)}
             /></span
           > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This ORCID
           iD is unclaimed on {network.label}, but can still receive funds that the owner can collect
@@ -118,17 +98,17 @@
       </div>
 
       <div class="stats">
-        {#if isClaimed(chainData)}
+        {#if orcidAccount.isClaimed}
           <div class="stat drip-bordered">
             <KeyValuePair key="Donations">
-              <AggregateFiatEstimate amounts={chainData?.totalEarned} />
+              <AggregateFiatEstimate amounts={totalEarned} />
             </KeyValuePair>
           </div>
-        {:else if chainData.withdrawableBalances.length > 0}
+        {:else if withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
             <KeyValuePair key="Donations">
               <AggregateFiatEstimate
-                amounts={mergeWithdrawableBalances(chainData.withdrawableBalances)}
+                amounts={mergeWithdrawableBalances(withdrawableBalances)}
               />
             </KeyValuePair>
           </div>
@@ -146,7 +126,7 @@
       </div>
     </header>
 
-    {#if !isClaimed(chainData) && chainData.withdrawableBalances.length > 0}
+    {#if !orcidAccount.isClaimed && withdrawableBalances.length > 0}
       <section class="app-section">
         <SectionHeader icon={Wallet} label="Claimable funds" />
         <SectionSkeleton loaded={true}>
@@ -154,8 +134,8 @@
             <UnclaimedOrcidCard
               {orcidAccount}
               unclaimedTokensExpandable={false}
-              unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
-              showClaimButton={!isClaimed(chainData)}
+              unclaimedTokensExpanded={withdrawableBalances.length > 0}
+              showClaimButton={!orcidAccount.isClaimed}
               on:claimButtonClick={() =>
                 goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
             />
@@ -175,7 +155,7 @@
     </section>
     <aside>
       <div class="become-supporter-card">
-        <SupportCard orcid={supportCardOrcidData} />
+        <SupportCard orcid={orcidAccount} />
       </div>
     </aside>
   </article>
