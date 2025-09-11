@@ -41,7 +41,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import modal from '$lib/stores/modal';
-  import { loadFundingInfo } from './enter-git-url';
+  import { loadFundingInfo } from './enter-orcid-id';
   import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import { fetchOrcid } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
   import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
