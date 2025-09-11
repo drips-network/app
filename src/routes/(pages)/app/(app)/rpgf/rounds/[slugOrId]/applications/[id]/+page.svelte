@@ -20,6 +20,7 @@
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
   import RpgfApplicationDetailsCard from '$lib/components/rpgf-application-details-card/rpgf-application-details-card.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
+  import Copyable from '$lib/components/copyable/copyable.svelte';
 
   export let data;
   $: round = data.round;
@@ -87,7 +88,7 @@
 
   <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 
-  <RpgfApplicationDetailsCard title="Application details" key="application-details">
+  <RpgfApplicationDetailsCard title="Form answers" key="form-answers">
     <div class="fields">
       {#if !canSeePrivateFields}
         <AnnotationBox type="info">
@@ -164,16 +165,22 @@
           {/if}
         </div>
       {/each}
+    </div>
+  </RpgfApplicationDetailsCard>
 
+  <RpgfApplicationDetailsCard title="Details" key="details">
+    <div class="fields">
       <div class="field">
         <h2 class="typo-header-4">GitHub repository</h2>
-        <ProjectBadge
-          linkTo="external-url"
-          size="tiny"
-          forceUnclaimed
-          project={data.dripsProject}
-          tooltip={false}
-        />
+        <Copyable value={data.dripsProject.source.url} alwaysVisible>
+          <ProjectBadge
+            linkTo="external-url"
+            size="tiny"
+            forceUnclaimed
+            project={data.dripsProject}
+            tooltip={false}
+          />
+        </Copyable>
       </div>
 
       <div class="field">
@@ -194,6 +201,15 @@
         </p>
       </div>
     </div>
+
+    {#if application.easAttestationUID}
+      <div class="field">
+        <h2 class="typo-header-4">EAS attestation UID</h2>
+        <Copyable value={application.easAttestationUID} alwaysVisible>
+          <p>{application.easAttestationUID}</p>
+        </Copyable>
+      </div>
+    {/if}
   </RpgfApplicationDetailsCard>
 </div>
 
