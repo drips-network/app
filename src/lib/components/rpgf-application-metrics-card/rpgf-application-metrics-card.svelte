@@ -2,6 +2,7 @@
   import { fade } from 'svelte/transition';
   import OsoLogo from '../illustrations/oso-logo.svelte';
   import MetricsGrid from '../metrics-grid/metrics-grid.svelte';
+  import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
 
   export let keyMetrics: Promise<Record<string, string>>;
 
@@ -14,9 +15,8 @@
   };
 </script>
 
-<div class="application-metrics-card">
-  <div class="header">
-    <h2 class="typo-header-5" style:white-space="nowrap">KEY METRICS</h2>
+<RpgfApplicationDetailsCard title="Key metrics" key="key-metrics">
+  <svelte:fragment slot="right">
     <div
       class="oso-logo typo-text-small"
       style:display="flex"
@@ -28,7 +28,7 @@
       <OsoLogo />
       <span class="typo-text-small-bold">Open Source Observer</span>
     </div>
-  </div>
+  </svelte:fragment>
 
   <div class="content-wrapper">
     {#await keyMetrics}
@@ -66,18 +66,9 @@
       </div>
     {/await}
   </div>
-</div>
+</RpgfApplicationDetailsCard>
 
 <style>
-  .application-metrics-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    background-color: var(--color-background-level-2);
-    border: 1px solid var(--color-foreground-level-3);
-  }
-
   .content-wrapper {
     position: relative;
   }
@@ -101,15 +92,6 @@
     100% {
       opacity: 0.5;
     }
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    gap: 0.5rem;
-    flex-wrap: wrap;
   }
 
   .no-data {

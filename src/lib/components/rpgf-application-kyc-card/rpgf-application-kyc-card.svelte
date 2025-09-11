@@ -8,6 +8,7 @@
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
   import ArrowCounterClockwiseHeart from '../icons/ArrowCounterClockwiseHeart.svelte';
   import ArrowRight from '../icons/ArrowRight.svelte';
+  import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
   import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
   import Stepper from '../stepper/stepper.svelte';
 
@@ -25,10 +26,8 @@
   }
 </script>
 
-<div class="application-kyc-card">
-  <div class="card-header">
-    <h5>Identity verification</h5>
-    <!-- TODO(rpgf): Real refresh icon -->
+<RpgfApplicationDetailsCard title="Identity verification" key="kyc">
+  <svelte:fragment slot="right">
     <Button
       variant="ghost"
       ariaLabel="Refresh"
@@ -38,7 +37,7 @@
     >
       Refresh status
     </Button>
-  </div>
+  </svelte:fragment>
 
   {#if !kycRequest}
     <div
@@ -163,32 +162,13 @@
       please contact the round organizers for assistance.
     </p>
   {/if}
-</div>
+</RpgfApplicationDetailsCard>
 
 <style>
-  .application-kyc-card {
-    display: flex;
-    gap: 1rem;
-    flex-direction: column;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    background-color: var(--color-background-level-2);
-    border: 1px solid var(--color-foreground-level-3);
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-  }
-
   .status-badge {
     display: flex;
     padding: 0.25rem 0.75rem;
     width: fit-content;
     border-radius: 1rem 0 1rem 1rem;
-  }
-
-  .application-kyc-card p {
-    color: var(--color-foreground-level-6);
   }
 </style>

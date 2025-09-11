@@ -18,6 +18,7 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
+  import RpgfApplicationDetailsCard from '$lib/components/rpgf-application-details-card/rpgf-application-details-card.svelte';
 
   export let data;
   $: round = data.round;
@@ -62,7 +63,7 @@
     {/if}
   </div>
 
-  {#if round.kycProvider}
+  {#if round.kycProvider && canSeePrivateFields}
     <RpgfApplicationKycCard
       roundId={data.round.id}
       kycRequest={data.kycRequest}
@@ -72,8 +73,7 @@
 
   <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 
-  <div class="card">
-    <h2 class="typo-header-5">Application details</h2>
+  <RpgfApplicationDetailsCard title="Application details" key="application-details">
     <div class="fields">
       {#if !canSeePrivateFields}
         <AnnotationBox type="info">
@@ -174,7 +174,7 @@
         </p>
       </div>
     </div>
-  </div>
+  </RpgfApplicationDetailsCard>
 </div>
 
 <style>
@@ -183,7 +183,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 1rem;
     border: 1px solid var(--color-foreground-level-3);
   }
