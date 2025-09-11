@@ -47,7 +47,7 @@
     : 'I added the FUNDING.json file to the root of my repo.';
 
   onMount(() => {
-    $context.linkedToRepo = false;
+    $context.linkedToClaimable = false;
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =
