@@ -21,7 +21,6 @@
   import OrcidAvatar from './orcid-avatar.svelte';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidName from './orcid-name.svelte';
-  import { PUBLIC_ORCID_API_URL } from '$env/static/public';
 
   export let orcid: OrcidTooltipFragment;
 </script>
@@ -48,7 +47,7 @@
   </div>
   <a
     class="typo-text-small"
-    href={buildExternalUrl(`${PUBLIC_ORCID_API_URL}/${orcid}`)}
+    href={buildExternalUrl(buildOrcidUrl(orcid.orcid, { external: true }))}
     target="_blank"
     rel="noreferrer">View ORCID</a
   >
