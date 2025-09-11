@@ -18,9 +18,9 @@
 
   $: formValid = $walletStore.connected;
 
-  function verifyProject() {
+  function verifyOrcid() {
     dispatch('await', {
-      message: 'Gathering ORCID information…',
+      message: 'Gathering ORCID iD information…',
       promise: () => {
         return loadFundingInfo(context);
       },
@@ -39,7 +39,7 @@
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={verifyProject}
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={verifyOrcid}
       >Continue</Button
     >
   </svelte:fragment>
