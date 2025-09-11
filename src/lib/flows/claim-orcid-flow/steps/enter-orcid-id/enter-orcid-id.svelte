@@ -16,6 +16,8 @@
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
     fragment EnterGitUrlStepOrcid on OrcidLinkedIdentity {
       ...UnclaimedOrcidCard
+      isClaimed
+      isLinked
       account {
         accountId
       }
@@ -48,7 +50,6 @@
   import { loadFundingInfo } from './enter-orcid-id';
   import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import { fetchOrcid } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 
   export let context: Writable<State>;
@@ -101,14 +102,13 @@
 
       const orcidAccount = response.orcidLinkedIdentityByOrcid;
       if (orcidAccount) {
-        const orcidChainData = filterCurrentChainData(orcidAccount.chainData);
-        if (orcidChainData.__typename === 'ClaimedOrcidAccountData') {
+        if(orcidAccount.isClaimed && orcidAccount.isLinked) {
           throw new InvalidUrlError('ORCID already claimed');
         }
 
         if (
-          orcidChainData.__typename === 'UnClaimedOrcidAccountData' &&
-          orcidChainData.linkedTo?.address.toLowerCase() === $walletStore.address?.toLowerCase()
+          orcidAccount.owner?.address.toLowerCase() === $walletStore.address?.toLowerCase() &&
+          !orcidAccount.isLinked
         ) {
           // The correct owner was already set previously for whatever reason. We can skip updating the owner.
           $context.isPartiallyClaimed = true;
@@ -117,23 +117,16 @@
         $context.claimableAccount = orcidAccount;
       } else {
         $context.claimableAccount = {
-          __typename: 'OrcidAccount',
+          __typename: 'OrcidLinkedIdentity',
           account: {
             __typename: "RepoDriverAccount",
             // TODO: calc real accountId?
             accountId: ''
           },
-          source: {
-            __typename: "OrcidSource",
-            url: orcidInfo.url
-          },
-          chainData: [
-            {
-              chain: network.gqlName,
-              __typename: 'UnClaimedOrcidAccountData',
-              withdrawableBalances: [],
-            },
-          ],
+          orcid: orcidInfo.id,
+          isClaimed: false,
+          isLinked: false,
+          chain: network.gqlName // Add the required 'chain' property
         };
       }
 
