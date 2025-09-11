@@ -50,20 +50,14 @@
   `;
 
   export const SUPPORT_CARD_ORCID_FRAGEMENT = gql`
-    fragment SupportCardOrcid on OrcidAccount {
-      source {
-        url
-      }
+    fragment SupportCardOrcid on OrcidLinkedIdentity {
+      orcid
       account {
         accountId
         driver
       }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          linkedTo {
-            accountId
-          }
-        }
+      owner {
+        accountId
       }
     }
   `;

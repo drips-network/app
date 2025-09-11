@@ -23,8 +23,8 @@ export const load = (async ({ params, fetch }) => {
   // by accountId... We will probably want to support urls that include accountid as well.
   let orcidAccount = undefined;
   const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
-  if (orcidGqlResponse.orcidAccountById) {
-    orcidAccount = orcidGqlResponse.orcidAccountById;
+  if (orcidGqlResponse.orcidLinkedIdentityByOrcid) {
+    orcidAccount = orcidGqlResponse.orcidLinkedIdentityByOrcid;
   }
 
   if (!orcidAccount) {

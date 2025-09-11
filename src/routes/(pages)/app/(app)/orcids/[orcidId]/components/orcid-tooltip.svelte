@@ -2,20 +2,11 @@
   import { gql } from 'graphql-request';
 
   export const ORCID_TOOLTIP_FRAGMENT = gql`
-    fragment OrcidTooltip on OrcidAccount {
-      source {
-        url
-      }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-          tooltipLinkedTo: linkedTo {
-            address
-          }
-        }
-        ... on UnClaimedOrcidAccountData {
-          chain
-        }
+    fragment OrcidTooltip on OrcidLinkedIdentity {
+      orcid
+      chain
+      owner {
+        address
       }
     }
   `;
