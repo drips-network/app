@@ -4,7 +4,7 @@
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
   import { slotsTemplate, state, steps } from './claim-orcid-flow';
 
-  export let orcidUrl: string | undefined = undefined;
+  export let orcidId: string | undefined = undefined;
   export let skipWalletConnect = false;
   export let displaySlots = false;
 
@@ -31,7 +31,7 @@
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
   context={() => myState}
-  steps={steps(myState, skipWalletConnect, true, orcidUrl)}
+  steps={steps(myState, skipWalletConnect, true, orcidId)}
   minHeightPx={0}
 />
 
