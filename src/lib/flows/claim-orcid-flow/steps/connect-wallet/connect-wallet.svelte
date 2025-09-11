@@ -10,7 +10,7 @@
   import Button from '$lib/components/button/button.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-orcid-flow';
-  import { loadFundingInfo } from '../enter-git-url/enter-git-url';
+  import { loadFundingInfo } from '../enter-orcid-id/enter-orcid-id';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
