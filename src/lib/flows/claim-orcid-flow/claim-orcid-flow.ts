@@ -8,7 +8,7 @@ import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
 import EnterGitUrl, {
   ENTER_GIT_URL_STEP_ORCID_FRAGMENT,
-} from './steps/enter-git-url/enter-git-url.svelte';
+} from './steps/enter-orcid-id/enter-orcid-id.svelte';
 import AddEthereumAddress, {
   ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT,
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
