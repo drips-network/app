@@ -28,6 +28,7 @@
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
   import type { SupportCardOrcidFragment } from '$lib/components/support-card/__generated__/gql.generated';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
+  import getLastPathSegment from '$lib/utils/get-last-path-segment';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
@@ -61,7 +62,7 @@
   function claimOrcid() {
     // eslint-disable-next-line no-console
     console.log('Launch claim ORCID flow');
-    launchClaimOrcid(orcidAccount.source.url)
+    launchClaimOrcid(getLastPathSegment(orcidAccount.source.url))
   }
 </script>
 
