@@ -47,6 +47,14 @@
         : undefined}
     />
   </div>
+
+  {#if !data.rpgfUserData}
+    <AnnotationBox type="info">
+      Sign in as the applicant or a round admin to see private fields, identity verification status,
+      and more.
+    </AnnotationBox>
+  {/if}
+
   <div class="card">
     <RpgfApplicationBadge hideState {application} hideName size="huge" />
     <h1>
