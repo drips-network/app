@@ -49,7 +49,7 @@
 
   export const DRIP_VISUAL_ORCID_FRAGMENT = gql`
     ${IDENTITY_CARD_ORCID_FRAGMENT}
-    fragment DripVisualOrcid on OrcidAccount {
+    fragment DripVisualOrcid on OrcidLinkedIdentity {
       ...IdentityCardOrcid
     }
   `;

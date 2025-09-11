@@ -37,13 +37,11 @@
   `;
 
   export const IDENTITY_CARD_ORCID_FRAGMENT = gql`
-    fragment IdentityCardOrcid on OrcidAccount {
+    fragment IdentityCardOrcid on OrcidLinkedIdentity {
       account {
         accountId
       }
-      source {
-        url
-      }
+      orcid
     }
   `
 </script>

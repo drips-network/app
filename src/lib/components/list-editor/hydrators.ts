@@ -71,8 +71,8 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
   const res = await query<GetOrcidQuery, GetOrcidQueryVariables>(
     gql`
       ${LIST_EDITOR_ORCID_FRAGMENT}
-      query GetOrcid($accountId: ID!, $chains: [SupportedChain!]) {
-        orcidAccountById(id: $accountId, chains: $chains) {
+      query GetOrcid($orcid: String!, $chain: SupportedChain!) {
+        orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
           ...ListEditorOrcid
           account {
             accountId
@@ -81,10 +81,10 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
       }
     `,
     // TODO: yes, for now it is fetched with the actual ORCID iD
-    { accountId: orcidId, chains: [network.gqlName] },
+    { orcid, chain: network.gqlName },
   );
 
-  let orcidAccount = res.orcidAccountById
+  let orcidAccount = res.orcidLinkedIdentityByOrcid
   // We don't know about it internally, let's construct a minimal OrcidAccount object
   // to mimic it.
   if (!orcidAccount) {
@@ -109,7 +109,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
           __typename: 'UnClaimedOrcidAccountData',
         },
       ],
-    } as NonNullable<GetOrcidQuery['orcidAccountById']>;
+    } as NonNullable<GetOrcidQuery['orcidLinkedIdentityByOrcid']>;
   }
 
   return {

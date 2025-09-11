@@ -1,17 +1,22 @@
+
+
 <script lang="ts" context="module">
+// TODO
+// chainData {
+//   ... on UnClaimedOrcidAccountData {
+//     chain
+//     withdrawableBalances {
+//       ...MergeWithdrawableBalances
+//     }
+//   }
+// }
+
   export const UNCLAIMED_ORCID_CARD_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
     ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-    fragment UnclaimedOrcidCard on OrcidAccount {
+    fragment UnclaimedOrcidCard on OrcidLinkedIdentity {
       ...OrcidBadge
-      chainData {
-        ... on UnClaimedOrcidAccountData {
-          chain
-          withdrawableBalances {
-            ...MergeWithdrawableBalances
-          }
-        }
-      }
+      chain
     }
   `;
 </script>
