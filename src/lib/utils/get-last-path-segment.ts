@@ -1,4 +1,4 @@
-export default function getLastPathSegment(url: string): string | undefined | null {
+export default function getLastPathSegment(url: string): string | undefined {
   try {
     // 1. Create a URL object
     const urlObject = new URL(url);
@@ -10,6 +10,6 @@ export default function getLastPathSegment(url: string): string | undefined | nu
     return pathSegments.pop();
   } catch (error) {
     console.error("Invalid URL:", error);
-    return null;
+    return undefined;
   }
 }
