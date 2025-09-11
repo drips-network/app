@@ -34,7 +34,7 @@ export const CLAIM_ORCID_FLOW_ORCID_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_ORCID_FRAGMENT}
   ${ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT}
   ${REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT}
-  fragment ClaimOrcidFlowOrcid on OrcidAccount {
+  fragment ClaimOrcidFlowOrcid on OrcidLinkedIdentity {
     ...EnterGitUrlStepOrcid
     ...AddEthereumAddressStepOrcid
     ...ReviewStepUnclaimedOrcid

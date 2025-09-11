@@ -4,16 +4,10 @@
 
   export const ORCID_BADGE_FRAGMENT = gql`
     ${ORCID_TOOLTIP_FRAGMENT}
-    fragment OrcidBadge on OrcidAccount {
+    fragment OrcidBadge on OrcidLinkedIdentity {
       ...OrcidTooltip
-      source {
-        url
-      }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-        }
-      }
+      chain
+      orcid
     }
   `;
 </script>

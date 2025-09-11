@@ -1,22 +1,26 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
+  // TODO
+  // chainData {
+  //   ... on UnClaimedOrcidAccountData {
+  //     linkedTo {
+  //       address
+  //     }
+  //     withdrawableBalances {
+  //       tokenAddress
+  //     }
+  //   }
+  // }
 
   export const ENTER_GIT_URL_STEP_ORCID_FRAGMENT = gql`
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
-    fragment EnterGitUrlStepOrcid on OrcidAccount {
+    fragment EnterGitUrlStepOrcid on OrcidLinkedIdentity {
       ...UnclaimedOrcidCard
       account {
         accountId
       }
-      chainData {
-        ... on UnClaimedOrcidAccountData {
-          linkedTo {
-            address
-          }
-          withdrawableBalances {
-            tokenAddress
-          }
-        }
+      owner {
+        address
       }
     }
   `;
@@ -68,8 +72,8 @@
 
   const orcidQuery = gql`
     ${CLAIM_ORCID_FLOW_ORCID_FRAGMENT}
-    query Orcid($id: ID!, $chains: [SupportedChain!]) {
-      orcidAccountById(id: $id, chains: $chains) {
+    query Orcid($orcid: String!, $chain: SupportedChain!) {
+      orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
         ...ClaimOrcidFlowOrcid
       }
     }
@@ -91,11 +95,11 @@
       $context.claimableMetadata = orcidInfo
 
       const response = await query<OrcidQuery, OrcidQueryVariables>(orcidQuery, {
-        id: $context.claimableId,
-        chains: [network.gqlName],
+        orcid: $context.claimableId,
+        chain: network.gqlName,
       });
 
-      const orcidAccount = response.orcidAccountById;
+      const orcidAccount = response.orcidLinkedIdentityByOrcid;
       if (orcidAccount) {
         const orcidChainData = filterCurrentChainData(orcidAccount.chainData);
         if (orcidChainData.__typename === 'ClaimedOrcidAccountData') {
