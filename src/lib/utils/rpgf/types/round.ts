@@ -1,6 +1,5 @@
-import z from "zod";
-import { applicationCategorySchema } from "./application";
-import { userSchema } from "./user";
+import z from 'zod';
+import { userSchema } from './user';
 
 export const roundStateSchema = z.union([
   z.literal('pending-intake'),
@@ -58,12 +57,15 @@ export const roundSchema = z.object({
   isAdmin: z.boolean(),
   isVoter: z.boolean(),
   linkedDripLists: z.string().array(),
-  validation: z.object({
-    scheduleValid: z.boolean(),
-    readyToPublish: z.boolean(),
-    applicationFormValid: z.boolean(),
-  }).nullable(),
+  validation: z
+    .object({
+      scheduleValid: z.boolean(),
+      readyToPublish: z.boolean(),
+      applicationFormValid: z.boolean(),
+    })
+    .nullable(),
   adminCount: z.number().nullable(),
+  kycProvider: z.enum(['Fern']).nullable(),
 });
 export type Round = z.infer<typeof roundSchema>;
 
@@ -84,6 +86,7 @@ export type CreateRoundDto = {
   maxVotesPerVoter: number | null;
   maxVotesPerProjectPerVoter: number | null;
   voterGuidelinesLink: string | null;
+  kycProvider: 'Fern' | null;
 };
 
 export type PatchRoundDto = Partial<Omit<CreateRoundDto, 'draft' | 'chainId'>>;

@@ -1,7 +1,7 @@
 import { PROJECT_BADGE_FRAGMENT } from '$lib/components/project-badge/project-badge.svelte';
 import query from '$lib/graphql/dripsQL';
 import network from '$lib/stores/wallet/network.js';
-import { getApplication } from '$lib/utils/rpgf/rpgf.js';
+import { getApplication, getKycRequestForApplication } from '$lib/utils/rpgf/rpgf.js';
 import { gql } from 'graphql-request';
 import type {
   ApplicationPageDripsProjectQuery,
@@ -9,11 +9,16 @@ import type {
 } from './__generated__/gql.generated.js';
 import { error } from '@sveltejs/kit';
 import { getRepoMetrics } from '$lib/utils/rpgf/oso.js';
+import type { KycRequest } from '$lib/utils/rpgf/types/kyc.js';
 
-export const load = async ({ fetch, params, parent }) => {
-  const { round } = await parent();
+export const load = async ({ fetch, params, parent, depends }) => {
+  depends('rpgf:round:applications');
+
+  const { round, rpgfUserData } = await parent();
+  const authenticated = Boolean(rpgfUserData);
 
   const application = await getApplication(fetch, round.id, params.id);
+  const isOwnApplication = rpgfUserData?.userId === application.submitter.id;
 
   const dripsProjectQuery = gql`
     ${PROJECT_BADGE_FRAGMENT}
@@ -36,6 +41,11 @@ export const load = async ({ fetch, params, parent }) => {
     throw error(404, 'Project not found');
   }
 
+  let kycRequest: KycRequest | null = null;
+  if (authenticated && (isOwnApplication || round.isAdmin)) {
+    kycRequest = await getKycRequestForApplication(fetch, application.id);
+  }
+
   // Not awaiting this so that it gets streamed to the client
   const osoCoreMetrics = getRepoMetrics(
     dripsProject.source.ownerName,
@@ -45,6 +55,7 @@ export const load = async ({ fetch, params, parent }) => {
 
   return {
     application,
+    kycRequest,
     dripsProject,
     osoCoreMetrics,
   };

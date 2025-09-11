@@ -17,10 +17,12 @@
 
   export let loading = false;
 
+  export let el: HTMLDivElement | undefined = undefined;
+
   export let onDownload: (() => void) | undefined = undefined;
 </script>
 
-<div class="table-view-configurator">
+<div class="table-view-configurator" bind:this={el}>
   {#if loading}
     <Spinner />
   {/if}

@@ -31,6 +31,11 @@ import {
 import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
 import { auditLogSchema, type AuditLog } from './types/auditLog';
+import {
+  kycRequestSchema,
+  type CreateKycRequestForApplicationDto,
+  type KycRequest,
+} from './types/kyc';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -646,4 +651,63 @@ export async function getAuditLog(
       logs: auditLogSchema.array(),
     })
     .parse(await res.json());
+}
+
+export async function createKycRequestForApplication(
+  f = fetch,
+  applicationId: string,
+  dto: CreateKycRequestForApplicationDto,
+): Promise<KycRequest> {
+  const res = await authenticatedRpgfServerCall(
+    `/kyc/applications/${applicationId}/request`,
+    'POST',
+    dto,
+    f,
+  );
+
+  return kycRequestSchema.parse(await res.json());
+}
+
+export async function getKycRequestForApplication(
+  f = fetch,
+  applicationId: string,
+): Promise<KycRequest | null> {
+  const res = await authenticatedRpgfServerCall(
+    `/kyc/applications/${applicationId}/request`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  if (res.status === 404) {
+    return null;
+  }
+
+  return kycRequestSchema.parse(await res.json());
+}
+
+export async function getKycRequestsForRound(f = fetch, roundId: string): Promise<KycRequest[]> {
+  const res = await authenticatedRpgfServerCall(
+    `/kyc/rounds/${roundId}/requests`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return kycRequestSchema.array().parse(await res.json());
+}
+
+export async function linkExistingKycRequestToApplication(
+  f = fetch,
+  applicationId: string,
+  kycRequestId: string,
+): Promise<void> {
+  await authenticatedRpgfServerCall(
+    `/kyc/applications/${applicationId}/link-existing`,
+    'POST',
+    { kycRequestId },
+    f,
+  );
+
+  return;
 }

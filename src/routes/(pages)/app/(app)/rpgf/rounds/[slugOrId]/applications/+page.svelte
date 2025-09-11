@@ -7,10 +7,13 @@
   import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
   import TableViewConfigurator from '$lib/components/table-view-configurator/table-view-configurator.svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store.js';
+  import highlightStore from '$lib/stores/highlight/highlight.store.js';
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import buildUrl from '$lib/utils/build-url.js';
   import downloadUrl from '$lib/utils/download-url.js';
   import { getApplicationsCsv } from '$lib/utils/rpgf/rpgf.js';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   export let data;
@@ -43,6 +46,29 @@
     }
   }
   $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
+
+  let tableConfiguratorEl: HTMLDivElement | undefined;
+
+  onMount(() => {
+    if (!tableConfiguratorEl) return;
+
+    const filterOnboardingDismissableKey = `rpgf-applications-filter-onboarding`;
+
+    const filterOnboardingDismissed = dismissablesStore.isDismissed(filterOnboardingDismissableKey);
+
+    if (!filterOnboardingDismissed) {
+      highlightStore.highlight({
+        title: 'Filter and sort applications',
+        description:
+          'Use this menu to see your own applications, filter by category, download CSVs, and more.',
+        element: tableConfiguratorEl,
+        borderRadius: '64px',
+        paddingPx: 8,
+      });
+
+      dismissablesStore.dismiss(filterOnboardingDismissableKey);
+    }
+  });
 </script>
 
 <HeadMeta
@@ -71,6 +97,7 @@
     <h1>Applications</h1>
     <div class="table-setting">
       <TableViewConfigurator
+        bind:el={tableConfiguratorEl}
         sortByOptions={{
           name: 'Name',
           createdAt: 'Created at',

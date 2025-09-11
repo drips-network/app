@@ -17,6 +17,7 @@
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import buildExternalUrl from '$lib/utils/build-external-url';
+  import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
 
   export let data;
   $: round = data.round;
@@ -60,6 +61,14 @@
       />
     {/if}
   </div>
+
+  {#if round.kycProvider}
+    <RpgfApplicationKycCard
+      roundId={data.round.id}
+      kycRequest={data.kycRequest}
+      applicationId={application.id}
+    />
+  {/if}
 
   <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 

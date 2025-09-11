@@ -56,6 +56,7 @@
           maxVotesPerVoter: null,
           maxVotesPerProjectPerVoter: null,
           voterGuidelinesLink: null,
+          kycProvider: null,
         });
 
         await goto(`/app/rpgf/rounds/${round.id}`);
