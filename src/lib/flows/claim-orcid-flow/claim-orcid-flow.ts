@@ -6,13 +6,13 @@ import {
 import type { Slots } from '../../components/standalone-flow-slots/standalone-flow-slots.svelte';
 import { makeStep } from '$lib/components/stepper/types';
 import ConnectWallet from './steps/connect-wallet/connect-wallet.svelte';
-import EnterGitUrl, {
+import EnterOrcidId, {
   ENTER_GIT_URL_STEP_ORCID_FRAGMENT,
 } from './steps/enter-orcid-id/enter-orcid-id.svelte';
 import AddEthereumAddress, {
   ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT,
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
-import ProjectSlot from './slots/orcid-slot.svelte';
+import OrcidSlot from './slots/orcid-slot.svelte';
 // import SplitYourFunds from './steps/split-your-funds/split-your-funds.svelte';
 // import ConfigureMaintainers from './steps/configure-maintainers/configure-maintainers.svelte';
 // import ConfigureDependencies from './steps/configure-dependencies/configure-dependencies.svelte';
@@ -49,6 +49,7 @@ export interface State {
   claimableAccount: ClaimOrcidFlowOrcidFragment | undefined;
   claimableMetadata: OrcidMetadata | undefined;
   claimableContext: Record<string, unknown>| undefined;
+  claimableProof: unknown;
 
   linkedToClaimable: boolean;
   gaslessOwnerUpdateTaskId: string | undefined;
@@ -98,6 +99,7 @@ export const state = () =>
     claimableAccount: undefined,
     claimableMetadata: undefined,
     claimableContext: undefined,
+    claimableProof: undefined,
     gaslessOwnerUpdateTaskId: undefined,
     recipientErrors: [],
 
@@ -126,9 +128,9 @@ export const state = () =>
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
-  const projectSlot = {
+  const orcidSlot = {
     leftComponent: {
-      component: ProjectSlot,
+      component: OrcidSlot,
       props: {
         orcidAccount: state.claimableAccount,
       },
@@ -152,15 +154,15 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
 
   switch (stepIndex) {
     case 2:
-      return [projectSlot];
+      return [orcidSlot];
     case 3:
-      return [projectSlot, walletSlot];
+      return [orcidSlot, walletSlot];
     case 4:
-      return [projectSlot, walletSlot];
+      return [orcidSlot, walletSlot];
     case 5:
-      return [projectSlot, walletSlot];
+      return [orcidSlot, walletSlot];
     case 6:
-      return [projectSlot, walletSlot];
+      return [orcidSlot, walletSlot];
     case 7:
       return [];
     default:
@@ -179,7 +181,7 @@ export const steps = (
     props: undefined,
   }),
   makeStep({
-    component: EnterGitUrl,
+    component: EnterOrcidId,
     props: {
       orcidId: claimableId,
     },
