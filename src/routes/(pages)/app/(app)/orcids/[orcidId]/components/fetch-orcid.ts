@@ -53,8 +53,8 @@ export async function fetchOrcidAccount(accountId: string, fetch: typeof global.
   return query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
     getOrcidQuery,
     {
-      accountId,
-      chains: [network.gqlName],
+      orcid: accountId,
+      chain: network.gqlName,
     },
     fetch,
   );

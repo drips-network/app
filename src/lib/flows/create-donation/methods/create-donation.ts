@@ -28,6 +28,7 @@ import type {
   CreateDonationDetailsStepOrcidFragment
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
+import type { OneTimeDonationSupport } from '$lib/graphql/__generated__/base-types';
 
 const projectSupportQuery = gql`
   query ProjectOTDs($id: ID!, $chains: [SupportedChain!]!) {
@@ -238,7 +239,7 @@ export default function (
               );
               break;
             // TODO: Verify!
-            case 'OrcidAccount':
+            case 'OrcidLinkedIdentity':
               await expect(
                 () =>
                   query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
@@ -248,7 +249,9 @@ export default function (
                 (res) => {
                   const orcidData = res.orcidLinkedIdentityByOrcid;
                   if (!orcidData) return true;
-                  return filterOrcidCurrentChainData(orcidData.chainData).support.some((support) => {
+                  // TODO: add support
+                  const orcidDataSupport: OneTimeDonationSupport[] = []
+                  return orcidDataSupport.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,
