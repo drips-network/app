@@ -68,6 +68,8 @@
       roundId={data.round.id}
       kycRequest={data.kycRequest}
       applicationId={application.id}
+      isOwnApplication={data.application.submitter.id === data.rpgfUserData?.userId}
+      isRoundAdmin={round.isAdmin}
     />
   {/if}
 

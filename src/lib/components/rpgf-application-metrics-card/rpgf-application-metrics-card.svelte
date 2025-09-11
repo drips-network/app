@@ -15,7 +15,7 @@
   };
 </script>
 
-<RpgfApplicationDetailsCard title="Key metrics" key="key-metrics">
+<RpgfApplicationDetailsCard title="Key code metrics" key="key-metrics">
   <svelte:fragment slot="right">
     <div
       class="oso-logo typo-text-small"
