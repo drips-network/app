@@ -29,7 +29,7 @@
 
   export const CREATE_STREAM_FLOW_ORCID_FRAGMENT = gql`
     ${DRIP_VISUAL_ORCID_FRAGMENT}
-    fragment CreateStreamFlowOrcidAccount on OrcidAccount {
+    fragment CreateStreamFlowOrcidAccount on OrcidLinkedIdentity {
       ...DripVisualOrcid
       account {
         accountId

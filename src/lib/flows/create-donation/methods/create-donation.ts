@@ -92,33 +92,37 @@ const ecosystemSupportQuery = gql`
   }
 `;
 
+
+// TODO
+// chainData {
+//   ... on ClaimedOrcidAccountData {
+//     chain
+//     support {
+//       ... on OneTimeDonationSupport {
+//         account {
+//           accountId
+//         }
+//         date
+//       }
+//     }
+//   }
+//   ... on UnClaimedOrcidAccountData {
+//     chain
+//     support {
+//       ... on OneTimeDonationSupport {
+//         account {
+//           accountId
+//         }
+//         date
+//       }
+//     }
+//   }
+// }
+
 const orcidSupportQuery = gql`
-  query OrcidOTDs($accountId: ID!, $chains: [SupportedChain!]) {
-    orcidAccountById(id: $accountId, chains: $chains) {
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-          support {
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-              date
-            }
-          }
-        }
-        ... on UnClaimedOrcidAccountData {
-          chain
-          support {
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-              date
-            }
-          }
-        }
-      }
+  query OrcidOTDs($orcid: String!, $chain: SupportedChain!) {
+    orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+      chain
     }
   }
 `;
@@ -238,11 +242,11 @@ export default function (
               await expect(
                 () =>
                   query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
-                    accountId: recipientAccountId,
-                    chains: [network.gqlName],
+                    orcid: recipientAccountId,
+                    chain: network.gqlName,
                   }),
                 (res) => {
-                  const orcidData = res.orcidAccountById;
+                  const orcidData = res.orcidLinkedIdentityByOrcid;
                   if (!orcidData) return true;
                   return filterOrcidCurrentChainData(orcidData.chainData).support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;

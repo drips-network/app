@@ -44,7 +44,7 @@
 
   export const CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT = gql`
     ${DRIP_VISUAL_ORCID_FRAGMENT}
-    fragment CreateDonationDetailsStepOrcid on OrcidAccount {
+    fragment CreateDonationDetailsStepOrcid on OrcidLinkedIdentity {
       ...DripVisualOrcid
       account {
         accountId

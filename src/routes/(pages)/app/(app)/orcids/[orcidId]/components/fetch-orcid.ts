@@ -42,8 +42,8 @@ export async function fetchOrcid(orcidId: string, fetch: typeof global.fetch) {
 
 const getOrcidQuery = gql`
   ${ORCID_PROFILE_FRAGMENT}
-  query OrcidByAccountId($accountId: ID!, $chains: [SupportedChain!]) {
-    orcidAccountById(id: $accountId, chains: $chains) {
+  query OrcidByAccountId($orcid: String!, $chain: SupportedChain!) {
+    orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
       ...OrcidProfile
     }
   }

@@ -2,10 +2,8 @@
   import { gql } from 'graphql-request';
 
   export const ORCID_NAME_FRAGMENT = gql`
-    fragment OrcidName on OrcidAccount {
-      source {
-        url
-      }
+    fragment OrcidName on OrcidLinkedIdentity {
+      orcid
     }
   `;
 </script>

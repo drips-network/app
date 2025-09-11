@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export const REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT = gql`
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
-    fragment ReviewStepUnclaimedOrcid on OrcidAccount {
+    fragment ReviewStepUnclaimedOrcid on OrcidLinkedIdentity {
       ...UnclaimedOrcidCard
     }
   `;

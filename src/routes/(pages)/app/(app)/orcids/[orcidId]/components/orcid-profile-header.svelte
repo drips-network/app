@@ -1,18 +1,12 @@
 <script lang="ts" context="module">
   export const ORCID_PROFILE_HEADER_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
-    fragment OrcidProfileHeader on OrcidAccount {
+    fragment OrcidProfileHeader on OrcidLinkedIdentity {
       ...OrcidBadge
-      source {
-        url
-      }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-          headerLinkedTo: linkedTo {
-            address
-          }
-        }
+      orcid
+      chain
+      owner {
+        address
       }
     }
   `;
