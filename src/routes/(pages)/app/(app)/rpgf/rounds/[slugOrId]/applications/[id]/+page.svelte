@@ -167,7 +167,13 @@
 
       <div class="field">
         <h2 class="typo-header-4">GitHub repository</h2>
-        <ProjectBadge size="tiny" forceUnclaimed project={data.dripsProject} tooltip={false} />
+        <ProjectBadge
+          linkTo="external-url"
+          size="tiny"
+          forceUnclaimed
+          project={data.dripsProject}
+          tooltip={false}
+        />
       </div>
 
       <div class="field">
