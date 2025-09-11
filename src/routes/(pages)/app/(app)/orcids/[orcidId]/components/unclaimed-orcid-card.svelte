@@ -35,10 +35,7 @@
     mergeSplittableFunds,
   } from '$lib/utils/merge-withdrawable-balances';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
-  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { UnClaimedOrcidAccountData } from '$lib/graphql/__generated__/base-types';
   import OrcidBadge, { ORCID_BADGE_FRAGMENT } from './orcid-badge.svelte';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
@@ -50,10 +47,9 @@
 
   export let orcidAccount: UnclaimedOrcidCardFragment;
 
-  $: orcidChainData = filterCurrentChainData(orcidAccount.chainData) as UnClaimedOrcidAccountData;
-
-  $: collectableFunds = mergeCollectableFunds(orcidChainData.withdrawableBalances);
-  $: splittableFunds = mergeSplittableFunds(orcidChainData.withdrawableBalances);
+  // TODO: where are the funds?
+  $: collectableFunds = mergeCollectableFunds([]);
+  $: splittableFunds = mergeSplittableFunds([]);
 
   $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 
