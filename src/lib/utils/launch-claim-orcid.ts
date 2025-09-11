@@ -5,18 +5,18 @@ import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
 import buildUrl from './build-url';
 
-export default function launchClaimOrcid(orcidUrl?: string) {
+export default function launchClaimOrcid(orcidId?: string) {
   if (get(walletStore).connected) {
     modal.show(ClaimOrcidStepper, undefined, {
       skipWalletConnect: true,
-      orcidUrl,
+      orcidId,
     });
     return;
   }
 
   const claimOrcidPath = '/app/claim-orcid';
-  if (orcidUrl) {
-    goto(buildUrl(claimOrcidPath, { orcidUrl }));
+  if (orcidId) {
+    goto(buildUrl(claimOrcidPath, { orcidId }));
     return;
   }
 
