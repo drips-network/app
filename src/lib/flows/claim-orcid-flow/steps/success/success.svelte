@@ -8,11 +8,9 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import buildUrl from '$lib/utils/build-url';
   import assert from '$lib/utils/assert';
-  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
 
   export let context: Writable<State>;
 
@@ -22,30 +20,24 @@
 
   $: safeAppMode = Boolean($walletStore.safe);
 
-  async function viewProject() {
+  async function viewOrcid() {
     loading = true;
 
-    const forge = $context.project?.source.forge;
-    const username = $context.project?.source.ownerName;
-    const repoName = $context.project?.source.repoName;
-    const projectChainData = $context.project?.chainData
-      ? (filterCurrentChainData($context.project.chainData) as ClaimedProjectData)
-      : undefined;
-
-    const collectedFunds =
-      mergeAmounts(
-        projectChainData?.withdrawableBalances.map((wb) => ({
-          tokenAddress: wb.tokenAddress,
-          amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
-        })) ?? [],
-      ).length > 0;
+    const collectedFunds = false
+    // const collectedFunds =
+    //   mergeAmounts(
+    //     projectChainData?.withdrawableBalances.map((wb) => ({
+    //       tokenAddress: wb.tokenAddress,
+    //       amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
+    //     })) ?? [],
+    //   ).length > 0;
 
     const ownAccountId = $walletStore.dripsAccountId;
     assert(ownAccountId);
 
     await goto(
       buildUrl(
-        `/app/projects/${forge?.toLowerCase()}/${username}/${repoName}?exact`,
+        buildOrcidUrl($context.claimableId),
         collectedFunds ? { collectHint: 'true' } : {},
       ),
     ).then(() => {
@@ -61,17 +53,17 @@
   {:else if safeAppMode}
     <h4>Continue in your Safe</h4>
     <p>
-      The project claim transaction has successfully been proposed to your Safe. Once it's executed,
-      navigate to Projects on your Dashboard to view your newly-claimed project.
+      The ORCID claim transaction has successfully been proposed to your Safe. Once it's executed,
+      navigate to ORCIDs on your Dashboard to view your newly-claimed ORCID.
     </p>
     <a href="/app/projects">
-      <Button variant="primary" icon={ArrowBoxUpRight}>View your projects</Button>
+      <Button variant="primary" icon={ArrowBoxUpRight}>View your ORCIDs</Button>
     </a>
   {:else}
     <h4>Congratulations!</h4>
-    <p>Youʼve successfully claimed your project.</p>
-    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewProject}
-      >View project profile</Button
+    <p>Youʼve successfully claimed your ORCID.</p>
+    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewOrcid}
+      >View ORCID profile</Button
     >
   {/if}
 </div>
