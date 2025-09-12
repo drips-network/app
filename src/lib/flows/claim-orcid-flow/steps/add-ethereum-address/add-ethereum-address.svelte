@@ -38,14 +38,12 @@
       ? 'ethereum'
       : $walletStore.network.name
     : unreachable();
-  $: link = `http://0.0.0.0/?ethereum_owned_by=${$walletStore.address}&orcid=${$context.claimableId}`
-  $: editing = !!$context.claimableProof
+  $: link = `http://0.0.0.0/?ethereum_owned_by=${$walletStore.address}&orcid=${$context.claimableId}`;
+  $: editing = !!$context.claimableProof;
   $: description = editing
     ? `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`
     : `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`;
-  $: checkboxLabel = editing
-    ? 'I edited link'
-    : 'I added this to my ORCID profile';
+  $: checkboxLabel = editing ? 'I edited link' : 'I added this to my ORCID profile';
 
   onMount(() => {
     $context.linkedToClaimable = false;
@@ -60,41 +58,27 @@
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 
-        await verifyOrcidClaim($context.claimableId, address)
+        await verifyOrcidClaim($context.claimableId, address);
 
         $context.linkedToClaimable = true;
 
         // Split 100% to the owner of this ORCID
         // TODO: is here the right place?
-        context.update(c => {
+        context.update((c) => {
           c.maintainerSplits = {
             items: {
               [$walletStore.dripsAccountId]: {
                 type: 'address',
-                address: $walletStore.address
-              }
+                address: $walletStore.address,
+              },
             },
             weights: {
-              [$walletStore.dripsAccountId]: 1000000
-            }
-          }
+              [$walletStore.dripsAccountId]: 1000000,
+            },
+          };
 
-          return c
-        })
-
-        // const highLevelPercentages = { 'maintainers':  100 }
-        // const maintainers: ListEditorConfig = {
-        //   items: {
-        //     [ownerAccountId]: {
-        //       type: 'address',
-        //       address: ownerAccountAddress
-        //     }
-        //   },
-        //   weights: {
-        //     [ownerAccountId]: 1000000
-        //   }
-        // }
-        // const dependencies: ListEditorConfig = { items: {}, weights: {} }
+          return c;
+        });
 
         if ($context.isPartiallyClaimed) {
           // If the project already has the right owner, we don't need to kick off a repo owner update again
@@ -135,8 +119,7 @@
         }
       },
       message: 'Verifying...',
-      subtitle:
-        `We’re scanning your ORCID profile for the link with your ${network} address`,
+      subtitle: `We’re scanning your ORCID profile for the link with your ${network} address`,
     });
   }
 
@@ -146,16 +129,10 @@
 
 <StandaloneFlowStepLayout headline="Verify ownership" {description}>
   <p>First add a new link to your profile</p>
-  <CodeBox
-    path="Link name"
-    code={CLAIMING_URL_NAME}
-  />
+  <CodeBox path="Link name" code={CLAIMING_URL_NAME} />
   <p>Then add the link</p>
   <!-- TODO: fix link overflowing container -->
-  <CodeBox
-    path="Link"
-    code={link}
-  />
+  <CodeBox path="Link" code={link} />
   <Checkbox bind:checked label={checkboxLabel} />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
