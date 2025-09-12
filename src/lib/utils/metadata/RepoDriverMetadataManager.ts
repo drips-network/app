@@ -12,7 +12,7 @@ import { Forge, type OxString } from '../sdk/sdk-types';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { executeRepoDriverReadMethod } from '../sdk/repo-driver/repo-driver';
 import filterCurrentChainData from '../filter-current-chain-data';
-import type { ClaimedProjectData, Project } from '$lib/graphql/__generated__/base-types';
+import type { ClaimedProjectData, OrcidLinkedIdentity, Project } from '$lib/graphql/__generated__/base-types';
 import network from '$lib/stores/wallet/network';
 
 type AccountId = string;
@@ -98,6 +98,17 @@ export default class RepoDriverMetadataManager extends MetadataManagerBase<
 
     return metadata;
   }
+
+  // public buildOrcidAccountMetadata(orcidAccount: PickGQLF<OrcidLinkedIdentity, 'account' | 'orcid'>) {
+  //   return {
+  //     driver: 'repo',
+  //     describes: {
+  //       driver: 'repo',
+  //       accountId: orcidAccount.account.accountId,
+  //     },
+  //     orcid: orcidAccount.orcid
+  //   };
+  // }
 
   public buildAccountMetadata(context: {
     forProject: PickGQLF<Project, 'account' | 'source' | 'isVisible'> & {
