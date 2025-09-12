@@ -3,6 +3,7 @@ import assert from '$lib/utils/assert';
 import deduplicateReadable from '../deduplicate-readable';
 import { z } from 'zod';
 import { formatUnits, getAddress, isAddress } from 'ethers';
+import { browser } from '$app/environment';
 
 type TokenAddress = string;
 type DataProviderTokenId = number;
@@ -31,6 +32,8 @@ const started = writable(false);
 
 /** Establish a connection to the data provider. */
 export async function start() {
+  if (!browser) return;
+
   const idMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
 
   idMap = z.record(z.string(), z.number()).parse(idMapRes);
@@ -42,6 +45,8 @@ export async function start() {
 
 /** Start tracking the provided addresses. */
 export async function track(addresses: TokenAddress[]) {
+  if (!browser) return;
+
   assert(
     idMap,
     'Store not started, ensure `start` is called and wait for `started` to be true first.',

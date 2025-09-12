@@ -3,6 +3,7 @@ import assert from '$lib/utils/assert';
 import network from '../wallet/network';
 import walletStore from '../wallet/wallet.store';
 import { getMainnetProvider, safeReverseLookup } from './ens';
+import { browser } from '$app/environment';
 
 export interface ResolvedRecord {
   name?: string;
@@ -23,6 +24,8 @@ export default (() => {
    * @param address The address to attempt resolving.
    */
   async function lookup(address: string): Promise<ResolvedRecord | undefined> {
+    if (!browser) return undefined;
+
     if (!network.enableEns || !mainnetProvider) {
       return undefined;
     }
@@ -74,6 +77,8 @@ export default (() => {
    * name in the store state.
    */
   async function reverseLookup(name: string): Promise<string | undefined> {
+    if (!browser) return undefined;
+
     if (!network.enableEns || !mainnetProvider) {
       return undefined;
     }

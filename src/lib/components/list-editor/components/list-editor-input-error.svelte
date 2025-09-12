@@ -19,7 +19,7 @@
   {@const textColor = `var(--color-${color}-level-6)`}
   {#if !error.suberrors?.length}
     <div
-      transition:slide|global={{ duration: 300 }}
+      transition:slide={{ duration: 300 }}
       class="error {error.severity}"
       style:background-color="var(--color-{color}-level-1)"
       style:color={textColor}
@@ -53,7 +53,7 @@
         </div>
       </button>
       {#key expanded}
-        <div class:hidden={!expanded} transition:slide|global={{ duration: 300 }}>
+        <div class:hidden={!expanded} transition:slide={{ duration: 300 }}>
           {#each error.suberrors as suberror, index (index)}
             <div
               class="suberror error {error.severity} typo-text"
