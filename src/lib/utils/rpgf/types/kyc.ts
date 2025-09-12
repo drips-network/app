@@ -3,6 +3,9 @@ import z from 'zod';
 const kycTypeSchema = z.enum(['INDIVIDUAL', 'BUSINESS']);
 export type KycType = z.infer<typeof kycTypeSchema>;
 
+export const kycProviderSchema = z.enum(['Fern']);
+export type KycProvider = z.infer<typeof kycProviderSchema>;
+
 const kycStatusSchema = z.enum([
   'CREATED',
   'UNDER_REVIEW',
