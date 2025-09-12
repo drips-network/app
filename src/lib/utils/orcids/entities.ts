@@ -1,6 +1,6 @@
 import type { OrcidApiResponse } from './schemas';
 
-const CLAIMING_URL_NAME = 'DRIPS_OWNERSHIP_CLAIM';
+export const CLAIMING_URL_NAME = 'DRIPS_OWNERSHIP_CLAIM';
 
 /**
  * A convenience class for working with crazily nested

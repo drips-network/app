@@ -1,11 +1,11 @@
 import { gql } from 'graphql-request';
-import { ORCID_PROFILE_FRAGMENT } from './orcid-profile-fragments';
+import { ORCID_PROFILE_FRAGMENT } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-profile-fragments';
 import network from '$lib/stores/wallet/network';
 import query from '$lib/graphql/dripsQL';
 import type {
   OrcidByAccountIdQuery,
   OrcidByAccountIdQueryVariables,
-} from './__generated__/gql.generated';
+} from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/__generated__/gql.generated';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
