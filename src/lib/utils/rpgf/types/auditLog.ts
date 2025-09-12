@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ethereumAddressSchema } from './user';
+import { kycProviderSchema } from './kyc';
 
 // Enum Schema
 export const auditLogActionSchema = z.enum([
@@ -22,6 +23,9 @@ export const auditLogActionSchema = z.enum([
   'application_form_created',
   'application_form_updated',
   'application_form_deleted',
+  'kyc_request_created',
+  'kyc_request_linked_to_application',
+  'kyc_request_updated',
 ]);
 export type AuditLogAction = z.infer<typeof auditLogActionSchema>;
 
@@ -47,11 +51,34 @@ const applicationCategoryDeletedPayloadSchema = z.any();
 const applicationFormCreatedPayloadSchema = z.any();
 const applicationFormUpdatedPayloadSchema = z.any();
 const applicationFormDeletedPayloadSchema = z.any();
+const kycRequestCreatedPayloadSchema = z.any();
+const kycRequestLinkedToApplicationPayloadSchema = z.any();
+const kycRequestUpdatedPayloadSchema = z.any();
+
+const userActorSchema = z.object({
+  type: z.literal('user'),
+  userId: z.string(),
+  walletAddress: ethereumAddressSchema,
+});
+const systemActorSchema = z.object({
+  type: z.literal('system'),
+});
+const kycProviderActorSchema = z.object({
+  type: z.literal('kyc_provider'),
+  provider: kycProviderSchema,
+});
+
+const actorSchema = z.discriminatedUnion('type', [
+  userActorSchema,
+  systemActorSchema,
+  kycProviderActorSchema,
+]);
+export type AuditLogActor = z.infer<typeof actorSchema>;
 
 // Base schema for common fields
 const baseAuditLogSchema = z.object({
   id: z.number(),
-  userWalletAddress: ethereumAddressSchema,
+  actor: actorSchema,
   createdAt: z.string().transform((str) => new Date(str)),
 });
 
@@ -132,6 +159,18 @@ export const auditLogSchema = z.discriminatedUnion('action', [
   baseAuditLogSchema.extend({
     action: z.literal(auditLogActionSchema.enum.application_form_deleted),
     payload: applicationFormDeletedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.kyc_request_created),
+    payload: kycRequestCreatedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.kyc_request_linked_to_application),
+    payload: kycRequestLinkedToApplicationPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.kyc_request_updated),
+    payload: kycRequestUpdatedPayloadSchema,
   }),
 ]);
 

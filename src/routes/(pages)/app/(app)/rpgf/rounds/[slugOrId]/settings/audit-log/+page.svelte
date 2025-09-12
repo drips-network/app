@@ -1,13 +1,13 @@
 <script lang="ts">
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import formatDate from '$lib/utils/format-date';
-  import type { AuditLogAction } from '$lib/utils/rpgf/types/auditLog';
+  import type { AuditLogAction, AuditLogActor } from '$lib/utils/rpgf/types/auditLog';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
   import modal from '$lib/stores/modal';
   import LogDetailModal from './components/log-detail-modal.svelte';
+  import LogActorCell from './components/log-actor-cell.svelte';
 
   export let data;
 
@@ -31,12 +31,13 @@
     application_form_created: 'Application form created',
     application_form_updated: 'Application form updated',
     application_form_deleted: 'Application form deleted',
+    kyc_request_created: 'KYC created',
+    kyc_request_linked_to_application: 'KYC linked to application',
+    kyc_request_updated: 'KYC status updated',
   } as const;
 
   interface LogTableRow {
-    user: {
-      address: string;
-    };
+    actor: { actor: AuditLogActor };
     action: string;
     createdAt: string;
   }
@@ -50,9 +51,9 @@
       enableSorting: false,
     },
     {
-      accessorKey: 'user',
+      accessorKey: 'actor',
       header: 'User',
-      cell: () => IdentityBadge,
+      cell: () => LogActorCell,
       size: 1,
       enableSorting: false,
     },
@@ -66,7 +67,7 @@
   ];
 
   $: logTableData = data.auditLog.map((entry) => ({
-    user: { address: entry.userWalletAddress },
+    actor: { actor: entry.actor },
     action: FRIENDLY_NAME_MAP[entry.action],
     createdAt: formatDate(entry.createdAt),
   }));
@@ -91,6 +92,3 @@
     />
   </PaddedHorizontalScroll>
 </RpgfSettingsForm>
-
-<style>
-</style>
