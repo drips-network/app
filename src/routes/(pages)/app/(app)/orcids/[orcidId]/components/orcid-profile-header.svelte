@@ -33,7 +33,7 @@
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
   <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
     <div class="avatar">
-      <OrcidAvatar size="huge" outline/>
+      <OrcidAvatar size="huge" outline />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
       <h1>{orcid.name}</h1>
@@ -44,11 +44,19 @@
           >{@html twemoji(orcid.bio)}
         </span>
       {/if}
-      <div style:display="flex" style:gap="0.75rem" style:margin-top="0.5rem" style:flex-wrap="wrap">
+      <div class="secondary">
         {#if orcidAccount.owner}
           <IdentityBadge address={orcidAccount.owner.address} />
         {/if}
-        <OrcidBadge size="tiny" orcid={orcidAccount} forceUnclaimed tooltip={false} linkTo="external-url" outlined copyable/>
+        <OrcidBadge
+          size="tiny"
+          orcid={orcidAccount}
+          forceUnclaimed
+          tooltip={false}
+          linkTo="external-url"
+          outlined
+          copyable
+        />
         {#if shareButton}
           <ShareButton buttonVariant="muted" {...shareButton} />
         {/if}
@@ -58,5 +66,11 @@
 </div>
 
 <style>
-
+  .secondary {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 </style>
