@@ -74,7 +74,7 @@ function transformReceiverToSdkReceiver(
         accountId: BigInt(receiver.account.accountId),
       } as SdkEcosystemMainAccountReceiver;
 
-    case 'OrcidAccount':
+    case 'OrcidLinkedIdentity':
       return {
         type: 'orcid-account',
         accountId: BigInt(receiver.account.accountId),

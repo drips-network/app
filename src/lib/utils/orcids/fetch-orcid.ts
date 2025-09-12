@@ -2,16 +2,13 @@ import { gql } from 'graphql-request';
 import { ORCID_PROFILE_FRAGMENT } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-profile-fragments';
 import network from '$lib/stores/wallet/network';
 import query from '$lib/graphql/dripsQL';
-import type {
-  OrcidByAccountIdQuery,
-  OrcidByAccountIdQueryVariables,
-} from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/__generated__/gql.generated';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { PUBLIC_ORCID_API_URL } from '$env/static/public';
 import { OrcidApiResponseSchema } from '$lib/utils/orcids/schemas';
 import Orcid from '$lib/utils/orcids/entities';
+import type { OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables } from './__generated__/gql.generated';
 
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
