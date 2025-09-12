@@ -65,7 +65,8 @@
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 
-        await verifyOrcidClaim($context.claimableId, address);
+        // todo: TEMPORARYILY DISABLED FOR TESTING
+        // await verifyOrcidClaim($context.claimableId, address);
 
         $context.linkedToClaimable = true;
 
