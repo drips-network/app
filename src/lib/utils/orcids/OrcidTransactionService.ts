@@ -1,144 +1,63 @@
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
 import MetadataManagerBase from '../metadata/MetadataManagerBase';
-import type { State } from '$lib/flows/claim-project-flow/claim-project-flow';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import type { LatestVersion } from '@efstajas/versioned-parser';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
-import GitHub from '../github/GitHub';
-import { Octokit } from '@octokit/rest';
-import { hexlify, toBigInt, toUtf8Bytes } from 'ethers';
+import { toBigInt } from 'ethers';
 import type { OxString } from '../sdk/sdk-types';
 import {
   populateRepoDriverWriteTx,
-  executeRepoDriverReadMethod,
 } from '../sdk/repo-driver/repo-driver';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import type { ContractTransaction } from 'ethers';
 import { populateDripsWriteTx } from '../sdk/drips/drips';
 import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
-import filterCurrentChainData from '../filter-current-chain-data';
-import unreachable from '../unreachable';
 import network from '$lib/stores/wallet/network';
 import {
   executeRepoSubAccountDriverReadMethod,
   populateRepoSubAccountDriverWriteTx,
 } from '../sdk/repo-sub-account-driver/repo-sub-account-driver';
+import type Orcid from './entities';
+import { fetchOrcid, orcidIdToAccountId } from './fetch-orcid';
+import type { State } from '$lib/flows/claim-orcid-flow/claim-orcid-flow';
 import type { ListEditorConfig } from '$lib/components/list-editor/types';
+import type { MergeWithdrawableBalancesFragment } from '../__generated__/gql.generated';
 
-export default class GitProjectService {
-  private _github!: GitHub;
+export default class OrcidTransactionService {
+  // private _github!: GitHub;
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
   private constructor() {}
 
-  public static async new(): Promise<GitProjectService> {
-    const gitProjectService = new GitProjectService();
+  // TODO: doesn't need to be async?
+  public static async new(): Promise<OrcidTransactionService> {
+    const orcidTransactionService = new OrcidTransactionService();
 
-    const octokit = new Octokit();
-    gitProjectService._github = new GitHub(octokit);
+    // const octokit = new Octokit();
+    // gitProjectService._github = new GitHub(octokit);
 
     const { connected, signer, address } = get(wallet);
 
     if (connected) {
       assert(signer, 'Signer address is undefined.');
 
-      gitProjectService._connectedAddress = address;
+      orcidTransactionService._connectedAddress = address;
     }
 
-    return gitProjectService;
+    return orcidTransactionService;
   }
 
-  public static deconstructUrl(url: string): {
-    forge: Forge;
-    username: string;
-    repoName: string;
-  } {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
+  public async getOrcidInfo(orcid: string): Promise<Orcid> {
+    const orcidProfile = await fetchOrcid(orcid, fetch)
+    if (!orcidProfile) {
+      throw new Error(`Cannot get orcid info`);
     }
 
-    // If URL ends with /, remove it
-    if (url.endsWith('/')) {
-      url = url.slice(0, -1);
-    }
-
-    const parsedURL = new URL(url);
-
-    // TODO: support more forges.
-    let forge: Forge;
-    switch (parsedURL.hostname) {
-      case 'github.com':
-        forge = Forge.GitHub;
-        break;
-      default:
-        throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
-    }
-
-    const name = parsedURL.pathname.startsWith('/')
-      ? parsedURL.pathname.slice(1)
-      : parsedURL.pathname;
-    const [username, repoName] = name.split('/');
-
-    return { forge, username, repoName };
-  }
-
-  public static populateSource(
-    forge: Forge,
-    repoName: string,
-    username: string,
-  ): LatestVersion<typeof repoDriverAccountMetadataParser>['source'] {
-    let url: string;
-
-    switch (forge) {
-      case Forge.GitHub:
-        url = `https://github.com/${username}/${repoName}`;
-        break;
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
-
-    switch (forge) {
-      case Forge.GitHub:
-        return {
-          url,
-          repoName,
-          forge: 'github',
-          ownerName: username,
-        };
-      default:
-        throw new Error(`Unsupported forge: ${forge}`);
-    }
-  }
-
-  public async getProjectInfo(url: string): Promise<{
-    description: string | null;
-    defaultBranch: string | null;
-    starsCount: number;
-    forksCount: number;
-  }> {
-    const forge = this._getForge(url);
-
-    if (forge === Forge.GitHub) {
-      const {
-        description,
-        forks_count: forksCount,
-        stargazers_count: starsCount,
-        default_branch: defaultBranch,
-      } = await this._github.getRepoByUrl(url);
-
-      return {
-        forksCount,
-        starsCount,
-        description,
-        defaultBranch,
-      };
-    } else {
-      throw new Error(`Cannot get project info: unsupported forge: ${forge}`);
-    }
+    return orcidProfile
   }
 
   public async buildUpdateSplitsBatchTx(
@@ -155,7 +74,7 @@ export default class GitProjectService {
       accountId,
       highLevelPercentages,
       maintainers,
-      dependencies,
+      // dependencies,
     );
 
     const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
@@ -206,28 +125,15 @@ export default class GitProjectService {
   }
 
   public async buildBatchTx(context: State): Promise<ContractTransaction[]> {
-    const { forge, username, repoName } = GitProjectService.deconstructUrl(context.gitUrl);
-
-    const accountId = (
-      await executeRepoDriverReadMethod({
-        functionName: 'calcAccountId',
-        args: [
-          forge === Forge.GitHub ? 0 : unreachable(),
-          hexlify(toUtf8Bytes(`${username}/${repoName}`)) as OxString,
-        ], // TODO: Change hard-coded Forge logic to dynamic when other forges are supported.
-      })
-    ).toString();
+    const accountId = (await orcidIdToAccountId(context.claimableId)).toString()
 
     const {
       tx: setSplitsTx,
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
       receivers,
     } = await this._buildSetSplitsTxAndMetadata(
       accountId,
       context.highLevelPercentages,
       context.maintainerSplits,
-      context.dependencySplits,
     );
 
     const repoSubAccountDriverExists = network.contracts.SUB_ACCOUNT_REPO_DRIVER !== undefined;
@@ -244,47 +150,36 @@ export default class GitProjectService {
       ).tx;
     }
 
-    const project = {
-      __typename: 'Project' as const,
-      account: {
-        __typename: 'RepoDriverAccount' as const,
+    // Create a fake ORCID that adheres to metadata parsing type
+    // TODO: Use RepoDriverMetadataManager to construct metadata that
+    // adheres to a yet-to-be-introduced structure
+    const orcidAccountMetadata = {
+      driver: 'repo' as const,
+      describes: {
+        driver: 'repo' as const,
         accountId,
-        driver: Driver.Repo,
       },
       source: {
-        __typename: 'Source' as const,
-        forge: forge,
-        ownerName: username,
-        repoName: repoName,
-        url: context.gitUrl,
-      },
-      chainData: {
-        __typename: 'ClaimedProjectData',
-        chain: network.gqlName,
-        color: context.projectColor,
-        avatar:
-          context.avatar.type === 'emoji'
-            ? {
-                __typename: 'EmojiAvatar' as const,
-                emoji: context.avatar.emoji,
-              }
-            : {
-                __typename: 'ImageAvatar' as const,
-                cid: context.avatar.cid,
-              },
+        forge: 'github' as const,
+        repoName: 'orcid-account',
+        ownerName: context.claimableId,
+        url: `https://orcid.org/${context.claimableId}`,
       },
       isVisible: true,
+      avatar: {
+        type: 'emoji' as const,
+        emoji: '👤',
+      },
+      color: '#16a085',
+      description: `ORCID account for ${context.claimableId}`,
+      splits: {
+        maintainers: [],
+        dependencies: [],
+      },
+      orcid: context.claimableId,
     };
 
-    const metadata = this._repoDriverMetadataManager.buildAccountMetadata({
-      forProject: project,
-      forSplits: {
-        dependencies: dependenciesSplitMetadata,
-        maintainers: maintainersSplitsMetadata,
-      },
-    });
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(metadata);
+    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(orcidAccountMetadata);
 
     const accountMetadataAsBytes = [
       {
@@ -298,18 +193,9 @@ export default class GitProjectService {
       args: [toBigInt(accountId), accountMetadataAsBytes],
     });
 
-    const projectChainData = context.project?.chainData
-      ? filterCurrentChainData(context.project.chainData)
-      : unreachable();
 
-    const splittableAmounts =
-      'withdrawableBalances' in projectChainData
-        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n)
-        : undefined;
-    const collectableAmounts =
-      'withdrawableBalances' in projectChainData
-        ? projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n)
-        : undefined;
+    const splittableAmounts: MergeWithdrawableBalancesFragment[] = []
+    const collectableAmounts: MergeWithdrawableBalancesFragment[] = []
 
     const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
@@ -404,63 +290,11 @@ export default class GitProjectService {
     accountId: string,
     highLevelPercentages: { [slug: string]: number },
     maintainerListEditorConfig: ListEditorConfig,
-    dependencyListEditorConfig: ListEditorConfig,
   ) {
     const receivers: ((
       | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'][number]
       | LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['dependencies'][number]
     ) & { sublist: 'dependencies' | 'maintainers' })[] = [];
-
-    for (const [accountId, weight] of Object.entries(dependencyListEditorConfig.weights)) {
-      const item = dependencyListEditorConfig.items[accountId];
-
-      const scaledWeight = Math.floor(
-        Math.floor(weight * (highLevelPercentages['dependencies'] / 100)),
-      );
-
-      if (scaledWeight === 0) continue;
-
-      switch (item.type) {
-        case 'address': {
-          const receiver = {
-            sublist: 'dependencies' as const,
-            type: 'address' as const,
-            weight: scaledWeight,
-            accountId: accountId,
-          };
-
-          receivers.push(receiver);
-          break;
-        }
-        case 'drip-list': {
-          const receiver = {
-            sublist: 'dependencies' as const,
-            type: 'dripList' as const,
-            weight: scaledWeight,
-            accountId: accountId,
-          };
-
-          receivers.push(receiver);
-          break;
-        }
-        case 'project': {
-          const receiver = {
-            sublist: 'dependencies' as const,
-            type: 'repoDriver' as const,
-            weight: scaledWeight,
-            accountId: accountId,
-            source: GitProjectService.populateSource(
-              item.project.source.forge,
-              item.project.source.repoName,
-              item.project.source.ownerName,
-            ),
-          };
-
-          receivers.push(receiver);
-          break;
-        }
-      }
-    }
 
     for (const [accountId, weight] of Object.entries(maintainerListEditorConfig.weights)) {
       const scaledWeight = Math.floor(
@@ -492,16 +326,5 @@ export default class GitProjectService {
       ) as LatestVersion<typeof repoDriverAccountMetadataParser>['splits']['maintainers'],
       receivers,
     };
-  }
-
-  private _getForge(url: string): Forge {
-    const parsedURL = new URL(url);
-
-    switch (parsedURL.hostname) {
-      case 'github.com':
-        return Forge.GitHub;
-      default:
-        throw new Error(`Unsupported hostname: ${parsedURL.hostname}`);
-    }
   }
 }

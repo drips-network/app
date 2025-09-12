@@ -115,3 +115,8 @@ export type RecipientClassification = {
   validate: () => Promise<boolean | string | undefined>;
   fetch: () => Promise<RecipientResult>;
 } | null;
+
+export interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
+}
