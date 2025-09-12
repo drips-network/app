@@ -20,14 +20,9 @@
   import type { State } from '../../claim-orcid-flow';
   import assert from '$lib/utils/assert';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
-  // import GitHub from '$lib/utils/github/GitHub';
   import { gql } from 'graphql-request';
-  // import { Octokit } from '@octokit/rest';
   import { CLAIMING_URL_NAME } from '$lib/utils/orcids/entities';
   import verifyOrcidClaim from '$lib/utils/orcids/verify-orcid';
-
-  // const octokit = new Octokit();
-  // const github = new GitHub(octokit);
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
