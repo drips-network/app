@@ -20,12 +20,14 @@
   import type { State } from '../../claim-orcid-flow';
   import assert from '$lib/utils/assert';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
-  import GitHub from '$lib/utils/github/GitHub';
+  // import GitHub from '$lib/utils/github/GitHub';
   import { gql } from 'graphql-request';
-  import { Octokit } from '@octokit/rest';
+  // import { Octokit } from '@octokit/rest';
+  import { CLAIMING_URL_NAME } from '$lib/utils/orcids/entities';
+  import verifyOrcidClaim from '$lib/utils/orcids/verify-orcid';
 
-  const octokit = new Octokit();
-  const github = new GitHub(octokit);
+  // const octokit = new Octokit();
+  // const github = new GitHub(octokit);
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -36,20 +38,21 @@
       ? 'ethereum'
       : $walletStore.network.name
     : unreachable();
-  $: editing = $context.funding.object && Object.keys($context.funding.object).length > 0;
+  $: link = `http://0.0.0.0/?ethereum_owned_by=${$walletStore.address}&orcid=${$context.claimableId}`
+  $: editing = !!$context.claimableProof
   $: description = editing
-    ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
-    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`;
+    ? `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`
+    : `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`;
   $: checkboxLabel = editing
-    ? 'I edited the FUNDING.json file'
-    : 'I added the FUNDING.json file to the root of my repo.';
+    ? 'I edited link'
+    : 'I added this to my ORCID profile';
 
   onMount(() => {
     $context.linkedToClaimable = false;
   });
 
   const GASLESS_CALL_ERROR_MESSAGE =
-    'Something went wrong while trying to update the repo owner on-chain. Please try again in ten minutes or reach out on Discord if the error persists.';
+    'Something went wrong while trying to update the ORCID owner on-chain. Please try again in ten minutes or reach out on Discord if the error persists.';
 
   function verify() {
     dispatch('await', {
@@ -57,26 +60,9 @@
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 
-        const addressInMaintainers = Boolean($context.maintainerSplits.items[dripsAccountId]);
-        const maintainersListEmpty = Object.keys($context.maintainerSplits.items).length === 0;
+        await verifyOrcidClaim($context.claimableId, address)
 
-        if (!addressInMaintainers && maintainersListEmpty) {
-          $context.maintainerSplits.items = {
-            [dripsAccountId]: { type: 'address', address },
-          };
-
-          $context.maintainerSplits.weights = {
-            [dripsAccountId]: 1000000,
-          };
-        }
-
-        const { forge, ownerName, repoName } = $context.project?.source ?? unreachable();
-
-        await github.verifyFundingJson(ownerName, repoName, address);
-
-        $context.linkedToRepo = true;
-
-        const numericForgeValue = forge === 'GitHub' ? 0 : 1;
+        $context.linkedToClaimable = true;
 
         if ($context.isPartiallyClaimed) {
           // If the project already has the right owner, we don't need to kick off a repo owner update again
@@ -98,8 +84,8 @@
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              forge: numericForgeValue,
-              projectName: `${ownerName}/${repoName}`,
+              forge: 3,
+              projectName: $context.claimableId,
               chainId: $walletStore.network.chainId,
             }),
           });
@@ -119,7 +105,7 @@
       },
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
+        `We’re scanning your ORCID profile for the link with your ${network} address`,
     });
   }
 
@@ -127,14 +113,17 @@
   $: formValid = $walletStore.connected && checked;
 </script>
 
-<StandaloneFlowStepLayout headline="Verify project ownership" {description}>
+<StandaloneFlowStepLayout headline="Verify ownership" {description}>
+  <p>First add a new link to your profile</p>
   <CodeBox
-    repoUrl={$context.gitUrl}
-    defaultBranch={$context.projectMetadata?.defaultBranch}
-    path="./FUNDING.json"
-    code={$context.funding.json}
-    highlight={$context.funding.highlight}
-    {editing}
+    path="Link name"
+    code={CLAIMING_URL_NAME}
+  />
+  <p>Then add the link</p>
+  <!-- TODO: fix link overflowing container -->
+  <CodeBox
+    path="Link"
+    code={link}
   />
   <Checkbox bind:checked label={checkboxLabel} />
   <svelte:fragment slot="left-actions">

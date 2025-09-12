@@ -1,7 +1,7 @@
 import type { State } from '../../claim-orcid-flow';
 import { get, type Writable } from 'svelte/store';
 import walletStore from '$lib/stores/wallet/wallet.store';
-import { fetchOrcid } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
+import { fetchOrcid } from '../../../../utils/orcids/fetch-orcid';
 
 // TODO: load orcid info
 export async function loadFundingInfo(context: Writable<State>): Promise<void> {
@@ -25,9 +25,8 @@ export async function loadFundingInfo(context: Writable<State>): Promise<void> {
     throw new Error('ORCID not found');
   }
 
-  const claimableProof = orcidInfo.claimingUrl;
   context.update((c) => {
-    c.claimableProof = claimableProof;
+    c.claimableProof = orcidInfo.claimingUrl;
     return c;
   });
 }

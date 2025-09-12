@@ -25,7 +25,7 @@
   export let orcid: OrcidTooltipFragment;
 </script>
 
-<div class="project-tooltip">
+<div class="orcid-tooltip">
   <div
     class="background"
     style:background-color={orcid.isClaimed
@@ -54,7 +54,7 @@
 </div>
 
 <style>
-  .project-tooltip {
+  .orcid-tooltip {
     width: 100%;
     max-width: fit-content;
     min-width: 10rem;

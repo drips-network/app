@@ -10,10 +10,10 @@
 //     }
 //   }
 // }
+// ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
 
   export const UNCLAIMED_ORCID_CARD_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
-    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment UnclaimedOrcidCard on OrcidLinkedIdentity {
       ...OrcidBadge
       chain
@@ -30,7 +30,7 @@
   import { gql } from 'graphql-request';
   import type { UnclaimedOrcidCardFragment } from './__generated__/gql.generated';
   import {
-    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+    // MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
     mergeCollectableFunds,
     mergeSplittableFunds,
   } from '$lib/utils/merge-withdrawable-balances';

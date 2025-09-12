@@ -132,7 +132,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
     leftComponent: {
       component: OrcidSlot,
       props: {
-        orcidAccount: state.claimableAccount,
+        orcid: state.claimableAccount,
       },
     },
     editStepIndex: 0,
