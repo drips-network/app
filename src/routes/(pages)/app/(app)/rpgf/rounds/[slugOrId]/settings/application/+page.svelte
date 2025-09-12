@@ -17,6 +17,8 @@
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { deleteApplicationCategory, deleteApplicationForm } from '$lib/utils/rpgf/rpgf';
   import { invalidate } from '$app/navigation';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
   export let data;
 
@@ -188,6 +190,42 @@
       on:click={() => modal.show(Stepper, undefined, createRpgfApplicationFormFlow(data.round.id))}
       >Create new form</Button
     >
+  </FormField>
+
+  <FormField
+    title="Identity verification"
+    description="Optionally require applicants to verify their identity using a third-party KYC provider after submitting their application."
+  >
+    <AnnotationBox type="info">
+      Identity verification is subject to additional fees, and can currently only be enabled or
+      changed by the Drips team. Please reach out to us on Discord if you would like to enable or
+      reconfigure this feature.
+    </AnnotationBox>
+
+    <svelte:fragment slot="action">
+      <Toggle checked={Boolean(data.round.kycProvider)} disabled />
+    </svelte:fragment>
+
+    {#if data.round.kycProvider}
+      <h5 style:margin-top="1rem">KYC Provider</h5>
+
+      <div
+        style:display="flex"
+        style:align-items="center"
+        style:gap="0.5rem"
+        style:margin-top="0.5rem"
+      >
+        <img
+          src="/assets/fern-logo.png"
+          alt="Fern Logo"
+          style:height="2rem"
+          style:width="auto"
+          style:border-radius="1rem"
+        />
+
+        <span class="typo-text">Fern KYC</span>
+      </div>
+    {/if}
   </FormField>
 </RpgfSettingsForm>
 
