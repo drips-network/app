@@ -26,6 +26,8 @@ services:
       - ECOSYSTEM_API_URL=http://ecosystems:5000
       - ECOSYSTEM_API_ACCESS_TOKEN=123
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - PUBLIC_DRIPS_RPGF_URL=http://localhost:5000
+      - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
     volumes:
     - .:/app
     - /app/node_modules/
@@ -249,4 +251,41 @@ services:
       meilisearch:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+
+  postgres-rpgf:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: rpgf_db
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+    ports:
+      - 54323:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  rpgf:
+    image: 'j537/rpgf:${RPGF_TAG-main}'
+    pull_policy: always
+    command: bash -c "deno task db:migrate && deno task configure-chain 31337 LOCALTESTNET http://localhost:8545 false; deno task start"
+    environment:
+      - DB_CONNECTION_STRING=postgresql://postgres:admin@postgres-rpgf:5432/rpgf_db
+      - PORT=5000
+      - DRIPS_GQL_API_URL=http://graphql-api:8080
+      - DRIPS_GQL_API_KEY=123
+      - JWT_SECRET=123
+      - JWT_EXPIRATION_MINUTES=60
+      - ENABLE_DANGEROUS_TEST_ROUTES=true
+    ports:
+      - 5000:5000
+    depends_on:
+      postgres-rpgf:
+        condition: service_healthy
+      graphql-api:
         condition: service_healthy

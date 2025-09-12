@@ -258,7 +258,7 @@
       </div>
       {#if project}
         <div>
-          <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" outline />
+          <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" />
         </div>
       {/if}
     </div>

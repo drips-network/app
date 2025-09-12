@@ -14,7 +14,6 @@
   import { makeStep } from '$lib/components/stepper/types';
   import Step_1 from './examples/example-stepper-steps/step-1.svelte';
   import Step_2 from './examples/example-stepper-steps/step-2.svelte';
-  import SuccessStep from './examples/example-stepper-steps/success-step.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import ProjectCard from '$lib/components/project-card/project-card.svelte';
@@ -47,6 +46,7 @@
   import modal from '$lib/stores/modal';
   import ExampleTransactStep from './examples/example-transact/example-transact-step.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
+  import SuccessStep from '$lib/components/success-step/success-step.svelte';
 
   // Button
   let disabled = false;
@@ -375,6 +375,33 @@
 <HeadMeta />
 
 <h1>Component showcase</h1>
+
+<div class="showcase-item">
+  <h2>Stepper</h2>
+  <div class="stepper-wrapper">
+    <Stepper
+      steps={[
+        makeStep({
+          component: Step_1,
+          props: {
+            testProp: 'test prop value',
+          },
+        }),
+        makeStep({
+          component: Step_2,
+          props: undefined,
+        }),
+        makeStep({
+          component: SuccessStep,
+          props: {
+            message: 'it worky',
+            action: 'none',
+          },
+        }),
+      ]}
+    />
+  </div>
+</div>
 
 <div class="showcase-item">
   <h2>Transact step</h2>
@@ -708,30 +735,6 @@
 </div>
 
 <div class="showcase-item">
-  <h2>Stepper</h2>
-  <div class="stepper-wrapper">
-    <Stepper
-      steps={[
-        makeStep({
-          component: Step_1,
-          props: {
-            testProp: 'test prop value',
-          },
-        }),
-        makeStep({
-          component: Step_2,
-          props: undefined,
-        }),
-        makeStep({
-          component: SuccessStep,
-          props: undefined,
-        }),
-      ]}
-    />
-  </div>
-</div>
-
-<div class="showcase-item">
   <h2>Amount</h2>
   <div>
     <p>Amount</p>
@@ -769,7 +772,7 @@
     width: 32rem;
     height: 32rem;
     overflow: scroll;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
     border-radius: 0.5rem;
   }
@@ -782,7 +785,7 @@
   }
 
   .stepper-wrapper {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 0.5rem;
   }
 

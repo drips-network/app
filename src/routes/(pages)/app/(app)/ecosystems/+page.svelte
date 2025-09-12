@@ -13,7 +13,6 @@
   `;
 </script>
 
-
 <script lang="ts">
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';

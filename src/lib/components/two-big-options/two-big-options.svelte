@@ -23,7 +23,7 @@
 <style>
   .options {
     display: flex;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 2rem 0 2rem 2rem;
     padding: 0.5rem;
     align-items: stretch;

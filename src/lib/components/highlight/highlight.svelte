@@ -5,6 +5,7 @@
   import { onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import FocusTrap from '../focus-trap/focus-trap.svelte';
+  import Button from '../button/button.svelte';
 
   let highlightBB = $highlightStore?.element.getBoundingClientRect();
   function updateBB() {
@@ -66,12 +67,11 @@
     }
 
     let alignment: 'top' | 'bottom' | 'left' | 'right';
-    if (remainingSpaceFromTop < 64) {
-      alignment = 'bottom';
-    } else if (remainingSpaceFromTop > 64 && remainingSpaceFromBottom > 64) {
-      alignment = textAlignment;
-    } else {
+    if (remainingSpaceFromTop > remainingSpaceFromBottom) {
+      // More space at the top
       alignment = 'top';
+    } else {
+      alignment = 'bottom';
     }
 
     let x: number;
@@ -84,17 +84,11 @@
     } else if (alignment === 'left') {
       x = highlightBB.right + 24;
     } else {
-      x = highlightBB.left - 24;
+      x = highlightBB.left - 24 - highlightWidth;
     }
 
     let y: number;
     switch (alignment) {
-      case 'left':
-      case 'right': {
-        // 12 is the height of half the arrow.
-        y = highlightBB.top + highlightBB.height / 2 - 12;
-        break;
-      }
       case 'bottom': {
         y = highlightBB.bottom + 16;
         break;
@@ -208,7 +202,8 @@
       <h3 class="arrow">{ARROWS[highlightPos.alignment]}</h3>
       <div class="content">
         <h3>{$highlightStore.title}</h3>
-        <p>{$highlightStore.description}</p>
+        <p style:margin-bottom="0.5rem">{$highlightStore.description}</p>
+        <Button on:click={dismiss}>Got it</Button>
       </div>
     </div>
     <!-- Dismisses clicks outside the target -->
@@ -311,6 +306,7 @@
   .highlight {
     position: fixed;
     z-index: 11;
+    width: 128px;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

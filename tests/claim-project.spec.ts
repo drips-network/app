@@ -1,49 +1,23 @@
-import { test, expect } from '@playwright/test';
-import { execa } from 'execa';
+import { test as base } from '@playwright/test';
+import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
+import { Project } from './fixtures/Project';
+import { projectClaimManager } from './fixtures/ProjectClaimManager';
 
-test('claim project flow', async ({ page }) => {
-  test.setTimeout(240_000);
+const test = base.extend<{ connectedSession: ConnectedSession; project: Project }>({
+  connectedSession: async ({ page }, use) => {
+    const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
+    await connectedSession.goto();
+    await connectedSession.connect();
 
-  page.emulateMedia({ reducedMotion: 'reduce' });
+    await use(connectedSession);
+  },
+  project: async ({ connectedSession }, use) => {
+    await use(new Project(connectedSession, projectClaimManager));
+  },
+});
 
-  await page.goto('http://localhost:5173/app');
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+test('claim project flow', async ({ project }) => {
+  test.setTimeout(120_000);
 
-  // wait for wallet connection
-  await expect(page.getByText('0xf3–2266').nth(0)).toBeVisible();
-
-  await page.getByRole('link', { name: 'Projects' }).click();
-  await page.getByRole('button', { name: 'Claim project' }).click();
-  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByRole('textbox', { name: 'Paste your GitHub project URL' }).click();
-  await page
-    .getByRole('textbox', { name: 'Paste your GitHub project URL' })
-    .fill('github.com/efstajas/drips-test-repo-1');
-  await page.getByRole('textbox', { name: 'Paste your GitHub project URL' }).press('Enter');
-  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByText('I edited the FUNDING.json file').click();
-  await page.getByRole('button', { name: 'Verify now' }).click();
-  await page.getByRole('textbox').first().click();
-  await page.getByRole('textbox').first().fill('100');
-  await page.getByRole('textbox').first().press('Enter');
-  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByRole('button', { name: 'Confirm in wallet' }).click();
-
-  await expect(page.getByTestId('current-tx')).toContainText('Finalizing verification', {
-    timeout: 60_000,
-  });
-
-  await execa`npm run dev:docker:update-repo-owner -- --accountId 80921553623925136102837120782793736893291544351678576578072673071360 --ownerAddress 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`;
-
-  await expect(page.getByText('Set project splits and metadata')).toBeVisible();
-
-  await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
-  await page.getByRole('button', { name: 'View project profile' }).click();
-
-  await page.waitForURL(
-    'http://localhost:5173/app/projects/github/efstajas/drips-test-repo-1?exact',
-  );
-  await expect(page.getByText('drips-test-repo-1').nth(0)).toBeVisible();
-  await expect(page.getByText('Splits', { exact: true })).toBeVisible();
+  await project.claim();
 });
