@@ -49,7 +49,7 @@
   import modal from '$lib/stores/modal';
   import { loadFundingInfo } from './enter-orcid-id';
   import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
-  import { fetchOrcid } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
+  import { fetchOrcid } from '../../../../utils/orcids/fetch-orcid';
   import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 
   export let context: Writable<State>;

@@ -13,7 +13,7 @@ import type {
 import { isAddress } from 'ethers';
 import network from '$lib/stores/wallet/network';
 import ListEditor from './list-editor.svelte';
-import { fetchOrcid, orcidIdToAccountId } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
+import { fetchOrcid, orcidIdToAccountId } from '../../utils/orcids/fetch-orcid';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
   const res = await query<GetDripListQuery, GetDripListQueryVariables>(
