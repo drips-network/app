@@ -7,13 +7,12 @@
   } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-orcid-flow';
-  // import GitProjectService from '$lib/utils/project/GitProjectService';
   import { gql } from 'graphql-request';
   import unreachable from '$lib/utils/unreachable';
   import query from '$lib/graphql/dripsQL';
   import type {
-  CheckOrcidVerificationStatusQuery,
-  CheckOrcidVerificationStatusQueryVariables,
+    CheckOrcidVerificationStatusQuery,
+    CheckOrcidVerificationStatusQueryVariables,
     OrcidIsClaimedQuery,
     OrcidIsClaimedQueryVariables,
   } from './__generated__/gql.generated';
@@ -33,7 +32,6 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  // $: projectSource = $context.project?.source ?? unreachable();
 
   async function checkOrcidInExpectedStateForClaiming() {
     const checkOrcidVerificationStatusQuery = gql`
@@ -57,9 +55,9 @@
       chain: network.gqlName,
     });
 
-    const orcidAccount = res.orcidLinkedIdentityByOrcid
+    const orcidAccount = res.orcidLinkedIdentityByOrcid;
     if (!orcidAccount) {
-      return false
+      return false;
     }
 
     return (
@@ -107,8 +105,6 @@
     }
 
     // Next, wait for the new owner to be indexed by our infra.
-    // The project will be either in `PendingMetadata` or `OwnerUpdated` state, at which point
-    // it's ready for the final claim TX that sets splits and metadata.
     const ownerIndexedExpectation = await expect(
       () => checkOrcidInExpectedStateForClaiming(),
       (response) => response,
@@ -254,7 +250,8 @@
             (result) =>
               Boolean(
                 result.orcidLinkedIdentityByOrcid &&
-                  result.orcidLinkedIdentityByOrcid.isClaimed && result.orcidLinkedIdentityByOrcid.isLinked,
+                  result.orcidLinkedIdentityByOrcid.isClaimed &&
+                  result.orcidLinkedIdentityByOrcid.isLinked,
               ),
             300000,
             2000,
