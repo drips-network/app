@@ -29,6 +29,7 @@ import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 // import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
 import type { AddItemError } from '$lib/components/list-editor/errors';
 import type Orcid from '$lib/utils/orcids/entities';
+import type { ListEditorConfig } from '$lib/components/list-editor/types';
 
 export const CLAIM_ORCID_FLOW_ORCID_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_ORCID_FRAGMENT}
@@ -55,8 +56,12 @@ export interface State {
   gaslessOwnerUpdateTaskId: string | undefined;
   isPartiallyClaimed: boolean;
 
+  highLevelPercentages: { [key: string]: number };
+  maintainerSplits: ListEditorConfig;
+  dependencySplits: ListEditorConfig;
+
   // or this is part of a project's claimableContext
-  recipientErrors: Array<AddItemError>;
+  // recipientErrors: Array<AddItemError>;
 
   // aka linked to ORCID profile?
   // linkedToRepo: boolean;
@@ -101,7 +106,16 @@ export const state = () =>
     claimableContext: undefined,
     claimableProof: undefined,
     gaslessOwnerUpdateTaskId: undefined,
-    recipientErrors: [],
+    highLevelPercentages: { maintainers: 100, dependencies: 0 },
+    maintainerSplits: {
+      items: {},
+      weights: {},
+    },
+    dependencySplits: {
+      items: {},
+      weights: {},
+    },
+    // recipientErrors: [],
 
     // claimableContext: {
     //   highLevelPercentages: { maintainers: 60, dependencies: 40 },
@@ -217,7 +231,7 @@ export const steps = (
     component: Review,
     props: {
       canEditWalletConnection: !skipWalletConnect,
-      isModal,
+      // isModal,
     },
   }),
   makeStep({

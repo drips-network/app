@@ -7,80 +7,68 @@
   } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-orcid-flow';
-  import GitProjectService from '$lib/utils/project/GitProjectService';
+  // import GitProjectService from '$lib/utils/project/GitProjectService';
   import { gql } from 'graphql-request';
   import unreachable from '$lib/utils/unreachable';
   import query from '$lib/graphql/dripsQL';
   import type {
-    ProjectIsClaimedQuery,
-    ProjectIsClaimedQueryVariables,
+  CheckOrcidVerificationStatusQuery,
+  CheckOrcidVerificationStatusQueryVariables,
+    OrcidIsClaimedQuery,
+    OrcidIsClaimedQueryVariables,
   } from './__generated__/gql.generated';
   import expect from '$lib/utils/expect';
-  import isClaimed from '$lib/utils/project/is-claimed';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
-  import type {
-    CheckProjectVerificationStatusQuery,
-    CheckProjectVerificationStatusQueryVariables,
-  } from './__generated__/gql.generated';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
   import { hexlify, toUtf8Bytes } from 'ethers';
-  import { ProjectVerificationStatus } from '$lib/graphql/__generated__/base-types';
+  import OrcidTransactionService from '$lib/utils/orcids/OrcidTransactionService';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  $: projectSource = $context.project?.source ?? unreachable();
+  // $: projectSource = $context.project?.source ?? unreachable();
 
-  async function checkProjectInExpectedStateForClaiming() {
-    const checkProjectVerificationStatusQuery = gql`
-      query CheckProjectVerificationStatus($projectUrl: String!, $chains: [SupportedChain!]) {
-        projectByUrl(url: $projectUrl, chains: $chains) {
-          chainData {
-            ... on UnClaimedProjectData {
-              chain
-              owner {
-                address
-              }
-              verificationStatus
-            }
-            ... on ClaimedProjectData {
-              chain
-              owner {
-                address
-              }
-              verificationStatus
-            }
+  async function checkOrcidInExpectedStateForClaiming() {
+    const checkOrcidVerificationStatusQuery = gql`
+      query CheckOrcidVerificationStatus($orcid: String!, $chain: SupportedChain!) {
+        orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+          chain
+          owner {
+            address
           }
+          isClaimed
+          isLinked
         }
       }
     `;
 
     const res = await query<
-      CheckProjectVerificationStatusQuery,
-      CheckProjectVerificationStatusQueryVariables
-    >(checkProjectVerificationStatusQuery, {
-      projectUrl: projectSource.url,
-      chains: [network.gqlName],
+      CheckOrcidVerificationStatusQuery,
+      CheckOrcidVerificationStatusQueryVariables
+    >(checkOrcidVerificationStatusQuery, {
+      orcid: $context.claimableId,
+      chain: network.gqlName,
     });
 
-    if (!res.projectByUrl?.chainData) return false;
-    const projectChainData = filterCurrentChainData(res.projectByUrl.chainData);
+    const orcidAccount = res.orcidLinkedIdentityByOrcid
+    if (!orcidAccount) {
+      return false
+    }
 
     return (
-      projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata &&
-      projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
+      orcidAccount.isClaimed &&
+      orcidAccount.owner?.address.toLowerCase() === $walletStore.address?.toLowerCase()
     );
   }
 
-  async function waitForRepoOwnerUpdate(gasless: boolean) {
+  async function waitForOrcidOwnerUpdate(gasless: boolean) {
     if (gasless) {
       // First, wait for Gelato Relay to resolve the update task.
       const gaslessOwnerUpdateExpectation = await expect(
@@ -122,7 +110,7 @@
     // The project will be either in `PendingMetadata` or `OwnerUpdated` state, at which point
     // it's ready for the final claim TX that sets splits and metadata.
     const ownerIndexedExpectation = await expect(
-      () => checkProjectInExpectedStateForClaiming(),
+      () => checkOrcidInExpectedStateForClaiming(),
       (response) => response,
       600000,
       2000,
@@ -137,7 +125,7 @@
 
   async function generateOwnerUpdateTransactions(
     gasslessOwnerUpdateTaskId: string | undefined,
-    gitUrl: string,
+    orcid: string,
   ) {
     let transactions: TransactionWrapperOrExternalTransaction[] = [];
     let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
@@ -170,19 +158,17 @@
         external: true,
         title: 'Finalizing verification...',
         ...fakeProgressBarConfig,
-        promise: () => waitForRepoOwnerUpdate(true),
+        promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      const { username, repoName } = GitProjectService.deconstructUrl(gitUrl);
-
       const ownerUpdateTx = await populateRepoDriverWriteTx({
         functionName: 'requestUpdateOwner',
-        args: [0, hexlify(toUtf8Bytes(`${username}/${repoName}`)) as `0x${string}`],
+        args: [0, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
       });
 
       transactions.push(
         {
-          title: 'Request update of repository owner',
+          title: 'Request update of ORCID owner',
           transaction: ownerUpdateTx,
           gasless: false,
           applyGasBuffer: false,
@@ -191,7 +177,7 @@
           external: true,
           title: 'Finalizing verification...',
           ...fakeProgressBarConfig,
-          promise: () => waitForRepoOwnerUpdate(false),
+          promise: () => waitForOrcidOwnerUpdate(false),
         },
       );
     }
@@ -203,12 +189,12 @@
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Claim your project',
+        headline: 'Claim your ORCID',
 
         before: async () => {
-          const gitProjectService = await GitProjectService.new();
+          const orcidProjectService = await OrcidTransactionService.new();
 
-          const setSplitsAndEmitMetadataBatch = await gitProjectService.buildBatchTx($context);
+          const setSplitsAndEmitMetadataBatch = await orcidProjectService.buildBatchTx($context);
 
           const tx = await populateCallerWriteTx({
             functionName: 'callBatched',
@@ -219,13 +205,13 @@
           // and skip the step that waits for everything to be in the right state if so.
           // We already kick off the gasless owner update after the user confirms the funding.json step,
           // so it could be that everything already resolved by the time we get here.
-          const projectAlreadyReadyForClaimTx = await checkProjectInExpectedStateForClaiming();
+          const projectAlreadyReadyForClaimTx = await checkOrcidInExpectedStateForClaiming();
 
           return { tx, projectAlreadyReadyForClaimTx };
         },
 
         messages: {
-          duringBefore: 'Preparing to claim project...',
+          duringBefore: 'Preparing to claim ORCID...',
         },
 
         transactions: async ({ tx, projectAlreadyReadyForClaimTx }) => {
@@ -233,47 +219,42 @@
             ? []
             : await generateOwnerUpdateTransactions(
                 $context.gaslessOwnerUpdateTaskId,
-                $context.gitUrl,
+                $context.claimableId,
               );
 
           const setSplitsAndMetadataTransactionStep = {
             transaction: tx,
             gasless: $gaslessStore,
             applyGasBuffer: false,
-            title: 'Set project splits and metadata',
+            title: 'Set ORCID splits and metadata',
           };
 
           return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
         },
 
         after: async () => {
-          const projectId = $context.project?.account.accountId ?? unreachable();
+          const orcidAccountId = $context.claimableAccount?.account.accountId ?? unreachable();
 
-          const projectClaimedQuery = gql`
-            query ProjectIsClaimed($id: ID!, $chains: [SupportedChain!]) {
-              projectById(id: $id, chains: $chains) {
-                chainData {
-                  ... on ClaimedProjectData {
-                    chain
-                  }
-                  ... on UnClaimedProjectData {
-                    chain
-                  }
-                }
+          const orcidClaimedQuery = gql`
+            query OrcidIsClaimed($orcid: String!, $chain: SupportedChain!) {
+              orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+                chain
+                isClaimed
+                isLinked
               }
             }
           `;
 
           await expect(
             () =>
-              query<ProjectIsClaimedQuery, ProjectIsClaimedQueryVariables>(projectClaimedQuery, {
-                id: projectId,
-                chains: [network.gqlName],
+              query<OrcidIsClaimedQuery, OrcidIsClaimedQueryVariables>(orcidClaimedQuery, {
+                orcid: $context.claimableId,
+                chain: network.gqlName,
               }),
             (result) =>
               Boolean(
-                result.projectById &&
-                  isClaimed(filterCurrentChainData(result.projectById.chainData)),
+                result.orcidLinkedIdentityByOrcid &&
+                  result.orcidLinkedIdentityByOrcid.isClaimed && result.orcidLinkedIdentityByOrcid.isLinked,
               ),
             300000,
             2000,
@@ -281,7 +262,7 @@
 
           // Invalidate cached project page (if any). This should happen automatically, but without
           // awaiting it here in addition, there could be a race condition. Better safe than sorry!
-          await invalidateAccountCache(projectId);
+          await invalidateAccountCache(orcidAccountId);
           await invalidateAll();
         },
       }),
