@@ -2,6 +2,7 @@ import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
 import type { TransactionLike } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
 import type { ComponentType, SvelteComponent } from 'svelte';
+import type { ProgressFn } from '../progress-bar/progress-bar.svelte';
 
 export type TransactionWrapper = {
   title: string;
@@ -85,6 +86,14 @@ export interface AwaitPendingPayload extends UpdateAwaitStepParams {
    * and text displayed on the await step before the promise resolves.
    */
   promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  /**
+   * Optional function to report progress of the awaited promise.
+   * If provided, a progress bar is shown below the message.
+   */
+  progressBar?: {
+    progressFn: ProgressFn;
+    centeredProgressText?: boolean;
+  };
 }
 
 export interface MovePayload {
