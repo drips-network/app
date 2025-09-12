@@ -94,7 +94,7 @@
                   case 'orcid':
                     return {
                       type: 'orcid',
-                      accountId: getLastPathSegment(v.orcid.source.url) as string,
+                      accountId: v.orcid.orcid,
                     };
                 }
               })
