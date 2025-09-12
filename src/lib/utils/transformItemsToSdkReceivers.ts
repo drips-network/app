@@ -42,7 +42,7 @@ export async function transformItemsToSdkReceivers(
       case 'orcid':
         receivers.push({
           type: 'orcid',
-          orcidId: getLastPathSegment(item.orcid.source.url) as string,
+          orcidId: item.orcid.orcid,
           weight,
         });
         break;
