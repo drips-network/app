@@ -64,6 +64,38 @@
 
         $context.linkedToClaimable = true;
 
+        // Split 100% to the owner of this ORCID
+        // TODO: is here the right place?
+        context.update(c => {
+          c.maintainerSplits = {
+            items: {
+              [$walletStore.dripsAccountId]: {
+                type: 'address',
+                address: $walletStore.address
+              }
+            },
+            weights: {
+              [$walletStore.dripsAccountId]: 1000000
+            }
+          }
+
+          return c
+        })
+
+        // const highLevelPercentages = { 'maintainers':  100 }
+        // const maintainers: ListEditorConfig = {
+        //   items: {
+        //     [ownerAccountId]: {
+        //       type: 'address',
+        //       address: ownerAccountAddress
+        //     }
+        //   },
+        //   weights: {
+        //     [ownerAccountId]: 1000000
+        //   }
+        // }
+        // const dependencies: ListEditorConfig = { items: {}, weights: {} }
+
         if ($context.isPartiallyClaimed) {
           // If the project already has the right owner, we don't need to kick off a repo owner update again
           return;
