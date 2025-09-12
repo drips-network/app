@@ -18,7 +18,7 @@ import network from '$lib/stores/wallet/network';
 import {
   fetchOrcid,
   orcidIdToAccountId,
-} from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/fetch-orcid';
+} from '../../utils/orcids/fetch-orcid';
 import { calcAccountId } from '$lib/utils/sdk/address-driver/calc-account-id';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
@@ -77,8 +77,8 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
   const res = await query<GetOrcidQuery, GetOrcidQueryVariables>(
     gql`
       ${LIST_EDITOR_ORCID_FRAGMENT}
-      query GetOrcid($accountId: ID!, $chains: [SupportedChain!]) {
-        orcidAccountById(id: $accountId, chains: $chains) {
+      query GetOrcid($orcid: String!, $chain: SupportedChain!) {
+        orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
           ...ListEditorOrcid
           account {
             accountId
@@ -87,10 +87,10 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
       }
     `,
     // TODO: yes, for now it is fetched with the actual ORCID iD
-    { accountId: orcidId, chains: [network.gqlName] },
+    { orcid: orcidId, chain: network.gqlName },
   );
 
-  let orcidAccount = res.orcidAccountById;
+  let orcidAccount = res.orcidLinkedIdentityByOrcid
   // We don't know about it internally, let's construct a minimal OrcidAccount object
   // to mimic it.
   if (!orcidAccount) {
@@ -103,19 +103,16 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
 
     const accountId = await orcidIdToAccountId(orcidId);
     orcidAccount = {
-      __typename: 'OrcidAccount',
+      __typename: 'OrcidLinkedIdentity',
       account: {
         __typename: 'RepoDriverAccount',
         accountId: String(accountId),
       },
-      source: { __typename: 'OrcidSource', url: orcid.url },
-      chainData: [
-        {
-          chain: network.gqlName,
-          __typename: 'UnClaimedOrcidAccountData',
-        },
-      ],
-    } as NonNullable<GetOrcidQuery['orcidAccountById']>;
+      chain: network.gqlName,
+      orcid: orcid.id,
+      isClaimed: false,
+      isLinked: false,
+    } as NonNullable<GetOrcidQuery['orcidLinkedIdentityByOrcid']>;
   }
 
   return {

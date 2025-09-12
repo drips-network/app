@@ -44,7 +44,7 @@
 
   export const CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT = gql`
     ${DRIP_VISUAL_ORCID_FRAGMENT}
-    fragment CreateDonationDetailsStepOrcid on OrcidAccount {
+    fragment CreateDonationDetailsStepOrcid on OrcidLinkedIdentity {
       ...DripVisualOrcid
       account {
         accountId
@@ -116,7 +116,7 @@
       case 'EcosystemMainAccount':
         receiverTypeLabel = 'Ecosystem';
         break;
-      case 'OrcidAccount':
+      case 'OrcidLinkedIdentity':
         receiverTypeLabel = 'ORCID';
         break;
     }
@@ -131,7 +131,7 @@
         break;
       case 'Project':
       case 'EcosystemMainAccount':
-      case 'OrcidAccount':
+      case 'OrcidLinkedIdentity':
         recipientAccountId = receiver.account.accountId;
         break;
     }

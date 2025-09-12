@@ -47,7 +47,7 @@ export const LIST_EDITOR_SUB_LIST_FRAGMENT = gql`
 
 export const LIST_EDITOR_ORCID_FRAGMENT = gql`
   ${ORCID_BADGE_FRAGMENT}
-  fragment ListEditorOrcid on OrcidAccount {
+  fragment ListEditorOrcid on OrcidLinkedIdentity {
     ...OrcidBadge
   }
 `;
@@ -115,3 +115,8 @@ export type RecipientClassification = {
   validate: () => Promise<boolean | string | undefined>;
   fetch: () => Promise<RecipientResult>;
 } | null;
+
+export interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
+}

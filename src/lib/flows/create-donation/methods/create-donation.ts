@@ -28,6 +28,7 @@ import type {
   CreateDonationDetailsStepOrcidFragment
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
+import type { OneTimeDonationSupport } from '$lib/graphql/__generated__/base-types';
 
 const projectSupportQuery = gql`
   query ProjectOTDs($id: ID!, $chains: [SupportedChain!]!) {
@@ -92,33 +93,37 @@ const ecosystemSupportQuery = gql`
   }
 `;
 
+
+// TODO
+// chainData {
+//   ... on ClaimedOrcidAccountData {
+//     chain
+//     support {
+//       ... on OneTimeDonationSupport {
+//         account {
+//           accountId
+//         }
+//         date
+//       }
+//     }
+//   }
+//   ... on UnClaimedOrcidAccountData {
+//     chain
+//     support {
+//       ... on OneTimeDonationSupport {
+//         account {
+//           accountId
+//         }
+//         date
+//       }
+//     }
+//   }
+// }
+
 const orcidSupportQuery = gql`
-  query OrcidOTDs($accountId: ID!, $chains: [SupportedChain!]) {
-    orcidAccountById(id: $accountId, chains: $chains) {
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-          support {
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-              date
-            }
-          }
-        }
-        ... on UnClaimedOrcidAccountData {
-          chain
-          support {
-            ... on OneTimeDonationSupport {
-              account {
-                accountId
-              }
-              date
-            }
-          }
-        }
-      }
+  query OrcidOTDs($orcid: String!, $chain: SupportedChain!) {
+    orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+      chain
     }
   }
 `;
@@ -234,17 +239,19 @@ export default function (
               );
               break;
             // TODO: Verify!
-            case 'OrcidAccount':
+            case 'OrcidLinkedIdentity':
               await expect(
                 () =>
                   query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
-                    accountId: recipientAccountId,
-                    chains: [network.gqlName],
+                    orcid: recipientAccountId,
+                    chain: network.gqlName,
                   }),
                 (res) => {
-                  const orcidData = res.orcidAccountById;
+                  const orcidData = res.orcidLinkedIdentityByOrcid;
                   if (!orcidData) return true;
-                  return filterOrcidCurrentChainData(orcidData.chainData).support.some((support) => {
+                  // TODO: add support
+                  const orcidDataSupport: OneTimeDonationSupport[] = []
+                  return orcidDataSupport.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,

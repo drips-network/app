@@ -97,7 +97,7 @@ export const SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT = gql`
 `;
 
 export const SELECT_DRIP_LIST_ORCID_TO_ADD_FRAGMENT = gql`
-  fragment SelectDripListOrcidToAdd on OrcidAccount {
+  fragment SelectDripListOrcidToAdd on OrcidLinkedIdentity {
     account {
       accountId
     }

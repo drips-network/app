@@ -23,7 +23,6 @@
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -94,7 +93,7 @@
                   case 'orcid':
                     return {
                       type: 'orcid',
-                      accountId: getLastPathSegment(v.orcid.source.url) as string,
+                      accountId: v.orcid.orcid,
                     };
                 }
               })

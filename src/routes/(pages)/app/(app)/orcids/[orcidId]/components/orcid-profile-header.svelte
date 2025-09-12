@@ -1,19 +1,15 @@
 <script lang="ts" context="module">
   export const ORCID_PROFILE_HEADER_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
-    fragment OrcidProfileHeader on OrcidAccount {
+    fragment OrcidProfileHeader on OrcidLinkedIdentity {
       ...OrcidBadge
-      source {
-        url
+      orcid
+      chain
+      owner {
+        address
       }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-          headerLinkedTo: linkedTo {
-            address
-          }
-        }
-      }
+      isClaimed
+      isLinked
     }
   `;
 </script>
@@ -24,18 +20,14 @@
   import type { OrcidProfileHeaderFragment } from './__generated__/gql.generated';
   import twemoji from '$lib/utils/twemoji';
   import OrcidBadge, { ORCID_BADGE_FRAGMENT } from './orcid-badge.svelte';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import OrcidAvatar from './orcid-avatar.svelte';
   import type Orcid from '$lib/utils/orcids/entities';
-  import isClaimed from '$lib/utils/orcids/is-claimed';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileHeaderFragment;
   export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
-
-  $: orcidChainData = filterCurrentChainData(orcidAccount.chainData);
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
@@ -53,8 +45,8 @@
         </span>
       {/if}
       <div style:display="flex" style:gap="0.75rem" style:margin-top="0.5rem" style:flex-wrap="wrap">
-        {#if isClaimed(orcidChainData)}
-          <IdentityBadge address={orcidChainData.headerLinkedTo.address} />
+        {#if orcidAccount.owner}
+          <IdentityBadge address={orcidAccount.owner.address} />
         {/if}
         <OrcidBadge size="tiny" orcid={orcidAccount} forceUnclaimed tooltip={false} linkTo="external-url" outlined copyable/>
         {#if shareButton}

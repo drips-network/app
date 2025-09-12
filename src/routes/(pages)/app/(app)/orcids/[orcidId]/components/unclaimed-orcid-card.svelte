@@ -1,17 +1,22 @@
+
+
 <script lang="ts" context="module">
+// TODO
+// chainData {
+//   ... on UnClaimedOrcidAccountData {
+//     chain
+//     withdrawableBalances {
+//       ...MergeWithdrawableBalances
+//     }
+//   }
+// }
+// ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
+
   export const UNCLAIMED_ORCID_CARD_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
-    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-    fragment UnclaimedOrcidCard on OrcidAccount {
+    fragment UnclaimedOrcidCard on OrcidLinkedIdentity {
       ...OrcidBadge
-      chainData {
-        ... on UnClaimedOrcidAccountData {
-          chain
-          withdrawableBalances {
-            ...MergeWithdrawableBalances
-          }
-        }
-      }
+      chain
     }
   `;
 </script>
@@ -25,15 +30,12 @@
   import { gql } from 'graphql-request';
   import type { UnclaimedOrcidCardFragment } from './__generated__/gql.generated';
   import {
-    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+    // MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
     mergeCollectableFunds,
     mergeSplittableFunds,
   } from '$lib/utils/merge-withdrawable-balances';
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
-  // import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-  import type { UnClaimedOrcidAccountData } from '$lib/graphql/__generated__/base-types';
   import OrcidBadge, { ORCID_BADGE_FRAGMENT } from './orcid-badge.svelte';
-  import filterCurrentChainData from '$lib/utils/orcids/filter-current-chain-data';
   import KeyValuePair from '$lib/components/key-value-pair/key-value-pair.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
@@ -45,10 +47,9 @@
 
   export let orcidAccount: UnclaimedOrcidCardFragment;
 
-  $: orcidChainData = filterCurrentChainData(orcidAccount.chainData) as UnClaimedOrcidAccountData;
-
-  $: collectableFunds = mergeCollectableFunds(orcidChainData.withdrawableBalances);
-  $: splittableFunds = mergeSplittableFunds(orcidChainData.withdrawableBalances);
+  // TODO: where are the funds?
+  $: collectableFunds = mergeCollectableFunds([]);
+  $: splittableFunds = mergeSplittableFunds([]);
 
   $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 

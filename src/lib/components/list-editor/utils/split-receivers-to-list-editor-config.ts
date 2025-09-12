@@ -84,13 +84,14 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
   }
 `;
 
-// TODO: theoretically would use ${LIST_EDITOR_ORCID_FRAGMENT} here, but OrcidReceiver
-// does not link a OrcidAccount, but a LinkedIdentity, which is a pointer to an OrcidAccount.
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
   fragment SplitReceiversToListEditorConfigOrcidReceiver on LinkedIdentityReceiver {
     weight
     linkedIdentity {
       ... on OrcidLinkedIdentity {
+        isLinked
+        isClaimed
+        chain
         account {
           accountId
         }
@@ -122,23 +123,9 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
     case 'LinkedIdentityReceiver':
-      // TODO: Do we need to be making this whole entity?
       return {
         type: 'orcid',
-        orcid: {
-          ...input.linkedIdentity,
-          __typename: 'OrcidAccount',
-          source: {
-            __typename: 'OrcidSource',
-            url: `/${input.linkedIdentity.orcid}`,
-          },
-          chainData: [
-            {
-              chain: network.gqlName,
-              __typename: 'UnClaimedOrcidAccountData',
-            },
-          ],
-        },
+        orcid: input.linkedIdentity
       };
   }
 }

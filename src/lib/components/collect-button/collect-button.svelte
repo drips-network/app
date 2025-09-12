@@ -82,7 +82,7 @@
       loading ||
       amountToShow?.fiatEstimateCents === 0 ||
       amountToShow?.includesUnknownPrice === true;
-    const newWidth = shouldHide ? 0 : amountElem?.getBoundingClientRect().width ?? 0;
+    const newWidth = shouldHide ? 0 : (amountElem?.getBoundingClientRect().width ?? 0);
 
     if (newWidth === 24) {
       amountElemWidth.set(0);
@@ -138,7 +138,7 @@
   </div>
   <div class="content">
     {#if loading}
-      <div transition:fade|global class="loading-state">
+      <div transition:fade class="loading-state">
         <Spinner />
       </div>
     {/if}

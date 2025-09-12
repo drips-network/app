@@ -4,29 +4,22 @@
 
   export const ORCID_BADGE_FRAGMENT = gql`
     ${ORCID_TOOLTIP_FRAGMENT}
-    fragment OrcidBadge on OrcidAccount {
+    fragment OrcidBadge on OrcidLinkedIdentity {
       ...OrcidTooltip
-      source {
-        url
-      }
-      chainData {
-        ... on ClaimedOrcidAccountData {
-          chain
-        }
-      }
+      chain
+      orcid
+      isClaimed
+      isLinked
     }
   `;
 </script>
 
 <script lang="ts">
   import buildExternalUrl from '$lib/utils/build-external-url';
-  import {
-    SupportedChain,
-  } from '$lib/graphql/__generated__/base-types';
+  import { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import network from '$lib/stores/wallet/network';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
-  import getLastPathSegment from '$lib/utils/get-last-path-segment';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidAvatar from './orcid-avatar.svelte';
   import OrcidName from './orcid-name.svelte';
@@ -49,28 +42,22 @@
   export let outlined: boolean = false;
   export let copyable: boolean = false;
 
-  let copySuccess = false
+  let copySuccess = false;
 
   let unclaimedOrcid: OrcidBadgeFragment;
   $: unclaimedOrcid = {
-    __typename: 'OrcidAccount',
-    source: { ...orcid.source },
-    chainData: [
-      {
-        chain: chainOverride ?? network.gqlName,
-        __typename: 'UnClaimedOrcidAccountData',
-      },
-    ],
+    ...orcid,
+    chain: chainOverride ?? network.gqlName,
+    isClaimed: false,
+    isLinked: false,
   } as OrcidBadgeFragment;
 
   $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;
 
-  $: orcidId = getLastPathSegment(processedOrcid.source.url)
-
   async function copyClipboard(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-    await navigator.clipboard.writeText(orcidId ?? '');
+    await navigator.clipboard.writeText(orcid.orcid);
     copySuccess = true;
     setTimeout(() => (copySuccess = false), 1000);
   }
@@ -81,10 +68,10 @@
     <svelte:element
       this={linkTo === 'nothing' ? 'div' : 'a'}
       class="orcid-badge gap-{smallText ? 1 : 2} flex items-center typo-text"
-      class:outlined={outlined}
-      href={linkTo === 'orcid-page' && orcidId
-        ? buildOrcidUrl(orcidId)
-        : buildExternalUrl(processedOrcid.source.url)}
+      class:outlined
+      href={linkTo === 'orcid-page'
+        ? buildOrcidUrl(orcid.orcid)
+        : buildExternalUrl(buildOrcidUrl(orcid.orcid, { external: true }))}
       target={linkTo === 'external-url' || linkToNewTab ? '_blank' : ''}
     >
       {#if !hideAvatar}
