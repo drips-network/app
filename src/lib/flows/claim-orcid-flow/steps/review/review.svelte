@@ -12,147 +12,74 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import { createEventDispatcher } from 'svelte';
-  import { makeStep, type StepComponentEvents } from '$lib/components/stepper/types';
+  import { type StepComponentEvents } from '$lib/components/stepper/types';
   import WalletIcon from '$lib/components/icons/Wallet.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import SplitsIcon from '$lib/components/icons/Splits.svelte';
   import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';
-  import TokenStreamsIcon from '$lib/components/icons/TokenStreams.svelte';
   import AccountBox from '$lib/components/account-box/account-box.svelte';
-  import ProjectProfileHeader from '$lib/components/project-profile-header/project-profile-header.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import unreachable from '$lib/utils/unreachable';
-  import { get, writable, type Writable } from 'svelte/store';
+  import { type Writable } from 'svelte/store';
   import type { State } from '../../claim-orcid-flow';
-  // import UnclaimedProjectCard, {
-  //   UNCLAIMED_PROJECT_CARD_FRAGMENT,
-  // } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
-  import Splits from '$lib/components/splits/splits.svelte';
   import PenIcon from '$lib/components/icons/Pen.svelte';
-  import Drip from '$lib/components/illustrations/drip.svelte';
-  import modal from '$lib/stores/modal';
-  import ProjectCustomizerModal from './components/project-customizer-modal.svelte';
-  import type { ProjectProfileHeaderFragment } from '$lib/components/project-profile-header/__generated__/gql.generated';
   import { gql } from 'graphql-request';
   import Download from '$lib/components/icons/Download.svelte';
-  import ProjectCustomizerStep from './components/project-customizer-step.svelte';
-  import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
-  import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';
-  import sanitize from 'sanitize-html';
+
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
-  import { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
+  import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
+  import type { MergeWithdrawableBalancesFragment } from '$lib/utils/__generated__/gql.generated';
+  import OrcidProfileHeader from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-profile-header.svelte';
+  import type { OrcidProfileHeaderFragment } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/__generated__/gql.generated';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
   export let canEditWalletConnection = true;
-  export let isModal = false;
 
-  $: project = $context.project ?? unreachable();
+  $: orcidProfile = $context.claimableMetadata ?? unreachable();
+  $: orcidAccount = $context.claimableAccount ?? unreachable()
 
   // For previewing what the project will look like after claiming
-  let fakeClaimedProject: ProjectProfileHeaderFragment;
-  $: fakeClaimedProject = {
-    __typename: 'Project',
-    source: { ...project.source },
-    isVisible: true,
-    chainData: [
-      {
-        owner: {
-          __typename: 'AddressDriverAccount',
-          address: $walletStore.address ?? unreachable(),
-        },
-        __typename: 'ClaimedProjectData',
-        chain: network.gqlName,
-        color: $context.projectColor,
-        avatar:
-          $context.avatar.type === 'emoji'
-            ? {
-                __typename: 'EmojiAvatar',
-                emoji: $context.avatar.emoji,
-              }
-            : {
-                __typename: 'ImageAvatar',
-                cid: $context.avatar.cid,
-              },
-      },
-    ],
+  let fakeClaimedOrcid: OrcidProfileHeaderFragment;
+  $: fakeClaimedOrcid = {
+    __typename: 'OrcidLinkedIdentity',
+    orcid: orcidAccount.orcid,
+    chain: network.gqlName,
+    owner: {
+      __typename: 'AddressDriverAccount',
+      address: $walletStore.address ?? unreachable(),
+    },
+    isLinked: false,
+    isClaimed: false
   };
-
-  $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.dependencySplits.items,
-    $context.dependencySplits.weights,
-    $context.highLevelPercentages['dependencies'],
-  );
-
-  $: maintainerRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.maintainerSplits.items,
-    $context.maintainerSplits.weights,
-    $context.highLevelPercentages['maintainers'],
-  );
 
   async function submit() {
     dispatch('goForward');
   }
 
-  function customize() {
-    const newProjectDataWritable = writable({
-      ...filterCurrentChainData(fakeClaimedProject.chainData, 'claimed'),
-      isProjectVisible: true,
-    });
-
-    if (isModal) {
-      dispatch('sidestep', {
-        steps: [
-          makeStep({
-            component: ProjectCustomizerStep,
-            props: {
-              originalProject: project,
-              newProjectData: newProjectDataWritable,
-            },
-          }),
-        ],
-      });
-    } else {
-      modal.show(
-        ProjectCustomizerModal,
-        () => {
-          const { avatar, color } = get(newProjectDataWritable);
-
-          $context.avatar =
-            avatar.__typename === 'EmojiAvatar'
-              ? { type: 'emoji', emoji: avatar.emoji }
-              : { type: 'image', cid: avatar.cid };
-          $context.projectColor = color;
-        },
-        { originalProject: project, newProjectData: newProjectDataWritable },
-      );
-    }
-  }
-
-  $: projectChainData = filterCurrentChainData(project.chainData, 'unclaimed');
+  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = []
 
   $: hasCollectableAmount =
-    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
+    withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
     0;
   $: hasSplittableAmount =
-    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
+    withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
     0;
 </script>
 
 <StandaloneFlowStepLayout
   headline="Review"
-  description="You’re almost done claiming your project and funds. Please review all details."
+  description="You’re almost done claiming your ORCID and funds. Please review all details."
 >
-  <FormField type="div" title="Git project">
+  <FormField type="div" title="ORCID iD">
     <div class="card">
-      <ProjectProfileHeader
-        project={fakeClaimedProject}
-        editButton="Customize"
-        on:editButtonClick={customize}
+      <OrcidProfileHeader
+        orcid={orcidProfile}
+        orcidAccount={fakeClaimedOrcid}
       />
     </div>
   </FormField>
@@ -167,41 +94,10 @@
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
-    <UnclaimedProjectCard
+    <UnclaimedOrcidCard
       detailedTokenBreakdown={hasCollectableAmount && hasSplittableAmount}
-      {project}
+      orcidAccount={orcidAccount}
     />
-  </FormField>
-  <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
-  <FormField type="div" title="Split funds with">
-    <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
-        >Edit</Button
-      >
-    </svelte:fragment>
-    <div class="card">
-      <!-- TODO: Show the total amount that will be split on tx confirmation -->
-      <div class="drip-icon">
-        <Drip />
-      </div>
-      <div class="splits-component">
-        <Splits
-          linkToNewTab={true}
-          list={[
-            {
-              __typename: 'SplitGroup',
-              name: 'Dependencies',
-              list: dependencyRepresentationalSplits,
-            },
-            {
-              __typename: 'SplitGroup',
-              name: 'Maintainers',
-              list: maintainerRepresentationalSplits,
-            },
-          ]}
-        />
-      </div>
-    </div>
   </FormField>
   <WhatsNextSection>
     {#if hasCollectableAmount || hasSplittableAmount}
@@ -239,44 +135,19 @@
       <svelte:fragment slot="title">After transaction confirmation...</svelte:fragment>
       <svelte:fragment slot="items">
         <WhatsNextItem icon={EyeOpenIcon}
-          >Anyone can support or split to your project on Drips.</WhatsNextItem
+          >Anyone can support or split to your ORCID on Drips.</WhatsNextItem
         >
         <WhatsNextItem icon={WalletIcon}
           >You can <span class="typo-text-bold">collect your tokens</span> from your
           <span class="typo-text-bold">Drips dashboard</span>.</WhatsNextItem
         >
-        <WhatsNextItem icon={TokenStreamsIcon}>
-          {@html sanitize(network.settlement.recipientsExplainerHtml, {
-            allowedTags: ['span'],
-            allowedAttributes: {
-              span: ['class'],
-            },
-          })}</WhatsNextItem
-        >
       </svelte:fragment>
     </WhatsNextCard>
   </WhatsNextSection>
   <svelte:fragment slot="left-actions">
-    <Button
-      icon={ArrowLeft}
-      on:click={() =>
-        dispatch('goForward', {
-          by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
-        })}>Back</Button
-    >
+    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm in wallet</Button>
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-  .drip-icon {
-    width: 1.5rem;
-  }
-
-  .splits-component {
-    margin-left: 10px;
-    width: fit-content;
-  }
-</style>

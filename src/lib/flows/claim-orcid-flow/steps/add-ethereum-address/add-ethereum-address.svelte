@@ -76,16 +76,15 @@
         }
 
         try {
+          // TODO: this endpoint doesn't exist!
           // Kick off repo owner update using gasless TX
-
-          const gaslessCall = await fetch('/api/gasless/call/repo-owner-update', {
+          const gaslessCall = await fetch('/api/gasless/call/orcid-owner-update', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              forge: 3,
-              projectName: $context.claimableId,
+              orcid: $context.claimableId,
               chainId: $walletStore.network.chainId,
             }),
           });
