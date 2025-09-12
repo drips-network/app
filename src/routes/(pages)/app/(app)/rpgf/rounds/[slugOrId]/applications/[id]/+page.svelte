@@ -252,4 +252,9 @@
     gap: 0.5rem;
     width: fit-content;
   }
+
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>
