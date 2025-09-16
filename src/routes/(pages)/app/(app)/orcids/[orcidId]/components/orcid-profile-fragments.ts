@@ -4,25 +4,11 @@ import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/suppor
 import { MERGE_WITHDRAWABLE_BALANCES_FRAGMENT } from '$lib/utils/merge-withdrawable-balances';
 import { ORCID_PROFILE_HEADER_FRAGMENT } from './orcid-profile-header.svelte';
 
-// TODO
-// withdrawableBalances {
-//   ...MergeWithdrawableBalances
-// }
-// support {
-//   ...SupportersSectionSupportItem
-//   ...SupporterPile
-// }
-// totalEarned {
-//   tokenAddress
-//   amount
-// }
-
-// ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
-// ${SUPPORTER_PILE_FRAGMENT}
-// ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-
 export const ORCID_PROFILE_FRAGMENT = gql`
   ${ORCID_PROFILE_HEADER_FRAGMENT}
+  ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
+  ${SUPPORTER_PILE_FRAGMENT}
+  ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
   fragment OrcidProfile on OrcidLinkedIdentity {
     ...OrcidProfileHeader
     account {
@@ -32,6 +18,17 @@ export const ORCID_PROFILE_FRAGMENT = gql`
     chain
     owner {
       accountId
+    }
+    withdrawableBalances {
+      ...MergeWithdrawableBalances
+    }
+    support {
+      ...SupportersSectionSupportItem
+      ...SupporterPile
+    }
+    totalEarned {
+      tokenAddress
+      amount
     }
   }
 `;
