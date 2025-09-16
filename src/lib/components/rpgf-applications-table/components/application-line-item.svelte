@@ -19,6 +19,8 @@
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot>;
 
+  export let excludeFromViewTransition = false;
+
   let picked = $ballotStore[application.id] !== undefined;
 
   function updateBallot(picked: boolean) {
@@ -85,9 +87,9 @@
   <a
     href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
       ? '?backToBallot'
-      : ''}#content-anchor"
+      : ''}"
   >
-    <RpgfApplicationBadge {application} />
+    <RpgfApplicationBadge {application} {excludeFromViewTransition} />
   </a>
 
   {#if reviewMode && application.state === 'pending'}

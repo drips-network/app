@@ -1,34 +1,21 @@
 <script lang="ts">
-  import storedWritable from '@efstajas/svelte-stored-writable';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Ledger from '../icons/Ledger.svelte';
   import Trophy from '../icons/Trophy.svelte';
   import { browser } from '$app/environment';
   import type { Round } from '$lib/utils/rpgf/types/round';
-  import { createApplicationDtoSchema } from '$lib/utils/rpgf/types/application';
+  import { locallyStoredApplicationExists } from '../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
 
   export let hasExistingBallot: boolean;
   export let round: Round;
-  export let signedIn: boolean;
+  export let signedInUserId: string | null;
   $: state = round.state;
   $: isRoundVoter = round.isVoter;
 
-  const localApplicationState = storedWritable(
-    `rpgf-form-data-${round.urlSlug}`,
-    createApplicationDtoSchema.partial(),
-    {
-      projectName: undefined,
-      dripsAccountId: undefined,
-      answers: [],
-    },
-    !browser,
-  );
-
-  $: localApplicationDraftExists =
-    $localApplicationState.projectName !== undefined ||
-    $localApplicationState.dripsAccountId !== undefined ||
-    ($localApplicationState.answers?.length ?? 0) > 0;
+  const localApplicationDraftExists = signedInUserId
+    ? locallyStoredApplicationExists(round.id, signedInUserId)
+    : false;
 
   const inProgressBallotExists = browser
     ? localStorage.getItem(`in-progress-ballot-${round.urlSlug}`) !== null
@@ -59,7 +46,7 @@
         submitted projects.
       </p>
     {:else if state === 'voting'}
-      {#if !signedIn}
+      {#if !signedInUserId}
         <h2 class="pixelated">Voting is open</h2>
         <p class="typo-text">
           The badgeholders of this round are now voting on the applications. After votes are

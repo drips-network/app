@@ -4,14 +4,20 @@ import Confirm from './steps/confirm.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import { invalidate } from '$app/navigation';
 import type {
+  Application,
   ApplicationFormFields,
   CreateApplicationDto,
 } from '$lib/utils/rpgf/types/application';
 
 export default (
   applicationData: CreateApplicationDto,
+  roundName: string,
+  categoryName: string,
   formFields: ApplicationFormFields,
   roundSlug: string,
+  roundId: string,
+  userId: string,
+  isUpdateForApplication: Application | null,
 ) => {
   const context = writable<{ applicationId: string | null }>({
     applicationId: null,
@@ -26,6 +32,11 @@ export default (
           formFields,
           applicationData,
           roundSlug,
+          roundId,
+          roundName,
+          categoryName,
+          isUpdateForApplication,
+          userId,
         },
       }),
       makeStep({

@@ -12,7 +12,11 @@ import {
 import mapFilterUndefined from '../map-filter-undefined';
 import { pin } from '../ipfs';
 import easAbi from './eas-abi';
-import type { ApplicationFormFields, CreateApplicationDto } from './types/application';
+import type {
+  ApplicationEasAttestationData,
+  ApplicationFormFields,
+  CreateApplicationDto,
+} from './types/application';
 
 function filterRelevantFields(
   applicationDataFields: CreateApplicationDto['answers'],
@@ -47,14 +51,18 @@ function filterRelevantFields(
 
 export async function pinApplicationAttestationData(
   applicationData: CreateApplicationDto,
+  categoryName: string,
+  roundName: string,
   formFields: ApplicationFormFields,
 ): Promise<string> {
   if (!network.retroFunding.enabled) {
     throw new Error('Retro Funding is not enabled on this network');
   }
 
-  const dataToPin: CreateApplicationDto = {
+  const dataToPin: ApplicationEasAttestationData = {
     ...applicationData,
+    categoryName,
+    roundName,
     answers: filterRelevantFields(applicationData.answers, formFields),
   };
 

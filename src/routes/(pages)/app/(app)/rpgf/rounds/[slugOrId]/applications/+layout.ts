@@ -4,7 +4,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 
-export const load = async ({ parent, route, url, depends }) => {
+export const load = async ({ parent, route, url, depends, fetch }) => {
   depends('rpgf:round:applications');
 
   const { round, existingBallot, rpgfUserData } = await parent();

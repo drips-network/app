@@ -293,6 +293,11 @@ export const createApplicationDtoSchema = z.object({
 });
 export type CreateApplicationDto = z.infer<typeof createApplicationDtoSchema>;
 
+export type ApplicationEasAttestationData = CreateApplicationDto & {
+  categoryName: string;
+  roundName: string;
+};
+
 export const applicationStateSchema = z.enum(['pending', 'approved', 'rejected']);
 export type ApplicationState = z.infer<typeof applicationStateSchema>;
 
@@ -337,21 +342,30 @@ export const applicationCategorySchema = z.object({
 });
 export type ApplicationCategory = z.infer<typeof applicationCategorySchema>;
 
-export const applicationSchema = z.object({
+export const applicationVersionSchema = z.object({
   id: z.string(),
-  state: applicationStateSchema,
-  projectName: z.string().min(1).max(255),
+  projectName: z.string().min(1),
   dripsAccountId: z.string().min(1).max(255),
   easAttestationUID: z.string().min(1).max(255).nullable(),
   dripsProjectDataSnapshot: projectChainDataSchema,
+  formId: z.string().min(1).max(255),
+  category: applicationCategorySchema,
+  answers: applicationAnswerSchema.array(),
+  createdAt: z.string().pipe(z.coerce.date()),
+});
+export type ApplicationVersion = z.infer<typeof applicationVersionSchema>;
+
+export const applicationSchema = z.object({
+  id: z.string(),
+  state: applicationStateSchema,
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()),
   roundId: z.string(),
-  formId: z.string(),
   allocation: z.number().nullable(),
-  category: applicationCategorySchema,
-  answers: z.array(applicationAnswerSchema),
   submitter: userSchema,
+  projectName: z.string().min(1).max(255),
+  dripsProjectDataSnapshot: projectChainDataSchema,
+  latestVersion: applicationVersionSchema,
 });
 export type Application = z.infer<typeof applicationSchema>;
 
@@ -367,8 +381,15 @@ export const listingApplicationSchema = z.object({
   id: z.string(),
   state: applicationStateSchema,
   projectName: z.string().min(1).max(255),
-  dripsAccountId: z.string().min(1).max(255),
   dripsProjectDataSnapshot: projectChainDataSchema,
   allocation: z.number().nullable(),
 });
 export type ListingApplication = z.infer<typeof listingApplicationSchema>;
+
+export type UpdateApplicationDto = {
+  projectName: string;
+  dripsAccountId: string;
+  attestationUID?: string;
+  categoryId: string;
+  answers: ApplicationAnswerDto;
+};

@@ -19,6 +19,8 @@
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot> = writable({});
 
+  export let excludeFromViewTransition = false;
+
   let searchQuery = '';
 
   $: filteredApplications = applications.filter((application) => {
@@ -59,6 +61,7 @@
             {reviewMode}
             {round}
             {application}
+            {excludeFromViewTransition}
             bind:decision={decisions[application.id]}
           />
         {/each}
