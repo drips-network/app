@@ -25,19 +25,14 @@
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
-  import type { MergeWithdrawableBalancesFragment } from '$lib/utils/__generated__/gql.generated';
-  import type { Amount } from '$lib/graphql/__generated__/base-types';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
-  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
-  let totalEarned: Amount[] = [];
 
   // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
-  $: orcidSupport = [];
 
   function claimOrcid() {
     // eslint-disable-next-line no-console
@@ -61,9 +56,10 @@
   {#if !orcidAccount.isClaimed}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if withdrawableBalances.length > 0}This ORCID iD has <span class="typo-text-small-bold"
+        {#if orcidAccount.withdrawableBalances.length > 0}This ORCID iD has <span
+            class="typo-text-small-bold"
             ><AggregateFiatEstimate
-              amounts={mergeWithdrawableBalances(withdrawableBalances)}
+              amounts={mergeWithdrawableBalances(orcidAccount.withdrawableBalances)}
             /></span
           > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This ORCID
           iD is unclaimed on {network.label}, but can still receive funds that the owner can collect
@@ -97,22 +93,24 @@
         {#if orcidAccount.isClaimed}
           <div class="stat drip-bordered">
             <KeyValuePair key="Donations">
-              <AggregateFiatEstimate amounts={totalEarned} />
+              <AggregateFiatEstimate amounts={orcidAccount.totalEarned} />
             </KeyValuePair>
           </div>
-        {:else if withdrawableBalances.length > 0}
+        {:else if orcidAccount.withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
             <KeyValuePair key="Unclaimed Support">
-              <AggregateFiatEstimate amounts={mergeWithdrawableBalances(withdrawableBalances)} />
+              <AggregateFiatEstimate
+                amounts={mergeWithdrawableBalances(orcidAccount.withdrawableBalances)}
+              />
             </KeyValuePair>
           </div>
         {/if}
-        {#if [orcidSupport].flat().length > 0}
+        {#if [orcidAccount.support].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
             <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile(orcidSupport)} />
+                <Pile maxItems={4} components={getSupportersPile(orcidAccount.support)} />
               </KeyValuePair>
             </a>
           </div>
@@ -120,7 +118,7 @@
       </div>
     </header>
 
-    {#if !orcidAccount.isClaimed && withdrawableBalances.length > 0}
+    {#if !orcidAccount.isClaimed && orcidAccount.withdrawableBalances.length > 0}
       <section class="app-section">
         <SectionHeader icon={Wallet} label="Claimable funds" />
         <SectionSkeleton loaded={true}>
@@ -128,7 +126,7 @@
             <UnclaimedOrcidCard
               {orcidAccount}
               unclaimedTokensExpandable={false}
-              unclaimedTokensExpanded={withdrawableBalances.length > 0}
+              unclaimedTokensExpanded={orcidAccount.withdrawableBalances.length > 0}
               showClaimButton={!orcidAccount.isClaimed}
               on:claimButtonClick={() =>
                 goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
@@ -143,7 +141,7 @@
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
-        supportItems={orcidSupport}
+        supportItems={orcidAccount.support}
         iconPrimary={false}
       />
     </section>
