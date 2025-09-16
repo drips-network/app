@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { invalidate, replaceState } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
@@ -44,11 +43,6 @@
   }
 
   $: ballotStore = data.ballot;
-
-  // remove #content-anchor from the URL if it exists
-  $: if ($page.url.hash === '#content-anchor') {
-    replaceState($page.url.pathname + $page.url.search, $page.state);
-  }
 </script>
 
 <div
@@ -112,12 +106,7 @@
   </div>
 
   <div class="page">
-    <div
-      id="content-anchor"
-      style:visibility="hidden"
-      style:position="absolute"
-      style:top="-84px"
-    />
+    <div style:visibility="hidden" style:position="absolute" style:top="-84px" />
     <slot />
   </div>
 </div>

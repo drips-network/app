@@ -111,7 +111,7 @@
       <Divider />
     {/if}
 
-    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications#content-anchor">
+    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications">
       <div class="step-headline" class:active={voteStep === 'build-ballot'}>
         <h6 class="typo-text-bold">
           {#if voteStep === 'assign-votes'}
@@ -149,7 +149,7 @@
 
     <Divider />
 
-    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot#content-anchor">
+    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot">
       <div class="step-headline" class:active={voteStep === 'assign-votes'}>
         <h6 class="typo-text-bold">Step {round.voterGuidelinesLink ? '3' : '2'}</h6>
         <span class="typo-text">Assign votes</span>

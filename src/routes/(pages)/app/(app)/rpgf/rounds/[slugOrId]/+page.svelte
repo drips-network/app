@@ -43,7 +43,7 @@
       {#if round.state}
         <RpgfCtaCard
           hasExistingBallot={Boolean(data.existingBallot)}
-          signedIn={Boolean(data.rpgfUserData)}
+          signedInUserId={data.rpgfUserData?.userId ?? null}
           {round}
         />
       {/if}

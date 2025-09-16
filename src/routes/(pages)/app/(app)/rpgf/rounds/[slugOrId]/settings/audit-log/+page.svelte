@@ -19,6 +19,7 @@
     round_published: 'Round published',
     round_deleted: 'Round deleted',
     application_submitted: 'Application submitted',
+    application_updated: 'Application updated',
     application_reviewed: 'Applications reviewed',
     ballot_submitted: 'Ballot submitted',
     ballot_updated: 'Ballot updated',

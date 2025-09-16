@@ -13,26 +13,35 @@
     getNonce,
     pinApplicationAttestationData,
   } from '$lib/utils/rpgf/eas';
-  import { submitApplication } from '$lib/utils/rpgf/rpgf';
+  import { submitApplication, updateApplication } from '$lib/utils/rpgf/rpgf';
   import { getUIDsFromAttestReceipt, ZERO_BYTES32 } from '@ethereum-attestation-service/eas-sdk';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import assert from '$lib/utils/assert';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import type {
+    Application,
     ApplicationFormFields,
     CreateApplicationDto,
   } from '$lib/utils/rpgf/types/application';
+  import { invalidate } from '$app/navigation';
+  import { clearLocallyStoredApplication } from '../../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
 
   export let context: Writable<{ applicationId: string | null }>;
   export let applicationData: CreateApplicationDto;
   export let formFields: ApplicationFormFields;
+  export let roundId: string;
   export let roundSlug: string;
+  export let roundName: string;
+  export let userId: string;
+  export let categoryName: string;
+
+  export let isUpdateForApplication: Application | null;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   async function sendApplication(attestationUID?: string) {
-    const application = await submitApplication(undefined, roundSlug, {
+    const application = await submitApplication(undefined, roundId, {
       ...applicationData,
       attestationUID,
     });
@@ -40,25 +49,47 @@
     $context.applicationId = application.id;
   }
 
+  async function sendApplicationUpdate(attestationUID?: string) {
+    assert(isUpdateForApplication, 'No application to update');
+
+    await updateApplication(undefined, roundId, isUpdateForApplication.id, {
+      ...applicationData,
+      attestationUID,
+    });
+
+    $context.applicationId = isUpdateForApplication.id;
+  }
+
   function handleWithAttest() {
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Submit application',
+        headline: isUpdateForApplication ? 'Update application' : 'Submit application',
 
         before: async () => {
+          assert(network.retroFunding.enabled, 'Retro funding is not enabled');
+          assert(
+            network.retroFunding.attestationConfig.enabled,
+            'Attestations are not enabled for retro funding',
+          );
+
           const { connected, address, provider } = $walletStore;
           if (!connected) {
             throw new Error('Wallet not connected');
           }
 
-          const ipfsHash = await pinApplicationAttestationData(applicationData, formFields);
+          const ipfsHash = await pinApplicationAttestationData(
+            applicationData,
+            categoryName,
+            roundName,
+            formFields,
+          );
 
           const attestationData = applicationAttestationData(ipfsHash, roundSlug);
 
-          const tx = await buildAttestApplicationTx(address, attestationData);
+          const attestTx = await buildAttestApplicationTx(address, attestationData);
 
-          const easAddress = tx.to;
+          const { easAddress } = network.retroFunding.attestationConfig;
 
           const easConfig =
             network.retroFunding.enabled &&
@@ -66,14 +97,14 @@
             network.retroFunding.attestationConfig;
           assert(easConfig, 'EAS configuration is not available');
 
-          return { attestTx: tx, easAddress, easConfig, address, attestationData, provider };
+          return { attestTx, easAddress, easConfig, address, attestationData, provider };
         },
 
         transactions: ({ attestTx, easAddress, easConfig, address, attestationData, provider }) => [
           {
             transaction: attestTx,
             applyGasBuffer: false,
-            title: 'Attest application on-chain',
+            title: 'Attest application',
             gasless: $gaslessStore
               ? {
                   nonceGetter: () => getNonce(provider, address),
@@ -119,9 +150,16 @@
         ],
 
         after: async (receipts) => {
-          const attestationUID = getUIDsFromAttestReceipt(receipts[0])[0];
+          const attestationReceipt = receipts[receipts.length - 1];
+          const attestationUID = getUIDsFromAttestReceipt(attestationReceipt)[0];
 
-          await sendApplication(attestationUID);
+          if (isUpdateForApplication) {
+            await sendApplicationUpdate(attestationUID);
+            await invalidate('rpgf:round:applications');
+          } else {
+            await sendApplication(attestationUID);
+            clearLocallyStoredApplication(roundId, userId);
+          }
         },
       }),
     );
@@ -146,7 +184,10 @@
 </script>
 
 <StepLayout>
-  <StepHeader headline="Submit your application" emoji="🗳️" />
+  <StepHeader
+    headline="{isUpdateForApplication ? 'Update' : 'Submit'} your application"
+    emoji="🗳️"
+  />
   <div class="description">
     <p>
       Once you've submitted your application, it'll be <span class="typo-text-bold"

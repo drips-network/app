@@ -10,6 +10,7 @@
   export let hideState = false;
   export let inline = false;
   export let size: ComponentProps<ProjectAvatar>['size'] = 'small';
+  export let excludeFromViewTransition = false;
 
   $: projectSnapshot = application.dripsProjectDataSnapshot;
 
@@ -32,8 +33,8 @@
   {#if !hideAvatar}
     <div
       class="avatar"
-      style:view-transition-name={viewTransitionName}
-      style:view-transition-class="element-handover"
+      style:view-transition-name={excludeFromViewTransition ? undefined : viewTransitionName}
+      style:view-transition-class={excludeFromViewTransition ? undefined : 'element-handover'}
     >
       <ProjectAvatar
         {size}

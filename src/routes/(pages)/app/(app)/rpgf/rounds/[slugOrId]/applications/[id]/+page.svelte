@@ -1,33 +1,30 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import Lock from '$lib/components/icons/Lock.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import ApplicationDecisionButtons from '$lib/components/rpgf-applications-table/components/application-decision-buttons.svelte';
-  import Table from '$lib/components/table/table.svelte';
-  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
-  import { getCoreRowModel } from '@tanstack/svelte-table';
-  import LinkCell from '$lib/components/table/cells/link.cell.svelte';
   import RpgfApplicationMetricsCard from '$lib/components/rpgf-application-metrics-card/rpgf-application-metrics-card.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
-  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
-  import buildExternalUrl from '$lib/utils/build-external-url';
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
-  import RpgfApplicationDetailsCard from '$lib/components/rpgf-application-details-card/rpgf-application-details-card.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
-  import Copyable from '$lib/components/copyable/copyable.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
+  import RpgfApplicationFormAnswersCard from '$lib/components/rpgf-application-form-answers-card/rpgf-application-form-answers-card.svelte';
+  import RpgfApplicationSubmissionDetailsCard from '$lib/components/rpgf-application-submission-details-card/rpgf-application-submission-details-card.svelte';
 
   export let data;
   $: round = data.round;
   $: application = data.application;
 
-  $: canSeePrivateFields =
-    round.isAdmin || data.application.submitter.id === data.rpgfUserData?.userId;
+  $: isSubmitter = data.application.submitter.id === data.rpgfUserData?.userId;
+  $: canSeePrivateFields = round.isAdmin || isSubmitter;
+
+  $: latestVersion = application.latestVersion;
 
   $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
 </script>
@@ -38,16 +35,31 @@
   <div class="actions">
     <Button
       href={backToBallot
-        ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot#content-anchor`
-        : `/app/rpgf/rounds/${round.urlSlug}/applications#content-anchor`}
+        ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot`
+        : `/app/rpgf/rounds/${round.urlSlug}/applications`}
       icon={ArrowLeft}>Back to {backToBallot ? 'ballot' : 'applications'}</Button
     >
-    <ShareButton
-      url={$page.url.toString().replaceAll('?backToBallot', '').replaceAll('#content-anchor', '')}
-      shareModalText={application.state !== 'approved'
-        ? "Please note that only the applicant or round admins can see this application before it's approved."
-        : undefined}
-    />
+    <div class="right">
+      <ShareButton
+        url={$page.url.toString().replaceAll('?backToBallot', '')}
+        shareModalText={application.state !== 'approved'
+          ? "Please note that only the applicant or round admins can see this application before it's approved."
+          : undefined}
+      />
+
+      <Button
+        href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history`}
+        icon={ArrowCounterClockwiseHeart}
+        variant="ghost">History</Button
+      >
+
+      {#if isSubmitter}
+        <Button
+          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/edit`}
+          icon={Pen}>Edit</Button
+        >
+      {/if}
+    </div>
   </div>
 
   {#if !data.rpgfUserData}
@@ -88,129 +100,16 @@
 
   <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 
-  <RpgfApplicationDetailsCard title="Form answers" key="form-answers">
-    <div class="fields">
-      {#if !canSeePrivateFields}
-        <AnnotationBox type="info">
-          Private fields may have been hidden for this application. Sign in as the applicant or a
-          round admin to view private data.
-        </AnnotationBox>
-      {/if}
+  <RpgfApplicationFormAnswersCard
+    {canSeePrivateFields}
+    applicationVersion={application.latestVersion}
+  />
 
-      <div class="field">
-        <h2 class="typo-header-4">Category</h2>
-        <p>{application.category.name}</p>
-      </div>
-
-      {#each application.answers as answer}
-        <div class="field">
-          <h2 class="typo-header-4" style:display="flex" style:gap="0.2rem">
-            {answer.field.label}
-            {#if answer.field.private}
-              <div style:cursor="help" style:width="fit-content">
-                <Tooltip>
-                  <svelte:fragment slot="tooltip-content">
-                    This field is private and only visible to admins or the applicant.
-                  </svelte:fragment>
-                  <Lock />
-                </Tooltip>
-              </div>
-            {/if}
-          </h2>
-
-          {#if answer.type === 'text' || answer.type === 'textarea'}
-            <p>{answer.text}</p>
-          {:else if answer.type === 'email'}
-            <p>{answer.email}</p>
-          {:else if answer.type === 'url'}
-            <a
-              style:width="fit-content"
-              class="typo-link"
-              href={buildExternalUrl(answer.url)}
-              target="_blank"
-              rel="noopener noreferrer">{answer.url}</a
-            >
-          {:else if answer.type === 'select'}
-            {#each answer.selected as selected}
-              <p>
-                {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
-              </p>
-            {/each}
-          {:else if answer.type === 'list'}
-            <Table
-              options={{
-                columns: answer.field.entryFields.map((ef) => ({
-                  header: ef.label,
-                  accessorKey: ef.label,
-                  cell: (v) => (ef.type === 'url' ? LinkCell : v),
-                  enableSorting: false,
-                })),
-                // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
-                data: answer.entries.map((row) => {
-                  return Object.fromEntries(
-                    Object.entries(row).map(([label, value]) => {
-                      const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
-
-                      if (fieldDef?.type === 'url' && typeof value === 'string') {
-                        return [label, { href: buildExternalUrl(value) }];
-                      } else {
-                        return [label, value];
-                      }
-                    }),
-                  );
-                }),
-                getCoreRowModel: getCoreRowModel(),
-              }}
-            />
-          {/if}
-        </div>
-      {/each}
-    </div>
-  </RpgfApplicationDetailsCard>
-
-  <RpgfApplicationDetailsCard title="Details" key="details">
-    <div class="fields">
-      <div class="field">
-        <h2 class="typo-header-4">GitHub repository</h2>
-        <Copyable value={data.dripsProject.source.url} alwaysVisible>
-          <ProjectBadge
-            linkTo="external-url"
-            size="tiny"
-            forceUnclaimed
-            project={data.dripsProject}
-            tooltip={false}
-          />
-        </Copyable>
-      </div>
-
-      <div class="field">
-        <h2 class="typo-header-4">Submitted by</h2>
-        <IdentityBadge address={application.submitter.walletAddress} />
-      </div>
-
-      <div class="field">
-        <h2 class="typo-header-4">Submitted at</h2>
-        <p>
-          {new Date(application.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </p>
-      </div>
-    </div>
-
-    {#if application.easAttestationUID}
-      <div class="field">
-        <h2 class="typo-header-4">EAS attestation UID</h2>
-        <Copyable value={application.easAttestationUID} alwaysVisible>
-          <p>{application.easAttestationUID}</p>
-        </Copyable>
-      </div>
-    {/if}
-  </RpgfApplicationDetailsCard>
+  <RpgfApplicationSubmissionDetailsCard
+    applicationVersion={latestVersion}
+    submitterWalletAddress={application.submitter.walletAddress}
+    project={data.dripsProject}
+  />
 </div>
 
 <style>
@@ -239,22 +138,8 @@
     margin-bottom: 1rem;
   }
 
-  .fields {
+  .actions .right {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-  }
-
-  .fields > .field {
-    display: flex;
-    flex-direction: column;
     gap: 0.5rem;
-    width: fit-content;
-  }
-
-  p {
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 </style>

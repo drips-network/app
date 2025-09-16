@@ -18,15 +18,18 @@ import {
   applicationCategorySchema,
   applicationFormSchema,
   applicationSchema,
+  applicationVersionSchema,
   listingApplicationSchema,
   type Application,
   type ApplicationCategory,
   type ApplicationForm,
   type ApplicationReviewDto,
+  type ApplicationVersion,
   type CreateApplicationCategoryDto,
   type CreateApplicationDto,
   type CreateApplicationFormDto,
   type ListingApplication,
+  type UpdateApplicationDto,
 } from './types/application';
 import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
@@ -204,6 +207,22 @@ export async function submitApplication(
   return applicationSchema.parse(await res.json());
 }
 
+export async function updateApplication(
+  f = fetch,
+  roundId: string,
+  applicationId: string,
+  application: UpdateApplicationDto,
+): Promise<Application> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/applications/${applicationId}`,
+    'POST',
+    application,
+    f,
+  );
+
+  return applicationSchema.parse(await res.json());
+}
+
 export async function getApplications(
   f = fetch,
   roundId: string,
@@ -256,6 +275,21 @@ export async function getApplication(
   );
 
   return applicationSchema.parse(await res.json());
+}
+
+export async function getApplicationHistory(
+  f = fetch,
+  roundId: string,
+  applicationId: string,
+): Promise<ApplicationVersion[]> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/applications/${applicationId}/history`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return applicationVersionSchema.array().parse(await res.json());
 }
 
 export async function patchRound(f = fetch, roundId: string, patchRoundDto: PatchRoundDto) {
