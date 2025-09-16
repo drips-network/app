@@ -7,7 +7,6 @@ import expect from '$lib/utils/expect';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-import filterOrcidCurrentChainData from '$lib//utils/orcids/filter-current-chain-data';
 import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
 import network from '$lib/stores/wallet/network';
 import type {
@@ -25,7 +24,7 @@ import type {
   CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
-  CreateDonationDetailsStepOrcidFragment
+  CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
 import type { OneTimeDonationSupport } from '$lib/graphql/__generated__/base-types';
@@ -92,7 +91,6 @@ const ecosystemSupportQuery = gql`
     }
   }
 `;
-
 
 // TODO
 // chainData {
@@ -250,7 +248,7 @@ export default function (
                   const orcidData = res.orcidLinkedIdentityByOrcid;
                   if (!orcidData) return true;
                   // TODO: add support
-                  const orcidDataSupport: OneTimeDonationSupport[] = []
+                  const orcidDataSupport: OneTimeDonationSupport[] = [];
                   return orcidDataSupport.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(

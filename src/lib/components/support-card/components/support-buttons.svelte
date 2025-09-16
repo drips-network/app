@@ -8,7 +8,7 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { fade } from 'svelte/transition';
 
-  export let type: 'dripList' | 'project' | 'ecosystem' | 'orcid';
+  export let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user';
 
   export let transitions = true;
 
