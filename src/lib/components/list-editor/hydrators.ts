@@ -1,5 +1,9 @@
 import query from '../../graphql/dripsQL';
-import { LIST_EDITOR_DRIP_LIST_FRAGMENT, LIST_EDITOR_PROJECT_FRAGMENT, LIST_EDITOR_ORCID_FRAGMENT } from './types';
+import {
+  LIST_EDITOR_DRIP_LIST_FRAGMENT,
+  LIST_EDITOR_PROJECT_FRAGMENT,
+  LIST_EDITOR_ORCID_FRAGMENT,
+} from './types';
 import { gql } from 'graphql-request';
 import type { RecipientResult } from './types';
 import type {
@@ -12,7 +16,6 @@ import type {
 } from './__generated__/gql.generated';
 import { isAddress } from 'ethers';
 import network from '$lib/stores/wallet/network';
-import ListEditor from './list-editor.svelte';
 import { fetchOrcid, orcidIdToAccountId } from '../../utils/orcids/fetch-orcid';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
@@ -84,7 +87,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
     { orcid: orcidId, chain: network.gqlName },
   );
 
-  let orcidAccount = res.orcidLinkedIdentityByOrcid
+  let orcidAccount = res.orcidLinkedIdentityByOrcid;
   // We don't know about it internally, let's construct a minimal OrcidAccount object
   // to mimic it.
   if (!orcidAccount) {
@@ -92,7 +95,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
     const orcid = await fetchOrcid(orcidId, fetch);
     // If we can't fetch the ORCID profile, we're out of luck
     if (!orcid) {
-      return null
+      return null;
     }
 
     const accountId = await orcidIdToAccountId(orcidId);
@@ -105,7 +108,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
       chain: network.gqlName,
       orcid: orcid.id,
       isClaimed: false,
-      isLinked: false,
+      areSplitsValid: false,
     } as NonNullable<GetOrcidQuery['orcidLinkedIdentityByOrcid']>;
   }
 

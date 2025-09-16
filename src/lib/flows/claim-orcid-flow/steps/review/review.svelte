@@ -30,7 +30,9 @@
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';
-  import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
+  import UnclaimedOrcidCard, {
+    UNCLAIMED_ORCID_CARD_FRAGMENT,
+  } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import type { MergeWithdrawableBalancesFragment } from '$lib/utils/__generated__/gql.generated';
   import OrcidProfileHeader from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-profile-header.svelte';
   import type { OrcidProfileHeaderFragment } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/__generated__/gql.generated';
@@ -41,7 +43,7 @@
   export let canEditWalletConnection = true;
 
   $: orcidProfile = $context.claimableMetadata ?? unreachable();
-  $: orcidAccount = $context.claimableAccount ?? unreachable()
+  $: orcidAccount = $context.claimableAccount ?? unreachable();
 
   // For previewing what the project will look like after claiming
   let fakeClaimedOrcid: OrcidProfileHeaderFragment;
@@ -53,22 +55,20 @@
       __typename: 'AddressDriverAccount',
       address: $walletStore.address ?? unreachable(),
     },
-    isLinked: false,
-    isClaimed: false
+    areSplitsValid: false,
+    isClaimed: false,
   };
 
   async function submit() {
     dispatch('goForward');
   }
 
-  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = []
+  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
 
   $: hasCollectableAmount =
-    withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
-    0;
+    withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0;
   $: hasSplittableAmount =
-    withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
-    0;
+    withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length > 0;
 </script>
 
 <StandaloneFlowStepLayout
@@ -77,10 +77,7 @@
 >
   <FormField type="div" title="ORCID iD">
     <div class="card">
-      <OrcidProfileHeader
-        orcid={orcidProfile}
-        orcidAccount={fakeClaimedOrcid}
-      />
+      <OrcidProfileHeader orcid={orcidProfile} orcidAccount={fakeClaimedOrcid} />
     </div>
   </FormField>
   <FormField type="div" title="Owned by">
@@ -96,7 +93,7 @@
   <FormField type="div" title="Claimable funds">
     <UnclaimedOrcidCard
       detailedTokenBreakdown={hasCollectableAmount && hasSplittableAmount}
-      orcidAccount={orcidAccount}
+      {orcidAccount}
     />
   </FormField>
   <WhatsNextSection>

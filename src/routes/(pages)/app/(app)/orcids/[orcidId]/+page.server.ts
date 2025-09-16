@@ -1,8 +1,11 @@
 import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fetchOrcid, fetchOrcidAccount, orcidIdToAccountId } from '../../../../../../lib/utils/orcids/fetch-orcid';
-import network from '$lib/stores/wallet/network';
+import {
+  fetchOrcid,
+  fetchOrcidAccount,
+  orcidIdToAccountId,
+} from '../../../../../../lib/utils/orcids/fetch-orcid';
 import type { OrcidProfileFragment } from './components/__generated__/gql.generated';
 
 /**
@@ -38,7 +41,7 @@ export const load = (async ({ params, fetch }) => {
       },
       orcid: orcid.id,
       isClaimed: false,
-      isLinked: false
+      areSplitsValid: false,
     } as OrcidProfileFragment;
   }
 

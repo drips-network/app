@@ -9,7 +9,7 @@
       chain
       orcid
       isClaimed
-      isLinked
+      areSplitsValid
     }
   `;
 </script>
@@ -50,7 +50,7 @@
     ...orcid,
     chain: chainOverride ?? network.gqlName,
     isClaimed: false,
-    isLinked: false,
+    areSplitsValid: false,
   } as OrcidBadgeFragment;
 
   $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;

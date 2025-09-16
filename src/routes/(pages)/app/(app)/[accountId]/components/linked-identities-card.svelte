@@ -9,7 +9,7 @@
         orcid
         chain
         isClaimed
-        isLinked
+        areSplitsValid
       }
     }
   `;

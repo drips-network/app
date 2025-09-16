@@ -17,7 +17,7 @@
     fragment EnterGitUrlStepOrcid on OrcidLinkedIdentity {
       ...UnclaimedOrcidCard
       isClaimed
-      isLinked
+      areSplitsValid
       account {
         accountId
       }
@@ -48,7 +48,9 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import modal from '$lib/stores/modal';
   import { loadFundingInfo } from './enter-orcid-id';
-  import UnclaimedOrcidCard, { UNCLAIMED_ORCID_CARD_FRAGMENT } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
+  import UnclaimedOrcidCard, {
+    UNCLAIMED_ORCID_CARD_FRAGMENT,
+  } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import { fetchOrcid } from '../../../../utils/orcids/fetch-orcid';
   import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 
@@ -88,12 +90,12 @@
     try {
       validationState = { type: 'pending' };
 
-      const orcidInfo = await fetchOrcid($context.claimableId, fetch)
-      if(!orcidInfo) {
+      const orcidInfo = await fetchOrcid($context.claimableId, fetch);
+      if (!orcidInfo) {
         throw new InvalidUrlError('ORCID iD not found');
       }
 
-      $context.claimableMetadata = orcidInfo
+      $context.claimableMetadata = orcidInfo;
 
       const response = await query<OrcidQuery, OrcidQueryVariables>(orcidQuery, {
         orcid: $context.claimableId,
@@ -102,13 +104,13 @@
 
       const orcidAccount = response.orcidLinkedIdentityByOrcid;
       if (orcidAccount) {
-        if(orcidAccount.isClaimed && orcidAccount.isLinked) {
+        if (orcidAccount.isClaimed && orcidAccount.areSplitsValid) {
           throw new InvalidUrlError('ORCID already claimed');
         }
 
         if (
           orcidAccount.owner?.address.toLowerCase() === $walletStore.address?.toLowerCase() &&
-          !orcidAccount.isLinked
+          !orcidAccount.areSplitsValid
         ) {
           // The correct owner was already set previously for whatever reason. We can skip updating the owner.
           $context.isPartiallyClaimed = true;
@@ -119,14 +121,14 @@
         $context.claimableAccount = {
           __typename: 'OrcidLinkedIdentity',
           account: {
-            __typename: "RepoDriverAccount",
+            __typename: 'RepoDriverAccount',
             // TODO: calc real accountId?
-            accountId: ''
+            accountId: '',
           },
           orcid: orcidInfo.id,
           isClaimed: false,
-          isLinked: false,
-          chain: network.gqlName // Add the required 'chain' property
+          areSplitsValid: false,
+          chain: network.gqlName, // Add the required 'chain' property
         };
       }
 

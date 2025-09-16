@@ -9,7 +9,7 @@
         address
       }
       isClaimed
-      isLinked
+      areSplitsValid
     }
   `;
 </script>
@@ -34,10 +34,7 @@
   />
   <div class="header">
     <OrcidAvatar size="large" outline />
-    <a
-      class="name typo-header-4"
-      href={buildOrcidUrl(orcid.orcid)}><OrcidName {orcid} /></a
-    >
+    <a class="name typo-header-4" href={buildOrcidUrl(orcid.orcid)}><OrcidName {orcid} /></a>
     {#if orcid.owner}
       <div class="owner typo-text-small">
         <span>Owned by </span>
