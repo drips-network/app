@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ThumbsDown from "$lib/components/icons/ThumbsDown.svelte";
-  import ThumbsUp from "$lib/components/icons/ThumbsUp.svelte";
+  import ThumbsDown from '$lib/components/icons/ThumbsDown.svelte';
+  import ThumbsUp from '$lib/components/icons/ThumbsUp.svelte';
 
   export let applicationId: string;
   export let decision: 'approve' | 'reject' | null = null;
@@ -17,16 +17,28 @@
 </script>
 
 <div role="group" aria-label="Application decision" class="application-decision-buttons">
-  <input type="checkbox" value="reject" checked={decision === 'reject'} id="{checkboxSlugPrefix}-reject" on:click={() => handleDecisionClick('reject')} />
+  <input
+    type="checkbox"
+    value="reject"
+    checked={decision === 'reject'}
+    id="{checkboxSlugPrefix}-reject"
+    on:click={() => handleDecisionClick('reject')}
+  />
   <label
     class:rejected={decision === 'reject'}
     for="{checkboxSlugPrefix}-reject"
     aria-label="Reject application"
   >
-    <ThumbsDown style="fill: var(--color-foreground)"/>
+    <ThumbsDown style="fill: var(--color-foreground)" />
   </label>
 
-  <input type="checkbox" value="approve" checked={decision === 'approve'} id="{checkboxSlugPrefix}-approve" on:click={() => handleDecisionClick('approve')} />
+  <input
+    type="checkbox"
+    value="approve"
+    checked={decision === 'approve'}
+    id="{checkboxSlugPrefix}-approve"
+    on:click={() => handleDecisionClick('approve')}
+  />
   <label
     class:approved={decision === 'approve'}
     for="{checkboxSlugPrefix}-approve"
@@ -37,6 +49,10 @@
 </div>
 
 <style>
+  .application-decision-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
   input {
     display: none;
   }
@@ -50,7 +66,10 @@
     height: 2rem;
     border-radius: 50%;
     color: var(--color-background);
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    transition:
+      background-color 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out,
+      opacity 0.2s ease-in-out;
     opacity: 0.5;
   }
 
