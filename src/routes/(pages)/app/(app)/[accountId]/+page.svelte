@@ -135,7 +135,9 @@
     </div>
     <aside class="article-sidebar">
       <SupportCard user={data.profileData} />
-      <LinkedIdentitiesCard linkedIdentities={profileChainData.linkedIdentities}
+      <LinkedIdentitiesCard
+        linkedIdentities={profileChainData.linkedIdentities}
+        canLinkIdentity={isSelf}
       ></LinkedIdentitiesCard>
     </aside>
   </article>
