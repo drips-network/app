@@ -15,6 +15,8 @@
   import Supporters from '$lib/components/supporters-section/supporters.section.svelte';
   import unreachable from '$lib/utils/unreachable';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+  import SupportCard from '$lib/components/support-card/support-card.svelte';
+  import LinkedIdentitiesCard from './components/linked-identities-card.svelte';
 
   export let data;
 
@@ -30,6 +32,8 @@
   $: isSelf =
     data.profileData?.account.address &&
     data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase();
+
+  $: profileChainData = filterCurrentChainData(data.profileData?.chainData ?? []);
 </script>
 
 <HeadMeta title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined} />
@@ -47,99 +51,140 @@
     description="Sorry, but we couldn't find that ENS name."
   />
 {:else if data.profileData}
-  <article class="flex flex-col gap-16">
-    <SectionSkeleton placeholderOutline={false} loaded>
-      <header class="flex flex-wrap sm:flex-nowrap gap-4">
-        <IdentityBadge
-          disableLink
-          address={data.profileData.account.address}
-          size="gigantic"
-          showIdentity={false}
-          disableTooltip
-        />
-        <div class="flex items-center sm:py-4">
-          <div class="flex flex-col gap-4">
-            <h1 class="w-full -mb-2">
-              <IdentityBadge
-                disableLink
-                address={data.profileData.account.address}
-                size="gigantic"
-                showAvatar={false}
-                disableTooltip
-              />
-            </h1>
-            <ul class="social-links">
-              <div in:fade>
-                <SocialLink network="ethereum" value={data.profileData.account.address} />
-              </div>
-              {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
-                {#if value}<li in:fade>
-                    <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
-                  </li>{/if}
-              {/each}
-            </ul>
-            {#if description}<p in:fade>{description}</p>{/if}
+  <article>
+    <div class="article-header">
+      <SectionSkeleton placeholderOutline={false} loaded horizontalScroll={false}>
+        <header class="flex flex-wrap sm:flex-nowrap gap-4">
+          <IdentityBadge
+            disableLink
+            address={data.profileData.account.address}
+            size="gigantic"
+            showIdentity={false}
+            disableTooltip
+          />
+          <div class="flex items-center sm:py-4">
+            <div class="flex flex-col gap-4">
+              <h1 class="w-full -mb-2">
+                <IdentityBadge
+                  disableLink
+                  address={data.profileData.account.address}
+                  size="gigantic"
+                  showAvatar={false}
+                  disableTooltip
+                />
+              </h1>
+              <ul class="social-links">
+                <div in:fade>
+                  <SocialLink network="ethereum" value={data.profileData.account.address} />
+                </div>
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                  {#if value}<li in:fade>
+                      <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
+                    </li>{/if}
+                {/each}
+              </ul>
+              {#if description}<p in:fade>{description}</p>{/if}
+            </div>
           </div>
-        </div>
-      </header>
-    </SectionSkeleton>
-    <Developer accountId={data.profileData.account.accountId} />
-    <YourProjectsSection
-      collapsable
-      collapsed={mapFilterUndefined([filterCurrentChainData(data.profileData.chainData)], (v) =>
-        v === null ? undefined : v,
-      ).length === 0}
-      projects={mapFilterUndefined(
-        filterCurrentChainData(data.profileData.chainData).projects,
-        (v) => (v === null ? undefined : v),
-      )}
-    />
-    <YourDripListsSection
-      collapsable
-      collapsed={[
-        ...data.profileData.votingRounds,
-        ...mapFilterUndefined(filterCurrentChainData(data.profileData.chainData).dripLists, (v) =>
+        </header>
+      </SectionSkeleton>
+    </div>
+    <div class="article-content gap-16">
+      <Developer accountId={data.profileData.account.accountId} />
+      <YourProjectsSection
+        collapsable
+        collapsed={mapFilterUndefined([profileChainData], (v) => (v === null ? undefined : v))
+          .length === 0}
+        projects={mapFilterUndefined(profileChainData.projects, (v) =>
           v === null ? undefined : v,
-        ),
-      ].length === 0}
-      votingRounds={data.profileData.votingRounds}
-      dripLists={mapFilterUndefined(
-        filterCurrentChainData(data.profileData.chainData).dripLists,
-        (v) => (v === null ? undefined : v),
-      )}
-    />
-    <Supporters
-      collapsable
-      collapsed={filterCurrentChainData(data.profileData.chainData).support.length === 0}
-      type="address"
-      supportItems={filterCurrentChainData(data.profileData.chainData).support}
-    />
-    <Streams
-      hideIncoming
-      collapsable
-      collapsed={filterCurrentChainData(data.profileData.chainData).streams.outgoing.length === 0}
-      userStreams={filterCurrentChainData(data.profileData.chainData).streams}
-      disableActions={!isSelf}
-      accountId={data.profileData.account.accountId}
-    />
-    <Balances
-      collapsable
-      collapsed={filterCurrentChainData(data.profileData.chainData).balances.length === 0}
-      userBalances={filterCurrentChainData(data.profileData.chainData).balances}
-      accountId={data.profileData.account.accountId}
-    />
+        )}
+        withClaimProjectButton={true}
+      />
+      <YourDripListsSection
+        collapsable
+        collapsed={[
+          ...data.profileData.votingRounds,
+          ...mapFilterUndefined(profileChainData.dripLists, (v) => (v === null ? undefined : v)),
+        ].length === 0}
+        votingRounds={data.profileData.votingRounds}
+        dripLists={mapFilterUndefined(profileChainData.dripLists, (v) =>
+          v === null ? undefined : v,
+        )}
+        withCreateButton={true}
+      />
+      <Supporters
+        collapsable
+        collapsed={profileChainData.support.length === 0}
+        type="address"
+        supportItems={profileChainData.support}
+      />
+      <Streams
+        hideIncoming
+        collapsable
+        collapsed={profileChainData.streams.outgoing.length === 0}
+        userStreams={profileChainData.streams}
+        disableActions={!isSelf}
+        accountId={data.profileData.account.accountId}
+      />
+      <Balances
+        collapsable
+        collapsed={profileChainData.balances.length === 0}
+        userBalances={profileChainData.balances}
+        accountId={data.profileData.account.accountId}
+      />
+    </div>
+    <aside class="article-sidebar">
+      <SupportCard disabled={false} />
+      <LinkedIdentitiesCard linkedIdentities={profileChainData.linkedIdentities}
+      ></LinkedIdentitiesCard>
+    </aside>
   </article>
 {/if}
 
 <style>
+  article {
+    display: flex;
+    gap: 3rem 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .article-header {
+    width: 100%;
+  }
+
+  .article-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 4rem;
+  }
+
   .social-links {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
   }
 
+  .article-sidebar {
+    width: 100%;
+    max-width: 18rem;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    display: flex;
+    gap: 1.5rem;
+    flex-direction: column;
+  }
+
   .social-links * {
     display: flex;
     gap: 0.375rem;
+  }
+
+  @media (max-width: 768px) {
+    .article-sidebar {
+      max-width: none;
+    }
   }
 </style>
