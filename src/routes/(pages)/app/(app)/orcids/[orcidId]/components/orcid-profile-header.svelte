@@ -9,7 +9,7 @@
         address
       }
       isClaimed
-      isLinked
+      areSplitsValid
     }
   `;
 </script>

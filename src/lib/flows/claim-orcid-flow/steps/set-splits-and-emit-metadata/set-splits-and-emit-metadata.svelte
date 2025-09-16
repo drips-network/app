@@ -42,7 +42,7 @@
             address
           }
           isClaimed
-          isLinked
+          areSplitsValid
         }
       }
     `;
@@ -236,7 +236,7 @@
               orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
                 chain
                 isClaimed
-                isLinked
+                areSplitsValid
               }
             }
           `;
@@ -251,7 +251,7 @@
               Boolean(
                 result.orcidLinkedIdentityByOrcid &&
                   result.orcidLinkedIdentityByOrcid.isClaimed &&
-                  result.orcidLinkedIdentityByOrcid.isLinked,
+                  result.orcidLinkedIdentityByOrcid.areSplitsValid,
               ),
             300000,
             2000,
