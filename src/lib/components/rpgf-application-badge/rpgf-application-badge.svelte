@@ -73,6 +73,7 @@
     align-items: center;
     gap: 0.5rem;
     vertical-align: middle;
+    white-space: nowrap;
   }
 
   .name {
