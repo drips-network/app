@@ -33,7 +33,7 @@
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
   let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
-  let totalEarned: Amount[] = []
+  let totalEarned: Amount[] = [];
 
   // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
@@ -42,7 +42,7 @@
   function claimOrcid() {
     // eslint-disable-next-line no-console
     console.log('Launch claim ORCID flow');
-    launchClaimOrcid(orcid.id)
+    launchClaimOrcid(orcid.id);
   }
 </script>
 
@@ -61,8 +61,7 @@
   {#if !orcidAccount.isClaimed}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if withdrawableBalances.length > 0}This ORCID iD has <span
-            class="typo-text-small-bold"
+        {#if withdrawableBalances.length > 0}This ORCID iD has <span class="typo-text-small-bold"
             ><AggregateFiatEstimate
               amounts={mergeWithdrawableBalances(withdrawableBalances)}
             /></span
@@ -72,11 +71,8 @@
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
             <CopyLinkButton url={buildOrcidUrl(orcid.id, { absolute: true })} variant="ghost" />
-            <Button
-              size="small"
-              icon={Registered}
-              variant="primary"
-              on:click={claimOrcid}>Claim ORCID iD</Button
+            <Button size="small" icon={Registered} variant="primary" on:click={claimOrcid}
+              >Claim ORCID iD</Button
             >
           </div>
         </svelte:fragment>
@@ -106,10 +102,8 @@
           </div>
         {:else if withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
-            <KeyValuePair key="Donations">
-              <AggregateFiatEstimate
-                amounts={mergeWithdrawableBalances(withdrawableBalances)}
-              />
+            <KeyValuePair key="Unclaimed Support">
+              <AggregateFiatEstimate amounts={mergeWithdrawableBalances(withdrawableBalances)} />
             </KeyValuePair>
           </div>
         {/if}
@@ -184,7 +178,7 @@
   .header {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 1.5rem;
     justify-content: space-between;
   }
@@ -198,8 +192,7 @@
   .stats .stat {
     padding: 1rem;
     min-height: 6.125rem;
-    flex-grow: 1;
-    flex-basis: 33%;
+    flex-basis: 50%;
   }
 
   .card {
@@ -219,6 +212,12 @@
 
   .notice {
     margin-bottom: 2rem;
+  }
+
+  #support {
+    gap: 3rem;
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 1080px) {

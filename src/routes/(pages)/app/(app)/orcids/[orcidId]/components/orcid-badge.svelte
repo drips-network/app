@@ -34,6 +34,7 @@
   /** display orcid as if it's unclaimed, even if it is claimed */
   export let forceUnclaimed = false;
   export let hideAvatar = false;
+  export let hideType = true;
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'orcid-page' | 'nothing' = 'orcid-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
@@ -79,7 +80,10 @@
           <div><OrcidAvatar {size} /></div>
         </div>
       {/if}
-      <div class="name flex-1 min-w-0 truncate">
+      {#if !hideType}
+        <div class="type">ORCID</div>
+      {/if}
+      <div class="name flex-1 min-w-0">
         <OrcidName tiny={smallText} orcid={processedOrcid} />
       </div>
       {#if copyable}
@@ -149,5 +153,9 @@
 
   .copy button > * {
     position: absolute;
+  }
+
+  .type {
+    font-weight: 600;
   }
 </style>
