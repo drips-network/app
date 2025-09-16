@@ -18,6 +18,8 @@ import type {
   EcosystemOtDsQueryVariables,
   OrcidOtDsQuery,
   OrcidOtDsQueryVariables,
+  AddressOtDsQuery,
+  AddressOtDsQueryVariables,
 } from './__generated__/gql.generated';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
@@ -122,6 +124,24 @@ const orcidSupportQuery = gql`
   query OrcidOTDs($orcid: String!, $chain: SupportedChain!) {
     orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
       chain
+    }
+  }
+`;
+
+const addressSupportQuery = gql`
+  query AddressOTDs($address: String!, $chains: [SupportedChain!]!) {
+    userByAddress(address: $address, chains: $chains) {
+      chainData {
+        chain
+        support {
+          ... on OneTimeDonationSupport {
+            account {
+              accountId
+            }
+            date
+          }
+        }
+      }
     }
   }
 `;
@@ -275,6 +295,33 @@ export default function (
                   if (!dripListData) return true;
 
                   return dripListData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            }
+            // TODO: Verify!
+            case 'AddressDriverAccount': {
+              await expect(
+                () =>
+                  query<AddressOtDsQuery, AddressOtDsQueryVariables>(addressSupportQuery, {
+                    address: recipient.address,
+                    chains: [network.gqlName],
+                  }),
+                (res) => {
+                  const userData = res.userByAddress;
+                  if (!userData) return true;
+
+                  return filterCurrentChainData(userData.chainData).support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,
