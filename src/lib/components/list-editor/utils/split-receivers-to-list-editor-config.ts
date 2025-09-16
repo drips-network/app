@@ -14,7 +14,6 @@ import type {
   SplitReceiversToListEditorConfigSubListReceiverFragment,
   SplitReceiversToListEditorConfigOrcidReceiverFragment,
 } from './__generated__/gql.generated';
-import network from '$lib/stores/wallet/network';
 
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT = gql`
   ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
@@ -89,7 +88,7 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql
     weight
     linkedIdentity {
       ... on OrcidLinkedIdentity {
-        isLinked
+        areSplitsValid
         isClaimed
         chain
         account {
@@ -125,7 +124,7 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
     case 'LinkedIdentityReceiver':
       return {
         type: 'orcid',
-        orcid: input.linkedIdentity
+        orcid: input.linkedIdentity,
       };
   }
 }
