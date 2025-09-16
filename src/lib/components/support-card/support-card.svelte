@@ -61,6 +61,16 @@
       }
     }
   `;
+
+  export const SUPPORT_CARD_USER_FRAGEMENT = gql`
+    fragment SupportCardUser on User {
+      account {
+        accountId
+        address
+        driver
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -90,6 +100,7 @@
     SupportCardProjectFragment,
     SupportCardEcosystemFragment,
     SupportCardOrcidFragment,
+    SupportCardUserFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps, {
@@ -110,15 +121,16 @@
   export let dripList: SupportCardDripListFragment | undefined = undefined;
   export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
   export let orcid: SupportCardOrcidFragment | undefined = undefined;
+  export let user: SupportCardUserFragment | undefined = undefined;
 
   export let draftListMode = false;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList && !ecosystem && !orcid) disabled = true;
+    if (!project && !dripList && !ecosystem && !orcid && !user) disabled = true;
   }
 
-  let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' = 'dripList';
+  let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user' = 'dripList';
 
   $: {
     switch (true) {
@@ -130,6 +142,9 @@
         break;
       case !!orcid:
         type = 'orcid';
+        break;
+      case !!user:
+        type = 'user';
         break;
       default:
         type = 'dripList';
@@ -152,6 +167,9 @@
         break;
       case !!orcid:
         supportUrl = `${BASE_URL}${buildOrcidUrl(orcid.orcid)}`;
+        break;
+      case !!user:
+        supportUrl = `${BASE_URL}/app/${user?.account.address}`;
         break;
       default:
         supportUrl = '/';
@@ -222,6 +240,7 @@
         hasAccountId = !!ecosystem.account.accountId;
         donationFlowStepsInput = ecosystem;
         break;
+      // TODO also remove?
       case !!orcid:
         hasAccountId = !!orcid.account.accountId;
         donationFlowStepsInput = orcid;
@@ -259,6 +278,9 @@
         break;
       case !!orcid:
         donationFlowStepsInput = orcid;
+        break;
+      case !!user:
+        donationFlowStepsInput = user.account;
         break;
       default:
         unreachable();
