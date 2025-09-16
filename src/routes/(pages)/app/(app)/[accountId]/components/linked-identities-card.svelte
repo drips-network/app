@@ -20,6 +20,7 @@
   import type { LinkedIdentitiesFragment } from './__generated__/gql.generated';
 
   export let linkedIdentities: LinkedIdentitiesFragment[] = [];
+  export let canLinkIdentity: boolean = false;
 </script>
 
 <div class="linked-identities-card">
@@ -38,7 +39,9 @@
     <span>Identities can be used to find and support you.</span>
     <a class="typo-link" target="_blank" href="https://docs.drips.network/TODO">Learn more</a>
   {/if}
-  <Button icon={Link} variant="muted">Link identity</Button>
+  {#if canLinkIdentity}
+    <Button icon={Link} variant="muted">Link identity</Button>
+  {/if}
 </div>
 
 <style>
