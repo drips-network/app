@@ -33,6 +33,8 @@
 
   // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
+  $: withdrawableBalances = orcidAccount.withdrawableBalances ?? [];
+  $: support = orcidAccount.support ?? [];
 
   function claimOrcid() {
     launchClaimOrcid(orcid.id);
@@ -54,10 +56,9 @@
   {#if !orcidAccount.isClaimed}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if orcidAccount.withdrawableBalances.length > 0}This ORCID iD has <span
-            class="typo-text-small-bold"
+        {#if withdrawableBalances.length > 0}This ORCID iD has <span class="typo-text-small-bold"
             ><AggregateFiatEstimate
-              amounts={mergeWithdrawableBalances(orcidAccount.withdrawableBalances)}
+              amounts={mergeWithdrawableBalances(withdrawableBalances)}
             /></span
           > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This ORCID
           iD is unclaimed on {network.label}, but can still receive funds that the owner can collect
@@ -94,21 +95,19 @@
               <AggregateFiatEstimate amounts={orcidAccount.totalEarned} />
             </KeyValuePair>
           </div>
-        {:else if orcidAccount.withdrawableBalances.length > 0}
+        {:else if withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
             <KeyValuePair key="Unclaimed Support">
-              <AggregateFiatEstimate
-                amounts={mergeWithdrawableBalances(orcidAccount.withdrawableBalances)}
-              />
+              <AggregateFiatEstimate amounts={mergeWithdrawableBalances(withdrawableBalances)} />
             </KeyValuePair>
           </div>
         {/if}
-        {#if [orcidAccount.support].flat().length > 0}
+        {#if [support].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
             <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile(orcidAccount.support)} />
+                <Pile maxItems={4} components={getSupportersPile(support)} />
               </KeyValuePair>
             </a>
           </div>
@@ -116,7 +115,7 @@
       </div>
     </header>
 
-    {#if !orcidAccount.isClaimed && orcidAccount.withdrawableBalances.length > 0}
+    {#if !orcidAccount.isClaimed && withdrawableBalances.length > 0}
       <section class="app-section">
         <SectionHeader icon={Wallet} label="Claimable funds" />
         <SectionSkeleton loaded={true}>
@@ -124,7 +123,7 @@
             <UnclaimedOrcidCard
               {orcidAccount}
               unclaimedTokensExpandable={false}
-              unclaimedTokensExpanded={orcidAccount.withdrawableBalances.length > 0}
+              unclaimedTokensExpanded={withdrawableBalances.length > 0}
               showClaimButton={!orcidAccount.isClaimed}
               on:claimButtonClick={() =>
                 goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
@@ -139,7 +138,7 @@
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
-        supportItems={orcidAccount.support}
+        supportItems={support}
         iconPrimary={false}
       />
     </section>
