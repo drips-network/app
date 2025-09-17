@@ -207,16 +207,29 @@
         <WhatsNextCard>
           <svelte:fragment slot="title">After your donation...</svelte:fragment>
           <svelte:fragment slot="items">
-            <WhatsNextItem icon={TransactionsIcon}>
-              Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
-              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-            </WhatsNextItem>
-            <WhatsNextItem icon={CalendarIcon}>
-              The next date that accumulated funds will be distributed is <span
-                class="typo-text-bold"
-                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-              >.
-            </WhatsNextItem>
+            {#if receiver.__typename === 'OrcidLinkedIdentity'}
+              <!-- TODO: what goes here? -->
+              <WhatsNextItem icon={CalendarIcon}>
+                Funds can be collected on <span class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {:else}
+              <WhatsNextItem icon={TransactionsIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
+                <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+              </WhatsNextItem>
+              <WhatsNextItem icon={CalendarIcon}>
+                The next date that accumulated funds will be distributed is <span
+                  class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {/if}
           </svelte:fragment>
         </WhatsNextCard>
       </WhatsNextSection>

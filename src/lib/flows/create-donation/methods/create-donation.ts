@@ -29,7 +29,6 @@ import type {
   CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
-import type { OneTimeDonationSupport } from '$lib/graphql/__generated__/base-types';
 
 const projectSupportQuery = gql`
   query ProjectOTDs($id: ID!, $chains: [SupportedChain!]!) {
@@ -94,36 +93,18 @@ const ecosystemSupportQuery = gql`
   }
 `;
 
-// TODO
-// chainData {
-//   ... on ClaimedOrcidAccountData {
-//     chain
-//     support {
-//       ... on OneTimeDonationSupport {
-//         account {
-//           accountId
-//         }
-//         date
-//       }
-//     }
-//   }
-//   ... on UnClaimedOrcidAccountData {
-//     chain
-//     support {
-//       ... on OneTimeDonationSupport {
-//         account {
-//           accountId
-//         }
-//         date
-//       }
-//     }
-//   }
-// }
-
 const orcidSupportQuery = gql`
   query OrcidOTDs($orcid: String!, $chain: SupportedChain!) {
     orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
       chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
     }
   }
 `;
@@ -231,7 +212,7 @@ export default function (
               );
               break;
             }
-            case 'EcosystemMainAccount':
+            case 'EcosystemMainAccount': {
               await expect(
                 () =>
                   query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
@@ -256,20 +237,19 @@ export default function (
                 1000,
               );
               break;
-            // TODO: Verify!
-            case 'OrcidLinkedIdentity':
+            }
+            case 'OrcidLinkedIdentity': {
               await expect(
                 () =>
                   query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
-                    orcid: recipientAccountId,
+                    orcid: recipient.orcid,
                     chain: network.gqlName,
                   }),
                 (res) => {
                   const orcidData = res.orcidLinkedIdentityByOrcid;
-                  if (!orcidData) return true;
-                  // TODO: add support
-                  const orcidDataSupport: OneTimeDonationSupport[] = [];
-                  return orcidDataSupport.some((support) => {
+                  if (!orcidData) return false;
+
+                  return orcidData.support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,
@@ -283,6 +263,7 @@ export default function (
                 1000,
               );
               break;
+            }
             case 'NftDriverAccount': {
               await expect(
                 () =>
