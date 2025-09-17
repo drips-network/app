@@ -41,7 +41,7 @@ function filterRelevantFields(
 
     const submittedField = applicationDataFields.find((f) => f.fieldId === fieldId);
 
-    if (!submittedField) {
+    if (!submittedField && !('required' in field && !field.required)) {
       throw new Error(`Fillable field ${fieldId} is missing`);
     }
 
