@@ -15,10 +15,7 @@ import type {
   GetOrcidQueryVariables,
 } from './__generated__/gql.generated';
 import network from '$lib/stores/wallet/network';
-import {
-  fetchOrcid,
-  orcidIdToAccountId,
-} from '../../utils/orcids/fetch-orcid';
+import { fetchOrcid, orcidIdToAccountId } from '../../utils/orcids/fetch-orcid';
 import { calcAccountId } from '$lib/utils/sdk/address-driver/calc-account-id';
 
 export const getDripList = async (dripListId: string): Promise<RecipientResult> => {
@@ -90,7 +87,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
     { orcid: orcidId, chain: network.gqlName },
   );
 
-  let orcidAccount = res.orcidLinkedIdentityByOrcid
+  let orcidAccount = res.orcidLinkedIdentityByOrcid;
   // We don't know about it internally, let's construct a minimal OrcidAccount object
   // to mimic it.
   if (!orcidAccount) {
@@ -111,7 +108,7 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
       chain: network.gqlName,
       orcid: orcid.id,
       isClaimed: false,
-      isLinked: false,
+      areSplitsValid: false,
     } as NonNullable<GetOrcidQuery['orcidLinkedIdentityByOrcid']>;
   }
 

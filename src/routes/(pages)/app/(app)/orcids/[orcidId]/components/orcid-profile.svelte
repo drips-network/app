@@ -25,24 +25,19 @@
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
-  import type { MergeWithdrawableBalancesFragment } from '$lib/utils/__generated__/gql.generated';
-  import type { Amount } from '$lib/graphql/__generated__/base-types';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
-  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
-  let totalEarned: Amount[] = []
 
   // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
-  $: orcidSupport = [];
+  $: withdrawableBalances = orcidAccount.withdrawableBalances ?? [];
+  $: support = orcidAccount.support ?? [];
 
   function claimOrcid() {
-    // eslint-disable-next-line no-console
-    console.log('Launch claim ORCID flow');
-    launchClaimOrcid(orcid.id)
+    launchClaimOrcid(orcid.id);
   }
 </script>
 
@@ -61,8 +56,7 @@
   {#if !orcidAccount.isClaimed}
     <div class="notice">
       <AnnotationBox type="info">
-        {#if withdrawableBalances.length > 0}This ORCID iD has <span
-            class="typo-text-small-bold"
+        {#if withdrawableBalances.length > 0}This ORCID iD has <span class="typo-text-small-bold"
             ><AggregateFiatEstimate
               amounts={mergeWithdrawableBalances(withdrawableBalances)}
             /></span
@@ -72,11 +66,8 @@
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
             <CopyLinkButton url={buildOrcidUrl(orcid.id, { absolute: true })} variant="ghost" />
-            <Button
-              size="small"
-              icon={Registered}
-              variant="primary"
-              on:click={claimOrcid}>Claim ORCID iD</Button
+            <Button size="small" icon={Registered} variant="primary" on:click={claimOrcid}
+              >Claim ORCID iD</Button
             >
           </div>
         </svelte:fragment>
@@ -101,24 +92,22 @@
         {#if orcidAccount.isClaimed}
           <div class="stat drip-bordered">
             <KeyValuePair key="Donations">
-              <AggregateFiatEstimate amounts={totalEarned} />
+              <AggregateFiatEstimate amounts={orcidAccount.totalEarned} />
             </KeyValuePair>
           </div>
         {:else if withdrawableBalances.length > 0}
           <div class="stat drip-bordered">
-            <KeyValuePair key="Donations">
-              <AggregateFiatEstimate
-                amounts={mergeWithdrawableBalances(withdrawableBalances)}
-              />
+            <KeyValuePair key="Unclaimed Support">
+              <AggregateFiatEstimate amounts={mergeWithdrawableBalances(withdrawableBalances)} />
             </KeyValuePair>
           </div>
         {/if}
-        {#if [orcidSupport].flat().length > 0}
+        {#if [support].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
             <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
-                <Pile maxItems={4} components={getSupportersPile(orcidSupport)} />
+                <Pile maxItems={4} components={getSupportersPile(support)} />
               </KeyValuePair>
             </a>
           </div>
@@ -149,7 +138,7 @@
       <SupportersSection
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
-        supportItems={orcidSupport}
+        supportItems={support}
         iconPrimary={false}
       />
     </section>
@@ -184,7 +173,7 @@
   .header {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
     padding: 1.5rem;
     justify-content: space-between;
   }
@@ -198,8 +187,7 @@
   .stats .stat {
     padding: 1rem;
     min-height: 6.125rem;
-    flex-grow: 1;
-    flex-basis: 33%;
+    flex-basis: 50%;
   }
 
   .card {
@@ -219,6 +207,12 @@
 
   .notice {
     margin-bottom: 2rem;
+  }
+
+  #support {
+    gap: 3rem;
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 1080px) {

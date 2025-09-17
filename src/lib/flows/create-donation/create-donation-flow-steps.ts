@@ -7,13 +7,14 @@ import InputDetails, {
   CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT,
   CREATE_DONATION_DETAILS_STEP_NFT_DRIVER_ACCOUNT_FRAGMENT,
   CREATE_DONATION_DETAILS_STEP_PROJECT_FRAGMENT,
-  CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT
+  CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT,
 } from './input-details.svelte';
 import type {
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepEcosystemFragment,
-  CreateDonationDetailsStepOrcidFragment
+  CreateDonationDetailsStepOrcidFragment,
+  CreateDonationDetailsStepAddressDriverAccountFragment,
 } from './__generated__/gql.generated';
 import { gql } from 'graphql-request';
 
@@ -49,10 +50,11 @@ export const CREATE_DONATION_FLOW_ORCID_FRAGMENT = gql`
 
 export default (
   receiver:
+    | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
     | CreateDonationDetailsStepEcosystemFragment
-    | CreateDonationDetailsStepOrcidFragment
+    | CreateDonationDetailsStepOrcidFragment,
 ) => ({
   context: createDonationFlowState,
   steps: [

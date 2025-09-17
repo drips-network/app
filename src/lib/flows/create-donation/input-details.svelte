@@ -5,6 +5,7 @@
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
     DRIP_VISUAL_ORCID_FRAGMENT,
+    DRIP_VISUAL_USER_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   export const CREATE_DONATION_DETAILS_STEP_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
@@ -50,7 +51,17 @@
         accountId
       }
     }
-  `
+  `;
+
+  export const CREATE_DONATION_DETAILS_STEP_USER_FRAGMENT = gql`
+    ${DRIP_VISUAL_USER_FRAGMENT}
+    fragment CreateDonationDetailsStepUser on User {
+      ...DripVisualUser
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -71,7 +82,7 @@
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
     CreateDonationDetailsStepEcosystemFragment,
-    CreateDonationDetailsStepOrcidFragment
+    CreateDonationDetailsStepOrcidFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -118,6 +129,9 @@
         break;
       case 'OrcidLinkedIdentity':
         receiverTypeLabel = 'ORCID';
+        break;
+      case 'AddressDriverAccount':
+        receiverTypeLabel = 'Address';
         break;
     }
   }
@@ -193,16 +207,29 @@
         <WhatsNextCard>
           <svelte:fragment slot="title">After your donation...</svelte:fragment>
           <svelte:fragment slot="items">
-            <WhatsNextItem icon={TransactionsIcon}>
-              Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
-              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-            </WhatsNextItem>
-            <WhatsNextItem icon={CalendarIcon}>
-              The next date that accumulated funds will be distributed is <span
-                class="typo-text-bold"
-                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-              >.
-            </WhatsNextItem>
+            {#if receiver.__typename === 'OrcidLinkedIdentity'}
+              <!-- TODO: what goes here? -->
+              <WhatsNextItem icon={CalendarIcon}>
+                Funds can be collected on <span class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {:else}
+              <WhatsNextItem icon={TransactionsIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
+                <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+              </WhatsNextItem>
+              <WhatsNextItem icon={CalendarIcon}>
+                The next date that accumulated funds will be distributed is <span
+                  class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {/if}
           </svelte:fragment>
         </WhatsNextCard>
       </WhatsNextSection>
