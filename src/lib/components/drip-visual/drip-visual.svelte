@@ -186,6 +186,8 @@
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
     {:else if to && to.__typename === 'EcosystemMainAccount'}
       <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
+    {:else if to && to.__typename === 'OrcidLinkedIdentity'}
+      <IdentityCard disableLink={disableLinks} orcid={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

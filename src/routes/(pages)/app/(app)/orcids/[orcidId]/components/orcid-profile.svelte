@@ -35,8 +35,6 @@
   $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
 
   function claimOrcid() {
-    // eslint-disable-next-line no-console
-    console.log('Launch claim ORCID flow');
     launchClaimOrcid(orcid.id);
   }
 </script>
