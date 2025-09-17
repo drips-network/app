@@ -98,7 +98,7 @@ const ResearcherUrlSchema = z.object({
 // });
 
 const PersonSchema = z.object({
-  'last-modified-date': TimestampSchema,
+  'last-modified-date': TimestampSchema.nullable(),
   name: NameSchema,
   biography: BiographySchema.nullable(),
   'researcher-urls': z.object({ 'researcher-url': z.array(ResearcherUrlSchema) }).nullable(),
