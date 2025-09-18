@@ -1,10 +1,14 @@
 <script lang="ts">
-  import modal from '$lib/stores/modal';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
-  import FieldSettingsModal from './field-settings-modal.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import type { State } from './add-rpgf-form-field-flow';
+  import type { Writable } from 'svelte/store';
 
+  const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  export let context: Writable<State>;
   export let onAdd: (field: ApplicationFieldDto) => void;
-  export let unavailableSlugs: string[];
 
   const DEFAULT_FIELD_SETTINGS: Record<ApplicationFieldDto['type'], ApplicationFieldDto> = {
     markdown: {
@@ -111,17 +115,11 @@
 
     if (type === 'divider') {
       onAdd(defaultSettings);
-      return modal.hide();
+      dispatch('conclude');
     }
 
-    modal.show(FieldSettingsModal, undefined, {
-      fieldSettings: defaultSettings,
-      onSave: (field) => {
-        onAdd(field);
-        modal.hide();
-      },
-      unavailableSlugs,
-    });
+    $context.field = defaultSettings;
+    dispatch('goForward');
   }
 </script>
 

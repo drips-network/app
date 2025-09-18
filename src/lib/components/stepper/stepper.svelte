@@ -32,9 +32,10 @@
 
   let internalSteps = steps;
 
+  let resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
   $: resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
 
-  export let currentStepIndex = 0;
+  export let currentStepIndex = nextValidStepIndex(0, 'forward');
   $: currentStep = resolvedSteps[currentStepIndex];
 
   let prevStepIndex = 0;
