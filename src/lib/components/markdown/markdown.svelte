@@ -34,17 +34,48 @@
         'ol',
         'li',
         'blockquote',
+        'code',
+        's',
+        'del',
+        'hr',
+        'br',
+        'pre',
+        'input',
+        'table',
+        'thead',
+        'tbody',
+        'tr',
+        'th',
+        'td',
+        'img',
+        'div',
+        'span',
+        'sup',
+        'sub',
+        'details',
       ],
       allowedAttributes: {
         a: ['href', 'target', 'rel'],
+        img: ['src', 'alt', 'title', 'width', 'height'],
+        input: ['type', 'checked', 'disabled'],
       },
     });
   }
   $: reRender(content);
 </script>
 
-{@html `
-  <div class="markdown-component-content">
+<div class="markdown">
+  {@html `
+    <div class="markdown-component-content">
     ${rendered}
-  </div>
-`}
+    </div>
+  `}
+</div>
+
+<style>
+  .markdown {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+</style>

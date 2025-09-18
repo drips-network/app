@@ -23,13 +23,15 @@
 
   $: {
     if (field.required) {
-      valid = value !== undefined && value.trim() !== '';
+      valid = value !== undefined && value.trim() !== '' && value.length <= 10000;
     } else {
-      valid = true;
+      valid = value == undefined || value.length <= 10000;
     }
   }
 
   let beenFocussed = false;
+
+  $: tooLong = value != undefined && value.length > 10000;
 </script>
 
 <FormField
@@ -45,4 +47,20 @@
     : undefined}
 >
   <TextArea bind:value resizable on:blur={() => (beenFocussed = true)} />
+  <div class="char-count">
+    Markdown supported · <span class:too-long={tooLong}>{value ? value.length : 0} / 10.000</span>
+  </div>
 </FormField>
+
+<style>
+  .char-count {
+    font-size: 0.875rem;
+    color: var(--color-foreground-level-6);
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .char-count .too-long {
+    color: var(--color-negative);
+  }
+</style>

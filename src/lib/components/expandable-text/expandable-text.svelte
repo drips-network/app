@@ -19,6 +19,8 @@
   let containerElem: HTMLDivElement;
   let overflown = false;
 
+  let isLong = false;
+
   function isOverflown() {
     return containerElem.scrollHeight > containerElem.clientHeight;
   }
@@ -26,10 +28,16 @@
   const resizeObserver = browser
     ? new ResizeObserver(() => {
         overflown = isOverflown();
+
+        if (overflown) {
+          // if this is true once, it will always be true
+          isLong = true;
+        }
       })
     : null;
   onMount(() => {
     overflown = isOverflown();
+
     resizeObserver?.observe(containerElem);
     return () => {
       resizeObserver?.disconnect();
@@ -38,7 +46,7 @@
 </script>
 
 <div bind:this={containerElem} class="expandable-text" class:expanded>
-  <slot />
+  <slot {isLong} />
   {#if overflown || expanded}
     <div class="expand-button">
       <Button on:click={toggleExpand}>
@@ -55,6 +63,7 @@
   .expandable-text {
     position: relative;
     max-height: 20rem;
+    max-width: 100%;
     overflow: hidden;
   }
 
