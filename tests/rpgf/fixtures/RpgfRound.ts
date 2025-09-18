@@ -257,7 +257,6 @@ export class RpgfRound {
         .nth(1)
         .click();
       await this.page.locator('form div').filter({ hasText: 'Save' }).first().click();
-      await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).click();
       await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('email');
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
 

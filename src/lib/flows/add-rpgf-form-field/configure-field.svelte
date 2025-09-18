@@ -1,21 +1,29 @@
 <script lang="ts">
-  import Button from '$lib/components/button/button.svelte';
-  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
-  import FormField from '$lib/components/form-field/form-field.svelte';
-  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import Trash from '$lib/components/icons/Trash.svelte';
-  import TextArea from '$lib/components/text-area/text-area.svelte';
-  import TextInput from '$lib/components/text-input/text-input.svelte';
-  import Toggle from '$lib/components/toggle/toggle.svelte';
-  import modal from '$lib/stores/modal';
+  import type { StepComponentEvents } from '$lib/components/stepper/types';
+  import { createEventDispatcher } from 'svelte';
+  import type { Writable } from 'svelte/store';
+  import type { State } from './add-rpgf-form-field-flow';
+  import unreachable from '$lib/utils/unreachable';
   import {
     applicationFieldDtoSchema,
     type ApplicationFieldDto,
   } from '$lib/utils/rpgf/types/application';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+  import TextArea from '$lib/components/text-area/text-area.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
+  import Dropdown from '$lib/components/dropdown/dropdown.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
 
-  export let fieldSettings: ApplicationFieldDto;
-  export let onSave: (field: ApplicationFieldDto) => void;
+  const dispatch = createEventDispatcher<StepComponentEvents>();
+
+  export let context: Writable<State>;
   export let unavailableSlugs: string[];
+  export let onAdd: (field: ApplicationFieldDto) => void;
+
+  $: fieldSettings = $context.field ?? unreachable();
 
   let valid: boolean;
   $: {
@@ -69,8 +77,8 @@
 <div class="field-settings-modal">
   <form
     on:submit|preventDefault={() => {
-      onSave(fieldSettings);
-      modal.hide();
+      onAdd(fieldSettings);
+      dispatch('conclude');
     }}
   >
     {#if 'content' in fieldSettings}

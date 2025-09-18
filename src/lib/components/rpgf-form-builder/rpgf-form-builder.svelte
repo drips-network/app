@@ -12,11 +12,11 @@
   import TextAreaField from '../rpgf-application-form/components/text-area-field.svelte';
   import TextField from '../rpgf-application-form/components/text-field.svelte';
   import UrlField from '../rpgf-application-form/components/url-field.svelte';
-  import AddFieldModal from './components/add-field-modal.svelte';
   import ComponentWrapper from './components/component-wrapper.svelte';
-  import FieldSettingsModal from './components/field-settings-modal.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
+  import Stepper from '../stepper/stepper.svelte';
+  import addRpgfFormFieldFlow from '$lib/flows/add-rpgf-form-field/add-rpgf-form-field-flow';
 
   export let fields: ApplicationFieldDto[] = [];
 
@@ -62,34 +62,39 @@
   }
 
   function editItem(index: number) {
-    modal.show(FieldSettingsModal, undefined, {
-      fieldSettings: fields[index],
-      onSave: (field) => {
-        applicationFormatWithKeys[index] = {
-          ...field,
-          key: applicationFormatWithKeys[index].key, // Preserve the key
-        };
-        applicationFormatWithKeys = [...applicationFormatWithKeys]; // Trigger reactivity
-      },
-      unavailableSlugs: getSlugsWithout(
-        'slug' in applicationFormatWithKeys[index]
-          ? applicationFormatWithKeys[index].slug
-          : undefined,
+    modal.show(
+      Stepper,
+      undefined,
+      addRpgfFormFieldFlow(
+        getSlugsWithout(
+          'slug' in applicationFormatWithKeys[index]
+            ? applicationFormatWithKeys[index].slug
+            : undefined,
+        ),
+        (newField) => {
+          applicationFormatWithKeys[index] = {
+            ...newField,
+            key: applicationFormatWithKeys[index].key, // Preserve the key
+          };
+          applicationFormatWithKeys = [...applicationFormatWithKeys]; // Trigger reactivity
+        },
+        applicationFormatWithKeys[index],
       ),
-    });
+    );
   }
 
   function addItem(afterIndex: number) {
-    modal.show(AddFieldModal, undefined, {
-      onAdd: (newField) => {
+    modal.show(
+      Stepper,
+      undefined,
+      addRpgfFormFieldFlow(slugs, (newField) => {
         applicationFormatWithKeys.splice(afterIndex + 1, 0, {
           ...newField,
           key: `${crypto.randomUUID()}`, // Generate a new key for the new field
         });
         applicationFormatWithKeys = [...applicationFormatWithKeys]; // Trigger reactivity
-      },
-      unavailableSlugs: slugs,
-    });
+      }),
+    );
   }
 
   $: slugs = mapFilterUndefined(applicationFormatWithKeys, (field) => {
