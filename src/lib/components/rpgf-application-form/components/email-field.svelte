@@ -19,6 +19,8 @@
       fieldId: field.id,
       value: value,
     };
+  } else {
+    answer = undefined;
   }
 
   $: hasValidEmail =

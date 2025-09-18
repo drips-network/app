@@ -13,11 +13,14 @@
   export let forceRevealError: boolean | undefined = undefined;
 
   let value: string | undefined = answer?.value;
-  $: if (value)
+  $: if (value) {
     answer = {
       fieldId: field.id,
       value: value,
     };
+  } else {
+    answer = undefined;
+  }
 
   function isValidUrl(url: string): boolean {
     try {
