@@ -5,7 +5,9 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { state, steps } from '$lib/flows/claim-orcid-flow/claim-orcid-flow';
+  import { steps } from '$lib/flows/claim-orcid-flow/claim-orcid-flow';
+  import walletStore from '$lib/stores/wallet/wallet.store';
+  import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -14,13 +16,17 @@
   const description = 'Select an identity type:';
 
   function launchSpecificIdentityFlow() {
-    const myState = state();
-    const skipWalletConnect = false;
-    const isModal = true;
+    const walletConnected = $walletStore.connected;
+    // TODO; will this ever not be connected?
+    // If a wallet is connected, sidestep for a nice transition
+    if (walletConnected) {
+      return dispatch('sidestep', {
+        steps: steps(undefined, !walletConnected),
+      });
+    }
 
-    dispatch('sidestep', {
-      steps: steps(myState, skipWalletConnect, isModal),
-    });
+    // otherwise, launch the flow from its own page
+    launchClaimOrcid();
   }
 </script>
 
