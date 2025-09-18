@@ -32,7 +32,7 @@
   let supportersSectionSkeleton: SectionSkeleton | undefined;
 
   // TODO: implement
-  $: imageBaseUrl = `/api/share-images/orcid/${encodeURIComponent(orcid.id)}.png`;
+  $: imageBaseUrl = `/api/share-images/orcids/${encodeURIComponent(orcid.id)}.png`;
   $: withdrawableBalances = orcidAccount.withdrawableBalances ?? [];
   $: support = orcidAccount.support ?? [];
 
