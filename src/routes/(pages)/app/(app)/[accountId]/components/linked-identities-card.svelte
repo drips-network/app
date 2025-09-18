@@ -18,12 +18,19 @@
 <script lang="ts">
   import OrcidBadge from '../../orcids/[orcidId]/components/orcid-badge.svelte';
   import type { LinkedIdentitiesFragment } from './__generated__/gql.generated';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import linkIdentitySteps from '$lib/flows/link-identity-flow/link-identity-steps';
 
   export let linkedIdentities: LinkedIdentitiesFragment[] = [];
   export let canLinkIdentity: boolean = false;
+
+  function launchLinkIdentityFlow() {
+    modal.show(Stepper, undefined, linkIdentitySteps());
+  }
 </script>
 
-<div class="linked-identities-card">
+<div class="linked-identities-card" class:can-link-identity={canLinkIdentity}>
   {#if linkedIdentities.length}
     <h5>Linked Identities</h5>
     <ul>
@@ -40,7 +47,9 @@
     <a class="typo-link" target="_blank" href="https://docs.drips.network/TODO">Learn more</a>
   {/if}
   {#if canLinkIdentity}
-    <Button icon={Link} variant="muted">Link identity</Button>
+    <div class="actions">
+      <Button icon={Link} variant="muted" on:click={launchLinkIdentityFlow}>Link identity</Button>
+    </div>
   {/if}
 </div>
 
@@ -58,5 +67,14 @@
   .typo-link {
     color: var(--color-foreground);
     margin-bottom: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .can-link-identity .actions {
+    flex-direction: row;
   }
 </style>

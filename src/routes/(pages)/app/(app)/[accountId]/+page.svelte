@@ -137,7 +137,7 @@
       <SupportCard user={data.profileData} />
       <LinkedIdentitiesCard
         linkedIdentities={profileChainData.linkedIdentities}
-        canLinkIdentity={isSelf}
+        canLinkIdentity={!!isSelf}
       ></LinkedIdentitiesCard>
     </aside>
   </article>
