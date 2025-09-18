@@ -46,6 +46,7 @@
     display: flex;
     flex-direction: column;
     gap: 3rem;
+    min-width: 0;
     margin-top: 1rem;
   }
 

@@ -8,6 +8,8 @@
   import Tooltip from '../tooltip/tooltip.svelte';
   import LinkCell from '$lib/components/table/cells/link.cell.svelte';
   import { getCoreRowModel } from '@tanstack/svelte-table';
+  import Markdown from '../markdown/markdown.svelte';
+  import ExpandableText from '../expandable-text/expandable-text.svelte';
 
   export let canSeePrivateFields: boolean;
 
@@ -44,8 +46,12 @@
           {/if}
         </h2>
 
-        {#if answer.type === 'text' || answer.type === 'textarea'}
-          <p>{answer.text}</p>
+        {#if answer.type === 'text'}
+          <ExpandableText let:isLong>
+            <div class="text-wrapper" class:is-long={isLong}>
+              <Markdown content={answer.text} />
+            </div>
+          </ExpandableText>
         {:else if answer.type === 'email'}
           <p>{answer.email}</p>
         {:else if answer.type === 'url'}
@@ -107,6 +113,14 @@
     flex-direction: column;
     gap: 0.5rem;
     width: fit-content;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .text-wrapper.is-long {
+    padding: 0.1rem 0.5rem;
+    background-color: var(--color-foreground-level-1);
+    border-radius: 0.5rem;
   }
 
   p {
