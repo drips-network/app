@@ -53,6 +53,14 @@ export class RpgfRound {
     return date.toISOString().replace('T', ' ').slice(0, 19);
   }
 
+  private saveAndWait = async () => {
+    await this.page.getByRole('button', { name: 'Save changes' }).click();
+
+    // wait for success-indicator testid to appear and disappear
+    await this.page.getByTestId('success-indicator').waitFor();
+    await this.page.getByTestId('success-indicator').waitFor({ state: 'detached' });
+  };
+
   async createDraft({
     name,
     description,
@@ -129,7 +137,7 @@ export class RpgfRound {
       await this.page.getByRole('textbox', { name: 'Description' }).fill(description);
     }
 
-    await this.page.getByRole('button', { name: 'Save changes' }).click();
+    await this.saveAndWait();
 
     // schedule
     await this.page.getByRole('link', { name: 'Schedule' }).nth(0).click();
@@ -149,7 +157,7 @@ export class RpgfRound {
       .getByRole('textbox', { name: 'Distribution start*' })
       .fill(this.formatDateForInput(schedule.fundingPeriodStart));
 
-    await this.page.getByRole('button', { name: 'Save changes' }).click();
+    await this.saveAndWait();
 
     // voting settings
     await this.page.getByRole('link', { name: 'Voting' }).nth(0).click();
@@ -179,7 +187,7 @@ export class RpgfRound {
     }
 
     if (voterAddresses.length > 0) {
-      await this.page.getByRole('button', { name: 'Save changes' }).click();
+      await this.saveAndWait();
     }
 
     // Configure application forms
@@ -203,12 +211,7 @@ export class RpgfRound {
       await this.page
         .getByRole('textbox', { name: 'Description (Markdown)' })
         .fill('Please consicely describe your project');
-      await this.page
-        .locator('label')
-        .filter({ hasText: 'Required field' })
-        .locator('div')
-        .nth(1)
-        .click();
+      await this.page.locator('label').filter({ hasText: 'Required field' }).click();
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
       await this.page.locator('.add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'Text Field A single-line text' }).click();
@@ -240,8 +243,8 @@ export class RpgfRound {
       await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('email');
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
 
-      await this.page.getByRole('button', { name: 'Save changes' }).click();
-      await this.page.waitForTimeout(1000);
+      await this.saveAndWait();
+
       await this.page.getByTestId('sidenav-item-Applications').click();
       await this.page.getByRole('button', { name: 'Add category' }).click();
       await this.page.getByRole('textbox', { name: 'Name*' }).fill('Default');

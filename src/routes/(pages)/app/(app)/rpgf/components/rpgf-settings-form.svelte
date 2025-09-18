@@ -35,7 +35,7 @@
     successTimeout = setTimeout(() => {
       success = false;
       successTimeout = undefined;
-    }, 2000);
+    }, 1000);
   }
 
   async function handleSave() {
@@ -76,7 +76,11 @@
     {#if saveHandler}
       <div class="actions">
         {#if success}
-          <div in:fly={{ y: 8, duration: 300 }} out:fly={{ y: -8, duration: 300 }}>
+          <div
+            data-testid="success-indicator"
+            in:fly={{ y: 8, duration: 300 }}
+            out:fly={{ y: -8, duration: 300 }}
+          >
             <CheckCircle style="fill: var(--color-positive)" />
           </div>
         {/if}
