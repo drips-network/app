@@ -146,7 +146,7 @@
 
   let currentStep: Step = Step.ProjectSelection;
   $: {
-    if ($state.dripsAccountId) {
+    if ($state.dripsAccountId.length > 0) {
       currentStep = Step.ApplicationName;
 
       if (applicationNameValidationState.type === 'valid') {
