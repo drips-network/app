@@ -208,9 +208,9 @@
           <svelte:fragment slot="title">After your donation...</svelte:fragment>
           <svelte:fragment slot="items">
             {#if receiver.__typename === 'OrcidLinkedIdentity'}
-              <!-- TODO: what goes here? -->
               <WhatsNextItem icon={CalendarIcon}>
-                Funds can be collected on <span class="typo-text-bold"
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed to its owner on
+                <span class="typo-text-bold"
                   >{nextSettlementDate === 'daily'
                     ? 'today'
                     : formatDate(nextSettlementDate())}</span
