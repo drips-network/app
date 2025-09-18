@@ -31,6 +31,7 @@ const PROFILE_PAGE_QUERY = gql`
   query ProfilePage($address: String!, $chains: [SupportedChain!]) {
     userByAddress(address: $address, chains: $chains) {
       account {
+        driver
         address
         accountId
       }
