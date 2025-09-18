@@ -158,7 +158,9 @@
             await invalidate('rpgf:round:applications');
           } else {
             await sendApplication(attestationUID);
+
             clearLocallyStoredApplication(roundId, userId);
+            await invalidate('rpgf:round:applications');
           }
         },
       }),
@@ -167,7 +169,11 @@
 
   function handleWithoutAttest() {
     dispatch('await', {
-      promise: async () => await sendApplication(),
+      promise: async () => {
+        await sendApplication();
+        await invalidate('rpgf:round:applications');
+        clearLocallyStoredApplication(roundId, userId);
+      },
       message: 'Submitting application...',
     });
   }

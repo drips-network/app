@@ -5,6 +5,7 @@ import {
   type ApplicationForm,
 } from '$lib/utils/rpgf/types/application';
 import storedWritable from '@efstajas/svelte-stored-writable';
+import { get } from 'svelte/store';
 import z from 'zod';
 
 const storageKey = (roundId: string, userId: string) => `rpgf-form-data-${roundId}-${userId}`;
@@ -43,7 +44,14 @@ const args: (roundId: string, userId: string) => Parameters<typeof storedWritabl
 export function locallyStoredApplicationExists(roundId: string, userId: string): boolean {
   if (!browser) return false;
 
-  return localStorage.getItem(storageKey(roundId, userId)) !== null;
+  const record = get(getLocallyStoredApplication(roundId, userId, [], [], [], false));
+
+  return (
+    record.projectName !== null ||
+    record.dripsAccountId.length > 0 ||
+    record.categoryId.length > 0 ||
+    Object.keys(record.answersByCategory).length > 0
+  );
 }
 
 export function getLocallyStoredApplication(
@@ -52,48 +60,51 @@ export function getLocallyStoredApplication(
   categories: ApplicationCategory[],
   availableProjectAccountIds: string[],
   forms: ApplicationForm[],
+  clean?: boolean,
 ): ReturnType<typeof storedWritable<ApplicationData>> {
   try {
     const writable = storedWritable<ApplicationData>(...args(roundId, userId));
 
-    // Clean the stored data, because categories and / or their forms may have changed.
-    writable.update((data) => {
-      // remove data for categories that no longer exist
-      for (const categoryId of Object.keys(data.answersByCategory)) {
-        if (!categories.find((c) => c.id === categoryId)) {
-          delete data.answersByCategory[categoryId];
-        }
-      }
-
-      // remove data for fields that no longer exist within each category
-      for (const [categoryId, answers] of Object.entries(data.answersByCategory)) {
-        const formForCategory = categories.find((c) => c.id === categoryId)?.applicationForm.id;
-        const form = forms.find((f) => f.id === formForCategory);
-
-        if (!form) {
-          delete data.answersByCategory[categoryId];
-          continue;
-        }
-
-        for (const [index, value] of answers.entries()) {
-          const fieldId = value.fieldId;
-
-          if (!form.fields.find((f) => f.id === fieldId)) {
-            data.answersByCategory[categoryId].splice(index, 1);
+    if (clean) {
+      // Clean the stored data, because categories and / or their forms may have changed.
+      writable.update((data) => {
+        // remove data for categories that no longer exist
+        for (const categoryId of Object.keys(data.answersByCategory)) {
+          if (!categories.find((c) => c.id === categoryId)) {
+            delete data.answersByCategory[categoryId];
           }
         }
-      }
 
-      // ensure dripsAccountId is still valid
-      if (
-        data.dripsAccountId.length > 0 &&
-        !availableProjectAccountIds.includes(data.dripsAccountId[0])
-      ) {
-        data.dripsAccountId = [];
-      }
+        // remove data for fields that no longer exist within each category
+        for (const [categoryId, answers] of Object.entries(data.answersByCategory)) {
+          const formForCategory = categories.find((c) => c.id === categoryId)?.applicationForm.id;
+          const form = forms.find((f) => f.id === formForCategory);
 
-      return data;
-    });
+          if (!form) {
+            delete data.answersByCategory[categoryId];
+            continue;
+          }
+
+          for (const [index, value] of answers.entries()) {
+            const fieldId = value.fieldId;
+
+            if (!form.fields.find((f) => f.id === fieldId)) {
+              data.answersByCategory[categoryId].splice(index, 1);
+            }
+          }
+        }
+
+        // ensure dripsAccountId is still valid
+        if (
+          data.dripsAccountId.length > 0 &&
+          !availableProjectAccountIds.includes(data.dripsAccountId[0])
+        ) {
+          data.dripsAccountId = [];
+        }
+
+        return data;
+      });
+    }
 
     return writable;
   } catch (e) {

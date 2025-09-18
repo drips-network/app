@@ -15,6 +15,9 @@ export class RpgfRound {
 
   constructor(public readonly connectedSession: ConnectedSession) {
     this.page = connectedSession.page;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.page.evaluate(() => ((window as any).disableHighlights = true));
   }
 
   async gotoRpgfPage(page = this.page) {
@@ -373,10 +376,13 @@ export class RpgfRound {
     // select the project
     await page.getByTestId(`item-${withProject.accountId}`).click();
 
-    // Fill the default application form
-    if (applicationTitle) {
-      await page.locator('input[type="text"]').first().fill(applicationTitle);
-    }
+    await page
+      .locator('input[type="text"]')
+      .first()
+      .fill(applicationTitle ?? 'Test Application');
+
+    // select default category by clicking it
+    await page.getByText('Default').first().click();
 
     await page.getByRole('textbox', { name: 'Please consicely describe' }).fill('Test description');
     await page.getByRole('textbox', { name: 'Please enter your name.' }).fill('Test Testerson');
