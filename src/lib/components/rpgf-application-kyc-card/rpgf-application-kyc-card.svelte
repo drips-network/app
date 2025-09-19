@@ -42,7 +42,7 @@
   };
 
   const STATE_BADGE_BACKGROUND: Record<KycStatus | 'NONE', string> = {
-    NONE: 'var(--color-foreground-level-1)',
+    NONE: 'var(--color-foreground-level-2)',
     CREATED: 'var(--color-caution-level-1)',
     UNDER_REVIEW: 'var(--color-caution-level-1)',
     NEEDS_ADDITIONAL_INFORMATION: 'var(--color-caution-level-1)',
@@ -99,8 +99,13 @@
               rel="noopener noreferrer">{kycRequest.kycFormUrl}</a
             >
           </Copyable>
-        {:else}
+        {:else if roundKycConfig.provider === 'Fern'}
           <p style:color="var(--color-foreground-level-5)">No KYC request linked</p>
+        {:else if roundKycConfig.provider === 'Treova'}
+          {@const url = `https://kyc.treova.ai/${roundKycConfig.formId}`}
+          <Copyable value={url} alwaysVisible>
+            <a class="typo-link" href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+          </Copyable>
         {/if}
       </div>
     </div>
