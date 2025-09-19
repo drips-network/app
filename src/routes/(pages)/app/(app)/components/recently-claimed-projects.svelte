@@ -33,7 +33,7 @@
     (p) => !p.source.repoName.includes('drips-test-repo'),
   );
 
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.slice(-4).filter((p) => p.isVisible);
+  $: recentlyClaimedProjects = projectsWithoutJasonTests.filter((p) => p.isVisible).slice(0, 4);
 </script>
 
 {#if recentlyClaimedProjects.length > 0}
