@@ -143,7 +143,7 @@
 
 <style>
   table {
-    padding: none;
+    padding: 0;
     border-collapse: separate;
     border-spacing: 0;
     box-sizing: border-box;

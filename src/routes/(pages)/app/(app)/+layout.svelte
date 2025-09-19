@@ -197,7 +197,8 @@
     }
 
     .page {
-      margin-left: 4.5rem;
+      margin-left: 0;
+      padding-left: 6.5rem;
     }
   }
 

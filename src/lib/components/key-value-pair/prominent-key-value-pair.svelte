@@ -44,6 +44,7 @@
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
+    justify-content: space-between;
   }
 
   .value-wrapper .header .explorer-items {
