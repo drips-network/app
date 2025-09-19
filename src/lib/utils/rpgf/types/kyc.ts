@@ -3,7 +3,7 @@ import z from 'zod';
 const kycTypeSchema = z.enum(['INDIVIDUAL', 'BUSINESS']);
 export type KycType = z.infer<typeof kycTypeSchema>;
 
-export const kycProviderSchema = z.enum(['Fern']);
+export const kycProviderSchema = z.enum(['Fern', 'Treova']);
 export type KycProvider = z.infer<typeof kycProviderSchema>;
 
 const kycStatusSchema = z.enum([
@@ -19,8 +19,8 @@ export type KycStatus = z.infer<typeof kycStatusSchema>;
 export const kycRequestSchema = z.object({
   id: z.string(),
   kycType: kycTypeSchema,
-  kycRequestId: z.string(),
-  kycEmail: z.string().email(),
+  kycProvider: kycProviderSchema,
+  kycEmail: z.string().email().nullable(),
   kycFormUrl: z.string().url(),
   status: kycStatusSchema,
   updatedAt: z.string().pipe(z.coerce.date()),

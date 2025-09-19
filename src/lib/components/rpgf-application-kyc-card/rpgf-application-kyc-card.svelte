@@ -4,6 +4,8 @@
   import linkKycRequestToApplicationFlow from '$lib/flows/link-kyc-request-to-application/link-kyc-request-to-application-flow';
   import modal from '$lib/stores/modal';
   import type { KycRequest, KycStatus } from '$lib/utils/rpgf/types/kyc';
+  import type { KycConfig } from '$lib/utils/rpgf/types/round';
+  import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
   import Copyable from '../copyable/copyable.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
@@ -14,6 +16,7 @@
   import Stepper from '../stepper/stepper.svelte';
 
   export let kycRequest: KycRequest | null;
+  export let roundKycConfig: KycConfig;
   export let applicationId: string;
   export let roundId: string;
   export let isOwnApplication: boolean;
@@ -115,31 +118,50 @@
         The round organizers require applicants to verify their identity with a third-party KYC
         provider before it can be approved. Click below to get started.
       </p>
-      <p>
-        If you're creating multiple applications for yourself or your organization, you can
-        alternatively re-use an existing KYC process.
-      </p>
 
       <!-- TODO(rpgf): Learn more link -->
 
-      <Button
-        size="large"
-        variant="primary"
-        on:click={() => modal.show(Stepper, undefined, createRpgfKycRequestFlow(applicationId))}
-        icon={ArrowRight}
-      >
-        Begin verification
-      </Button>
+      {#if roundKycConfig.provider === 'Fern'}
+        <p>
+          If you're creating multiple applications for yourself or your organization, you can
+          alternatively re-use an existing KYC process.
+        </p>
 
-      <OrDivider />
+        <Button
+          size="large"
+          variant="primary"
+          on:click={() => modal.show(Stepper, undefined, createRpgfKycRequestFlow(applicationId))}
+          icon={ArrowRight}
+        >
+          Begin verification
+        </Button>
 
-      <Button
-        size="large"
-        on:click={() =>
-          modal.show(Stepper, undefined, linkKycRequestToApplicationFlow(applicationId, roundId))}
-      >
-        Link existing KYC process
-      </Button>
+        <OrDivider />
+
+        <Button
+          size="large"
+          on:click={() =>
+            modal.show(Stepper, undefined, linkKycRequestToApplicationFlow(applicationId, roundId))}
+        >
+          Link existing KYC process
+        </Button>
+      {:else if roundKycConfig.provider === 'Treova'}
+        <AnnotationBox type="info">
+          Use the same wallet address as you did for this application in the KYC form to ensure it
+          gets linked correctly. After submitting the form, it may take a few minutes for the status
+          to update here.
+        </AnnotationBox>
+
+        <Button
+          size="large"
+          variant="primary"
+          href="https://kyc.treova.ai/{roundKycConfig.formId}"
+          target="_blank"
+          icon={ArrowBoxUpRight}
+        >
+          Open verification form
+        </Button>
+      {/if}
     {:else if kycRequest.status === 'CREATED'}
       <p>Please fill out all the necessary information on the KYC provider's form.</p>
 
@@ -155,13 +177,13 @@
     {:else if kycRequest.status === 'UNDER_REVIEW'}
       <p>
         The KYC provider is currently reviewing your submission. This process is usually quick, but
-        may take up to a few days. Be on the lookout for any emails from Fern in case additional
-        information is needed.
+        may take up to a few days. Be on the lookout for any emails from {roundKycConfig.provider} in
+        case additional information is needed.
       </p>
     {:else if kycRequest.status === 'NEEDS_ADDITIONAL_INFORMATION'}
       <p>
-        The KYC provider needs additional information from you to complete the verification, and
-        will reach out to your provided email address directly. Please check your email for details
+        {roundKycConfig.provider} needs additional information from you to complete the verification,
+        and will reach out to your provided email address directly. Please check your email for details
         and next steps.
       </p>
     {:else if kycRequest.status === 'ACTIVE'}
@@ -169,12 +191,12 @@
     {:else if kycRequest.status === 'REJECTED'}
       <p>
         Unfortunately, your verification was not successful. Please check your email for details
-        from the KYC provider and consider reapplying.
+        from the KYC provider {roundKycConfig.provider} and consider reapplying.
       </p>
     {:else if kycRequest.status === 'DEACTIVATED'}
       <p>
-        Your KYC request has been deactivated for an unknown reason. If you believe this is a
-        mistake, please contact the round organizers for assistance.
+        Your KYC request has been deactivated by the KYC provider for an unknown reason. If you
+        believe this is a mistake, please contact the round organizers for assistance.
       </p>
     {/if}
   {/if}
