@@ -57,6 +57,7 @@
         {#if round.isAdmin}
           <Button
             icon={Settings}
+            dataTestId="rpgf-round-settings-button"
             href={`/app/rpgf/rounds/${round.urlSlug ?? round.id}/settings/representation`}
             >Settings</Button
           >

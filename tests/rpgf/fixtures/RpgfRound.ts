@@ -121,7 +121,7 @@ export class RpgfRound {
     // Page title and header meta
     await expect(this.page.getByText('Unnamed round')).toHaveCount(2);
 
-    await this.page.getByRole('link', { name: 'Settings' }).nth(0).click();
+    await this.page.getByTestId('rpgf-round-settings-button').click();
     await this.page.getByRole('textbox', { name: 'Round name*' }).click();
     await this.page.getByRole('textbox', { name: 'Round name*' }).fill(name);
 
