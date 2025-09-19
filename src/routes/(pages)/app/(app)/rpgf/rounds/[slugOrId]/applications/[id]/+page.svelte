@@ -88,9 +88,10 @@
     {/if}
   </div>
 
-  {#if round.kycProvider && canSeePrivateFields}
+  {#if round.kycConfig && canSeePrivateFields}
     <RpgfApplicationKycCard
       roundId={data.round.id}
+      roundKycConfig={round.kycConfig}
       kycRequest={data.kycRequest}
       applicationId={application.id}
       isOwnApplication={data.application.submitter.id === data.rpgfUserData?.userId}
