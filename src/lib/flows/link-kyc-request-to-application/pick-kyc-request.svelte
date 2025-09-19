@@ -54,7 +54,7 @@
             kr.id,
             {
               type: 'selectable',
-              label: kr.kycEmail,
+              label: kr.kycEmail ?? '',
               text: `${kr.kycType} - ${kr.status}`,
             },
           ]),
