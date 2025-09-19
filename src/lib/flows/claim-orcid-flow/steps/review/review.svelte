@@ -63,7 +63,8 @@
     dispatch('goForward');
   }
 
-  let withdrawableBalances: MergeWithdrawableBalancesFragment[] = [];
+  let withdrawableBalances: MergeWithdrawableBalancesFragment[] =
+    $context.claimableAccount?.withdrawableBalances ?? [];
 
   $: hasCollectableAmount =
     withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0;
