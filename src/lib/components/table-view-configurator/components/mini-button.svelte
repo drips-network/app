@@ -4,10 +4,12 @@
   export let icon: ComponentType;
   export let highlight = false;
 
+  export let label: string;
+
   export let open = false;
 </script>
 
-<button class:highlight class:open on:click>
+<button class:highlight class:open on:click aria-label={label}>
   <svelte:component this={icon} style="fill: var(--color-foreground)" />
 </button>
 

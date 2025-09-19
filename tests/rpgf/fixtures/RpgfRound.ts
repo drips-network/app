@@ -15,9 +15,6 @@ export class RpgfRound {
 
   constructor(public readonly connectedSession: ConnectedSession) {
     this.page = connectedSession.page;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.page.evaluate(() => ((window as any).disableHighlights = true));
   }
 
   async gotoRpgfPage(page = this.page) {
@@ -254,11 +251,19 @@ export class RpgfRound {
       await this.page.locator('div:nth-child(3) > .add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'Email Field A field for' }).click();
       await this.page.getByRole('textbox', { name: 'Label*' }).fill('Email');
-      // await this.page
-      //   .getByRole('textbox', { name: 'Description (Markdown)' })
-      //   .fill('Please enter your email');
-      // await this.page.locator('label').filter({ hasText: 'Required field' }).getByTestId('toggle-slider').click();
-      // await this.page.locator('label').filter({ hasText: 'Private field' }).getByTestId('toggle-slider').click();
+      await this.page
+        .getByRole('textbox', { name: 'Description (Markdown)' })
+        .fill('Please enter your email');
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .getByTestId('toggle-slider')
+        .click();
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Private field' })
+        .getByTestId('toggle-slider')
+        .click();
       await this.page.locator('form div').filter({ hasText: 'Save' }).first().click();
       await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('email');
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
@@ -285,7 +290,7 @@ export class RpgfRound {
     return this.draftId;
   }
 
-  async navigateToRoundOrDraft() {
+  async navigateToRoundOrDraft(page = this.page) {
     if (!this.signedIn) {
       throw new Error('User not signed in. Please call logIn() first.');
     }
@@ -293,10 +298,10 @@ export class RpgfRound {
       throw new Error('Draft name not set. Please create a draft first.');
     }
 
-    await this.gotoRpgfPage();
+    await this.gotoRpgfPage(page);
 
     // Find the draft by name
-    const draftLocator = this.page.getByRole('link', { name: this.name });
+    const draftLocator = page.getByRole('link', { name: this.name });
     await expect(draftLocator.nth(0)).toBeVisible();
 
     // Click on the draft to open it

@@ -10,6 +10,8 @@
   export let options: TOptions;
   export let value: keyof TOptions | null = null;
 
+  export let label: string;
+
   export let allowNull = false;
 
   export let open = false;
@@ -62,7 +64,12 @@
     aria-label="Toggle dropdown"
     bind:this={toggleButtonElem}
   >
-    <MiniButton highlight={Boolean(highlightIfSet && value)} {icon} {open} />
+    <MiniButton
+      label="Open {label} dropdown"
+      highlight={Boolean(highlightIfSet && value)}
+      {icon}
+      {open}
+    />
   </button>
 
   {#if open}

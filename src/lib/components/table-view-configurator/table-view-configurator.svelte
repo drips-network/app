@@ -28,18 +28,20 @@
   {/if}
 
   {#if onDownload}
-    <MiniButton icon={Download} on:click={onDownload} />
+    <MiniButton label="Download CSV" icon={Download} on:click={onDownload} />
 
     <div class="vertical-divider" />
   {/if}
 
   <MiniDropdown
+    label="Sort by"
     icon={SortMostToLeast}
     options={sortByOptions}
     disabled={loading}
     bind:value={sortBy}
   />
   <MiniDropdown
+    label="Filter by"
     icon={Filter}
     options={filterOptions}
     allowNull

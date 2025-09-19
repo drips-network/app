@@ -1,9 +1,16 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import { RpgfRound } from './rpgf/fixtures/RpgfRound';
 import { Project } from './fixtures/Project';
 import { projectClaimManager } from './fixtures/ProjectClaimManager';
 import workerUniqueString from './utils/worker-unique-string';
+import path from 'node:path';
+import { readFile, unlink } from 'node:fs/promises';
+
+function disableHighlights(page: Page) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  page.addInitScript(() => ((window as any).disableHighlights = true));
+}
 
 const test = base
   .extend<{
@@ -13,6 +20,7 @@ const test = base
     connectedSession4: ConnectedSession;
   }>({
     connectedSession: async ({ page }, use) => {
+      disableHighlights(page);
       const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
       await connectedSession.goto();
       await connectedSession.connect();
@@ -22,6 +30,7 @@ const test = base
     connectedSession2: async ({ browser }, use) => {
       const context = await browser.newContext();
       const page = await context.newPage();
+      disableHighlights(page);
       const connectedSession2 = new ConnectedSession(page, TEST_ADDRESSES[1]);
       await connectedSession2.goto();
       await connectedSession2.connect();
@@ -31,6 +40,7 @@ const test = base
     connectedSession3: async ({ browser }, use) => {
       const context = await browser.newContext();
       const page = await context.newPage();
+      disableHighlights(page);
       const connectedSession3 = new ConnectedSession(page, TEST_ADDRESSES[2]);
       await connectedSession3.goto();
       await connectedSession3.connect();
@@ -256,5 +266,108 @@ test.describe('rounds', () => {
       approveApplicationIds: [applicationId1],
       denyApplicationIds: [applicationId2],
     });
+  });
+
+  test('csv export of applications', async ({
+    rpgfRound,
+    connectedSession2,
+    project1,
+  }, testInfo) => {
+    await rpgfRound.logIn();
+
+    const roundName = workerUniqueString(testInfo, 'csv export test');
+    const roundSlug = workerUniqueString(testInfo, 'e2e-test-round-csv-export');
+
+    await rpgfRound.createDraft({
+      name: roundName,
+      urlSlug: roundSlug,
+      emoji: '📁',
+      voterAddresses: [TEST_ADDRESSES[3], TEST_ADDRESSES[4]],
+    });
+
+    await rpgfRound.publishRound();
+
+    await rpgfRound.forceRoundIntoState('intake');
+    await rpgfRound.gotoRpgfPage();
+    await rpgfRound.navigateToRoundOrDraft();
+
+    const applicationId = await rpgfRound.applyToRound({
+      withProject: project1,
+      applicationTitle: 'CSV Test Application',
+    });
+
+    const downloadCsv = async (check: (fileContent: string) => Promise<void>, page: Page) => {
+      await connectedSession2.goto();
+      await rpgfRound.navigateToRoundOrDraft(page);
+
+      // click first "View all" button to go to applications page
+      await page.getByRole('link', { name: 'View all' }).first().click();
+
+      // download the csv
+      await page.getByRole('button', { name: 'Download CSV' }).click();
+      const download = await page.waitForEvent('download');
+
+      const fileName = workerUniqueString(testInfo, 'export-user2') + '.csv';
+      const filePath = path.join(process.cwd(), 'test-data', fileName);
+
+      await download.saveAs(filePath);
+
+      const fileContent = await readFile(filePath, 'utf-8');
+
+      await check(fileContent);
+
+      // delete the file
+      await unlink(filePath);
+    };
+
+    // ensure the admin's download contains the application with full details
+    await downloadCsv(async (fileContent) => {
+      expect(fileContent).toContain('CSV Test Application');
+      expect(fileContent).toContain('ID,State,');
+      expect(fileContent).toContain('pending');
+
+      // make sure the public fields are included
+      expect(fileContent).toContain(',web,');
+      expect(fileContent).toContain('https://test.com');
+      expect(fileContent).toContain(',description,');
+      expect(fileContent).toContain('Test description');
+
+      // make sure the private fields are included
+      expect(fileContent).toContain(',name,');
+      expect(fileContent).toContain(',email,');
+      expect(fileContent).toContain('Test Testerson');
+      expect(fileContent).toContain('test@test.com');
+    }, rpgfRound.page);
+
+    // ensure user 2's export does not contain the application
+    await downloadCsv(async (fileContent) => {
+      expect(fileContent).not.toContain('CSV Test Application');
+      expect(fileContent).toContain('ID,State,');
+    }, connectedSession2.page);
+
+    // ensure that the application data is included in user2 export after approving the application
+
+    await rpgfRound.approveAndDenyApplications({
+      approveApplicationIds: [applicationId],
+      denyApplicationIds: [],
+    });
+
+    await downloadCsv(async (fileContent) => {
+      expect(fileContent).toContain('CSV Test Application');
+      expect(fileContent).toContain('ID,State,');
+      expect(fileContent).toContain('approved');
+
+      // make sure the public fields are included
+      expect(fileContent).toContain(',web,');
+      expect(fileContent).toContain('https://test.com');
+      expect(fileContent).toContain(',description,');
+      expect(fileContent).toContain('Test description');
+
+      // make sure the private fields are not included
+      expect(fileContent).not.toContain(',name,');
+      expect(fileContent).not.toContain(',email,');
+      expect(fileContent).not.toContain('Test Testerson');
+      expect(fileContent).not.toContain('test@test.com');
+    }, connectedSession2.page);
   });
 });
