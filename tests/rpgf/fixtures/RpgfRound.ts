@@ -208,11 +208,23 @@ export class RpgfRound {
       await this.page
         .getByRole('textbox', { name: 'A unique identifier for this' })
         .fill('description');
+      await this.page.waitForTimeout(500);
+
       await this.page
         .getByRole('textbox', { name: 'Description (Markdown)' })
         .fill('Please consicely describe your project');
-      await this.page.locator('label').filter({ hasText: 'Required field' }).click();
+      await this.page.waitForTimeout(500);
+
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .getByTestId('toggle-slider')
+        .click();
+      await this.page.waitForTimeout(500);
+
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
+      await this.page.waitForTimeout(500);
+
       await this.page.locator('.add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'Text Field A single-line text' }).click();
       await this.page.getByRole('textbox', { name: 'Label*' }).fill('Name');
@@ -220,8 +232,16 @@ export class RpgfRound {
         .getByRole('textbox', { name: 'Description (Markdown)' })
         .fill('Please enter your name.');
       await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('name');
-      await this.page.locator('label').filter({ hasText: 'Required field' }).click();
-      await this.page.locator('label').filter({ hasText: 'Private field' }).click();
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Required field' })
+        .getByTestId('toggle-slider')
+        .click();
+      await this.page
+        .locator('label')
+        .filter({ hasText: 'Private field' })
+        .getByTestId('toggle-slider')
+        .click();
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
       await this.page.locator('div:nth-child(2) > .add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'URL Field A field for' }).click();
@@ -234,11 +254,11 @@ export class RpgfRound {
       await this.page.locator('div:nth-child(3) > .add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'Email Field A field for' }).click();
       await this.page.getByRole('textbox', { name: 'Label*' }).fill('Email');
-      await this.page
-        .getByRole('textbox', { name: 'Description (Markdown)' })
-        .fill('Please enter your email');
-      await this.page.locator('label').filter({ hasText: 'Required field' }).click();
-      await this.page.locator('label').filter({ hasText: 'Private field' }).click();
+      // await this.page
+      //   .getByRole('textbox', { name: 'Description (Markdown)' })
+      //   .fill('Please enter your email');
+      // await this.page.locator('label').filter({ hasText: 'Required field' }).getByTestId('toggle-slider').click();
+      // await this.page.locator('label').filter({ hasText: 'Private field' }).getByTestId('toggle-slider').click();
       await this.page.locator('form div').filter({ hasText: 'Save' }).first().click();
       await this.page.getByRole('textbox', { name: 'A unique identifier for this' }).fill('email');
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();

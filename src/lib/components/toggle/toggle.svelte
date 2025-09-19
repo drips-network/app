@@ -17,7 +17,7 @@
     on:blur={() => (focus = false)}
     {disabled}
   />
-  <div class="slider" class:checked class:focus>
+  <div class="slider" class:checked class:focus data-testid="toggle-slider">
     <div class="head" />
   </div>
 </label>

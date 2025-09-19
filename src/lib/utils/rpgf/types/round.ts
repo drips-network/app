@@ -30,6 +30,17 @@ export const possibleColorSchema = z.union([
 ]);
 export type PossibleColor = z.infer<typeof possibleColorSchema>;
 
+export const kycConfigSchema = z.discriminatedUnion('provider', [
+  z.object({
+    provider: z.literal('Fern'),
+  }),
+  z.object({
+    provider: z.literal('Treova'),
+    formId: z.string(),
+  }),
+]);
+export type KycConfig = z.infer<typeof kycConfigSchema>;
+
 export const roundSchema = z.object({
   id: z.string(),
   published: z.boolean(),
@@ -65,7 +76,7 @@ export const roundSchema = z.object({
     })
     .nullable(),
   adminCount: z.number().nullable(),
-  kycProvider: z.enum(['Fern']).nullable(),
+  kycConfig: kycConfigSchema.nullable(),
 });
 export type Round = z.infer<typeof roundSchema>;
 
