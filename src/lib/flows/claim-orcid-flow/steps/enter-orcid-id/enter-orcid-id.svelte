@@ -1,17 +1,5 @@
 <script lang="ts" context="module">
   import { gql } from 'graphql-request';
-  // TODO
-  // chainData {
-  //   ... on UnClaimedOrcidAccountData {
-  //     linkedTo {
-  //       address
-  //     }
-  //     withdrawableBalances {
-  //       tokenAddress
-  //     }
-  //   }
-  // }
-
   export const ENTER_GIT_URL_STEP_ORCID_FRAGMENT = gql`
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
     fragment EnterGitUrlStepOrcid on OrcidLinkedIdentity {
@@ -23,6 +11,9 @@
       }
       owner {
         address
+      }
+      withdrawableBalances {
+        tokenAddress
       }
     }
   `;
