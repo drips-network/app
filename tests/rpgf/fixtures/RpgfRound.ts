@@ -201,29 +201,29 @@ export class RpgfRound {
         .getByRole('textbox', { name: 'Enter a unique name for this' })
         .fill('Default form');
       await this.page.getByRole('button', { name: 'Create form' }).click();
+      await this.page.waitForTimeout(1000);
 
       await this.page.getByRole('button', { name: 'Add first field' }).click();
+
       await this.page.getByRole('button', { name: 'Text Area A multi-line text' }).click();
+
       await this.page.getByRole('textbox', { name: 'Label*' }).fill('Description');
+
       await this.page
         .getByRole('textbox', { name: 'A unique identifier for this' })
         .fill('description');
-      await this.page.waitForTimeout(500);
 
       await this.page
         .getByRole('textbox', { name: 'Description (Markdown)' })
         .fill('Please consicely describe your project');
-      await this.page.waitForTimeout(500);
 
       await this.page
         .locator('label')
         .filter({ hasText: 'Required field' })
         .getByTestId('toggle-slider')
         .click();
-      await this.page.waitForTimeout(500);
 
       await this.page.getByRole('button', { name: 'Save', exact: true }).click();
-      await this.page.waitForTimeout(500);
 
       await this.page.locator('.add-item-row > .button').click();
       await this.page.getByRole('button', { name: 'Text Field A single-line text' }).click();
@@ -388,7 +388,7 @@ export class RpgfRound {
 
     await page.getByRole('textbox', { name: 'Please consicely describe' }).fill('Test description');
     await page.getByRole('textbox', { name: 'Please enter your name.' }).fill('Test Testerson');
-    await page.getByRole('textbox', { name: 'Please enter your email' }).fill('test@test.com');
+    await page.getByRole('textbox', { name: 'Email' }).fill('test@test.com');
     await page
       .getByRole('textbox', { name: 'Please enter the URL to your' })
       .fill('https://test.com');
