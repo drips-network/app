@@ -19,6 +19,8 @@
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
+  import Copy from '$lib/components/icons/Copy.svelte';
+  import cloneRpgfFormFlow from '$lib/flows/clone-rpgf-form-flow/clone-rpgf-form-flow';
 
   export let data;
 
@@ -100,6 +102,13 @@
         );
       },
     },
+    cloneButton: {
+      variant: 'ghost',
+      circular: true,
+      icon: Copy,
+      ariaLabel: 'Clone form',
+      onClick: () => modal.show(Stepper, undefined, cloneRpgfFormFlow(form, data.round.id)),
+    },
     editButton: {
       variant: 'ghost',
       circular: true,
@@ -121,6 +130,12 @@
       cell: () => Button,
       enableSorting: false,
       size: 24,
+    },
+    {
+      enableSorting: false,
+      accessorKey: 'cloneButton',
+      cell: () => Button,
+      size: 40,
     },
     {
       enableSorting: false,
