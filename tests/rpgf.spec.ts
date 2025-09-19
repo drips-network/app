@@ -59,7 +59,8 @@ const test = base
 
 test.describe('drafts', () => {
   test.beforeEach(() => {
-    test.setTimeout(300000); // 5 minutes
+    // 3 min
+    test.setTimeout(180000);
   });
 
   test.afterEach(async ({ rpgfRound }) => {
@@ -102,7 +103,8 @@ test.describe('drafts', () => {
 
 test.describe('rounds', () => {
   test.beforeEach(() => {
-    test.setTimeout(600000); // 10 minutes
+    // 3 min
+    test.setTimeout(180000);
   });
 
   test.afterEach(async ({ rpgfRound }) => {
