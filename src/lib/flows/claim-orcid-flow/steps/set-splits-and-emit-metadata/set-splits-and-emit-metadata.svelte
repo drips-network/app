@@ -201,17 +201,17 @@
           // and skip the step that waits for everything to be in the right state if so.
           // We already kick off the gasless owner update after the user confirms the funding.json step,
           // so it could be that everything already resolved by the time we get here.
-          const projectAlreadyReadyForClaimTx = await checkOrcidInExpectedStateForClaiming();
+          const orcidAlreadyReadyForClaimTx = await checkOrcidInExpectedStateForClaiming();
 
-          return { tx, projectAlreadyReadyForClaimTx };
+          return { tx, orcidAlreadyReadyForClaimTx };
         },
 
         messages: {
           duringBefore: 'Preparing to claim ORCID...',
         },
 
-        transactions: async ({ tx, projectAlreadyReadyForClaimTx }) => {
-          const ownerUpdateTransactionSteps = projectAlreadyReadyForClaimTx
+        transactions: async ({ tx, orcidAlreadyReadyForClaimTx }) => {
+          const ownerUpdateTransactionSteps = orcidAlreadyReadyForClaimTx
             ? []
             : await generateOwnerUpdateTransactions(
                 $context.gaslessOwnerUpdateTaskId,
