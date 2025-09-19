@@ -203,10 +203,10 @@
     </AnnotationBox>
 
     <svelte:fragment slot="action">
-      <Toggle checked={Boolean(data.round.kycProvider)} disabled />
+      <Toggle checked={Boolean(data.round.kycConfig)} disabled />
     </svelte:fragment>
 
-    {#if data.round.kycProvider}
+    {#if data.round.kycConfig}
       <h5 style:margin-top="1rem">KYC Provider</h5>
 
       <div
@@ -216,14 +216,17 @@
         style:margin-top="0.5rem"
       >
         <img
-          src="/assets/fern-logo.png"
+          src="/assets/{data.round.kycConfig.provider === 'Fern'
+            ? 'fern-logo.png'
+            : 'treova-logo.png'}"
           alt="Fern Logo"
           style:height="2rem"
           style:width="auto"
           style:border-radius="1rem"
+          style:border="1px solid var(--color-foreground-level-3)"
         />
 
-        <span class="typo-text">Fern KYC</span>
+        <span class="typo-text">{data.round.kycConfig.provider}</span>
       </div>
     {/if}
   </FormField>
