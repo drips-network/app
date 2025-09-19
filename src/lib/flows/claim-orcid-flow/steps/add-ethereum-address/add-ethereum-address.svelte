@@ -36,9 +36,9 @@
   $: link = `http://0.0.0.0/?ethereum_owned_by=${$walletStore.address}&orcid=${$context.claimableId}`;
   $: editing = !!$context.claimableProof;
   $: description = editing
-    ? `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`
+    ? `To verify you are the owner of this ORCID iD, please add or edit the funding URL to the Websites & social links section of your ORCID profile.`
     : `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`;
-  $: checkboxLabel = editing ? 'I edited link' : 'I added this to my ORCID profile';
+  $: checkboxLabel = editing ? 'I added or edited the URL.' : 'I added this to my ORCID profile';
 
   onMount(() => {
     $context.linkedToClaimable = false;

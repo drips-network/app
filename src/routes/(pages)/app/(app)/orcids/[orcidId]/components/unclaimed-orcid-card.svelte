@@ -1,22 +1,13 @@
-
-
 <script lang="ts" context="module">
-// TODO
-// chainData {
-//   ... on UnClaimedOrcidAccountData {
-//     chain
-//     withdrawableBalances {
-//       ...MergeWithdrawableBalances
-//     }
-//   }
-// }
-// ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
-
   export const UNCLAIMED_ORCID_CARD_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
+    ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
     fragment UnclaimedOrcidCard on OrcidLinkedIdentity {
       ...OrcidBadge
       chain
+      withdrawableBalances {
+        ...MergeWithdrawableBalances
+      }
     }
   `;
 </script>
@@ -30,7 +21,7 @@
   import { gql } from 'graphql-request';
   import type { UnclaimedOrcidCardFragment } from './__generated__/gql.generated';
   import {
-    // MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
+    MERGE_WITHDRAWABLE_BALANCES_FRAGMENT,
     mergeCollectableFunds,
     mergeSplittableFunds,
   } from '$lib/utils/merge-withdrawable-balances';
@@ -47,9 +38,8 @@
 
   export let orcidAccount: UnclaimedOrcidCardFragment;
 
-  // TODO: where are the funds?
-  $: collectableFunds = mergeCollectableFunds([]);
-  $: splittableFunds = mergeSplittableFunds([]);
+  $: collectableFunds = mergeCollectableFunds(orcidAccount.withdrawableBalances);
+  $: splittableFunds = mergeSplittableFunds(orcidAccount.withdrawableBalances);
 
   $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
 
@@ -132,7 +122,8 @@
               </div>
             </div>
           {/if}
-          {#if splittableFunds.length > 0}
+          <!--  TODO: there are no splittable funds for an ORCID? -->
+          <!-- {#if splittableFunds.length > 0}
             <div class="table-and-title">
               <div class="title">
                 <h5>Splittable</h5>
@@ -144,7 +135,7 @@
                 <TokenAmountsTable amounts={splittableFunds} />
               </div>
             </div>
-          {/if}
+          {/if} -->
         </div>
       {:else}
         <div class="token-amounts-table">

@@ -28,7 +28,7 @@
 
 <StandaloneFlowStepLayout
   headline="Where do you want to claim?"
-  description="Choose which network you'd like to claim your project on. You can claim on as many networks as you like."
+  description="Choose which network you'd like to claim your ORCID on. You can claim on as many networks as you like."
 >
   <div class="inner">
     <div class="networks">
