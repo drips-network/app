@@ -23,7 +23,7 @@ export const load = async ({ fetch, params, parent, depends }) => {
   }
 
   let kycRequest: KycRequest | null = null;
-  if (authenticated && (isOwnApplication || round.isAdmin) && round.kycProvider) {
+  if (authenticated && (isOwnApplication || round.isAdmin) && round.kycConfig) {
     kycRequest = await getKycRequestForApplication(fetch, application.id);
   }
 
