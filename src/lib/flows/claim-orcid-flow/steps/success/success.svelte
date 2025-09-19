@@ -11,6 +11,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import mergeAmounts from '$lib/utils/amounts/merge-amounts';
 
   export let context: Writable<State>;
 
@@ -23,23 +24,19 @@
   async function viewOrcid() {
     loading = true;
 
-    const collectedFunds = false
-    // const collectedFunds =
-    //   mergeAmounts(
-    //     projectChainData?.withdrawableBalances.map((wb) => ({
-    //       tokenAddress: wb.tokenAddress,
-    //       amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
-    //     })) ?? [],
-    //   ).length > 0;
+    const collectedFunds =
+      mergeAmounts(
+        $context.claimableAccount?.withdrawableBalances.map((wb) => ({
+          tokenAddress: wb.tokenAddress,
+          amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
+        })) ?? [],
+      ).length > 0;
 
     const ownAccountId = $walletStore.dripsAccountId;
     assert(ownAccountId);
 
     await goto(
-      buildUrl(
-        buildOrcidUrl($context.claimableId),
-        collectedFunds ? { collectHint: 'true' } : {},
-      ),
+      buildUrl(buildOrcidUrl($context.claimableId), collectedFunds ? { collectHint: 'true' } : {}),
     ).then(() => {
       loading = false;
       dispatch('conclude');
@@ -62,8 +59,7 @@
   {:else}
     <h4>Congratulations!</h4>
     <p>Youʼve successfully claimed your ORCID.</p>
-    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewOrcid}
-      >View ORCID profile</Button
+    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewOrcid}>View ORCID profile</Button
     >
   {/if}
 </div>
