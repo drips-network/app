@@ -1,13 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
+import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 
-test('create a drip list', async ({ page }) => {
+const test = base.extend<{ connectedSession: ConnectedSession }>({
+  connectedSession: async ({ page }, use) => {
+    const connectedSession = new ConnectedSession(page, TEST_ADDRESSES[0]);
+    await connectedSession.goto();
+    await connectedSession.connect();
+
+    await use(connectedSession);
+  },
+});
+
+test('create a drip list', async ({ page, connectedSession }) => {
   test.setTimeout(240_000);
 
-  page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('http://localhost:5173/app/drip-lists');
+  await connectedSession.connect();
 
-  await page.goto('http://localhost:5173/app');
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
-  await page.getByTestId('sidenav-item-Drip Lists').click();
   await page.getByRole('button', { name: 'Create Drip List' }).click();
   await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
   await page.getByRole('textbox', { name: 'Title*' }).fill('E2E test list');
@@ -54,7 +63,7 @@ test('create a drip list', async ({ page }) => {
   await page.getByRole('button', { name: 'Support later' }).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
   await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
-  await page.getByRole('button', { name: 'View your Drip List' }).click();
+  await page.getByRole('link', { name: 'View your Drip List' }).click();
 
   await page.waitForURL('http://localhost:5173/app/drip-lists/*');
 
@@ -65,14 +74,12 @@ test('create a drip list', async ({ page }) => {
   await expect(page.getByText('40%').nth(0)).toBeVisible();
 });
 
-test('create collaborative drip list', async ({ page }) => {
+test('create collaborative drip list', async ({ page, connectedSession }) => {
   test.setTimeout(240_000);
 
-  page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('http://localhost:5173/app/drip-lists');
+  await connectedSession.connect();
 
-  await page.goto('http://localhost:5173/app');
-  await page.getByRole('button', { name: 'Connect', exact: true }).click();
-  await page.getByTestId('sidenav-item-Drip Lists').click();
   await page.getByRole('button', { name: 'Create Drip List' }).click();
   await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
   await page.getByRole('textbox', { name: 'Title*' }).fill('Test collaborative list');
@@ -107,7 +114,9 @@ test('create collaborative drip list', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
-  await page.getByRole('button', { name: 'View your Drip List' }).click();
+
+  await page.getByRole('link', { name: 'View your Drip List' }).click();
+
   await page.getByRole('button', { name: 'Cast your vote' }).click();
   await page.getByRole('textbox', { name: 'Add' }).click();
   await page.getByRole('textbox', { name: 'Add' }).fill('github.com/efstajas/drips-test-repo-10');

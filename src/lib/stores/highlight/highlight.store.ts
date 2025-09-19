@@ -15,6 +15,10 @@ const currentHighlight = writable<Highlight | null>(null);
  * @param config Title, description and element for the highlight.
  */
 function highlight(config: Highlight) {
+  // Allow disabling highlights for testing purposes.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((window as any).disableHighlights === true) return;
+
   currentHighlight.set(config);
 }
 

@@ -114,7 +114,7 @@
     border-radius: 0.5rem 0 0.5rem 0.5rem;
     background: var(--color-background);
     overflow: hidden;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     position: relative;
   }
 

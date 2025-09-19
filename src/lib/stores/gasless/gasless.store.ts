@@ -9,6 +9,6 @@ import walletStore from '../wallet/wallet.store';
  * If true, the app will use gasless project claiming and collecting of earnings on supported
  * networks.
  */
-export default network.gaslessClaimAndCollect && !get(walletStore).safe
+export default network.gaslessTransactions && !get(walletStore).safe
   ? storedWritable('gasless-claims-and-collects', z.boolean(), true, !browser)
   : writable(false);
