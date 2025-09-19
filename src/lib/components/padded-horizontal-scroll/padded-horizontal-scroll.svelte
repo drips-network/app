@@ -42,17 +42,16 @@
     top: 0;
     bottom: 0;
     width: 2rem;
+    pointer-events: none;
   }
 
   .gradient.left-edge {
     left: -0;
     background: linear-gradient(to right, var(--color-background) 0%, transparent);
-    z-index: 1;
   }
 
   .gradient.right-edge {
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
-    z-index: 1;
   }
 </style>
