@@ -11,6 +11,7 @@ import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { OrcidQuery, OrcidQueryVariables } from './__generated__/gql.generated';
 import network from '$lib/stores/wallet/network';
+import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
 export const GET: RequestHandler = async ({ url, fetch, params }) => {
   const { orcidId } = params;
@@ -22,6 +23,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
         chain
         areSplitsValid
         isClaimed
+        orcid
         orcidMetadata {
           givenName
           familyName
@@ -46,9 +48,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
     error(404);
   }
 
-  const firstName = orcidAccount.orcidMetadata?.givenName ?? '';
-  const lastname = orcidAccount.orcidMetadata?.familyName ?? '';
-  const orcidName = `${firstName} ${lastname}`;
+  const orcidName = getOrcidDisplayName(orcidAccount);
   const supportersCount = orcidAccount.support.length;
 
   const target = url.searchParams.get('target');
