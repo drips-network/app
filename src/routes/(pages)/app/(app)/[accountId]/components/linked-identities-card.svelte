@@ -10,6 +10,10 @@
         chain
         isClaimed
         areSplitsValid
+        orcidMetadata {
+          givenName
+          familyName
+        }
       }
     }
   `;

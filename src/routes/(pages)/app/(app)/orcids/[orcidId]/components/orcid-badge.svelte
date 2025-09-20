@@ -10,6 +10,10 @@
       orcid
       isClaimed
       areSplitsValid
+      orcidMetadata {
+        givenName
+        familyName
+      }
     }
   `;
 </script>
