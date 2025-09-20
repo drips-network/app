@@ -26,9 +26,17 @@ services:
       - ECOSYSTEM_API_URL=http://ecosystems:5000
       - ECOSYSTEM_API_ACCESS_TOKEN=123
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
     volumes:
     - .:/app
     - /app/node_modules/
+    # *) Uncomment the following line and save this file
+    # - ./node_modules/@drips-network/sdk:/app/node_modules/@drips-network/sdk
+    # *) Build the SDK locally, then run
+    # npm link ../path/to/sdk
+    # *) And start the local docker environment with
+    # CONTRACTS_TAG=igor-orcid GRAPHQL_API_TAG=refactor-linked-identities npm run dev:docker
+
     ports:
     - 5173:5173
     depends_on:

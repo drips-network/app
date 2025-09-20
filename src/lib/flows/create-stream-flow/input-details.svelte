@@ -26,6 +26,16 @@
       accountId
     }
   `;
+
+  export const CREATE_STREAM_FLOW_ORCID_FRAGMENT = gql`
+    ${DRIP_VISUAL_ORCID_FRAGMENT}
+    fragment CreateStreamFlowOrcidAccount on OrcidLinkedIdentity {
+      ...DripVisualOrcid
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -43,6 +53,7 @@
   import DripVisual, {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
+    DRIP_VISUAL_ORCID_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
