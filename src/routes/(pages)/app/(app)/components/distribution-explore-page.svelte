@@ -62,10 +62,6 @@
     <FeaturedRpgfRounds rounds={featuredRpgfRounds} />
   {/if}
 
-  {#if projects}
-    <RecentlyClaimedProjects {projects} />
-  {/if}
-
   {#if featuredDripLists.length > 0}
     <Section
       header={{
