@@ -10,6 +10,10 @@
       }
       isClaimed
       areSplitsValid
+      orcidMetadata {
+        givenName
+        familyName
+      }
     }
   `;
 </script>
@@ -24,10 +28,13 @@
   import type Orcid from '$lib/utils/orcids/entities';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileHeaderFragment;
   export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
+
+  const orcidName = getOrcidDisplayName(orcidAccount);
 </script>
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
@@ -36,7 +43,7 @@
       <OrcidAvatar size="huge" outline />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">
-      <h1>{orcid.name}</h1>
+      <h1>{orcidName}</h1>
       {#if orcid.bio}
         <span
           class="typo-text-small line-clamp-1 twemoji-text"
