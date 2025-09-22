@@ -30,5 +30,9 @@ export const ORCID_PROFILE_FRAGMENT = gql`
       tokenAddress
       amount
     }
+    orcidMetadata {
+      givenName
+      familyName
+    }
   }
 `;
