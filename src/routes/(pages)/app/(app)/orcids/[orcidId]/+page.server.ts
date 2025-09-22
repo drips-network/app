@@ -23,8 +23,6 @@ export const load = (async ({ params, fetch }) => {
     return error(404);
   }
 
-  // TODO: I think there's a problem here, I thought we were supposed to fetch the orcid
-  // by accountId... We will probably want to support urls that include accountid as well.
   let orcidAccount = undefined;
   const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
   if (orcidGqlResponse.orcidLinkedIdentityByOrcid) {

@@ -25,13 +25,14 @@
   import buildUrl from '$lib/utils/build-url';
   import mergeWithdrawableBalances from '$lib/utils/merge-withdrawable-balances';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
+  import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
   export let orcid: Orcid;
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
+  const orcidDisplayName = getOrcidDisplayName(orcidAccount);
 
-  // TODO: implement
   $: imageBaseUrl = `/api/share-images/orcids/${encodeURIComponent(orcid.id)}.png`;
   $: withdrawableBalances = orcidAccount.withdrawableBalances ?? [];
   $: support = orcidAccount.support ?? [];
@@ -42,8 +43,8 @@
 </script>
 
 <HeadMeta
-  title={orcid.name}
-  description="Support {orcid.name} on Drips and help make Open-Source Software sustainable."
+  title={orcidDisplayName}
+  description="Support {orcidDisplayName} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
 />
