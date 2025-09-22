@@ -8,11 +8,6 @@ import {
 } from '../../../../../../lib/utils/orcids/fetch-orcid';
 import type { OrcidProfileFragment } from './components/__generated__/gql.generated';
 
-/**
- * 0009-0007-5482-8654 me in ORCID prod
- * 0009-0007-1106-8413 drips.network in ORCID sandbox
- * 0000-0002-2677-7622 random other sandbox
- */
 export const load = (async ({ params, fetch }) => {
   if (!isValidOrcidId(params.orcidId)) {
     return error(404);
