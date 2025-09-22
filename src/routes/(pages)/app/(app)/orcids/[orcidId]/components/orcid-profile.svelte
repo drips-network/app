@@ -27,7 +27,9 @@
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
   import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
+  // for bio
   export let orcid: Orcid;
+  // for everything else
   export let orcidAccount: OrcidProfileFragment;
 
   let supportersSectionSkeleton: SectionSkeleton | undefined;
@@ -38,7 +40,7 @@
   $: support = orcidAccount.support ?? [];
 
   function claimOrcid() {
-    launchClaimOrcid(orcid.id);
+    launchClaimOrcid(orcidAccount.orcid);
   }
 </script>
 
@@ -50,7 +52,7 @@
 />
 
 <svelte:head>
-  <link rel="canonical" href={`https://drips.network/app/orcids/${orcid.id}`} />
+  <link rel="canonical" href={`https://drips.network/app/orcids/${orcidAccount.orcid}`} />
 </svelte:head>
 
 <PrimaryColorThemer colorHex={undefined}>
@@ -66,7 +68,10 @@
           later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <CopyLinkButton url={buildOrcidUrl(orcid.id, { absolute: true })} variant="ghost" />
+            <CopyLinkButton
+              url={buildOrcidUrl(orcidAccount.orcid, { absolute: true })}
+              variant="ghost"
+            />
             <Button size="small" icon={Registered} variant="primary" on:click={claimOrcid}
               >Claim ORCID iD</Button
             >
@@ -83,7 +88,7 @@
           {orcid}
           {orcidAccount}
           shareButton={{
-            url: buildOrcidUrl(orcid.id, { absolute: true }),
+            url: buildOrcidUrl(orcidAccount.orcid, { absolute: true }),
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
         />
@@ -127,7 +132,7 @@
               unclaimedTokensExpanded={withdrawableBalances.length > 0}
               showClaimButton={!orcidAccount.isClaimed}
               on:claimButtonClick={() =>
-                goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
+                goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcidAccount.orcid }))}
             />
           </div>
         </SectionSkeleton>
