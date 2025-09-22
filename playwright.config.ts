@@ -26,15 +26,6 @@ export default defineConfig({
       },
     },
     {
-      name: 'safari',
-      use: {
-        ...devices['Desktop Safari'],
-        contextOptions: {
-          reducedMotion: 'reduce',
-        },
-      },
-    },
-    {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
