@@ -37,7 +37,7 @@
 
 <style>
   .value-wrapper {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     padding: 1rem;
     border-radius: 1rem 0 1rem 1rem;
     display: flex;
