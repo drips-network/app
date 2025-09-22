@@ -341,7 +341,7 @@ export class RpgfRound {
 
     await this.page.getByRole('link', { name: this.name }).click();
 
-    // Publish the round0x90F79bf6EB2c4f870365E785982E1f101E93b906
+    // Publish the round
     await this.page.getByRole('button', { name: 'Publish' }).click();
     await this.page.getByRole('button', { name: 'Publish round' }).nth(0).click();
     await this.page.getByRole('button', { name: 'Got it' }).click();
