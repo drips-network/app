@@ -66,7 +66,7 @@ const systemActorSchema = z.object({
   type: z.literal('system'),
 });
 const kycProviderActorSchema = z.object({
-  type: z.literal('kyc_provider'),
+  type: z.literal('kyc-provider'),
   provider: kycProviderSchema,
 });
 

@@ -12,11 +12,20 @@
     <img src="/icons/icon-192.png" alt="Fern Logo" />
     <span class="typo-text">System</span>
   </div>
-{:else if actor.type === 'kyc_provider'}
+{:else if actor.type === 'kyc-provider'}
   {#if actor.provider === 'Fern'}
     <div class="badge">
       <img src="/assets/fern-logo.png" alt="Fern Logo" />
       <span class="typo-text">Fern KYC</span>
+    </div>
+  {:else if actor.provider === 'Treova'}
+    <div class="badge">
+      <img src="/assets/treova-logo.png" alt="Treova Logo" />
+      <span class="typo-text">Treova</span>
+    </div>
+  {:else}
+    <div class="badge">
+      <span class="typo-text">KYC Provider</span>
     </div>
   {/if}
 {/if}
