@@ -1,3 +1,4 @@
+import getOrcidDisplayName from './display-name';
 import type { OrcidApiResponse } from './schemas';
 
 export const CLAIMING_URL_NAME = 'DRIPS_OWNERSHIP_CLAIM';
@@ -19,9 +20,13 @@ export default class Orcid {
 
   get name(): string {
     const name = this.data.person.name;
-    return (
-      name['given-names']?.value || name['credit-name']?.value || name['family-name']?.value || ''
-    );
+    return getOrcidDisplayName({
+      orcid: this.id,
+      orcidMetadata: {
+        givenName: name['given-names']?.value,
+        familyName: name['family-name']?.value,
+      },
+    });
   }
 
   get bio(): string {
