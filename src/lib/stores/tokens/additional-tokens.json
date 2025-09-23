@@ -30,7 +30,7 @@
       "name": "Wrapped Filecoin",
       "symbol": "WFIL",
       "decimals": 18,
-      "logoURI": "https://cryptologos.cc/logos/filecoin-fil-logo.png"
+      "logoURI": "/assets/tokens/filecoin.png"
     },
     {
       "chainId": 1088,
