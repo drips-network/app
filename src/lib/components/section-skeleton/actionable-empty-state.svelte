@@ -1,22 +1,15 @@
 <script lang="ts">
-  import Button from '../button/button.svelte';
   import EmptyState from './empty-state.svelte';
-  import type { ComponentProps } from 'svelte';
 
   export let emoji: string | undefined = undefined;
   export let headline: string | undefined = undefined;
   export let description: string | undefined = undefined;
-  export let button:
-    | { label: string; icon?: ComponentProps<Button>['icon']; handler: () => void }
-    | undefined = undefined;
 </script>
 
 <div class="dynamic-empty-state">
   <EmptyState {emoji} {headline} text={description} />
   <div class="buttons">
-    {#if button}<Button icon={button.icon} variant="primary" on:click={button.handler}
-        >{button.label}</Button
-      >{/if}
+    <slot name="actions" />
   </div>
 </div>
 

@@ -6,6 +6,8 @@
   export let active: boolean;
   export let icon: ComponentType;
   export let external = false;
+
+  export let backgroundOnActive = false;
 </script>
 
 <a
@@ -13,8 +15,10 @@
   data-testid="sidenav-item-{label}"
   class="sidenav-item typo-text"
   class:active
+  class:background-on-active={backgroundOnActive}
   {href}
   target={external ? '_blank' : undefined}
+  on:click
 >
   <svelte:component
     this={icon}
@@ -36,12 +40,18 @@
     padding: 0.75rem;
     transition:
       background-color 0.3s,
+      box-shadow 0.3s,
       color 0.3s;
     overflow: hidden;
   }
 
   .sidenav-item.active {
     color: var(--color-primary-level-6);
+  }
+
+  .sidenav-item.background-on-active.active {
+    background-color: var(--color-primary-level-1);
+    box-shadow: var(--elevation-low);
   }
 
   .sidenav-item:focus {

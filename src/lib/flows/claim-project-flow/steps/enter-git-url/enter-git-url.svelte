@@ -56,6 +56,7 @@
 
   export let context: Writable<State>;
   export let projectUrl: string | undefined = undefined;
+  export let showBackButton: boolean = true;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -318,6 +319,8 @@
     {/if}
   </svelte:fragment>
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    {#if showBackButton}
+      <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    {/if}
   </svelte:fragment>
 </StandaloneFlowStepLayout>

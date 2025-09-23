@@ -99,7 +99,7 @@
       <Spinner visibilityDelay={0} />
     {:else if projectChainData && description && project}
       <div class="avatar">
-        <ProjectAvatar project={projectChainData} size="xlarge" outline />
+        <ProjectAvatar project={projectChainData} size="xlarge" />
       </div>
       <div class="details">
         <h2>

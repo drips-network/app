@@ -9,7 +9,7 @@ printf " | |  __| \  / |\n"
 printf " | | |_ | |\/| |\n"
 printf " | |__| | |  | |\n"
 printf "  \_____|_|  |_|\n\n"
-                
+      
 echo "ℹ️ Starting with UID: $USER_ID, GID: $GROUP_ID"
 useradd -u $USER_ID -o -m drippy
 groupmod -g $GROUP_ID drippy 2>/dev/null

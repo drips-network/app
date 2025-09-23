@@ -168,7 +168,7 @@
 <style>
   .project-info {
     border-radius: 1rem 0 1rem 1rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -176,7 +176,7 @@
   }
 
   .token-amounts-table {
-    border-top: 1px solid var(--color-foreground);
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 
   .basic-info {
@@ -202,7 +202,7 @@
   }
 
   .tables-container {
-    border-top: 1px solid var(--color-foreground);
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 
   .tables-container .table-and-title {

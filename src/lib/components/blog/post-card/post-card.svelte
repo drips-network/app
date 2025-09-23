@@ -102,7 +102,7 @@
     width: 1.5rem;
     border-radius: 50%;
     display: inline-block;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .post.link:hover,

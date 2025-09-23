@@ -74,7 +74,7 @@
 
 <style>
   li + li {
-    border-top: 1px solid var(--color-foreground);
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 
   .muted {

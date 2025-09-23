@@ -15,7 +15,7 @@ import ConfigureDependencies from './steps/configure-dependencies/configure-depe
 import Review, { REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT } from './steps/review/review.svelte';
 import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
 import LinkedProject from './slots/linked-project.svelte';
-import Success from './steps/success/success.svelte';
+import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
@@ -24,6 +24,12 @@ import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 import type { FundingJson } from '$lib/utils/github/GitHub';
 import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
 import type { AddItemError } from '$lib/components/list-editor/errors';
+import walletStore from '$lib/stores/wallet/wallet.store';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
+import type { ClaimedProjectData } from '$lib/graphql/__generated__/base-types';
+import mergeAmounts from '$lib/utils/amounts/merge-amounts';
+import buildUrl from '$lib/utils/build-url';
+import MultiChain from '$lib/components/illustrations/multi-chain.svelte';
 
 export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_PROJECT_FRAGMENT}
@@ -152,21 +158,34 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
   }
 }
 
+const staticHeaderComponent = {
+  component: MultiChain,
+  props: {
+    strokeWidth: 6,
+  },
+};
+
 export const steps = (
   state: Writable<State>,
   skipWalletConnect = false,
   isModal = false,
   projectUrl: string | undefined = undefined,
+  linkToProjectPageOnSuccess = true,
+  skipNetworkSelection = false,
 ) => [
   makeStep({
     component: ChooseNetwork,
+    staticHeaderComponent,
     props: undefined,
+    condition: () => !skipNetworkSelection,
   }),
   makeStep({
     component: EnterGitUrl,
     props: {
       projectUrl,
+      showBackButton: !skipNetworkSelection,
     },
+    staticHeaderComponent,
   }),
   ...(skipWalletConnect
     ? []
@@ -174,25 +193,30 @@ export const steps = (
         makeStep({
           component: ConnectWallet,
           props: undefined,
+          staticHeaderComponent,
         }),
       ]),
   makeStep({
     component: AddEthereumAddress,
     props: undefined,
+    staticHeaderComponent,
   }),
   makeStep({
     component: SplitYourFunds,
     props: undefined,
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureMaintainers,
     props: undefined,
     condition: () => get(state).highLevelPercentages.maintainers > 0,
+    staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureDependencies,
     props: undefined,
     condition: () => get(state).highLevelPercentages.dependencies > 0,
+    staticHeaderComponent,
   }),
   makeStep({
     component: Review,
@@ -200,13 +224,43 @@ export const steps = (
       canEditWalletConnection: !skipWalletConnect,
       isModal,
     },
+    staticHeaderComponent,
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,
     props: undefined,
+    staticHeaderComponent,
   }),
   makeStep({
-    component: Success,
-    props: undefined,
+    component: SuccessStep,
+    props: {
+      message: 'Your project has been successfully claimed.',
+      action: linkToProjectPageOnSuccess ? 'link' : 'close',
+      href() {
+        const context = get(state);
+
+        const forge = context.project?.source.forge;
+        const username = context.project?.source.ownerName;
+        const repoName = context.project?.source.repoName;
+        const projectChainData = context.project?.chainData
+          ? (filterCurrentChainData(context.project.chainData) as ClaimedProjectData)
+          : undefined;
+
+        const collectedFunds =
+          mergeAmounts(
+            projectChainData?.withdrawableBalances.map((wb) => ({
+              tokenAddress: wb.tokenAddress,
+              amount: BigInt(wb.collectableAmount) + BigInt(wb.splittableAmount),
+            })) ?? [],
+          ).length > 0;
+
+        return buildUrl(
+          `/app/projects/${forge?.toLowerCase()}/${username}/${repoName}?exact`,
+          collectedFunds ? { collectHint: 'true' } : {},
+        );
+      },
+      linkText: 'View your project',
+      safeAppMode: Boolean(get(walletStore).safe),
+    },
   }),
 ];

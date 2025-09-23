@@ -107,7 +107,7 @@
     border-radius: 0 0 0 1.25rem;
     z-index: 10;
     cursor: pointer;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     background-color: var(--color-background);
     border-right: none;
     border-top: none;

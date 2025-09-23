@@ -1,9 +1,10 @@
 <script lang="ts">
   export let disableScroll = false;
+  export let innerElem: HTMLDivElement | undefined = undefined;
 </script>
 
 <div class="wrapper" class:disable-scroll={disableScroll}>
-  <div class="inner">
+  <div class="inner" bind:this={innerElem}>
     <div class="content">
       <slot />
     </div>
@@ -14,8 +15,8 @@
 
 <style>
   .wrapper {
-    width: calc(100% + 5rem);
-    margin-left: -2.5rem;
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
     position: relative;
   }
 
@@ -33,7 +34,7 @@
 
   .inner > .content {
     min-width: 100%;
-    padding: 1px 2.5rem; /* 1px so box-shadow outlined content is not clipped */
+    padding: 1px 1rem; /* 1px so box-shadow outlined content is not clipped */
     width: fit-content;
   }
 
@@ -41,8 +42,8 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 2rem;
     pointer-events: none;
+    width: 1rem;
   }
 
   .gradient.left-edge {
@@ -53,5 +54,20 @@
   .gradient.right-edge {
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
+  }
+
+  @media (max-width: 577px) {
+    .wrapper {
+      margin-left: -1rem;
+      width: calc(100% + 2rem);
+    }
+
+    .inner > .content {
+      padding: 1px 1rem; /* 1px so box-shadow outlined content is not clipped */
+    }
+
+    .gradient {
+      width: 1rem;
+    }
   }
 </style>

@@ -75,7 +75,11 @@
   function textUpdate(text: string, formatTokens: FormatToken[]) {
     if (text.length) {
       const result = parse(text, formatTokens, $store);
-      if (result.date !== null) {
+      if (
+        result.date !== null &&
+        (min ? result.date > min : true) &&
+        (max ? result.date < max : true)
+      ) {
         valid = true;
         store.set(result.date);
       } else {
