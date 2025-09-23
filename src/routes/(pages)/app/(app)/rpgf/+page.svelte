@@ -81,8 +81,12 @@
       Interested to run your round on Drips? Reach out to the team now.
 
       <svelte:fragment slot="actions">
-        <Button href={INBOUND_LEAD_FORM_URL} target="_blank" icon={ArrowBoxUpRight}>
-          Learn about RetroPGF on Drips
+        <Button
+          href="https://docs.drips.network/rpgf/overview"
+          target="_blank"
+          icon={ArrowBoxUpRight}
+        >
+          Learn more
         </Button>
         <Button
           variant="primary"
