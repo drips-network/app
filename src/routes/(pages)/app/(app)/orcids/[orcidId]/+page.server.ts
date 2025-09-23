@@ -1,42 +1,44 @@
 import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import {
-  fetchOrcid,
-  fetchOrcidAccount,
-  orcidIdToAccountId,
-} from '../../../../../../lib/utils/orcids/fetch-orcid';
-import type { OrcidProfileFragment } from './components/__generated__/gql.generated';
+import { fetchOrcid, fetchOrcidAccount } from '../../../../../../lib/utils/orcids/fetch-orcid';
+import Orcid from '$lib/utils/orcids/entities';
 
 export const load = (async ({ params, fetch }) => {
   if (!isValidOrcidId(params.orcidId)) {
     return error(404);
   }
 
-  const orcid = await fetchOrcid(params.orcidId, fetch);
-  if (!orcid) {
+  const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
+  const orcidAccount = orcidGqlResponse.orcidLinkedIdentityByOrcid;
+  // If the backend can't get the ORCID info, then something is deeply wrong
+  // and we cannot proceed
+  if (!orcidAccount) {
     return error(404);
   }
 
-  let orcidAccount = undefined;
-  const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
-  if (orcidGqlResponse.orcidLinkedIdentityByOrcid) {
-    orcidAccount = orcidGqlResponse.orcidLinkedIdentityByOrcid;
-  }
-
-  if (!orcidAccount) {
-    const accountId = await orcidIdToAccountId(params.orcidId);
-    orcidAccount = {
-      __typename: 'OrcidLinkedIdentity',
-      account: {
-        __typename: 'RepoDriverAccount',
-        accountId: String(accountId),
-        driver: 'REPO' as const,
+  // If the frontend can't the ORCID info, then there might be a rate
+  // limiting issue or an API authroization issue. Fake it till you make it.
+  let orcid = await fetchOrcid(params.orcidId, fetch);
+  if (!orcid) {
+    orcid = new Orcid({
+      'orcid-identifier': {
+        uri: `https://orcid.org/${params.orcidId}`,
+        path: params.orcidId,
+        host: 'orcid.org',
       },
-      orcid: orcid.id,
-      isClaimed: false,
-      areSplitsValid: false,
-    } as OrcidProfileFragment;
+      person: {
+        'last-modified-date': null,
+        name: {
+          'given-names': null,
+          'family-name': null,
+          'credit-name': null,
+        },
+        biography: null,
+        'researcher-urls': null,
+        'other-names': null,
+      },
+    });
   }
 
   return {
