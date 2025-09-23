@@ -44,6 +44,7 @@
   } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import { fetchOrcid } from '../../../../utils/orcids/fetch-orcid';
   import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
+  import isClaimed from '$lib/utils/orcids/is-claimed';
 
   export let context: Writable<State>;
   export let orcidId: string | undefined = undefined;
@@ -95,7 +96,7 @@
 
       const orcidAccount = response.orcidLinkedIdentityByOrcid;
       if (orcidAccount) {
-        if (orcidAccount.isClaimed && orcidAccount.areSplitsValid) {
+        if (isClaimed(orcidAccount)) {
           throw new InvalidUrlError('ORCID already claimed');
         }
 
@@ -119,7 +120,8 @@
           orcid: orcidInfo.id,
           isClaimed: false,
           areSplitsValid: false,
-          chain: network.gqlName, // Add the required 'chain' property
+          chain: network.gqlName,
+          withdrawableBalances: [],
         };
       }
 
