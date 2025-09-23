@@ -6,6 +6,8 @@
   import { browser } from '$app/environment';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import { locallyStoredApplicationExists } from '../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
+  import Divider from '../divider/divider.svelte';
+  import ArrowRight from '../icons/ArrowRight.svelte';
 
   export let hasExistingBallot: boolean;
   export let round: Round;
@@ -39,6 +41,19 @@
           Apply now
         {/if}
       </Button>
+
+      {#if signedInUserId}
+        <Divider />
+
+        <Button
+          href="/app/rpgf/rounds/{round.urlSlug}/applications?sortBy=createdAt&filter=own"
+          icon={ArrowRight}>Your applications</Button
+        >
+      {:else}
+        <AnnotationBox type="info"
+          >Sign in to view your previously-submitted applications.</AnnotationBox
+        >
+      {/if}
     {:else if state === 'pending-voting'}
       <h2 class="pixelated">Registration closed</h2>
       <p class="typo-text">
