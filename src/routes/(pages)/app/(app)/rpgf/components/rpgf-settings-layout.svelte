@@ -12,6 +12,7 @@
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
   import ScrollableTabs from '$lib/components/scrollable-tabs/scrollable-tabs.svelte';
   import type { Round } from '$lib/utils/rpgf/types/round';
+  import File from '$lib/components/icons/File.svelte';
 
   export let round: Round;
   export let amountOfVoters: number;
@@ -92,7 +93,7 @@
       label="Audit log"
       href="{settingsBaseUrl}/audit-log"
       active={$page.url.pathname === `${settingsBaseUrl}/audit-log`}
-      icon={Ledger}
+      icon={File}
       backgroundOnActive
     />
   </div>
