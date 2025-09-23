@@ -159,8 +159,8 @@
     </Setting>
     {#if network.gaslessTransactions}
       <Setting
-        title="Gasless claim & collect transactions"
-        subtitle="When enabled, sends transactions for claiming a project and collecting funds gaslessly using EIP-712. This isn't supported on all networks, and won't work with Safe multisigs."
+        title="Gasless transactions"
+        subtitle="When enabled, sends various transactions (claiming a project, collecting funds, applying to a round, etc.) gaslessly using EIP-712. This isn't supported on all networks, and won't work with Safe multisigs."
       >
         <Toggle bind:checked={$gaslessStore} />
       </Setting>
