@@ -42,19 +42,18 @@
     position: absolute;
     top: 0;
     bottom: 0;
+    pointer-events: none;
     width: 1rem;
   }
 
   .gradient.left-edge {
     left: -0;
     background: linear-gradient(to right, var(--color-background) 0%, transparent);
-    z-index: 1;
   }
 
   .gradient.right-edge {
     right: 0;
     background: linear-gradient(to left, var(--color-background) 0%, transparent);
-    z-index: 1;
   }
 
   @media (max-width: 577px) {
