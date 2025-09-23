@@ -3,8 +3,8 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
-  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import RpgfRoundCard from '$lib/components/rpgf-round-card/rpgf-round-card.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -78,10 +78,18 @@
       <span class="typo-text-small-bold"
         >Currently, only whitelisted users can create new RetroPGF rounds.</span
       >
-      Ready to run your round on Drips? Reach out to the team now.
+      Interested to run your round on Drips? Reach out to the team now.
 
       <svelte:fragment slot="actions">
-        <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank" icon={ArrowRight}>
+        <Button href={INBOUND_LEAD_FORM_URL} target="_blank" icon={ArrowBoxUpRight}>
+          Learn about RetroPGF on Drips
+        </Button>
+        <Button
+          variant="primary"
+          href={INBOUND_LEAD_FORM_URL}
+          target="_blank"
+          icon={ArrowBoxUpRight}
+        >
           Get in touch
         </Button>
       </svelte:fragment>
