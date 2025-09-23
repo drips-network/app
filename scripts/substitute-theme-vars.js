@@ -9,6 +9,7 @@
 // - white -> var(--color-background)
 // - #FFFFFF -> var(--color-background)
 // - #EAEAFF -> var(--color-primary-level-1)
+// - #313166 -> var(--color-primary-level-6)
 
 import fs from 'fs';
 import path from 'path';
@@ -31,7 +32,8 @@ const updatedContent = fileContent
   .replace(/#28333D/g, 'var(--color-foreground)')
   .replace(/white/g, 'var(--color-background)')
   .replace(/#FFFFFF/g, 'var(--color-background)')
-  .replace(/#EAEAFF/g, 'var(--color-primary-level-1)');
+  .replace(/#EAEAFF/g, 'var(--color-primary-level-1)')
+  .replace(/#313166/g, 'var(--color-primary-level-6)');
 
 // replace file in place
 fs.writeFileSync(filePath, updatedContent, 'utf8');

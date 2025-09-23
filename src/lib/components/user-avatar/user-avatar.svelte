@@ -37,7 +37,7 @@
     border-radius: calc(100% / 2);
     object-fit: cover;
     box-sizing: border-box;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   img {

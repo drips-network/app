@@ -266,7 +266,7 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     left: 50%;
     transform: translateX(-50%);
     border-radius: 2rem 0 2rem 2rem;

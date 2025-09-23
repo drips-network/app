@@ -443,7 +443,7 @@
     height: 1.5rem;
     padding-right: 1.3rem;
     margin: 0px;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     outline: none;
     transition: all 80ms cubic-bezier(0.4, 0, 0.2, 1);
     background-image: none;

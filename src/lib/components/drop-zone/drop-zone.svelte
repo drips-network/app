@@ -193,7 +193,7 @@
     color: var(--color-foreground-level-6);
     gap: 1rem;
     border-radius: 1rem 0 1rem 1rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .drop-zone.loading,

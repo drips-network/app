@@ -14,6 +14,7 @@ import cached from '$lib/utils/cache/remote/cached.js';
 import FEATURED_DRIP_LISTS_CONFIG from '../drip-lists/components/featured-drip-lists-config.js';
 import EXPLORE_PAGE_CONFIG, { type ExplorePageVariant } from './explore-page-config.js';
 import { redis } from '../../../../api/redis.js';
+import loadFeaturedRpgfRounds from './load-featured-rpgf-rounds.js';
 
 export default async function loadDistributionExplorePage(fetch: typeof global.fetch) {
   const currentConfig = EXPLORE_PAGE_CONFIG[network.chainId];
@@ -22,13 +23,15 @@ export default async function loadDistributionExplorePage(fetch: typeof global.f
   const fetchProjectsParameters = createDefaultFetchProjectsParameters();
   const featuredDripListIds = FEATURED_DRIP_LISTS_CONFIG[network.chainId].featuredDripListIds || [];
 
+  const featuredRpgfRoundIds = currentConfig.featuredRpgfRoundIds;
+
   const cacheKey = queryCacheKey(
     fetchProjectsQuery + dripListsQuery,
-    [Object.entries(fetchProjectsParameters), featuredDripListIds],
+    [Object.entries(fetchProjectsParameters), featuredDripListIds, featuredRpgfRoundIds],
     'explore-page',
   );
 
-  const [projects, featuredDripLists, blogPosts] = await cached(
+  const [projects, featuredDripLists, blogPosts, featuredRpgfRounds] = await cached(
     redis,
     cacheKey,
     1 * 60 * 60, // 1 hr
@@ -37,6 +40,7 @@ export default async function loadDistributionExplorePage(fetch: typeof global.f
         showRecentProjects ? fetchProjects(fetch) : null,
         fetchFeaturedDripLists(network.chainId, fetch),
         fetchBlogPosts(),
+        loadFeaturedRpgfRounds(featuredRpgfRoundIds || [], fetch),
       ]),
   );
 
@@ -47,6 +51,7 @@ export default async function loadDistributionExplorePage(fetch: typeof global.f
       featuredDripLists,
       blogPosts,
       welcomeCardConfig,
+      featuredRpgfRounds,
     },
   };
 }

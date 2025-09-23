@@ -1,7 +1,3 @@
-<script lang="ts" context="module">
-  // TODO maybe something
-</script>
-
 <script lang="ts">
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import Section from '../section/section.svelte';

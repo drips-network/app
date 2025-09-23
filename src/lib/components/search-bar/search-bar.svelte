@@ -153,6 +153,7 @@
         in:fly={{ duration: 200, y: 8, easing: sineOut }}
         out:fly={{ duration: 200, y: 8, easing: sineIn }}
         class="results"
+        data-testid="search-results"
       >
         <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
       </div>
@@ -180,7 +181,7 @@
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     max-width: 32rem;
     width: 100%;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     transition: border 0.3s;
     z-index: 100;
     position: relative;
@@ -230,7 +231,7 @@
     max-height: calc(100dvh - 6rem);
     overflow: scroll;
     background-color: var(--color-background);
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
     box-shadow: var(--elevation-medium);
   }

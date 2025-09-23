@@ -249,6 +249,15 @@
       gap: 1rem;
     }
 
+    .items {
+      padding: 0 1rem;
+      scroll-padding: 1rem;
+    }
+
+    .overflow-gradient {
+      width: 1rem;
+    }
+
     .item {
       flex-basis: 100%;
       scroll-snap-align: center;

@@ -13,6 +13,8 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import DripListsGrid from './drip-lists-grid.svelte';
   import type { ComponentProps } from 'svelte';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import FeaturedRpgfRounds from './featured-rpgf-rounds.svelte';
 
   export let blogPosts: z.infer<typeof postsListingSchema>;
   export let projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
@@ -25,6 +27,7 @@
       href: string;
     };
   };
+  export let featuredRpgfRounds: Round[] = [];
 </script>
 
 <div class="explore">
@@ -53,6 +56,10 @@
         </div>
       </div>
     </div>
+  {/if}
+
+  {#if featuredRpgfRounds.length > 0}
+    <FeaturedRpgfRounds rounds={featuredRpgfRounds} />
   {/if}
 
   {#if featuredDripLists.length > 0}
@@ -107,7 +114,7 @@
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     padding: 0 1rem 1rem 1rem;
     border-radius: 2rem 0 2rem 2rem;
     overflow: hidden;
@@ -136,7 +143,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     box-sizing: border-box;
   }
 

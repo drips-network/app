@@ -12,6 +12,7 @@ export type ExplorePageConfig = {
   variant: ExplorePageVariant;
   welcomeCardConfig?: PageProps['welcomeCardConfig'];
   showRecentProjects?: boolean;
+  featuredRpgfRoundIds?: string[];
 };
 
 const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
@@ -27,14 +28,16 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     variant: 'distribution',
     welcomeCardConfig: {
       title: 'Welcome to Drips on Filecoin',
-      description:
-        "Drips on Filecoin is where rewards from Filecoin's RetroPGF are being distributed.",
+      description: "Drips on Filecoin is the home for Filecoin's RetroPGF program.",
       docsButton: {
-        label: 'Read the FIL-RetroPGF-2 docs',
-        href: 'https://fil-retropgf.notion.site/FIL-RetroPGF-4b6f5358440043c8bb1bf53f0297541e',
+        label: 'Learn more about FIL-RPGF',
+        href: 'https://fil-retropgf.io',
       },
     },
     showRecentProjects: true,
+    featuredRpgfRoundIds: [
+      'e35f0fdf-4cba-4620-be48-8ad669c22921', // test round (staging only)
+    ],
   },
   1088: {
     variant: 'distribution',

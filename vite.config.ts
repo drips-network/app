@@ -61,6 +61,7 @@ const config = defineConfig({
     },
   },
   server: {
+    // required for local env
     allowedHosts: ['app'],
   },
 });

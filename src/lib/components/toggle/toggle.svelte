@@ -2,11 +2,12 @@
   export let checked: boolean;
   export let label: string | undefined = undefined;
   export let size: 'normal' | 'big' = 'normal';
+  export let disabled: boolean = false;
 
   let focus = false;
 </script>
 
-<label class="toggle {size}">
+<label class="toggle {size}" class:disabled>
   {#if label}<span class="typo-text-bold">{label}</span>{/if}
   <input
     tabindex="0"
@@ -14,8 +15,9 @@
     bind:checked
     on:focus={() => (focus = true)}
     on:blur={() => (focus = false)}
+    {disabled}
   />
-  <div class="slider" class:checked class:focus>
+  <div class="slider" class:checked class:focus data-testid="toggle-slider">
     <div class="head" />
   </div>
 </label>
@@ -25,6 +27,11 @@
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
+  }
+
+  .toggle.disabled {
+    opacity: 0.75;
+    pointer-events: none;
   }
 
   input {
@@ -39,7 +46,7 @@
     width: 2.5rem;
     border-radius: 1rem 0 1rem 1rem;
     position: relative;
-    box-shadow: inset 0px 0px 0px 1px var(--color-foreground);
+    box-shadow: inset 0px 0px 0px 1px var(--color-foreground-level-3);
     transition:
       background-color 0.3s,
       box-shadow 0.2s;

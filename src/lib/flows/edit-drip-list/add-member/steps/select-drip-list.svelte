@@ -194,7 +194,7 @@
 
 <style>
   .card {
-    border: 1px solid var(--color-foreground);
+    border: 1px solid var(--color-foreground-level-3);
     overflow-x: scroll;
     border-radius: 1rem 0 1rem 1rem;
     max-height: 16rem;

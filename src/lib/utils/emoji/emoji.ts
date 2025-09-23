@@ -1256,14 +1256,6 @@ export default [
     unicode_version: '6.0',
   },
   {
-    aliases: ['eye_speech_bubble'],
-    description: 'eye in speech bubble',
-    unicode: '👁️‍🗨️',
-    category: 'Smileys & Emotion',
-    tags: [],
-    unicode_version: '11.0',
-  },
-  {
     aliases: ['left_speech_bubble'],
     description: 'left speech bubble',
     unicode: '🗨️',

@@ -28,6 +28,10 @@ services:
       - ./docker/pgadmin-servers.json:/pgadmin4/servers.json
       - ./docker/pgadmin-passwords:/pgpass
 
+  postgres-rpgf:
+    volumes:
+      - postgres-rpgf-data:/var/lib/postgresql/data
+
   fake-pinata:
     volumes:
       - fake-pinata-data:/app/data
@@ -35,6 +39,7 @@ services:
 volumes:
   postgres-data:
   postgres-multiplayer-data:
+  postgres-rpgf-data:
   anvil-data:
   fake-pinata-data:
   postgres-ecosystems-data:
