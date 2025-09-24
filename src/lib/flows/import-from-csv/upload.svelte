@@ -101,7 +101,7 @@
 
         // can't classify this input as something we recognize
         if (!classification) {
-          const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
+          const error = new AddItemSuberror("This isn't valid", recipient, index + 1);
           errors.push(error);
           continue;
         }

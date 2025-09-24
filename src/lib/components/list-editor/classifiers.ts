@@ -5,6 +5,7 @@ import {
   reformatUrl,
   validateAddress,
   validateDripList,
+  validateOrcid,
   validateProject,
 } from './validators';
 import { getAddress, getDripList, getProject, getOrcid } from './hydrators';
@@ -97,10 +98,8 @@ export const classifyRecipient = (
     return {
       type: 'orcid',
       value: input,
-      async validate() {
-        // No complex validation for ORCID IDs, just check format
-        // BUT we could check if the ORCID is fetchable / not private?
-        return true;
+      validate() {
+        return validateOrcid(this.value);
       },
       fetch() {
         return getOrcid(this.value);
