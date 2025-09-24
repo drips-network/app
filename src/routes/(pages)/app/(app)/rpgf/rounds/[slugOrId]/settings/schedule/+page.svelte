@@ -33,13 +33,21 @@
 </script>
 
 <RpgfSettingsForm round={data.round} saveEnabled={changesMade} {saveHandler}>
-  {#if published}
-    <div style:align-self="flex-start">
-      <AnnotationBox>
-        The schedule of an ongoing, published round can no longer be changed.
-      </AnnotationBox>
-    </div>
-  {/if}
+  <div style:width="100%">
+    {#if published}
+      <div style:margin-bottom="1rem">
+        <AnnotationBox>
+          The schedule of an ongoing, published round can no longer be changed. Contact the Drips
+          team if necessary.
+        </AnnotationBox>
+      </div>
+    {/if}
+
+    <AnnotationBox type="info">
+      All dates shown here are in your local timezone ({Intl.DateTimeFormat().resolvedOptions()
+        .timeZone}). Users viewing the schedule will see the dates in their own local timezone.
+    </AnnotationBox>
+  </div>
 
   <FormField
     title="Application intake start*"
