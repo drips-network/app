@@ -13,7 +13,7 @@ type InnerLocale = {
   months: string[];
   weekStartsOn: number;
 };
-export function getLocaleDefaults(): InnerLocale {
+function getLocaleDefaults(): InnerLocale {
   return {
     weekdays: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
     months: [

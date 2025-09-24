@@ -33,7 +33,7 @@ export const getChangedTemplate = (
   return [asJSON, [start, end]];
 };
 
-export const objectTemplate = (address: string, network = 'ethereum'): FundingJson => {
+const objectTemplate = (address: string, network = 'ethereum'): FundingJson => {
   return {
     drips: {
       [network]: {

@@ -50,7 +50,7 @@ enum Direction {
   Next = 1,
 }
 
-export function getFocusableElements(container: HTMLElement | null = document.body) {
+function getFocusableElements(container: HTMLElement | null = document.body) {
   if (container == null) return [];
   return Array.from(container.querySelectorAll<HTMLElement>(focusableSelector));
 }
@@ -61,56 +61,6 @@ export enum FocusableMode {
 
   /** The element should be inside of a focusable element. */
   Loose,
-}
-
-function match<TValue extends string | number = string, TReturnValue = unknown>(
-  value: TValue,
-  lookup: Record<TValue, TReturnValue | ((...args: unknown[]) => TReturnValue)>,
-  ...args: unknown[]
-): TReturnValue {
-  if (value in lookup) {
-    const returnValue = lookup[value];
-    return typeof returnValue === 'function'
-      ? (returnValue as (...args: unknown[]) => TReturnValue)(...args)
-      : (returnValue as TReturnValue);
-  }
-
-  const error = new Error(
-    `Tried to handle "${value}" but there is no handler defined. Only defined handlers are: ${Object.keys(
-      lookup,
-    )
-      .map((key) => `"${key}"`)
-      .join(', ')}.`,
-  );
-  if (Error.captureStackTrace) Error.captureStackTrace(error, match);
-  throw error;
-}
-
-export function isFocusableElement(
-  element: HTMLElement,
-  mode: FocusableMode = FocusableMode.Strict,
-) {
-  if (element === document.body) return false;
-
-  return match(mode, {
-    [FocusableMode.Strict]() {
-      return element.matches(focusableSelector);
-    },
-    [FocusableMode.Loose]() {
-      let next: HTMLElement | null = element;
-
-      while (next !== null) {
-        if (next.matches(focusableSelector)) return true;
-        next = next.parentElement;
-      }
-
-      return false;
-    },
-  });
-}
-
-export function focusElement(element: HTMLElement | null) {
-  element?.focus({ preventScroll: true });
 }
 
 export function focusIn(container: HTMLElement | HTMLElement[], focus: Focus) {
