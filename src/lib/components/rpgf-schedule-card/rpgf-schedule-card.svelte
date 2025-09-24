@@ -4,6 +4,7 @@
   import { tweened } from 'svelte/motion';
   import { expoOut } from 'svelte/easing';
   import type { Round } from '$lib/utils/rpgf/types/round';
+  import { browser } from '$app/environment';
 
   export let round: Round;
 
@@ -87,9 +88,14 @@
   }
 </script>
 
-{#if timeline && schedule}
+{#if timeline && schedule && browser}
   <div class="rpgf-schedule-card">
-    <h2 class="typo-header-5">Schedule</h2>
+    <div style:display="flex" style:justify-content="space-between">
+      <h2 class="typo-header-5">Schedule</h2>
+      <div class="timezone-badge typo-text-small">
+        {Intl.DateTimeFormat().resolvedOptions().timeZone}
+      </div>
+    </div>
     <div class="items">
       {#if now < schedule.applicationPeriodStart}<div class="spacer" />{/if}
       {#each timeline as { title, date }, i}
@@ -98,18 +104,31 @@
           {title}
           {date}
           isActive={i === activeItemIndex}
+          expanded={i === activeItemIndex}
           isDone={i < activeItemIndex}
           until={timeline[i + 1]?.date}
-        />
+          onExpandChange={() => updateTimeline()}
+        >
+          {#if title === 'Registration'}
+            Anyone can submit applications.
+          {:else if title === 'Review'}
+            Applications are closed and admins are reviewing the submitted applications.
+          {:else if title === 'Voting'}
+            Designed voters can cast their votes for the applications they want to fund.
+          {:else if title === 'Tallying'}
+            The votes are being tallied and the results prepared. Round admins will publish the
+            results once ready.
+          {:else if title === 'Distribution'}
+            From this date onwards, rewards are being distributed to the selected applicants
+            according to the round results.
+          {/if}
+        </ScheduleItem>
       {/each}
       <div class="timeline" bind:this={timelineElem}>
         <div class="line" />
-        <div
-          class="circle"
-          class:visible={updatedOnce}
-          style:transform="translateY({$timelineCircleOffsetY}px)"
-          bind:this={timelineCircle}
-        />
+        <div class="circle-wrapper" style:transform="translateY({$timelineCircleOffsetY}px)">
+          <div class="circle" class:visible={updatedOnce} bind:this={timelineCircle} />
+        </div>
       </div>
     </div>
   </div>
@@ -125,6 +144,16 @@
     border: 1px solid var(--color-foreground-level-3);
     view-transition-name: rpgf-schedule-card;
     view-transition-class: element-handover;
+  }
+
+  .timezone-badge {
+    background-color: var(--color-foreground-level-1);
+    color: var(--color-foreground-level-5);
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+    height: 20px;
+    display: flex;
+    align-items: center;
   }
 
   .items {
@@ -158,6 +187,10 @@
     height: 1rem;
   }
 
+  .circle-wrapper {
+    transform: translateY(2px);
+  }
+
   .circle {
     height: 1rem;
     width: 1rem;
@@ -165,8 +198,8 @@
     background-color: var(--color-primary);
     border-radius: 50%;
     position: absolute;
-    transform: translateY(2px);
     left: calc(40% - 0.5rem);
+    transform-origin: center;
     animation: pulsing 3s infinite;
     opacity: 0;
   }
@@ -179,6 +212,13 @@
   @keyframes pulsing {
     0% {
       box-shadow: 0 0 0 0px var(--color-primary-level-2);
+      transform: scale(1);
+    }
+    10% {
+      transform: scale(0.8);
+    }
+    20% {
+      transform: scale(1);
     }
     50% {
       box-shadow: 0 0 0 0.5rem transparent;
