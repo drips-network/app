@@ -87,7 +87,6 @@
         }
 
         try {
-          // TODO: this endpoint doesn't exist!
           // Kick off repo owner update using gasless TX
           const gaslessCall = await fetch('/api/gasless/call/orcid-owner-update', {
             method: 'POST',
