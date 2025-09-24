@@ -1,8 +1,8 @@
-import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fetchOrcid, fetchOrcidAccount } from '../../../../../../lib/utils/orcids/fetch-orcid';
 import Orcid from '$lib/utils/orcids/entities';
+import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
 export const load = (async ({ params, fetch }) => {
   if (!isValidOrcidId(params.orcidId)) {

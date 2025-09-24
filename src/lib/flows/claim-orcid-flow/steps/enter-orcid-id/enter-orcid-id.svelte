@@ -43,7 +43,7 @@
     UNCLAIMED_ORCID_CARD_FRAGMENT,
   } from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/unclaimed-orcid-card.svelte';
   import { fetchOrcid } from '../../../../utils/orcids/fetch-orcid';
-  import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
+  import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
   import isClaimed from '$lib/utils/orcids/is-claimed';
 
   export let context: Writable<State>;
