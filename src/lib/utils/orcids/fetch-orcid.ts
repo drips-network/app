@@ -8,7 +8,10 @@ import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import { PUBLIC_ORCID_API_URL } from '$env/static/public';
 import { OrcidApiResponseSchema } from '$lib/utils/orcids/schemas';
 import Orcid from '$lib/utils/orcids/entities';
-import type { OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables } from './__generated__/gql.generated';
+import type {
+  OrcidByAccountIdQuery,
+  OrcidByAccountIdQueryVariables,
+} from './__generated__/gql.generated';
 
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
@@ -46,7 +49,7 @@ const getOrcidQuery = gql`
   }
 `;
 
-export async function fetchOrcidAccount(accountId: string, fetch: typeof global.fetch) {
+export async function fetchOrcidAccount(accountId: string, fetch?: typeof global.fetch) {
   return query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
     getOrcidQuery,
     {
