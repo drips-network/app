@@ -1,6 +1,6 @@
-import isValidOrcidId from './is-orcid-id';
+import isValidOrcidId from './is-valid-orcid-id';
 
-describe('is-orcid.ts', () => {
+describe('is-valid-orcid.ts', () => {
   it('returns false for non-string input', () => {
     expect(isValidOrcidId(5 as unknown as string)).toBe(false);
   });
