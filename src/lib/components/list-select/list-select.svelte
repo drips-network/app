@@ -4,6 +4,7 @@
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
+  import VirtualList from 'svelte-tiny-virtual-list';
 
   export let items: Items;
   export let type: 'tokens' | 'generic' = 'generic';
@@ -19,9 +20,10 @@
   let searchString = '';
 
   $: filteredItems = Object.fromEntries(
-    Object.entries(items).filter((entry) => {
+    Object.entries(items || {}).filter((entry) => {
+      if (!entry || entry.length < 2) return false;
       const item = entry[1];
-      if (item.type === 'interstitial') return;
+      if (!item || item.type === 'interstitial') return false;
 
       const itemSearchString =
         (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
@@ -36,9 +38,22 @@
     }),
   );
 
+  // Create an array of visible items for virtual scrolling
+  $: visibleItemEntries = Object.entries(items || {}).filter(([slug, item]) => {
+    if (!slug || !item) return false;
+    // Include if item passes filtering
+    if (Object.values(filteredItems).includes(item)) {
+      // Apply hideUnselected logic (only for selectable items, not actions or interstitials)
+      if (hideUnselected && item.type === 'selectable' && !selected.includes(slug)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  });
+
   $: noItems = Object.keys(items).length === 0;
-  $: listIsEmpty =
-    Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0;
+  $: hasVisibleItems = visibleItemEntries.length > 0;
 
   export let selected: string[] = [];
 
@@ -116,8 +131,9 @@
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
 
+    // Get actually visible DOM elements
     const visibleEls = Object.values(itemElements).filter(
-      (itemElement) => !itemElement?.classList.contains('hidden'),
+      (itemElement) => itemElement && itemElement.offsetParent !== null,
     );
 
     const itemElemInFocus = visibleEls.find((elem) => document.activeElement === elem);
@@ -128,7 +144,7 @@
     switch (e.key) {
       case 'ArrowDown': {
         if (!itemElemInFocus) {
-          visibleEls[0].focus();
+          visibleEls[0]?.focus();
           break;
         }
 
@@ -143,7 +159,7 @@
         if (previousElem) {
           previousElem.focus();
         } else {
-          searchBarElem.focus();
+          searchBarElem?.focus();
         }
 
         break;
@@ -182,7 +198,7 @@
       />
     </div>
   {/if}
-  {#if listIsEmpty && showEmptyState}
+  {#if !hasVisibleItems && showEmptyState}
     <div class="empty-state">
       <EyeClosedIcon />
       {#if noItems || !searchString}
@@ -192,80 +208,96 @@
       {/if}
     </div>
   {/if}
-  {#each Object.entries(items) as [slug, item]}
-    {#if item.type === 'interstitial'}
-      <div class="interstitial">
-        <h4>{item.label}</h4>
-        <p class="typo-text-small">{item.description}</p>
-      </div>
-    {:else if !hideUnselected || selected.includes(slug)}
-      <div
-        role="option"
-        aria-selected={selected.includes(slug)}
-        class="item flex items-center p-3 select-none"
-        class:selected={selected.includes(slug)}
-        class:disabled={isItemDisabled(slug)}
-        class:hidden={!Object.values(filteredItems).includes(item)}
-        on:click={isItemDisabled(slug) || blockSelecting
-          ? undefined
-          : (e) => handleItemClick(e, slug)}
-        on:keydown={isItemDisabled(slug) || blockSelecting
-          ? undefined
-          : (e) => handleKeypress(e, slug)}
-        tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
-        data-testid={`item-${slug}`}
-        bind:this={itemElements[slug]}
-        on:focus={() => (focussedSlug = slug)}
-        on:blur={() => (focussedSlug = undefined)}
+  {#if hasVisibleItems}
+    <div class="items-container">
+      <VirtualList
+        height={Math.min(visibleItemEntries.length * 60, 400)}
+        width="100%"
+        itemCount={visibleItemEntries.length}
+        itemSize={60}
+        getKey={(index) => visibleItemEntries[index]?.[0] ?? `item-${index}`}
       >
-        {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
-          <div class="check-icon">
-            <SelectedDot
-              focussed={focussedSlug === slug}
-              type={multiselect ? 'check' : 'radio'}
-              selected={selected.includes(slug)}
-            />
-          </div>
-        {/if}
-        {#if item.image}
-          <div class="image">
-            {#if typeof item.image === 'string'}
-              <img src={item.image} alt="List item" />
-            {:else if item.image}
-              <svelte:component this={item.image.component} {...item.image.props} />
+        <div slot="item" let:index let:style {style}>
+          {@const [slug, item] = visibleItemEntries[index] || ['', null]}
+          {#if item && slug}
+            {#if item.type === 'interstitial'}
+              <div class="interstitial">
+                <h4>{item.label}</h4>
+                <p class="typo-text-small">{item.description}</p>
+              </div>
+            {:else}
+              <div
+                role="option"
+                aria-selected={selected.includes(slug)}
+                class="item flex items-center p-3 select-none"
+                class:selected={selected.includes(slug)}
+                class:disabled={isItemDisabled(slug)}
+                on:click={isItemDisabled(slug) || blockSelecting
+                  ? undefined
+                  : (e) => handleItemClick(e, slug)}
+                on:keydown={isItemDisabled(slug) || blockSelecting
+                  ? undefined
+                  : (e) => handleKeypress(e, slug)}
+                tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction
+                  ? undefined
+                  : 0}
+                data-testid={`item-${slug}`}
+                bind:this={itemElements[slug]}
+                on:focus={() => (focussedSlug = slug)}
+                on:blur={() => (focussedSlug = undefined)}
+              >
+                {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
+                  <div class="check-icon">
+                    <SelectedDot
+                      focussed={focussedSlug === slug}
+                      type={multiselect ? 'check' : 'radio'}
+                      selected={selected.includes(slug)}
+                    />
+                  </div>
+                {/if}
+                {#if item.image}
+                  <div class="image">
+                    {#if typeof item.image === 'string'}
+                      <img src={item.image} alt="List item" />
+                    {:else if item.image}
+                      <svelte:component this={item.image.component} {...item.image.props} />
+                    {/if}
+                  </div>
+                {/if}
+                <div
+                  class="content xs:flex flex-wrap items-center justify-between w-full text-foreground"
+                  class:action={item.type === 'action'}
+                >
+                  {#if typeof item.label === 'string'}
+                    <span class="label typo-text pr-4">{item.label}</span>
+                  {:else}
+                    <svelte:component this={item.label.component} {...item.label.props} />
+                  {/if}
+                  <div class="right">
+                    {#if item.type === 'selectable' && item.text}
+                      {#if typeof item.text === 'string'}
+                        <span class="text typo-text tabular-nums flex-shrink-0">
+                          {item.text}
+                        </span>
+                      {:else}
+                        <svelte:component this={item.text.component} {...item.text.props} />
+                      {/if}
+                    {/if}
+                    {#if item.type === 'selectable' && item.editablePercentage}
+                      <PercentageEditor
+                        bind:percentage={percentages[slug]}
+                        disabled={!selected.includes(slug)}
+                      />
+                    {/if}
+                  </div>
+                </div>
+              </div>
             {/if}
-          </div>
-        {/if}
-        <div
-          class="content xs:flex flex-wrap items-center justify-between w-full text-foreground"
-          class:action={item.type === 'action'}
-        >
-          {#if typeof item.label === 'string'}
-            <span class="label typo-text pr-4">{item.label}</span>
-          {:else}
-            <svelte:component this={item.label.component} {...item.label.props} />
           {/if}
-          <div class="right">
-            {#if item.type === 'selectable' && item.text}
-              {#if typeof item.text === 'string'}
-                <span class="text typo-text tabular-nums flex-shrink-0">
-                  {item.text}
-                </span>
-              {:else}
-                <svelte:component this={item.text.component} {...item.text.props} />
-              {/if}
-            {/if}
-            {#if item.type === 'selectable' && item.editablePercentage}
-              <PercentageEditor
-                bind:percentage={percentages[slug]}
-                disabled={!selected.includes(slug)}
-              />
-            {/if}
-          </div>
         </div>
-      </div>
-    {/if}
-  {/each}
+      </VirtualList>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -281,6 +313,11 @@
 
   .search-bar input::placeholder {
     color: var(--color-foreground-level-4);
+  }
+
+  .items-container {
+    max-height: 25rem;
+    overflow: hidden;
   }
 
   .search-bar,
@@ -317,10 +354,6 @@
     flex-direction: column;
     gap: 0.25rem;
     padding: 2rem 1rem 0.75rem 1rem;
-  }
-
-  .hidden {
-    display: none;
   }
 
   .item:not(.disabled) {

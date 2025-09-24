@@ -68,7 +68,7 @@ describe('list-select.svelte', async () => {
     const item2 = screen.queryByTestId('item-test-item-2');
 
     expect(item1).toBeInTheDocument();
-    expect(item2).toHaveClass('hidden');
+    expect(item2).not.toBeInTheDocument(); // With virtual scrolling, filtered out items are not in DOM
   });
 
   it('allows selecting an item', async () => {
