@@ -11,7 +11,7 @@ import { getAddress, getDripList, getProject, getOrcid } from './hydrators';
 import { buildRepositoryURL, isDripsProjectUrl } from '../../utils/build-repo-url';
 import type { RecipientClassification } from './types';
 import { isAddress } from 'ethers';
-import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
+import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
 export const classifyRecipient = (
   input: string,
@@ -105,7 +105,7 @@ export const classifyRecipient = (
       fetch() {
         return getOrcid(this.value);
       },
-    }
+    };
   }
 
   return null;

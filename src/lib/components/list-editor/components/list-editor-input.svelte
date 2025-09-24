@@ -18,7 +18,7 @@
   import { AddItemError } from '../errors';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import { isAddress } from 'ethers';
-  import isValidOrcidId from '$lib/utils/is-orcid-id/is-orcid-id';
+  import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
