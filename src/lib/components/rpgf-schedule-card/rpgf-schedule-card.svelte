@@ -90,7 +90,12 @@
 
 {#if timeline && schedule && browser}
   <div class="rpgf-schedule-card">
-    <div style:display="flex" style:justify-content="space-between">
+    <div
+      style:display="flex"
+      style:justify-content="space-between"
+      style:flex-wrap="wrap"
+      style:gap="0.5rem"
+    >
       <h2 class="typo-header-5">Schedule</h2>
       <div class="timezone-badge typo-text-small">
         {Intl.DateTimeFormat().resolvedOptions().timeZone}
