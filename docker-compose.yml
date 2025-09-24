@@ -282,6 +282,7 @@ services:
       - JWT_SECRET=123
       - JWT_EXPIRATION_MINUTES=60
       - ENABLE_DANGEROUS_TEST_ROUTES=true
+      - CORS_ALLOW_ALL_ORIGINS=true
     ports:
       - 5000:5000
     depends_on:
