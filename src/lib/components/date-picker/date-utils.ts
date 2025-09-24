@@ -5,7 +5,7 @@
 
 import type { FormatToken } from './parse.js';
 
-export function isLeapYear(year: number): boolean {
+function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 export function getMonthLength(year: number, month: number): number {
@@ -33,7 +33,7 @@ export type CalendarDay = {
   month: number;
   number: number;
 };
-export function getMonthDays(year: number, month: number): CalendarDay[] {
+function getMonthDays(year: number, month: number): CalendarDay[] {
   const monthLength = getMonthLength(year, month);
   const days: CalendarDay[] = [];
   for (let i = 0; i < monthLength; i++) {

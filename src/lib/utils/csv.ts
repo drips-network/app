@@ -1,6 +1,6 @@
 import { default as parseCSV } from 'csv-simple-parser';
 
-export const parse = (csvString: string | undefined): unknown[][] | Record<string, unknown>[] => {
+const parse = (csvString: string | undefined): unknown[][] | Record<string, unknown>[] => {
   if (!csvString) {
     return [];
   }
