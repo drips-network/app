@@ -13,15 +13,17 @@
   class:overlay
 >
   <div class="flex gap-2 items-start">
-    {#if icon}
-      <svelte:component this={icon} style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
-    {:else if type === 'warning'}
-      <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
-    {:else if type === 'info'}
-      <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
-    {:else}
-      <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)" />
-    {/if}
+    <div class="icon-container">
+      {#if icon}
+        <svelte:component this={icon} style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
+      {:else if type === 'warning'}
+        <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
+      {:else if type === 'info'}
+        <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
+      {:else}
+        <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)" />
+      {/if}
+    </div>
     <div class="flex-1 pt-px">
       <slot />
     </div>
@@ -63,5 +65,13 @@
   .annotation-box.overlay {
     background-color: var(--color-background);
     border: 1px solid var(--color-foreground);
+  }
+
+  .icon-container {
+    height: 18px; /* Match line-height of typo-text-small */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 </style>
