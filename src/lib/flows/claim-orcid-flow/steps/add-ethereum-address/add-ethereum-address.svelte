@@ -22,7 +22,6 @@
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import { gql } from 'graphql-request';
   import { CLAIMING_URL_NAME } from '$lib/utils/orcids/entities';
-  import verifyOrcidClaim from '$lib/utils/orcids/verify-orcid';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -53,7 +52,8 @@
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 
-        await verifyOrcidClaim($context.claimableId, address);
+        // todo: TEMPORARYILY DISABLED FOR TESTING
+        // await verifyOrcidClaim($context.claimableId, address);
 
         $context.linkedToClaimable = true;
 
