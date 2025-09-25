@@ -25,6 +25,19 @@ describe('section-header.svelte', () => {
     screen.getByTestId('section-icon');
   });
 
+  it('applies primary styling when iconPrimary is true', () => {
+    render(SectionHeader, {
+      props: {
+        label: 'Test Label',
+        icon: ThumbsUp,
+        iconPrimary: true,
+      },
+    });
+
+    const iconWrapper = screen.getByTestId('section-icon');
+    expect(iconWrapper).toHaveClass('icon-primary');
+  });
+
   it('renders actions', async () => {
     const spy1 = vi.fn();
     const spy2 = vi.fn();

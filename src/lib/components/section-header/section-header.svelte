@@ -42,7 +42,10 @@
   <div class="title">
     {#if icon}
       <div data-testid="section-icon" class="icon-wrapper" class:icon-primary={iconPrimary}>
-        <svelte:component this={icon} style="fill: var(--color-background)" />
+        <svelte:component
+          this={icon}
+          style={iconPrimary ? 'fill: var(--color-primary)' : 'fill: var(--color-background)'}
+        />
       </div>
     {/if}
     <h3>{label}</h3>
@@ -122,7 +125,7 @@
   }
 
   .icon-wrapper.icon-primary {
-    background-color: var(--color-primary);
+    background-color: var(--color-primary-level-1);
   }
 
   .expand-button {
@@ -165,5 +168,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .section-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .title h3 {
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+    }
+
+    .actions {
+      justify-content: flex-start;
+    }
   }
 </style>
