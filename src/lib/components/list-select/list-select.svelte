@@ -131,37 +131,47 @@
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
 
-    // Get actually visible DOM elements
-    const visibleEls = Object.values(itemElements).filter(
-      (itemElement) => itemElement && itemElement.offsetParent !== null,
+    if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
+
+    // Get actually visible and focusable DOM elements within the virtual list
+    const container = document.querySelector('.items-container');
+    if (!container) return;
+    
+    const visibleItems = Array.from(container.querySelectorAll('[role="option"]')).filter(
+      (elem): elem is HTMLElement => elem instanceof HTMLElement && elem.tabIndex >= 0
     );
 
-    const itemElemInFocus = visibleEls.find((elem) => document.activeElement === elem);
+    const itemElemInFocus = visibleItems.find((elem) => document.activeElement === elem);
+    const isSearchBarFocused = searchBarElem === focussedElem;
 
-    if (!(searchBarElem === focussedElem || itemElemInFocus)) return;
-    if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
+    if (!(isSearchBarFocused || itemElemInFocus)) return;
 
     switch (e.key) {
       case 'ArrowDown': {
-        if (!itemElemInFocus) {
-          visibleEls[0]?.focus();
+        if (isSearchBarFocused) {
+          visibleItems[0]?.focus();
           break;
         }
 
-        visibleEls[visibleEls.indexOf(itemElemInFocus) + 1]?.focus();
+        if (itemElemInFocus) {
+          const currentIndex = visibleItems.indexOf(itemElemInFocus);
+          visibleItems[currentIndex + 1]?.focus();
+        }
         break;
       }
       case 'ArrowUp': {
-        if (!itemElemInFocus) break;
+        if (isSearchBarFocused) break;
 
-        const previousElem = visibleEls[visibleEls.indexOf(itemElemInFocus) - 1];
+        if (itemElemInFocus) {
+          const currentIndex = visibleItems.indexOf(itemElemInFocus);
+          const previousElem = visibleItems[currentIndex - 1];
 
-        if (previousElem) {
-          previousElem.focus();
-        } else {
-          searchBarElem?.focus();
+          if (previousElem) {
+            previousElem.focus();
+          } else {
+            searchBarElem?.focus();
+          }
         }
-
         break;
       }
     }
@@ -211,10 +221,10 @@
   {#if hasVisibleItems}
     <div class="items-container">
       <VirtualList
-        height={Math.min(visibleItemEntries.length * 60, 400)}
+        height={Math.min(visibleItemEntries.length * 48, 400)}
         width="100%"
         itemCount={visibleItemEntries.length}
-        itemSize={60}
+        itemSize={48}
         getKey={(index) => visibleItemEntries[index]?.[0] ?? `item-${index}`}
       >
         <div slot="item" let:index let:style {style}>
@@ -265,13 +275,15 @@
                   </div>
                 {/if}
                 <div
-                  class="content xs:flex flex-wrap items-center justify-between w-full text-foreground"
+                  class="content xs:flex items-center justify-between w-full text-foreground"
                   class:action={item.type === 'action'}
                 >
                   {#if typeof item.label === 'string'}
-                    <span class="label typo-text pr-4">{item.label}</span>
+                    <span class="label typo-text pr-4 truncate min-w-0 flex-1">{item.label}</span>
                   {:else}
-                    <svelte:component this={item.label.component} {...item.label.props} />
+                    <div class="min-w-0 flex-1">
+                      <svelte:component this={item.label.component} {...item.label.props} />
+                    </div>
                   {/if}
                   <div class="right">
                     {#if item.type === 'selectable' && item.text}
