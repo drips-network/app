@@ -119,7 +119,7 @@
           {:else if title === 'Review'}
             Applications are closed and admins are reviewing the submitted applications.
           {:else if title === 'Voting'}
-            Designed voters can cast their votes for the applications they want to fund.
+            Designated voters can cast their votes for the applications they want to fund.
           {:else if title === 'Tallying'}
             The votes are being tallied and the results prepared. Round admins will publish the
             results once ready.
