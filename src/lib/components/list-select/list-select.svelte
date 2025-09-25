@@ -329,7 +329,7 @@
 
   .items-container {
     max-height: 25rem;
-    overflow: hidden;
+    overflow: scroll;
   }
 
   .search-bar,
