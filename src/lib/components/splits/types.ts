@@ -1,5 +1,4 @@
 import { gql } from 'graphql-request';
-import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
 import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
 import { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
 import type {
@@ -9,52 +8,7 @@ import type {
   SplitsComponentEcosystemReceiverFragment,
   SplitsComponentSubListReceiverFragment,
 } from './__generated__/gql.generated';
-
-export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
-  ${PROJECT_AVATAR_FRAGMENT}
-  ${DRIP_LIST_BADGE_FRAGMENT}
-  fragment SplitsComponentProjectSplits on ProjectData {
-    ... on ClaimedProjectData {
-      splits {
-        dependencies {
-          ... on AddressReceiver {
-            account {
-              address
-              driver
-            }
-            driver
-          }
-          ... on ProjectReceiver {
-            project {
-              chainData {
-                ...ProjectAvatar
-              }
-            }
-          }
-          ... on DripListReceiver {
-            dripList {
-              ...DripListBadge
-            }
-            account {
-              accountId
-              driver
-            }
-            driver
-          }
-        }
-        maintainers {
-          ... on AddressReceiver {
-            account {
-              address
-              driver
-            }
-            driver
-          }
-        }
-      }
-    }
-  }
-`;
+import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
 
 export const SPLITS_COMPONENT_PROJECT_FRAGMENT = gql`
   ${PROJECT_BADGE_FRAGMENT}
@@ -78,7 +32,9 @@ export const SPLITS_COMPONENT_PROJECT_FRAGMENT = gql`
 `;
 
 export const SPLITS_COMPONENT_DRIP_LIST_FRAGMENT = gql`
+  ${DRIP_LIST_BADGE_FRAGMENT}
   fragment SplitsComponentDripList on DripList {
+    ...DripListBadge
     account {
       accountId
     }
@@ -137,6 +93,43 @@ export const SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT = gql`
     subList {
       account {
         accountId
+      }
+    }
+  }
+`;
+
+export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
+  ${PROJECT_AVATAR_FRAGMENT}
+  ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT}
+  fragment SplitsComponentProjectSplits on ProjectData {
+    ... on ClaimedProjectData {
+      splits {
+        dependencies {
+          ... on AddressReceiver {
+            ...SplitsComponentAddressReceiver
+          }
+          ... on ProjectReceiver {
+            ...SplitsComponentProjectReceiver
+          }
+          ... on DripListReceiver {
+            ...SplitsComponentDripListReceiver
+          }
+          ... on EcosystemMainAccountReceiver {
+            ...SplitsComponentEcosystemReceiver
+          }
+          ... on SubListReceiver {
+            ...SplitsComponentSubListReceiver
+          }
+        }
+        maintainers {
+          ... on AddressReceiver {
+            ...SplitsComponentAddressReceiver
+          }
+        }
       }
     }
   }

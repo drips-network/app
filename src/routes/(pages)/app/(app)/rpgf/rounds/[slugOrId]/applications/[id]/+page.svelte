@@ -16,6 +16,7 @@
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import RpgfApplicationFormAnswersCard from '$lib/components/rpgf-application-form-answers-card/rpgf-application-form-answers-card.svelte';
   import RpgfApplicationSubmissionDetailsCard from '$lib/components/rpgf-application-submission-details-card/rpgf-application-submission-details-card.svelte';
+  import RpgfApplicationSplitsCard from '$lib/components/rpgf-application-splits-card/rpgf-application-splits-card.svelte';
 
   export let data;
   $: round = data.round;
@@ -99,18 +100,20 @@
     />
   {/if}
 
-  <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
-
   <RpgfApplicationFormAnswersCard
     {canSeePrivateFields}
     applicationVersion={application.latestVersion}
   />
+
+  <RpgfApplicationSplitsCard project={data.dripsProject} />
 
   <RpgfApplicationSubmissionDetailsCard
     applicationVersion={latestVersion}
     submitterWalletAddress={application.submitter.walletAddress}
     project={data.dripsProject}
   />
+
+  <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 </div>
 
 <style>
