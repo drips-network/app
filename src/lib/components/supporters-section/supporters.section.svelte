@@ -132,8 +132,6 @@
   export let collapsed = false;
   export let collapsable = false;
 
-  export let iconPrimary = true;
-
   let emptyStateText: string;
   $: {
     switch (type) {
@@ -164,7 +162,6 @@
     bind:collapsable
     header={{
       icon: Heart,
-      iconPrimary,
       label: headline,
       infoTooltip,
     }}
