@@ -16,7 +16,6 @@ export async function buildOrcidClaimingTxs(orcidId: string): Promise<{
       {
         title: 'Claim ORCID',
         transaction: preparedTx,
-        gasless: false,
         applyGasBuffer: true,
       },
     ],
