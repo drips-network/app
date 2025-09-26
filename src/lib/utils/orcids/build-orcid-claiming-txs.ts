@@ -14,7 +14,7 @@ export async function buildOrcidClaimingTxs(orcidId: string): Promise<{
   return {
     txs: [
       {
-        title: 'Claim ORCID',
+        title: 'Request update of ORCID owner',
         transaction: preparedTx,
         applyGasBuffer: true,
       },
