@@ -3,6 +3,7 @@
   import {
     makeTransactPayload,
     type StepComponentEvents,
+    type TransactionWrapperOrExternalTransaction,
     // type TransactionWrapperOrExternalTransaction,
   } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
@@ -67,120 +68,123 @@
     );
   }
 
-  // async function waitForOrcidOwnerUpdate(gasless: boolean) {
-  //   if (gasless) {
-  //     // First, wait for Gelato Relay to resolve the update task.
-  //     const gaslessOwnerUpdateExpectation = await expect(
-  //       async () => {
-  //         const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
-  //         if (!res.ok) throw new Error('Failed to track gasless owner update task');
+  async function waitForOrcidOwnerUpdate(gasless: boolean) {
+    if (gasless) {
+      // First, wait for Gelato Relay to resolve the update task.
+      const gaslessOwnerUpdateExpectation = await expect(
+        async () => {
+          const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
+          if (!res.ok) throw new Error('Failed to track gasless owner update task');
 
-  //         const { task } = await res.json();
-  //         assert(typeof task === 'object', 'Invalid task');
-  //         const { taskState } = task;
-  //         assert(typeof taskState === 'string', 'Invalid task state');
+          const { task } = await res.json();
+          assert(typeof task === 'object', 'Invalid task');
+          const { taskState } = task;
+          assert(typeof taskState === 'string', 'Invalid task state');
 
-  //         return taskState;
-  //       },
-  //       (taskState) => {
-  //         switch (taskState) {
-  //           case 'ExecSuccess':
-  //             return true;
-  //           case 'Cancelled':
-  //             throw new Error(
-  //               'Failed to gaslessly update the repository owner on-chain. There may be a temporary issue with our Transaction Relay provider. Please try again later.',
-  //             );
-  //           default:
-  //             return false;
-  //         }
-  //       },
-  //       600000,
-  //       2000,
-  //     );
+          return taskState;
+        },
+        (taskState) => {
+          switch (taskState) {
+            case 'ExecSuccess':
+              return true;
+            case 'Cancelled':
+              throw new Error(
+                'Failed to gaslessly update the repository owner on-chain. There may be a temporary issue with our Transaction Relay provider. Please try again later.',
+              );
+            default:
+              return false;
+          }
+        },
+        600000,
+        2000,
+      );
 
-  //     if (gaslessOwnerUpdateExpectation.failed) {
-  //       throw new Error(
-  //         "The gasless owner update transaction didn't resolve in the expected timeframe. There may be an issue with our Transaction Relay provider. Please try again later, or disable gasless transactions in the Drips application settings.",
-  //       );
-  //     }
-  //   }
+      if (gaslessOwnerUpdateExpectation.failed) {
+        throw new Error(
+          "The gasless owner update transaction didn't resolve in the expected timeframe. There may be an issue with our Transaction Relay provider. Please try again later, or disable gasless transactions in the Drips application settings.",
+        );
+      }
+    }
 
-  //   // Next, wait for the new owner to be indexed by our infra.
-  //   const ownerIndexedExpectation = await expect(
-  //     () => checkOrcidInExpectedStateForClaiming(),
-  //     (response) => response,
-  //     600000,
-  //     2000,
-  //   );
+    // Next, wait for the new owner to be indexed by our infra.
+    const ownerIndexedExpectation = await expect(
+      () => checkOrcidInExpectedStateForClaiming(),
+      (response) => response,
+      600000,
+      2000,
+    );
 
-  //   if (ownerIndexedExpectation.failed) {
-  //     throw new Error(
-  //       'The new owner was not indexed in the expected timeframe. There may be a temporary issue with our oracle provider. Please try again later.',
-  //     );
-  //   }
-  // }
+    if (ownerIndexedExpectation.failed) {
+      throw new Error(
+        'The new owner was not indexed in the expected timeframe. There may be a temporary issue with our oracle provider. Please try again later.',
+      );
+    }
+  }
 
-  // async function generateOwnerUpdateTransactions(
-  //   gasslessOwnerUpdateTaskId: string | undefined,
-  //   orcid: string,
-  // ) {
-  //   let transactions: TransactionWrapperOrExternalTransaction[] = [];
-  //   let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
+  async function generateOwnerUpdateTransactions(
+    gasslessOwnerUpdateTaskId: string | undefined,
+    orcid: string,
+  ) {
+    let transactions: TransactionWrapperOrExternalTransaction[] = [];
+    let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
 
-  //   switch (network.chainId) {
-  //     case 1: {
-  //       fakeProgressBarConfig = {
-  //         expectedDurationMs: 100000,
-  //         expectedDurationText: 'Usually less than a minute',
-  //       };
-  //       break;
-  //     }
-  //     case 314: {
-  //       fakeProgressBarConfig = {
-  //         expectedDurationMs: 500000,
-  //         expectedDurationText: 'Usually less than 5 minutes',
-  //       };
-  //       break;
-  //     }
-  //     default: {
-  //       fakeProgressBarConfig = {
-  //         expectedDurationMs: 100000,
-  //         expectedDurationText: 'Usually less than a minute',
-  //       };
-  //     }
-  //   }
+    switch (network.chainId) {
+      case 1: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 100000,
+          expectedDurationText: 'Usually less than a minute',
+        };
+        break;
+      }
+      case 314: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 500000,
+          expectedDurationText: 'Usually less than 5 minutes',
+        };
+        break;
+      }
+      default: {
+        fakeProgressBarConfig = {
+          expectedDurationMs: 100000,
+          expectedDurationText: 'Usually less than a minute',
+        };
+      }
+    }
 
-  //   if (gasslessOwnerUpdateTaskId) {
-  //     transactions.push({
-  //       external: true,
-  //       title: 'Finalizing verification...',
-  //       ...fakeProgressBarConfig,
-  //       promise: () => waitForOrcidOwnerUpdate(true),
-  //     });
-  //   } else {
-  //     const ownerUpdateTx = await populateRepoDriverWriteTx({
-  //       functionName: 'requestUpdateOwner',
-  //       args: [0, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
-  //     });
+    if (gasslessOwnerUpdateTaskId) {
+      transactions.push({
+        external: true,
+        title: 'Finalizing verification...',
+        ...fakeProgressBarConfig,
+        promise: () => waitForOrcidOwnerUpdate(true),
+      });
+    } else {
+      // const ownerUpdateTx = await populateRepoDriverWriteTx({
+      //   functionName: 'requestUpdateOwner',
+      //   args: [0, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
+      // });
 
-  //     transactions.push(
-  //       {
-  //         title: 'Request update of ORCID owner',
-  //         transaction: ownerUpdateTx,
-  //         gasless: false,
-  //         applyGasBuffer: false,
-  //       },
-  //       {
-  //         external: true,
-  //         title: 'Finalizing verification...',
-  //         ...fakeProgressBarConfig,
-  //         promise: () => waitForOrcidOwnerUpdate(false),
-  //       },
-  //     );
-  //   }
+      const tx = await buildOrcidClaimingTxs(orcid);
 
-  //   return transactions;
-  // }
+      transactions.push(
+        ...tx.txs,
+        // {
+        //   title: 'Request update of ORCID owner',
+        //   transaction: ownerUpdateTx,
+        //   gasless: false,
+        //   applyGasBuffer: false,
+        // },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForOrcidOwnerUpdate(false),
+        },
+      );
+    }
+
+    return transactions;
+  }
 
   onMount(() =>
     dispatch(
@@ -198,7 +202,7 @@
           //   args: [setSplitsAndEmitMetadataBatch.map(txToCallerCall)],
           // });
 
-          const tx = await buildOrcidClaimingTxs($context);
+          const tx = await buildOrcidClaimingTxs($context.claimableId);
 
           // Check once if the project is already in the expected state for the final claim TX,
           // and skip the step that waits for everything to be in the right state if so.
@@ -213,7 +217,8 @@
           duringBefore: 'Preparing to claim ORCID...',
         },
 
-        transactions: async ({ tx }) => {
+        // TODO: what do we do with this?
+        transactions: async (/*{ tx }*/) => {
           // if(gasless) {
           //   return generateOwnerUpdateTransactions(
           //     $context.gaslessOwnerUpdateTaskId,
@@ -238,7 +243,10 @@
           // };
 
           // return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
-          return tx.txs;
+          return generateOwnerUpdateTransactions(
+            $context.gaslessOwnerUpdateTaskId,
+            $context.claimableId,
+          );
         },
 
         after: async () => {

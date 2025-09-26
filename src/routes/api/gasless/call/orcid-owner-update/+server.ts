@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { ethers, toUtf8Bytes } from 'ethers';
+// import { ethers, toUtf8Bytes } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
 import assert from '$lib/utils/assert';
@@ -14,11 +14,12 @@ import type {
 } from './__generated__/gql.generated';
 import { redis } from '../../../redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
-import { JsonRpcProvider } from 'ethers';
+// import { JsonRpcProvider } from 'ethers';
 import isClaimed from '$lib/utils/orcids/is-claimed';
 import { fetchOrcid } from '$lib/utils/orcids/fetch-orcid';
 import { getClaimingUrlAddress } from '$lib/utils/orcids/verify-orcid';
-import { Forge } from '$lib/utils/sdk/sdk-types';
+// import { Forge } from '$lib/utils/sdk/sdk-types';
+import { buildOrcidClaimingTxs } from '$lib/utils/orcids/build-orcid-claiming-txs';
 
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
@@ -32,18 +33,18 @@ const payloadSchema = z.object({
   chainId: z.number(),
 });
 
-const REPO_DRIVER_ABI = `[
-  {
-    "inputs": [
-      { "internalType": "enum Forge", "name": "forge", "type": "uint8" },
-      { "internalType": "bytes", "name": "name", "type": "bytes" }
-    ],
-    "name": "requestUpdateOwner",
-    "outputs": [{ "internalType": "uint256", "name": "accountId", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-]`;
+// const REPO_DRIVER_ABI = `[
+//   {
+//     "inputs": [
+//       { "internalType": "enum Forge", "name": "forge", "type": "uint8" },
+//       { "internalType": "bytes", "name": "name", "type": "bytes" }
+//     ],
+//     "name": "requestUpdateOwner",
+//     "outputs": [{ "internalType": "uint256", "name": "accountId", "type": "uint256" }],
+//     "stateMutability": "nonpayable",
+//     "type": "function"
+//   },
+// ]`;
 
 const orcidUnclaimedQuery = gql`
   query isOrcidUnclaimed($orcid: String!, $chain: SupportedChain!) {
@@ -142,18 +143,22 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const provider = new JsonRpcProvider(network.rpcUrl);
-  const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
+  const {
+    txs: [{ transaction: claimOrcidTx }],
+  } = await buildOrcidClaimingTxs(orcid);
 
-  const tx = await contract.requestUpdateOwner.populateTransaction(
-    Forge.orcidId,
-    ethers.hexlify(toUtf8Bytes(orcid)),
-  );
+  // const provider = new JsonRpcProvider(network.rpcUrl);
+  // const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
+
+  // const tx = await contract.requestUpdateOwner.populateTransaction(
+  //   Forge.orcidId,
+  //   ethers.hexlify(toUtf8Bytes(orcid)),
+  // );
 
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),
-    target: tx.to ?? unreachable(),
-    data: tx.data ?? unreachable(),
+    target: claimOrcidTx.to ?? unreachable(),
+    data: claimOrcidTx.data ?? unreachable(),
   };
 
   const relay = new GelatoRelay();
