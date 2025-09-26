@@ -31,6 +31,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="section-header"
+  class:has-actions={actions.length > 0}
   on:click={() => (collapsable ? (collapsed = !collapsed) : undefined)}
   class:collapsed
   class:collapsable
@@ -41,11 +42,8 @@
 
   <div class="title">
     {#if icon}
-      <div data-testid="section-icon" class="icon-wrapper" class:icon-primary={iconPrimary}>
-        <svelte:component
-          this={icon}
-          style={iconPrimary ? 'fill: var(--color-primary)' : 'fill: var(--color-background)'}
-        />
+      <div data-testid="section-icon" class="icon-wrapper icon-primary">
+        <svelte:component this={icon} style="fill: var(--color-primary)" />
       </div>
     {/if}
     <h3>{label}</h3>
@@ -174,6 +172,10 @@
     .section-header {
       flex-direction: column;
       align-items: stretch;
+      gap: 0;
+    }
+    
+    .section-header.has-actions {
       gap: 1rem;
     }
 
