@@ -145,7 +145,6 @@
         bind:sectionSkeleton={supportersSectionSkeleton}
         type="ecosystem"
         supportItems={support}
-        iconPrimary={false}
       />
     </section>
     <aside>
