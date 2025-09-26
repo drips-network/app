@@ -25,6 +25,47 @@ describe('section-header.svelte', () => {
     screen.getByTestId('section-icon');
   });
 
+  it('applies primary styling to all icons by default', () => {
+    render(SectionHeader, {
+      props: {
+        label: 'Test Label',
+        icon: ThumbsUp,
+      },
+    });
+
+    const iconWrapper = screen.getByTestId('section-icon');
+    expect(iconWrapper).toHaveClass('icon-primary');
+  });
+
+  it('adds has-actions class when actions are provided', () => {
+    render(SectionHeader, {
+      props: {
+        label: 'Test Label',
+        actions: [
+          {
+            label: 'test action',
+            handler: () => {},
+          },
+        ],
+      },
+    });
+
+    const sectionHeader = document.querySelector('.section-header');
+    expect(sectionHeader).toHaveClass('has-actions');
+  });
+
+  it('does not add has-actions class when no actions are provided', () => {
+    render(SectionHeader, {
+      props: {
+        label: 'Test Label',
+        actions: [],
+      },
+    });
+
+    const sectionHeader = document.querySelector('.section-header');
+    expect(sectionHeader).not.toHaveClass('has-actions');
+  });
+
   it('renders actions', async () => {
     const spy1 = vi.fn();
     const spy2 = vi.fn();
