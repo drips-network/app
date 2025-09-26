@@ -4,7 +4,6 @@
     makeTransactPayload,
     type StepComponentEvents,
     type TransactionWrapperOrExternalTransaction,
-    // type TransactionWrapperOrExternalTransaction,
   } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../claim-orcid-flow';
@@ -19,17 +18,14 @@
   } from './__generated__/gql.generated';
   import expect from '$lib/utils/expect';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
-  // import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
-  // import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import network from '$lib/stores/wallet/network';
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
-  // import assert from '$lib/utils/assert';
+  import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  // import gaslessStore from '$lib/stores/gasless/gasless.store';
-  // import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
-  // import { hexlify, toUtf8Bytes } from 'ethers';
-  // import OrcidTransactionService from '$lib/utils/orcids/OrcidTransactionService';
   import { buildOrcidClaimingTxs } from '$lib/utils/orcids/build-orcid-claiming-txs';
+  import OrcidTransactionService from '$lib/utils/orcids/OrcidTransactionService';
+  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
+  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -159,28 +155,14 @@
         promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      // const ownerUpdateTx = await populateRepoDriverWriteTx({
-      //   functionName: 'requestUpdateOwner',
-      //   args: [0, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
-      // });
+      const ownerUpdateTx = await buildOrcidClaimingTxs(orcid);
 
-      const tx = await buildOrcidClaimingTxs(orcid);
-
-      transactions.push(
-        ...tx.txs,
-        // {
-        //   title: 'Request update of ORCID owner',
-        //   transaction: ownerUpdateTx,
-        //   gasless: false,
-        //   applyGasBuffer: false,
-        // },
-        {
-          external: true,
-          title: 'Finalizing verification...',
-          ...fakeProgressBarConfig,
-          promise: () => waitForOrcidOwnerUpdate(false),
-        },
-      );
+      transactions.push(...ownerUpdateTx.txs, {
+        external: true,
+        title: 'Finalizing verification...',
+        ...fakeProgressBarConfig,
+        promise: () => waitForOrcidOwnerUpdate(false),
+      });
     }
 
     return transactions;
@@ -193,18 +175,17 @@
         headline: 'Claim your ORCID',
 
         before: async () => {
-          // const orcidProjectService = await OrcidTransactionService.new();
+          const orcidTransactionService = await OrcidTransactionService.new();
 
-          // const setSplitsAndEmitMetadataBatch = await orcidProjectService.buildBatchTx($context);
+          const setSplitsAndEmitMetadataBatch =
+            await orcidTransactionService.buildBatchTx($context);
 
-          // const tx = await populateCallerWriteTx({
-          //   functionName: 'callBatched',
-          //   args: [setSplitsAndEmitMetadataBatch.map(txToCallerCall)],
-          // });
+          const tx = await populateCallerWriteTx({
+            functionName: 'callBatched',
+            args: [setSplitsAndEmitMetadataBatch.map(txToCallerCall)],
+          });
 
-          const tx = await buildOrcidClaimingTxs($context.claimableId);
-
-          // Check once if the project is already in the expected state for the final claim TX,
+          // Check once if the ORCID is already in the expected state for the final claim TX,
           // and skip the step that waits for everything to be in the right state if so.
           // We already kick off the gasless owner update after the user confirms the funding.json step,
           // so it could be that everything already resolved by the time we get here.
@@ -218,35 +199,21 @@
         },
 
         // TODO: what do we do with this?
-        transactions: async (/*{ tx }*/) => {
-          // if(gasless) {
-          //   return generateOwnerUpdateTransactions(
-          //     $context.gaslessOwnerUpdateTaskId,
-          //     $context.claimableId,
-          //   );
-          // }
+        transactions: async ({ tx, orcidAlreadyReadyForClaimTx }) => {
+          const ownerUpdateTransactionSteps = orcidAlreadyReadyForClaimTx
+            ? []
+            : await generateOwnerUpdateTransactions(
+                $context.gaslessOwnerUpdateTaskId,
+                $context.claimableId,
+              );
 
-          // otherwise, do the claiming via the SDK?
+          const setSplitsAndMetadataTransactionStep = {
+            transaction: tx,
+            applyGasBuffer: false,
+            title: 'Set ORCID splits and metadata',
+          };
 
-          // const ownerUpdateTransactionSteps = orcidAlreadyReadyForClaimTx
-          //   ? []
-          //   : await generateOwnerUpdateTransactions(
-          //       $context.gaslessOwnerUpdateTaskId,
-          //       $context.claimableId,
-          //     );
-
-          // const setSplitsAndMetadataTransactionStep = {
-          //   transaction: tx,
-          //   gasless: $gaslessStore,
-          //   applyGasBuffer: false,
-          //   title: 'Set ORCID splits and metadata',
-          // };
-
-          // return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
-          return generateOwnerUpdateTransactions(
-            $context.gaslessOwnerUpdateTaskId,
-            $context.claimableId,
-          );
+          return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
         },
 
         after: async () => {
