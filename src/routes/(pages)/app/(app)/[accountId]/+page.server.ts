@@ -15,6 +15,7 @@ import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-fr
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 import { getMainnetProvider, safeReverseLookup } from '$lib/stores/ens/ens';
 import { JsonRpcProvider } from 'ethers';
+import { LINKED_IDENTITIES_CARD_FRAGMENT } from './components/linked-identities-card.svelte';
 
 const currentNetworkProvider = new JsonRpcProvider(network.rpcUrl);
 
@@ -26,9 +27,11 @@ const PROFILE_PAGE_QUERY = gql`
   ${STREAMS_SECTION_STREAMS_FRAGMENT}
   ${USER_BALANCES_FRAGMENT}
   ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
+  ${LINKED_IDENTITIES_CARD_FRAGMENT}
   query ProfilePage($address: String!, $chains: [SupportedChain!]) {
     userByAddress(address: $address, chains: $chains) {
       account {
+        driver
         address
         accountId
       }
@@ -48,6 +51,9 @@ const PROFILE_PAGE_QUERY = gql`
         }
         support {
           ...SupportersSectionSupportItem
+        }
+        linkedIdentities {
+          ...LinkedIdentities
         }
       }
     }

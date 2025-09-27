@@ -1,5 +1,13 @@
 import { isAddress } from 'ethers';
 import ensStore from '../../stores/ens/ens.store';
+import type { RecipientClassification } from './types';
+import { gql } from 'graphql-request';
+import query from '$lib/graphql/dripsQL';
+import network from '$lib/stores/wallet/network';
+import type {
+  ValidateOrcidQuery,
+  ValidateOrcidQueryVariables,
+} from './__generated__/gql.generated';
 
 export const reformatUrl = (url: string): string => {
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -51,7 +59,29 @@ export const validateAddress = async (
   }
 };
 
-export const createInvalidMessage = (type: string): string => {
+const validateOrcidQuery = gql`
+  query ValidateOrcid($orcid: String!, $chain: SupportedChain!) {
+    orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+      orcid
+    }
+  }
+`;
+
+export const validateOrcid = async (orcidId: string) => {
+  const orcidQueryResponse = await query<ValidateOrcidQuery, ValidateOrcidQueryVariables>(
+    validateOrcidQuery,
+    {
+      orcid: orcidId,
+      chain: network.gqlName,
+    },
+    fetch,
+  );
+  return !!orcidQueryResponse.orcidLinkedIdentityByOrcid;
+};
+
+export const createInvalidMessage = (
+  type: NonNullable<RecipientClassification>['type'],
+): string => {
   switch (type) {
     case 'address':
       return "This isn't a valid wallet address";
@@ -59,7 +89,7 @@ export const createInvalidMessage = (type: string): string => {
       return "This isn't a GitHub repo or isn't public";
     case 'drip-list':
       return "This isn't a recognized Drip List";
-    default:
-      return "This isn't valid";
+    case 'orcid':
+      return 'This ORCID iD is invalid or inaccessible.';
   }
 };

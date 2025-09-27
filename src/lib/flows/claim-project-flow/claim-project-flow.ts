@@ -19,7 +19,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
-import type { Items, Weights } from '$lib/components/list-editor/types';
+import type { Items, ListEditorConfig, Weights } from '$lib/components/list-editor/types';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 import type { FundingJson } from '$lib/utils/github/GitHub';
 import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';
@@ -42,11 +42,6 @@ export const CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT = gql`
     isVisible
   }
 `;
-
-interface ListEditorConfig {
-  items: Items;
-  weights: Weights;
-}
 
 export interface State {
   linkedToRepo: boolean;
