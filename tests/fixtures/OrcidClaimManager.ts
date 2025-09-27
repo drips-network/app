@@ -172,5 +172,5 @@ class OrcidClaimManager {
   }
 }
 
-export type { OrcidClaimManager };
+export { OrcidClaimManager };
 export const orcidClaimManager = OrcidClaimManager.getInstance();
