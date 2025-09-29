@@ -1,20 +1,14 @@
 import RepoDriverMetadataManager from '../metadata/RepoDriverMetadataManager';
-import MetadataManagerBase from '../metadata/MetadataManagerBase';
 import { get } from 'svelte/store';
 import wallet from '$lib/stores/wallet/wallet.store';
 import assert from '$lib/utils/assert';
 import type { LatestVersion } from '@efstajas/versioned-parser';
 import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
-import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import { toBigInt } from 'ethers';
 import type { OxString } from '../sdk/sdk-types';
-import {
-  populateRepoDriverWriteTx,
-} from '../sdk/repo-driver/repo-driver';
+import { populateRepoDriverWriteTx } from '../sdk/repo-driver/repo-driver';
 import { formatSplitReceivers } from '../sdk/utils/format-split-receivers';
 import type { ContractTransaction } from 'ethers';
-import { populateDripsWriteTx } from '../sdk/drips/drips';
-import keyValueToMetatada from '../sdk/utils/key-value-to-metadata';
 import network from '$lib/stores/wallet/network';
 import {
   executeRepoSubAccountDriverReadMethod,
@@ -24,21 +18,20 @@ import type Orcid from './entities';
 import { fetchOrcid, orcidIdToAccountId } from './fetch-orcid';
 import type { State } from '$lib/flows/claim-orcid-flow/claim-orcid-flow';
 import type { ListEditorConfig } from '$lib/components/list-editor/types';
-import type { MergeWithdrawableBalancesFragment } from '../__generated__/gql.generated';
+import { populateDripsWriteTx } from '../sdk/drips/drips';
 
+// TODO: constructor doesn't need to be
+// TOOD: we know what the splits need to be in advance, remove their "calculation"
+// here.
+// TODO: rename to something more apropriate
 export default class OrcidTransactionService {
-  // private _github!: GitHub;
   private readonly _repoDriverMetadataManager = new RepoDriverMetadataManager();
   private _connectedAddress: string | undefined;
 
   private constructor() {}
 
-  // TODO: doesn't need to be async?
   public static async new(): Promise<OrcidTransactionService> {
     const orcidTransactionService = new OrcidTransactionService();
-
-    // const octokit = new Octokit();
-    // gitProjectService._github = new GitHub(octokit);
 
     const { connected, signer, address } = get(wallet);
 
@@ -52,24 +45,24 @@ export default class OrcidTransactionService {
   }
 
   public async getOrcidInfo(orcid: string): Promise<Orcid> {
-    const orcidProfile = await fetchOrcid(orcid, fetch)
+    const orcidProfile = await fetchOrcid(orcid, fetch);
     if (!orcidProfile) {
       throw new Error(`Cannot get orcid info`);
     }
 
-    return orcidProfile
+    return orcidProfile;
   }
 
   public async buildUpdateSplitsBatchTx(
     accountId: string,
     highLevelPercentages: { [slug: string]: number },
     maintainers: ListEditorConfig,
-    dependencies: ListEditorConfig,
-  ): Promise<{ newMetadataHash: string; batch: ContractTransaction[] }> {
+    // dependencies: ListEditorConfig,
+  ): Promise<{ batch: ContractTransaction[] }> {
     const {
       tx: setSplitsTx,
-      dependenciesSplitMetadata,
-      maintainersSplitsMetadata,
+      // dependenciesSplitMetadata,
+      // maintainersSplitsMetadata,
     } = await this._buildSetSplitsTxAndMetadata(
       accountId,
       highLevelPercentages,
@@ -87,50 +80,15 @@ export default class OrcidTransactionService {
       ).tx;
     }
 
-    const currentMetadata = await this._repoDriverMetadataManager.fetchAccountMetadata(accountId);
-    assert(currentMetadata, `The project with user ID ${accountId} does not exist.`);
-
-    const upgraded = this._repoDriverMetadataManager.upgradeAccountMetadata(currentMetadata.data);
-
-    const newMetadata = {
-      ...upgraded,
-      splits: {
-        dependencies: dependenciesSplitMetadata,
-        maintainers: maintainersSplitsMetadata,
-      },
-    };
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(newMetadata);
-
-    const accountMetadataAsBytes = [
-      {
-        key: MetadataManagerBase.USER_METADATA_KEY,
-        value: ipfsHash,
-      },
-    ].map(keyValueToMetatada);
-
-    const emitAccountMetadataTx = await populateRepoDriverWriteTx({
-      functionName: 'emitAccountMetadata',
-      args: [toBigInt(accountId), accountMetadataAsBytes],
-    });
-
     return {
-      batch: [
-        ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
-        setSplitsTx,
-        emitAccountMetadataTx,
-      ],
-      newMetadataHash: ipfsHash,
+      batch: [...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []), setSplitsTx],
     };
   }
 
   public async buildBatchTx(context: State): Promise<ContractTransaction[]> {
-    const accountId = (await orcidIdToAccountId(context.claimableId)).toString()
+    const accountId = (await orcidIdToAccountId(context.claimableId)).toString();
 
-    const {
-      tx: setSplitsTx,
-      receivers,
-    } = await this._buildSetSplitsTxAndMetadata(
+    const { tx: setSplitsTx, receivers } = await this._buildSetSplitsTxAndMetadata(
       accountId,
       context.highLevelPercentages,
       context.maintainerSplits,
@@ -150,52 +108,14 @@ export default class OrcidTransactionService {
       ).tx;
     }
 
-    // Create a fake ORCID that adheres to metadata parsing type
-    // TODO: Use RepoDriverMetadataManager to construct metadata that
-    // adheres to a yet-to-be-introduced structure
-    const orcidAccountMetadata = {
-      driver: 'repo' as const,
-      describes: {
-        driver: 'repo' as const,
-        accountId,
-      },
-      source: {
-        forge: 'github' as const,
-        repoName: 'orcid-account',
-        ownerName: context.claimableId,
-        url: `https://orcid.org/${context.claimableId}`,
-      },
-      isVisible: true,
-      avatar: {
-        type: 'emoji' as const,
-        emoji: '👤',
-      },
-      color: '#16a085',
-      description: `ORCID account for ${context.claimableId}`,
-      splits: {
-        maintainers: [],
-        dependencies: [],
-      },
-      orcid: context.claimableId,
-    };
-
-    const ipfsHash = await this._repoDriverMetadataManager.pinAccountMetadata(orcidAccountMetadata);
-
-    const accountMetadataAsBytes = [
-      {
-        key: MetadataManagerBase.USER_METADATA_KEY,
-        value: ipfsHash,
-      },
-    ].map(keyValueToMetatada);
-
-    const emitAccountMetadataTx = await populateRepoDriverWriteTx({
-      functionName: 'emitAccountMetadata',
-      args: [toBigInt(accountId), accountMetadataAsBytes],
-    });
-
-
-    const splittableAmounts: MergeWithdrawableBalancesFragment[] = []
-    const collectableAmounts: MergeWithdrawableBalancesFragment[] = []
+    const splittableAmounts =
+      context.claimableAccount?.withdrawableBalances.filter(
+        (wb) => BigInt(wb.splittableAmount) > 0n,
+      ) || [];
+    const collectableAmounts =
+      context.claimableAccount?.withdrawableBalances.filter(
+        (wb) => BigInt(wb.collectableAmount) > 0n,
+      ) || [];
 
     const splitTxs: Promise<ContractTransaction>[] = [];
     splittableAmounts?.forEach(({ tokenAddress }) => {
@@ -222,7 +142,6 @@ export default class OrcidTransactionService {
     return Promise.all([
       ...(setSubAccountSplitsTx ? [setSubAccountSplitsTx] : []),
       setSplitsTx,
-      emitAccountMetadataTx,
       ...splitTxs,
       ...collectTxs,
     ]);

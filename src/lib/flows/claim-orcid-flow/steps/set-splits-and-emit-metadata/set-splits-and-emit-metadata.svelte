@@ -177,12 +177,11 @@
         before: async () => {
           const orcidTransactionService = await OrcidTransactionService.new();
 
-          const setSplitsAndEmitMetadataBatch =
-            await orcidTransactionService.buildBatchTx($context);
+          const setSplitsBatch = await orcidTransactionService.buildBatchTx($context);
 
           const tx = await populateCallerWriteTx({
             functionName: 'callBatched',
-            args: [setSplitsAndEmitMetadataBatch.map(txToCallerCall)],
+            args: [setSplitsBatch.map(txToCallerCall)],
           });
 
           // Check once if the ORCID is already in the expected state for the final claim TX,
