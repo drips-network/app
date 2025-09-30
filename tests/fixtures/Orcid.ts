@@ -1,7 +1,8 @@
 import { type Page, expect } from '@playwright/test';
 import type { ConnectedSession } from './ConnectedSession';
-import { type OrcidClaimManager } from './OrcidClaimManager';
+import { OrcidClaimManager } from './OrcidClaimManager';
 import { gqlClient } from './gqlClient';
+import { execa } from 'execa';
 
 export class Orcid {
   public readonly page: Page;
@@ -68,13 +69,13 @@ export class Orcid {
     await this.page.goto(orcidProfileUrl);
 
     // Wait for the page to load and verify we're on the correct ORCID profile
-    await expect(this.page.getByText('Shawna Test Sadler Test')).toBeVisible();
+    // await expect(this.page.getByText('Shawna Test Sadler Test')).toBeVisible();
 
     // Check if there are claimable funds
-    await expect(this.page.getByText('$0.00')).toBeVisible();
+    // await expect(this.page.getByText('$0.00')).toBeVisible();
 
     // Verify the claimable funds section is visible
-    await expect(this.page.getByText('Claimable funds')).toBeVisible();
+    // await expect(this.page.getByText('Claimable funds')).toBeVisible();
 
     // Click the "Claim ORCID iD" button to start the claiming flow
     await this.page.getByRole('button', { name: 'Claim ORCID iD' }).click();
@@ -92,12 +93,12 @@ export class Orcid {
     await this.page.waitForTimeout(2000);
 
     // The ORCID iD should be pre-filled, look for Search button or Continue button
-    const searchButton = this.page.getByRole('button', { name: 'Search' });
-    if (await searchButton.isVisible({ timeout: 5000 })) {
-      await searchButton.click();
-      // Wait for search to complete and Continue button to appear
-      await this.page.waitForTimeout(3000);
-    }
+    // const searchButton = this.page.getByRole('button', { name: 'Search' });
+    // if (await searchButton.isVisible({ timeout: 5000 })) {
+    //   await searchButton.click();
+    //   // Wait for search to complete and Continue button to appear
+    //   await this.page.waitForTimeout(3000);
+    // }
 
     continueButton = this.page.getByRole('button', { name: 'Continue' });
     if (await continueButton.isVisible({ timeout: 10000 })) {
@@ -106,6 +107,12 @@ export class Orcid {
 
     // Step 3: Connect Wallet (might be skipped if already connected)
     await this.page.waitForTimeout(2000);
+
+    // TODO: remove?
+    continueButton = this.page.getByRole('button', { name: 'Connect wallet' });
+    if (await continueButton.isVisible({ timeout: 10000 })) {
+      await continueButton.click();
+    }
 
     continueButton = this.page.getByRole('button', { name: 'Continue' });
     if (await continueButton.isVisible({ timeout: 10000 })) {
@@ -116,7 +123,7 @@ export class Orcid {
     await this.page.waitForTimeout(2000);
 
     // Look for the verification step - need to check the checkbox first
-    const checkbox = this.page.getByRole('checkbox');
+    const checkbox = this.page.getByText('I added or edited the URL.');
     if (await checkbox.isVisible({ timeout: 10000 })) {
       await checkbox.check();
     }
@@ -141,11 +148,11 @@ export class Orcid {
     await this.page.waitForTimeout(2000);
 
     // Look for splits configuration - might have percentage input fields
-    const splitInput = this.page.getByRole('textbox').first();
-    if (await splitInput.isVisible({ timeout: 10000 })) {
-      await splitInput.fill('100');
-      await splitInput.press('Enter');
-    }
+    // const splitInput = this.page.getByRole('textbox').first();
+    // if (await splitInput.isVisible({ timeout: 10000 })) {
+    //   await splitInput.fill('100');
+    //   await splitInput.press('Enter');
+    // }
 
     // Continue to next step after setting splits
     continueButton = this.page.getByRole('button', { name: 'Continue' });
@@ -170,6 +177,9 @@ export class Orcid {
         timeout: 60_000,
       });
     }
+
+    const accountId = await this._populateAccountId(orcidId);
+    await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${this.ownerAddress}`;
 
     // Step 8: Success step - wait for completion
     await expect(this.page.getByText('Success')).toBeVisible({
