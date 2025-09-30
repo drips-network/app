@@ -6,7 +6,6 @@
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 
   export let icon: ComponentType | undefined = undefined;
-  export let iconPrimary: boolean = false;
   export let label: string;
   export let actions: {
     handler?: (event: MouseEvent) => void;
@@ -31,6 +30,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="section-header"
+  class:has-actions={actions.length > 0}
   on:click={() => (collapsable ? (collapsed = !collapsed) : undefined)}
   class:collapsed
   class:collapsable
@@ -41,8 +41,8 @@
 
   <div class="title">
     {#if icon}
-      <div data-testid="section-icon" class="icon-wrapper" class:icon-primary={iconPrimary}>
-        <svelte:component this={icon} style="fill: var(--color-background)" />
+      <div data-testid="section-icon" class="icon-wrapper icon-primary">
+        <svelte:component this={icon} style="fill: var(--color-primary-level-6)" />
       </div>
     {/if}
     <h3>{label}</h3>
@@ -122,7 +122,7 @@
   }
 
   .icon-wrapper.icon-primary {
-    background-color: var(--color-primary);
+    background-color: var(--color-primary-level-1);
   }
 
   .expand-button {
@@ -165,5 +165,27 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .section-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .section-header.has-actions {
+      gap: 1rem;
+    }
+
+    .title h3 {
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+    }
+
+    .actions {
+      justify-content: flex-start;
+    }
   }
 </style>

@@ -3,6 +3,7 @@ import ProjectAvatar, {
   PROJECT_AVATAR_FRAGMENT,
 } from '$lib/components/project-avatar/project-avatar.svelte';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import { gql } from 'graphql-request';
 import type { SupporterPileFragment } from './__generated__/gql.generated';
 
@@ -76,7 +77,7 @@ export default function getSupportersPile(
           return {
             component: ProjectAvatar,
             props: {
-              project: s.project,
+              project: filterCurrentChainData(s.project.chainData),
               outline: true,
               size: COMPONENT_SIZES[size]['ProjectAvatar'],
             },

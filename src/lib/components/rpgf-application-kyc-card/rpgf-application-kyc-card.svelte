@@ -9,7 +9,7 @@
   import Button from '../button/button.svelte';
   import Copyable from '../copyable/copyable.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
-  import ArrowCounterClockwiseHeart from '../icons/ArrowCounterClockwiseHeart.svelte';
+  import Refresh from '../icons/Refresh.svelte';
   import ArrowRight from '../icons/ArrowRight.svelte';
   import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
   import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
@@ -67,7 +67,7 @@
     <Button
       variant="ghost"
       ariaLabel="Refresh"
-      icon={ArrowCounterClockwiseHeart}
+      icon={Refresh}
       loading={refreshing}
       on:click={handleRefreshKyc}
     >
