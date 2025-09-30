@@ -5,6 +5,7 @@ import ProjectAvatar, {
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { gql } from 'graphql-request';
 import type { SupporterPileFragment } from './__generated__/gql.generated';
+import type { ComponentProps } from 'svelte';
 
 export const SUPPORTER_PILE_FRAGMENT = gql`
   ${PROJECT_AVATAR_FRAGMENT}
@@ -40,11 +41,21 @@ export const SUPPORTER_PILE_FRAGMENT = gql`
   }
 `;
 
+type SupporterPileItem =
+  | {
+      component: typeof IdentityBadge;
+      props: ComponentProps<IdentityBadge>;
+    }
+  | {
+      component: typeof ProjectAvatar;
+      props: ComponentProps<ProjectAvatar>;
+    };
+
 export default function getSupportersPile(
   support: SupporterPileFragment[],
   size: 'tiny' | 'normal' = 'normal',
-) {
-  let result = [];
+): SupporterPileItem[] {
+  let result: SupporterPileItem[] = [];
 
   // Component sizes are unfortunately a mess so we need to do this
   const COMPONENT_SIZES = {
@@ -59,7 +70,7 @@ export default function getSupportersPile(
   };
 
   result.push(
-    ...mapFilterUndefined(support, (s) => {
+    ...mapFilterUndefined(support, (s): SupporterPileItem | undefined => {
       switch (s.__typename) {
         case 'DripListSupport':
           return {
@@ -67,7 +78,7 @@ export default function getSupportersPile(
             props: {
               address: s.dripList.owner.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
               disableTooltip: true,
               disableLink: true,
             },
@@ -76,9 +87,8 @@ export default function getSupportersPile(
           return {
             component: ProjectAvatar,
             props: {
-              project: s.project,
-              outline: true,
-              size: COMPONENT_SIZES[size]['ProjectAvatar'],
+              project: s.project.chainData[0],
+              size: COMPONENT_SIZES[size]['ProjectAvatar'] as ComponentProps<ProjectAvatar>['size'],
             },
           };
         case 'OneTimeDonationSupport':
@@ -87,7 +97,7 @@ export default function getSupportersPile(
             props: {
               address: s.account.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
               disableTooltip: true,
               disableLink: true,
             },
@@ -98,7 +108,7 @@ export default function getSupportersPile(
             props: {
               address: s.stream.sender.account.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
               disableTooltip: true,
               disableLink: true,
             },
@@ -107,10 +117,21 @@ export default function getSupportersPile(
     }),
   );
 
-  // Dedupe identity badges based on address prop
+  // Dedupe identity badges based on address prop (only for IdentityBadge components)
   result = result.filter(
     (item, index, self) =>
-      self.findIndex((i) => i && item && i.props.address === item.props.address) === index,
+      self.findIndex((i) => {
+        if (!i || !item) return false;
+        // Only dedupe IdentityBadge components by address
+        if (item.component === IdentityBadge && i.component === IdentityBadge) {
+          return (
+            (i.props as ComponentProps<IdentityBadge>).address ===
+            (item.props as ComponentProps<IdentityBadge>).address
+          );
+        }
+        // For different component types or ProjectAvatar, don't dedupe
+        return i === item;
+      }) === index,
   );
 
   return result.flat();
