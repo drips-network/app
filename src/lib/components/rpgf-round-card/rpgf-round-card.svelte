@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Round, RoundState } from '$lib/utils/rpgf/types/round';
+  import type { Round } from '$lib/utils/rpgf/types/round';
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
@@ -10,16 +10,55 @@
 
   $: roundSlugOrDraftId = round.urlSlug ?? round.id;
 
-  const stateLabels: Record<RoundState, string> = {
-    'pending-intake': 'Pending intake',
-    intake: 'Accepting applications',
-    'pending-voting': 'Pending voting',
-    voting: 'Voting in progress',
-    'pending-results': 'Pending results',
-    results: 'Results available',
+  enum EnrichedState {
+    Draft,
+    PendingIntake,
+    Intake,
+    PendingVoting,
+    Voting,
+    PendingResults,
+    Results,
+  }
+  let enrichedState: EnrichedState;
+
+  $: {
+    if (!round.state) {
+      enrichedState = EnrichedState.Draft;
+    } else if (round.resultsPublished) {
+      enrichedState = EnrichedState.Results;
+    } else {
+      switch (round.state) {
+        case 'intake':
+          enrichedState = EnrichedState.Intake;
+          break;
+        case 'voting':
+          enrichedState = EnrichedState.Voting;
+          break;
+        case 'pending-intake':
+          enrichedState = EnrichedState.PendingIntake;
+          break;
+        case 'pending-voting':
+          enrichedState = EnrichedState.PendingVoting;
+          break;
+        case 'pending-results':
+        case 'results':
+          enrichedState = EnrichedState.PendingResults;
+          break;
+      }
+    }
+  }
+
+  const stateLabels: Record<EnrichedState, string> = {
+    [EnrichedState.Draft]: 'Draft',
+    [EnrichedState.PendingIntake]: 'Pending intake',
+    [EnrichedState.Intake]: 'Registrations open',
+    [EnrichedState.PendingVoting]: 'Application review',
+    [EnrichedState.Voting]: 'Voting open',
+    [EnrichedState.PendingResults]: 'Tallying',
+    [EnrichedState.Results]: 'Results available',
   };
 
-  $: stateLabel = !round.state ? 'Draft' : stateLabels[round.state];
+  $: stateLabel = stateLabels[enrichedState];
 </script>
 
 <PrimaryColorThemer colorHex={round.color}>
