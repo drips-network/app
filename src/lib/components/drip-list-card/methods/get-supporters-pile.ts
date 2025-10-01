@@ -52,6 +52,17 @@ type SupporterPileItem =
       props: ComponentProps<ProjectAvatar>;
     };
 
+type ComponentSizes = {
+  tiny: {
+    IdentityBadge: ComponentProps<IdentityBadge>['size'];
+    ProjectAvatar: ComponentProps<ProjectAvatar>['size'];
+  };
+  normal: {
+    IdentityBadge: ComponentProps<IdentityBadge>['size'];
+    ProjectAvatar: ComponentProps<ProjectAvatar>['size'];
+  };
+};
+
 export default function getSupportersPile(
   support: SupporterPileFragment[],
   size: 'tiny' | 'normal' = 'normal',
@@ -59,14 +70,14 @@ export default function getSupportersPile(
   let result: SupporterPileItem[] = [];
 
   // Component sizes are unfortunately a mess so we need to do this
-  const COMPONENT_SIZES = {
+  const COMPONENT_SIZES: ComponentSizes = {
     tiny: {
       IdentityBadge: 'normal',
       ProjectAvatar: 'tiny',
     },
     normal: {
       IdentityBadge: 'medium',
-      ProjectAvatar: 'normal',
+      ProjectAvatar: 'small',
     },
   };
 
@@ -79,7 +90,7 @@ export default function getSupportersPile(
             props: {
               address: s.dripList.owner.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'],
               disableTooltip: true,
               disableLink: true,
             },
@@ -89,7 +100,7 @@ export default function getSupportersPile(
             component: ProjectAvatar,
             props: {
               project: filterCurrentChainData(s.project.chainData),
-              size: COMPONENT_SIZES[size]['ProjectAvatar'] as ComponentProps<ProjectAvatar>['size'],
+              size: COMPONENT_SIZES[size]['ProjectAvatar'],
             },
           };
         case 'OneTimeDonationSupport':
@@ -98,7 +109,7 @@ export default function getSupportersPile(
             props: {
               address: s.account.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'],
               disableTooltip: true,
               disableLink: true,
             },
@@ -109,7 +120,7 @@ export default function getSupportersPile(
             props: {
               address: s.stream.sender.account.address,
               showIdentity: false,
-              size: COMPONENT_SIZES[size]['IdentityBadge'] as ComponentProps<IdentityBadge>['size'],
+              size: COMPONENT_SIZES[size]['IdentityBadge'],
               disableTooltip: true,
               disableLink: true,
             },
