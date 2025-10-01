@@ -40,6 +40,7 @@
     } else {
       return {
         __typename: 'UnClaimedProjectData' as const,
+        chain: network.gqlName,
       };
     }
   }
@@ -80,7 +81,7 @@
   >
     {#if avatarConfig.__typename === 'ClaimedProjectData'}
       <div style:margin-right="-1.25rem">
-        <ProjectAvatar project={{ __typename: 'UnClaimedProjectData' }} />
+        <ProjectAvatar project={{ __typename: 'UnClaimedProjectData', chain: network.gqlName }} />
       </div>
     {/if}
     <ProjectAvatar project={avatarConfig} />
