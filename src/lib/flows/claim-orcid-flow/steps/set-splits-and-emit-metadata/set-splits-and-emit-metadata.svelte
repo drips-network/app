@@ -22,10 +22,12 @@
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import { buildOrcidClaimingTxs } from '$lib/utils/orcids/build-orcid-claiming-txs';
+  // import { buildOrcidClaimingTxs } from '$lib/utils/orcids/build-orcid-claiming-txs';
   import OrcidTransactionService from '$lib/utils/orcids/OrcidTransactionService';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
+  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
+  import { hexlify, toUtf8Bytes } from 'ethers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -155,14 +157,26 @@
         promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      const ownerUpdateTx = await buildOrcidClaimingTxs(orcid);
-
-      transactions.push(...ownerUpdateTx.txs, {
-        external: true,
-        title: 'Finalizing verification...',
-        ...fakeProgressBarConfig,
-        promise: () => waitForOrcidOwnerUpdate(false),
+      // const ownerUpdateTx = await buildOrcidClaimingTxs(orcid);
+      const ownerUpdateTx = await populateRepoDriverWriteTx({
+        functionName: 'requestUpdateOwner',
+        args: [2, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
       });
+
+      transactions.push(
+        // ...ownerUpdateTx.txs,
+        {
+          title: 'Request update of ORCID owner',
+          transaction: ownerUpdateTx,
+          applyGasBuffer: false,
+        },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForOrcidOwnerUpdate(false),
+        },
+      );
     }
 
     return transactions;
@@ -172,7 +186,7 @@
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Claim your ORCID',
+        headline: 'Claim your ORCID iD',
 
         before: async () => {
           const orcidTransactionService = await OrcidTransactionService.new();
