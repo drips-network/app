@@ -55,6 +55,7 @@
       __typename: 'AddressDriverAccount',
       address: $walletStore.address ?? unreachable(),
     },
+    orcidMetadata: orcidAccount.orcidMetadata,
     areSplitsValid: false,
     isClaimed: false,
   };
