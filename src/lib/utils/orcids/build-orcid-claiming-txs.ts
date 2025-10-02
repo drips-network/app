@@ -7,6 +7,7 @@ export async function buildOrcidClaimingTxs(orcidId: string): Promise<{
   const sdk = sdkManager.sdk;
   if (!sdk) throw new Error('SDK not initialized');
 
+  // also sets splits
   const preparedTx = await sdk.linkedIdentities.prepareClaimOrcid({
     orcidId,
   });
