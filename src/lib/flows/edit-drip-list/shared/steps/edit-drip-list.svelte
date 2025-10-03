@@ -43,12 +43,13 @@
   } from '$lib/components/list-editor/types';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCsvSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
-  import type { ListEditorItem, AccountId, Weights } from '$lib/components/list-editor/types';
+  import type { ListEditorItem, Weights } from '$lib/components/list-editor/types';
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$app/navigation';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { buildDripListUpdateTxs } from '$lib/utils/driplist/buildDripListUpdateTxs';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -133,7 +134,7 @@
         description:
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
-          'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
+          'A recipient can be a wallet address, GitHub repo URL, Drip List URL, or ORCID iD. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
         addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
           $state.listEditorConfig.items = {
             ...$state.listEditorConfig.items,
