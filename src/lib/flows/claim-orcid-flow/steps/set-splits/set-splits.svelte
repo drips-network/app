@@ -5,8 +5,8 @@
     type StepComponentEvents,
     type TransactionWrapperOrExternalTransaction,
   } from '$lib/components/stepper/types';
-  import type { Writable } from 'svelte/store';
-  import type { State } from '../../claim-orcid-flow';
+  import { writable, type Writable } from 'svelte/store';
+  import { type State } from '../../claim-orcid-flow';
   import { gql } from 'graphql-request';
   import unreachable from '$lib/utils/unreachable';
   import query from '$lib/graphql/dripsQL';
@@ -22,12 +22,8 @@
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  // import { buildOrcidClaimingTxs } from '$lib/utils/orcids/build-orcid-claiming-txs';
-  import OrcidTransactionService from '$lib/utils/orcids/OrcidTransactionService';
-  import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
-  import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
-  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
-  import { hexlify, toUtf8Bytes } from 'ethers';
+  import { sdkManager } from '$lib/utils/sdk/sdk-manager';
+  import type { ClaimOrcidParams } from '@drips-network/sdk';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -120,6 +116,7 @@
   }
 
   async function generateOwnerUpdateTransactions(
+    sdk: NonNullable<typeof sdkManager.sdk>,
     gasslessOwnerUpdateTaskId: string | undefined,
     orcid: string,
   ) {
@@ -157,24 +154,60 @@
         promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      // const ownerUpdateTx = await buildOrcidClaimingTxs(orcid);
-      const ownerUpdateTx = await populateRepoDriverWriteTx({
-        functionName: 'requestUpdateOwner',
-        args: [2, hexlify(toUtf8Bytes(orcid)) as `0x${string}`],
+      const progressContext: Writable<Parameters<NonNullable<ClaimOrcidParams['onProgress']>>[0]> =
+        writable('claiming');
+      const claimOrcidPromise = sdk.linkedIdentities.claimOrcid({
+        orcidId: orcid,
+        waitOptions: { timeoutMs: 120000, pollIntervalMs: 5000 },
+        onProgress: (_step) => {
+          progressContext.set(_step);
+        },
       });
 
       transactions.push(
-        // ...ownerUpdateTx.txs,
         {
-          title: 'Request update of ORCID owner',
-          transaction: ownerUpdateTx,
-          applyGasBuffer: false,
+          title: 'Request update of ORCID iD owner',
+          external: true,
+          ...fakeProgressBarConfig,
+          promise: () => {
+            return new Promise<void>((resolve) => {
+              progressContext.subscribe((progress) => {
+                if (progress === 'waiting') {
+                  resolve();
+                }
+              });
+            });
+          },
         },
         {
-          external: true,
           title: 'Finalizing verification...',
+          external: true,
           ...fakeProgressBarConfig,
-          promise: () => waitForOrcidOwnerUpdate(false),
+          promise: () => {
+            return new Promise<void>((resolve) => {
+              progressContext.subscribe((progress) => {
+                if (progress === 'configuring') {
+                  resolve();
+                }
+              });
+            });
+          },
+        },
+        {
+          title: 'Set ORCID iD splits',
+          external: true,
+          ...fakeProgressBarConfig,
+          promise: async () => {
+            const result = await claimOrcidPromise;
+            if (result.status !== 'complete') {
+              const failure =
+                (!result.claim.success && result.claim.error) ??
+                (!result.ownership.success && result.ownership.error) ??
+                (!result.splits.success && result.splits.error) ??
+                new Error('ORCID claim incomplete.');
+              throw failure;
+            }
+          },
         },
       );
     }
@@ -186,47 +219,24 @@
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Claim your ORCID iD',
+        headline: 'Claim your ORCID',
+        messages: {
+          duringBefore: 'Preparing to claim ORCID…',
+          duringAfter: 'Waiting for ownership + splits…',
+        },
 
         before: async () => {
-          const orcidTransactionService = await OrcidTransactionService.new();
-
-          const setSplitsBatch = await orcidTransactionService.buildBatchTx($context);
-
-          const tx = await populateCallerWriteTx({
-            functionName: 'callBatched',
-            args: [setSplitsBatch.map(txToCallerCall)],
-          });
-
-          // Check once if the ORCID is already in the expected state for the final claim TX,
-          // and skip the step that waits for everything to be in the right state if so.
-          // We already kick off the gasless owner update after the user confirms the funding.json step,
-          // so it could be that everything already resolved by the time we get here.
-          const orcidAlreadyReadyForClaimTx = await checkOrcidInExpectedStateForClaiming();
-
-          return { tx, orcidAlreadyReadyForClaimTx };
+          const sdk = sdkManager.sdk;
+          if (!sdk) throw new Error('SDK not initialized');
+          return { sdk };
         },
 
-        messages: {
-          duringBefore: 'Preparing to claim ORCID...',
-        },
-
-        // TODO: what do we do with this?
-        transactions: async ({ tx, orcidAlreadyReadyForClaimTx }) => {
-          const ownerUpdateTransactionSteps = orcidAlreadyReadyForClaimTx
-            ? []
-            : await generateOwnerUpdateTransactions(
-                $context.gaslessOwnerUpdateTaskId,
-                $context.claimableId,
-              );
-
-          const setSplitsAndMetadataTransactionStep = {
-            transaction: tx,
-            applyGasBuffer: false,
-            title: 'Set ORCID splits and metadata',
-          };
-
-          return [...ownerUpdateTransactionSteps, setSplitsAndMetadataTransactionStep];
+        transactions: ({ sdk }) => {
+          return generateOwnerUpdateTransactions(
+            sdk,
+            $context.gaslessOwnerUpdateTaskId,
+            $context.claimableId,
+          );
         },
 
         after: async () => {
