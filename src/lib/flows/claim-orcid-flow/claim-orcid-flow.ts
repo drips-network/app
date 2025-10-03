@@ -10,7 +10,7 @@ import AddEthereumAddress, {
 } from './steps/add-ethereum-address/add-ethereum-address.svelte';
 import OrcidSlot from './slots/orcid-slot.svelte';
 import Review, { REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT } from './steps/review/review.svelte';
-import SetSplitsAndEmitMetadata from './steps/set-splits-and-emit-metadata/set-splits-and-emit-metadata.svelte';
+import SetSplitsAndEmitMetadata from './steps/set-splits/set-splits.svelte';
 import LinkedOrcid from './slots/linked-orcid.svelte';
 import Success from './steps/success/success.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
