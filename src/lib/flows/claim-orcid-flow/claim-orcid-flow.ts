@@ -18,7 +18,6 @@ import { gql } from 'graphql-request';
 import type { ClaimOrcidFlowOrcidFragment } from './__generated__/gql.generated';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 import type Orcid from '$lib/utils/orcids/entities';
-import type { ListEditorConfig } from '$lib/components/list-editor/types';
 
 export const CLAIM_ORCID_FLOW_ORCID_FRAGMENT = gql`
   ${ENTER_GIT_URL_STEP_ORCID_FRAGMENT}
@@ -43,10 +42,6 @@ export interface State {
   linkedToClaimable: boolean;
   gaslessOwnerUpdateTaskId: string | undefined;
   isPartiallyClaimed: boolean;
-
-  highLevelPercentages: { [key: string]: number };
-  maintainerSplits: ListEditorConfig;
-  dependencySplits: ListEditorConfig;
 }
 
 export const state = () =>
@@ -59,15 +54,6 @@ export const state = () =>
     claimableContext: undefined,
     claimableProof: undefined,
     gaslessOwnerUpdateTaskId: undefined,
-    highLevelPercentages: { maintainers: 100, dependencies: 0 },
-    maintainerSplits: {
-      items: {},
-      weights: {},
-    },
-    dependencySplits: {
-      items: {},
-      weights: {},
-    },
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {
