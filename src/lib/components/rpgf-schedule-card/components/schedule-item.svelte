@@ -45,7 +45,12 @@
   </div>
   <p style:color="var(--color-foreground-level-5)">
     {!until ? 'Starting ' : ''}
-    {date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', hour: 'numeric' })}<br />
+    {date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    })}<br />
   </p>
 
   <TransitionedHeight negativeMarginWhileCollapsed="-0.25rem" collapsed={!expanded}>
