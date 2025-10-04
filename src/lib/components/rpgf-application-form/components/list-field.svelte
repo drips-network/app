@@ -14,7 +14,6 @@
   import assert from '$lib/utils/assert';
 
   export let field: ApplicationListField;
-  $: if (!field.id) throw new Error('Field id is required');
 
   export let forceRevealError: boolean | undefined = undefined;
 
@@ -22,6 +21,10 @@
   export let answer: ApplicationListAnswerDto | undefined = undefined;
 
   function addToValues(item: Record<string, string | number>) {
+    if (!field.id) {
+      throw new Error('Field ID is required');
+    }
+
     if (!answer) {
       answer = {
         fieldId: field.id ?? unreachable(),
