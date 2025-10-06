@@ -65,119 +65,49 @@ export class Orcid {
   private async _claim(orcidId: string) {
     const orcidProfileUrl = `http://localhost:5173/app/orcids/${orcidId}`;
 
-    // Navigate to the ORCID profile page
+    // Navigate to the ORCID profile page and start claiming flow
     await this.page.goto(orcidProfileUrl);
-
-    // Click the "Claim ORCID iD" button to start the claiming flow
     await this.page.getByRole('button', { name: 'Claim ORCID iD' }).click();
 
     // Step 1: Choose Network (first step in the flow)
-    await this.page.waitForTimeout(2000);
-
-    // Look for Continue button to proceed from network selection
-    let continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
+    await this.page.getByRole('button', { name: 'Continue' }).first().click();
 
     // Step 2: Enter ORCID iD (should be pre-filled since we came from the profile page)
-    await this.page.waitForTimeout(2000);
-
-    continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
+    await this.page.getByRole('button', { name: 'Continue' }).click();
 
     // Step 3: Connect Wallet (might be skipped if already connected)
-    await this.page.waitForTimeout(2000);
-
-    // TODO: remove? Why is this needed if we're already connected?
-    continueButton = this.page.getByRole('button', { name: 'Connect wallet' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
-
-    continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
+    await this.page.getByRole('button', { name: 'Connect wallet' }).click();
+    await this.page.getByRole('button', { name: 'Continue' }).click();
 
     // Step 4: Add Ethereum Address (verify ownership)
-    await this.page.waitForTimeout(2000);
-
-    // Look for the verification step - need to check the checkbox first
-    const checkbox = this.page.getByText('I added or edited the URL.');
-    if (await checkbox.isVisible({ timeout: 10000 })) {
-      await checkbox.check();
-    }
-
-    // Then click Verify now
-    const verifyButton = this.page.getByRole('button', { name: 'Verify now' });
-    if (await verifyButton.isVisible({ timeout: 10000 })) {
-      await verifyButton.click();
-      // Wait for verification to complete
-      await this.page.waitForTimeout(5000);
-    }
+    await this.page.getByText('I added or edited the URL.').click();
+    await this.page.getByRole('button', { name: 'Verify now' }).click();
 
     // Step 5: Review step
     await this.page.waitForTimeout(2000);
 
-    continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
+    // Step 8: Wallet confirmation
+    await this.page.getByRole('button', { name: 'Confirm in wallet' }).click();
 
-    // Step 6: Set Splits and Emit Metadata
-    await this.page.waitForTimeout(2000);
+    await expect(this.page.getByTestId('current-tx')).toContainText('Finalizing', {
+      timeout: 60_000,
+    });
 
-    // Continue to next step after setting splits
-    continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
-
-    // Look for final continue button before wallet confirmation
-    await this.page.waitForTimeout(2000);
-    continueButton = this.page.getByRole('button', { name: 'Continue' });
-    if (await continueButton.isVisible({ timeout: 10000 })) {
-      await continueButton.click();
-    }
-
-    // Step 7: Wallet confirmation
-    const confirmButton = this.page.getByRole('button', { name: 'Confirm in wallet' });
-    if (await confirmButton.isVisible({ timeout: 10000 })) {
-      await confirmButton.click();
-
-      // Wait for transaction to be processed
-      await expect(this.page.getByTestId('current-tx')).toContainText('Finalizing', {
-        timeout: 60_000,
-      });
-    }
+    const accountId = await this._populateAccountId(orcidId);
 
     // Update the repo owner via CLI to simulate the backend process
-    const accountId = await this._populateAccountId(orcidId);
     await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${this.ownerAddress}`;
 
-    // Step 8: Success step - wait for completion
+    // Step 9: Success step - wait for completion
     await expect(this.page.getByText('Success')).toBeVisible({
       timeout: 60_000,
     });
 
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click();
-
-    // Look for "View your ORCID" or similar completion link
-    const viewOrcidLink = this.page.getByRole('button', { name: 'View ORCID profile' });
-    if (await viewOrcidLink.isVisible({ timeout: 10000 })) {
-      await viewOrcidLink.click();
-    }
+    await this.page.getByRole('button', { name: 'View ORCID profile' }).click();
 
     // Verify we're back on the ORCID profile page and it's now claimed
     await this.page.waitForURL(orcidProfileUrl);
-
-    // Wait for the profile to load
-    await this.page.waitForTimeout(2000);
-
-    // Verify the ORCID profile page shows the connected address
     await expect(this.page.getByRole('heading', { name: 'drips.network' })).toBeVisible();
     await expect(
       this.page.locator(`.orcid-profile :text("${this.ownerAddress.slice(-4)}")`).nth(0),
