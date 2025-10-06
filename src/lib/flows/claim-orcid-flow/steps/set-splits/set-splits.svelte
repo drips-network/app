@@ -159,8 +159,8 @@
       const claimOrcidPromise = sdk.linkedIdentities.claimOrcid({
         orcidId: orcid,
         waitOptions: { timeoutMs: 120000, pollIntervalMs: 5000 },
-        onProgress: (_step) => {
-          progressContext.set(_step);
+        onProgress: (step) => {
+          progressContext.set(step);
         },
       });
 

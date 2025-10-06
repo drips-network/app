@@ -8,12 +8,9 @@ import { TEST_ADDRESSES } from './ConnectedSession';
 import { gqlClient } from './gqlClient';
 
 export const ADDRESS_TO_ORCID_MAP: Record<string, string> = {
-  [TEST_ADDRESSES[0]]: '0009-0007-1106-8413', // drips.network sandbox
-  [TEST_ADDRESSES[1]]: '0000-0001-6453-8713', // Test ORCID 2
-  [TEST_ADDRESSES[2]]: '0000-0002-3437-1614', // Test ORCID 3
-  [TEST_ADDRESSES[3]]: '0000-0002-2677-7622', // Test ORCID 4
-  [TEST_ADDRESSES[4]]: '0000-0001-7174-1373', // Test ORCID 5
-  [TEST_ADDRESSES[5]]: '0000-0002-2099-3156', // Test ORCID 6
+  // drips.network in ORCID sandbox, has TEST_ADDRESSES[0] claiming
+  // URL in links section.
+  [TEST_ADDRESSES[0]]: '0009-0007-1106-8413',
 };
 
 const lockOptions = {
