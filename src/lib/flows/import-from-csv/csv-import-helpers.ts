@@ -16,15 +16,16 @@ type ItemsContainer = Pick<DripListConfig, 'items' | 'weights'>;
  * @param itemsPath - The path to the items object in the context (e.g., 'dripList', 'maintainerSplits')
  * @returns A function that adds an item with proper weight conversion
  */
-export function createAddItemFunction<T extends Record<string, ItemsContainer>>(
+export function createAddItemFunction<K extends string, T extends Record<K, ItemsContainer>>(
   context: Writable<T>,
-  itemsPath: keyof T,
+  itemsPath: K,
 ) {
-  return (key: AccountId, item: ListEditorItem, weight: number | undefined) => {
+  return (key: AccountId, item: ListEditorItem, weight: number | undefined): undefined => {
     context.update((c) => {
+      const container = c[itemsPath];
       // Update items
-      const currentItems = c[itemsPath]?.items || {};
-      c[itemsPath].items = {
+      const currentItems = container?.items || {};
+      container.items = {
         ...currentItems,
         [key]: item,
       };
@@ -35,7 +36,7 @@ export function createAddItemFunction<T extends Record<string, ItemsContainer>>(
         // This prevents ethers.js underflow errors when encoding BigInt values
         // Example: 0.25380710659898476 * 10000 = 2538.0710659898477 (without Math.round)
         //          Math.round(0.25380710659898476 * 10000) = 2538 (with Math.round)
-        c[itemsPath].weights[key] = Math.round(weight * WEIGHT_FACTOR);
+        container.weights[key] = Math.round(weight * WEIGHT_FACTOR);
       }
 
       return c;
@@ -50,14 +51,15 @@ export function createAddItemFunction<T extends Record<string, ItemsContainer>>(
  * @param itemsPath - The path to the items object in the context
  * @returns A function that clears all items and weights
  */
-export function createClearItemsFunction<T extends Record<string, ItemsContainer>>(
+export function createClearItemsFunction<K extends string, T extends Record<K, ItemsContainer>>(
   context: Writable<T>,
-  itemsPath: keyof T,
+  itemsPath: K,
 ) {
-  return () => {
+  return (): undefined => {
     context.update((c) => {
-      c[itemsPath].items = {};
-      c[itemsPath].weights = {};
+      const container = c[itemsPath];
+      container.items = {};
+      container.weights = {};
       return c;
     });
   };
