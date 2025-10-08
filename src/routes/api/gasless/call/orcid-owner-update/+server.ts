@@ -16,8 +16,7 @@ import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 import isClaimed from '$lib/utils/orcids/is-claimed';
 import { fetchOrcid } from '$lib/utils/orcids/fetch-orcid';
 import { getClaimingUrlAddress } from '$lib/utils/orcids/verify-orcid';
-import { ethers, JsonRpcProvider, toUtf8Bytes } from 'ethers';
-import { Forge } from '$lib/utils/sdk/sdk-types';
+import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 
 // TODO: update with SDK changes
 const GELATO_API_KEY = getOptionalEnvVar(
@@ -31,19 +30,6 @@ const payloadSchema = z.object({
   orcid: z.string(),
   chainId: z.number(),
 });
-
-const REPO_DRIVER_ABI = `[
-  {
-    "inputs": [
-      { "internalType": "enum Forge", "name": "forge", "type": "uint8" },
-      { "internalType": "bytes", "name": "name", "type": "bytes" }
-    ],
-    "name": "requestUpdateOwner",
-    "outputs": [{ "internalType": "uint256", "name": "accountId", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-]`;
 
 const orcidUnclaimedQuery = gql`
   query isOrcidUnclaimed($orcid: String!, $chain: SupportedChain!) {
@@ -142,14 +128,13 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const provider = new JsonRpcProvider(network.rpcUrl);
-  const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
+  const sdk = sdkManager.sdk;
+  if (!sdk) {
+    return error(500, 'SDK not initialized');
+  }
 
-  const claimOrcidTx = await contract.requestUpdateOwner.populateTransaction(
-    Forge.orcidId,
-    ethers.hexlify(toUtf8Bytes(orcid)),
-  );
-
+  const txs = await sdk.linkedIdentities.prepareClaimOrcid({ orcidId: orcid });
+  const { claimTx: claimOrcidTx } = txs;
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),
     target: claimOrcidTx.to ?? unreachable(),
