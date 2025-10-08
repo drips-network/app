@@ -154,13 +154,14 @@
         promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      const progressContext: Writable<Parameters<NonNullable<ClaimOrcidParams['onProgress']>>[0]> =
-        writable('claiming');
+      const progressContext: Writable<
+        Parameters<NonNullable<ClaimOrcidParams['onProgress']>>[0]['step']
+      > = writable('claiming');
       const claimOrcidPromise = sdk.linkedIdentities.claimOrcid({
         orcidId: orcid,
         waitOptions: { timeoutMs: 120000, pollIntervalMs: 5000 },
-        onProgress: (step) => {
-          progressContext.set(step);
+        onProgress: (progressEvent) => {
+          progressContext.set(progressEvent.step);
         },
       });
 
