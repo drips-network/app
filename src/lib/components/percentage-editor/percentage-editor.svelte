@@ -96,7 +96,6 @@
   on:click|stopPropagation={focusInput}
   on:keypress|stopPropagation
 >
-  fart
   <input
     bind:this={inputElem}
     class="typo-text tabular-nums"
