@@ -1,12 +1,15 @@
 import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
 import { WEIGHT_FACTOR } from '$lib/components/list-editor/types';
 import type { Writable } from 'svelte/store';
-import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
+import type { Items, Weights } from '$lib/components/list-editor/types';
 
 /**
  * Structure for items containing a list of items and their weights
  */
-type ItemsContainer = Pick<DripListConfig, 'items' | 'weights'>;
+type ItemsContainer = {
+  items: Items;
+  weights: Weights;
+};
 
 /**
  * Creates an addItem function for CSV imports that properly handles weight conversion
