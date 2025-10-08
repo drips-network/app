@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { createAddItemFunction, createClearItemsFunction } from '../csv-import-helpers';
 import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
 import { toBigInt } from 'ethers';
@@ -54,10 +54,7 @@ describe('csv-import-helpers', () => {
       addItem(accountId, item, percentage);
 
       // Get the stored weight
-      let storedWeight: number | undefined;
-      context.subscribe((c) => {
-        storedWeight = c.dripList.weights[accountId as string];
-      })();
+      const storedWeight = get(context).dripList.weights[accountId as string];
 
       // The weight should be a clean integer, not a float
       expect(storedWeight).toBe(2538);
