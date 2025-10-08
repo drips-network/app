@@ -1,5 +1,5 @@
 import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
-import { WEIGHT_FACTOR } from './import-from-csv-steps';
+import { WEIGHT_FACTOR } from '$lib/components/list-editor/types';
 import type { Writable } from 'svelte/store';
 import type { DripListConfig } from '$lib/components/drip-list-editor/drip-list-editor.svelte';
 

@@ -13,9 +13,9 @@
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import { WEIGHT_FACTOR } from '$lib/components/list-editor/types';
   import importFromCSVSteps, {
     DEFAULT_MAX_ENTRIES,
-    WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
