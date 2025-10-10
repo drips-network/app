@@ -480,7 +480,7 @@ export class RpgfRound {
 
     if (!result.ok) {
       const body = await result.text();
-      throw new Error(`Failed to force round into state ${desiredState}: ${body}`);
+      throw new Error(`Failed to force round ${this.urlSlug} into state ${desiredState}: ${body}`);
     }
 
     await this.navigateToRoundOrDraft();
