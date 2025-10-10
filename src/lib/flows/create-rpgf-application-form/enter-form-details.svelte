@@ -37,7 +37,7 @@
           fields: [],
         });
 
-        await invalidate('rpgf:round');
+        await invalidate('rpgf:round:applications:categories-and-forms');
         dispatch('conclude');
         await goto(`/app/rpgf/rounds/${roundId}/settings/application/forms/${createdForm.id}`);
       },
