@@ -2,7 +2,6 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
-  import ensureAtLeastOneArrayMember from '$lib/utils/ensure-at-least-one-array-member';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -16,7 +15,9 @@
   export let data;
 
   let updatedRound: PatchRoundDto = { ...data.round };
-  let updatedVoterAddresses: string[] = [...data.roundVoters.map((u) => getAddress(u.walletAddress))];
+  let updatedVoterAddresses: string[] = [
+    ...data.roundVoters.map((u) => getAddress(u.walletAddress)),
+  ];
 
   $: isDraft = !data.round.published;
 
@@ -50,7 +51,10 @@
       votesPerVoterValidationState = { type: 'unvalidated' };
     } else if (updatedRound.maxVotesPerVoter < 1) {
       votesPerVoterValidationState = { type: 'invalid', message: 'Must be at least 1' };
-    } else if (updatedRound.maxVotesPerProjectPerVoter && updatedRound.maxVotesPerVoter < updatedRound.maxVotesPerProjectPerVoter) {
+    } else if (
+      updatedRound.maxVotesPerProjectPerVoter &&
+      Number(updatedRound.maxVotesPerVoter) < Number(updatedRound.maxVotesPerProjectPerVoter)
+    ) {
       votesPerVoterValidationState = {
         type: 'invalid',
         message: 'Must be equal or higher than max votes per project',
@@ -66,7 +70,10 @@
       maxVotesPerProjectValidationState = { type: 'unvalidated' };
     } else if (updatedRound.maxVotesPerProjectPerVoter < 1) {
       maxVotesPerProjectValidationState = { type: 'invalid', message: 'Must be at least 1' };
-    } else if (updatedRound.maxVotesPerVoter && updatedRound.maxVotesPerProjectPerVoter > updatedRound.maxVotesPerVoter) {
+    } else if (
+      updatedRound.maxVotesPerVoter &&
+      Number(updatedRound.maxVotesPerProjectPerVoter) > Number(updatedRound.maxVotesPerVoter)
+    ) {
       maxVotesPerProjectValidationState = {
         type: 'invalid',
         message: 'Must be equal or lower than votes per voter',
@@ -77,7 +84,9 @@
   }
 
   // Voters can not be updated if voting is already over
-  $: canUpdateVoters = data.round.state ? data.round.state === 'pending-results' || data.round.state === 'results' : true;
+  $: canUpdateVoters = data.round.state
+    ? data.round.state === 'pending-results' || data.round.state === 'results'
+    : true;
 
   let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
   $: {
@@ -93,12 +102,11 @@
     }
   }
 
-  $: valid =
-    Boolean(
-        votesPerVoterValidationState.type !== 'invalid' &&
-        maxVotesPerProjectValidationState.type !== 'invalid' &&
-        voterGuidelinesLinkValidationState.type !== 'invalid',
-    )
+  $: valid = Boolean(
+    votesPerVoterValidationState.type !== 'invalid' &&
+      maxVotesPerProjectValidationState.type !== 'invalid' &&
+      voterGuidelinesLinkValidationState.type !== 'invalid',
+  );
 
   $: changesMade =
     updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
@@ -106,19 +114,19 @@
     updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
     !areStringArraysEqual(
       updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort()
+      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
     );
 
   async function saveHandler() {
-    await updateRound(
-      undefined,
-      data.round.id,
-      {
-        maxVotesPerVoter: updatedRound.maxVotesPerVoter ? Number(updatedRound.maxVotesPerVoter) : undefined,
-        maxVotesPerProjectPerVoter: updatedRound.maxVotesPerProjectPerVoter ? Number(updatedRound.maxVotesPerProjectPerVoter) : undefined,
-        voterGuidelinesLink: updatedRound.voterGuidelinesLink,
-      },
-    );
+    await updateRound(undefined, data.round.id, {
+      maxVotesPerVoter: updatedRound.maxVotesPerVoter
+        ? Number(updatedRound.maxVotesPerVoter)
+        : undefined,
+      maxVotesPerProjectPerVoter: updatedRound.maxVotesPerProjectPerVoter
+        ? Number(updatedRound.maxVotesPerProjectPerVoter)
+        : undefined,
+      voterGuidelinesLink: updatedRound.voterGuidelinesLink,
+    });
 
     if (canUpdateVoters) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
