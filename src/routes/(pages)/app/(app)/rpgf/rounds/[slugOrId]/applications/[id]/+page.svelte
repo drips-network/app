@@ -4,7 +4,6 @@
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import ApplicationDecisionButtons from '$lib/components/rpgf-applications-table/components/application-decision-buttons.svelte';
-  import RpgfApplicationMetricsCard from '$lib/components/rpgf-application-metrics-card/rpgf-application-metrics-card.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
@@ -112,8 +111,6 @@
     submitterWalletAddress={application.submitter.walletAddress}
     project={data.dripsProject}
   />
-
-  <RpgfApplicationMetricsCard keyMetrics={data.osoCoreMetrics} />
 </div>
 
 <style>

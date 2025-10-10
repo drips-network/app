@@ -102,7 +102,7 @@
         {:else if roundKycConfig.provider === 'Fern'}
           <p style:color="var(--color-foreground-level-5)">No KYC request linked</p>
         {:else if roundKycConfig.provider === 'Treova'}
-          {@const url = `https://kyc.treova.ai/${roundKycConfig.formId}`}
+          {@const url = `https://verify.treova.ai/${roundKycConfig.formId}`}
           <Copyable value={url} alwaysVisible>
             <a class="typo-link" href={url} target="_blank" rel="noopener noreferrer">{url}</a>
           </Copyable>
@@ -157,10 +157,15 @@
           to update here.
         </AnnotationBox>
 
+        <AnnotationBox type="warning">
+          Clicking the link below will take you to a third-party KYC provider. Their Privacy Policy
+          and Terms of Service apply.
+        </AnnotationBox>
+
         <Button
           size="large"
           variant="primary"
-          href="https://kyc.treova.ai/{roundKycConfig.formId}"
+          href="https://verify.treova.ai/{roundKycConfig.formId}"
           target="_blank"
           icon={ArrowBoxUpRight}
         >

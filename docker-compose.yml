@@ -26,7 +26,7 @@ services:
       - ECOSYSTEM_API_URL=http://ecosystems:5000
       - ECOSYSTEM_API_ACCESS_TOKEN=123
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
-      - PUBLIC_DRIPS_RPGF_URL=http://localhost:5000
+      - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
     volumes:
     - .:/app
@@ -284,7 +284,7 @@ services:
       - ENABLE_DANGEROUS_TEST_ROUTES=true
       - CORS_ALLOW_ALL_ORIGINS=true
     ports:
-      - 5000:5000
+      - 5293:5000
     depends_on:
       postgres-rpgf:
         condition: service_healthy
