@@ -67,7 +67,7 @@
 <div class="markdown">
   {@html `
     <div class="markdown-component-content">
-    ${rendered}
+    ${rendered ?? ''}
     </div>
   `}
 </div>
