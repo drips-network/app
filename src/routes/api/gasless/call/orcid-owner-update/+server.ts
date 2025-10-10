@@ -18,7 +18,6 @@ import { fetchOrcid } from '$lib/utils/orcids/fetch-orcid';
 import { getClaimingUrlAddress } from '$lib/utils/orcids/verify-orcid';
 import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 
-// TODO: update with SDK changes
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
   true,
