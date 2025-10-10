@@ -35,7 +35,7 @@ async function createSiweMessage(address: string) {
     domain: window.location.host,
     address,
     statement:
-      'Sign into Drips RPGF to manage your rounds. This is not a transaction, and no gas is required.',
+      'Sign into RetroPGF on Drips to manage your rounds. This is not a transaction, and no gas is required.',
     uri: window.location.origin,
     version: '1',
     chainId: network.chainId,
