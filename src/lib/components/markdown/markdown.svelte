@@ -2,13 +2,18 @@
   import { marked } from 'marked';
   import sanitize from 'sanitize-html';
   import './markdown.css';
+  import { browser } from '$app/environment';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   export let content: string;
 
   marked.use({
     renderer: {
       link({ href, text }) {
-        return `<a href="${href}" target="_blank" rel="noreferrer">${text}</a>`;
+        const sameDomain = browser && href.startsWith(window.location.origin);
+        const url = sameDomain ? href : buildExternalUrl(href);
+
+        return `<a href="${url}" target="_blank" rel="noreferrer">${text}</a>`;
       },
     },
   });
