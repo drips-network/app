@@ -84,8 +84,8 @@
   {#if !data.rpgfUserData}
     <div transition:fade={{ duration: 300 }}>
       <AnnotationBox type="info">
-        Sign in to Drips RPGF to see your own applications, vote on applications, or view private
-        data if you're an admin.
+        Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
+        private data if you're an admin.
         <svelte:fragment slot="actions">
           <RpgfSiweButton />
         </svelte:fragment>

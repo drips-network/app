@@ -37,5 +37,5 @@
 </script>
 
 <Button loading={pending} variant="primary" icon={Wallet} on:click={handleClick}
-  >{$walletStore.connected ? '' : 'Connect wallet & '}Sign in</Button
+  >{$walletStore.connected ? 'S' : 'Connect wallet & s'}ign in</Button
 >
