@@ -5,8 +5,6 @@
 
   export let content: string;
 
-  let rendered: string | null = null;
-
   marked.use({
     renderer: {
       link({ href, text }) {
@@ -15,10 +13,10 @@
     },
   });
 
-  async function reRender(content: string) {
-    const markup = await marked(content);
+  function reRender(content: string): string {
+    const markup = marked(content) as string;
 
-    rendered = sanitize(markup, {
+    return sanitize(markup, {
       allowedTags: [
         'h1',
         'h2',
@@ -61,13 +59,14 @@
       },
     });
   }
-  $: reRender(content);
+
+  $: rendered = reRender(content);
 </script>
 
 <div class="markdown">
   {@html `
     <div class="markdown-component-content">
-    ${rendered}
+    ${rendered ?? ''}
     </div>
   `}
 </div>

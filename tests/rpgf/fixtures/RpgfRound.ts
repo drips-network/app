@@ -470,13 +470,18 @@ export class RpgfRound {
       throw new Error('Draft not set. Please create a draft first.');
     }
 
-    await fetch(`${RPGF_API_URL}/testing/force-round-state`, {
+    const result = await fetch(`${RPGF_API_URL}/testing/force-round-state`, {
       method: 'POST',
       body: JSON.stringify({
         roundSlug: this.urlSlug,
         desiredState,
       }),
     });
+
+    if (!result.ok) {
+      const body = await result.text();
+      throw new Error(`Failed to force round ${this.urlSlug} into state ${desiredState}: ${body}`);
+    }
 
     await this.navigateToRoundOrDraft();
   }
