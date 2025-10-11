@@ -3,7 +3,7 @@ import type { ConnectedSession } from '../../fixtures/ConnectedSession';
 import type { Project } from '../../fixtures/Project';
 import type { RoundState } from '$lib/utils/rpgf/types/round';
 
-const RPGF_API_URL = 'http://localhost:5000/api';
+const RPGF_API_URL = 'http://localhost:5293/api';
 
 export class RpgfRound {
   public draftId: string | null = null;
