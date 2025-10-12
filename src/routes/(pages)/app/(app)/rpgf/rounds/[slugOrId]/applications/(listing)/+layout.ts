@@ -1,4 +1,4 @@
-import { getApplications } from '$lib/utils/rpgf/rpgf.js';
+import { getApplicationCategories, getApplications } from '$lib/utils/rpgf/rpgf.js';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ parent, url, depends, fetch }) => {
@@ -16,7 +16,7 @@ export const load = async ({ parent, url, depends, fetch }) => {
     url.searchParams.get('sortBy') ?? (resultsPublished ? 'allocation' : 'createdAt');
   const filterParam: string | null = url.searchParams.get('filter');
 
-  const allApplications =
+  const [allApplications, categories] = await Promise.all([
     filterParam === 'own' && !rpgfUserData
       ? []
       : await getApplications(
@@ -41,11 +41,14 @@ export const load = async ({ parent, url, depends, fetch }) => {
             ? filterParam
             : undefined,
           filterParam?.startsWith('cat-') ? filterParam.replaceAll('cat-', '') : undefined,
-        );
+        ),
+    getApplicationCategories(fetch, round.id),
+  ]);
 
   return {
     allApplications,
     sortByParam,
+    categories,
     filterParam,
   };
 };
