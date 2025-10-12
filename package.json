@@ -108,7 +108,7 @@
     "@web3-onboard/walletconnect": "^2.5.5",
     "bezier-easing": "^2.1.0",
     "csv-simple-parser": "^1.0.3",
-    "cupertino-pane": "^1.4.21",
+    "cupertino-pane": "^1.5.4",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^6.15.0",
     "globals": "^15.6.0",
