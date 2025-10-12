@@ -36,7 +36,7 @@ const EXPLORE_PAGE_CONFIG: ValueForEachSupportedChain<ExplorePageConfig> = {
     },
     showRecentProjects: true,
     featuredRpgfRoundIds: [
-      'e35f0fdf-4cba-4620-be48-8ad669c22921', // test round (staging only)
+      'a4d12d71-37a2-45c7-b823-3389637ec03c', // FIL-RetroPGF-3
     ],
   },
   1088: {
