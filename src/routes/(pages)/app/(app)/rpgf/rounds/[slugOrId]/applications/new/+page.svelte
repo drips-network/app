@@ -57,10 +57,9 @@
     <h1>Apply to {round.name}</h1>
 
     <p>
-      To apply to this round, please first pick one of your existing GitHub repository claimed on
-      Drips. If you haven't claimed your repository yet, click "Claim new project" below and follow
-      the instructions. Any rewards from the round will be distributed directly to your selected
-      project. <a
+      To apply to this round, first pick one of your existing GitHub repositories claimed on Drips.
+      If you haven't claimed your repository yet, click "Claim new project" below and follow the
+      instructions. Any rewards from the round will be distributed to your selected Drips project. <a
         class="typo-link"
         href="https://docs.drips.network/rpgf/apply-to-a-round#before-you-apply-your-drips-project"
         target="_blank">Learn more</a
