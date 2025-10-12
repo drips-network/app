@@ -7,11 +7,15 @@ import type {
   RpgfLinkedDripListQueryVariables,
 } from './__generated__/gql.generated';
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
+import { getApplications } from '$lib/utils/rpgf/rpgf';
 
-export const load = async ({ parent }) => {
+export const load = async ({ parent, depends, fetch }) => {
+  depends('rpgf:round:linkedDripLists');
+  depends('rpgf:round:applications');
+
   const { round } = await parent();
 
-  const { linkedDripLists } = round;
+  const { linkedDripLists: linkedDripListsIds } = round;
 
   async function fetchLists(
     listIds: string[],
@@ -39,5 +43,16 @@ export const load = async ({ parent }) => {
     );
   }
 
-  return { linkedDripLists: await fetchLists(linkedDripLists), blockWhileInitializing: false };
+  const [linkedDripLists, fiveApplications] = await Promise.all([
+    fetchLists(linkedDripListsIds ?? []),
+    getApplications(
+      fetch,
+      round.id,
+      5,
+      0,
+      round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
+    ),
+  ]);
+
+  return { fiveApplications, linkedDripLists, blockWhileInitializing: false };
 };

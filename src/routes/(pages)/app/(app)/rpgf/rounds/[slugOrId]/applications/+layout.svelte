@@ -39,6 +39,7 @@
 
     clearDecisions();
 
+    await invalidate('rpgf:round');
     await invalidate('rpgf:round:applications');
   }
 

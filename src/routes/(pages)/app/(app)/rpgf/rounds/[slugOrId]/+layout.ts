@@ -1,4 +1,4 @@
-import { getApplications, getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
+import { getBallotStats, getOwnBallot, getRound } from '$lib/utils/rpgf/rpgf.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, params, url, depends }) => {
@@ -23,26 +23,13 @@ export const load = async ({ fetch, params, url, depends }) => {
     throw redirect(307, newUrl);
   }
 
-  // Max 5 applications for the preview
-  const applications = await getApplications(
-    fetch,
-    round.id,
-    5,
-    0,
-    round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
-  );
-
-  const existingBallot = round.isVoter ? await getOwnBallot(fetch, round.id) : null;
-
-  let ballotStats: Awaited<ReturnType<typeof getBallotStats>> | null = null;
-
-  if (round.isAdmin) {
-    ballotStats = await getBallotStats(fetch, round.id);
-  }
+  const [existingBallot, ballotStats] = await Promise.all([
+    round.isVoter ? getOwnBallot(fetch, round.id) : null,
+    round.isAdmin ? getBallotStats(fetch, round.id) : null,
+  ]);
 
   return {
     round,
-    applications,
     existingBallot,
     ballotStats,
   };
