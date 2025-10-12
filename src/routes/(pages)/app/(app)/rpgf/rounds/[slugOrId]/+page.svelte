@@ -92,14 +92,14 @@
         ],
       }}
       skeleton={{
-        empty: data.applications.length === 0,
+        empty: data.fiveApplications.length === 0,
         loaded: true,
         emptyStateEmoji: '🫙',
         emptyStateHeadline: 'No applications',
         emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
       }}
     >
-      <RpgfApplicationsTable searchable={false} {round} applications={data.applications} />
+      <RpgfApplicationsTable searchable={false} {round} applications={data.fiveApplications} />
     </Section>
 
     {#if round.isAdmin}
