@@ -9,6 +9,8 @@
   export let isDone: boolean;
   export let until: Date | undefined;
 
+  export let fuzzy: boolean = false;
+
   export let elem: HTMLTimeElement;
 
   export let expanded = false;
@@ -44,13 +46,19 @@
     </button>
   </div>
   <p style:color="var(--color-foreground-level-5)">
-    {!until ? 'Starting ' : ''}
-    {date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    })}<br />
+    {#if fuzzy}
+      {date.toLocaleDateString('en-US', {
+        month: 'long',
+      })} onwards
+    {:else}
+      {!until ? 'Starting ' : ''}
+      {date.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+      })}<br />
+    {/if}
   </p>
 
   <TransitionedHeight negativeMarginWhileCollapsed="-0.25rem" collapsed={!expanded}>

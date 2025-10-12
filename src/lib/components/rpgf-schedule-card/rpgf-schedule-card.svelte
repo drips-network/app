@@ -113,6 +113,7 @@
           isDone={i < activeItemIndex}
           until={timeline[i + 1]?.date}
           onExpandChange={() => updateTimeline()}
+          fuzzy={title === 'Distribution'}
         >
           {#if title === 'Registration'}
             Anyone can submit applications.
