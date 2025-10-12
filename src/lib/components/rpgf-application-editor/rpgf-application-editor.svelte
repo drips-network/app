@@ -253,7 +253,7 @@
 
 <FormField
   type="div"
-  title="Application name*"
+  title="Project name*"
   description="Give your application a memorable name that describes it well."
   disabled={currentStep < Step.ApplicationName}
 >
