@@ -53,7 +53,7 @@
         variant="ghost">History</Button
       >
 
-      {#if isSubmitter}
+      {#if isSubmitter && data.round.state === 'intake'}
         <Button
           href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/edit`}
           icon={Pen}>Edit</Button
