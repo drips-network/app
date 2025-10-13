@@ -121,7 +121,8 @@
     {#if !kycRequest}
       <p>
         The round organizers require applicants to verify their identity with a third-party KYC
-        provider before it can be approved. Click below to get started.
+        provider before rewards can be distributed. We have provided an option to complete your KYC
+        ahead of time below to expedite post-round distribution. Click below to get started.
       </p>
 
       <!-- TODO(rpgf): Learn more link -->
