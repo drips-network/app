@@ -5,6 +5,10 @@ import fetchApplicationFormData from '../../shared/fetch-application-form-data';
 export const load = async ({ parent, url }) => {
   const { application, rpgfUserData, round } = await parent();
 
+  if (round.state !== 'intake') {
+    throw error(403, 'Applications can only be edited during the intake phase');
+  }
+
   if (!rpgfUserData) {
     redirect(307, buildUrl('/app/connect', { backTo: url.pathname, requireRpgfSignIn: 'true' }));
   }
