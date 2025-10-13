@@ -108,6 +108,13 @@
           </Copyable>
         {/if}
       </div>
+
+      {#if kycRequest}
+        <div class="field">
+          <h2 class="typo-header-4">Verification type</h2>
+          <p style:text-transform="capitalize">{kycRequest.kycType}</p>
+        </div>
+      {/if}
     </div>
   {:else}
     <div
