@@ -95,7 +95,7 @@
         empty: data.fiveApplications.length === 0,
         loaded: true,
         emptyStateEmoji: '🫙',
-        emptyStateHeadline: 'No applications',
+        emptyStateHeadline: 'No approved applications',
         emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
       }}
     >
