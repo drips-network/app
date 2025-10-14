@@ -83,9 +83,11 @@
     }
   }
 
-  // Voters can not be updated if voting is already over
+  // Voters can not be updated after voting has started
   $: canUpdateVoters = data.round.state
-    ? data.round.state === 'pending-results' || data.round.state === 'results'
+    ? data.round.state !== 'pending-results' &&
+      data.round.state !== 'results' &&
+      data.round.state !== 'voting'
     : true;
 
   let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
