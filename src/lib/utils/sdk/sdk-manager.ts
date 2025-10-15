@@ -16,9 +16,7 @@ export class SDKManager {
   private walletUnsubscribe?: () => void;
 
   private constructor() {
-    if (browser) {
-      this.initializeWalletSubscription();
-    }
+    this.initializeWalletSubscription();
   }
 
   static getInstance(): SDKManager {
@@ -34,8 +32,6 @@ export class SDKManager {
 
   private initializeWalletSubscription(): void {
     this.walletUnsubscribe = walletStore.subscribe((walletState) => {
-      if (!browser) return;
-
       try {
         const blockchainClient = walletState.connected ? walletState.signer : walletState.provider;
 
