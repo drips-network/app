@@ -16,7 +16,8 @@ import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 import isClaimed from '$lib/utils/orcids/is-claimed';
 import { fetchOrcid } from '$lib/utils/orcids/fetch-orcid';
 import { getClaimingUrlAddress } from '$lib/utils/orcids/verify-orcid';
-import { sdkManager } from '$lib/utils/sdk/sdk-manager';
+import { Forge } from '$lib/utils/sdk/sdk-types';
+import { buildRequestOwnerUpdateTx } from '../build-txs';
 
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
@@ -127,14 +128,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const sdk = sdkManager.sdk;
-  if (!sdk) {
-    return error(500, 'SDK not initialized');
-  }
+  const claimOrcidTx = await buildRequestOwnerUpdateTx(Forge.orcidId, orcid);
 
-  const { claimTx: claimOrcidTx } = await sdk.linkedIdentities.prepareClaimOrcid({
-    orcidId: orcid,
-  });
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),
     target: claimOrcidTx.to ?? unreachable(),
