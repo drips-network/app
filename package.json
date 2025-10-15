@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test:unit": "PUBLIC_NETWORK=1 PUBLIC_JUNCTION_URL=http://dummy.org PUBLIC_INTERNAL_JUNCTION_URL=http://dummy.org vitest run unit",
     "test:e2e": "NODE_OPTIONS='--no-experimental-strip-types' CONTRACTS_TAG=igor-orcid GRAPHQL_API_TAG=refactor-linked-identities ./docker/start-e2e.sh --start-playwright-ui",
-    "test:e2e:headless": "NODE_OPTIONS='--no-experimental-strip-types' ./docker/start-e2e.sh --prod-build",
+    "test:e2e:headless": "NODE_OPTIONS='--no-experimental-strip-types' CONTRACTS_TAG=igor-orcid GRAPHQL_API_TAG=refactor-linked-identities ./docker/start-e2e.sh --prod-build",
     "coverage": "vitest run --coverage",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
