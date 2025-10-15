@@ -83,7 +83,6 @@ export const getOrcid = async (orcidId: string): Promise<RecipientResult> => {
         }
       }
     `,
-    // TODO: yes, for now it is fetched with the actual ORCID iD
     { orcid: orcidId, chain: network.gqlName },
   );
 
