@@ -5,7 +5,7 @@
     type StepComponentEvents,
     type TransactionWrapperOrExternalTransaction,
   } from '$lib/components/stepper/types';
-  import { writable, type Writable } from 'svelte/store';
+  import { type Writable } from 'svelte/store';
   import { type State } from '../../claim-orcid-flow';
   import { gql } from 'graphql-request';
   import unreachable from '$lib/utils/unreachable';
@@ -23,7 +23,12 @@
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { sdkManager } from '$lib/utils/sdk/sdk-manager';
-  import type { ClaimOrcidParams } from '@drips-network/sdk';
+  import {
+    CallerERC2771Domain,
+    CallSignedERC2771Types,
+    getCallerNonce,
+  } from '$lib/utils/sdk/caller/caller';
+  import gaslessStore from '$lib/stores/gasless/gasless.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -154,61 +159,40 @@
         promise: () => waitForOrcidOwnerUpdate(true),
       });
     } else {
-      const progressContext: Writable<
-        Parameters<NonNullable<ClaimOrcidParams['onProgress']>>[0]['step']
-      > = writable('claiming');
-      const claimOrcidPromise = sdk.linkedIdentities.claimOrcid({
+      const { address } = $walletStore;
+      assert(address, 'Wallet address is not defined');
+
+      const { claimTx: claimOrcidTx } = await sdk.linkedIdentities.prepareClaimOrcid({
         orcidId: orcid,
-        waitOptions: { timeoutMs: 120000, pollIntervalMs: 5000 },
-        onProgress: (progressEvent) => {
-          progressContext.set(progressEvent.step);
-        },
       });
 
       transactions.push(
         {
           title: 'Request update of ORCID iD owner',
-          external: true,
           ...fakeProgressBarConfig,
-          promise: () => {
-            return new Promise<void>((resolve) => {
-              progressContext.subscribe((progress) => {
-                if (progress === 'waiting') {
-                  resolve();
-                }
-              });
-            });
+          transaction: claimOrcidTx,
+          gasless: {
+            nonceGetter: () => getCallerNonce(address),
+            ERC2771Data: (nonce) => ({
+              domain: CallerERC2771Domain,
+              types: CallSignedERC2771Types,
+              payload: {
+                sender: $walletStore.address,
+                target: claimOrcidTx.to,
+                data: claimOrcidTx.data,
+                value: '0',
+                nonce,
+                deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+              },
+            }),
           },
+          applyGasBuffer: false,
         },
         {
           title: 'Finalizing verification...',
           external: true,
           ...fakeProgressBarConfig,
-          promise: () => {
-            return new Promise<void>((resolve) => {
-              progressContext.subscribe((progress) => {
-                if (progress === 'configuring') {
-                  resolve();
-                }
-              });
-            });
-          },
-        },
-        {
-          title: 'Set ORCID iD splits',
-          external: true,
-          ...fakeProgressBarConfig,
-          promise: async () => {
-            const result = await claimOrcidPromise;
-            if (result.status !== 'complete') {
-              const failure =
-                (!result.claim.success && result.claim.error) ??
-                (!result.ownership.success && result.ownership.error) ??
-                (!result.splits.success && result.splits.error) ??
-                new Error('ORCID claim incomplete.');
-              throw failure;
-            }
-          },
+          promise: () => waitForOrcidOwnerUpdate(false),
         },
       );
     }
@@ -232,12 +216,41 @@
           return { sdk };
         },
 
-        transactions: ({ sdk }) => {
-          return generateOwnerUpdateTransactions(
+        transactions: async ({ sdk }) => {
+          const txs = await generateOwnerUpdateTransactions(
             sdk,
             $context.gaslessOwnerUpdateTaskId,
             $context.claimableId,
           );
+
+          const { setSplitsTx } = await sdk.linkedIdentities.prepareClaimOrcid({
+            orcidId: $context.claimableId,
+          });
+
+          txs.push({
+            title: 'Set ORCID iD splits',
+            transaction: setSplitsTx,
+            gasless: $gaslessStore
+              ? {
+                  nonceGetter: () => getCallerNonce($walletStore.address!),
+                  ERC2771Data: (nonce) => ({
+                    domain: CallerERC2771Domain,
+                    types: CallSignedERC2771Types,
+                    payload: {
+                      sender: $walletStore.address,
+                      target: setSplitsTx.to,
+                      data: setSplitsTx.data,
+                      value: '0',
+                      nonce,
+                      deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+                    },
+                  }),
+                }
+              : undefined,
+            applyGasBuffer: false,
+          });
+
+          return txs;
         },
 
         after: async () => {

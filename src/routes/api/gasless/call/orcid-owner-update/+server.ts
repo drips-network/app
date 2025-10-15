@@ -132,8 +132,9 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     return error(500, 'SDK not initialized');
   }
 
-  const txs = await sdk.linkedIdentities.prepareClaimOrcid({ orcidId: orcid });
-  const { claimTx: claimOrcidTx } = txs;
+  const { claimTx: claimOrcidTx } = await sdk.linkedIdentities.prepareClaimOrcid({
+    orcidId: orcid,
+  });
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),
     target: claimOrcidTx.to ?? unreachable(),
