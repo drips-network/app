@@ -290,7 +290,6 @@ export default function (
               );
               break;
             }
-            // TODO: Verify!
             case 'AddressDriverAccount': {
               await expect(
                 () =>
