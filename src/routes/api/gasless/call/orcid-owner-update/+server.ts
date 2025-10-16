@@ -85,18 +85,16 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 
   const orcidAccount = isOrcidUnclaimedQueryResponse.orcidLinkedIdentityByOrcid;
   if (!orcidAccount) {
-    return error(400, 'ORCID not found');
+    return error(404, 'ORCID account not found');
   }
 
   if (isClaimed(orcidAccount)) {
-    return error(400, 'Orcid already claimed');
+    return error(400, 'ORCID iD already claimed');
   }
 
   const orcidProfile = await fetchOrcid(orcid, fetch);
-  // TODO: yowza, do we need to think about this more? If we can fetch the account, but not
-  // the profile, what's going on?
   if (!orcidProfile) {
-    return error(400, 'Orcid unfetchable');
+    return error(500, 'Cannot fetch ORCID profile to validate claiming URL.');
   }
 
   const urlAddress = getClaimingUrlAddress(orcidProfile.claimingUrl);
