@@ -114,7 +114,6 @@
           __typename: 'OrcidLinkedIdentity',
           account: {
             __typename: 'RepoDriverAccount',
-            // TODO: calc real accountId?
             accountId: '',
           },
           orcid: orcidInfo.id,
@@ -185,7 +184,7 @@
 
 <StandaloneFlowStepLayout
   headline="Claim your ORCID iD"
-  description="Enter your iD to see if it has claimable funds and start the registration."
+  description="Enter your ORCID iD to see if it has claimable funds and start the registration."
 >
   <TextInput
     bind:value={$context.claimableId}
