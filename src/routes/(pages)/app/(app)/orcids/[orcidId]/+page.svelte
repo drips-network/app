@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hydrate } from '$lib/reviver';
+  import { hydrate } from '$lib/utils/orcids/reviver';
   import type Orcid from '$lib/utils/orcids/entities';
   import type { PageData } from './$types';
   import OrcidProfile from './components/orcid-profile.svelte';
