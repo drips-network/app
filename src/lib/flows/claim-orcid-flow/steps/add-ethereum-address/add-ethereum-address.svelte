@@ -107,8 +107,7 @@
   <p>First add a new link to your profile</p>
   <CodeBox path="Link name" code={CLAIMING_URL_NAME} />
   <p>Then add the link</p>
-  <!-- TODO: fix link overflowing container -->
-  <CodeBox path="Link" code={link} />
+  <CodeBox path="Link" code={link} wrap />
   <Checkbox bind:checked label={checkboxLabel} />
   <svelte:fragment slot="left-actions">
     <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
