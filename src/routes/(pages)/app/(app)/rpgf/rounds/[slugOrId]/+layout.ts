@@ -24,7 +24,7 @@ export const load = async ({ fetch, params, url, depends }) => {
   }
 
   const [existingBallot, ballotStats] = await Promise.all([
-    round.isVoter ? getOwnBallot(fetch, round.id) : null,
+    round.isVoter && round.state === 'voting' ? getOwnBallot(fetch, round.id) : null,
     round.isAdmin ? getBallotStats(fetch, round.id) : null,
   ]);
 
