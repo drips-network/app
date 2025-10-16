@@ -121,32 +121,36 @@
       </div>
     </header>
 
-    {#if !orcidAccount.isClaimed && withdrawableBalances.length > 0}
-      <section class="app-section">
-        <SectionHeader icon={Wallet} label="Claimable funds" />
-        <SectionSkeleton loaded={true}>
-          <div class="unclaimed-funds-section">
-            <UnclaimedOrcidCard
-              {orcidAccount}
-              unclaimedTokensExpandable={false}
-              unclaimedTokensExpanded={withdrawableBalances.length > 0}
-              showClaimButton={!orcidAccount.isClaimed}
-              on:claimButtonClick={() =>
-                goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcidAccount.orcid }))}
-            />
-          </div>
-        </SectionSkeleton>
-      </section>
-    {/if}
-
-    <section id="support">
+    <div class="orcid-profile-content">
       <Developer accountId={orcidAccount?.account.accountId} />
-      <SupportersSection
-        bind:sectionSkeleton={supportersSectionSkeleton}
-        type="ecosystem"
-        supportItems={support}
-      />
-    </section>
+
+      {#if !orcidAccount.isClaimed && withdrawableBalances.length > 0}
+        <section class="app-section">
+          <SectionHeader icon={Wallet} label="Claimable funds" />
+          <SectionSkeleton loaded={true}>
+            <div class="unclaimed-funds-section">
+              <UnclaimedOrcidCard
+                {orcidAccount}
+                unclaimedTokensExpandable={false}
+                unclaimedTokensExpanded={withdrawableBalances.length > 0}
+                showClaimButton={!orcidAccount.isClaimed}
+                on:claimButtonClick={() =>
+                  goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcidAccount.orcid }))}
+              />
+            </div>
+          </SectionSkeleton>
+        </section>
+      {/if}
+
+      <section id="support">
+        <SupportersSection
+          bind:sectionSkeleton={supportersSectionSkeleton}
+          type="ecosystem"
+          supportItems={support}
+        />
+      </section>
+    </div>
+
     <aside>
       <div class="become-supporter-card">
         <SupportCard orcid={orcidAccount} />
@@ -163,6 +167,12 @@
   .orcid-profile {
     display: grid;
     grid-template-columns: 3fr minmax(auto, 18rem);
+    gap: 3rem;
+  }
+
+  .orcid-profile-content {
+    display: flex;
+    flex-direction: column;
     gap: 3rem;
   }
 
@@ -240,6 +250,12 @@
 
     aside {
       grid-row-start: 3;
+      grid-column: span 2;
+    }
+
+    .orcid-profile-content {
+      gap: 1.5rem;
+      grid-row-start: 2;
       grid-column: span 2;
     }
   }
