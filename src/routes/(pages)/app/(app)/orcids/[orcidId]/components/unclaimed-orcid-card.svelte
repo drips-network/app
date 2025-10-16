@@ -123,19 +123,17 @@
             </div>
           {/if}
           <!--  TODO: there are no splittable funds for an ORCID? -->
-          <!-- {#if splittableFunds.length > 0}
+          {#if splittableFunds.length > 0}
             <div class="table-and-title">
               <div class="title">
                 <h5>Splittable</h5>
-                <p class="typo-text-small">
-                  These claimable funds will be split with your maintainers and dependencies.
-                </p>
+                <p class="typo-text-small">These claimable funds will be split to the owner.</p>
               </div>
               <div class="table">
                 <TokenAmountsTable amounts={splittableFunds} />
               </div>
             </div>
-          {/if} -->
+          {/if}
         </div>
       {:else}
         <div class="token-amounts-table">
