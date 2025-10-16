@@ -1,7 +1,6 @@
 import type { Items, Weights } from '$lib/components/list-editor/types';
 import type { SdkSplitsReceiver } from '@drips-network/sdk';
 import assert from '$lib/utils/assert';
-import getLastPathSegment from './get-last-path-segment';
 
 export async function transformItemsToSdkReceivers(
   weights: Weights,

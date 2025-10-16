@@ -240,11 +240,6 @@
         hasAccountId = !!ecosystem.account.accountId;
         donationFlowStepsInput = ecosystem;
         break;
-      // TODO also remove?
-      case !!orcid:
-        hasAccountId = !!orcid.account.accountId;
-        donationFlowStepsInput = orcid;
-        break;
     }
 
     return (

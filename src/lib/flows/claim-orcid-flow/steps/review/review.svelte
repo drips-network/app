@@ -45,7 +45,7 @@
   $: orcidProfile = $context.claimableMetadata ?? unreachable();
   $: orcidAccount = $context.claimableAccount ?? unreachable();
 
-  // For previewing what the project will look like after claiming
+  // For previewing what the ORCID will look like after claiming
   let fakeClaimedOrcid: OrcidProfileHeaderFragment;
   $: fakeClaimedOrcid = {
     __typename: 'OrcidLinkedIdentity',

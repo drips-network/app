@@ -113,7 +113,6 @@ export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
     amount: amountInputValue,
     erc20: tokenAddress as Address,
     tokenDecimals: token.info.decimals,
-    // TODO: integrate SdkOrcidReceiver into SDK
     receiver: sdkReceiver as SdkReceiver,
   });
 
