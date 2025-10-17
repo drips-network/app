@@ -11,10 +11,11 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
-  import importFromCSVSteps, {
-    WEIGHT_FACTOR,
-  } from '$lib/flows/import-from-csv/import-from-csv-steps';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import {
+    createAddItemFunction,
+    createClearItemsFunction,
+  } from '$lib/flows/import-from-csv/csv-import-helpers';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -35,27 +36,8 @@
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
           'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
-        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
-          context.update((c) => {
-            c.dripList.items = {
-              ...c.dripList.items,
-              [key]: item,
-            };
-
-            if (weight) {
-              c.dripList.weights[key] = Math.round(weight * WEIGHT_FACTOR);
-            }
-
-            return c;
-          });
-        },
-        clearItems() {
-          context.update((c) => {
-            c.dripList.items = {};
-            c.dripList.weights = {};
-            return c;
-          });
-        },
+        addItem: createAddItemFunction(context, 'dripList'),
+        clearItems: createClearItemsFunction(context, 'dripList'),
       }),
     );
   }

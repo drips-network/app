@@ -86,6 +86,8 @@ export type AccountId = string;
 export type Items = Record<AccountId, ListEditorItem>;
 export type Weights = Record<AccountId, number>;
 
+export const WEIGHT_FACTOR = 10_000;
+
 export type RecipientResult = {
   accountId: string;
   dripList?: ListEditorDripListFragment;

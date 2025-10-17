@@ -12,11 +12,13 @@
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
   import importFromCSVSteps, {
     DEFAULT_MAX_ENTRIES,
-    WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import {
+    createAddItemFunction,
+    createClearItemsFunction,
+  } from '$lib/flows/import-from-csv/csv-import-helpers';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -57,27 +59,8 @@
         ),
         allowProjects: false,
         allowDripLists: false,
-        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
-          context.update((c) => {
-            c.maintainerSplits.items = {
-              ...c.maintainerSplits.items,
-              [key]: item,
-            };
-
-            if (weight) {
-              c.maintainerSplits.weights[key] = weight * WEIGHT_FACTOR;
-            }
-
-            return c;
-          });
-        },
-        clearItems() {
-          context.update((c) => {
-            c.maintainerSplits.items = {};
-            c.maintainerSplits.weights = {};
-            return c;
-          });
-        },
+        addItem: createAddItemFunction(context, 'maintainerSplits'),
+        clearItems: createClearItemsFunction(context, 'maintainerSplits'),
       }),
     );
   }

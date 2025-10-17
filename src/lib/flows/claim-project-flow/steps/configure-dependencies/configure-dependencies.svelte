@@ -12,11 +12,13 @@
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
-  import type { ListEditorItem, AccountId } from '$lib/components/list-editor/types';
   import importFromCSVSteps, {
     DEFAULT_MAX_ENTRIES,
-    WEIGHT_FACTOR,
   } from '$lib/flows/import-from-csv/import-from-csv-steps';
+  import {
+    createAddItemFunction,
+    createClearItemsFunction,
+  } from '$lib/flows/import-from-csv/csv-import-helpers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,27 +43,8 @@
           'Your CSV file should be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
           'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
-        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
-          context.update((c) => {
-            c.dependencySplits.items = {
-              ...c.dependencySplits.items,
-              [key]: item,
-            };
-
-            if (weight) {
-              c.dependencySplits.weights[key] = weight * WEIGHT_FACTOR;
-            }
-
-            return c;
-          });
-        },
-        clearItems() {
-          context.update((c) => {
-            c.dependencySplits.items = {};
-            c.dependencySplits.weights = {};
-            return c;
-          });
-        },
+        addItem: createAddItemFunction(context, 'dependencySplits'),
+        clearItems: createClearItemsFunction(context, 'dependencySplits'),
       }),
     );
   }

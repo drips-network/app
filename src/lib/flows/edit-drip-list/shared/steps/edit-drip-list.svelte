@@ -43,7 +43,11 @@
   } from '$lib/components/list-editor/types';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
   import importFromCsvSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
-  import type { ListEditorItem, AccountId, Weights } from '$lib/components/list-editor/types';
+  import type { Weights } from '$lib/components/list-editor/types';
+  import {
+    createAddItemFunction,
+    createClearItemsFunction,
+  } from '$lib/flows/import-from-csv/csv-import-helpers';
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import { invalidateAll } from '$app/navigation';
@@ -134,24 +138,8 @@
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
           'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
-        addItem(key: AccountId, item: ListEditorItem, weight: number | undefined) {
-          $state.listEditorConfig.items = {
-            ...$state.listEditorConfig.items,
-            [key]: item,
-          };
-
-          const MAX_WEIGHT = 1000000;
-
-          if (weight) {
-            $state.listEditorConfig.weights[key] = (weight * MAX_WEIGHT) / 100;
-          }
-        },
-        clearItems() {
-          $state.listEditorConfig = {
-            items: {},
-            weights: {},
-          };
-        },
+        addItem: createAddItemFunction(state, 'listEditorConfig'),
+        clearItems: createClearItemsFunction(state, 'listEditorConfig'),
       }),
     );
   }
