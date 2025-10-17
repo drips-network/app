@@ -9,6 +9,7 @@
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import Settings from '../icons/Settings.svelte';
   import Trash from '../icons/Trash.svelte';
+  import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
   export let round: Round;
@@ -36,12 +37,17 @@
     />
   </div>
   <div class="content">
-    <h1 class:unnamed={!round.name}>
-      {round.name || 'Unnamed round'}
-      {#if !round.published}
-        <span class="draft-badge typo-header-5">Draft</span>
-      {/if}
-    </h1>
+    <div style:display="flex" style:flex-direction="column" style:gap="0.5rem">
+      <h1 class:unnamed={!round.name}>
+        {round.name || 'Unnamed round'}
+        {#if !round.published}
+          <span class="draft-badge typo-header-5">Draft</span>
+        {/if}
+      </h1>
+
+      <IdentityBadge address={round.createdByUser.walletAddress} />
+    </div>
+
     {#if interactive}
       <div class="actions">
         <ShareButton

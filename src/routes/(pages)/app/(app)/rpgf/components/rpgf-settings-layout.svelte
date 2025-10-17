@@ -206,7 +206,7 @@
         'content';
       gap: 2rem;
       max-width: 100vw;
-      padding-bottom: 7rem;
+      padding-bottom: 3rem;
     }
 
     .settings-sidenav {
