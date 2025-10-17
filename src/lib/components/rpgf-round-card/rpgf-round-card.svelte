@@ -75,7 +75,7 @@
         />
       </div>
       <h2 class="pixelated">{round.name ?? 'Unnamed round'}</h2>
-      <IdentityBadge address={round.createdByUser.walletAddress} />
+      <IdentityBadge disableLink address={round.createdByUser.walletAddress} />
     </div>
     <div class="details">
       <span class="typo-text-bold">{stateLabel}</span>
