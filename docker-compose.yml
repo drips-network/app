@@ -28,9 +28,17 @@ services:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
+      - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
     volumes:
     - .:/app
     - /app/node_modules/
+    # *) Uncomment the following line and save this file
+    # - ./node_modules/@drips-network/sdk:/app/node_modules/@drips-network/sdk
+    # *) Build the SDK locally, then run
+    # npm link ../path/to/sdk
+    # *) And start the local docker environment with
+    # CONTRACTS_TAG=igor-orcid GRAPHQL_API_TAG=refactor-linked-identities npm run dev:docker
+
     ports:
     - 5173:5173
     depends_on:
@@ -90,6 +98,10 @@ services:
       - DRIPS_API_KEY=123
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - REDIS_URL=redis://redis:6379
+      - ORCID_API_ENDPOINT=${ORCID_API_ENDPOINT-https://pub.sandbox.orcid.org/v3.0}
+      - ORCID_CLIENT_ID=${ORCID_CLIENT_ID}
+      - ORCID_CLIENT_SECRET=${ORCID_CLIENT_SECRET}
+      - ORCID_TOKEN_ENDPOINT=${ORCID_TOKEN_ENDPOINT-https://sandbox.orcid.org/oauth/token}
     ports:
       - '8080:8080'
     depends_on:

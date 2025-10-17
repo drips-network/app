@@ -37,6 +37,14 @@ export async function transformItemsToSdkReceivers(
           weight,
         });
         break;
+
+      case 'orcid':
+        receivers.push({
+          type: 'orcid',
+          orcidId: item.orcid.orcid,
+          weight,
+        });
+        break;
     }
   }
 

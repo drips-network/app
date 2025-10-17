@@ -3,6 +3,7 @@ import type {
   CreateStreamFlowAddressDriverAccountFragment,
   CreateStreamFlowDetailsNftDriverAccountFragment,
   CreateStreamFlowEcosystemAccountFragment,
+  CreateStreamFlowOrcidAccountFragment,
 } from './__generated__/gql.generated';
 import type { CurrentAmountsUserBalanceTimelineItemFragment } from '$lib/utils/__generated__/gql.generated';
 
@@ -25,6 +26,7 @@ export interface CreateStreamFlowState {
     | CreateStreamFlowAddressDriverAccountFragment
     | CreateStreamFlowDetailsNftDriverAccountFragment
     | CreateStreamFlowEcosystemAccountFragment
+    | CreateStreamFlowOrcidAccountFragment
     | undefined;
 }
 
@@ -33,6 +35,7 @@ export default (
     | CreateStreamFlowAddressDriverAccountFragment
     | CreateStreamFlowDetailsNftDriverAccountFragment
     | CreateStreamFlowEcosystemAccountFragment
+    | CreateStreamFlowOrcidAccountFragment
     | undefined,
   selectedTokenAddress: string | undefined,
 ) =>
