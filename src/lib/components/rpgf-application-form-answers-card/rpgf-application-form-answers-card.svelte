@@ -29,12 +29,10 @@
     </AnswerField>
 
     {#each applicationVersion.answers as answer}
-      <AnswerField title={answer.field.label} private={answer.field.private}>
+      <AnswerField title={answer.field.label} isPrivate={answer.field.private}>
         {#if answer.type === 'text'}
-          <ExpandableText let:isLong>
-            <div class="text-wrapper" class:is-long={isLong}>
-              <Markdown content={answer.text} />
-            </div>
+          <ExpandableText>
+            <Markdown content={answer.text} />
           </ExpandableText>
         {:else if answer.type === 'email'}
           <p>{answer.email}</p>
@@ -90,12 +88,6 @@
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-  }
-
-  .text-wrapper.is-long {
-    padding: 0.1rem 0.5rem;
-    background-color: var(--color-foreground-level-1);
-    border-radius: 0.5rem;
   }
 
   p {
