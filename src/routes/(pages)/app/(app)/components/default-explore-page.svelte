@@ -22,6 +22,10 @@
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
   import type { ADripListFragment } from '../drip-lists/components/__generated__/gql.generated';
+  import FeatureCard from './feature-card.svelte';
+  import Button from '$lib/components/button/button.svelte';
+  import ArrowUpRight from '$lib/components/icons/ArrowUpRight.svelte';
+  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
@@ -61,6 +65,41 @@
 </script>
 
 <div class="explore">
+  <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
+    <div
+      style:background-color="var(--color-primary-level-2)"
+      style:color="var(--color-primary-level-6)"
+      style:width="fit-content"
+      style:padding="0.25rem 0.5rem"
+      style:border-radius="2rem 0 2rem 2rem"
+      class="typo-header-5"
+    >
+      LIVE NOW
+    </div>
+
+    <div>
+      <h2 style:margin-bottom="0.25rem">Filecoin RetroPGF-3 on Drips</h2>
+      <p>
+        Filecoin's largest RetroPGF round to date is now live on Drips' new end-to-end RetroPGF
+        platform.
+      </p>
+    </div>
+
+    <svelte:fragment slot="actions">
+      <Button
+        variant="primary"
+        icon={ArrowUpRight}
+        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
+        target="_blank">Check it out</Button
+      >
+      <Button
+        icon={ArrowCounterClockwiseHeart}
+        href="https://www.drips.network/solutions/retro-pgf"
+        target="_blank">About RetroPGF on Drips</Button
+      >
+    </svelte:fragment>
+  </FeatureCard>
+
   <Section
     header={{
       icon: TrophyIcon,
