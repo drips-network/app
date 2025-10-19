@@ -64,6 +64,8 @@
   .content .inner {
     position: relative;
     width: fit-content;
+    max-width: 100%;
+    overflow-wrap: break-word;
   }
 
   .content .inner .wrapper {
