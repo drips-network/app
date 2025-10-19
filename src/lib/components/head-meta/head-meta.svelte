@@ -5,7 +5,7 @@
   export let image = '/assets/share/og-generic.png';
   export let twitterImage = '/assets/share/twitter-summary.png';
   export let description =
-    'Drips is a decentralized toolkit for funding Open-Source with flexible, programmable token splits and streams.';
+    'Drips is the easiest way to fund Open Source in your ecosystem. Fund your dependencies with built-in dependency splitting, run RetroPGF rounds, and achieve any funding mechanism you can dream of.';
 
   export let twitterCardType: 'summary' | 'summary_large_image' =
     twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
