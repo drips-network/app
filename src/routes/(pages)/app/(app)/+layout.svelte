@@ -153,7 +153,7 @@
     position: relative;
     min-height: 100vh;
     width: 100vw;
-    padding: 6.5rem 2.5rem 4rem 2.5rem;
+    padding: 6rem 2.5rem 4rem 2.5rem;
     margin: 0 auto 0 16rem;
   }
 
