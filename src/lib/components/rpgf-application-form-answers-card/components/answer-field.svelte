@@ -22,7 +22,7 @@
     {/if}
   </h2>
 
-  <span class="typo-text">
+  <span class="typo-text content">
     <slot />
   </span>
 </div>
@@ -44,6 +44,10 @@
     width: calc(100% + 2rem);
     margin: 0 -1rem;
     background-color: var(--color-foreground-level-2);
+  }
+
+  .content {
+    color: var(--color-foreground-level-6);
   }
 
   .divider:last-child {
