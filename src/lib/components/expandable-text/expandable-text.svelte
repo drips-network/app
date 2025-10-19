@@ -11,7 +11,7 @@
     if (!expanded) {
       // scroll to the top when collapsing
       window.scrollTo({
-        top: containerElem.offsetTop - 80,
+        top: containerElem.getBoundingClientRect().top + document.documentElement.scrollTop - 80,
       });
     }
   }
