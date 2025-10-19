@@ -78,7 +78,10 @@
       {application.projectName}
       <RpgfApplicationBadge inline hideName hideAvatar {application} />
     </h1>
-    <ProjectBadge project={data.dripsProject} />
+
+    <div>
+      <ProjectBadge project={data.dripsProject} />
+    </div>
 
     {#if data.reviewMode && application.state === 'pending'}
       <ApplicationDecisionButtons
@@ -122,6 +125,11 @@
     padding: 1rem;
     border-radius: 1rem;
     border: 1px solid var(--color-foreground-level-3);
+  }
+
+  .card > * {
+    width: 100%;
+    min-width: 0;
   }
 
   .application {
