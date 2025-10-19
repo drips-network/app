@@ -9,13 +9,30 @@
   import Markdown from '../markdown/markdown.svelte';
   import ExpandableText from '../expandable-text/expandable-text.svelte';
   import AnswerField from './components/answer-field.svelte';
+  import Toggle from '../toggle/toggle.svelte';
+  import storedWritable from '@efstajas/svelte-stored-writable';
+  import z from 'zod';
+  import { browser } from '$app/environment';
 
   export let canSeePrivateFields: boolean;
 
   export let applicationVersion: ApplicationVersion;
+
+  let privateFieldsHidden = storedWritable(
+    'rpgf-application-form-answers-card-private-fields-hidden',
+    z.boolean(),
+    true,
+    !browser,
+  );
 </script>
 
 <RpgfApplicationDetailsCard title="Form answers" key="form-answers">
+  <svelte:fragment slot="right">
+    {#if applicationVersion.answers.some((a) => a.field.private)}
+      <Toggle size="small" label="Hide private" bind:checked={$privateFieldsHidden} />
+    {/if}
+  </svelte:fragment>
+
   <div class="fields">
     {#if !canSeePrivateFields}
       <AnnotationBox type="info">
@@ -29,7 +46,11 @@
     </AnswerField>
 
     {#each applicationVersion.answers as answer}
-      <AnswerField title={answer.field.label} isPrivate={answer.field.private}>
+      <AnswerField
+        title={answer.field.label}
+        isPrivate={answer.field.private}
+        hidden={$privateFieldsHidden && answer.field.private}
+      >
         {#if answer.type === 'text'}
           <ExpandableText>
             <Markdown content={answer.text} />

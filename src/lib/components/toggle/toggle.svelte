@@ -1,14 +1,18 @@
 <script lang="ts">
   export let checked: boolean;
   export let label: string | undefined = undefined;
-  export let size: 'normal' | 'big' = 'normal';
+  export let size: 'small' | 'normal' = 'normal';
   export let disabled: boolean = false;
 
   let focus = false;
 </script>
 
 <label class="toggle {size}" class:disabled>
-  {#if label}<span class="typo-text-bold">{label}</span>{/if}
+  {#if label}<span
+      class="label"
+      class:typo-text-bold={size === 'normal'}
+      class:typo-text-small={size === 'small'}>{label}</span
+    >{/if}
   <input
     tabindex="0"
     type="checkbox"
@@ -26,12 +30,18 @@
   .toggle {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
   }
 
   .toggle.disabled {
     opacity: 0.75;
     pointer-events: none;
+  }
+
+  .label.small {
+    font-weight: 400;
+    font-size: 0.875rem;
   }
 
   input {
