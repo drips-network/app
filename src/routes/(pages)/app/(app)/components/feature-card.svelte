@@ -93,7 +93,7 @@
 
   .actions {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.5rem;
     margin-top: auto;
     flex-wrap: wrap;
   }

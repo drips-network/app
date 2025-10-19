@@ -5,6 +5,7 @@
   import { expoOut } from 'svelte/easing';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import { browser } from '$app/environment';
+  import PulsatingCircle from '../pulsating-circle/pulsating-circle.svelte';
 
   export let round: Round;
 
@@ -79,7 +80,7 @@
 
     const activeItemTop = activeItem.getBoundingClientRect().top;
     const timelineTop = timelineElem.getBoundingClientRect().top;
-    const offsetY = activeItemTop - timelineTop + 2;
+    const offsetY = activeItemTop - timelineTop + 4;
     timelineCircleOffsetY.set(offsetY);
   }
   $: {
@@ -133,7 +134,7 @@
       <div class="timeline" bind:this={timelineElem}>
         <div class="line" />
         <div class="circle-wrapper" style:transform="translateY({$timelineCircleOffsetY}px)">
-          <div class="circle" class:visible={updatedOnce} bind:this={timelineCircle} />
+          <PulsatingCircle visible={updatedOnce} bind:element={timelineCircle} />
         </div>
       </div>
     </div>
@@ -194,40 +195,7 @@
   }
 
   .circle-wrapper {
-    transform: translateY(2px);
-  }
-
-  .circle {
-    height: 1rem;
-    width: 1rem;
-    border: 2px solid var(--color-foreground);
-    background-color: var(--color-primary);
-    border-radius: 50%;
     position: absolute;
     left: calc(40% - 0.5rem);
-    transform-origin: center;
-    animation: pulsing 3s infinite;
-    opacity: 0;
-  }
-
-  .circle.visible {
-    opacity: 1;
-    transition: opacity 0.5s;
-  }
-
-  @keyframes pulsing {
-    0% {
-      box-shadow: 0 0 0 0px var(--color-primary-level-2);
-      transform: scale(1);
-    }
-    10% {
-      transform: scale(0.8);
-    }
-    20% {
-      transform: scale(1);
-    }
-    50% {
-      box-shadow: 0 0 0 0.5rem transparent;
-    }
   }
 </style>

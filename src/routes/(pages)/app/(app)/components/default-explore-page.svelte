@@ -26,6 +26,7 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowUpRight from '$lib/components/icons/ArrowUpRight.svelte';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
+  import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
 
   export let projects: DefaultExplorePageFeaturedProjectFragment[];
   export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
@@ -70,10 +71,14 @@
       style:background-color="var(--color-primary-level-2)"
       style:color="var(--color-primary-level-6)"
       style:width="fit-content"
-      style:padding="0.25rem 0.5rem"
+      style:padding="0.25rem 0.5rem 0.25rem 0.35rem"
       style:border-radius="2rem 0 2rem 2rem"
+      style:display="flex"
+      style:align-items="center"
+      style:gap="0.5rem"
       class="typo-header-5"
     >
+      <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
       LIVE NOW
     </div>
 
