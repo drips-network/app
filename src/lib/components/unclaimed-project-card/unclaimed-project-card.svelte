@@ -75,12 +75,17 @@
 
   /** Show which tokens are collectable / splittable */
   export let detailedTokenBreakdown = false;
+
+  /** Show the project badge with project name */
+  export let showProjectBadge = true;
 </script>
 
 <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
-  {#if project}
+  {#if project && (showProjectBadge || projectMetadata?.description)}
     <div class="basic-info text-left">
-      <ProjectBadge linkToNewTab {project} />
+      {#if showProjectBadge}
+        <ProjectBadge linkToNewTab {project} />
+      {/if}
       {#if projectMetadata?.description}
         <p class="description typo-text">
           {projectMetadata.description}

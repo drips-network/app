@@ -574,6 +574,7 @@
                 unclaimedTokensExpandable={false}
                 unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
                 showClaimButton={repoExists}
+                showProjectBadge={false}
                 on:claimButtonClick={() =>
                   goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
               />
