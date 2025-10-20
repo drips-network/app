@@ -108,7 +108,14 @@ export async function authenticatedRpgfServerCall(
   if (res.status === 400 || res.status === 401) {
     const errorBody = await res.text();
 
-    const message = errorBody ? errorBody : res.status === 400 ? 'Bad Request' : 'Unauthorized';
+    let message;
+    if (errorBody) {
+      message = errorBody;
+    } else if (res.status === 400) {
+      message = 'Bad Request';
+    } else {
+      message = 'Unauthorized';
+    }
 
     throw error(res.status, message);
   }
