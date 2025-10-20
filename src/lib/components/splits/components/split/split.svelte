@@ -21,6 +21,7 @@
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
+  import OrcidBadge from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -107,6 +108,11 @@
               project: filterCurrentChainData(s.project.chainData, undefined, chainOverride),
               outline: true,
             },
+          } as ComponentAndProps;
+        case 'LinkedIdentityReceiver':
+          return {
+            component: OrcidAvatar,
+            props: { size: 'small' },
           } as ComponentAndProps;
       }
     });
@@ -218,9 +224,7 @@
           />
         </PrimaryColorThemer>
       {:else if split.__typename === 'LinkedIdentityReceiver'}
-        <!-- For now a hack since OrcidBadge needs an `OrcidAccount` which does not exist on `LinkedIdentityReceiver` ☹️ -->
-        <OrcidAvatar />
-        {split.linkedIdentity.orcid}
+        <OrcidBadge {chainOverride} orcid={split.linkedIdentity} />
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"

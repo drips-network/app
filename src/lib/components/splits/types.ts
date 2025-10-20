@@ -104,10 +104,17 @@ export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
     weight
     linkedIdentity {
       ... on OrcidLinkedIdentity {
+        chain
+        isClaimed
+        areSplitsValid
         account {
           accountId
         }
         orcid
+        orcidMetadata {
+          givenName
+          familyName
+        }
       }
     }
   }
