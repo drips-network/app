@@ -46,7 +46,7 @@ async function invalidateExplorePageCache(client: RedisClientType) {
 
   if (!client) return;
 
-  const pattern = '*-explore-page:*';
+  const pattern = `${network.name}-explore-page:*`;
 
   for await (const key of client.scanIterator({ MATCH: pattern })) {
     await client.del(key);
