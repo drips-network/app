@@ -20,6 +20,16 @@ export function orcidIdToAccountId(orcidId: string) {
   });
 }
 
+/**
+ * Fetch ORCID profile from the ORCID public API. Subject to anonymous usage limits:
+ * - 12 req/sec
+ * - 40 burst/sec
+ * - 25,000 reads/day (Per IP address)
+ *
+ * @param orcidId The ORCID iD of the profile to fetch.
+ * @param fetch A fetch function
+ * @returns A Orcid instance or null if not found or on error.
+ */
 export async function fetchOrcid(orcidId: string, fetch: typeof global.fetch) {
   const orcidResponse = await fetch(`${PUBLIC_ORCID_API_URL}/v3.0/${orcidId}/record`, {
     method: 'GET',

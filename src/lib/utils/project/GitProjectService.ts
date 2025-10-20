@@ -459,6 +459,18 @@ export default class GitProjectService {
           receivers.push(receiver);
           break;
         }
+        case 'orcid': {
+          const receiver = {
+            sublist: 'dependencies' as const,
+            type: 'orcid' as const,
+            weight: scaledWeight,
+            accountId: accountId,
+            orcidId: item.orcid.orcid,
+          };
+
+          receivers.push(receiver);
+          break;
+        }
       }
     }
 
