@@ -46,6 +46,7 @@
       errors,
     );
   };
+  export let blockedAccountIds: string[] = [];
 
   let uploadForm: HTMLFormElement | undefined = undefined;
   let parsedFile: Array<Array<string>> = [];
@@ -143,6 +144,18 @@
         }
 
         const { accountId, ...rest } = recipientResult;
+
+        // Check if this accountId is blocked (already exists in another list)
+        if (blockedAccountIds.includes(accountId)) {
+          const error = new AddItemSuberror(
+            'This recipient is already in another list',
+            recipient,
+            index + 1,
+          );
+          errors.push(error);
+          continue;
+        }
+
         const listEditorItem = { type: classification.type, ...rest } as ListEditorItem;
         const weight = typeof split === 'undefined' ? undefined : roundToX(split, MAX_DECIMALS);
         addItem(accountId, listEditorItem, weight);
