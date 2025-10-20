@@ -33,9 +33,7 @@ export default class GitHub {
         status === 429 || (status === 403 && message.toLowerCase().includes('rate limit'));
 
       if (isRateLimit) {
-        throw new Error(
-          'GitHub API rate limit exceeded. Please wait about an hour and try again. If you have a GitHub account, consider authenticating to increase your rate limit.',
-        );
+        throw new Error('GitHub API rate limit exceeded. Please wait about an hour and try again.');
       }
       throw error;
     }
@@ -85,9 +83,7 @@ export default class GitHub {
         status === 429 || (status === 403 && message.toLowerCase().includes('rate limit'));
 
       if (isRateLimit) {
-        throw new Error(
-          'GitHub API rate limit exceeded. Please wait about an hour and try again. If you have a GitHub account, consider authenticating to increase your rate limit.',
-        );
+        throw new Error('GitHub API rate limit exceeded. Please wait about an hour and try again.');
       }
 
       throw new Error('FUNDING.json not found.');
