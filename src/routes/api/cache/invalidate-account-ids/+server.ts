@@ -18,6 +18,7 @@ import type {
 } from './queries/__generated__/gql.generated';
 import network from '$lib/stores/wallet/network';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
+import FEATURED_DRIP_LISTS_CONFIG from '../../../(pages)/app/(app)/drip-lists/components/featured-drip-lists-config';
 
 const ENABLE_INVALIDATE_LOGS = true;
 
@@ -34,6 +35,18 @@ async function invalidateAccountCache(accountId: string, client: RedisClientType
   if (!client) return;
 
   const pattern = `*:${accountId}:*`;
+
+  for await (const key of client.scanIterator({ MATCH: pattern })) {
+    await client.del(key);
+  }
+}
+
+async function invalidateExplorePageCache(client: RedisClientType) {
+  log('INVALIDATE EXPLORE PAGE CACHE');
+
+  if (!client) return;
+
+  const pattern = '*-explore-page:*';
 
   for await (const key of client.scanIterator({ MATCH: pattern })) {
     await client.del(key);
@@ -160,6 +173,19 @@ export const POST = async ({ request }) => {
       }
     }),
   );
+
+  // Check if any of the invalidated account IDs are featured on the explore page
+  const allFeaturedDripListIds = (
+    Object.values(FEATURED_DRIP_LISTS_CONFIG) as Array<{ featuredDripListIds?: string[] }>
+  ).flatMap((config) => config.featuredDripListIds ?? []);
+
+  const shouldInvalidateExplorePage = validAccountIds.some((accountId) =>
+    allFeaturedDripListIds.includes(accountId),
+  );
+
+  if (shouldInvalidateExplorePage) {
+    await invalidateExplorePageCache(redis);
+  }
 
   return new Response('OK');
 };
