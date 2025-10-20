@@ -62,6 +62,15 @@ export default class GitHub {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('FUNDING.json not found', error);
+
+      // Check if the error is due to rate limiting
+      const status = (error as { status?: number }).status;
+      if (status === 403 || status === 429) {
+        throw new Error(
+          'GitHub API rate limit exceeded. Please wait about an hour and try again. If you have a GitHub account, consider authenticating to increase your rate limit.',
+        );
+      }
+
       throw new Error('FUNDING.json not found.');
     }
 
