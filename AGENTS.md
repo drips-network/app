@@ -51,3 +51,7 @@ npm run test:e2e:headless
 ```
 
 ... to run E2E tests against the local env (with automatically cleared state). You must first close the dev environment before running this command.
+
+## Linting
+
+Before submitting changes, run `npx lint-staged --concurrent false` and `npm run check`. This will ensure there are no linting or compiler errors.
