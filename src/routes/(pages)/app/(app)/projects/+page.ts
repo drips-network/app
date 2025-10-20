@@ -1,6 +1,7 @@
 import { fetchAndCategorizeProjects } from './components/load-projects';
 import fetchChainStats from '../components/load-chain-stats';
 import network from '$lib/stores/wallet/network';
+import type { ProjectQuery } from './components/__generated__/gql.generated';
 import {
   default as fetchTotalDrippedApproximation,
   totalDrippedPrices as fetchTotalDrippedPrices,
@@ -20,7 +21,9 @@ export const load = async ({ fetch }) => {
   return {
     yourProjects,
     restProjects,
-    featuredProjects: featuredProjects.filter((project) => Boolean(project)),
+    featuredProjects: featuredProjects.filter(
+      (project): project is NonNullable<ProjectQuery['projectById']> => Boolean(project),
+    ),
     chainStats,
     totalDrippedPrices,
     totalDrippedAmounts,
