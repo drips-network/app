@@ -11,6 +11,7 @@
   import { onMount, tick } from 'svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
   import type { AddItemError } from './errors';
+  import { WEIGHT_FACTOR } from './types';
 
   const MAX_WEIGHT = 1000000;
 
@@ -137,7 +138,7 @@
     percentagesManuallyChanged = true;
 
     const newWeights = { ...weights };
-    newWeights[key] = Math.floor((Number(value) / 100) * 1000000);
+    newWeights[key] = Math.floor(Number(value) * WEIGHT_FACTOR);
 
     weights = adjustWeights(newWeights);
   }
