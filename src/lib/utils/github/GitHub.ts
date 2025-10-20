@@ -18,12 +18,27 @@ export default class GitHub {
   }
 
   public async getRepoByOwnerAndName(owner: string, repo: string) {
-    const { data } = await this.octokit.request('GET /repos/{owner}/{repo}', {
-      owner,
-      repo,
-    });
+    try {
+      const { data } = await this.octokit.request('GET /repos/{owner}/{repo}', {
+        owner,
+        repo,
+      });
 
-    return data;
+      return data;
+    } catch (error) {
+      // Check if the error is due to rate limiting
+      const status = (error as { status?: number }).status;
+      const message = (error as Error).message || '';
+      const isRateLimit =
+        status === 429 || (status === 403 && message.toLowerCase().includes('rate limit'));
+
+      if (isRateLimit) {
+        throw new Error(
+          'GitHub API rate limit exceeded. Please wait about an hour and try again. If you have a GitHub account, consider authenticating to increase your rate limit.',
+        );
+      }
+      throw error;
+    }
   }
 
   public async getRepoByUrl(repoUrl: string) {
@@ -65,7 +80,11 @@ export default class GitHub {
 
       // Check if the error is due to rate limiting
       const status = (error as { status?: number }).status;
-      if (status === 403 || status === 429) {
+      const message = (error as Error).message || '';
+      const isRateLimit =
+        status === 429 || (status === 403 && message.toLowerCase().includes('rate limit'));
+
+      if (isRateLimit) {
         throw new Error(
           'GitHub API rate limit exceeded. Please wait about an hour and try again. If you have a GitHub account, consider authenticating to increase your rate limit.',
         );
