@@ -16,11 +16,13 @@ No values in `.env` should be required for running the local dev stack, however 
 
 To run the stack on Windows, [use WSL2 in order to get a UNIX shell](https://learn.microsoft.com/en-us/windows/wsl/install). Make sure Docker is installed on your WSL distribution. The easiest way is to download Docker Desktop for Windows, configure it to use the WSL backend, and make sure to enable the WSL integration for your distro of choice in Docker Desktop -> Resources -> WSL integration -> Enable integration with additional distros. After that, you can use the Docker local environment as described above.
 
-### 🦊 Using MetaMask with the local testnet
+### 🦊 Using MetaMask with the local testnet (or not using a wallet)
 
 Usage of MetaMask is recommended for development. After starting the app with `npm run dev:docker`, click "Connect" and it should automatically prompt you to add the local testnet to MetaMask.
 
 After this, create a new account and import the private key `ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`. This account has a large amount of testnet ETH available, as well as 1000 TEST tokens that you can use with Drips.
+
+If you can't or don't want to set up MetaMask, start the dev environment with `APP_USE_LOCAL_TESTNET_WALLET_STORE=true npm run dev:docker`. This will put the app in a mode in which it doesn't require a wallet, and instead connects directly to the first available test address when clicking `Connect`. In this mode, all transactions and signatures will immediately be accepted by the fake "wallet".
 
 ### 🚮 Clearing the local environment
 
