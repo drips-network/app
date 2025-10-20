@@ -72,4 +72,10 @@
     flex-direction: column;
     gap: 2rem;
   }
+
+  @media (max-width: 767px) {
+    article {
+      padding-top: 0;
+    }
+  }
 </style>

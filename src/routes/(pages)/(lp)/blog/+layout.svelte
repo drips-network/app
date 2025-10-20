@@ -27,7 +27,7 @@
 
   @media (max-width: 577px) {
     .wrapper {
-      padding-top: 4rem;
+      padding-top: 5rem;
     }
   }
 </style>
