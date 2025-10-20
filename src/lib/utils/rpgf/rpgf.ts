@@ -105,20 +105,17 @@ export async function authenticatedRpgfServerCall(
     }
   }
 
-  if (res.status === 401) {
-    // User needs to re-authenticate
-    throw error(401);
+  if (res.status === 400 || res.status === 401) {
+    const errorBody = await res.text();
+
+    const message = errorBody ? errorBody : res.status === 400 ? 'Bad Request' : 'Unauthorized';
+
+    throw error(res.status, message);
   }
 
   if (res.status === 500) {
     // Server error, throw a generic error
     throw error(500, 'Unexpected server error occurred.');
-  }
-
-  if (res.status === 400) {
-    const errorBody = await res.json().catch(() => null);
-    const message = errorBody?.error || 'Bad Request';
-    throw error(400, message);
   }
 
   return res;
@@ -290,21 +287,6 @@ export async function getApplicationHistory(
   );
 
   return applicationVersionSchema.array().parse(await res.json());
-}
-
-export async function patchRound(f = fetch, roundId: string, patchRoundDto: PatchRoundDto) {
-  // strip empty fields
-  const strippedRound = Object.fromEntries(
-    Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
-  );
-
-  //...except customAvatarCid, which can be null
-  strippedRound.customAvatarCid = patchRoundDto.customAvatarCid ?? null;
-
-  const res = await authenticatedRpgfServerCall(`/rounds/${roundId}`, 'PATCH', strippedRound, f);
-
-  const parsed = roundSchema.parse(await res.json());
-  return parsed;
 }
 
 export async function submitApplicationReview(
