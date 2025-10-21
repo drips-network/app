@@ -16,6 +16,7 @@
   import RpgfApplicationFormAnswersCard from '$lib/components/rpgf-application-form-answers-card/rpgf-application-form-answers-card.svelte';
   import RpgfApplicationSubmissionDetailsCard from '$lib/components/rpgf-application-submission-details-card/rpgf-application-submission-details-card.svelte';
   import RpgfApplicationSplitsCard from '$lib/components/rpgf-application-splits-card/rpgf-application-splits-card.svelte';
+  import RpgfApplicationCustomDatasets from '$lib/components/rpgf-application-custom-datasets/rpgf-application-custom-datasets.svelte';
 
   export let data;
   $: round = data.round;
@@ -106,6 +107,8 @@
     {canSeePrivateFields}
     applicationVersion={application.latestVersion}
   />
+
+  <RpgfApplicationCustomDatasets {application} />
 
   <RpgfApplicationSplitsCard project={data.dripsProject} />
 

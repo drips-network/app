@@ -8,11 +8,11 @@
   import { getCoreRowModel } from '@tanstack/svelte-table';
   import Markdown from '../markdown/markdown.svelte';
   import ExpandableText from '../expandable-text/expandable-text.svelte';
-  import AnswerField from './components/answer-field.svelte';
   import Toggle from '../toggle/toggle.svelte';
   import storedWritable from '@efstajas/svelte-stored-writable';
   import z from 'zod';
   import { browser } from '$app/environment';
+  import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
   export let canSeePrivateFields: boolean;
 
@@ -41,12 +41,12 @@
       </AnnotationBox>
     {/if}
 
-    <AnswerField title="Category">
+    <TitleAndValue title="Category">
       {applicationVersion.category.name}
-    </AnswerField>
+    </TitleAndValue>
 
     {#each applicationVersion.answers as answer}
-      <AnswerField
+      <TitleAndValue
         title={answer.field.label}
         isPrivate={answer.field.private}
         hidden={$privateFieldsHidden && answer.field.private}
@@ -98,7 +98,7 @@
             }}
           />
         {/if}
-      </AnswerField>
+      </TitleAndValue>
     {/each}
   </div>
 </RpgfApplicationDetailsCard>
