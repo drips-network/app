@@ -44,7 +44,7 @@
 
   function handleCreate() {
     dispatch('await', {
-      message: 'Creating dataset…',
+      message: 'Updating dataset…',
       promise: async () => {
         await updateCustomDataset(
           undefined,
