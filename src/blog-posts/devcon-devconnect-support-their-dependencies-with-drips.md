@@ -10,8 +10,6 @@ announcementBannerCopy: 'Devcon & Devconnect support open-source dependencies vi
 
 # **Devcon & Devconnect Supporting their Dependencies with Drips**
 
-The Ethereum Foundation team behind **Devcon** and **Devconnect** is using [**Drips**](https://www.drips.network/) to fund the open-source software dependencies that enable their work.
-
 The Devcon team & Drips share a commitment to strengthening the open-source ecosystem that powers the Ethereum Ecosystem, and we’re thrilled to work with them.
 
 ## **Funding in Action: $30,000 to OSS**
