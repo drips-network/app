@@ -6,6 +6,8 @@
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import EmptyState from './empty-state.svelte';
   import DisconnectedState from './disconnected-state.svelte';
+  import type { ComponentProps } from 'svelte';
+  import Button from '../button/button.svelte';
 
   export let loaded = false;
   export let empty = false;
@@ -13,6 +15,7 @@
   export let error = false;
   export let placeholderOutline = true;
   export let horizontalScroll = true;
+  export let overflowAction: (ComponentProps<Button> & { label: string }) | undefined = undefined;
 
   let highlit = false;
 
@@ -103,6 +106,14 @@
             <slot />
           {/if}
         </div>
+
+        {#if overflowAction}
+          <div class="overflow-action">
+            <div style:pointer-events="auto">
+              <Button {...overflowAction}>{overflowAction.label}</Button>
+            </div>
+          </div>
+        {/if}
       {/if}
     </div>
   </TransitionedHeight>
@@ -163,6 +174,24 @@
     border-radius: 1.25rem 0 1.25rem 1.25rem;
   }
 
+  .overflow-action {
+    pointer-events: none;
+    position: absolute;
+    left: 2.5rem;
+    right: 2.5rem;
+    bottom: -1rem;
+    height: 8rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0),
+      var(--color-background) 79%,
+      var(--color-background)
+    );
+  }
+
   @media (max-width: 577px) {
     .section-skeleton {
       margin: 0 -1rem;
@@ -170,6 +199,11 @@
 
     .section-skeleton .inner-wrapper {
       padding: 0 1rem;
+    }
+
+    .overflow-action {
+      left: 1rem;
+      right: 1rem;
     }
   }
 </style>
