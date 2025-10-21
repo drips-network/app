@@ -304,8 +304,4 @@
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
   }
-
-  .list-select-wrapper.min-height {
-    min-height: 14rem;
-  }
 </style>

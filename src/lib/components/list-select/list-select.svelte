@@ -299,12 +299,12 @@
   }
 
   .empty-state {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     align-items: center;
-    color: var(--color-foreground);
+    color: var(--color-foreground-level-5);
     text-align: center;
   }
 
