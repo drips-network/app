@@ -62,7 +62,7 @@
   }
 </script>
 
-<StandaloneFlowStepLayout headline="Create custom dataset">
+<StandaloneFlowStepLayout headline="Edit custom dataset">
   <FormField title="Name*">
     <TextInput
       validationState={nameValidationState}
