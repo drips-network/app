@@ -81,6 +81,7 @@ export type Network = {
   enableEns: boolean;
   ecosystems: boolean;
   retroFunding: DripsRetroFundingConfig;
+  orcids: boolean;
 };
 
 type DripsRetroFundingConfig =
@@ -204,6 +205,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     ecosystems: false,
     retroFunding: { enabled: false },
+    orcids: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -248,6 +250,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     ecosystems: true,
     retroFunding: { enabled: false },
+    orcids: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -304,6 +307,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
           '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
       },
     },
+    orcids: false,
   },
   [31337]: {
     chainId: 31337,
@@ -362,6 +366,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         enabled: false,
       },
     },
+    orcids: true,
   },
   [84532]: {
     chainId: 84532,
@@ -406,6 +411,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     retroFunding: { enabled: false },
     ecosystems: false,
+    orcids: false,
   },
   [314]: {
     chainId: 314,
@@ -473,6 +479,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     ecosystems: false,
+    orcids: false,
   },
   [1088]: {
     chainId: 1088,
@@ -525,6 +532,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     retroFunding: { enabled: false },
     ecosystems: false,
+    orcids: false,
   },
   [10]: {
     chainId: 10,
@@ -577,6 +585,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     retroFunding: { enabled: false },
     ecosystems: false,
+    orcids: false,
   },
 };
 

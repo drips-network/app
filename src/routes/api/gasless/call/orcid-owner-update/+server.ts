@@ -45,6 +45,11 @@ const orcidUnclaimedQuery = gql`
 `;
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
+  // Only allow ORCID claiming on networks where the feature is enabled
+  if (!network.orcids) {
+    return error(404, 'ORCID functionality is not enabled on this network');
+  }
+
   assert(
     GELATO_API_KEY,
     'GELATO_API_KEY is required. Gasless transactions will not work without it.',
