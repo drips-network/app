@@ -2,6 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
 
@@ -25,13 +26,15 @@
     <h1>Your ballot</h1>
   </div>
 
-  <RpgfApplicationsTable
-    voteStep="assign-votes"
-    reviewMode={false}
-    round={data.round}
-    {ballotStore}
-    applications={selectedApplications}
-  />
+  <PaddedHorizontalScroll>
+    <RpgfApplicationsTable
+      voteStep="assign-votes"
+      reviewMode={false}
+      round={data.round}
+      {ballotStore}
+      applications={selectedApplications}
+    />
+  </PaddedHorizontalScroll>
 </div>
 
 <style>

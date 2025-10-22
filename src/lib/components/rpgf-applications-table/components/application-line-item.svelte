@@ -21,6 +21,8 @@
 
   export let excludeFromViewTransition = false;
 
+  export let ellipsis: boolean = false;
+
   let picked = $ballotStore[application.id] !== undefined;
 
   function updateBallot(picked: boolean) {
@@ -85,6 +87,7 @@
 
 <div class="application-line-item" data-testid="application-line-item-{application.id}">
   <a
+    class:ellipsis
     href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
       ? '?backToBallot'
       : ''}"
@@ -126,6 +129,10 @@
     gap: 0.5rem;
     padding: 0.5rem;
     border-bottom: 1px solid var(--color-foreground-level-3);
+  }
+
+  .ellipsis {
+    min-width: 0;
   }
 
   .application-line-item:last-child {

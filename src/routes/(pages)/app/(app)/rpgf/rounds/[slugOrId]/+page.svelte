@@ -82,21 +82,34 @@
       header={{
         label: 'Applications',
         icon: Ledger,
-        actions: [
-          {
-            label: 'View all',
-            href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
-            icon: ArrowRight,
-            disabled: !round.published,
-          },
-        ],
+        actions:
+          data.fiveApplications.length < 5
+            ? [
+                {
+                  label: 'View all',
+                  href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+                  icon: ArrowRight,
+                  disabled: !round.published,
+                },
+              ]
+            : [],
       }}
       skeleton={{
         empty: data.fiveApplications.length === 0,
         loaded: true,
+        horizontalScroll: false,
         emptyStateEmoji: '🫙',
         emptyStateHeadline: 'No approved applications',
         emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
+        overflowAction:
+          data.fiveApplications.length >= 5
+            ? {
+                label: 'View all',
+                href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+                icon: ArrowRight,
+                disabled: !round.published,
+              }
+            : undefined,
       }}
     >
       <RpgfApplicationsTable searchable={false} {round} applications={data.fiveApplications} />

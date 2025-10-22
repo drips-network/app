@@ -1,12 +1,12 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
-  import ApplicationLineItem from './components/application-line-item.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import MagnifyingGlass from '../icons/MagnifyingGlass.svelte';
   import Cross from '../icons/Cross.svelte';
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import ApplicationsTable from './components/applications-table.svelte';
 
   export let searchable = true;
 
@@ -20,6 +20,8 @@
   export let ballotStore: Writable<InProgressBallot> = writable({});
 
   export let excludeFromViewTransition = false;
+
+  export let horizontalScroll = false;
 
   let searchQuery = '';
 
@@ -44,34 +46,34 @@
   </div>
 {/if}
 
-<PaddedHorizontalScroll>
-  <div class="wrapper">
-    <div class="table-wrapper">
-      {#if includesResults}
-        <div class="applications-table-header">
-          <h5>Project name</h5>
-          <h5>Vote result</h5>
-        </div>
-      {/if}
-      <div class="applications-table">
-        {#each filteredApplications as application (application.id)}
-          <ApplicationLineItem
-            {voteStep}
-            {ballotStore}
-            {reviewMode}
-            {round}
-            {application}
-            {excludeFromViewTransition}
-            bind:decision={decisions[application.id]}
-          />
-        {/each}
-        {#if applications.length === 0}
-          <div class="empty">Nothing to see here</div>
-        {/if}
-      </div>
-    </div>
-  </div>
-</PaddedHorizontalScroll>
+{#if horizontalScroll}
+  <PaddedHorizontalScroll>
+    <ApplicationsTable
+      {includesResults}
+      {applications}
+      {filteredApplications}
+      {voteStep}
+      {ballotStore}
+      {reviewMode}
+      {round}
+      {excludeFromViewTransition}
+      {decisions}
+    />
+  </PaddedHorizontalScroll>
+{:else}
+  <ApplicationsTable
+    {includesResults}
+    {applications}
+    {filteredApplications}
+    {voteStep}
+    {ballotStore}
+    {reviewMode}
+    {round}
+    {excludeFromViewTransition}
+    {decisions}
+    ellipsis={true}
+  />
+{/if}
 
 <style>
   .search-bar {
@@ -95,37 +97,5 @@
     color: var(--color-foreground);
     width: 100%;
     outline: none;
-  }
-
-  .wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .applications-table-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 0.5rem;
-  }
-
-  .table-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .applications-table {
-    display: flex;
-    flex-direction: column;
-    border-radius: 1rem 0 1rem 1rem;
-    border: 1px solid var(--color-foreground-level-3);
-    overflow: hidden;
-  }
-
-  .empty {
-    padding: 5rem 1rem;
-    text-align: center;
-    color: var(--color-foreground-level-5);
   }
 </style>
