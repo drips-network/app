@@ -66,8 +66,6 @@ At Drips, our mission is simple: **we’re committed to helping organizations su
 
 With Drips teams can stream funds \- one-off or continuous \- to projects they care about, and as those projects map their dependencies, support drips downstream to the ecosystem projects that need it most. It’s predictable for maintainers, auditable for organizations, and aligned with Ethereum’s open-source ethos.
 
-##
-
 ## See you in Buenos Aires\!
 
 The next [**Devconnect**](https://devconnect.org/) is in **Buenos Aires this November**, and it will be the first-ever Ethereum World’s Fair. We can’t wait to see what the Devconnect team has in store for us\!
