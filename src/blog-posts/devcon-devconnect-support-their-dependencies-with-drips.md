@@ -16,8 +16,9 @@ Beyond speakers, venues, and schedules, Devcon has a layer of open-source tools 
 
 Using Drips, a decentralised platform for funding open source projects, the Ethereum Foundation events team has allocated $30,000 support to the tools and libraries they depend on.
 
-"Open-source software forms the backbone of our modern, digital world and is critical to the success and sustainability of the Ethereum ecosystem. With this initiative we want to support the open-source projects, and its maintainers that we're depending on for the success of Devcon."
-— _Wesley, Devcon/nect team_
+> "Open-source software forms the backbone of our modern, digital world and is critical to the success and sustainability of the Ethereum ecosystem. With this initiative we want to support the open-source projects, and its maintainers that we're depending on for the success of Devcon."
+>
+> — _Wesley, Devcon/nect team_
 
 ## How Each Dependency Helps
 
@@ -51,8 +52,9 @@ Funding these tools strengthens the commons and recognizes the open source build
 
 At Drips, our mission is simple: **we’re committed to helping organizations sustain Ethereum** by funding the software they rely on continuously, transparently, and in a way that’s sustainable.
 
-“The Ethereum Foundation and Devcon have always led the way in exploring new ways to fund open-source software. By using Drips, their support cascades through the network of projects that make their work possible”
-— _Eleftherios Diakomichalis, Founder, Drips_
+> “The Ethereum Foundation and Devcon have always led the way in exploring new ways to fund open-source software. By using Drips, their support cascades through the network of projects that make their work possible”
+>
+> — _Eleftherios Diakomichalis, Founder, Drips_
 
 With Drips teams can stream funds \- one-off or continuous \- to projects they care about, and as those projects map their dependencies, support drips downstream to the ecosystem projects that need it most. It’s predictable for maintainers, auditable for organizations, and aligned with Ethereum’s open-source ethos.
 
