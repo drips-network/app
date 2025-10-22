@@ -170,7 +170,12 @@
   function handleWithoutAttest() {
     dispatch('await', {
       promise: async () => {
-        await sendApplication();
+        if (isUpdateForApplication) {
+          await sendApplicationUpdate();
+        } else {
+          await sendApplication();
+        }
+
         await invalidate('rpgf:round:applications');
         clearLocallyStoredApplication(roundId, userId);
       },
