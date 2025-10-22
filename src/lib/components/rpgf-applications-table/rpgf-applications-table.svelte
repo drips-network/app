@@ -57,7 +57,7 @@
       {reviewMode}
       {round}
       {excludeFromViewTransition}
-      {decisions}
+      bind:decisions
     />
   </PaddedHorizontalScroll>
 {:else}
@@ -70,7 +70,7 @@
     {reviewMode}
     {round}
     {excludeFromViewTransition}
-    {decisions}
+    bind:decisions
     ellipsis={true}
   />
 {/if}
