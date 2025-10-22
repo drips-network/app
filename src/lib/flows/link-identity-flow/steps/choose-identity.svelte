@@ -9,6 +9,7 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
   import { createEventDispatcher } from 'svelte';
+  import network from '$lib/stores/wallet/network';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -40,9 +41,13 @@
       </div>
     </svelte:fragment>
   </StepHeader>
-  <Button variant="muted" size="large" on:click={launchSpecificIdentityFlow}>
-    <Orcid style="fill: var(--color-foreground); width: 2rem;" />ORCID</Button
-  >
+  {#if network.orcids}
+    <Button variant="muted" size="large" on:click={launchSpecificIdentityFlow}>
+      <Orcid style="fill: var(--color-foreground); width: 2rem;" />ORCID</Button
+    >
+  {:else}
+    <p class="disabled-notice">Linking ORCIDs is not enabled on {network.label}.</p>
+  {/if}
   <p>More types of identities coming soon.</p>
 </StepLayout>
 
