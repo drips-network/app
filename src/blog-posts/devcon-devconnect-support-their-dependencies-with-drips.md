@@ -8,13 +8,17 @@ author: 'becca'
 announcementBannerCopy: 'Devcon & Devconnect support open-source dependencies on Drips'
 ---
 
+<script>
+import BlogProjectSplitsCard from "$lib/components/blog/article-layout/components/blog-project-splits-card.svelte";
+</script>
+
 The Devcon team & Drips share a commitment to strengthening the open-source ecosystem that powers the Ethereum Ecosystem, and we’re thrilled to work with them.
 
 ## Funding in Action: $30,000 to OSS
 
 Beyond speakers, venues, and schedules, Devcon has a layer of open-source tools that enable planning, production, streaming and comms. For the team it’s simple: if Devcon benefits from these tools, the people who build and maintain them should benefit too.
 
-Using Drips, a decentralised platform for funding open source projects, the Ethereum Foundation events team has allocated $30,000 support to the tools and libraries they depend on.
+Using Drips, a decentralised platform for funding open source projects, **the Ethereum Foundation events team has allocated $30,000 support to the tools and libraries they depend on**.
 
 > "Open-source software forms the backbone of our modern, digital world and is critical to the success and sustainability of the Ethereum ecosystem. With this initiative we want to support the open-source projects, and its maintainers that we're depending on for the success of Devcon."
 >
@@ -22,13 +26,17 @@ Using Drips, a decentralised platform for funding open source projects, the Ethe
 
 ## How Each Dependency Helps
 
-To put that principle into practice, the Devcon team has created **two Drip Lists**:
+To put that principle into practice, the Devcon team has claimed and funded two of its repos on Drips, each splitting all funds to dependencies:
 
 1. [**Open-source products, tools, and projects used to organize Devcon**](https://www.drips.network/app/projects/github/efdevcon/tools?exact%20)
-   This list funds the operational stack privacy-first collaboration tools, live-streaming infrastructure, content pipelines, analytics, and the bridges that keep conversations flowing.
+   This project funds the operational stack privacy-first collaboration tools, live-streaming infrastructure, content pipelines, analytics, and the bridges that keep conversations flowing.
+
+<BlogProjectSplitsCard projectId="80921553529402819944048027742961662227947926488453030273313562165248" />
 
 2. [**Main repository for Devcon-related apps**](https://www.drips.network/app/projects/github/efdevcon/monorepo?exact)
    This list supports the EF’s own Devcon apps and services \- the code that’s shipped to deliver an excellent attendee experience.
+
+<BlogProjectSplitsCard projectId="80921553529402819944048027133174347042275421972850711084549890113536" />
 
 A quick look at the key dependencies:
 

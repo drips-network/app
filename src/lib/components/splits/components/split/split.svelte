@@ -42,7 +42,7 @@
 
   let element: HTMLDivElement;
 
-  let groupExpanded = false;
+  export let groupExpanded = false;
 
   $: primaryColor = element
     ? getComputedStyle(element).getPropertyValue('--color-primary')
@@ -130,6 +130,7 @@
 
   async function toggleGroup() {
     if (!groupElem) return;
+    if (!groupsExpandable) return;
     if (split.__typename !== 'SplitGroup' || split.list.length === 0) return;
 
     groupExpanded = !groupExpanded;
@@ -334,7 +335,8 @@
   }
 
   .arrow .percentage.is-nested {
-    background: linear-gradient(45deg, var(--color-primary-level-2), var(--color-primary-level-2)),
+    background:
+      linear-gradient(45deg, var(--color-primary-level-2), var(--color-primary-level-2)),
       linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
@@ -343,11 +345,8 @@
   }
 
   .draft .arrow .percentage.is-nested {
-    background: linear-gradient(
-        45deg,
-        var(--color-foreground-level-2),
-        var(--color-foreground-level-2)
-      ),
+    background:
+      linear-gradient(45deg, var(--color-foreground-level-2), var(--color-foreground-level-2)),
       linear-gradient(45deg, var(--color-background), var(--color-background));
   }
 
