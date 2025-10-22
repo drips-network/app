@@ -8,11 +8,11 @@ author: 'becca'
 announcementBannerCopy: 'Devcon & Devconnect support open-source dependencies on Drips'
 ---
 
-# **Devcon & Devconnect Supporting their Dependencies with Drips**
+# Devcon & Devconnect Supporting their Dependencies with Drips
 
 The Devcon team & Drips share a commitment to strengthening the open-source ecosystem that powers the Ethereum Ecosystem, and we’re thrilled to work with them.
 
-## **Funding in Action: $30,000 to OSS**
+## Funding in Action: $30,000 to OSS
 
 Beyond speakers, venues, and schedules, Devcon has a layer of open-source tools that enable planning, production, streaming and comms. For the team it’s simple: if Devcon benefits from these tools, the people who build and maintain them should benefit too.
 
@@ -21,7 +21,7 @@ Using Drips, a decentralised platform for funding open source projects, the Ethe
 "Open-source software forms the backbone of our modern, digital world and is critical to the success and sustainability of the Ethereum ecosystem. With this initiative we want to support the open-source projects, and its maintainers that we're depending on for the success of Devcon."
 — _Wesley, Devcon/nect team_
 
-## **How Each Dependency Helps**
+## How Each Dependency Helps
 
 To put that principle into practice, the Devcon team has created **two Drip Lists**:
 
@@ -49,7 +49,7 @@ Together, they make up part of the technical stack supporting Devcon’s infrast
 
 Funding these tools strengthens the commons and recognizes the open source builders who keep things running.
 
-## **Drips & Devcon: A shared Open Source Ethos**
+## Drips & Devcon: A shared Open Source Ethos
 
 At Drips, our mission is simple: **we’re committed to helping organizations sustain Ethereum** by funding the software they rely on continuously, transparently, and in a way that’s sustainable.
 
@@ -60,7 +60,7 @@ With Drips teams can stream funds \- one-off or continuous \- to projects they c
 
 ##
 
-## **See you in Buenos Aires\!**
+## See you in Buenos Aires\!
 
 The next [**Devconnect**](https://devconnect.org/) is in **Buenos Aires this November**, and it will be the first-ever Ethereum World’s Fair. We can’t wait to see what the Devconnect team has in store for us\!
 
