@@ -1,5 +1,5 @@
 ---
-title: 'Devcon & Devconnect Supporting their Dependencies with Drips'
+title: 'Devcon & Devconnect Support their Dependencies with Drips'
 date: '2025-10-21'
 coverImage: '/assets/blog-images/devcon-devconnect-support-their-dependencies-with-drips.jpg'
 coverImageAlt: 'Drippy on stage at Devcon presenting supported dependencies.'
