@@ -1,6 +1,7 @@
 import { get, writable } from 'svelte/store';
 import { createAddItemFunction, createClearItemsFunction } from '../csv-import-helpers';
-import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
+import type { ListEditorItem } from '$lib/components/list-editor/types';
+import type { AccountId } from '$lib/utils/common-types';
 import { toBigInt } from 'ethers';
 import { parseFile } from '../parse-upload';
 import splitsUnderflow from './data/splits-underflow.csv?raw';
