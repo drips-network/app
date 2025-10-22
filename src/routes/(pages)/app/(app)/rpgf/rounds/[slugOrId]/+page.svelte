@@ -97,6 +97,7 @@
       skeleton={{
         empty: data.fiveApplications.length === 0,
         loaded: true,
+        horizontalScroll: false,
         emptyStateEmoji: '🫙',
         emptyStateHeadline: 'No approved applications',
         emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,

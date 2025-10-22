@@ -123,6 +123,7 @@
     {round}
     {ballotStore}
     applications={data.allApplications}
+    horizontalScroll
   />
 </div>
 
