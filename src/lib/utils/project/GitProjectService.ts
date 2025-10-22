@@ -9,7 +9,6 @@ import type { repoDriverAccountMetadataParser } from '../metadata/schemas';
 import { Driver, Forge } from '$lib/graphql/__generated__/base-types';
 import GitHub from '../github/GitHub';
 import { Octokit } from '@octokit/rest';
-import type { Items, Weights } from '$lib/components/list-editor/types';
 import { hexlify, toBigInt, toUtf8Bytes } from 'ethers';
 import type { OxString } from '../sdk/sdk-types';
 import {
@@ -27,11 +26,7 @@ import {
   executeRepoSubAccountDriverReadMethod,
   populateRepoSubAccountDriverWriteTx,
 } from '../sdk/repo-sub-account-driver/repo-sub-account-driver';
-
-interface ListEditorConfig {
-  items: Items;
-  weights: Weights;
-}
+import type { ListEditorConfig } from '$lib/components/list-editor/types';
 
 export default class GitProjectService {
   private _github!: GitHub;
@@ -459,6 +454,18 @@ export default class GitProjectService {
               item.project.source.repoName,
               item.project.source.ownerName,
             ),
+          };
+
+          receivers.push(receiver);
+          break;
+        }
+        case 'orcid': {
+          const receiver = {
+            sublist: 'dependencies' as const,
+            type: 'orcid' as const,
+            weight: scaledWeight,
+            accountId: accountId,
+            orcidId: item.orcid.orcid,
           };
 
           receivers.push(receiver);

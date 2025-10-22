@@ -4,7 +4,7 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' =
+  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' | 'muted' =
     'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
@@ -153,6 +153,10 @@
   }
 
   .button .inner:not(.ghost) {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
+  }
+
+  .button .inner.muted {
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 

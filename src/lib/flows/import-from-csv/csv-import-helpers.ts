@@ -1,4 +1,5 @@
-import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
+import type { ListEditorItem } from '$lib/components/list-editor/types';
+import type { AccountId } from '$lib/utils/common-types';
 import { WEIGHT_FACTOR } from '$lib/components/list-editor/types';
 import type { Writable } from 'svelte/store';
 import type { Items, Weights } from '$lib/components/list-editor/types';
