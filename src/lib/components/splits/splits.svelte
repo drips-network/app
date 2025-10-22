@@ -10,6 +10,7 @@
 
   /** Set to false to hide the chevron next to split groups. */
   export let groupsExpandable = true;
+  export let startExpanded = false;
 
   export let draft = false;
 
@@ -50,6 +51,7 @@
   {#each sortedList as listItem, index}
     <li class="split">
       <SplitComponent
+        groupExpanded={startExpanded}
         disableTooltip={disableTooltips}
         disableLink={disableLinks}
         {groupsExpandable}
