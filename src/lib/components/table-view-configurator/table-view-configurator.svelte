@@ -1,13 +1,16 @@
 <script
   lang="ts"
-  generics="TSortByOptions extends { [value: string]: string | null }, TFilterOptions extends { [value: string]: string | null }"
+  generics="TSortByOptions extends _TDropdownOptions, TFilterOptions extends _TDropdownOptions"
 >
   import Download from '../icons/Download.svelte';
+  import FileCSV from '../icons/FileCSV.svelte';
+  import FileXLSX from '../icons/FileXLSX.svelte';
   import Filter from '../icons/Filter.svelte';
   import SortMostToLeast from '../icons/SortMostToLeast.svelte';
   import Spinner from '../spinner/spinner.svelte';
-  import MiniButton from './components/mini-button.svelte';
-  import MiniDropdown from './components/mini-dropdown.svelte';
+  import MiniDropdown, {
+    type TDropdownOptions as _TDropdownOptions,
+  } from './components/mini-dropdown.svelte';
 
   export let sortByOptions: TSortByOptions;
   export let sortBy: string | null = null;
@@ -19,7 +22,7 @@
 
   export let el: HTMLDivElement | undefined = undefined;
 
-  export let onDownload: (() => void) | undefined = undefined;
+  export let onDownload: ((filetype: 'csv' | 'xlsx') => void) | undefined = undefined;
 </script>
 
 <div class="table-view-configurator" bind:this={el}>
@@ -28,7 +31,19 @@
   {/if}
 
   {#if onDownload}
-    <MiniButton label="Download CSV" icon={Download} on:click={onDownload} />
+    <MiniDropdown
+      label="Download"
+      icon={Download}
+      options={{
+        csv: { label: 'CSV', icon: FileCSV },
+        xlsx: { label: 'Excel (XLSX)', icon: FileXLSX },
+      }}
+      disabled={loading}
+      onOptionClick={(key, selectFn) => {
+        onDownload?.(key);
+        if (!onDownload) selectFn();
+      }}
+    />
 
     <div class="vertical-divider" />
   {/if}

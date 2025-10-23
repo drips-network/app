@@ -304,7 +304,8 @@ test.describe('rounds', () => {
       await page.getByRole('link', { name: 'View all' }).first().click();
 
       // download the csv
-      await page.getByRole('button', { name: 'Download CSV' }).click();
+      await page.getByRole('button', { name: 'Open Download dropdown' }).click();
+      await page.getByRole('button', { name: 'CSV' }).click();
       const download = await page.waitForEvent('download');
 
       const fileName = workerUniqueString(testInfo, 'export-user2') + '.csv';

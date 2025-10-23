@@ -12,7 +12,7 @@
   import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import buildUrl from '$lib/utils/build-url.js';
   import downloadUrl from '$lib/utils/download-url.js';
-  import { getApplicationsCsv } from '$lib/utils/rpgf/rpgf.js';
+  import { getApplicationsCsv, getApplicationsXlsx } from '$lib/utils/rpgf/rpgf.js';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
@@ -20,13 +20,21 @@
   $: round = data.round;
   $: ballotStore = data.ballot;
 
-  async function handleDownload() {
-    const csvContent = await getApplicationsCsv(undefined, round.id);
+  async function handleDownload(format: 'csv' | 'xlsx') {
+    const content: Blob | string =
+      format === 'csv'
+        ? await getApplicationsCsv(undefined, round.id)
+        : await getApplicationsXlsx(undefined, round.id);
 
-    downloadUrl(
-      URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' })),
-      `applications-${round.urlSlug}.csv`,
-    );
+    const fileType =
+      format === 'csv'
+        ? 'text/csv'
+        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+    const fileName =
+      format === 'csv' ? `applications-${round.urlSlug}.csv` : `applications-${round.urlSlug}.xlsx`;
+
+    downloadUrl(URL.createObjectURL(new Blob([content], { type: fileType })), fileName);
   }
 
   let selectedSortBy = data.sortByParam;
@@ -99,16 +107,23 @@
       <TableViewConfigurator
         bind:el={tableConfiguratorEl}
         sortByOptions={{
-          name: 'Name',
-          createdAt: 'Created at',
-          allocation: round.isAdmin || round.resultsPublished ? 'Allocation amount' : null,
+          name: { label: 'Project name' },
+          createdAt: { label: 'Created at' },
+
+          ...(round.isAdmin || round.resultsPublished
+            ? { allocation: { label: 'Allocation amount' } }
+            : null),
         }}
         bind:sortBy={selectedSortBy}
         filterOptions={{
-          own: data.rpgfUserData ? 'My applications' : null,
-          pending: 'Pending',
-          approved: 'Approved',
-          ...Object.fromEntries(data.categories.map((cat) => [`cat-${cat.id}`, cat.name])),
+          ...(data.rpgfUserData ? { own: { label: 'My applications' } } : null),
+
+          pending: { label: 'Pending' },
+          approved: { label: 'Approved' },
+
+          ...Object.fromEntries(
+            data.categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }]),
+          ),
         }}
         bind:filterBy={selectedFilter}
         onDownload={handleDownload}

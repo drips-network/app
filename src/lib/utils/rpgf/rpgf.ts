@@ -279,6 +279,21 @@ export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<
   return await res.text();
 }
 
+export async function getApplicationsXlsx(f = fetch, roundSlug: string): Promise<Blob> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/applications?format=xlsx`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  if (!res.ok) {
+    throw new Error(`${res.status} - Failed to fetch applications XLSX: ${res.statusText}`);
+  }
+
+  return await res.blob();
+}
+
 export async function getApplication(
   f = fetch,
   roundId: string,
