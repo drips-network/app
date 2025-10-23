@@ -103,7 +103,7 @@
       aria-labelledby="select-button-{ariaSlug}"
       bind:this={dropdownElem}
     >
-      {#each Object.entries(options).filter((v) => v[1]) as [key, item]}
+      {#each Object.entries(options) as [key, item]}
         <li
           role="option"
           aria-selected={value === key}
