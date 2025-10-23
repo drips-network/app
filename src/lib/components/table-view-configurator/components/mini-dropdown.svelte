@@ -1,8 +1,18 @@
-<script lang="ts" generics="TOptions extends { [value: string]: string | null }">
+<script lang="ts" context="module">
+  import type { ComponentType } from 'svelte';
+
+  export type TDropdownOption = {
+    icon?: ComponentType;
+    label: string;
+  };
+
+  export type TDropdownOptions = { [value: string]: TDropdownOption };
+</script>
+
+<script lang="ts" generics="TOptions extends TDropdownOptions">
   import { fly } from 'svelte/transition';
 
   import Check from '$lib/components/icons/Check.svelte';
-  import type { ComponentType } from 'svelte';
   import MiniButton from './mini-button.svelte';
 
   export let icon: ComponentType;
@@ -20,11 +30,14 @@
 
   export let disabled = false;
 
+  export let onOptionClick: ((key: keyof TOptions, selectFn: () => void) => void) | undefined =
+    undefined;
+
   function handleClick() {
     open = !open;
   }
 
-  function handleOptionClick(key: keyof TOptions) {
+  function selectFn(key: keyof TOptions) {
     if (allowNull && key === value) {
       value = null;
     } else {
@@ -32,6 +45,15 @@
     }
 
     open = false;
+  }
+
+  function handleOptionClick(key: keyof TOptions) {
+    if (onOptionClick) {
+      onOptionClick(key, () => selectFn(key));
+      return;
+    }
+
+    selectFn(key);
   }
 
   let dropdownElem: HTMLUListElement | undefined = undefined;
@@ -81,7 +103,7 @@
       aria-labelledby="select-button-{ariaSlug}"
       bind:this={dropdownElem}
     >
-      {#each Object.entries(options).filter((v) => !!v[1]) as [key, label]}
+      {#each Object.entries(options) as [key, item]}
         <li
           role="option"
           aria-selected={value === key}
@@ -93,8 +115,12 @@
             }
           }}
         >
+          {#if item.icon}
+            <svelte:component this={item.icon} style="fill: var(--color-foreground)" />
+          {/if}
+
           <button>
-            {label}
+            {item.label}
           </button>
 
           <div class="checkmark" style:opacity={value === key ? '1' : '0'}><Check /></div>
