@@ -15,6 +15,9 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import unreachable from '$lib/utils/unreachable';
+  import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
+  import File from '../icons/File.svelte';
+  import rpgfSpreadsheetVoteFlowSteps from '$lib/flows/rpgf-spreadsheet-vote-flow/rpgf-spreadsheet-vote-flow-steps';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
@@ -48,7 +51,7 @@
   $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
 
   async function handleSubmitBallot() {
-    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round, previouslyCastBallot));
+    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
   }
 </script>
 
@@ -108,7 +111,7 @@
         {/if}
       </div>
 
-      <Divider />
+      <Divider sideMargin={-1} />
     {/if}
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications">
@@ -131,6 +134,7 @@
           <p class="typo-text-small">
             Use this step to decide on which projects you believe are worthy of funding.
           </p>
+          <p class="typo-text-small">Alternatively, you can vote by uploading a spreadsheet.</p>
         </div>
 
         <div class="actions">
@@ -143,11 +147,22 @@
             href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
             >Continue to assign votes</Button
           >
+
+          <OrDivider />
+
+          <Button
+            icon={File}
+            href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+            on:click={(e) => {
+              e.preventDefault();
+              modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+            }}>Vote using spreadsheet</Button
+          >
         </div>
       {/if}
     </a>
 
-    <Divider />
+    <Divider sideMargin={-1} />
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot">
       <div class="step-headline" class:active={voteStep === 'assign-votes'}>
@@ -168,7 +183,12 @@
           <div class="assignment-progress-bar">
             <div class="progress-bar" style:width="{percentageOfVotesAssigned * 100}%"></div>
           </div>
-          <div style:margin-top="1rem" style:display="flex" style:flex-direction="column">
+          <div
+            style:margin-top="1rem"
+            style:display="flex"
+            style:flex-direction="column"
+            style:gap="0.5rem"
+          >
             <Button
               size="large"
               icon={Proposals}
@@ -185,6 +205,22 @@
                 Submit your ballot
               {/if}
             </Button>
+
+            <OrDivider />
+
+            <Button
+              icon={File}
+              href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+              on:click={(e) => {
+                e.preventDefault();
+                modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+              }}
+              >{#if previouslyCastBallot}
+                Update using spreadsheet
+              {:else}
+                Vote using spreadsheet
+              {/if}</Button
+            >
           </div>
         </div>
       {/if}
