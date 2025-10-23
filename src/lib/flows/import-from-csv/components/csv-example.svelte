@@ -1,7 +1,7 @@
 <script lang="ts">
   import { DEFAULT_CSV_HEADERS } from '../import-from-csv-steps';
 
-  export let caption: string | undefined;
+  export let caption: string | undefined = undefined;
   export let headers: Array<string> = DEFAULT_CSV_HEADERS;
   export let data: Array<Array<unknown>> = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
@@ -32,7 +32,7 @@
     <tbody>
       {#if data}
         {#each data as row}
-          <tr>
+          <tr class="typo-text">
             {#each row as column}
               <td>{column}</td>
             {/each}

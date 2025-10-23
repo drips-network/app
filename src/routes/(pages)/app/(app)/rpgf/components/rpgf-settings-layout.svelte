@@ -13,6 +13,7 @@
   import ScrollableTabs from '$lib/components/scrollable-tabs/scrollable-tabs.svelte';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import File from '$lib/components/icons/File.svelte';
+  import Server from '$lib/components/icons/Server.svelte';
 
   export let round: Round;
   export let amountOfVoters: number;
@@ -90,6 +91,13 @@
       backgroundOnActive
     />
     <SidenavItem
+      label="Custom datasets"
+      href="{settingsBaseUrl}/custom-datasets"
+      active={$page.url.pathname === `${settingsBaseUrl}/custom-datasets`}
+      icon={Server}
+      backgroundOnActive
+    />
+    <SidenavItem
       label="Audit log"
       href="{settingsBaseUrl}/audit-log"
       active={$page.url.pathname === `${settingsBaseUrl}/audit-log`}
@@ -125,6 +133,11 @@
           label: 'Applications',
           href: `${settingsBaseUrl}/application`,
           icon: Ledger,
+        },
+        {
+          label: 'Custom datasets',
+          href: `${settingsBaseUrl}/custom-datasets`,
+          icon: Server,
         },
         {
           label: 'Audit log',

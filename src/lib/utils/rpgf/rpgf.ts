@@ -39,6 +39,7 @@ import {
   type CreateKycRequestForApplicationDto,
   type KycRequest,
 } from './types/kyc';
+import { customDatasetSchema, type CustomDataset } from './types/customDataset';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -57,6 +58,7 @@ export async function rpgfServerCall(
   body: unknown = null,
   headers: Record<string, string> = {},
   f = fetch,
+  contentType: 'application/json' | 'text/csv' = 'application/json',
 ) {
   if (!rpgfApiUrl || !rpgfInternalApiUrl) {
     throw new Error('Required environment variables are not set');
@@ -68,10 +70,14 @@ export async function rpgfServerCall(
     method,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
       ...headers,
+      'Content-Type': contentType,
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    body: body
+      ? contentType === 'application/json'
+        ? JSON.stringify(body)
+        : (body as string)
+      : null,
   });
 
   return res;
@@ -83,6 +89,8 @@ export async function authenticatedRpgfServerCall(
   body: unknown = null,
   f = fetch,
   attemptRefresh: boolean = true,
+  disableErrorHandling = false,
+  contentType: 'application/json' | 'text/csv' = 'application/json',
 ) {
   const accessToken = get(walletStore).connected ? get(rpgfAccessJwtStore) : null;
 
@@ -94,6 +102,7 @@ export async function authenticatedRpgfServerCall(
       Authorization: accessToken ? `Bearer ${accessToken}` : '',
     },
     f,
+    contentType,
   );
 
   if (res.status === 401 && accessToken && attemptRefresh) {
@@ -118,6 +127,10 @@ export async function authenticatedRpgfServerCall(
     }
 
     throw error(res.status, message);
+  }
+
+  if (disableErrorHandling) {
+    return res;
   }
 
   if (res.status === 500) {
@@ -733,4 +746,90 @@ export async function linkExistingKycRequestToApplication(
   );
 
   return;
+}
+
+export async function getCustomDatasetsForRound(
+  f = fetch,
+  roundId: string,
+): Promise<CustomDataset[]> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return customDatasetSchema.array().parse(await res.json());
+}
+
+export async function createCustomDataset(
+  f = fetch,
+  roundId: string,
+  name: string,
+): Promise<CustomDataset> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets`,
+    'PUT',
+    { name, isPublic: false },
+    f,
+  );
+
+  return customDatasetSchema.parse(await res.json());
+}
+
+export async function updateCustomDataset(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+  name: string,
+  isPublic: boolean,
+): Promise<CustomDataset> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}`,
+    'PATCH',
+    { name, isPublic },
+    f,
+  );
+
+  return customDatasetSchema.parse(await res.json());
+}
+
+export async function deleteCustomDataset(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+): Promise<void> {
+  await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}`,
+    'DELETE',
+    undefined,
+    f,
+  );
+
+  return;
+}
+
+export async function uploadCustomDatasetCsv(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+  csvData: string,
+): Promise<CustomDataset | { error: string }> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}/upload`,
+    'POST',
+    csvData,
+    f,
+    true,
+    true,
+    'text/csv',
+  );
+
+  return customDatasetSchema
+    .or(
+      z.object({
+        error: z.string(),
+      }),
+    )
+    .parse(await res.json());
 }

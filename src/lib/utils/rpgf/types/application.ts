@@ -366,6 +366,13 @@ export const applicationSchema = z.object({
   projectName: z.string().min(1).max(255),
   dripsProjectDataSnapshot: projectChainDataSchema,
   latestVersion: applicationVersionSchema,
+  customDatasetValues: z.array(
+    z.object({
+      datasetId: z.string(),
+      datasetName: z.string(),
+      values: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]).nullable()),
+    }),
+  ),
 });
 export type Application = z.infer<typeof applicationSchema>;
 
