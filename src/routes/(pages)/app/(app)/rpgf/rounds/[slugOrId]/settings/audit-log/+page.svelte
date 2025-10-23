@@ -35,6 +35,10 @@
     kyc_request_created: 'KYC created',
     kyc_request_linked_to_application: 'KYC linked to application',
     kyc_request_updated: 'KYC status updated',
+    custom_dataset_created: 'Custom dataset created',
+    custom_dataset_updated: 'Custom dataset updated',
+    custom_dataset_deleted: 'Custom dataset deleted',
+    custom_dataset_uploaded: 'Custom dataset uploaded',
   } as const;
 
   interface LogTableRow {

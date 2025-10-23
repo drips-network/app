@@ -27,6 +27,10 @@ export const auditLogActionSchema = z.enum([
   'kyc_request_created',
   'kyc_request_linked_to_application',
   'kyc_request_updated',
+  'custom_dataset_created',
+  'custom_dataset_updated',
+  'custom_dataset_deleted',
+  'custom_dataset_uploaded',
 ]);
 export type AuditLogAction = z.infer<typeof auditLogActionSchema>;
 
@@ -56,6 +60,10 @@ const applicationFormDeletedPayloadSchema = z.any();
 const kycRequestCreatedPayloadSchema = z.any();
 const kycRequestLinkedToApplicationPayloadSchema = z.any();
 const kycRequestUpdatedPayloadSchema = z.any();
+const customDatasetCreatedPayloadSchema = z.any();
+const customDatasetUpdatedPayloadSchema = z.any();
+const customDatasetDeletedPayloadSchema = z.any();
+const customDatasetUploadedPayloadSchema = z.any();
 
 const userActorSchema = z.object({
   type: z.literal('user'),
@@ -177,6 +185,22 @@ export const auditLogSchema = z.discriminatedUnion('action', [
   baseAuditLogSchema.extend({
     action: z.literal(auditLogActionSchema.enum.kyc_request_updated),
     payload: kycRequestUpdatedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.custom_dataset_created),
+    payload: customDatasetCreatedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.custom_dataset_updated),
+    payload: customDatasetUpdatedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.custom_dataset_deleted),
+    payload: customDatasetDeletedPayloadSchema,
+  }),
+  baseAuditLogSchema.extend({
+    action: z.literal(auditLogActionSchema.enum.custom_dataset_uploaded),
+    payload: customDatasetUploadedPayloadSchema,
   }),
 ]);
 
