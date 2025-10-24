@@ -103,7 +103,7 @@
 
   let filterOptions: Record<FilterParam, TDropdownOption>;
   $: filterOptions = {
-    ...(loggedIn ? { own: { label: 'My applications' } } : null),
+    ...(loggedIn ? { own: { label: 'My applications' } } : {}),
 
     pending: { label: 'Pending' },
     approved: { label: 'Approved' },
