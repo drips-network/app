@@ -149,7 +149,7 @@
 <style>
   .applications-layout {
     display: grid;
-    grid-template-columns: minmax(auto, 30rem) 2fr;
+    grid-template-columns: minmax(24rem, 1fr) 2fr;
     grid-template-areas: 'apps page';
     gap: 2rem;
   }
@@ -166,6 +166,7 @@
 
   .apps {
     grid-area: apps;
+    min-width: 0;
   }
 
   .apps-inner {
@@ -184,7 +185,7 @@
   }
 
   .applications-layout.three-column {
-    grid-template-columns: minmax(auto, 24rem) 1fr minmax(auto, 18rem);
+    grid-template-columns: minmax(24rem, 1fr) 2fr minmax(auto, 18rem);
     grid-template-areas: 'apps page sidebar';
   }
 
@@ -219,9 +220,10 @@
     position: relative;
     grid-area: page;
     max-width: calc(100vw - 2rem);
+    min-width: 0;
   }
 
-  @media (max-width: 1251px) {
+  @media (max-width: 1400px) {
     .applications-layout.three-column {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;

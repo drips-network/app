@@ -166,7 +166,7 @@
     display: none;
   }
 
-  @media (max-width: 1251px) {
+  @media (max-width: 1400px) {
     .top {
       flex-direction: column-reverse;
       align-items: flex-start;

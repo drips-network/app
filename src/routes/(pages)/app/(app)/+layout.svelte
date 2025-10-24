@@ -202,7 +202,7 @@
   }
 
   .sidenav-forced-collapsed .page-content-inner {
-    max-width: 100rem;
+    max-width: 124rem;
   }
 
   @media (max-width: 1252px) {
