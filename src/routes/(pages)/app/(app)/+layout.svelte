@@ -113,7 +113,7 @@
 >
   <div class="page">
     <div class="page-content">
-      <div class:loading={$navigating} class="page-content-inner"><slot /></div>
+      <div class:loading={showLoadingSpinner} class="page-content-inner"><slot /></div>
     </div>
   </div>
 
