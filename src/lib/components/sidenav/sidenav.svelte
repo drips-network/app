@@ -108,7 +108,7 @@
     display: flex;
     align-items: center;
     background-color: var(--color-background);
-    z-index: 200;
+    z-index: 2000;
     box-shadow: var(--elevation-low);
   }
 
