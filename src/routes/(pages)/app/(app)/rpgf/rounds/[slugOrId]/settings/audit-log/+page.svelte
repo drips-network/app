@@ -84,7 +84,7 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round}>
+<RpgfSettingsForm>
   <PaddedHorizontalScroll>
     <Table
       isRowClickable

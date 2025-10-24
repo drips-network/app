@@ -115,7 +115,7 @@
     };
   }
 
-  $: changesMade = 
+  $: changesMade =
     updatedRound.name !== data.round.name ||
     updatedRound.emoji !== data.round.emoji ||
     updatedRound.color !== data.round.color ||
@@ -124,21 +124,18 @@
     updatedRound.customAvatarCid !== data.round.customAvatarCid;
 
   async function saveHandler() {
-    await updateRound(undefined,
-      data.round.id,
-      {
-        name: updatedRound.name,
-        emoji: updatedRound.emoji,
-        color: updatedRound.color,
-        urlSlug: updatedRound.urlSlug,
-        description: updatedRound.description,
-        customAvatarCid: updatedRound.customAvatarCid,
-      }
-    )
+    await updateRound(undefined, data.round.id, {
+      name: updatedRound.name,
+      emoji: updatedRound.emoji,
+      color: updatedRound.color,
+      urlSlug: updatedRound.urlSlug,
+      description: updatedRound.description,
+      customAvatarCid: updatedRound.customAvatarCid,
+    });
   }
 </script>
 
-<RpgfSettingsForm round={data.round} {invalid} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm {invalid} saveEnabled={changesMade} {saveHandler}>
   <FormField title="Preview">
     <RpgfHeaderCard round={updatedRound} interactive={false} />
   </FormField>
