@@ -56,7 +56,7 @@ export const load = async ({ parent, route, url, depends }) => {
       z.literal('approved'),
       z.literal('rejected'),
       z.literal('pending'),
-      z.string().regex(/^cat-\w+$/),
+      z.string().regex(/^cat-.*/),
     ])
     .safeParse(url.searchParams.get('filter')).success
     ? (url.searchParams.get('filter') as FilterParam)
