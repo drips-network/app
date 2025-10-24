@@ -118,7 +118,7 @@ h3,
 }
 
 :root::view-transition-group(.element-handover) {
-  animation-duration: 200ms;
+  animation-duration: 300ms;
   animation-timing-function: ease-in-out;
 }
 
