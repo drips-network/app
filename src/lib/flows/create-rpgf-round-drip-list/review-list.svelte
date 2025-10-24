@@ -14,7 +14,7 @@
   import network from '$lib/stores/wallet/network';
   import expect from '$lib/utils/expect';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import type {
     DripListExistsQuery,
     DripListExistsQueryVariables,

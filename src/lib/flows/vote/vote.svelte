@@ -12,7 +12,7 @@
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from './vote-flow-steps';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 

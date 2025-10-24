@@ -124,7 +124,7 @@
     SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT,
   } from '../splits/types';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import CoinFlying from '../icons/CoinFlying.svelte';

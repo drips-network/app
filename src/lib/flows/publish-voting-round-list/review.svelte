@@ -15,7 +15,7 @@
   import DripList from '$lib/components/icons/DripList.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import network from '$lib/stores/wallet/network';
   import { sdkManager } from '$lib/utils/sdk/sdk-manager';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
