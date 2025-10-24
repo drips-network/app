@@ -6,6 +6,7 @@
     ApplicationUrlField,
   } from '$lib/utils/rpgf/types/application';
   import type { ComponentProps } from 'svelte';
+  import z from 'zod';
 
   export let field: ApplicationUrlField;
   export let answer: ApplicationUrlAnswerDto | undefined = undefined;
@@ -23,12 +24,12 @@
   }
 
   function isValidUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
+    // ensure valid URL, explicitly no spaces allowed
+    return z
+      .string()
+      .url()
+      .refine((val) => !/\s/.test(val))
+      .safeParse(url).success;
   }
 
   $: hasValidUrl = value !== undefined && value.trim() !== '' && isValidUrl(value);
@@ -49,7 +50,8 @@
     : beenFocussed || forceRevealError
       ? {
           type: 'invalid',
-          message: 'This field is required and must be a full, valid URL, including https://.',
+          message:
+            'This field is required and must be a full, valid URL without spaces, including https://.',
         }
       : { type: 'valid' };
 </script>
