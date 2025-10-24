@@ -9,12 +9,12 @@
   export let applications: ListingApplication[];
   export let filteredApplications: ListingApplication[];
   export let ellipsis: boolean = false;
+  export let signedIn: boolean;
 
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot>;
   export let reviewMode = false;
   export let round: Round;
-  export let excludeFromViewTransition = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 </script>
 
@@ -26,7 +26,7 @@
         <h5>Vote result</h5>
       </div>
     {/if}
-    <div class="applications-table">
+    <div class="applications-table" class:empty={applications.length === 0}>
       {#each filteredApplications as application (application.id)}
         <ApplicationLineItem
           {ellipsis}
@@ -35,12 +35,13 @@
           {reviewMode}
           {round}
           {application}
-          {excludeFromViewTransition}
           bind:decision={decisions[application.id]}
         />
       {/each}
       {#if applications.length === 0}
-        <div class="empty">Nothing to see here</div>
+        <div class="empty">
+          No applications matched your filters.{signedIn ? '' : ' You may have to sign in.'}
+        </div>
       {/if}
     </div>
   </div>
@@ -69,12 +70,15 @@
     display: flex;
     flex-direction: column;
     border-radius: 1rem 0 1rem 1rem;
-    border: 1px solid var(--color-foreground-level-3);
     overflow: hidden;
   }
 
+  .applications-table:not(.empty) {
+    border: 1px solid var(--color-foreground-level-3);
+  }
+
   .empty {
-    padding: 5rem 1rem;
+    padding: 0 1rem;
     text-align: center;
     color: var(--color-foreground-level-5);
   }

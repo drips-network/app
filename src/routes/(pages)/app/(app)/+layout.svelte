@@ -153,7 +153,7 @@
     position: relative;
     min-height: 100vh;
     width: 100vw;
-    padding: 6rem 2.5rem 4rem 2.5rem;
+    padding: 6rem 2.5rem 1rem 2.5rem;
     margin: 0 auto 0 16rem;
   }
 
@@ -191,14 +191,27 @@
     display: none;
   }
 
+  .sidenav-forced-collapsed .sidenav {
+    width: 5rem;
+  }
+
+  .sidenav-forced-collapsed .page {
+    margin-left: 4rem;
+    padding-left: 2rem;
+  }
+
+  .sidenav-forced-collapsed .page-content-inner {
+    max-width: 100rem;
+  }
+
   @media (max-width: 1252px) {
     .sidenav {
       width: 4.5rem;
     }
 
     .page {
-      margin-left: 0;
-      padding-left: 6.5rem;
+      margin-left: 4rem;
+      padding-left: 2rem;
     }
   }
 
@@ -212,7 +225,8 @@
       display: none;
     }
 
-    .page {
+    .page,
+    .sidenav-forced-collapsed .page {
       padding: 6rem 1rem 6rem 1rem;
       margin-left: 0;
     }

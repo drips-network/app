@@ -1,58 +1,16 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
-  import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
-  import TableViewConfigurator from '$lib/components/table-view-configurator/table-view-configurator.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store.js';
   import highlightStore from '$lib/stores/highlight/highlight.store.js';
-  import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
-  import buildUrl from '$lib/utils/build-url.js';
-  import downloadUrl from '$lib/utils/download-url.js';
-  import { getApplicationsCsv, getApplicationsXlsx } from '$lib/utils/rpgf/rpgf.js';
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
+  import ThreePaneLayout from '../shared/three-pane-layout.svelte';
+  import ApplicationsPane from '../shared/applications-pane.svelte';
+  import EmptyState from '$lib/components/section-skeleton/empty-state.svelte';
 
   export let data;
   $: round = data.round;
   $: ballotStore = data.ballot;
 
-  async function handleDownload(format: 'csv' | 'xlsx') {
-    const content: Blob | string =
-      format === 'csv'
-        ? await getApplicationsCsv(undefined, round.id)
-        : await getApplicationsXlsx(undefined, round.id);
-
-    const fileType =
-      format === 'csv'
-        ? 'text/csv'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-
-    const fileName =
-      format === 'csv' ? `applications-${round.urlSlug}.csv` : `applications-${round.urlSlug}.xlsx`;
-
-    downloadUrl(URL.createObjectURL(new Blob([content], { type: fileType })), fileName);
-  }
-
-  let selectedSortBy = data.sortByParam;
-  let selectedFilter = data.filterParam;
-
-  $: {
-    if (selectedSortBy !== data.sortByParam || selectedFilter !== data.filterParam) {
-      goto(
-        buildUrl(`/app/rpgf/rounds/${round.urlSlug}/applications`, {
-          sortBy: selectedSortBy,
-          filter: selectedFilter ?? '',
-        }),
-        {
-          replaceState: true,
-        },
-      );
-    }
-  }
   $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
 
   let tableConfiguratorEl: HTMLDivElement | undefined;
@@ -86,81 +44,24 @@
   twitterImage="{imageBaseUrl}?target=twitter"
 />
 
-<div class="page">
-  <div><Button href="/app/rpgf/rounds/{round.urlSlug}" icon={ArrowLeft}>Back to round</Button></div>
+<ThreePaneLayout {...data} pageIsEmpty>
+  <svelte:fragment slot="apps">
+    <ApplicationsPane {...data} {ballotStore} loggedIn={data.rpgfUserData !== null} />
+  </svelte:fragment>
 
-  {#if !data.rpgfUserData}
-    <div transition:fade={{ duration: 300 }}>
-      <AnnotationBox type="info">
-        Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
-        private data if you're an admin.
-        <svelte:fragment slot="actions">
-          <RpgfSiweButton />
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-
-  <div class="header">
-    <h1>Applications</h1>
-    <div class="table-setting">
-      <TableViewConfigurator
-        bind:el={tableConfiguratorEl}
-        sortByOptions={{
-          name: { label: 'Project name' },
-          createdAt: { label: 'Created at' },
-
-          ...(round.isAdmin || round.resultsPublished
-            ? { allocation: { label: 'Allocation amount' } }
-            : null),
-        }}
-        bind:sortBy={selectedSortBy}
-        filterOptions={{
-          ...(data.rpgfUserData ? { own: { label: 'My applications' } } : null),
-
-          pending: { label: 'Pending' },
-          approved: { label: 'Approved' },
-
-          ...Object.fromEntries(
-            data.categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }]),
-          ),
-        }}
-        bind:filterBy={selectedFilter}
-        onDownload={handleDownload}
-      />
-    </div>
+  <div class="empty">
+    <EmptyState emoji="🫙" headline="" text="Select an application on the left to view details" />
   </div>
-
-  <RpgfApplicationsTable
-    voteStep={data.voteMode ? 'build-ballot' : undefined}
-    reviewMode={data.reviewMode}
-    bind:decisions={$decisionsStore}
-    {round}
-    {ballotStore}
-    applications={data.allApplications}
-    horizontalScroll
-  />
-</div>
+</ThreePaneLayout>
 
 <style>
-  .page {
+  .empty {
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .header {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between;
-  }
-
-  .table-setting {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    white-space: nowrap;
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 1rem 0 1rem 1rem;
+    view-transition-name: rpgf-applications-pane-empty;
   }
 </style>

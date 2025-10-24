@@ -115,6 +115,7 @@
   .sidenav.force-collapsed {
     opacity: 0.5;
     transition: opacity 0.3s;
+    width: 3rem;
   }
 
   .sidenav.force-collapsed:hover,

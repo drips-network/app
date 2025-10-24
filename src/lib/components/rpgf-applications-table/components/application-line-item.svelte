@@ -9,6 +9,7 @@
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import { page } from '$app/stores';
 
   export let round: Round;
   export let application: ListingApplication;
@@ -18,8 +19,6 @@
 
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot>;
-
-  export let excludeFromViewTransition = false;
 
   export let ellipsis: boolean = false;
 
@@ -83,17 +82,21 @@
     }
   }
   $: updateVoteAmount(voteAmountInput);
+
+  $: active = $page.url.href.includes(`/applications/${application.id}`);
 </script>
 
-<div class="application-line-item" data-testid="application-line-item-{application.id}">
-  <a
-    class:ellipsis
-    href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
-      ? '?backToBallot'
-      : ''}"
-  >
-    <RpgfApplicationBadge {application} {excludeFromViewTransition} />
-  </a>
+<a
+  href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
+    ? '?backToBallot'
+    : ''}{$page.url.search}"
+  class="application-line-item"
+  class:active
+  data-testid="application-line-item-{application.id}"
+>
+  <div class:ellipsis>
+    <RpgfApplicationBadge short {application} />
+  </div>
 
   {#if reviewMode && application.state === 'pending'}
     <ApplicationDecisionButtons applicationId={application.id} bind:decision />
@@ -106,6 +109,7 @@
   {#if voteStep === 'assign-votes' && application.state === 'approved'}
     <div class="vote-count-input">
       <TextInput
+        on:click={(e) => e.preventDefault()}
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
         variant={{ type: 'number', min: 0 }}
@@ -119,7 +123,7 @@
       {application.allocation}
     </span>
   {/if}
-</div>
+</a>
 
 <style>
   .application-line-item {
@@ -129,6 +133,14 @@
     gap: 0.5rem;
     padding: 0.5rem;
     border-bottom: 1px solid var(--color-foreground-level-3);
+  }
+
+  .application-line-item.active {
+    background-color: var(--color-primary-level-1);
+  }
+
+  .application-line-item:hover {
+    background-color: var(--color-foreground-level-1);
   }
 
   .ellipsis {
