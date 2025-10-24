@@ -1,5 +1,5 @@
 /**
- * Genereate a URL path string from a path and object of parameters.
+ * Generate a URL path string from a path and object of parameters.
  * @param path The URL path, which may contain placeholders like [param] and an existing query string.
  * @param params Params to add/overwrite/remove.
  * - `string` values overwrite/add query params or interpolate path params.
