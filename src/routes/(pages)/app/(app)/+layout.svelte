@@ -185,6 +185,7 @@
     width: 16rem;
     padding: 1rem;
     padding-top: 6rem;
+    z-index: 2;
   }
 
   .bottom-nav {
