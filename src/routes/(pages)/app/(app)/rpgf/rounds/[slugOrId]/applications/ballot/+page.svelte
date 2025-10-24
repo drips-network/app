@@ -4,7 +4,7 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
-  import ThreePaneLayout from '../../shared/three-pane-layout.svelte';
+  import ThreePaneLayout from '../shared/three-pane-layout.svelte';
 
   export let data;
   $: ballotStore = data.ballot;

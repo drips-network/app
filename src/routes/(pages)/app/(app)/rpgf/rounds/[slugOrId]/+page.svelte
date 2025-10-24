@@ -112,7 +112,12 @@
             : undefined,
       }}
     >
-      <RpgfApplicationsTable searchable={false} {round} applications={data.fiveApplications} />
+      <RpgfApplicationsTable
+        searchable={false}
+        {round}
+        applications={data.fiveApplications}
+        signedIn={data.rpgfUserData !== undefined}
+      />
     </Section>
 
     {#if round.isAdmin}
