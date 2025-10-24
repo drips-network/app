@@ -3,8 +3,8 @@
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store.js';
   import highlightStore from '$lib/stores/highlight/highlight.store.js';
   import { onMount } from 'svelte';
-  import ThreePaneLayout from '../shared/three-pane-layout.svelte';
-  import ApplicationsPane from '../shared/applications-pane.svelte';
+  import ThreePaneLayout from './shared/three-pane-layout.svelte';
+  import ApplicationsPane from './shared/applications-pane.svelte';
   import EmptyState from '$lib/components/section-skeleton/empty-state.svelte';
 
   export let data;
