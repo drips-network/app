@@ -14,6 +14,9 @@ import network from '$lib/stores/wallet/network';
 
 export const load = async ({ fetch, params }) => {
   const connectedAddress = getConnectedAddress();
+  const { accountId, token } = params;
+
+  const tokenAddress = token.toLowerCase();
 
   if (!connectedAddress) {
     redirect(307, buildUrl('/app/connect', { backTo: `/app/tokens/${params.token}` }));
@@ -52,6 +55,8 @@ export const load = async ({ fetch, params }) => {
   return {
     balances: chainData.balances,
     streams: chainData.streams,
+    tokenAddress,
+    accountId,
   };
 };
 
