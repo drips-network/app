@@ -62,10 +62,6 @@ export const load = async ({ parent, route, url, depends }) => {
     ? (url.searchParams.get('filter') as FilterParam)
     : null;
 
-  // const sortByParam: string =
-  //   url.searchParams.get('sortBy') ?? (resultsPublished ? 'allocation' : 'createdAt');
-  // const filterParam: string | null = url.searchParams.get('filter');
-
   const [allApplications, categories] = await Promise.all([
     filterParam === 'own' && !rpgfUserData
       ? []
