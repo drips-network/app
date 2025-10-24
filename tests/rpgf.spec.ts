@@ -226,7 +226,7 @@ test.describe('rounds', () => {
     await connectedSession2.page.waitForURL(`**/applications/${applicationId}`);
 
     await expect(
-      connectedSession2.page.getByText('Visibility Test Application').first(),
+      connectedSession2.page.getByText('Visibility Test Application').nth(1),
     ).toBeVisible();
 
     // check private field name Test Testerson is not visible
