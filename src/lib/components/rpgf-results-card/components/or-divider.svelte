@@ -15,7 +15,7 @@
 
   .line {
     flex-grow: 1;
-    height: 2px;
+    height: 1px;
     border-radius: 1px;
     background-color: var(--color-foreground-level-3);
   }

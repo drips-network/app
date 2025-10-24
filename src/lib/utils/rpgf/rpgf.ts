@@ -58,7 +58,10 @@ export async function rpgfServerCall(
   body: unknown = null,
   headers: Record<string, string> = {},
   f = fetch,
-  contentType: 'application/json' | 'text/csv' = 'application/json',
+  contentType:
+    | 'application/json'
+    | 'text/csv'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' = 'application/json',
 ) {
   if (!rpgfApiUrl || !rpgfInternalApiUrl) {
     throw new Error('Required environment variables are not set');
@@ -76,7 +79,7 @@ export async function rpgfServerCall(
     body: body
       ? contentType === 'application/json'
         ? JSON.stringify(body)
-        : (body as string)
+        : (body as BodyInit)
       : null,
   });
 
@@ -90,7 +93,10 @@ export async function authenticatedRpgfServerCall(
   f = fetch,
   attemptRefresh: boolean = true,
   disableErrorHandling = false,
-  contentType: 'application/json' | 'text/csv' = 'application/json',
+  contentType:
+    | 'application/json'
+    | 'text/csv'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' = 'application/json',
 ) {
   const accessToken = get(walletStore).connected ? get(rpgfAccessJwtStore) : null;
 
@@ -350,18 +356,38 @@ export async function castBallot(
   return parsed;
 }
 
-export async function patchBallot(
+export async function castBallotAsCsv(
   f = fetch,
-  roundId: string,
-  updatedBallot: Ballot,
+  roundSlug: string,
+  data: string,
 ): Promise<WrappedBallot> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/ballots/own`,
-    'PATCH',
-    {
-      ballot: updatedBallot,
-    },
+    `/rounds/${roundSlug}/ballots/spreadsheet?format=csv`,
+    'POST',
+    data,
     f,
+    true,
+    false,
+    'text/csv',
+  );
+
+  const parsed = wrappedBallotSchema.parse(await res.json());
+  return parsed;
+}
+
+export async function castBallotAsXlsx(
+  f = fetch,
+  roundSlug: string,
+  data: ArrayBuffer,
+): Promise<WrappedBallot> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/spreadsheet?format=xlsx`,
+    'POST',
+    data,
+    f,
+    true,
+    false,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   );
 
   const parsed = wrappedBallotSchema.parse(await res.json());
