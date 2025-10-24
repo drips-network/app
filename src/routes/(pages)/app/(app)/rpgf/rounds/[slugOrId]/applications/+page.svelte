@@ -1,8 +1,5 @@
 <script lang="ts">
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import dismissablesStore from '$lib/stores/dismissables/dismissables.store.js';
-  import highlightStore from '$lib/stores/highlight/highlight.store.js';
-  import { onMount } from 'svelte';
   import ThreePaneLayout from './shared/three-pane-layout.svelte';
   import ApplicationsPane from './shared/applications-pane.svelte';
   import EmptyState from '$lib/components/section-skeleton/empty-state.svelte';
@@ -12,29 +9,6 @@
   $: ballotStore = data.ballot;
 
   $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
-
-  let tableConfiguratorEl: HTMLDivElement | undefined;
-
-  onMount(() => {
-    if (!tableConfiguratorEl) return;
-
-    const filterOnboardingDismissableKey = `rpgf-applications-filter-onboarding`;
-
-    const filterOnboardingDismissed = dismissablesStore.isDismissed(filterOnboardingDismissableKey);
-
-    if (!filterOnboardingDismissed) {
-      highlightStore.highlight({
-        title: 'Filter and sort applications',
-        description:
-          'Use this menu to see your own applications, filter by category, download CSVs, and more.',
-        element: tableConfiguratorEl,
-        borderRadius: '64px',
-        paddingPx: 8,
-      });
-
-      dismissablesStore.dismiss(filterOnboardingDismissableKey);
-    }
-  });
 </script>
 
 <HeadMeta
@@ -50,7 +24,7 @@
   </svelte:fragment>
 
   <div class="empty">
-    <EmptyState emoji="🫙" headline="" text="Select an application on the left to view details" />
+    <EmptyState emoji="👀" headline="" text="Select an application on the left to view details" />
   </div>
 </ThreePaneLayout>
 
