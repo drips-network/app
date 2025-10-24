@@ -37,6 +37,9 @@
           'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
         addItem: createAddItemFunction(context, 'dependencySplits'),
         clearItems: createClearItemsFunction(context, 'dependencySplits'),
+        blockedAccountIds: $context.projectAccountId
+          ? [$context.projectAccountId, ...maintainerKeys]
+          : maintainerKeys,
       }),
     );
   }
