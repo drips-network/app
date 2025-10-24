@@ -22,6 +22,11 @@
 
   export let ellipsis: boolean = false;
 
+  /** If true, only the application name and icon are clickable, otherwise entire row.
+   * Needed for voting mode bc otherwise the input becomes really buggy
+   */
+  $: smallLink = voteStep === 'assign-votes';
+
   let picked = $ballotStore[application.id] !== undefined;
 
   function updateBallot(picked: boolean) {
@@ -84,19 +89,23 @@
   $: updateVoteAmount(voteAmountInput);
 
   $: active = $page.url.href.includes(`/applications/${application.id}`);
+
+  $: link = `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
+    voteStep === 'assign-votes' ? '?backToBallot' : ''
+  }${$page.url.search}`;
 </script>
 
-<a
-  href="/app/rpgf/rounds/{round.urlSlug}/applications/{application.id}{voteStep === 'assign-votes'
-    ? '?backToBallot'
-    : ''}{$page.url.search}"
+<svelte:element
+  this={smallLink ? 'div' : 'a'}
+  href={link}
   class="application-line-item"
   class:active
+  class:small-link={smallLink}
   data-testid="application-line-item-{application.id}"
 >
-  <div class:ellipsis>
+  <svelte:element this={smallLink ? 'a' : 'div'} href={link} class:ellipsis>
     <RpgfApplicationBadge short {application} />
-  </div>
+  </svelte:element>
 
   {#if reviewMode && application.state === 'pending'}
     <ApplicationDecisionButtons applicationId={application.id} bind:decision />
@@ -123,7 +132,7 @@
       {application.allocation}
     </span>
   {/if}
-</a>
+</svelte:element>
 
 <style>
   .application-line-item {
@@ -139,7 +148,7 @@
     background-color: var(--color-primary-level-1);
   }
 
-  .application-line-item:hover {
+  .application-line-item:not(.small-link):hover {
     background-color: var(--color-foreground-level-1);
   }
 
