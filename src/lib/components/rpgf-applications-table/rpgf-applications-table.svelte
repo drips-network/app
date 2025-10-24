@@ -12,14 +12,13 @@
 
   export let applications: ListingApplication[];
   export let round: Round;
+  export let signedIn: boolean;
 
   export let reviewMode = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot> = writable({});
-
-  export let excludeFromViewTransition = false;
 
   export let horizontalScroll = false;
 
@@ -56,7 +55,7 @@
       {ballotStore}
       {reviewMode}
       {round}
-      {excludeFromViewTransition}
+      {signedIn}
       bind:decisions
     />
   </PaddedHorizontalScroll>
@@ -69,7 +68,7 @@
     {ballotStore}
     {reviewMode}
     {round}
-    {excludeFromViewTransition}
+    {signedIn}
     bind:decisions
     ellipsis={true}
   />

@@ -21,7 +21,6 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import editRpgfRoundLinkedDripListsFlow from '$lib/flows/edit-rpgf-round-linked-drip-lists/edit-rpgf-round-linked-drip-lists-flow';
   import Pen from '$lib/components/icons/Pen.svelte';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
 
   export let data;
@@ -37,156 +36,159 @@
   twitterImage="{imageBaseUrl}?target=twitter"
 />
 
-<PrimaryColorThemer colorHex={round.color}>
-  <RpgfBaseLayout>
-    <svelte:fragment slot="sidebar">
-      {#if round.state}
-        <RpgfCtaCard
-          hasExistingBallot={Boolean(data.existingBallot)}
-          signedInUserId={data.rpgfUserData?.userId ?? null}
-          {round}
-        />
-      {/if}
-
-      {#if !round.published}
-        <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
-      {/if}
-      <RpgfScheduleCard {round} />
-    </svelte:fragment>
-
-    <svelte:fragment slot="header">
-      <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
-        {#if !data.rpgfUserData}
-          <div transition:fade={{ duration: 300 }}>
-            <AnnotationBox type="info">
-              Sign in to RetroPGF on Drips to view your own applications and other private data.
-              <svelte:fragment slot="actions">
-                <RpgfSiweButton />
-              </svelte:fragment>
-            </AnnotationBox>
-          </div>
-        {/if}
-      </TransitionedHeight>
-      <RpgfHeaderCard {round} />
-    </svelte:fragment>
-
-    {#if round.description}
-      <div style:padding="0 1rem">
-        <ExpandableText>
-          <Markdown content={round.description} />
-        </ExpandableText>
-      </div>
+<RpgfBaseLayout>
+  <svelte:fragment slot="sidebar">
+    {#if round.state}
+      <RpgfCtaCard
+        hasExistingBallot={Boolean(data.existingBallot)}
+        signedInUserId={data.rpgfUserData?.userId ?? null}
+        {round}
+      />
     {/if}
 
-    <Section
-      header={{
-        label: 'Applications',
-        icon: Ledger,
-        actions:
-          data.fiveApplications.length < 5
-            ? [
-                {
-                  label: 'View all',
-                  href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
-                  icon: ArrowRight,
-                  disabled: !round.published,
-                },
-              ]
-            : [],
-      }}
-      skeleton={{
-        empty: data.fiveApplications.length === 0,
-        loaded: true,
-        horizontalScroll: false,
-        emptyStateEmoji: '🫙',
-        emptyStateHeadline: 'No approved applications',
-        emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
-        overflowAction:
-          data.fiveApplications.length >= 5
-            ? {
+    {#if !round.published}
+      <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
+    {/if}
+    <RpgfScheduleCard {round} />
+  </svelte:fragment>
+
+  <svelte:fragment slot="header">
+    <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
+      {#if !data.rpgfUserData}
+        <div transition:fade={{ duration: 300 }}>
+          <AnnotationBox type="info">
+            Sign in to RetroPGF on Drips to view your own applications and other private data.
+            <svelte:fragment slot="actions">
+              <RpgfSiweButton />
+            </svelte:fragment>
+          </AnnotationBox>
+        </div>
+      {/if}
+    </TransitionedHeight>
+    <RpgfHeaderCard {round} />
+  </svelte:fragment>
+
+  {#if round.description}
+    <div style:padding="0 1rem">
+      <ExpandableText>
+        <Markdown content={round.description} />
+      </ExpandableText>
+    </div>
+  {/if}
+
+  <Section
+    header={{
+      label: 'Applications',
+      icon: Ledger,
+      actions:
+        data.fiveApplications.length < 5
+          ? [
+              {
                 label: 'View all',
                 href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
                 icon: ArrowRight,
                 disabled: !round.published,
-              }
-            : undefined,
-      }}
-    >
-      <RpgfApplicationsTable searchable={false} {round} applications={data.fiveApplications} />
-    </Section>
-
-    {#if round.isAdmin}
-      <Section
-        header={{
-          label: 'Ballots',
-          icon: Proposals,
-          actions: [
-            {
-              label: 'View all',
-              href: `/app/rpgf/rounds/${round.urlSlug}/ballots`,
-              icon: ArrowRight,
-              disabled: !data.ballotStats || data.ballotStats.numberOfBallots === 0,
-            },
-          ],
-        }}
-        skeleton={{
-          empty: !data.ballotStats,
-          loaded: true,
-          emptyStateEmoji: '🫙',
-          emptyStateHeadline: 'No ballots yet',
-          emptyStateText:
-            'As an admin, you can see ballots as they are submitted in the voting phase.',
-        }}
-      >
-        {#if data.ballotStats}
-          <div class="ballot-stats">
-            <div class="stat">
-              <h5>Voters</h5>
-              <span class="typo-header-1">{data.ballotStats.numberOfVoters}</span>
-            </div>
-            <div class="stat">
-              <h5>Recorded Ballots</h5>
-              <span class="typo-header-1">{data.ballotStats.numberOfBallots}</span>
-            </div>
-          </div>
-        {/if}
-      </Section>
-    {/if}
-
-    <Section
-      header={{
-        label: 'Distribution',
-        anchorTarget: 'distribution',
-        icon: Trophy,
-        actions: round.isAdmin
-          ? [
-              {
-                label: 'Edit linked lists',
-                icon: Pen,
-                disabled: !round.published,
-                handler: () =>
-                  modal.show(
-                    Stepper,
-                    undefined,
-                    editRpgfRoundLinkedDripListsFlow(round.id, data.linkedDripLists),
-                  ),
               },
             ]
           : [],
+    }}
+    skeleton={{
+      empty: data.fiveApplications.length === 0,
+      loaded: true,
+      horizontalScroll: false,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No approved applications',
+      emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
+      overflowAction:
+        data.fiveApplications.length >= 5
+          ? {
+              label: 'View all',
+              href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+              icon: ArrowRight,
+              disabled: !round.published,
+            }
+          : undefined,
+    }}
+  >
+    <RpgfApplicationsTable
+      searchable={false}
+      {round}
+      applications={data.fiveApplications}
+      signedIn={data.rpgfUserData !== undefined}
+    />
+  </Section>
+
+  {#if round.isAdmin}
+    <Section
+      header={{
+        label: 'Ballots',
+        icon: Proposals,
+        actions: [
+          {
+            label: 'View all',
+            href: `/app/rpgf/rounds/${round.urlSlug}/ballots`,
+            icon: ArrowRight,
+            disabled: !data.ballotStats || data.ballotStats.numberOfBallots === 0,
+          },
+        ],
       }}
       skeleton={{
-        empty: data.linkedDripLists.length === 0,
+        empty: !data.ballotStats,
         loaded: true,
         emptyStateEmoji: '🫙',
-        emptyStateHeadline: 'No linked Drip Lists',
+        emptyStateHeadline: 'No ballots yet',
         emptyStateText:
-          'Rewards for the round will be distributed via Drip Lists, which will appear here.',
+          'As an admin, you can see ballots as they are submitted in the voting phase.',
       }}
     >
-      <DripListsGrid dripLists={data.linkedDripLists} />
+      {#if data.ballotStats}
+        <div class="ballot-stats">
+          <div class="stat">
+            <h5>Voters</h5>
+            <span class="typo-header-1">{data.ballotStats.numberOfVoters}</span>
+          </div>
+          <div class="stat">
+            <h5>Recorded Ballots</h5>
+            <span class="typo-header-1">{data.ballotStats.numberOfBallots}</span>
+          </div>
+        </div>
+      {/if}
     </Section>
-  </RpgfBaseLayout>
-</PrimaryColorThemer>
+  {/if}
+
+  <Section
+    header={{
+      label: 'Distribution',
+      anchorTarget: 'distribution',
+      icon: Trophy,
+      actions: round.isAdmin
+        ? [
+            {
+              label: 'Edit linked lists',
+              icon: Pen,
+              disabled: !round.published,
+              handler: () =>
+                modal.show(
+                  Stepper,
+                  undefined,
+                  editRpgfRoundLinkedDripListsFlow(round.id, data.linkedDripLists),
+                ),
+            },
+          ]
+        : [],
+    }}
+    skeleton={{
+      empty: data.linkedDripLists.length === 0,
+      loaded: true,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No linked Drip Lists',
+      emptyStateText:
+        'Rewards for the round will be distributed via Drip Lists, which will appear here.',
+    }}
+  >
+    <DripListsGrid dripLists={data.linkedDripLists} />
+  </Section>
+</RpgfBaseLayout>
 
 <style>
   .ballot-stats {

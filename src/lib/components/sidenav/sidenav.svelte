@@ -79,6 +79,17 @@
     view-transition-name: sidenav;
   }
 
+  :root::view-transition-old(sidenav) {
+    animation: none;
+    opacity: 0;
+  }
+
+  :root::view-transition-new(sidenav) {
+    animation: none;
+    opacity: 1;
+    width: auto;
+  }
+
   .block {
     display: flex;
     flex-direction: column;
@@ -115,6 +126,7 @@
   .sidenav.force-collapsed {
     opacity: 0.5;
     transition: opacity 0.3s;
+    width: 3rem;
   }
 
   .sidenav.force-collapsed:hover,

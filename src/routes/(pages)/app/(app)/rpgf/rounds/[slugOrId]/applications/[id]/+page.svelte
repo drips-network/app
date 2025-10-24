@@ -3,12 +3,10 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
-  import ApplicationDecisionButtons from '$lib/components/rpgf-applications-table/components/application-decision-buttons.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { page } from '$app/stores';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import { decisionsStore } from '$lib/stores/rpgf-decisions/rpgf-decisions.store.js';
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
@@ -32,64 +30,66 @@
 
 <HeadMeta title="{application.projectName} | {round.name}" />
 
-<div class="application">
-  <div class="actions">
+<div
+  class="application"
+  style:view-transition-name="application-{application.id}"
+  style:view-transition-class="element-handover"
+>
+  <div class="back-button">
     <Button
       href={backToBallot
         ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot`
         : `/app/rpgf/rounds/${round.urlSlug}/applications`}
       icon={ArrowLeft}>Back to {backToBallot ? 'ballot' : 'applications'}</Button
     >
-    <div class="right">
-      <ShareButton
-        url={$page.url.toString().replaceAll('?backToBallot', '')}
-        shareModalText={application.state !== 'approved'
-          ? "Please note that only the applicant or round admins can see this application before it's approved."
-          : undefined}
-      />
-
-      <Button
-        href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history`}
-        icon={ArrowCounterClockwiseHeart}
-        variant="ghost">History</Button
-      >
-
-      {#if isSubmitter && data.round.state === 'intake'}
-        <Button
-          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/edit`}
-          icon={Pen}>Edit</Button
-        >
-      {/if}
-    </div>
   </div>
-
   {#if !data.rpgfUserData}
-    <AnnotationBox type="info">
-      Sign in as the applicant or a round admin to see private fields, identity verification status,
-      and more.
-      <svelte:fragment slot="actions">
-        <RpgfSiweButton />
-      </svelte:fragment>
-    </AnnotationBox>
+    <div class="signin-note">
+      <AnnotationBox type="info">
+        Sign in as the applicant or a round admin to see private fields, identity verification
+        status, and more.
+        <svelte:fragment slot="actions">
+          <RpgfSiweButton />
+        </svelte:fragment>
+      </AnnotationBox>
+    </div>
   {/if}
 
   <div class="card">
-    <RpgfApplicationBadge hideState {application} hideName size="huge" />
+    <div class="top">
+      <RpgfApplicationBadge hideState {application} hideName size="huge" />
+      <div class="actions">
+        <ShareButton
+          url={$page.url.toString().replaceAll('?backToBallot', '')}
+          shareModalText={application.state !== 'approved'
+            ? "Please note that only the applicant or round admins can see this application before it's approved."
+            : undefined}
+        />
+
+        <Button
+          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history`}
+          icon={ArrowCounterClockwiseHeart}
+          variant="ghost">History</Button
+        >
+
+        {#if isSubmitter && data.round.state === 'intake'}
+          <Button
+            href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/edit`}
+            icon={Pen}>Edit</Button
+          >
+        {/if}
+      </div>
+    </div>
     <h1>
       {application.projectName}
-      <RpgfApplicationBadge inline hideName hideAvatar {application} />
+      <span style:margin-left="0.25rem">
+        <RpgfApplicationBadge inline hideName hideAvatar {application} />
+      </span>
     </h1>
 
     <div>
-      <ProjectBadge project={data.dripsProject} />
+      <ProjectBadge tooltip={false} project={data.dripsProject} />
     </div>
-
-    {#if data.reviewMode && application.state === 'pending'}
-      <ApplicationDecisionButtons
-        applicationId={application.id}
-        bind:decision={$decisionsStore[application.id]}
-      />
-    {/if}
   </div>
 
   {#if round.kycConfig && canSeePrivateFields}
@@ -139,21 +139,46 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-width: 64rem;
     margin: 0 auto;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
   }
 
   .actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    margin-bottom: 1rem;
     gap: 1rem;
     flex-wrap: wrap;
+    width: 100%;
   }
 
-  .actions .right {
-    display: flex;
-    gap: 0.5rem;
+  .signin-note {
+    display: none;
+  }
+
+  .back-button {
+    display: none;
+  }
+
+  @media (max-width: 1400px) {
+    .top {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .signin-note {
+      display: initial;
+    }
+
+    .back-button {
+      display: initial;
+    }
   }
 </style>

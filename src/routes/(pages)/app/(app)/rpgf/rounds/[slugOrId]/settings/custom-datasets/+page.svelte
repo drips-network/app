@@ -115,7 +115,7 @@
   ];
 </script>
 
-<RpgfSettingsForm round={data.round}>
+<RpgfSettingsForm>
   <FormField
     title="Custom Datasets"
     descriptionMd="Upload a dataset that is displayed on the application view, useful for giving badgeholders additional context. Datasets set to visible are immediately shown on application views and included with CSV exports. [Learn more](https://docs.drips.network/rpgf/advanced/custom-datasets)"
