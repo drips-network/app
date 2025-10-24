@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import RpgfApplicationsTable from '$lib/components/rpgf-applications-table/rpgf-applications-table.svelte';
   import RpgfSiweButton from '$lib/components/rpgf-siwe-button/rpgf-siwe-button.svelte';
@@ -15,10 +14,25 @@
   import { getApplicationsCsv, getApplicationsXlsx } from '$lib/utils/rpgf/rpgf.js';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import type { Writable } from 'svelte/store';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { ApplicationCategory, ListingApplication } from '$lib/utils/rpgf/types/application';
+  import { page } from '$app/stores';
+  import type { FilterParam, SortByParam } from '../+layout';
+  import type { TDropdownOption } from '$lib/components/table-view-configurator/components/mini-dropdown.svelte';
 
-  export let data;
-  $: round = data.round;
-  $: ballotStore = data.ballot;
+  export let round: Round;
+  export let ballotStore: Writable<InProgressBallot> & {
+    clear: () => void;
+  };
+  export let sortByParam: SortByParam;
+  export let filterParam: FilterParam | null;
+  export let loggedIn: boolean;
+  export let categories: ApplicationCategory[];
+  export let voteMode: boolean;
+  export let reviewMode: boolean;
+  export let allApplications: ListingApplication[];
 
   async function handleDownload(format: 'csv' | 'xlsx') {
     const content: Blob | string =
@@ -37,23 +51,32 @@
     downloadUrl(URL.createObjectURL(new Blob([content], { type: fileType })), fileName);
   }
 
-  let selectedSortBy = data.sortByParam;
-  let selectedFilter = data.filterParam;
+  let selectedSortBy: SortByParam = sortByParam;
+  let selectedFilter: FilterParam | null = filterParam;
 
-  $: {
-    if (selectedSortBy !== data.sortByParam || selectedFilter !== data.filterParam) {
-      goto(
-        buildUrl(`/app/rpgf/rounds/${round.urlSlug}/applications`, {
-          sortBy: selectedSortBy,
-          filter: selectedFilter ?? '',
-        }),
-        {
-          replaceState: true,
-        },
-      );
-    }
+  async function handleTableOptsChange({
+    sortBy,
+    filterBy,
+    selectFn,
+  }: {
+    sortBy: string | null;
+    filterBy: string | null;
+    selectFn: () => void;
+  }) {
+    let sortByToSet = sortBy ?? 'createdAt';
+
+    await goto(
+      buildUrl($page.url.pathname, {
+        sortBy: sortByToSet,
+        filter: filterBy ?? null,
+      }),
+      { replaceState: true, noScroll: true },
+    );
+
+    await invalidate('rpgf:round:listing-applications');
+
+    selectFn();
   }
-  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
 
   let tableConfiguratorEl: HTMLDivElement | undefined;
 
@@ -77,30 +100,36 @@
       dismissablesStore.dismiss(filterOnboardingDismissableKey);
     }
   });
+
+  let filterOptions: Record<FilterParam, TDropdownOption>;
+  $: filterOptions = {
+    ...(loggedIn ? { own: { label: 'My applications' } } : {}),
+
+    pending: { label: 'Pending' },
+    approved: { label: 'Approved' },
+    rejected: { label: 'Rejected' },
+
+    ...Object.fromEntries(categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }])),
+  } as Record<FilterParam, TDropdownOption>;
 </script>
 
-<HeadMeta
-  title="Applications | {round.name}"
-  description="Applications for the RetroPGF round '{round.name}'. {round.description ?? ''}"
-  image="{imageBaseUrl}?target=og"
-  twitterImage="{imageBaseUrl}?target=twitter"
-/>
+<div>
+  <Button href="/app/rpgf/rounds/{round.urlSlug}" icon={ArrowLeft}>Back to round</Button>
+</div>
 
-<div class="page">
-  <div><Button href="/app/rpgf/rounds/{round.urlSlug}" icon={ArrowLeft}>Back to round</Button></div>
+{#if !loggedIn}
+  <div transition:fade={{ duration: 300 }}>
+    <AnnotationBox type="info">
+      Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
+      private data if you're an admin.
+      <svelte:fragment slot="actions">
+        <RpgfSiweButton />
+      </svelte:fragment>
+    </AnnotationBox>
+  </div>
+{/if}
 
-  {#if !data.rpgfUserData}
-    <div transition:fade={{ duration: 300 }}>
-      <AnnotationBox type="info">
-        Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
-        private data if you're an admin.
-        <svelte:fragment slot="actions">
-          <RpgfSiweButton />
-        </svelte:fragment>
-      </AnnotationBox>
-    </div>
-  {/if}
-
+<div class="apps-pane">
   <div class="header">
     <h1>Applications</h1>
     <div class="table-setting">
@@ -114,39 +143,38 @@
             ? { allocation: { label: 'Allocation amount' } }
             : null),
         }}
-        bind:sortBy={selectedSortBy}
-        filterOptions={{
-          ...(data.rpgfUserData ? { own: { label: 'My applications' } } : null),
-
-          pending: { label: 'Pending' },
-          approved: { label: 'Approved' },
-
-          ...Object.fromEntries(
-            data.categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }]),
-          ),
-        }}
-        bind:filterBy={selectedFilter}
+        {filterOptions}
         onDownload={handleDownload}
+        sortBy={selectedSortBy}
+        filterBy={selectedFilter}
+        onFilterChange={(filterBy, selectFn) =>
+          handleTableOptsChange({ sortBy: selectedSortBy, filterBy, selectFn })}
+        onSortChange={(sortBy, selectFn) =>
+          handleTableOptsChange({ sortBy, filterBy: selectedFilter, selectFn })}
       />
     </div>
   </div>
 
   <RpgfApplicationsTable
-    voteStep={data.voteMode ? 'build-ballot' : undefined}
-    reviewMode={data.reviewMode}
+    voteStep={voteMode ? 'build-ballot' : undefined}
+    {reviewMode}
     bind:decisions={$decisionsStore}
     {round}
     {ballotStore}
-    applications={data.allApplications}
-    horizontalScroll
+    applications={allApplications}
+    signedIn={loggedIn}
   />
 </div>
 
 <style>
-  .page {
+  .apps-pane {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
   }
 
   .header {

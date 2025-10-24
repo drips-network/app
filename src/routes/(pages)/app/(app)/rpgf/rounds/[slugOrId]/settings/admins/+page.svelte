@@ -12,7 +12,9 @@
 
   export let data;
 
-  let updatedAdminAddresses: string[] = [...data.roundAdmins.map((u) => getAddress(u.walletAddress))];
+  let updatedAdminAddresses: string[] = [
+    ...data.roundAdmins.map((u) => getAddress(u.walletAddress)),
+  ];
 
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
   let adminItems: Items = Object.fromEntries(
@@ -49,10 +51,10 @@
   $: ownAddress = $walletStore.address?.toLowerCase();
 
   let changesMade = false;
-  
+
   $: changesMade = !areStringArraysEqual(
     updatedAdminAddresses.map((a) => a.toLowerCase()).sort(),
-    data.roundAdmins.map((u) => u.walletAddress.toLowerCase()).sort()
+    data.roundAdmins.map((u) => u.walletAddress.toLowerCase()).sort(),
   );
 
   async function saveHandler() {
@@ -60,7 +62,7 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm saveEnabled={changesMade} {saveHandler}>
   <FormField
     title="Administrators"
     description="Administrators can edit round settings, see full applications including private data, review pending applications, and export vote data."

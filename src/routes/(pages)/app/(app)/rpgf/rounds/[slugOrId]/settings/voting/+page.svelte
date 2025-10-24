@@ -136,7 +136,7 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round} invalid={!valid} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm invalid={!valid} saveEnabled={changesMade} {saveHandler}>
   {#if !isDraft}
     <div style:align-self="flex-start">
       <AnnotationBox>

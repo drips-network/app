@@ -146,7 +146,7 @@
   ];
 </script>
 
-<RpgfSettingsForm round={data.round}>
+<RpgfSettingsForm>
   <FormField
     title="Categories"
     description="When creating a new application, applicants first select one of these categories. Each category can have a unique application form assigned to it. If you only create a single category, all applications will use that one."
