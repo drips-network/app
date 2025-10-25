@@ -238,6 +238,7 @@
 
     .apps-inner {
       width: 100%;
+      height: auto;
       padding: 0;
       border: none;
     }
