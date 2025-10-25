@@ -283,6 +283,7 @@ services:
       - JWT_EXPIRATION_MINUTES=60
       - ENABLE_DANGEROUS_TEST_ROUTES=true
       - CORS_ALLOW_ALL_ORIGINS=true
+      - REDIS_URL=redis://redis:6379
     ports:
       - 5293:5000
     depends_on:
