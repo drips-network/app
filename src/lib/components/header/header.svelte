@@ -165,6 +165,10 @@
     view-transition-name: header;
   }
 
+  :root::view-transition-group(header) {
+    z-index: 10;
+  }
+
   .loading-indicator {
     visibility: hidden;
     opacity: 0;
