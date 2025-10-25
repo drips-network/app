@@ -62,7 +62,7 @@
   let dropdownPosition = { top: 0, right: 0 };
 
   function updateDropdownPosition() {
-    if (toggleButtonElem) {
+    if (toggleButtonElem && typeof window !== 'undefined') {
       const rect = toggleButtonElem.getBoundingClientRect();
       dropdownPosition = {
         top: rect.bottom + 4,
