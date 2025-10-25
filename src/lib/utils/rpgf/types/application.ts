@@ -231,7 +231,7 @@ export const applicationSelectAnswerSchema = z.object({
   type: z.literal('select'),
   fieldId: z.string().min(1).max(255),
   field: applicationSelectFieldDtoSchema,
-  selected: z.array(z.string().min(1).max(255)).max(100),
+  selected: z.array(z.string().min(1).max(255)).max(100).nullable(),
 });
 export type ApplicationSelectAnswer = z.infer<typeof applicationSelectAnswerSchema>;
 
