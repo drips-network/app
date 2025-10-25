@@ -75,6 +75,9 @@
 
     await invalidate('rpgf:round:listing-applications');
 
+    selectedSortBy = sortByToSet as SortByParam;
+    selectedFilter = filterBy as FilterParam | null;
+
     selectFn();
   }
 

@@ -67,7 +67,7 @@
         />
 
         <Button
-          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history`}
+          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history${$page.url.search}`}
           icon={ArrowCounterClockwiseHeart}
           variant="ghost">History</Button
         >
