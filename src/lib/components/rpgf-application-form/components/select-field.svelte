@@ -28,7 +28,7 @@
 
   let beenFocussed = false;
 
-  let selected: string[] = answer ? [...answer.value] : [];
+  let selected: string[] = answer ? [...(answer.value ?? [])] : [];
   $: answer = {
     fieldId: field.id,
     value: selected,
@@ -36,7 +36,7 @@
 
   $: {
     if (field.required) {
-      valid = answer !== undefined && answer.value.length > 0;
+      valid = answer !== undefined && (answer.value ?? []).length > 0;
     } else {
       valid = true;
     }

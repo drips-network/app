@@ -32,6 +32,10 @@
       };
     }
 
+    if (!answer.value) {
+      answer.value = [];
+    }
+
     answer = {
       ...answer,
       value: [...answer.value, item],
@@ -44,7 +48,7 @@
 
     answer = {
       ...answer,
-      value: answer.value.filter((_, i) => i !== index),
+      value: (answer.value ?? []).filter((_, i) => i !== index),
     };
   }
 
@@ -96,14 +100,15 @@
         </div>
         <Button
           variant="ghost"
-          on:click={(e) => (answer ? deleteValue(e, answer.value.indexOf(item)) : undefined)}
+          on:click={(e) =>
+            answer && answer.value ? deleteValue(e, answer.value.indexOf(item)) : undefined}
           icon={Trash}
         />
       </div>
     {/each}
   </div>
 
-  {#if answer?.value.length === 0}
+  {#if answer?.value?.length === 0}
     <p class="list-field-empty">No items added yet.</p>
   {/if}
 
