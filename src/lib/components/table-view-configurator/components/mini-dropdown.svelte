@@ -59,6 +59,17 @@
 
   let dropdownElem: HTMLUListElement | undefined = undefined;
   let toggleButtonElem: HTMLButtonElement | undefined = undefined;
+  let dropdownPosition = { top: 0, right: 0 };
+
+  function updateDropdownPosition() {
+    if (toggleButtonElem) {
+      const rect = toggleButtonElem.getBoundingClientRect();
+      dropdownPosition = {
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+      };
+    }
+  }
 
   function handleWindowClick(event: MouseEvent) {
     if (
@@ -69,6 +80,10 @@
     ) {
       open = false;
     }
+  }
+
+  $: if (open && toggleButtonElem) {
+    updateDropdownPosition();
   }
 
   const ariaSlug = `mini-dropdown-${Math.random().toString(36).substring(2, 15)}`;
@@ -99,6 +114,7 @@
     <ul
       transition:fly={{ y: 4, duration: 200 }}
       class="dropdown"
+      style="top: {dropdownPosition.top}px; right: {dropdownPosition.right}px;"
       role="listbox"
       id="select-dropdown-{ariaSlug}"
       aria-labelledby="select-button-{ariaSlug}"
@@ -142,9 +158,7 @@
   }
 
   .dropdown {
-    position: absolute;
-    top: 2.5rem;
-    right: 0;
+    position: fixed;
     background: var(--color-background);
     box-shadow: var(--elevation-medium);
     border-radius: 1rem 0 1rem 1rem;
@@ -170,5 +184,4 @@
     width: 100%;
     text-align: left;
   }
-
 </style>
