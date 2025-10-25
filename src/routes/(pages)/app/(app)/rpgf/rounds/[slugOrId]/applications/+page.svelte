@@ -3,12 +3,38 @@
   import ThreePaneLayout from './shared/three-pane-layout.svelte';
   import ApplicationsPane from './shared/applications-pane.svelte';
   import EmptyState from '$lib/components/section-skeleton/empty-state.svelte';
+  import { onMount } from 'svelte';
+  import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
+  import highlightStore from '$lib/stores/highlight/highlight.store';
 
   export let data;
   $: round = data.round;
   $: ballotStore = data.ballot;
 
   $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
+
+  let tableConfiguratorEl: HTMLDivElement | undefined;
+
+  onMount(() => {
+    if (!tableConfiguratorEl) return;
+
+    const filterOnboardingDismissableKey = `rpgf-applications-filter-onboarding`;
+
+    const filterOnboardingDismissed = dismissablesStore.isDismissed(filterOnboardingDismissableKey);
+
+    if (!filterOnboardingDismissed) {
+      highlightStore.highlight({
+        title: 'Filter and sort applications',
+        description:
+          'Use this menu to see your own applications, filter by category, download CSVs, and more.',
+        element: tableConfiguratorEl,
+        borderRadius: '64px',
+        paddingPx: 8,
+      });
+
+      dismissablesStore.dismiss(filterOnboardingDismissableKey);
+    }
+  });
 </script>
 
 <HeadMeta
@@ -20,7 +46,12 @@
 
 <ThreePaneLayout {...data} pageIsEmpty>
   <svelte:fragment slot="apps">
-    <ApplicationsPane {...data} {ballotStore} loggedIn={data.rpgfUserData !== null} />
+    <ApplicationsPane
+      bind:tableConfiguratorEl
+      {...data}
+      {ballotStore}
+      loggedIn={data.rpgfUserData !== null}
+    />
   </svelte:fragment>
 
   <div class="empty">
