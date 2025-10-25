@@ -53,50 +53,70 @@
       >
         {#if answer.type === 'text'}
           <ExpandableText>
-            <Markdown content={answer.text} />
+            {#if answer.text === null}
+              <span class="no-answer">No answer provided</span>
+            {:else}
+              <Markdown content={answer.text} />
+            {/if}
           </ExpandableText>
         {:else if answer.type === 'email'}
-          <p>{answer.email}</p>
+          {#if answer.email === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <p>{answer.email}</p>
+          {/if}
         {:else if answer.type === 'url'}
-          <a
-            style:width="fit-content"
-            class="typo-link"
-            href={buildExternalUrl(answer.url)}
-            target="_blank"
-            rel="noopener noreferrer">{answer.url}</a
-          >
+          {#if answer.url === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <a
+              style:width="fit-content"
+              class="typo-link"
+              href={buildExternalUrl(answer.url)}
+              target="_blank"
+              rel="noopener noreferrer">{answer.url}</a
+            >
+          {/if}
         {:else if answer.type === 'select'}
-          {#each answer.selected as selected}
-            <p>
-              {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
-            </p>
-          {/each}
+          {#if answer.selected === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            {#each answer.selected as selected}
+              <p>
+                {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
+              </p>
+            {/each}
+          {/if}
         {:else if answer.type === 'list'}
-          <Table
-            options={{
-              columns: answer.field.entryFields.map((ef) => ({
-                header: ef.label,
-                accessorKey: ef.label,
-                cell: (v) => (ef.type === 'url' ? LinkCell : v),
-                enableSorting: false,
-              })),
-              // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
-              data: answer.entries.map((row) => {
-                return Object.fromEntries(
-                  Object.entries(row).map(([label, value]) => {
-                    const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
+          {#if answer.entries === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <Table
+              options={{
+                columns: answer.field.entryFields.map((ef) => ({
+                  header: ef.label,
+                  accessorKey: ef.label,
+                  cell: (v) => (ef.type === 'url' ? LinkCell : v),
+                  enableSorting: false,
+                })),
+                // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
+                data: answer.entries.map((row) => {
+                  return Object.fromEntries(
+                    Object.entries(row).map(([label, value]) => {
+                      const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
 
-                    if (fieldDef?.type === 'url' && typeof value === 'string') {
-                      return [label, { href: buildExternalUrl(value) }];
-                    } else {
-                      return [label, value];
-                    }
-                  }),
-                );
-              }),
-              getCoreRowModel: getCoreRowModel(),
-            }}
-          />
+                      if (fieldDef?.type === 'url' && typeof value === 'string') {
+                        return [label, { href: buildExternalUrl(value) }];
+                      } else {
+                        return [label, value];
+                      }
+                    }),
+                  );
+                }),
+                getCoreRowModel: getCoreRowModel(),
+              }}
+            />
+          {/if}
         {/if}
       </TitleAndValue>
     {/each}
