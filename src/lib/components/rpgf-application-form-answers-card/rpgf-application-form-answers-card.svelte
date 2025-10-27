@@ -135,4 +135,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .no-answer {
+    color: var(--color-foreground-level-5);
+  }
 </style>

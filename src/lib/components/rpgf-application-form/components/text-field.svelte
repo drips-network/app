@@ -11,7 +11,7 @@
   export let valid: boolean = false;
   export let forceRevealError: boolean | undefined = undefined;
 
-  let value: string | undefined = answer?.value;
+  let value: string | undefined = answer?.value ?? undefined;
   $: if (value) {
     answer = {
       fieldId: field.id,

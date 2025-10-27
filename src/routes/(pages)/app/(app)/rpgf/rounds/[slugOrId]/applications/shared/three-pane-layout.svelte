@@ -111,11 +111,7 @@
         {/if}
 
         {#if voteMode}
-          <RpgfVotingCard
-            previouslyCastBallot={Boolean(existingBallot)}
-            {round}
-            ballot={ballotStore}
-          />
+          <RpgfVotingCard previouslyCastBallot={existingBallot} {round} ballot={ballotStore} />
         {/if}
 
         {#if resultsMode}

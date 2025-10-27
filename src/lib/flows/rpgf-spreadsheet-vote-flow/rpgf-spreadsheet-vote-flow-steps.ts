@@ -1,18 +1,18 @@
 import { makeStep } from '$lib/components/stepper/types';
-import type { Writable } from 'svelte/store';
-import Confirm from './steps/confirm.svelte';
 import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import type { Round } from '$lib/utils/rpgf/types/round';
+import type { Writable } from 'svelte/store';
+import UploadBallot from './upload-ballot.svelte';
 import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
 
-export default (ballot: Writable<InProgressBallot> & { clear: () => void }, round: Round) => ({
+export default (
+  round: Round,
+  inProgressBallot: Writable<InProgressBallot> & { clear: () => void },
+) => ({
   steps: [
     makeStep({
-      component: Confirm,
-      props: {
-        ballot,
-        roundId: round.id,
-      },
+      component: UploadBallot,
+      props: { round, inProgressBallot },
     }),
     makeStep({
       component: SuccessStep,

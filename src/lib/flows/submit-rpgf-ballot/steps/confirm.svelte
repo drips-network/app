@@ -5,7 +5,7 @@
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { castBallot, patchBallot } from '$lib/utils/rpgf/rpgf';
+  import { castBallot } from '$lib/utils/rpgf/rpgf';
   import type { Ballot, InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
@@ -13,7 +13,6 @@
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
-  export let previouslyCastBallot: boolean;
   export let roundId: string;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -41,11 +40,7 @@
 
         assertValidBallot(strippedBallot);
 
-        if (previouslyCastBallot) {
-          await patchBallot(undefined, roundId, strippedBallot);
-        } else {
-          await castBallot(undefined, roundId, strippedBallot);
-        }
+        await castBallot(undefined, roundId, strippedBallot);
 
         ballot.clear();
         await invalidate('rpgf:round');
