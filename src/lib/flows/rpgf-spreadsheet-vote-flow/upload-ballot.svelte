@@ -39,8 +39,8 @@
 
     const content: Blob | string =
       format === 'csv'
-        ? await getApplicationsCsv(undefined, round.id)
-        : await getApplicationsXlsx(undefined, round.id);
+        ? await getApplicationsCsv(undefined, round.id, true)
+        : await getApplicationsXlsx(undefined, round.id, true);
 
     const fileType =
       format === 'csv'

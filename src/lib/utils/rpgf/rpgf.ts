@@ -270,9 +270,13 @@ export async function getApplications(
   return listingApplicationSchema.array().parse(await res.json());
 }
 
-export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<string> {
+export async function getApplicationsCsv(
+  f = fetch,
+  roundSlug: string,
+  onlyApproved = false,
+): Promise<string> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/applications?format=csv`,
+    `/rounds/${roundSlug}/applications?format=csv${onlyApproved ? '&state=approved' : ''}`,
     'GET',
     undefined,
     f,
@@ -285,9 +289,13 @@ export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<
   return await res.text();
 }
 
-export async function getApplicationsXlsx(f = fetch, roundSlug: string): Promise<Blob> {
+export async function getApplicationsXlsx(
+  f = fetch,
+  roundSlug: string,
+  onlyApproved = false,
+): Promise<Blob> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/applications?format=xlsx`,
+    `/rounds/${roundSlug}/applications?format=xlsx${onlyApproved ? '&state=approved' : ''}`,
     'GET',
     undefined,
     f,
