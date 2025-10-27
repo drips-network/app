@@ -161,6 +161,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     ecosystems: false,
     retroFunding: { enabled: false },
+    orcids: false,
   },
   [80002]: {
     chainId: 80002,
