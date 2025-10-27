@@ -13,16 +13,48 @@
   } from './components/mini-dropdown.svelte';
 
   export let sortByOptions: TSortByOptions;
-  export let sortBy: string | null = null;
-
   export let filterOptions: TFilterOptions;
-  export let filterBy: string | null = null;
 
   export let loading = false;
 
   export let el: HTMLDivElement | undefined = undefined;
 
   export let onDownload: ((filetype: 'csv' | 'xlsx') => void) | undefined = undefined;
+
+  export let sortBy: keyof TSortByOptions | null = null;
+  export let filterBy: keyof TFilterOptions | null = null;
+
+  export let onFilterChange:
+    | ((filterBy: keyof TFilterOptions | null, selectFn: () => void) => Promise<void>)
+    | undefined = undefined;
+  export let onSortChange:
+    | ((sortBy: keyof TSortByOptions | null, selectFn: () => void) => Promise<void>)
+    | undefined = undefined;
+
+  function handleOptionClick(
+    type: 'filter' | 'sort',
+    key: keyof TSortByOptions | keyof TFilterOptions,
+    selectFn: () => void,
+    isSelected: boolean,
+  ) {
+    if (type === 'filter') {
+      if (onFilterChange) {
+        const keyToSend = isSelected ? null : (key as keyof TFilterOptions);
+
+        onFilterChange(keyToSend, selectFn);
+        return;
+      }
+    } else {
+      if (onSortChange) {
+        const keyToSend = isSelected ? null : (key as keyof TSortByOptions);
+
+        onSortChange(keyToSend, selectFn);
+        return;
+      }
+    }
+
+    selectFn();
+  }
 </script>
 
 <div class="table-view-configurator" bind:this={el}>
@@ -53,16 +85,20 @@
     icon={SortMostToLeast}
     options={sortByOptions}
     disabled={loading}
-    bind:value={sortBy}
+    value={sortBy}
+    onOptionClick={(key, selectFn, isSelected) =>
+      handleOptionClick('sort', key, selectFn, isSelected)}
   />
   <MiniDropdown
     label="Filter by"
     icon={Filter}
     options={filterOptions}
     allowNull
+    value={filterBy}
     highlightIfSet
     disabled={loading}
-    bind:value={filterBy}
+    onOptionClick={(key, selectFn, isSelected) =>
+      handleOptionClick('filter', key, selectFn, isSelected)}
   />
 </div>
 

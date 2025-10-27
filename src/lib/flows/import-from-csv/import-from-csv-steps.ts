@@ -17,6 +17,7 @@ type UploadProps = {
   addItem: (key: AccountId, item: ListEditorItem, weight: number | undefined) => undefined;
   clearItems: () => undefined;
   onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
+  blockedAccountIds?: string[];
 };
 
 export const DEFAULT_CSV_HEADERS = ['recipient', 'percentage'];

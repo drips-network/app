@@ -32,7 +32,7 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm saveEnabled={changesMade} {saveHandler}>
   <div style:width="100%">
     {#if published}
       <div style:margin-bottom="1rem">

@@ -32,7 +32,7 @@
     flex-direction: column;
     gap: 1rem;
     position: sticky;
-    top: 6.5rem;
+    top: 6rem;
   }
 
   .header {

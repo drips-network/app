@@ -95,7 +95,7 @@ export class Project {
     await this.page.getByRole('link', { name: 'View your project' }).click();
 
     const repoName = repoUrl.split('/').slice(-2).join('/');
-    await this.page.waitForURL(`http://localhost:5173/app/projects/github/${repoName}?exact`);
+    await this.page.waitForURL(`http://localhost:5173/app/projects/github/${repoName}?exact=`);
     await expect(this.page.getByText(repoName).nth(0)).toBeVisible();
     await expect(this.page.getByText('Splits', { exact: true })).toBeVisible();
   }

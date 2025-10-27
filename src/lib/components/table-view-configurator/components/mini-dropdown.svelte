@@ -30,8 +30,9 @@
 
   export let disabled = false;
 
-  export let onOptionClick: ((key: keyof TOptions, selectFn: () => void) => void) | undefined =
-    undefined;
+  export let onOptionClick:
+    | ((key: keyof TOptions, selectFn: () => void, isSelected: boolean) => void)
+    | undefined = undefined;
 
   function handleClick() {
     open = !open;
@@ -49,7 +50,7 @@
 
   function handleOptionClick(key: keyof TOptions) {
     if (onOptionClick) {
-      onOptionClick(key, () => selectFn(key));
+      onOptionClick(key, () => selectFn(key), value === key);
       return;
     }
 

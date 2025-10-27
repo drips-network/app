@@ -2,15 +2,10 @@
   import { invalidate } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
-  import type { Round } from '$lib/utils/rpgf/types/round';
   import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  // TODO(rpgf): Proper existing round editing
-
-  export let round: Round;
   export let saveHandler: (() => Promise<void>) | undefined = undefined;
 
   export let saveEnabled = true;
@@ -69,31 +64,29 @@
   });
 </script>
 
-<PrimaryColorThemer colorHex={round.color}>
-  <div class="rpgf-settings-form">
-    <slot />
+<div class="rpgf-settings-form">
+  <slot />
 
-    {#if saveHandler}
-      <div class="actions">
-        {#if success}
-          <div
-            data-testid="success-indicator"
-            in:fly={{ y: 8, duration: 300 }}
-            out:fly={{ y: -8, duration: 300 }}
-          >
-            <CheckCircle style="fill: var(--color-positive)" />
-          </div>
-        {/if}
-        <Button
-          variant="primary"
-          loading={saving}
-          on:click={handleSave}
-          disabled={!saveEnabled || invalid}>Save changes</Button
+  {#if saveHandler}
+    <div class="actions">
+      {#if success}
+        <div
+          data-testid="success-indicator"
+          in:fly={{ y: 8, duration: 300 }}
+          out:fly={{ y: -8, duration: 300 }}
         >
-      </div>
-    {/if}
-  </div>
-</PrimaryColorThemer>
+          <CheckCircle style="fill: var(--color-positive)" />
+        </div>
+      {/if}
+      <Button
+        variant="primary"
+        loading={saving}
+        on:click={handleSave}
+        disabled={!saveEnabled || invalid}>Save changes</Button
+      >
+    </div>
+  {/if}
+</div>
 
 <style>
   .rpgf-settings-form {

@@ -20,6 +20,7 @@ import HourglassIcon from '$lib/components/icons/⏳.svelte';
 import BallotIcon from '$lib/components/icons/🗳️.svelte';
 import FamilyIcon from '$lib/components/icons/👪.svelte';
 import PartyPopperIcon from '$lib/components/icons/🎉.svelte';
+import EyesIcon from '$lib/components/icons/👀.svelte';
 
 export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['✅']: CheckIcon,
@@ -42,4 +43,5 @@ export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
   ['🗳️']: BallotIcon,
   ['👪']: FamilyIcon,
   ['🎉']: PartyPopperIcon,
+  ['👀']: EyesIcon,
 };
