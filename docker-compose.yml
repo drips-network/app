@@ -57,24 +57,31 @@ services:
     ports:
     - 6379:6379
 
-  event-processor:
-    image: 'j537/event-processor:${EVENT_PROCESSOR_TAG-main}-localtestnet'
+  dripfeed:
+    image: 'j537/dripfeed:${DRIPFEED_TAG-main}-localtestnet'
     pull_policy: always
-    entrypoint: bash -c "npm run db:run-migrations && npm run start"
+    entrypoint: bash -c "npm run db:migrate && npm run start"
     environment:
-      - IPFS_GATEWAY_URL=http://fake-pinata:3000
-      - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
-      - PRIMARY_RPC_URL=http://testnet:8545
+      - DATABASE_URL=postgresql://user:admin@postgres:5432/dripsdb
+      - DB_SCHEMA=localtestnet
       - NETWORK=localtestnet
-      - POLLING_INTERVAL=${EVENT_PROCESSOR_POLLING_INTERVAL}
-      - CHUNK_SIZE=${EVENT_PROCESSOR_CHUNK_SIZE}
+      - RPC_URL=http://testnet:8545
       - CONFIRMATIONS=0
-      - SHOULD_START_MONITORING_UI=true
-      - REDIS_CONNECTION_STRING=redis://redis:6379
-      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
-      - LOG_LEVEL=debug
-      - MONITORING_UI_PORT=3001
+      - FETCH_BATCH_SIZE=5000
+      - INSERT_CHUNK_SIZE=1000
+      - PROCESS_BATCH_SIZE=100
+      - POLL_DELAY=2000
+      - MAX_CONSECUTIVE_ERRORS=10
+      - RPC_CONCURRENCY=10
+      - AUTO_HANDLE_REORGS=false
+      - LOG_LEVEL=DEBUG
+      - LOG_PRETTY=true
+      - IPFS_GATEWAY_URL=http://fake-pinata:3000
       - CACHE_INVALIDATION_ENDPOINT=http://app:5173/api/cache/invalidate-account-ids
+      - HEALTH_PORT=3000
+      - NODE_ENV=development
+      - OTEL_DEBUG=false
+      - OTEL_SERVICE_NAME=dripfeed-dev
     ports:
       - 3001:3001
     depends_on:
