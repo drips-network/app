@@ -82,6 +82,10 @@
     }
   }
 
+  function handleWindowResize() {
+    open = false;
+  }
+
   $: if (open && toggleButtonElem) {
     updateDropdownPosition();
   }
@@ -89,7 +93,7 @@
   const ariaSlug = `mini-dropdown-${Math.random().toString(36).substring(2, 15)}`;
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} on:resize={handleWindowResize} />
 
 <div class="mini-dropdown" class:open class:highlight={highlightIfSet && value}>
   <button
