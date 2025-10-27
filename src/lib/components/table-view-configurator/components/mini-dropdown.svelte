@@ -59,6 +59,17 @@
 
   let dropdownElem: HTMLUListElement | undefined = undefined;
   let toggleButtonElem: HTMLButtonElement | undefined = undefined;
+  let dropdownPosition = { top: 0, right: 0 };
+
+  function updateDropdownPosition() {
+    if (toggleButtonElem && typeof window !== 'undefined') {
+      const rect = toggleButtonElem.getBoundingClientRect();
+      dropdownPosition = {
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      };
+    }
+  }
 
   function handleWindowClick(event: MouseEvent) {
     if (
@@ -71,10 +82,18 @@
     }
   }
 
+  function handleWindowResize() {
+    open = false;
+  }
+
+  $: if (open && toggleButtonElem) {
+    updateDropdownPosition();
+  }
+
   const ariaSlug = `mini-dropdown-${Math.random().toString(36).substring(2, 15)}`;
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} on:resize={handleWindowResize} />
 
 <div class="mini-dropdown" class:open class:highlight={highlightIfSet && value}>
   <button
@@ -99,6 +118,7 @@
     <ul
       transition:fly={{ y: 4, duration: 200 }}
       class="dropdown"
+      style="top: {dropdownPosition.top}px; right: {dropdownPosition.right}px;"
       role="listbox"
       id="select-dropdown-{ariaSlug}"
       aria-labelledby="select-button-{ariaSlug}"
@@ -124,7 +144,9 @@
             {item.label}
           </button>
 
-          <div class="checkmark" style:opacity={value === key ? '1' : '0'}><Check /></div>
+          <div class="checkmark" style:opacity={value === key ? '1' : '0'}>
+            <Check style="fill: var(--color-foreground)" />
+          </div>
         </li>
       {/each}
     </ul>
@@ -142,9 +164,7 @@
   }
 
   .dropdown {
-    position: absolute;
-    top: 2.5rem;
-    right: 0;
+    position: fixed;
     background: var(--color-background);
     box-shadow: var(--elevation-medium);
     border-radius: 1rem 0 1rem 1rem;
@@ -170,5 +190,4 @@
     width: 100%;
     text-align: left;
   }
-
 </style>
