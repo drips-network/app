@@ -46,7 +46,7 @@
 					"projectName": "root"
 			},
       {
-        "projectName": "Byron/gitoxide"
+        "projectName": "GitoxideLabs/gitoxide"
       },
       {
         "projectName": "websockets/ws"
@@ -55,11 +55,11 @@
     "edges": [
       {
         "source": "root",
-        "target": "Byron/gitoxide",
+        "target": "GitoxideLabs/gitoxide",
         "weight": 1
       },
       {
-        "source": "Byron/gitoxide",
+        "source": "GitoxideLabs/gitoxide",
         "target": "websockets/ws",
         "weight": 0.5
       }
