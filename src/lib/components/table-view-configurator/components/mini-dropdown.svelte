@@ -65,7 +65,7 @@
     if (toggleButtonElem && typeof window !== 'undefined') {
       const rect = toggleButtonElem.getBoundingClientRect();
       dropdownPosition = {
-        top: rect.bottom + 4,
+        top: rect.bottom + 8,
         right: window.innerWidth - rect.right,
       };
     }
@@ -144,7 +144,9 @@
             {item.label}
           </button>
 
-          <div class="checkmark" style:opacity={value === key ? '1' : '0'}><Check /></div>
+          <div class="checkmark" style:opacity={value === key ? '1' : '0'}>
+            <Check style="fill: var(--color-foreground)" />
+          </div>
         </li>
       {/each}
     </ul>
