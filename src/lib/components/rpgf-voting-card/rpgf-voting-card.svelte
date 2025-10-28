@@ -13,14 +13,19 @@
   import submitRpgfBallotFlowSteps from '$lib/flows/submit-rpgf-ballot/submit-rpgf-ballot-flow-steps';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import type { Round } from '$lib/utils/rpgf/types/round';
-  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { InProgressBallot, WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import unreachable from '$lib/utils/unreachable';
+  import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
+  import File from '../icons/File.svelte';
+  import rpgfSpreadsheetVoteFlowSteps from '$lib/flows/rpgf-spreadsheet-vote-flow/rpgf-spreadsheet-vote-flow-steps';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import { goto, invalidate } from '$app/navigation';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
   export let round: Round;
-  export let previouslyCastBallot: boolean;
+  export let previouslyCastBallot: WrappedBallot | null;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
   $: voterGuidelinesSeen = round.voterGuidelinesLink
@@ -48,7 +53,33 @@
   $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
 
   async function handleSubmitBallot() {
-    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round, previouslyCastBallot));
+    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
+  }
+
+  $: localStoredBallotIsDifferentFromRemote =
+    previouslyCastBallot === null
+      ? ballotHasEntries
+      : Object.keys($ballot).length !== Object.keys(previouslyCastBallot.ballot).length ||
+        Object.entries($ballot).some(
+          ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
+        );
+
+  let clearingLocalBallot = false;
+  async function clearLocalBallotHandler() {
+    await doWithConfirmationModal(
+      previouslyCastBallot
+        ? 'Are you sure you want to clear your changes and revert to your previously submitted ballot?'
+        : 'Are you sure you want to clear your changes?',
+      async () => {
+        clearingLocalBallot = true;
+
+        ballot.clear();
+        await invalidate('rpgf:round:ownBallot');
+        await goto(`/app/rpgf/rounds/${round.urlSlug}`);
+
+        clearingLocalBallot = false;
+      },
+    );
   }
 </script>
 
@@ -63,6 +94,18 @@
         <Button
           variant="primary"
           on:click={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
+        >
+      </svelte:fragment>
+    </AnnotationBox>
+  {/if}
+
+  {#if localStoredBallotIsDifferentFromRemote}
+    <AnnotationBox type="warning">
+      Changes to your ballot have not yet been submitted.
+
+      <svelte:fragment slot="actions">
+        <Button on:click={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
+          >Clear changes</Button
         >
       </svelte:fragment>
     </AnnotationBox>
@@ -108,10 +151,10 @@
         {/if}
       </div>
 
-      <Divider />
+      <Divider sideMargin={-1} />
     {/if}
 
-    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications">
+    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications?filter=approved">
       <div class="step-headline" class:active={voteStep === 'build-ballot'}>
         <h6 class="typo-text-bold">
           {#if voteStep === 'assign-votes'}
@@ -131,6 +174,7 @@
           <p class="typo-text-small">
             Use this step to decide on which projects you believe are worthy of funding.
           </p>
+          <p class="typo-text-small">Alternatively, you can vote by uploading a spreadsheet.</p>
         </div>
 
         <div class="actions">
@@ -143,11 +187,22 @@
             href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
             >Continue to assign votes</Button
           >
+
+          <OrDivider />
+
+          <Button
+            icon={File}
+            href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+            on:click={(e) => {
+              e.preventDefault();
+              modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+            }}>Vote using spreadsheet</Button
+          >
         </div>
       {/if}
     </a>
 
-    <Divider />
+    <Divider sideMargin={-1} />
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot">
       <div class="step-headline" class:active={voteStep === 'assign-votes'}>
@@ -168,11 +223,18 @@
           <div class="assignment-progress-bar">
             <div class="progress-bar" style:width="{percentageOfVotesAssigned * 100}%"></div>
           </div>
-          <div style:margin-top="1rem" style:display="flex" style:flex-direction="column">
+          <div
+            style:margin-top="1rem"
+            style:display="flex"
+            style:flex-direction="column"
+            style:gap="0.5rem"
+          >
             <Button
               size="large"
               icon={Proposals}
-              disabled={!ballotHasEntries || amountOfVotesAssigned === 0}
+              disabled={!ballotHasEntries ||
+                amountOfVotesAssigned === 0 ||
+                (Boolean(previouslyCastBallot) && !localStoredBallotIsDifferentFromRemote)}
               on:click={(e) => {
                 e.preventDefault();
                 handleSubmitBallot();
@@ -185,6 +247,22 @@
                 Submit your ballot
               {/if}
             </Button>
+
+            <OrDivider />
+
+            <Button
+              icon={File}
+              href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+              on:click={(e) => {
+                e.preventDefault();
+                modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+              }}
+              >{#if previouslyCastBallot}
+                Update using spreadsheet
+              {:else}
+                Vote using spreadsheet
+              {/if}</Button
+            >
           </div>
         </div>
       {/if}

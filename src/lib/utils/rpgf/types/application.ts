@@ -214,7 +214,10 @@ export const applicationListAnswerSchema = z.object({
   type: z.literal('list'),
   fieldId: z.string().min(1).max(255),
   field: applicationListFieldDtoSchema,
-  entries: z.array(z.record(z.union([z.string().max(1000), z.number()]))).max(100).nullable(),
+  entries: z
+    .array(z.record(z.union([z.string().max(1000), z.number()])))
+    .max(100)
+    .nullable(),
 });
 export type ApplicationListAnswer = z.infer<typeof applicationListAnswerSchema>;
 
