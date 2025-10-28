@@ -37,8 +37,6 @@ export ARCH
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
-# TODO: remove!
- npm run dev:docker
 if [ $PROD_BUILD = true ]; then
   docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
 else
