@@ -85,6 +85,20 @@
     },
   };
 
+  let exampleLargeListItems: ListItems = {
+    ...Object.fromEntries(
+      Array.from({ length: 100000 }, (_, i) => i).map((i) => [
+        `token-${i}`,
+        {
+          type: 'selectable' as const,
+          label: `Token ${i}`,
+          text: `TKN${i}`,
+          image: 'https://s2.coinmarketcap.com/static/img/coins/200x200/6843.png',
+        },
+      ]),
+    ),
+  };
+
   // Amount
   let amount = '1000000000000000000';
   let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
@@ -711,6 +725,10 @@
       {searchable}
       {multiselect}
     />
+  </div>
+  <h3>List Select: {Object.keys(exampleLargeListItems).length} Items</h3>
+  <div class="list-container">
+    <ListSelect items={exampleLargeListItems} {searchable} {multiselect} />
   </div>
 </div>
 

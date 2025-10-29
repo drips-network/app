@@ -4,6 +4,7 @@
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
+  import VirtualList from 'svelte-tiny-virtual-list';
 
   export let items: Items;
   export let type: 'tokens' | 'generic' = 'generic';
@@ -161,11 +162,35 @@
       (item.disabled || (!canSelectAnother && !selected.includes(slug)))
     );
   }
+
+  // Convert filtered items to array for VirtualList
+  $: itemsArray = Object.entries(filteredItems).filter(([slug, item]) => {
+    if (hideUnselected && item.type === 'selectable') {
+      return selected.includes(slug);
+    }
+    return true;
+  });
+
+  // Fixed item height for VirtualList
+  const ITEM_HEIGHT = 48;
+
+  // Measure parent container height
+  let containerElem: HTMLDivElement;
+  let containerHeight = 0;
+
+  $: if (containerElem) {
+    containerHeight = containerElem.clientHeight;
+  }
+
+  // Calculate height: use parent height if available, otherwise based on item count
+  $: virtualListHeight =
+    containerHeight > 0 ? containerHeight : Math.min(itemsArray.length * ITEM_HEIGHT, 1000);
 </script>
 
 <svelte:window on:keydown={handleArrowKeys} on:keydown={handleArrowKeys} />
 
 <div
+  bind:this={containerElem}
   role="listbox"
   aria-multiselectable={multiselect}
   class="flex flex-col box-border"
@@ -191,81 +216,87 @@
         <p class="typo-text">No matches</p>
       {/if}
     </div>
-  {/if}
-  {#each Object.entries(items) as [slug, item]}
-    {#if item.type === 'interstitial'}
-      <div class="interstitial">
-        <h4>{item.label}</h4>
-        <p class="typo-text-small">{item.description}</p>
-      </div>
-    {:else if !hideUnselected || selected.includes(slug)}
-      <div
-        role="option"
-        aria-selected={selected.includes(slug)}
-        class="item flex items-center p-3 select-none"
-        class:selected={selected.includes(slug)}
-        class:disabled={isItemDisabled(slug)}
-        class:hidden={!Object.values(filteredItems).includes(item)}
-        on:click={isItemDisabled(slug) || blockSelecting
-          ? undefined
-          : (e) => handleItemClick(e, slug)}
-        on:keydown={isItemDisabled(slug) || blockSelecting
-          ? undefined
-          : (e) => handleKeypress(e, slug)}
-        tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
-        data-testid={`item-${slug}`}
-        bind:this={itemElements[slug]}
-        on:focus={() => (focussedSlug = slug)}
-        on:blur={() => (focussedSlug = undefined)}
-      >
-        {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
-          <div class="check-icon">
-            <SelectedDot
-              focussed={focussedSlug === slug}
-              type={multiselect ? 'check' : 'radio'}
-              selected={selected.includes(slug)}
-            />
+  {:else if itemsArray.length > 0}
+    <VirtualList
+      height={virtualListHeight}
+      width="100%"
+      itemCount={itemsArray.length}
+      itemSize={ITEM_HEIGHT}
+      getKey={(index) => itemsArray[index][0]}
+    >
+      <div slot="item" let:index let:style {style}>
+        {@const [slug, item] = itemsArray[index]}
+        {#if item.type === 'interstitial'}
+          <div class="interstitial">
+            <h4>{item.label}</h4>
+            <p class="typo-text-small">{item.description}</p>
           </div>
-        {/if}
-        {#if item.image}
-          <div class="image">
-            {#if typeof item.image === 'string'}
-              <img src={item.image} alt="List item" />
-            {:else if item.image}
-              <svelte:component this={item.image.component} {...item.image.props} />
+        {:else if !hideUnselected || selected.includes(slug)}
+          <div
+            role="option"
+            aria-selected={selected.includes(slug)}
+            class="item"
+            class:selected={selected.includes(slug)}
+            class:disabled={isItemDisabled(slug)}
+            on:click={isItemDisabled(slug) || blockSelecting
+              ? undefined
+              : (e) => handleItemClick(e, slug)}
+            on:keydown={isItemDisabled(slug) || blockSelecting
+              ? undefined
+              : (e) => handleKeypress(e, slug)}
+            tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
+            data-testid={`item-${slug}`}
+            bind:this={itemElements[slug]}
+            on:focus={() => (focussedSlug = slug)}
+            on:blur={() => (focussedSlug = undefined)}
+          >
+            {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
+              <div class="check-icon">
+                <SelectedDot
+                  focussed={focussedSlug === slug}
+                  type={multiselect ? 'check' : 'radio'}
+                  selected={selected.includes(slug)}
+                />
+              </div>
             {/if}
-          </div>
-        {/if}
-        <div
-          class="content xs:flex flex-wrap items-center justify-between w-full text-foreground"
-          class:action={item.type === 'action'}
-        >
-          {#if typeof item.label === 'string'}
-            <span class="label typo-text pr-4">{item.label}</span>
-          {:else}
-            <svelte:component this={item.label.component} {...item.label.props} />
-          {/if}
-          <div class="right">
-            {#if item.type === 'selectable' && item.text}
-              {#if typeof item.text === 'string'}
-                <span class="text typo-text tabular-nums flex-shrink-0">
-                  {item.text}
-                </span>
+            {#if item.image}
+              <div class="image">
+                {#if typeof item.image === 'string'}
+                  <img src={item.image} alt="List item" />
+                {:else if item.image}
+                  <svelte:component this={item.image.component} {...item.image.props} />
+                {/if}
+              </div>
+            {/if}
+            <div class="content" class:action={item.type === 'action'}>
+              {#if typeof item.label === 'string'}
+                <span class="label typo-text">{item.label}</span>
               {:else}
-                <svelte:component this={item.text.component} {...item.text.props} />
+                <svelte:component this={item.label.component} {...item.label.props} />
               {/if}
-            {/if}
-            {#if item.type === 'selectable' && item.editablePercentage}
-              <PercentageEditor
-                bind:percentage={percentages[slug]}
-                disabled={!selected.includes(slug)}
-              />
-            {/if}
+              <div class="right">
+                {#if item.type === 'selectable' && item.text}
+                  {#if typeof item.text === 'string'}
+                    <span class="text typo-text tabular-nums">
+                      {item.text}
+                    </span>
+                  {:else}
+                    <svelte:component this={item.text.component} {...item.text.props} />
+                  {/if}
+                {/if}
+                {#if item.type === 'selectable' && item.editablePercentage}
+                  <PercentageEditor
+                    bind:percentage={percentages[slug]}
+                    disabled={!selected.includes(slug)}
+                  />
+                {/if}
+              </div>
+            </div>
           </div>
-        </div>
+        {/if}
       </div>
-    {/if}
-  {/each}
+    </VirtualList>
+  {/if}
 </div>
 
 <style>
@@ -283,19 +314,20 @@
     color: var(--color-foreground-level-4);
   }
 
-  .search-bar,
-  .item {
+  .search-bar {
     border-bottom: 1px solid var(--color-foreground-level-3);
     display: flex;
     gap: 0.5rem;
   }
 
-  .item:last-child {
-    border-bottom: none;
-  }
-
-  .item:has(+ .interstitial) {
-    border-bottom: none;
+  .item {
+    height: 48px;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-foreground-level-3);
+    user-select: none;
   }
 
   .empty-state {
@@ -317,10 +349,6 @@
     flex-direction: column;
     gap: 0.25rem;
     padding: 2rem 1rem 0.75rem 1rem;
-  }
-
-  .hidden {
-    display: none;
   }
 
   .item:not(.disabled) {
@@ -345,6 +373,31 @@
     border-radius: 1rem;
   }
 
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: var(--color-foreground);
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .content .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .content .right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
   .item .content .text {
     color: var(--color-foreground-level-4);
     flex-shrink: 0;
@@ -352,5 +405,9 @@
 
   .item .content.action {
     color: var(--color-foreground-level-4);
+  }
+
+  .check-icon {
+    flex-shrink: 0;
   }
 </style>
