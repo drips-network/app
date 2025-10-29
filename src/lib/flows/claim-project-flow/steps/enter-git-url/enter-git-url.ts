@@ -30,7 +30,8 @@ export async function loadFundingInfo(context: Writable<State>): Promise<void> {
     fundingObject = await github.fetchFundingJson(ownerName, repoName);
   } catch (error) {
     // if the FUNDING.json is not found or not parseable, that's fine. It means we need a new one,
-    // so we continue below. The user will be prompted to create a valid FUNDING.json in the next step.
+    // so we continue below. The user will be prompted to create a valid FUNDING.json in the next step
+    // (add-ethereum-address), where verifyFundingJson() will properly validate the file.
     // Only if the file is still invalid after that step should we show an error.
     if (
       !(error as Error).message.includes('not found') &&
