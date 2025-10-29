@@ -24,24 +24,27 @@ export async function loadFundingInfo(context: Writable<State>): Promise<void> {
   }
 
   let fundingObject = {};
+  let fundingJson = '';
+  let jsonHighlight: [number | null, number | null] = [null, null];
+
   try {
     const $context = get(context);
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
     fundingObject = await github.fetchFundingJson(ownerName, repoName);
+    [fundingJson, jsonHighlight] = getChangedTemplate(fundingObject, address, network);
   } catch (error) {
-    // if the FUNDING.json is not found or not parseable, that's fine. It means we need a new one,
-    // so we continue below. The user will be prompted to create a valid FUNDING.json in the next step
+    // If the FUNDING.json is not found, not parseable, or has an invalid structure, that's fine.
+    // It means we need a new one, so we continue below with an empty funding object.
+    // The user will be prompted to create a valid FUNDING.json in the next step
     // (add-ethereum-address), where verifyFundingJson() will properly validate the file.
-    // Only if the file is still invalid after that step should we show an error.
-    if (
-      !(error as Error).message.includes('not found') &&
-      !(error as Error).message.includes('Unable to parse')
-    ) {
-      throw error;
+    if ((error as Error).message.includes('not found')) {
+      // File not found - continue with empty object
+      [fundingJson, jsonHighlight] = getChangedTemplate(fundingObject, address, network);
+    } else {
+      // Any other error (parsing error, invalid structure, etc.) - continue with empty object
+      [fundingJson, jsonHighlight] = getChangedTemplate({}, address, network);
     }
   }
-
-  const [fundingJson, jsonHighlight] = getChangedTemplate(fundingObject, address, network);
 
   context.update((c) => {
     c.funding = {
