@@ -29,10 +29,13 @@ export async function loadFundingInfo(context: Writable<State>): Promise<void> {
     const { ownerName, repoName } = $context.project?.source ?? unreachable();
     fundingObject = await github.fetchFundingJson(ownerName, repoName);
   } catch (error) {
-    // if the FUNDING.json is not found, that's fine. It means we need a new one, so
-    // we continue below. Otherwise (here), something is wrong and we should show
-    // an error.
-    if (!(error as Error).message.includes('not found')) {
+    // if the FUNDING.json is not found or not parseable, that's fine. It means we need a new one,
+    // so we continue below. The user will be prompted to create a valid FUNDING.json in the next step.
+    // Only if the file is still invalid after that step should we show an error.
+    if (
+      !(error as Error).message.includes('not found') &&
+      !(error as Error).message.includes('Unable to parse')
+    ) {
       throw error;
     }
   }
