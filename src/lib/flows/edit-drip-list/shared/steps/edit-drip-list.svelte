@@ -50,6 +50,7 @@
   } from '$lib/flows/import-from-csv/csv-import-helpers';
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  import { invalidateAll as invalidateAllFetchedDataCache } from '$lib/stores/fetched-data-cache/invalidate';
   import { invalidateAll } from '$app/navigation';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { buildDripListUpdateTxs } from '$lib/utils/driplist/buildDripListUpdateTxs';
@@ -123,6 +124,7 @@
         after: async (_, { accountId, ipfsHash }) => {
           await waitForAccountMetadata(accountId, ipfsHash, 'dripList');
           await invalidateAccountCache(accountId);
+          await invalidateAllFetchedDataCache();
           await invalidateAll();
         },
       }),
