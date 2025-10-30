@@ -25,11 +25,17 @@ async function checkRpc() {
 }
 
 async function checkLp(f: typeof fetch) {
-  await f('/', { signal: AbortSignal.timeout(10000) });
+  const response = await f('/', { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) {
+    throw new Error(`Landing page returned status ${response.status}`);
+  }
 }
 
 async function checkExplore(f: typeof fetch) {
-  await f('/app', { signal: AbortSignal.timeout(10000) });
+  const response = await f('/app', { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) {
+    throw new Error(`Explore page returned status ${response.status}`);
+  }
 }
 
 export const GET = async ({ fetch }) => {
@@ -59,8 +65,21 @@ export const GET = async ({ fetch }) => {
   );
 
   const errors = results
-    .map((result) => (result.status === 'rejected' ? result.reason : null))
+    .map((result) => {
+      if (result.status === 'rejected') {
+        const { error } = result.reason;
+        if (!error) {
+          return result.reason;
+        }
+
+        // Ensure error properly serialized later when returning failing status.
+        return JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      }
+
+      return null;
+    })
     .filter((error) => error !== null);
+  console.log(errors);
 
   if (errors.length > 0) {
     console.error('Health endpoint request failed. Errors:', JSON.stringify(errors));
