@@ -26,15 +26,15 @@ async function checkRpc() {
 
 async function checkLp(f: typeof fetch) {
   const response = await f('/', { signal: AbortSignal.timeout(10000) });
-  if (!response.ok && response.status >= 400) {
-    error(response.status, `Landing page returned status ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`Landing page returned status ${response.status}`);
   }
 }
 
 async function checkExplore(f: typeof fetch) {
   const response = await f('/app', { signal: AbortSignal.timeout(10000) });
-  if (!response.ok && response.status >= 400) {
-    error(response.status, `Explore page returned status ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`Explore page returned status ${response.status}`);
   }
 }
 
