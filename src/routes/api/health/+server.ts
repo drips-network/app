@@ -79,7 +79,6 @@ export const GET = async ({ fetch }) => {
       return null;
     })
     .filter((error) => error !== null);
-  console.log(errors);
 
   if (errors.length > 0) {
     console.error('Health endpoint request failed. Errors:', JSON.stringify(errors));
