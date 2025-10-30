@@ -44,7 +44,8 @@ export const GET = async ({ fetch }) => {
   const checks = [
     { name: 'GraphQL API', fn: checkGqlApi },
     { name: 'RPC', fn: checkRpc },
-    { name: 'Landing Page', fn: () => checkLp(fetch) },
+    // Skip LP check if in alternative chain mode (redirects to /app)
+    ...(network.alternativeChainMode ? [] : [{ name: 'Landing Page', fn: () => checkLp(fetch) }]),
     { name: 'Explore', fn: () => checkExplore(fetch) },
   ];
 
