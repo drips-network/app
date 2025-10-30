@@ -50,6 +50,7 @@
   } from '$lib/flows/import-from-csv/csv-import-helpers';
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
+  // /drip-lists relies on fetchedDataCache to cache its data
   import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { buildDripListUpdateTxs } from '$lib/utils/driplist/buildDripListUpdateTxs';
