@@ -27,14 +27,14 @@ async function checkRpc() {
 async function checkLp(f: typeof fetch) {
   const response = await f('/', { signal: AbortSignal.timeout(10000) });
   if (!response.ok) {
-    error(response.status, `Landing page returned status ${response.status}`);
+    throw new Error(`Landing page returned status ${response.status}`);
   }
 }
 
 async function checkExplore(f: typeof fetch) {
   const response = await f('/app', { signal: AbortSignal.timeout(10000) });
   if (!response.ok) {
-    error(response.status, `Explore page returned status ${response.status}`);
+    throw new Error(`Explore page returned status ${response.status}`);
   }
 }
 
@@ -44,7 +44,8 @@ export const GET = async ({ fetch }) => {
   const checks = [
     { name: 'GraphQL API', fn: checkGqlApi },
     { name: 'RPC', fn: checkRpc },
-    { name: 'Landing Page', fn: () => checkLp(fetch) },
+    // Skip LP check if in alternative chain mode (redirects to /app)
+    ...(network.alternativeChainMode ? [] : [{ name: 'Landing Page', fn: () => checkLp(fetch) }]),
     { name: 'Explore', fn: () => checkExplore(fetch) },
   ];
 
