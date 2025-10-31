@@ -38,6 +38,9 @@
         accountId
       }
       repoMetadata {
+        url
+        repoName
+        ownerName
         description
         forksCount
         stargazersCount

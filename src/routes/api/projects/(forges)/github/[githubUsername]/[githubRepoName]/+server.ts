@@ -70,10 +70,10 @@ export const GET: RequestHandler = async ({ params }) => {
   };
 
   const repo: Repo = {
-    url: project.source.url,
+    url: project.repoMetadata.url,
     description: project.repoMetadata.description ?? null,
-    repoName: project.source.repoName,
-    ownerName: project.source.ownerName,
+    repoName: project.repoMetadata.repoName,
+    ownerName: project.repoMetadata.ownerName,
     forksCount: project.repoMetadata.forksCount,
     stargazersCount: project.repoMetadata.stargazersCount,
     defaultBranch: project.repoMetadata.defaultBranch,
