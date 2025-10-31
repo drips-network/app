@@ -14,7 +14,7 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
 import { isWalletUnlocked } from './utils/is-wallet-unlocked';
 import network, { getNetwork, isConfiguredChainId, NETWORK_CONFIG, type Network } from './network';
-import { invalidateAll } from '../fetched-data-cache/invalidate';
+import { invalidateAll } from '$app/navigation';
 import { BrowserProvider } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';

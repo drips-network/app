@@ -44,7 +44,7 @@
   import type { repoDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
   import { toBigInt } from 'ethers';
   import keyValueToMetatada from '$lib/utils/sdk/utils/key-value-to-metadata';

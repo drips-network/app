@@ -14,7 +14,7 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import { mapSplitsFromListEditorData } from '$lib/components/splits/utils';

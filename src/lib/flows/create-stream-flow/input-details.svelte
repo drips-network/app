@@ -65,7 +65,7 @@
   import { buildStreamCreateBatchTx } from '$lib/utils/streams/streams';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import { isAddress } from 'ethers';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
   import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
