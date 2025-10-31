@@ -22,6 +22,8 @@
 
   export let horizontalScroll = false;
 
+  export let displayVisibilityNote = false;
+
   let searchQuery = '';
 
   $: filteredApplications = applications.filter((application) => {
@@ -56,6 +58,7 @@
       {reviewMode}
       {round}
       {signedIn}
+      {displayVisibilityNote}
       bind:decisions
     />
   </PaddedHorizontalScroll>
@@ -71,6 +74,7 @@
     {signedIn}
     bind:decisions
     ellipsis={true}
+    {displayVisibilityNote}
   />
 {/if}
 
