@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+import { tick } from 'svelte';
 import ListSelect from './list-select.svelte';
 import type { Items } from './list-select.types';
 
@@ -64,11 +65,13 @@ describe('list-select.svelte', async () => {
 
     await userEvent.type(searchBar, 'test-item-1');
 
+    await tick();
+
     const item1 = screen.queryByTestId('item-test-item-1');
     const item2 = screen.queryByTestId('item-test-item-2');
 
     expect(item1).toBeInTheDocument();
-    expect(item2).toHaveClass('hidden');
+    expect(item2).not.toBeInTheDocument();
   });
 
   it('allows selecting an item', async () => {
