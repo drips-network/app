@@ -19,7 +19,7 @@
   import expect from '$lib/utils/expect';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import network from '$lib/stores/wallet/network';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import assert from '$lib/utils/assert';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { sdkManager } from '$lib/utils/sdk/sdk-manager';
