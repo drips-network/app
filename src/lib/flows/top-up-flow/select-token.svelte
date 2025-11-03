@@ -44,6 +44,26 @@
         },
       ]) ?? [],
     ),
+    // Test tokens
+    ...Object.fromEntries(
+      Array.from({ length: 100 }, (_, i) => [
+        `0xtest${i.toString().padStart(40, '0')}`,
+        {
+          type: 'selectable',
+          searchString: [`Test Token ${i + 1}`, `TEST${i + 1}`],
+          label: `Test Token ${i + 1}`,
+          text: `TEST${i + 1}`,
+          image: {
+            component: Token,
+            props: {
+              show: 'none',
+              address: `0xtest${i.toString().padStart(40, '0')}`,
+              size: 'small',
+            },
+          },
+        },
+      ]),
+    ),
     'add-custom-token': {
       type: 'action',
       label: 'Add custom token',
@@ -114,6 +134,5 @@
     height: 24rem;
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
-    overflow: scroll;
   }
 </style>
