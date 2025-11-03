@@ -3,7 +3,7 @@
 
   let origin = window?.location?.origin;
 
-  export let caption: string | undefined;
+  export let caption: string | undefined = undefined;
   export let headers: Array<string> = DEFAULT_CSV_HEADERS;
   export let data: Array<Array<unknown>> = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
