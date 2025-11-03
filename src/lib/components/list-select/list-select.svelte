@@ -118,36 +118,49 @@
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
 
-    const visibleEls = Object.values(itemElements).filter(
-      (itemElement) => !itemElement?.classList.contains('hidden'),
+    // Check if focus is on search bar or any item
+    const itemElemInFocus = Object.values(itemElements).find(
+      (elem) => document.activeElement === elem,
     );
-
-    const itemElemInFocus = visibleEls.find((elem) => document.activeElement === elem);
 
     if (!(searchBarElem === focussedElem || itemElemInFocus)) return;
     if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
 
+    // Get the current focused slug
+    const currentSlug = focussedSlug;
+
+    // Get array of selectable slugs in order
+    const selectableItems = itemsArray.filter(
+      ([slug, item]) =>
+        item.type !== 'interstitial' && (!hideUnselected || selected.includes(slug)),
+    );
+
+    const currentIndex = currentSlug
+      ? selectableItems.findIndex(([slug]) => slug === currentSlug)
+      : -1;
+
     switch (e.key) {
       case 'ArrowDown': {
-        if (!itemElemInFocus) {
-          visibleEls[0].focus();
-          break;
+        if (currentIndex === -1 && selectableItems.length > 0) {
+          // Focus first item
+          const firstSlug = selectableItems[0][0];
+          itemElements[firstSlug]?.focus();
+        } else if (currentIndex < selectableItems.length - 1) {
+          // Focus next item
+          const nextSlug = selectableItems[currentIndex + 1][0];
+          itemElements[nextSlug]?.focus();
         }
-
-        visibleEls[visibleEls.indexOf(itemElemInFocus) + 1]?.focus();
         break;
       }
       case 'ArrowUp': {
-        if (!itemElemInFocus) break;
-
-        const previousElem = visibleEls[visibleEls.indexOf(itemElemInFocus) - 1];
-
-        if (previousElem) {
-          previousElem.focus();
-        } else {
-          searchBarElem.focus();
+        if (currentIndex > 0) {
+          // Focus previous item
+          const prevSlug = selectableItems[currentIndex - 1][0];
+          itemElements[prevSlug]?.focus();
+        } else if (currentIndex === 0) {
+          // Focus search bar if at first item
+          searchBarElem?.focus();
         }
-
         break;
       }
     }
