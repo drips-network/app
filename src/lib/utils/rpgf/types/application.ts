@@ -274,6 +274,10 @@ export const createApplicationDtoSchema = z.object({
   projectName: z.string().min(1).max(255),
   dripsAccountId: z.string().min(1).max(255),
   attestationUID: z.string().min(1).max(255).optional(),
+  deferredAttestationTxHash: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{64}$/)
+    .optional(),
   categoryId: z.string().min(1).max(255),
   answers: applicationAnswerDtoSchema,
 });
@@ -383,6 +387,7 @@ export type UpdateApplicationDto = {
   projectName: string;
   dripsAccountId: string;
   attestationUID?: string;
+  deferredAttestationTxHash?: string;
   categoryId: string;
   answers: ApplicationAnswerDto;
 };
