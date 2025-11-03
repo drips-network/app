@@ -95,7 +95,7 @@
       >
         <div slot="item" let:index let:style {style}>
           <div class="emojis-row">
-            {#each emojiRows[index] as e}
+            {#each emojiRows[index] as e (e.unicode)}
               <div class="emoji" class:selected={selectedEmoji === e.unicode}>
                 <input
                   id={e.unicode}
