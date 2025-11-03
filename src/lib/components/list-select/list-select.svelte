@@ -103,17 +103,10 @@
     e.preventDefault();
   }
 
-  const handleKeypress = (e: KeyboardEvent, slug: string) => {
-    const selectKeys = ['Enter', ' '];
-    if (!selectKeys.includes(e.key)) return;
-
-    selectItem(slug, e.shiftKey);
-    e.preventDefault();
-  };
-
   let searchBarElem: HTMLDivElement;
   let itemElements: { [slug: string]: HTMLDivElement } = {};
   let focussedSlug: string | undefined;
+  let scrollToIndex: number | undefined = undefined;
 
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
@@ -123,7 +116,18 @@
       (elem) => document.activeElement === elem,
     );
 
-    if (!(searchBarElem === focussedElem || itemElemInFocus)) return;
+    // Allow navigation if focus is in component OR we have a tracked focussedSlug
+    if (!(searchBarElem === focussedElem || itemElemInFocus || focussedSlug)) return;
+
+    // Handle Enter/Space to select the currently focused item
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (focussedSlug && !isItemDisabled(focussedSlug)) {
+        selectItem(focussedSlug, e.shiftKey);
+        e.preventDefault();
+      }
+      return;
+    }
+
     if (!(e.key === 'ArrowDown' || e.key === 'ArrowUp')) return;
 
     // Get the current focused slug
@@ -144,19 +148,21 @@
         if (currentIndex === -1 && selectableItems.length > 0) {
           // Focus first item
           const firstSlug = selectableItems[0][0];
-          itemElements[firstSlug]?.focus();
+          focusItemAtIndex(0, firstSlug);
         } else if (currentIndex < selectableItems.length - 1) {
           // Focus next item
-          const nextSlug = selectableItems[currentIndex + 1][0];
-          itemElements[nextSlug]?.focus();
+          const nextIndex = currentIndex + 1;
+          const nextSlug = selectableItems[nextIndex][0];
+          focusItemAtIndex(nextIndex, nextSlug);
         }
         break;
       }
       case 'ArrowUp': {
         if (currentIndex > 0) {
           // Focus previous item
-          const prevSlug = selectableItems[currentIndex - 1][0];
-          itemElements[prevSlug]?.focus();
+          const prevIndex = currentIndex - 1;
+          const prevSlug = selectableItems[prevIndex][0];
+          focusItemAtIndex(prevIndex, prevSlug);
         } else if (currentIndex === 0) {
           // Focus search bar if at first item
           searchBarElem?.focus();
@@ -166,6 +172,24 @@
     }
 
     e.preventDefault();
+  }
+
+  function focusItemAtIndex(index: number, slug: string) {
+    // Update the focused slug first
+    focussedSlug = slug;
+
+    // Scroll to the item in the virtual list by setting the prop
+    scrollToIndex = index;
+
+    // Wait for the item to render and scroll, then try to focus it
+    requestAnimationFrame(() => {
+      const elem = itemElements[slug];
+      if (elem) {
+        elem.focus();
+      }
+      // Reset scrollToIndex after attempting focus
+      scrollToIndex = undefined;
+    });
   }
 
   function isItemDisabled(slug: string) {
@@ -241,6 +265,8 @@
         width="100%"
         itemCount={itemsArray.length}
         itemSize={ITEM_HEIGHT}
+        {scrollToIndex}
+        scrollToAlignment="auto"
         getKey={(index) => itemsArray[index]?.[0] ?? `item-${index}`}
       >
         <div slot="item" let:index let:style {style}>
@@ -252,6 +278,7 @@
                 <p class="typo-text-small">{item.description}</p>
               </div>
             {:else if !hideUnselected || selected.includes(slug)}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
               <div
                 role="option"
                 aria-selected={selected.includes(slug)}
@@ -261,16 +288,27 @@
                 on:click={isItemDisabled(slug) || blockSelecting
                   ? undefined
                   : (e) => handleItemClick(e, slug)}
-                on:keydown={isItemDisabled(slug) || blockSelecting
-                  ? undefined
-                  : (e) => handleKeypress(e, slug)}
                 tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction
                   ? undefined
                   : 0}
                 data-testid={`item-${slug}`}
                 bind:this={itemElements[slug]}
                 on:focus={() => (focussedSlug = slug)}
-                on:blur={() => (focussedSlug = undefined)}
+                on:blur={() => {
+                  // Don't clear focussedSlug immediately - keep it for keyboard navigation
+                  // Only clear if focus moves outside AND component is not visible
+                  requestAnimationFrame(() => {
+                    const newFocus = document.activeElement;
+                    const isFocusInList = Object.values(itemElements).some((el) => el === newFocus);
+
+                    if (!isFocusInList && newFocus !== searchBarElem) {
+                      // Check if component is still visible before clearing
+                      if (containerElem && !containerElem.checkVisibility?.()) {
+                        focussedSlug = undefined;
+                      }
+                    }
+                  });
+                }}
               >
                 {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
                   <div class="check-icon">
