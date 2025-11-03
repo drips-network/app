@@ -23,6 +23,7 @@
     Application,
     ApplicationFormFields,
     CreateApplicationDto,
+    UpdateApplicationDto,
   } from '$lib/utils/rpgf/types/application';
   import { invalidate } from '$app/navigation';
   import { clearLocallyStoredApplication } from '../../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
@@ -38,26 +39,56 @@
 
   export let isUpdateForApplication: Application | null;
 
+  type SubmissionExtras = {
+    attestationUID?: string;
+    deferredAttestationTxHash?: string;
+  };
+
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  async function sendApplication(attestationUID?: string) {
-    const application = await submitApplication(undefined, roundId, {
-      ...applicationData,
-      attestationUID,
-    });
+  async function sendApplication(extras: SubmissionExtras = {}) {
+    const payload: CreateApplicationDto = { ...applicationData };
+
+    if (extras.attestationUID) {
+      payload.attestationUID = extras.attestationUID;
+    }
+
+    if (extras.deferredAttestationTxHash) {
+      payload.deferredAttestationTxHash = extras.deferredAttestationTxHash;
+    }
+
+    const application = await submitApplication(undefined, roundId, payload);
 
     $context.applicationId = application.id;
   }
 
-  async function sendApplicationUpdate(attestationUID?: string) {
+  async function sendApplicationUpdate(extras: SubmissionExtras = {}) {
     assert(isUpdateForApplication, 'No application to update');
 
-    await updateApplication(undefined, roundId, isUpdateForApplication.id, {
-      ...applicationData,
-      attestationUID,
-    });
+    const payload: UpdateApplicationDto = { ...applicationData };
+
+    if (extras.attestationUID) {
+      payload.attestationUID = extras.attestationUID;
+    }
+
+    if (extras.deferredAttestationTxHash) {
+      payload.deferredAttestationTxHash = extras.deferredAttestationTxHash;
+    }
+
+    await updateApplication(undefined, roundId, isUpdateForApplication.id, payload);
 
     $context.applicationId = isUpdateForApplication.id;
+  }
+
+  async function finalizeSubmission(extras: SubmissionExtras = {}) {
+    if (isUpdateForApplication) {
+      await sendApplicationUpdate(extras);
+    } else {
+      await sendApplication(extras);
+      clearLocallyStoredApplication(roundId, userId);
+    }
+
+    await invalidate('rpgf:round:applications');
   }
 
   function handleWithAttest() {
@@ -73,7 +104,7 @@
             'Attestations are not enabled for retro funding',
           );
 
-          const { connected, address, provider } = $walletStore;
+          const { connected, address, provider, safe } = $walletStore;
           if (!connected) {
             throw new Error('Wallet not connected');
           }
@@ -97,7 +128,15 @@
             network.retroFunding.attestationConfig;
           assert(easConfig, 'EAS configuration is not available');
 
-          return { attestTx, easAddress, easConfig, address, attestationData, provider };
+          return {
+            attestTx,
+            easAddress,
+            easConfig,
+            address,
+            attestationData,
+            provider,
+            isSafeSubmission: Boolean(safe),
+          };
         },
 
         transactions: ({ attestTx, easAddress, easConfig, address, attestationData, provider }) => [
@@ -149,19 +188,23 @@
           },
         ],
 
-        after: async (receipts) => {
+        after: async (receipts, context) => {
+          if (context?.isSafeSubmission) {
+            return;
+          }
+
           const attestationReceipt = receipts[receipts.length - 1];
           const attestationUID = getUIDsFromAttestReceipt(attestationReceipt)[0];
 
-          if (isUpdateForApplication) {
-            await sendApplicationUpdate(attestationUID);
-            await invalidate('rpgf:round:applications');
-          } else {
-            await sendApplication(attestationUID);
+          await finalizeSubmission({ attestationUID });
+        },
 
-            clearLocallyStoredApplication(roundId, userId);
-            await invalidate('rpgf:round:applications');
+        async afterSafe({ safeTxHash }, _context) {
+          if (!safeTxHash) {
+            throw new Error('Safe transaction hash not available for deferred attestation.');
           }
+
+          await finalizeSubmission({ deferredAttestationTxHash: safeTxHash });
         },
       }),
     );
@@ -170,14 +213,7 @@
   function handleWithoutAttest() {
     dispatch('await', {
       promise: async () => {
-        if (isUpdateForApplication) {
-          await sendApplicationUpdate();
-        } else {
-          await sendApplication();
-        }
-
-        await invalidate('rpgf:round:applications');
-        clearLocallyStoredApplication(roundId, userId);
+        await finalizeSubmission();
       },
       message: 'Submitting application...',
     });
