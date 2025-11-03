@@ -24,7 +24,7 @@
   } from './__generated__/gql.generated';
   import { buildPauseStreamPopulatedTx } from '$lib/utils/streams/streams';
   import query from '$lib/graphql/dripsQL';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
 

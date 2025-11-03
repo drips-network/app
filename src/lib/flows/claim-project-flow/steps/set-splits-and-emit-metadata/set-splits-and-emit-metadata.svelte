@@ -27,7 +27,7 @@
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import type {
     CheckProjectVerificationStatusQuery,
     CheckProjectVerificationStatusQueryVariables,

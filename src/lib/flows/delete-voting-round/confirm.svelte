@@ -9,7 +9,7 @@
   import assert from '$lib/utils/assert';
   import { goto } from '$app/navigation';
   import Wallet from '$lib/components/icons/Wallet.svelte';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

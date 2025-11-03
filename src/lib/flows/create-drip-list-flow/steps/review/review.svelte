@@ -24,7 +24,7 @@
   import OneTimeDonationReviewCard from './components/one-time-donation-review-card.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import network from '$lib/stores/wallet/network';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import invalidateAccountCache from '$lib/utils/cache/remote/invalidate-account-cache';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';

@@ -19,7 +19,7 @@
   import formatDate from '$lib/utils/format-date';
   import * as multiplayer from '$lib/utils/multiplayer';
   import assert from '$lib/utils/assert';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import WhatsNextSection from '$lib/components/whats-next/whats-next-section.svelte';
   import WhatsNextCard from '$lib/components/whats-next/whats-next-card.svelte';
   import WhatsNextItem from '$lib/components/whats-next/whats-next-item.svelte';

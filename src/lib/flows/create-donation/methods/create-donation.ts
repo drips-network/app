@@ -7,7 +7,7 @@ import expect from '$lib/utils/expect';
 import query from '$lib/graphql/dripsQL';
 import { gql } from 'graphql-request';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+import { invalidateAll } from '$app/navigation';
 import network from '$lib/stores/wallet/network';
 import type {
   ProjectOtDsQuery,
