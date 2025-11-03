@@ -22,7 +22,7 @@ import { buildRequestOwnerUpdateTx } from '../build-txs';
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
   true,
-  "Gasless transactions won't work." +
+  "Gasless transactions won't work. " +
     "This means that claiming a project won't and collecting funds (on networks supporting gasless TXs and with gasless TXs enabled in settings) won't work.",
 );
 
