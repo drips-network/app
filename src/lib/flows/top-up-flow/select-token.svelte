@@ -134,5 +134,6 @@
     height: 24rem;
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
+    overflow: auto;
   }
 </style>
