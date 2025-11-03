@@ -174,6 +174,7 @@
 
   // Fixed item height for VirtualList
   const ITEM_HEIGHT = 48;
+  const SEARCH_BAR_HEIGHT = 48;
 
   // Measure parent container height
   let containerElem: HTMLDivElement;
@@ -183,9 +184,11 @@
     containerHeight = containerElem.clientHeight;
   }
 
-  // Calculate height: use parent height if available, otherwise based on item count
+  // Calculate height: subtract search bar height if searchable, use parent height if available
   $: virtualListHeight =
-    containerHeight > 0 ? containerHeight : Math.min(itemsArray.length * ITEM_HEIGHT, 1000);
+    containerHeight > 0
+      ? containerHeight - (searchable ? SEARCH_BAR_HEIGHT : 0)
+      : Math.min(itemsArray.length * ITEM_HEIGHT, 1000);
 </script>
 
 <svelte:window on:keydown={handleArrowKeys} on:keydown={handleArrowKeys} />
@@ -194,7 +197,7 @@
   bind:this={containerElem}
   role="listbox"
   aria-multiselectable={multiselect}
-  class="flex flex-col box-border"
+  class="list-select-container"
   style:pointer-events={blockInteraction ? 'none' : 'all'}
 >
   {#if searchable}
@@ -208,105 +211,127 @@
       />
     </div>
   {/if}
-  {#if listIsEmpty && showEmptyState}
-    <div class="empty-state">
-      <EyeClosedIcon />
-      {#if noItems || !searchString}
-        <p class="typo-text">{emptyStateText}</p>
-      {:else}
-        <p class="typo-text">No matches</p>
-      {/if}
-    </div>
-  {/if}
-  {#if hasAnyItems && itemsArray.length > 0}
-    <VirtualList
-      height={virtualListHeight}
-      width="100%"
-      itemCount={itemsArray.length}
-      itemSize={ITEM_HEIGHT}
-      getKey={(index) => itemsArray[index]?.[0] ?? `item-${index}`}
-    >
-      <div slot="item" let:index let:style {style}>
-        {#if itemsArray[index]}
-          {@const [slug, item] = itemsArray[index]}
-          {#if item.type === 'interstitial'}
-            <div class="interstitial">
-              <h4>{item.label}</h4>
-              <p class="typo-text-small">{item.description}</p>
-            </div>
-          {:else if !hideUnselected || selected.includes(slug)}
-            <div
-              role="option"
-              aria-selected={selected.includes(slug)}
-              class="item"
-              class:selected={selected.includes(slug)}
-              class:disabled={isItemDisabled(slug)}
-              on:click={isItemDisabled(slug) || blockSelecting
-                ? undefined
-                : (e) => handleItemClick(e, slug)}
-              on:keydown={isItemDisabled(slug) || blockSelecting
-                ? undefined
-                : (e) => handleKeypress(e, slug)}
-              tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
-              data-testid={`item-${slug}`}
-              bind:this={itemElements[slug]}
-              on:focus={() => (focussedSlug = slug)}
-              on:blur={() => (focussedSlug = undefined)}
-            >
-              {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
-                <div class="check-icon">
-                  <SelectedDot
-                    focussed={focussedSlug === slug}
-                    type={multiselect ? 'check' : 'radio'}
-                    selected={selected.includes(slug)}
-                  />
-                </div>
-              {/if}
-              {#if item.image}
-                <div class="image">
-                  {#if typeof item.image === 'string'}
-                    <img src={item.image} alt="List item" />
-                  {:else if item.image}
-                    <svelte:component this={item.image.component} {...item.image.props} />
-                  {/if}
-                </div>
-              {/if}
-              <div class="content" class:action={item.type === 'action'}>
-                {#if typeof item.label === 'string'}
-                  <span class="label typo-text">{item.label}</span>
-                {:else}
-                  <svelte:component this={item.label.component} {...item.label.props} />
-                {/if}
-                <div class="right">
-                  {#if item.type === 'selectable' && item.text}
-                    {#if typeof item.text === 'string'}
-                      <span class="text typo-text tabular-nums">
-                        {item.text}
-                      </span>
-                    {:else}
-                      <svelte:component this={item.text.component} {...item.text.props} />
-                    {/if}
-                  {/if}
-                  {#if item.type === 'selectable' && item.editablePercentage}
-                    <PercentageEditor
-                      bind:percentage={percentages[slug]}
-                      disabled={!selected.includes(slug)}
-                    />
-                  {/if}
-                </div>
-              </div>
-            </div>
-          {/if}
+  <div class="list-content">
+    {#if listIsEmpty && showEmptyState}
+      <div class="empty-state">
+        <EyeClosedIcon />
+        {#if noItems || !searchString}
+          <p class="typo-text">{emptyStateText}</p>
+        {:else}
+          <p class="typo-text">No matches</p>
         {/if}
       </div>
-    </VirtualList>
-  {/if}
+    {/if}
+    {#if hasAnyItems && itemsArray.length > 0}
+      <VirtualList
+        height={virtualListHeight}
+        width="100%"
+        itemCount={itemsArray.length}
+        itemSize={ITEM_HEIGHT}
+        getKey={(index) => itemsArray[index]?.[0] ?? `item-${index}`}
+      >
+        <div slot="item" let:index let:style {style}>
+          {#if itemsArray[index]}
+            {@const [slug, item] = itemsArray[index]}
+            {#if item.type === 'interstitial'}
+              <div class="interstitial">
+                <h4>{item.label}</h4>
+                <p class="typo-text-small">{item.description}</p>
+              </div>
+            {:else if !hideUnselected || selected.includes(slug)}
+              <div
+                role="option"
+                aria-selected={selected.includes(slug)}
+                class="item"
+                class:selected={selected.includes(slug)}
+                class:disabled={isItemDisabled(slug)}
+                on:click={isItemDisabled(slug) || blockSelecting
+                  ? undefined
+                  : (e) => handleItemClick(e, slug)}
+                on:keydown={isItemDisabled(slug) || blockSelecting
+                  ? undefined
+                  : (e) => handleKeypress(e, slug)}
+                tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction
+                  ? undefined
+                  : 0}
+                data-testid={`item-${slug}`}
+                bind:this={itemElements[slug]}
+                on:focus={() => (focussedSlug = slug)}
+                on:blur={() => (focussedSlug = undefined)}
+              >
+                {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
+                  <div class="check-icon">
+                    <SelectedDot
+                      focussed={focussedSlug === slug}
+                      type={multiselect ? 'check' : 'radio'}
+                      selected={selected.includes(slug)}
+                    />
+                  </div>
+                {/if}
+                {#if item.image}
+                  <div class="image">
+                    {#if typeof item.image === 'string'}
+                      <img src={item.image} alt="List item" />
+                    {:else if item.image}
+                      <svelte:component this={item.image.component} {...item.image.props} />
+                    {/if}
+                  </div>
+                {/if}
+                <div class="content" class:action={item.type === 'action'}>
+                  {#if typeof item.label === 'string'}
+                    <span class="label typo-text">{item.label}</span>
+                  {:else}
+                    <svelte:component this={item.label.component} {...item.label.props} />
+                  {/if}
+                  <div class="right">
+                    {#if item.type === 'selectable' && item.text}
+                      {#if typeof item.text === 'string'}
+                        <span class="text typo-text tabular-nums">
+                          {item.text}
+                        </span>
+                      {:else}
+                        <svelte:component this={item.text.component} {...item.text.props} />
+                      {/if}
+                    {/if}
+                    {#if item.type === 'selectable' && item.editablePercentage}
+                      <PercentageEditor
+                        bind:percentage={percentages[slug]}
+                        disabled={!selected.includes(slug)}
+                      />
+                    {/if}
+                  </div>
+                </div>
+              </div>
+            {/if}
+          {/if}
+        </div>
+      </VirtualList>
+    {/if}
+  </div>
 </div>
 
 <style>
+  .list-select-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
   .search-bar {
     height: 48px;
     padding: 0.75rem 1rem;
+    flex-shrink: 0;
+    background-color: var(--color-background);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .list-content {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
   }
 
   .search-bar input {
