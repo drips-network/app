@@ -108,6 +108,12 @@
   let focussedSlug: string | undefined;
   let scrollToIndex: number | undefined = undefined;
 
+  // Reset focus when search changes
+  $: if (searchString !== undefined) {
+    focussedSlug = undefined;
+    scrollToIndex = undefined;
+  }
+
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
 
