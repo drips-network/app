@@ -16,13 +16,13 @@ const config = defineConfig(({ mode }) => ({
     sveltekit(),
     process.env.FARO_UPLOAD_SOURCE_MAPS_KEY
       ? faroUploader({
-          appName: 'app',
-          endpoint: 'https://faro-api-prod-eu-west-2.grafana.net/faro/api/v1',
-          appId: '2936',
-          stackId: '1238676',
-          apiKey: process.env.FARO_UPLOAD_SOURCE_MAPS_KEY,
-          gzipContents: true,
-        })
+        appName: 'app',
+        endpoint: 'https://faro-api-prod-eu-west-2.grafana.net/faro/api/v1',
+        appId: '2936',
+        stackId: '1238676',
+        apiKey: process.env.FARO_UPLOAD_SOURCE_MAPS_KEY,
+        gzipContents: true,
+      })
       : undefined,
   ],
   test: {
