@@ -121,6 +121,11 @@
 
     // Handle Enter/Space to select the currently focused item
     if (e.key === 'Enter' || e.key === ' ') {
+      // Ignore these if focus is on search bar
+      if (searchBarElem === focussedElem) {
+        return;
+      }
+
       if (focussedSlug && !isItemDisabled(focussedSlug)) {
         selectItem(focussedSlug, e.shiftKey);
         e.preventDefault();
@@ -266,7 +271,6 @@
         itemCount={itemsArray.length}
         itemSize={ITEM_HEIGHT}
         {scrollToIndex}
-        scrollToAlignment="auto"
         getKey={(index) => itemsArray[index]?.[0] ?? `item-${index}`}
       >
         <div slot="item" let:index let:style {style}>
