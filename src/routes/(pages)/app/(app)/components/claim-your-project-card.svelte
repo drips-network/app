@@ -32,14 +32,9 @@
   }
 
   .illustration {
-    display: contents;
-    color: var(--color-primary);
-  }
-
-  /* TODO: illustration should accommodate boundaries */
-  .illustration > :global(svg) {
     width: 186px;
     height: 186px;
+    color: var(--color-primary);
   }
 
   .content {
