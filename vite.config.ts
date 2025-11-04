@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import { visualizer } from 'rollup-plugin-visualizer';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 import faroUploader from '@grafana/faro-rollup-plugin';
@@ -23,7 +22,7 @@ const config = defineConfig({
           gzipContents: true,
         })
       : undefined,
-    visualizer(),
+    // visualizer(),
   ],
   test: {
     // Jest like globals
@@ -32,14 +31,14 @@ const config = defineConfig({
     include: ['src/**/*.{test,spec}.ts'],
     exclude: ['src/e2e-tests/.tmp/**'],
     setupFiles: ['./setup-test.js'],
-    deps: {
-      inline: [
-        '@ethersproject/signing-key',
-        '@ethersproject/basex',
-        '@depay/solana-web3.js',
-        'cupertino-pane',
-      ],
-    },
+    // deps: {
+    //   inline: [
+    //     '@ethersproject/signing-key',
+    //     '@ethersproject/basex',
+    //     '@depay/solana-web3.js',
+    //     'cupertino-pane',
+    //   ],
+    // },
     testTimeout: 7000,
   },
   build: {
