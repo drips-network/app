@@ -44,7 +44,7 @@
     gap: 0.5rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .claim-your-project-card {
       flex-direction: column;
       text-align: center;
