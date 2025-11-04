@@ -5,7 +5,7 @@
   import launchClaimProject from '$lib/utils/launch-claim-project';
 </script>
 
-<div class="claim-card">
+<div class="claim-your-project-card">
   <div class="illustration">
     <RepoGitProject />
   </div>
@@ -21,7 +21,7 @@
 </div>
 
 <style>
-  .claim-card {
+  .claim-your-project-card {
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -45,7 +45,7 @@
   }
 
   @media (max-width: 768px) {
-    .claim-card {
+    .claim-your-project-card {
       flex-direction: column;
       text-align: center;
       gap: 1.5rem;
