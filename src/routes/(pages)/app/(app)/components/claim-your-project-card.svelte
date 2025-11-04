@@ -24,10 +24,10 @@
   .claim-card {
     display: flex;
     align-items: center;
-    gap: 3rem;
+    gap: 1.5rem;
     padding: 2rem 3rem;
     background-color: var(--color-primary-level-1);
-    border-radius: 1rem;
+    border-radius: 1rem 0 1rem 1rem;
     border: 1px solid var(--color-primary-level-2);
   }
 
