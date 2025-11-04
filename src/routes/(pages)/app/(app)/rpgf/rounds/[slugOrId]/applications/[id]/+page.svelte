@@ -30,11 +30,7 @@
 
 <HeadMeta title="{application.projectName} | {round.name}" />
 
-<div
-  class="application"
-  style:view-transition-name="application-{application.id}"
-  style:view-transition-class="element-handover"
->
+<div class="application">
   <div class="back-button">
     <Button
       href={backToBallot

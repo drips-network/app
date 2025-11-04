@@ -8,8 +8,6 @@
 
   $: url = `/app/rpgf/rounds/${round.urlSlug ?? round.id}`;
 
-  $: roundSlugOrDraftId = round.urlSlug ?? round.id;
-
   enum EnrichedState {
     Draft,
     PendingIntake,
@@ -64,10 +62,7 @@
 <PrimaryColorThemer colorHex={round.color}>
   <a class="rpgf-round-card" href={url}>
     <div class="card-content">
-      <div
-        style:view-transition-name="rpgf-header-card-avatar-{roundSlugOrDraftId}"
-        style:view-transition-class="element-handover"
-      >
+      <div>
         <EmojiOrIpfsAvatar
           emoji={round.emoji}
           ipfsCid={round.customAvatarCid ?? undefined}

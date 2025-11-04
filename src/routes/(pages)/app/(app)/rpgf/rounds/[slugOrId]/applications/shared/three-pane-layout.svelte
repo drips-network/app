@@ -199,6 +199,8 @@
     gap: 1rem;
     position: sticky;
     top: 6rem;
+    view-transition-name: rpgf-applications-sidebar;
+    view-transition-class: element-handover;
   }
 
   .sidebar-card {
@@ -208,8 +210,6 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
-    view-transition-name: rpgf-applications-sidebar-card;
-    view-transition-class: element-handover;
   }
 
   .page {
