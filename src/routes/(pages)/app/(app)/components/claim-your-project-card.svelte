@@ -2,6 +2,7 @@
   import Button from '$lib/components/button/button.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import RepoGitProject from '$lib/components/illustrations/repo-git-project.svelte';
+  import launchClaimProject from '$lib/utils/launch-claim-project';
 </script>
 
 <div class="claim-card">
@@ -13,7 +14,9 @@
     <p>If you develop an open-source project, claim it on Drips to start collecting funds.</p>
   </div>
   <div class="actions">
-    <Button icon={Plus} href="/app/projects/new" variant="primary">Claim your project</Button>
+    <Button icon={Plus} on:click={() => launchClaimProject()} variant="primary"
+      >Claim your project</Button
+    >
   </div>
 </div>
 
@@ -33,6 +36,7 @@
     color: var(--color-primary);
   }
 
+  /* TODO: illustration should accommodate boundaries */
   .illustration > :global(svg) {
     width: 186px;
     height: 186px;
