@@ -30,6 +30,7 @@ jobs:
           GQL_ACCESS_TOKEN=123
           ECOSYSTEM_API_URL=https://ecosystems-api-mainnet.up.railway.app/
           ECOSYSTEM_API_ACCESS_TOKEN=123
+          PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
           EOF
 
       - name: Install dependencies
