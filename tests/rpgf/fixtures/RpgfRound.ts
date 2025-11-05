@@ -164,11 +164,11 @@ export class RpgfRound {
       .getByRole('spinbutton', { name: 'Votes per voter*' })
       .fill(votingSettings.votesPerVoter.toString());
     await this.page
-      .getByRole('spinbutton', { name: 'Maximum votes per project*' })
+      .getByRole('spinbutton', { name: 'Maximum votes per project' })
       .fill(votingSettings.maximumVotesPerProject.toString());
     if (votingSettings.minimumVotesPerProject !== undefined) {
       await this.page
-        .getByRole('spinbutton', { name: 'Minimum votes per project*' })
+        .getByRole('spinbutton', { name: 'Minimum votes per project' })
         .fill(votingSettings.minimumVotesPerProject.toString());
     }
     if (votingSettings.badgeholderGuidelinesLink) {
