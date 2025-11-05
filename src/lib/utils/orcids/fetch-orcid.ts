@@ -5,13 +5,20 @@ import query from '$lib/graphql/dripsQL';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
-import { PUBLIC_ORCID_API_URL } from '$env/static/public';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { OrcidApiResponseSchema } from '$lib/utils/orcids/schemas';
 import Orcid from '$lib/utils/orcids/entities';
+import assert from '$lib/utils/assert';
 import type {
   OrcidByAccountIdQuery,
   OrcidByAccountIdQueryVariables,
 } from './__generated__/gql.generated';
+
+const PUBLIC_ORCID_API_URL = getOptionalEnvVar(
+  'PUBLIC_ORCID_API_URL',
+  network.orcids,
+  'PUBLIC_ORCID_API_URL is required when orcids are enabled on the current network',
+);
 
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
@@ -31,6 +38,7 @@ export function orcidIdToAccountId(orcidId: string) {
  * @returns A Orcid instance or null if not found or on error.
  */
 export async function fetchOrcid(orcidId: string, fetch: typeof global.fetch) {
+  assert(PUBLIC_ORCID_API_URL, 'PUBLIC_ORCID_API_URL is required to fetch ORCID profiles');
   const orcidResponse = await fetch(`${PUBLIC_ORCID_API_URL}/v3.0/${orcidId}/record`, {
     method: 'GET',
     headers: {
