@@ -157,12 +157,33 @@
             You must include at least the "ID" and "Allocation" columns.
           </span>
         </p>
-        <p>
-          As per the round configuration, you can assign
-          <span class="typo-text-bold">a maximum of {round.maxVotesPerProjectPerVoter} votes</span>
-          for a given application, and a
-          <span class="typo-text-bold">total of {round.maxVotesPerVoter} votes</span> across all applications.
-        </p>
+        <p>As per the round configuration:</p>
+
+        <ul>
+          {#if round.minVotesPerProjectPerVoter !== null}
+            <li>
+              You must assign
+              <span class="typo-text-bold">at least {round.minVotesPerProjectPerVoter} votes</span>
+              to any application you include.
+            </li>
+          {/if}
+          {#if round.maxVotesPerProjectPerVoter !== null}
+            <li>
+              You can assign
+              <span class="typo-text-bold"
+                >a maximum of {round.maxVotesPerProjectPerVoter} votes</span
+              >
+              for a given application.
+            </li>
+          {/if}
+          {#if round.maxVotesPerVoter !== null}
+            <li>
+              You can allocate a
+              <span class="typo-text-bold">total of {round.maxVotesPerVoter} votes</span>
+              across all applications.
+            </li>
+          {/if}
+        </ul>
 
         {#if round.voterGuidelinesLink}
           <p>
@@ -174,13 +195,6 @@
             > for more information on how to allocate your votes.
           </p>
         {/if}
-
-        <div style:margin-top="0.5rem">
-          <AnnotationBox type="info">
-            Empty allocations (blank cells) will be treated as not submitting a vote for that
-            application, and explicit zeroes (0) will be treated as submitting a vote of zero.
-          </AnnotationBox>
-        </div>
       </div>
     </div>
 
@@ -275,6 +289,11 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
   }
 
   .actions {

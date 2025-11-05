@@ -30,7 +30,7 @@
           "PassFile": "/pgpass",
           "SSLMode": "prefer"
       },
-      "3": {
+      "4": {
           "Name": "Ecosystems DB",
           "Group": "Servers",
           "Host": "postgres-ecosystems",

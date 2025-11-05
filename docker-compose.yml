@@ -90,6 +90,10 @@ services:
       - DRIPS_API_KEY=123
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - REDIS_URL=redis://redis:6379
+      - ORCID_API_ENDPOINT=${ORCID_API_ENDPOINT-https://pub.sandbox.orcid.org/v3.0}
+      - ORCID_CLIENT_ID=${ORCID_CLIENT_ID-dummy}
+      - ORCID_CLIENT_SECRET=${ORCID_CLIENT_SECRET-dummy}
+      - ORCID_TOKEN_ENDPOINT=${ORCID_TOKEN_ENDPOINT-https://sandbox.orcid.org/oauth/token}
     ports:
       - '8080:8080'
     depends_on:

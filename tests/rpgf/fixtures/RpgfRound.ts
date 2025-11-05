@@ -74,6 +74,7 @@ export class RpgfRound {
     votingSettings = {
       votesPerVoter: 1000,
       maximumVotesPerProject: 100,
+      minimumVotesPerProject: undefined,
     },
     categories = [
       {
@@ -96,6 +97,7 @@ export class RpgfRound {
     votingSettings?: {
       votesPerVoter: number;
       maximumVotesPerProject: number;
+      minimumVotesPerProject?: number;
       badgeholderGuidelinesLink?: string;
     };
     categories?: {
@@ -164,6 +166,11 @@ export class RpgfRound {
     await this.page
       .getByRole('spinbutton', { name: 'Maximum votes per project*' })
       .fill(votingSettings.maximumVotesPerProject.toString());
+    if (votingSettings.minimumVotesPerProject !== undefined) {
+      await this.page
+        .getByRole('spinbutton', { name: 'Minimum votes per project*' })
+        .fill(votingSettings.minimumVotesPerProject.toString());
+    }
     if (votingSettings.badgeholderGuidelinesLink) {
       await this.page
         .getByRole('textbox', { name: 'Badgeholder guidelines link' })

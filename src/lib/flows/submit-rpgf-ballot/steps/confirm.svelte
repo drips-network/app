@@ -6,7 +6,9 @@
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { castBallot } from '$lib/utils/rpgf/rpgf';
-  import type { Ballot, InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import { prepareBallotForSubmission } from '$lib/utils/rpgf/validate-ballot';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
 
@@ -14,33 +16,15 @@
     clear: () => void;
   };
   export let roundId: string;
+  export let round: Round;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-
-  function assertValidBallot(
-    inProgressBallot: InProgressBallot,
-  ): asserts inProgressBallot is Ballot {
-    // check that there is at least one entry in the ballot, and no null values
-    if (
-      Object.keys(inProgressBallot).length === 0 ||
-      Object.values(inProgressBallot).includes(null)
-    ) {
-      throw new Error('Invalid ballot: must have at least one entry and no null values');
-    }
-  }
-
   function handleConfirm() {
     dispatch('await', {
       promise: async () => {
-        const strippedBallot = Object.fromEntries(
-          Object.entries($ballot).filter(
-            (v) => v[1] !== null && v[1] !== undefined && v[1] !== 0 && v[1] !== '',
-          ),
-        ) as Ballot;
+        const sanitizedBallot = prepareBallotForSubmission($ballot, round);
 
-        assertValidBallot(strippedBallot);
-
-        await castBallot(undefined, roundId, strippedBallot);
+        await castBallot(undefined, roundId, sanitizedBallot);
 
         ballot.clear();
         await invalidate('rpgf:round');
