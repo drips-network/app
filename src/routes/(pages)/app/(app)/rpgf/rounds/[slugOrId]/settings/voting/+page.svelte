@@ -190,8 +190,8 @@
 
     await updateRound(undefined, data.round.id, {
       maxVotesPerVoter,
-      maxVotesPerProjectPerVoter: maxVotesPerProject || null,
-      minVotesPerProjectPerVoter: minVotesPerProject || null,
+      maxVotesPerProjectPerVoter: maxVotesPerProject ?? null,
+      minVotesPerProjectPerVoter: minVotesPerProject ?? null,
       voterGuidelinesLink: updatedRound.voterGuidelinesLink,
     });
 
