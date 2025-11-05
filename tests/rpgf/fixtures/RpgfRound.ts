@@ -374,7 +374,8 @@ export class RpgfRound {
       await this.gotoRpgfPage(page);
     }
 
-    // click on the round
+    // click on the round - wait for it to be visible first to handle cross-session visibility lag
+    await page.getByRole('link', { name: this.name }).waitFor({ state: 'visible', timeout: 30000 });
     await page.getByRole('link', { name: this.name }).click();
 
     // click on apply CTA
