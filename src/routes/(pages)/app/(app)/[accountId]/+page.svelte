@@ -85,6 +85,7 @@
     </SectionSkeleton>
     <Developer accountId={data.profileData.account.accountId} />
     <YourProjectsSection
+      label={isSelf ? 'Your projects' : 'Projects'}
       collapsable
       collapsed={mapFilterUndefined([filterCurrentChainData(data.profileData.chainData)], (v) =>
         v === null ? undefined : v,
@@ -95,6 +96,7 @@
       )}
     />
     <YourDripListsSection
+      label={isSelf ? 'Your Drip Lists' : 'Drip Lists'}
       collapsable
       collapsed={[
         ...data.profileData.votingRounds,
