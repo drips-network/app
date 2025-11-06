@@ -59,8 +59,7 @@ export const roundSchema = z.object({
   resultsPeriodStart: z.coerce.date().nullable(),
   maxVotesPerVoter: z.number().nullable(),
   maxVotesPerProjectPerVoter: z.number().nullable(),
-  // for backwards compatibility on deploy
-  minVotesPerProjectPerVoter: z.number().optional(),
+  minVotesPerProjectPerVoter: z.number().nullable(),
   voterGuidelinesLink: z.string().nullable(),
   createdByUser: userSchema,
   createdAt: z.coerce.date(),
