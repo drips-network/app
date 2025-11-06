@@ -12,6 +12,7 @@ export default (ballot: Writable<InProgressBallot> & { clear: () => void }, roun
       props: {
         ballot,
         roundId: round.id,
+        round,
       },
     }),
     makeStep({

@@ -18,8 +18,12 @@
   import type { InProgressBallot, WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import unreachable from '$lib/utils/unreachable.js';
-  import { onMount } from 'svelte';
-  import type { Writable } from 'svelte/store';
+  import { onMount, setContext } from 'svelte';
+  import { writable, type Writable } from 'svelte/store';
+  import {
+    ballotValidationContextKey,
+    type BallotValidationErrorsStore,
+  } from '$lib/utils/rpgf/ballot-validation-context';
 
   export let round: Round;
   export let ballot: Writable<InProgressBallot> & {
@@ -31,6 +35,9 @@
   export let existingBallot: WrappedBallot | null;
   export let pageIsEmpty = false;
   export let hideAppsPane = false;
+
+  const ballotValidationErrors: BallotValidationErrorsStore = writable(new Set());
+  setContext(ballotValidationContextKey, ballotValidationErrors);
 
   onMount(() => {
     forceCollapsed.set(true);
@@ -111,7 +118,12 @@
         {/if}
 
         {#if voteMode}
-          <RpgfVotingCard previouslyCastBallot={existingBallot} {round} ballot={ballotStore} />
+          <RpgfVotingCard
+            previouslyCastBallot={existingBallot}
+            {round}
+            ballot={ballotStore}
+            {ballotValidationErrors}
+          />
         {/if}
 
         {#if resultsMode}
