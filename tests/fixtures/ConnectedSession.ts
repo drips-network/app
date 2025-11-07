@@ -26,15 +26,52 @@ export class ConnectedSession {
   }
 
   async connect() {
+    // Wait for page to be fully loaded and network to be idle to avoid race conditions
+    await this.page.waitForLoadState('networkidle');
+
+    // Wait for the Connect button to be visible - this ensures the page has fully
+    // hydrated and is stable before we inject JavaScript
+    await this.page
+      .getByRole('button', { name: 'Connect', exact: true })
+      .waitFor({ state: 'visible' });
+
     // insert hidden `span` with id E2E_ADDRESS into the DOM in order to tell
     // the local testnet wallet store which address to use
-    await this.page.evaluate((addr) => {
-      const span = document.createElement('span');
-      span.style.display = 'none';
-      span.id = 'E2E_ADDRESS';
-      span.textContent = addr;
-      document.body.appendChild(span);
-    }, this.address);
+    // Retry mechanism to handle potential navigation timing issues
+    let retries = 3;
+    let lastError;
+
+    while (retries > 0) {
+      try {
+        await this.page.evaluate((addr) => {
+          const span = document.createElement('span');
+          span.style.display = 'none';
+          span.id = 'E2E_ADDRESS';
+          span.textContent = addr;
+          document.body.appendChild(span);
+        }, this.address);
+        break; // Success, exit retry loop
+      } catch (error) {
+        lastError = error;
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        if (errorMessage.includes('Execution context was destroyed') && retries > 1) {
+          // Wait for navigation to complete and retry
+          await this.page.waitForLoadState('networkidle');
+          await this.page
+            .getByRole('button', { name: 'Connect', exact: true })
+            .waitFor({ state: 'visible' });
+          retries--;
+          continue;
+        }
+        // If it's a different error or last retry, throw
+        throw error;
+      }
+    }
+
+    if (retries === 0 && lastError) {
+      throw lastError;
+    }
 
     await this.page.getByRole('button', { name: 'Connect', exact: true }).click();
 
