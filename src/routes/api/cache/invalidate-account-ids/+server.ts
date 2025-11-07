@@ -121,16 +121,40 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
   );
   const { ecosystemMainAccount } = associatedEcosystemAccountIds;
   if (ecosystemMainAccount) {
+    // Separate ProjectReceiver splits from other splits
+    const projectSplits = ecosystemMainAccount.splits.filter(
+      (split) => split.__typename === 'ProjectReceiver',
+    );
+    const nonProjectSplits = ecosystemMainAccount.splits.filter(
+      (split) => split.__typename !== 'ProjectReceiver',
+    );
+
+    // Invalidate the standard accounts (excluding ProjectReceiver splits)
     const accountIdsToClear = [
       nftDriverAccountId,
       ecosystemMainAccount.owner.accountId,
       ...ecosystemMainAccount.support.map((support) => support.account.accountId),
-      ...ecosystemMainAccount.splits.map((split) => split.account.accountId),
+      ...nonProjectSplits.map((split) => split.account.accountId),
     ];
 
-    return Promise.all(
+    log('ECOSYSTEM cache invalidation', {
+      ecosystem: nftDriverAccountId,
+      nonProjectSplitAccountIds: nonProjectSplits.map((s) => s.account.accountId),
+      projectSplitAccountIds: projectSplits.map((s) => s.account.accountId),
+    });
+
+    await Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
+
+    // For ProjectReceiver splits, invalidate using invalidateProjectCache
+    if (projectSplits.length > 0) {
+      await Promise.all(
+        projectSplits.map((split) => invalidateProjectCache(split.account.accountId, client)),
+      );
+    }
+
+    return;
   }
 
   return invalidateAccountCache(nftDriverAccountId, client);
