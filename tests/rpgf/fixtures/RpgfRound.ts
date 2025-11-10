@@ -31,6 +31,10 @@ export class RpgfRound {
 
     await page.getByRole('button', { name: 'Sign in' }).click();
 
+    // Wait for sign-in to complete by waiting for the "New round" button to appear
+    // (The sign-in button doesn't actually get removed from the DOM, it just changes state)
+    await page.getByRole('button', { name: 'New round' }).waitFor({ state: 'visible' });
+
     this.signedIn = true;
   }
 
@@ -113,7 +117,17 @@ export class RpgfRound {
 
     await this.gotoRpgfPage();
 
-    await this.page.getByRole('button', { name: 'New round' }).click();
+    // Wait for page to be fully loaded
+    await this.page.waitForLoadState('networkidle');
+
+    // Wait for the "New round" button to be actionable
+    const newRoundButton = this.page.getByRole('button', { name: 'New round' });
+    await newRoundButton.waitFor({ state: 'visible' });
+
+    // Small delay to ensure any overlays/animations are complete
+    await this.page.waitForTimeout(1000);
+
+    await newRoundButton.click();
 
     await this.page.waitForURL('**/app/rpgf/rounds/*');
 
