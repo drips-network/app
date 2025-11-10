@@ -1,4 +1,5 @@
 import type { Page } from '@playwright/test';
+import { waitForPageInteractive } from '../utils/wait-for-page-interactive';
 
 /** These addresses all start with 10000 ETH on the local testnet */
 export const TEST_ADDRESSES = [
@@ -23,6 +24,9 @@ export class ConnectedSession {
   async goto() {
     await this.page.goto('http://localhost:5173/app');
     await this.page.waitForTimeout(1000); // Reduce flakiness of first nav, for some reason
+
+    // Wait for loading state to clear to avoid pointer-events: none blocking clicks
+    await waitForPageInteractive(this.page);
   }
 
   async connect() {
