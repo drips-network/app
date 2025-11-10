@@ -113,13 +113,6 @@ export class RpgfRound {
 
     await this.gotoRpgfPage();
 
-    // TODO document more
-    // For round publishing e2e test, only this conifguration makes it work?
-    const button = this.page.getByRole('button', { name: 'Sign in' });
-    if (await button.isVisible()) {
-      await this.page.getByRole('button', { name: 'New round' }).waitFor({ state: 'visible' });
-    }
-
     await this.page.getByRole('button', { name: 'New round' }).click();
 
     await this.page.waitForURL('**/app/rpgf/rounds/*');
