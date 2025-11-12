@@ -1,4 +1,4 @@
-{@html `<svg width="314" height="250" viewBox="0 25 314 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+{@html `<svg width="100%" height="100%" viewBox="0 25 314 250" xmlns="http://www.w3.org/2000/svg">
   <path d="M43.573 100.099L14.0935 168.003L43.573 153.772V214.967L157.018 270.877V155.805L178.569 220.253L291.608 163.734L270.464 100.099L157.018 42.9695L43.573 100.099Z" fill="var(--color-background)"/>
   <path d="M270.415 214.93V174.27L178.038 220.428L157 155.803V270.831L270.415 214.93Z" fill="var(--color-primary)" stroke="var(--color-foreground)" stroke-width="2" stroke-linejoin="round"/>
   <path d="M157 155.803L43.5842 99.9015V214.93L157 270.831V155.803ZM157 155.803L270.354 100.166M157 155.803V43.332" stroke="var(--color-foreground)" stroke-width="2" stroke-linejoin="round"/>
