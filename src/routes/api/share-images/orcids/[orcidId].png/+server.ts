@@ -86,7 +86,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
           <span style="font-family: Inter; font-size: 40px">${supportersCount} ${supportersString}</span>
         </div>
       </div>
-    </div>`),
+    </div>`) as Parameters<typeof satori>[0],
     {
       width: 1200,
       height: height,
