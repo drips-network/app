@@ -11,8 +11,15 @@ export type SignedBallotPayload = {
 };
 
 export function hashBallotVotes(ballot: Ballot): string {
-  const sortedEntries = Object.entries(ballot).sort(([a], [b]) => a.localeCompare(b));
-  const sortedBallot = Object.fromEntries(sortedEntries);
+  // Convert ballot to a deterministic JSON string
+  // Sort keys to ensure consistent hashing
+  const sortedBallot = Object.keys(ballot)
+    .sort()
+    .reduce((acc, key) => {
+      acc[key] = ballot[key];
+      return acc;
+    }, {} as Ballot);
+
   const ballotJson = JSON.stringify(sortedBallot);
 
   return keccak256(toUtf8Bytes(ballotJson));
