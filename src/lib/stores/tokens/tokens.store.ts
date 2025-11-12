@@ -1,6 +1,6 @@
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 
-import type { TokenInfo } from '@uniswap/token-lists';
+import type { TokenInfo } from '@uniswap/token-lists/src/types';
 import { derived, get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
