@@ -89,7 +89,21 @@
       },
     );
   }
+
+  let shiftKeyPressed = false;
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = true;
+    }
+  }
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = false;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
 <div class="voting-card">
   <h5>Voting</h5>
@@ -256,7 +270,9 @@
               disabled={!ballotHasEntries ||
                 amountOfVotesAssigned === 0 ||
                 hasValidationErrors ||
-                (Boolean(previouslyCastBallot) && !localStoredBallotIsDifferentFromRemote)}
+                (Boolean(previouslyCastBallot) &&
+                  !shiftKeyPressed &&
+                  !localStoredBallotIsDifferentFromRemote)}
               on:click={(e) => {
                 e.preventDefault();
                 handleSubmitBallot();

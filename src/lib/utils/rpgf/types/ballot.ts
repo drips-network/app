@@ -7,6 +7,8 @@ export type InProgressBallot = Record<string, number | null | string>;
 
 export type SubmitBallotDto = {
   ballot: Ballot;
+  signature: string;
+  chainId: number;
 };
 
 export const wrappedBallotSchema = z.object({
