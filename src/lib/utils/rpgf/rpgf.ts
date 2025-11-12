@@ -168,12 +168,9 @@ export async function createRound(f = fetch, draft: CreateRoundDto): Promise<Rou
 
 export async function updateRound(f = fetch, id: string, draft: PatchRoundDto): Promise<Round> {
   // strip empty fields
-  const strippedDraft: PatchRoundDto = Object.fromEntries(
-    Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
-  );
-
-  // ...except customAvatarCid, which can be null
-  strippedDraft.customAvatarCid = draft.customAvatarCid ?? null;
+  const strippedDraft = Object.fromEntries(
+    Object.entries(draft).filter(([_, value]) => value !== undefined && value !== ''),
+  ) as PatchRoundDto;
 
   const res = await authenticatedRpgfServerCall(`/rounds/${id}`, 'PATCH', strippedDraft, f);
 

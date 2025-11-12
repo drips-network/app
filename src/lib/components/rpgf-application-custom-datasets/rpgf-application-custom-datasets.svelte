@@ -11,7 +11,11 @@
     <div class="fields" style:display="flex" style="flex-direction: column" style:gap="1rem">
       {#each Object.entries(dataset.values) as [fieldName, value]}
         <TitleAndValue title={fieldName}>
-          {value ?? '—'}
+          {#if value}
+            {value ?? '—'}
+          {:else}
+            <span style:color="var(--color-foreground-level-5">Unknown</span>
+          {/if}
         </TitleAndValue>
       {/each}
     </div>
