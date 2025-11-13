@@ -308,7 +308,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
           '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
       },
     },
-    orcids: false,
+    orcids: true,
   },
   [31337]: {
     chainId: 31337,
@@ -412,7 +412,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     enableEns: true,
     retroFunding: { enabled: false },
     ecosystems: false,
-    orcids: true,
+    orcids: false,
   },
   [314]: {
     chainId: 314,
