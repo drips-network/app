@@ -14,6 +14,7 @@
   import type { AddItemError } from './errors';
   import { WEIGHT_FACTOR } from './types';
   import type { AccountId } from '$lib/utils/common-types';
+  import network from '$lib/stores/wallet/network';
 
   const MAX_WEIGHT = 1000000;
 
@@ -32,7 +33,7 @@
   export let allowDripLists = true;
   export let allowProjects = true;
   export let allowAddresses = true;
-  export let allowOrcids = true;
+  export let allowOrcids = network.orcids;
 
   export let allowEmptyPercentages = false;
 
