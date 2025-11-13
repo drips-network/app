@@ -16,6 +16,12 @@ const test = base.extend<{ connectedSession: ConnectedSession; orcid: Orcid }>({
   },
 });
 
+/**
+ * This test relies on the profile at https://sandbox.orcid.org/my-orcid?orcid=0009-0007-1106-8413
+ * having its DRIPS_OWNERSHIP_CLAIM set to
+ * http://0.0.0.0/?ethereum_owned_by=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266&orcid=0009-0007-1106-8413
+ * (i.e. pointing to the local dev wallet address).
+ */
 test('claim ORCID flow', async ({ orcid }) => {
   test.setTimeout(120_000);
 
