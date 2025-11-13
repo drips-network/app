@@ -17,6 +17,7 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import LinkedIdentitiesCard from './components/linked-identities-card.svelte';
+  import network from '$lib/stores/wallet/network';
 
   export let data;
 
@@ -135,10 +136,12 @@
     </div>
     <aside class="article-sidebar">
       <SupportCard user={data.profileData} />
-      <LinkedIdentitiesCard
-        linkedIdentities={profileChainData.linkedIdentities}
-        canLinkIdentity={!!isSelf}
-      ></LinkedIdentitiesCard>
+      {#if network.orcids}
+        <LinkedIdentitiesCard
+          linkedIdentities={profileChainData.linkedIdentities}
+          canLinkIdentity={!!isSelf}
+        ></LinkedIdentitiesCard>
+      {/if}
     </aside>
   </article>
 {/if}
