@@ -6,7 +6,7 @@ import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
 export const load = (async ({ params, fetch }) => {
   if (!isValidOrcidId(params.orcidId)) {
-    return error(404);
+    return error(400, 'Invalid ORCID iD');
   }
 
   const orcidGqlResponse = await fetchOrcidAccount(params.orcidId, fetch);
