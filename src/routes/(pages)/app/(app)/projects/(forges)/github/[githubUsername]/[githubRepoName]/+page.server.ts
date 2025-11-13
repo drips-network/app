@@ -34,10 +34,13 @@ async function fetchDripsProject(repoUrl: string) {
     args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
   });
 
-  const subAccountId = await executeRepoSubAccountDriverReadMethod({
-    functionName: 'calcAccountId',
-    args: [accountId],
-  });
+  let subAccountId = 0n;
+  if (network.contracts.SUB_ACCOUNT_REPO_DRIVER) {
+    subAccountId = await executeRepoSubAccountDriverReadMethod({
+      functionName: 'calcAccountId',
+      args: [accountId],
+    });
+  }
 
   // Projects may be referenced with their repo sub account id or their "main" repo account id,
   // so we add both to their cache key to ensure we remove the cache with the invalidate-account-ids endpoint.
