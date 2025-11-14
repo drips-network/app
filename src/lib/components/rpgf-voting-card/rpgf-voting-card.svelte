@@ -20,12 +20,14 @@
   import rpgfSpreadsheetVoteFlowSteps from '$lib/flows/rpgf-spreadsheet-vote-flow/rpgf-spreadsheet-vote-flow-steps';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import { goto, invalidate } from '$app/navigation';
+  import type { BallotValidationErrorsStore } from '$lib/utils/rpgf/ballot-validation-context';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
   export let round: Round;
   export let previouslyCastBallot: WrappedBallot | null;
+  export let ballotValidationErrors: BallotValidationErrorsStore;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
   $: voterGuidelinesSeen = round.voterGuidelinesLink
@@ -51,8 +53,13 @@
     .filter((vote) => vote !== null)
     .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0);
   $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
+  $: hasValidationErrors = $ballotValidationErrors.size > 0;
 
   async function handleSubmitBallot() {
+    if (hasValidationErrors) {
+      return;
+    }
+
     modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
   }
 
@@ -74,6 +81,7 @@
         clearingLocalBallot = true;
 
         ballot.clear();
+        ballotValidationErrors.set(new Set());
         await invalidate('rpgf:round:ownBallot');
         await goto(`/app/rpgf/rounds/${round.urlSlug}`);
 
@@ -81,7 +89,21 @@
       },
     );
   }
+
+  let shiftKeyPressed = false;
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = true;
+    }
+  }
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = false;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
 <div class="voting-card">
   <h5>Voting</h5>
@@ -214,6 +236,19 @@
         <div class="description">
           <p class="typo-text-small">Assign votes to the selected applications.</p>
           <p class="typo-text-small">Once you're done, cast your ballot below.</p>
+          {#if round.minVotesPerProjectPerVoter !== null || round.maxVotesPerProjectPerVoter !== null}
+            <p class="typo-text-small">
+              {#if round.minVotesPerProjectPerVoter !== null}
+                Each project you include must receive at least
+                <span class="typo-text-small-bold">{round.minVotesPerProjectPerVoter}</span> votes.
+              {/if}
+              {#if round.maxVotesPerProjectPerVoter !== null}
+                {#if round.minVotesPerProjectPerVoter !== null}{' '}{/if}
+                No project may receive more than
+                <span class="typo-text-small-bold">{round.maxVotesPerProjectPerVoter}</span> votes.
+              {/if}
+            </p>
+          {/if}
         </div>
 
         <div class="actions">
@@ -234,7 +269,10 @@
               icon={Proposals}
               disabled={!ballotHasEntries ||
                 amountOfVotesAssigned === 0 ||
-                (Boolean(previouslyCastBallot) && !localStoredBallotIsDifferentFromRemote)}
+                hasValidationErrors ||
+                (Boolean(previouslyCastBallot) &&
+                  !shiftKeyPressed &&
+                  !localStoredBallotIsDifferentFromRemote)}
               on:click={(e) => {
                 e.preventDefault();
                 handleSubmitBallot();
@@ -247,6 +285,12 @@
                 Submit your ballot
               {/if}
             </Button>
+
+            {#if hasValidationErrors}
+              <p class="typo-text-small error-hint">
+                Fix validation errors in your ballot before submitting.
+              </p>
+            {/if}
 
             <OrDivider />
 
@@ -344,5 +388,10 @@
     height: 100%;
     background-color: var(--color-primary);
     transition: width 0.3s;
+  }
+
+  .error-hint {
+    color: var(--color-negative);
+    text-align: center;
   }
 </style>

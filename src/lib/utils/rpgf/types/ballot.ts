@@ -1,12 +1,14 @@
 import z from 'zod';
 import { userSchema } from './user';
 
-export const ballotSchema = z.record(z.string().uuid(), z.number().int().positive());
+export const ballotSchema = z.record(z.string().uuid(), z.number().int().min(0));
 export type Ballot = z.infer<typeof ballotSchema>;
 export type InProgressBallot = Record<string, number | null | string>;
 
 export type SubmitBallotDto = {
   ballot: Ballot;
+  signature: string;
+  chainId: number;
 };
 
 export const wrappedBallotSchema = z.object({

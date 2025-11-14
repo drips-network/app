@@ -14,7 +14,7 @@
         href="https://www.drips.network/app"
         target="_blank"
         rel="noopener noreferrer">https://www.drips.network/app</a
-      >), and other *.drips.network/app instances, hereinafter " Drips Web App ") as well as other
+      >, and other *.drips.network/app instances, hereinafter " Drips Web App ") as well as other
       Drips websites (such as
       <a href="https://www.drips.network/" target="_blank" rel="noopener noreferrer"
         >https://www.drips.network/</a
@@ -29,7 +29,7 @@
     <p>The following services are available:</p>
     <ul>
       <li>Visit of the Drips Services (Drips Website or Drips Web App)</li>
-      <li>Use of the 'Get in Touch form'</li>
+      <li>Use of the 'Get In Touch form'</li>
       <li>Use of the Drips Web App functions</li>
     </ul>
     <p>
@@ -86,7 +86,7 @@
       <li>Operating system used</li>
       <li>Website from which the access is made (referrer URL)</li>
       <li>Host name of the accessing computer</li>
-      <li>Date and time of access to which URL</li>
+      <li>Date and time of access and the requested URL</li>
       <li>IP address of the requesting computer</li>
     </ul>
     <p>
@@ -100,9 +100,16 @@
     </p>
     <p>
       Art. 6 (1) sentence 1 lit. f GDPR serves as the legal basis for the temporary storage of
-      Access Data. Our legitimate interest here is to be able to provide you with a technically
-      functioning and user-friendly website and to ensure the security of our systems as well as
-      optimizing our services.
+      Access Data.
+    </p>
+    <p>
+      Where enabled, this includes routing traffic through Cloudflare (edge reverse proxy/CDN and
+      web application firewall). In this context, and acting as our processor (see section 5.3),
+      Cloudflare necessarily processes Access Data (including your IP address and request-related
+      system and routing metadata) to deliver the Drips Services, mitigate attacks, and ensure
+      availability and performance. Our legitimate interest here is to be able to provide you with a
+      technically functioning and user-friendly website and to ensure the security of our systems as
+      well as optimizing our services.
     </p>
     <p>
       Your IP address will be stored on Railway’s server for a maximum of 30 days for IT security
@@ -116,13 +123,19 @@
 
     <h3>Use of cookies and similar functions/technologies</h3>
     <p>
-      We do not use our own so-called cookies and similar technologies on the Drips Services and
-      neither do our service providers Railway and Grafana (see also below section 5.3); please note
-      that when using the embedded Get In Touch form via Notion (see below section 3.3), that
-      provider may set its own cookies under its sole responsibility. Cookies are small text files
-      that are stored on your computer and saved by your browser. A cookie contains a characteristic
-      string of characters that enables your browser to be uniquely identified when you return to
-      the Drips Services.
+      We do not set our own so-called cookies and similar technologies on the Drips Services. Our
+      service providers Railway and Grafana do not set cookies either (see also below section 5.3).
+      However, our service provider Cloudflare (see also below section 5.3) may set strictly
+      necessary cookies required to provide security and availability. These cookies are essential
+      to operate the Drips Services and do not track users across sites (for storage period and
+      expiry see Section 7).
+    </p>
+    <p>
+      Please note that when using the embedded Get In Touch form via Notion (see below section 3.3),
+      that provider may set its own cookies under its sole responsibility. Cookies are small text
+      files that are stored on your computer and saved by your browser. A cookie contains a
+      characteristic string of characters that enables your browser to be uniquely identified when
+      you return to the Drips Services.
     </p>
 
     <h3>Get In Touch form</h3>
@@ -355,6 +368,12 @@
     <h3>Hosting and technical service providers</h3>
     <ul>
       <li>
+        Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA, certified under the Data
+        Privacy Framework, for edge delivery and security services (reverse proxy/CDN, Web
+        Application Firewall) to ensure the security, availability, and performance of the Drips
+        Services.
+      </li>
+      <li>
         Railway Corporation, 548 Market St PMB 68956, San Francisco, CA 94104, USA, certified under
         the Data Privacy Framework for hosting of the Drips Services.
       </li>
@@ -420,6 +439,12 @@
     <p>
       Insofar as the processing is carried out to safeguard our legitimate interests, the processing
       period includes the period until the processing purposes pursued are achieved.
+    </p>
+    <p>
+      Where enabled, Cloudflare retains Access Data (as defined in section 3.1) and
+      strictly-necessary cookies only for the periods necessary to provide the security,
+      availability, and performance of the Drips Services, as further described in Cloudflare’s
+      Privacy Policy and cookie documentation.
     </p>
     <p>
       If the processing is based on your consent, the processing period covers the period from the

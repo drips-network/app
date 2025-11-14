@@ -1,6 +1,7 @@
 <script lang="ts">
   import emoji from '$lib/utils/emoji/emoji';
   import twemoji from '$lib/utils/twemoji';
+  import VirtualList from 'svelte-tiny-virtual-list';
 
   export let selectedEmoji: string | undefined;
 
@@ -32,24 +33,47 @@
 
   let searchTerm = '';
 
-  $: filteredEmoji = emoji
-    .filter((e) => {
-      let { tags, description, aliases, unicode } = e;
+  // Approximate number of emojis per row based on the grid layout
+  const EMOJIS_PER_ROW = 15;
+  const ROW_HEIGHT = 40; // Height of each row (2rem emoji + 0.5rem padding-bottom)
+  const CONTAINER_HEIGHT = 240; // 15rem in px
+  const CONTAINER_PADDING = 12; // 0.75rem padding in px
+  const CATEGORIES_HEIGHT = 48; // Approximate height of categories section (buttons + margin)
 
-      return searchTerm
-        ? [...tags, ...aliases, description, unicode].some((a) =>
-            a.toLowerCase().includes(searchTerm.toLowerCase()),
-          )
-        : e.category === category;
-    })
-    .slice(0, 150);
+  let categoriesElement: HTMLDivElement | undefined;
+  let actualCategoriesHeight = CATEGORIES_HEIGHT;
+
+  $: filteredEmoji = emoji.filter((e) => {
+    let { tags, description, aliases, unicode } = e;
+
+    return searchTerm
+      ? [...tags, ...aliases, description, unicode].some((a) =>
+          a.toLowerCase().includes(searchTerm.toLowerCase()),
+        )
+      : e.category === category;
+  });
+
+  // Group emojis into rows for virtual scrolling
+  $: emojiRows = Array.from({ length: Math.ceil(filteredEmoji.length / EMOJIS_PER_ROW) }, (_, i) =>
+    filteredEmoji.slice(i * EMOJIS_PER_ROW, (i + 1) * EMOJIS_PER_ROW),
+  );
+
+  // Calculate virtual list height accounting for categories section and padding
+  $: virtualListHeight = searchTerm
+    ? CONTAINER_HEIGHT - CONTAINER_PADDING * 2
+    : CONTAINER_HEIGHT - actualCategoriesHeight - CONTAINER_PADDING * 2;
+
+  // Update actual categories height when element is available
+  $: if (categoriesElement) {
+    actualCategoriesHeight = categoriesElement.offsetHeight;
+  }
 </script>
 
 <div class="emoji-picker">
   <input class="emoji-search-input" type="text" bind:value={searchTerm} placeholder="Search…" />
   <div class="emojis-container">
     {#if !searchTerm}
-      <div class="categories">
+      <div class="categories" bind:this={categoriesElement}>
         {#each categories as c}
           <button
             class="category typo-text-small"
@@ -62,25 +86,36 @@
       </div>
     {/if}
 
-    <div class="emojis">
-      {#each filteredEmoji as e}
-        <div class="emoji" class:selected={selectedEmoji === e.unicode}>
-          <input
-            id={e.unicode}
-            bind:group={selectedEmoji}
-            value={e.unicode}
-            name="emoji"
-            type="radio"
-            class="radio"
-          />
-          <label class="emoji-label" for={e.unicode}
-            >{@html twemoji(e.unicode, {
-              attributes: () => ({ loading: 'lazy' }),
-            })}</label
-          >
+    {#if emojiRows.length > 0}
+      <VirtualList
+        height={virtualListHeight}
+        width="100%"
+        itemCount={emojiRows.length}
+        itemSize={ROW_HEIGHT}
+      >
+        <div slot="item" let:index let:style {style}>
+          <div class="emojis-row">
+            {#each emojiRows[index] as e (e.unicode)}
+              <div class="emoji" class:selected={selectedEmoji === e.unicode}>
+                <input
+                  id={e.unicode}
+                  bind:group={selectedEmoji}
+                  value={e.unicode}
+                  name="emoji"
+                  type="radio"
+                  class="radio"
+                />
+                <label class="emoji-label" for={e.unicode}
+                  >{@html twemoji(e.unicode, {
+                    attributes: () => ({ loading: 'lazy' }),
+                  })}</label
+                >
+              </div>
+            {/each}
+          </div>
         </div>
-      {/each}
-    </div>
+      </VirtualList>
+    {/if}
   </div>
 </div>
 
@@ -107,7 +142,7 @@
     position: relative;
     height: 15rem;
     padding: 0.75rem;
-    overflow: scroll;
+    overflow: hidden;
     border-radius: 1rem 0 1rem 1rem;
   }
 
@@ -144,12 +179,12 @@
     font-size: 1rem;
   }
 
-  .emojis {
+  .emojis-row {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr));
-    flex-wrap: wrap;
     gap: 0.5rem;
     user-select: none;
+    padding-bottom: 0.5rem;
   }
 
   .emoji {

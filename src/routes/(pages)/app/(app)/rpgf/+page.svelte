@@ -55,6 +55,7 @@
           resultsPeriodStart: null,
           maxVotesPerVoter: null,
           maxVotesPerProjectPerVoter: null,
+          minVotesPerProjectPerVoter: null,
           voterGuidelinesLink: null,
           kycProvider: null,
         });
