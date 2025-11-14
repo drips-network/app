@@ -22,7 +22,7 @@
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import { gql } from 'graphql-request';
   import { CLAIMING_URL_NAME } from '$lib/utils/orcids/entities';
-  import verifyOrcidClaim from '$lib/utils/orcids/verify-orcid';
+  import verifyOrcidClaim, { getNetworkLinkName } from '$lib/utils/orcids/verify-orcid';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -33,7 +33,7 @@
       ? 'ethereum'
       : $walletStore.network.name
     : unreachable();
-  $: link = `http://0.0.0.0/?ethereum_owned_by=${$walletStore.address}&orcid=${$context.claimableId}`;
+  $: link = `http://0.0.0.0/?${getNetworkLinkName()}=${$walletStore.address}&orcid=${$context.claimableId}`;
   $: editing = !!$context.claimableProof;
   $: description = editing
     ? `To verify you are the owner of this ORCID iD, please add or edit the funding URL to the Websites & social links section of your ORCID profile.`
