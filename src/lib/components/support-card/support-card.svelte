@@ -251,7 +251,7 @@
     </div>
   {/if}
   <div class="header">
-    <div class="background" />
+    <div class="background"></div>
     <div class="circles">
       <div class="circle">
         <Heart style="height: 3rem; width: 3rem; fill: var(--color-primary)" />

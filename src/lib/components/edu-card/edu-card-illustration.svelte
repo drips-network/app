@@ -1,4 +1,4 @@
-<div class="edu-card-illustration-bg" />
+<div class="edu-card-illustration-bg"></div>
 <div class="edu-card-illustration-wrapper">
   <slot />
 </div>

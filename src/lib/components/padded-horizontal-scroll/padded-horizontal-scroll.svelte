@@ -9,8 +9,8 @@
       <slot />
     </div>
   </div>
-  <div class="gradient left-edge" />
-  <div class="gradient right-edge" />
+  <div class="gradient left-edge"></div>
+  <div class="gradient right-edge"></div>
 </div>
 
 <style>

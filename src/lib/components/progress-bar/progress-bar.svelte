@@ -75,7 +75,7 @@
       style:background={progressBarColor}
     >
       {#if progressFractionRaw < 1 && progressFractionRaw > 0 && !errorMessage}
-        <div transition:fade={{ duration: 200 }} class="progress-bar-wave-animation-overlay" />
+        <div transition:fade={{ duration: 200 }} class="progress-bar-wave-animation-overlay"></div>
       {/if}
     </div>
   </div>

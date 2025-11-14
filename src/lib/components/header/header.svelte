@@ -76,10 +76,10 @@
         bind:isPeeking={collectButtonPeeking}
       />
     </div>
-    <div />
+    <div></div>
   {:else}
     <!-- ensure nav items are right-aligned on mobile still even though nothing's on the left -->
-    <div />
+    <div></div>
   {/if}
   <div class="search-bar">
     <SearchBar bind:searchOpen={searchMode} />
@@ -145,7 +145,7 @@
       class="search-background"
       transition:fade={{ duration: 300 }}
       on:click={() => (searchMode = false)}
-    />
+   ></div>
   {/if}
 </header>
 

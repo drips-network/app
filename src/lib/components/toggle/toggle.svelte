@@ -22,7 +22,7 @@
     {disabled}
   />
   <div class="slider" class:checked class:focus data-testid="toggle-slider">
-    <div class="head" />
+    <div class="head"></div>
   </div>
 </label>
 

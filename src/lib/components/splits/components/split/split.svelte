@@ -181,10 +181,10 @@
         </span>
       </div>
       {#if isFirst}
-        <div class="intro-line" />
+        <div class="intro-line"></div>
       {/if}
       {#if !isLast}
-        <div class="line" />
+        <div class="line"></div>
       {/if}
     </div>
     <div class="receiver">
@@ -255,7 +255,7 @@
               />
             </div>
           {/if}
-          <div class="cutoff-gradient" />
+          <div class="cutoff-gradient"></div>
         </div>
       {/if}
     </div>

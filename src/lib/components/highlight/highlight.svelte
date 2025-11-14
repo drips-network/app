@@ -190,8 +190,8 @@
     style:padding="{$highlightStore.paddingPx}px"
     bind:this={wrapperElem}
   >
-    <div class="background" style:border-radius={$highlightStore.borderRadius} />
-    <div class="animated-outline" style:border-radius={$highlightStore.borderRadius} />
+    <div class="background" style:border-radius={$highlightStore.borderRadius}></div>
+    <div class="animated-outline" style:border-radius={$highlightStore.borderRadius}></div>
     <div
       transition:fly={{ duration: 600, ...ANIMATION_SETTINGS[highlightPos.alignment] }}
       class="highlight {highlightPos.alignment} side-{highlightPos.textAlignment}"
@@ -209,7 +209,7 @@
     <!-- Dismisses clicks outside the target -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div class="click-preventer" on:click={dismiss} />
+    <div class="click-preventer" on:click={dismiss}></div>
     <!-- Catches & forwards clicks on the target -->
     <div
       role="button"
@@ -224,7 +224,7 @@
       on:click={handleClickCatcherEvent}
       on:keydown={handleClickCatcherEvent}
       style:border-radius={$highlightStore.borderRadius}
-    />
+   ></div>
   </div>
 {/if}
 

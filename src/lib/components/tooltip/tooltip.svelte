@@ -133,7 +133,7 @@
       on:click|stopPropagation
       on:keydown|stopPropagation
     >
-      <div class="target-buffer" />
+      <div class="target-buffer"></div>
       <div class="tooltip-content typo-text" style:max-width={MAX_WIDTH}>
         {#if copyable && text}
           <Copyable alwaysVisible value={text}

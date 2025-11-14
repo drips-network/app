@@ -54,7 +54,7 @@
     on:blur
     on:keydown
     on:keypress
-  />
+ ></textarea>
 
   {#if caption && validationState.type !== 'invalid'}
     <p class="caption typo-text-small">

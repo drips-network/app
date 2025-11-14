@@ -112,7 +112,7 @@
 {#if openMenu}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)} />
+  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)}></div>
 {/if}
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -127,7 +127,7 @@
   </div>
 
   {#if overflowLeft}
-    <div transition:fade={{ duration: 100 }} class="overflow-gradient left" />
+    <div transition:fade={{ duration: 100 }} class="overflow-gradient left"></div>
     <button
       on:click={() => navigate('backward')}
       tabindex="-1"
@@ -139,7 +139,7 @@
     </button>
   {/if}
   {#if overflowRight}
-    <div transition:fade={{ duration: 100 }} class="overflow-gradient right" />
+    <div transition:fade={{ duration: 100 }} class="overflow-gradient right"></div>
     <button
       on:click={() => navigate('forward')}
       tabindex="-1"

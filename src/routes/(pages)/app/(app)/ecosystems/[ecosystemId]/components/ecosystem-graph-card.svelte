@@ -141,7 +141,7 @@
     on:wheel={(event) => stopScroll(event)}
     on:touchmove={(event) => stopTouchScroll(event)}
   >
-    <div class="background" />
+    <div class="background"></div>
     <div class="graph">
       <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
     </div>

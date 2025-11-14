@@ -63,7 +63,7 @@
   <div class="logo" style="height: {sizes[size]}px; width: {sizes[size]}px">
     <CoinAnimation enable={shouldAnimate} {animateOnMount}>
       {#if tokenInfo?.logoURI && !imageFailed}
-        <div class="background" class:loaded />
+        <div class="background" class:loaded></div>
         <img
           bind:this={imgElem}
           on:load={() => (loaded = true)}

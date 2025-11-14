@@ -33,7 +33,7 @@
       transition:fade={{ duration: 200 }}
       on:click={clickOutside}
       on:keydown={clickOutside}
-    />
+   ></div>
     <div class="content">
       <div
         class="modal-wrapper"

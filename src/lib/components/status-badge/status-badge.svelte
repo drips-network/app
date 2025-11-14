@@ -19,7 +19,7 @@
       style="fill: var(--color-{color}-level-6); width:18px; height:18px"
     />
   {:else}
-    <div class="dot" style:background-color={`var(--color-${color}-level-6)`} />
+    <div class="dot" style:background-color={`var(--color-${color}-level-6)`}></div>
   {/if}
   <span class={textClasses[size]} style:color={`var(--color-${color}-level-6)`}><slot /></span>
 </div>

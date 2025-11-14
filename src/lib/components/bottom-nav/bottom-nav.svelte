@@ -90,7 +90,7 @@
           class="selector"
           transition:fade={{ duration: 300 }}
           style={`left: ${selectorOffset}px; width: ${selectorWidth}px`}
-        />
+       ></div>
       {/if}
     </div>
   </div>

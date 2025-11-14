@@ -52,7 +52,7 @@
       >
     </svelte:fragment>
     <svelte:fragment slot="illustration">
-      <div class="edu-card-illustration-bg" />
+      <div class="edu-card-illustration-bg"></div>
       <div class="edu-card-illustration-wrapper">
         <DripList />
       </div>

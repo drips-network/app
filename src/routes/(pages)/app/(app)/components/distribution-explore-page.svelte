@@ -35,7 +35,7 @@
     <div class="hero">
       <div class="welcome-card">
         <div class="illustration">
-          <div class="background" />
+          <div class="background"></div>
           <div class="filecoin-logo-wrapper">
             <svelte:component this={network.icon} style="height: 3rem; width: 3rem;" />
           </div>

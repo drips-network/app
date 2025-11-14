@@ -77,7 +77,7 @@
       }}
     />
 
-    <div class="vertical-divider" />
+    <div class="vertical-divider"></div>
   {/if}
 
   <MiniDropdown

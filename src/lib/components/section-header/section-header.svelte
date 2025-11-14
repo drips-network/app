@@ -36,7 +36,7 @@
   class:collapsable
 >
   {#if anchorTarget}
-    <div class="anchor-target" id={anchorTarget} />
+    <div class="anchor-target" id={anchorTarget}></div>
   {/if}
 
   <div class="title">

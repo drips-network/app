@@ -55,7 +55,7 @@
     </div>
     {#if visible}
       <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'} style:width>
-        <div class="margin" />
+        <div class="margin"></div>
         <div class="wrapper">
           <slot name="content" />
         </div>

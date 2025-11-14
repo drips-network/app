@@ -57,7 +57,7 @@
         <div class="sm:order-last">
           <FiatEstimateValue fiatEstimateCents={fiatEstimates[i]} />
         </div>
-        <div class="w-full my-1 sm:hidden" />
+        <div class="w-full my-1 sm:hidden"></div>
         <div class="muted sm:flex-1 sm:text-right">
           {formatTokenAmount(amount, tokens[i]?.info.decimals ?? unreachable(), 1n, false)}
           {tokens[i]?.info.symbol}

@@ -8,7 +8,7 @@
   {#each possibleColors as color}
     <div class="color" class:selected={selectedColor === color}>
       <input type="radio" name="color" bind:group={selectedColor} value={color} id={color} />
-      <label class="color-label" style:background-color={color} for={color} />
+      <label class="color-label" style:background-color={color} for={color}></label>
     </div>
   {/each}
 </div>

@@ -103,7 +103,7 @@
       </div>
     </div>
     <div class="items">
-      {#if now < schedule.applicationPeriodStart}<div class="spacer" />{/if}
+      {#if now < schedule.applicationPeriodStart}<div class="spacer"></div>{/if}
       {#each timeline as { title, date }, i}
         <ScheduleItem
           bind:elem={timeItems[i]}
@@ -132,7 +132,7 @@
         </ScheduleItem>
       {/each}
       <div class="timeline" bind:this={timelineElem}>
-        <div class="line" />
+        <div class="line"></div>
         <div class="circle-wrapper" style:transform="translateY({$timelineCircleOffsetY}px)">
           <PulsatingCircle visible={updatedOnce} bind:element={timelineCircle} />
         </div>

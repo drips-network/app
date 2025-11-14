@@ -62,7 +62,7 @@
         id={String(option.value)}
       >
         <label for={String(option.value)}>{option.title}</label>
-        <div class="background" />
+        <div class="background"></div>
       </div>
     {/each}
   </div>
@@ -72,7 +72,7 @@
     class:at-beginning={options.findIndex((o) => o.value === active) === 0}
     class:at-end={options.findIndex((o) => o.value === active) === options.length - 1}
     style="transform: translateX({selectorOffset}px); width: {selectorWidth}px;"
-  />
+ ></div>
 </div>
 
 <style>

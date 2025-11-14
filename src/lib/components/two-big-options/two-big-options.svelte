@@ -16,7 +16,7 @@
 
 <div class="options" role="radiogroup">
   <Option on:click={() => (selected = 1)} selected={selected === 1} {...option1} />
-  <div class="divider" />
+  <div class="divider"></div>
   <Option on:click={() => (selected = 2)} selected={selected === 2} {...option2} />
 </div>
 

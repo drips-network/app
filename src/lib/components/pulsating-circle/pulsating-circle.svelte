@@ -4,7 +4,7 @@
   export let pulseColor = 'var(--color-primary-level-2)';
 </script>
 
-<div style="--pulse-color: {pulseColor}" class="circle" class:visible bind:this={element} />
+<div style="--pulse-color: {pulseColor}" class="circle" class:visible bind:this={element}></div>
 
 <style>
   .circle {

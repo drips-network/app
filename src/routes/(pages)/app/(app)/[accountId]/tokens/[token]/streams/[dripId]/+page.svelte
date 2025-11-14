@@ -312,7 +312,7 @@
                 </div>
               </div>
               <div class="absolute overlay flex flex-col sm:flex-row">
-                <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1" />
+                <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1"></div>
               </div>
             </div>
           </div>
@@ -403,7 +403,7 @@
                 {token.info.symbol}
               </span>
             {:else}
-              <div out:fade={{ duration: 200 }} class="loading value small-text tabular-nums" />
+              <div out:fade={{ duration: 200 }} class="loading value small-text tabular-nums"></div>
             {/if}
           </div>
         {/if}

@@ -64,7 +64,7 @@
     </div>
   {/each}
   {#if selectorPos !== undefined}
-    <div transition:fade={{ duration: 200 }} class="selector" style={`top: ${selectorPos}px`} />
+    <div transition:fade={{ duration: 200 }} class="selector" style={`top: ${selectorPos}px`}></div>
   {/if}
 </nav>
 

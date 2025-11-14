@@ -24,7 +24,7 @@
           style:visibility="hidden"
           style:position="absolute"
           style:top="-230px"
-        />
+       ></div>
         <AnnotationBox type="error">
           {validationState.message}
         </AnnotationBox>

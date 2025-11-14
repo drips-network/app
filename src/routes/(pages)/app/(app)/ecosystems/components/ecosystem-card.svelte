@@ -37,7 +37,7 @@
   href={`/app/ecosystems/${ecosystem.id}`}
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
-    <div class="background" />
+    <div class="background"></div>
     {#if $$slots.banner}
       <div class="banner">
         <slot name="banner" />

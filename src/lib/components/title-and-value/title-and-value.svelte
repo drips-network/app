@@ -38,7 +38,7 @@
   </span>
 </div>
 
-<div class="divider" />
+<div class="divider"></div>
 
 <style>
   .field {

@@ -46,6 +46,6 @@
       on:click={() => {
         expanded = true;
       }}
-    />
+   ></button>
   {/if}
 </div>

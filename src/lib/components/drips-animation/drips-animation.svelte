@@ -176,7 +176,7 @@
   <canvas
     bind:this={canvasElem}
     style={`width: ${containerSize?.[0]}px; height: ${containerSize?.[1]}px;`}
-  />
+ ></canvas>
   <div style="display: none">
     <img
       bind:this={dripImg}

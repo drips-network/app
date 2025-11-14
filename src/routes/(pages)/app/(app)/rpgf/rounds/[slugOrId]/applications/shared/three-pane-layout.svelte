@@ -508,7 +508,7 @@
               on:pointercancel={stopResize}
               on:keydown={handleKeyResize}
               on:dblclick={resetAppsWidth}
-            />
+           ></div>
           {/if}
         </div>
       </div>

@@ -18,7 +18,7 @@
       </div>
     </div>
   {:else}
-    <iframe title="YouTube video" width="100%" height="0" {src} allowfullscreen />
+    <iframe title="YouTube video" width="100%" height="0" {src} allowfullscreen></iframe>
   {/if}
 </div>
 

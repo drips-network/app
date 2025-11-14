@@ -123,7 +123,7 @@
 
 <div id="cupertino-pane">
   <div class="inner">
-    <div class="dragger" />
+    <div class="dragger"></div>
     {#if $cupertinoPaneStore.component}
       <div class="content">
         <svelte:component this={$cupertinoPaneStore.component} {...$cupertinoPaneStore.props} />
