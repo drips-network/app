@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
           <span style="font-family: Inter; font-size: 40px">${recipientsCount} ${recipientsString}</span>
         </div>
       </div>
-    </div>`),
+    </div>`) as Parameters<typeof satori>[0],
     {
       width: 1200,
       height: height,
@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
 
   const image = resvg.render();
 
-  return new Response(image.asPng(), {
+  return new Response(image.asPng() as BodyInit, {
     headers: {
       'content-type': 'image/png',
       'cache-control': 'public, max-age=86400', // 24 hours

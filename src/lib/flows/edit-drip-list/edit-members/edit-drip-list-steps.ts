@@ -5,38 +5,9 @@ import EditDripListStep from '../shared/steps/edit-drip-list.svelte';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import {
   mapSplitReceiversToEditorConfig,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
   type SplitReceiver,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
-import { gql } from 'graphql-request';
-import type { EditDripListFlowDripListFragment } from './__generated__/gql.generated';
-
-export const EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT = gql`
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT}
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT}
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT}
-  fragment EditDripListFlowDripList on DripList {
-    name
-    description
-    isVisible
-    account {
-      accountId
-    }
-    splits {
-      ... on DripListReceiver {
-        ...SplitReceiversToListEditorConfigDripListReceiver
-      }
-      ... on AddressReceiver {
-        ...SplitReceiversToListEditorConfigAddressReceiver
-      }
-      ... on ProjectReceiver {
-        ...SplitReceiversToListEditorConfigProjectReceiver
-      }
-    }
-  }
-`;
+import type { EditDripListFlowDripListFragment } from '../__generated__/gql.generated';
 
 export default (dripList: EditDripListFlowDripListFragment) => {
   const state = writable({

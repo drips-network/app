@@ -36,7 +36,7 @@ export const GET = async ({ params }) => {
 
   const jimp = (await Jimp.read(`static${metadata.coverImage}`)).cover(1200, height);
 
-  return new Response(await jimp.getBufferAsync(Jimp.MIME_PNG), {
+  return new Response((await jimp.getBufferAsync(Jimp.MIME_PNG)) as BodyInit, {
     headers: {
       'content-type': 'image/png',
     },

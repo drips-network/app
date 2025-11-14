@@ -70,12 +70,16 @@ test('ecosystems donation flow', async ({ connectedSession, request }, testInfo)
   await page.getByRole('button', { name: 'Support' }).nth(0).click();
   await page.getByRole('button', { name: 'One-time donation' }).first().click();
   await page.getByText('Test Token').click();
+
+  // Wait for token balance to load completely before interacting with amount input
+  // The token balance fetch is async, and while loading, the input value gets reset to '0'
+  // This can cause a race condition where Playwright's fill() conflicts with the reactive reset
+  await expect(page.getByText('TEST', { exact: true }).last()).toBeVisible({ timeout: 10000 });
+
+  // Additional safety: wait a brief moment for all reactive statements to settle
+  await page.waitForTimeout(500);
+
   await page.getByRole('spinbutton', { name: 'TEST Amount' }).click();
-
-  // wait for test amount input to be visible and enabled
-  await expect(page.getByRole('spinbutton', { name: 'TEST Amount' })).toBeVisible();
-  await expect(page.getByRole('spinbutton', { name: 'TEST Amount' })).toBeEnabled();
-
   await page.getByRole('spinbutton', { name: 'TEST Amount' }).fill('10');
   await page.getByRole('button', { name: 'Confirm in your wallet' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();

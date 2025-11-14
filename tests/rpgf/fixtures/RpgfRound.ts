@@ -2,6 +2,7 @@ import { type Page, expect } from '@playwright/test';
 import type { ConnectedSession } from '../../fixtures/ConnectedSession';
 import type { Project } from '../../fixtures/Project';
 import type { RoundState } from '$lib/utils/rpgf/types/round';
+import { waitForPageInteractive } from '../../utils/wait-for-page-interactive';
 
 const RPGF_API_URL = 'http://localhost:5293/api';
 
@@ -22,6 +23,9 @@ export class RpgfRound {
 
     // wait for the URL to either be /app/rpgf or /app/connect using regex
     await page.waitForURL(/\/app\/rpgf(\/|$)|\/app\/connect/);
+
+    // Wait for loading state to clear to avoid pointer-events: none blocking clicks
+    await waitForPageInteractive(page);
   }
 
   async logIn(connectedSession = this.connectedSession) {

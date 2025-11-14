@@ -10,6 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : 4,
   retries: process.env.CI ? 1 : 0,
   reporter: 'html',
+  globalTeardown: './tests/global-teardown.ts',
 
   use: {
     trace: 'on',

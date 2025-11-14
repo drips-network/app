@@ -1,6 +1,6 @@
 export function extractDriverNameFromAccountId(
   id: string,
-): 'address' | 'nft' | 'immutableSplits' | 'repo' {
+): 'address' | 'nft' | 'immutableSplits' | 'repo' | 'repoSubAccountDriver' {
   if (Number.isNaN(Number(id))) {
     throw new Error(`Could not get bits: ${id} is not a number.`);
   }
@@ -26,6 +26,8 @@ export function extractDriverNameFromAccountId(
       return 'immutableSplits';
     case 3n:
       return 'repo';
+    case 4n:
+      return 'repoSubAccountDriver';
     default:
       throw new Error(`Unknown driver for ID ${id}.`);
   }

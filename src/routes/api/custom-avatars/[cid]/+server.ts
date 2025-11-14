@@ -29,7 +29,7 @@ export const GET = async ({ params, fetch, url }) => {
 
   const resized = image.cover(size, size);
 
-  return new Response(await resized.getBufferAsync(Jimp.MIME_PNG), {
+  return new Response((await resized.getBufferAsync(Jimp.MIME_PNG)) as BodyInit, {
     headers: {
       'content-type': 'image/png',
       'cache-control': 'public, max-age=31536000',

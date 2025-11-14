@@ -14,6 +14,7 @@ WORKDIR /app
 # Copies both package.json and package-lock.json
 COPY package*.json ./
 # Install dependencies
+RUN npm install drips-network/sdk#mhgbrown/allow-sandbox-orcids --ignore-scripts
 RUN npm ci --ignore-scripts;
 RUN rm -rf .svelte-kit
 
