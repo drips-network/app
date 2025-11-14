@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SendTransactionsResponse } from '@safe-global/safe-apps-sdk';
 import type { TransactionLike, TypedDataDomain, TypedDataField } from 'ethers';
 import type { TransactionReceipt } from 'ethers';
-import type { ComponentType, SvelteComponent } from 'svelte';
+import type { Component, ComponentProps } from 'svelte';
 
 export type TransactionWrapper = {
   title: string;
@@ -47,7 +48,7 @@ export interface TransactPayload<T> {
   headline: string;
   description?: string;
   icon?: {
-    component: ComponentType;
+    component: Component;
     props?: Record<string, unknown>;
   };
   messages?: {
@@ -78,7 +79,7 @@ export interface UpdateAwaitStepParams {
     label: string;
   };
   icon?: {
-    component: ComponentType;
+    component: Component;
     props: Record<string, unknown>;
   };
 }
@@ -102,9 +103,6 @@ export interface SidestepPayload {
   steps: Steps;
   onSidestepComplete?: () => void;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Constructor<T> = new (...args: any[]) => T;
 
 export type StepComponentEvents = {
   /** Go forward one step (or a custom amount by setting `by`). */
@@ -134,26 +132,23 @@ export type StepComponentEvents = {
 };
 
 type OmitContext<T> = Omit<T, 'context'>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Props<T> = T extends SvelteComponent<infer P, any, any> ? OmitContext<P> : never;
-export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
 
-type ComponentAndProps<T extends SvelteComponent> = {
-  component: Constructor<T>;
-  props: PropsOrUndefined<T>;
+type ComponentAndProps<T extends Component<any>> = {
+  component: T;
+  props: OmitContext<ComponentProps<T>>;
 };
 
-export type Step<T extends SvelteComponent> = {
-  component: Constructor<T>;
-  props: PropsOrUndefined<T>;
+export type Step<T extends Component<any>> = {
+  component: T;
+  props: OmitContext<ComponentProps<T>>;
   condition?: () => boolean;
-  staticHeaderComponent?: ComponentAndProps<SvelteComponent>;
+  staticHeaderComponent?: ComponentAndProps<Component>;
 };
 
-type SomeStep = <R>(step: <T extends SvelteComponent>(step: Step<T>) => R) => R;
+type SomeStep = <R>(step: <T extends Component<any>>(step: Step<T>) => R) => R;
 
 export type Steps = SomeStep[];
 
-export function makeStep<T extends SvelteComponent>(i: Step<T>): SomeStep {
+export function makeStep<T extends Component<any>>(i: Step<T>): SomeStep {
   return (cb) => cb(i);
 }

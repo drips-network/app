@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
@@ -10,14 +12,14 @@
   import { setRoundAdmins } from '$lib/utils/rpgf/rpgf';
   import { areStringArraysEqual } from '$lib/utils/compare-string-array';
 
-  export let data;
+  let { data } = $props();
 
-  let updatedAdminAddresses: string[] = [
+  let updatedAdminAddresses: string[] = $state([
     ...data.roundAdmins.map((u) => getAddress(u.walletAddress)),
-  ];
+  ]);
 
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let adminItems: Items = Object.fromEntries(
+  let adminItems: Items = $state(Object.fromEntries(
     data.roundAdmins.map((u) => {
       return [
         getAddress(u.walletAddress),
@@ -27,9 +29,9 @@
         },
       ];
     }),
-  );
+  ));
 
-  $: {
+  run(() => {
     if (adminItems) {
       const addresses = mapFilterUndefined(
         Object.values(adminItems).map((item) => {
@@ -46,16 +48,18 @@
         updatedAdminAddresses = [...addresses.map((a) => getAddress(a))];
       }
     }
-  }
+  });
 
-  $: ownAddress = $walletStore.address?.toLowerCase();
+  let ownAddress = $derived($walletStore.address?.toLowerCase());
 
-  let changesMade = false;
+  let changesMade = $state(false);
 
-  $: changesMade = !areStringArraysEqual(
-    updatedAdminAddresses.map((a) => a.toLowerCase()).sort(),
-    data.roundAdmins.map((u) => u.walletAddress.toLowerCase()).sort(),
-  );
+  run(() => {
+    changesMade = !areStringArraysEqual(
+      updatedAdminAddresses.map((a) => a.toLowerCase()).sort(),
+      data.roundAdmins.map((u) => u.walletAddress.toLowerCase()).sort(),
+    );
+  });
 
   async function saveHandler() {
     await setRoundAdmins(undefined, data.round.id, updatedAdminAddresses);

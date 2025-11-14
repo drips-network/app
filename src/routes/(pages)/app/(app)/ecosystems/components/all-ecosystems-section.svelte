@@ -4,12 +4,16 @@
   import type { EcosystemsListItem } from '$lib/utils/ecosystems/schemas';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
 
   let error = false;
 
-  export let collapsed = false;
-  export let collapsable = false;
+  interface Props {
+    ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
+    collapsed?: boolean;
+    collapsable?: boolean;
+  }
+
+  let { ecosystems, collapsed = $bindable(false), collapsable = $bindable(false) }: Props = $props();
 </script>
 
 <Section

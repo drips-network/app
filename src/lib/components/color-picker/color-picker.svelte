@@ -1,14 +1,18 @@
 <script lang="ts">
   import possibleColors from '$lib/utils/project/possible-colors';
 
-  export let selectedColor: string | undefined;
+  interface Props {
+    selectedColor: string | undefined;
+  }
+
+  let { selectedColor = $bindable() }: Props = $props();
 </script>
 
 <div class="colors">
   {#each possibleColors as color}
     <div class="color" class:selected={selectedColor === color}>
       <input type="radio" name="color" bind:group={selectedColor} value={color} id={color} />
-      <label class="color-label" style:background-color={color} for={color} />
+      <label class="color-label" style:background-color={color} for={color}></label>
     </div>
   {/each}
 </div>

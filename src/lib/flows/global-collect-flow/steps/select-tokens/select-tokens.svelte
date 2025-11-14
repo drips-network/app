@@ -25,10 +25,14 @@
     amount: bigint;
   }
 
-  export let splittable: {
+  interface Props {
+    splittable: {
     tokenAddress: string;
     amount: bigint;
   }[];
+  }
+
+  let { splittable }: Props = $props();
 
   function getListItemDescription(amount: Amount) {
     const token = tokensStore.getByAddress(amount.tokenAddress);
@@ -38,8 +42,22 @@
       : '';
   }
 
-  $: selectorItems =
-    $tokensStore &&
+
+
+
+
+  let selected =
+    $state(mapFilterUndefined(splittable, (s) => {
+      const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
+
+      return unknownToken ? undefined : s.tokenAddress;
+    }) ?? []);
+
+  function submit() {
+    batchCollect(selected, dispatch, shouldAutoUnwrap);
+  }
+  let selectorItems =
+    $derived($tokensStore &&
     Object.fromEntries(
       mapFilterUndefined(splittable ?? [], (s) => {
         const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
@@ -66,13 +84,9 @@
           },
         ];
       }),
-    );
-
-  $: canCollect = Object.values(selectorItems ?? {}).length > 0;
-
-  $: shouldAutoUnwrap = shouldShowAutoUnwrapToggle;
-
-  $: shouldShowAutoUnwrapToggle = splittable.some((s) => {
+    ));
+  let canCollect = $derived(Object.values(selectorItems ?? {}).length > 0);
+  let shouldShowAutoUnwrapToggle = $derived(splittable.some((s) => {
     // Not all chains have the unwrapping helper contract deployed
     if (!network.contracts.NATIVE_TOKEN_UNWRAPPER) return false;
 
@@ -81,18 +95,8 @@
     return network.autoUnwrapPairs?.find(
       (p) => p.nativeSymbol === token?.info.symbol || p.wrappedSymbol === token?.info.symbol,
     );
-  });
-
-  let selected =
-    mapFilterUndefined(splittable, (s) => {
-      const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
-
-      return unknownToken ? undefined : s.tokenAddress;
-    }) ?? [];
-
-  function submit() {
-    batchCollect(selected, dispatch, shouldAutoUnwrap);
-  }
+  }));
+  let shouldAutoUnwrap = $derived(shouldShowAutoUnwrapToggle);
 </script>
 
 <StepLayout>
@@ -119,17 +123,20 @@
       <p>Next settlement</p>
       <Tooltip>
         <InfoCircle />
-        <svelte:fragment slot="tooltip-content">
-          <p>
-            {network.settlement.explainerText}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://docs.drips.network/get-support/claim-your-repository#settlement-of-future-funds"
-              class="learn-more">Learn more</a
-            >
-          </p>
-        </svelte:fragment>
+        <!-- @migration-task: migrate this slot by hand, `tooltip-content` is an invalid identifier -->
+  {#snippet tooltip_content()}
+              
+            <p>
+              {network.settlement.explainerText}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://docs.drips.network/get-support/claim-your-repository#settlement-of-future-funds"
+                class="learn-more">Learn more</a
+              >
+            </p>
+          
+              {/snippet}
       </Tooltip>
     </div>
     <p class="typo-text-bold">
@@ -149,16 +156,18 @@
       </div>
     </div>
   {/if}
-  <svelte:fragment slot="actions">
-    {#if canCollect}
-      <Button on:click={modal.hide} variant="ghost">Never mind</Button>
-      <Button on:click={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
-        >Confirm in wallet</Button
-      >
-    {:else}
-      <Button on:click={modal.hide}>Close</Button>
-    {/if}
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      {#if canCollect}
+        <Button onclick={modal.hide} variant="ghost">Never mind</Button>
+        <Button onclick={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
+          >Confirm in wallet</Button
+        >
+      {:else}
+        <Button onclick={modal.hide}>Close</Button>
+      {/if}
+    
+  {/snippet}
 </StepLayout>
 
 <style>

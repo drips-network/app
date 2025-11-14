@@ -1,7 +1,7 @@
-import type { ComponentType } from 'svelte';
+import type { Component } from 'svelte';
 
 interface ComponentAndProps {
-  component: ComponentType;
+  component: Component<never>;
   props: { [propName: string]: unknown };
 }
 
@@ -32,7 +32,7 @@ export interface ActionItem {
   image?:
     | string
     | {
-        component: ComponentType;
+        component: Component<never>;
         props: { [propName: string]: unknown };
       };
 }

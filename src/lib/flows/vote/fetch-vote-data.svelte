@@ -11,9 +11,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let votingRound: VotingRound;
-  export let collaborator: Collaborator | undefined;
+  interface Props {
+    context: Writable<State>;
+    votingRound: VotingRound;
+    collaborator: Collaborator | undefined;
+  }
+
+  let { context, votingRound, collaborator }: Props = $props();
 
   onMount(async () => {
     dispatch('await', {

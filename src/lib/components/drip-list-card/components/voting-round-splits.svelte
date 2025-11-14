@@ -12,16 +12,20 @@
   import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
   import Splits from '$lib/components/splits/splits.svelte';
 
-  export let votingRound: VotingRound & {
+  interface Props {
+    votingRound: VotingRound & {
     splits?: SplitsComponentSplitsReceiver[];
   };
-  export let maxRows: number | undefined = undefined;
-  export let listingMode: boolean;
+    maxRows?: number | undefined;
+    listingMode: boolean;
+  }
 
-  $: isOwnVotingRound =
-    votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
+  let { votingRound, maxRows = undefined, listingMode }: Props = $props();
 
-  let revealedResultsSplits: SplitsComponentSplitsReceiver[] | undefined;
+  let isOwnVotingRound =
+    $derived(votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase());
+
+  let revealedResultsSplits: SplitsComponentSplitsReceiver[] | undefined = $state();
 
   async function handleRevealResults() {
     if (!$walletStore.connected) return;
@@ -45,7 +49,7 @@
     revealedResultsSplits = await mapSplitsFromMultiplayerResults(revealedResults.result);
   }
 
-  $: resultsToShow = votingRound.result ?? revealedResultsSplits ?? [];
+  let resultsToShow = $derived(votingRound.result ?? revealedResultsSplits ?? []);
 </script>
 
 <TransitionedHeight transitionHeightChanges>
@@ -57,7 +61,7 @@
         <h4>Awaiting votes</h4>
         <p>Vote results will be revealed after the voting period ends.</p>
         {#if isOwnVotingRound && !listingMode}
-          <Button on:click={handleRevealResults}>Preview results</Button>
+          <Button onclick={handleRevealResults}>Preview results</Button>
         {/if}
       </div>
     {:else if resultsToShow.length === 0}

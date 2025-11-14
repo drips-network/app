@@ -12,9 +12,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let formValid: boolean;
+  let { context }: Props = $props();
+
+  let formValid: boolean = $state();
 </script>
 
 <StandaloneFlowStepLayout
@@ -39,17 +43,20 @@
     bind:topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed}
     bind:selectedTokenAddress={$context.continuousSupportConfig.listSelected[0]}
   />
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={Check}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        disabled={!formValid}
+        icon={Check}
+        variant="primary"
+        onclick={() => dispatch('goForward')}>Continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

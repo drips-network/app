@@ -19,18 +19,33 @@
   import type { FilterParam, SortByParam } from '../+layout';
   import type { TDropdownOption } from '$lib/components/table-view-configurator/components/mini-dropdown.svelte';
 
-  export let round: Round;
-  export let ballotStore: Writable<InProgressBallot> & {
+  interface Props {
+    round: Round;
+    ballotStore: Writable<InProgressBallot> & {
     clear: () => void;
   };
-  export let sortByParam: SortByParam;
-  export let filterParam: FilterParam | null;
-  export let loggedIn: boolean;
-  export let categories: ApplicationCategory[];
-  export let voteMode: boolean;
-  export let reviewMode: boolean;
-  export let allApplications: ListingApplication[];
-  export let tableConfiguratorEl: HTMLDivElement | undefined = undefined;
+    sortByParam: SortByParam;
+    filterParam: FilterParam | null;
+    loggedIn: boolean;
+    categories: ApplicationCategory[];
+    voteMode: boolean;
+    reviewMode: boolean;
+    allApplications: ListingApplication[];
+    tableConfiguratorEl?: HTMLDivElement | undefined;
+  }
+
+  let {
+    round,
+    ballotStore,
+    sortByParam,
+    filterParam,
+    loggedIn,
+    categories,
+    voteMode,
+    reviewMode,
+    allApplications,
+    tableConfiguratorEl = $bindable(undefined)
+  }: Props = $props();
 
   async function handleDownload(format: 'csv' | 'xlsx') {
     const content: Blob | string =
@@ -49,8 +64,8 @@
     downloadUrl(URL.createObjectURL(new Blob([content], { type: fileType })), fileName);
   }
 
-  let selectedSortBy: SortByParam = sortByParam;
-  let selectedFilter: FilterParam | null = filterParam;
+  let selectedSortBy: SortByParam = $state(sortByParam);
+  let selectedFilter: FilterParam | null = $state(filterParam);
 
   async function handleTableOptsChange({
     sortBy,
@@ -79,8 +94,7 @@
     selectFn();
   }
 
-  let filterOptions: Record<FilterParam, TDropdownOption>;
-  $: filterOptions = {
+  let filterOptions: Record<FilterParam, TDropdownOption> = $derived({
     ...(loggedIn ? { own: { label: 'My applications' } } : {}),
 
     pending: { label: 'Pending' },
@@ -88,7 +102,8 @@
     rejected: { label: 'Rejected' },
 
     ...Object.fromEntries(categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }])),
-  } as Record<FilterParam, TDropdownOption>;
+  } as Record<FilterParam, TDropdownOption>);
+  
 </script>
 
 <div>
@@ -100,9 +115,11 @@
     <AnnotationBox type="info">
       Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
       private data if you're an admin.
-      <svelte:fragment slot="actions">
-        <RpgfSiweButton />
-      </svelte:fragment>
+      {#snippet actions()}
+          
+          <RpgfSiweButton />
+        
+          {/snippet}
     </AnnotationBox>
   </div>
 {/if}

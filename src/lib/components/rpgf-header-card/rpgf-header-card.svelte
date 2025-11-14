@@ -12,9 +12,13 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
-  export let round: Round;
 
-  export let interactive = true;
+  interface Props {
+    round: Round;
+    interactive?: boolean;
+  }
+
+  let { round, interactive = true }: Props = $props();
 
   function handleDeleteDraft() {
     doWithConfirmationModal('Are you sure you want to delete this round?', async () => {
@@ -69,7 +73,7 @@
           >
         {/if}
         {#if round.isAdmin && !round.published}
-          <Button variant="destructive" icon={Trash} on:click={handleDeleteDraft}
+          <Button variant="destructive" icon={Trash} onclick={handleDeleteDraft}
             >Delete draft</Button
           >
         {/if}

@@ -9,8 +9,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let roundId: string;
+  interface Props {
+    context: Writable<State>;
+    roundId: string;
+  }
+
+  let { context, roundId }: Props = $props();
 
   onMount(() => {
     dispatch('await', {

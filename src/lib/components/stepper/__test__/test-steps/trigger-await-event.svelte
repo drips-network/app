@@ -8,14 +8,14 @@
 
 Trigger await event step
 <Button
-  on:click={() =>
+  onclick={() =>
     dispatch('await', {
       message: 'Await success message',
       promise: () => new Promise((resolve) => setTimeout(resolve, 1000)),
     })}>Await success</Button
 >
 <Button
-  on:click={() =>
+  onclick={() =>
     dispatch('await', {
       message: 'Await error message',
       promise: () => new Promise((_, reject) => setTimeout(reject, 1000)),

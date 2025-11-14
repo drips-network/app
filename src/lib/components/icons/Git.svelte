@@ -1,10 +1,14 @@
 <script lang="ts">
   import IconWrapper from './IconWrapper.svelte';
 
-  export let style: string | undefined = undefined;
+  interface Props {
+    style?: string | undefined;
+  }
+
+  let { style = undefined }: Props = $props();
 </script>
 
-<IconWrapper on:click {style}>
+<IconWrapper {style}>
   <path
     fill-rule="evenodd"
     clip-rule="evenodd"

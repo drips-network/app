@@ -3,17 +3,28 @@
   import ChevronDown from '../icons/ChevronDown.svelte';
   import { page } from '$app/stores';
 
-  export let dropdown = false;
-  export let tonedDown: boolean = false;
-  export let dropdownActive = false;
 
-  export let href: string | null = null;
 
-  $: current = href && $page.url.pathname.includes(href);
 
-  export let elem: HTMLAnchorElement | HTMLButtonElement | null = null;
+  interface Props {
+    dropdown?: boolean;
+    tonedDown?: boolean;
+    dropdownActive?: boolean;
+    href?: string | null;
+    elem?: HTMLAnchorElement | HTMLButtonElement | null;
+    children?: import('svelte').Snippet;
+  }
 
-  let element: HTMLDivElement;
+  let {
+    dropdown = false,
+    tonedDown = false,
+    dropdownActive = false,
+    href = null,
+    elem = $bindable(null),
+    children
+  }: Props = $props();
+
+  let element: HTMLDivElement = $state();
 
   const dispatch = createEventDispatcher<{ activate: Element; navigate: void }>();
 
@@ -27,7 +38,8 @@
     }
   }
 
-  $: externalLink = href && href.startsWith('http');
+  let current = $derived(href && $page.url.pathname.includes(href));
+  let externalLink = $derived(href && href.startsWith('http'));
 </script>
 
 <svelte:element
@@ -39,9 +51,9 @@
   class:toned-down={tonedDown}
   class:dropdown-active={dropdownActive}
   class="wrapper typo-text"
-  on:mouseenter={handleHover}
-  on:focus={handleHover}
-  on:click={handleClick}
+  onmouseenter={handleHover}
+  onfocus={handleHover}
+  onclick={handleClick}
   target={externalLink ? '_blank' : undefined}
   rel={externalLink ? 'noopener noreferrer' : undefined}
 >
@@ -50,7 +62,7 @@
     style:color={current ? 'var(--color-primary)' : 'var(--color-foreground)'}
     bind:this={element}
   >
-    <slot />
+    {@render children?.()}
   </div>
   {#if dropdown}
     <div class="chevron" class:rotate={dropdownActive}>

@@ -23,10 +23,10 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
 
-  export let data;
-  $: round = data.round;
+  let { data } = $props();
+  let round = $derived(data.round);
 
-  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
+  let imageBaseUrl = $derived(`/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`);
 </script>
 
 <HeadMeta
@@ -37,36 +37,42 @@
 />
 
 <RpgfBaseLayout>
-  <svelte:fragment slot="sidebar">
-    {#if round.state}
-      <RpgfCtaCard
-        hasExistingBallot={Boolean(data.existingBallot)}
-        signedInUserId={data.rpgfUserData?.userId ?? null}
-        {round}
-      />
-    {/if}
-
-    {#if !round.published}
-      <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
-    {/if}
-    <RpgfScheduleCard {round} />
-  </svelte:fragment>
-
-  <svelte:fragment slot="header">
-    <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
-      {#if !data.rpgfUserData}
-        <div transition:fade={{ duration: 300 }}>
-          <AnnotationBox type="info">
-            Sign in to RetroPGF on Drips to view your own applications and other private data.
-            <svelte:fragment slot="actions">
-              <RpgfSiweButton />
-            </svelte:fragment>
-          </AnnotationBox>
-        </div>
+  {#snippet sidebar()}
+  
+      {#if round.state}
+        <RpgfCtaCard
+          hasExistingBallot={Boolean(data.existingBallot)}
+          signedInUserId={data.rpgfUserData?.userId ?? null}
+          {round}
+        />
       {/if}
-    </TransitionedHeight>
-    <RpgfHeaderCard {round} />
-  </svelte:fragment>
+
+      {#if !round.published}
+        <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
+      {/if}
+      <RpgfScheduleCard {round} />
+    
+  {/snippet}
+
+  {#snippet header()}
+  
+      <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
+        {#if !data.rpgfUserData}
+          <div transition:fade={{ duration: 300 }}>
+            <AnnotationBox type="info">
+              Sign in to RetroPGF on Drips to view your own applications and other private data.
+              {#snippet actions()}
+                      
+                  <RpgfSiweButton />
+                
+                      {/snippet}
+            </AnnotationBox>
+          </div>
+        {/if}
+      </TransitionedHeight>
+      <RpgfHeaderCard {round} />
+    
+  {/snippet}
 
   {#if round.description}
     <div style:padding="0 1rem">

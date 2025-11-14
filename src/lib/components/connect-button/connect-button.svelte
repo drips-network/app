@@ -8,7 +8,7 @@
   import SafeLogo from '../icons/safe-logo.svelte';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
-  $: safeAppMode = Boolean($wallet.safe);
+  let safeAppMode = $derived(Boolean($wallet.safe));
 
   const walletInitializedStore = wallet.initialized;
   const waitingForOnboardStore = wallet.waitingForOnboard;
@@ -18,29 +18,33 @@
   {#if $wallet.connected}
     <div class="desktop-only">
       <Flyout>
-        <div class="trigger" slot="trigger">
-          {#if safeAppMode}<div class="safe-logo">
-              <SafeLogo />
-            </div>{/if}
-          <IdentityBadge
-            disableTooltip
-            hideAvatarOnMobile
-            disableLink
-            size="medium"
-            address={$wallet.address}
-          />
-        </div>
-        <div slot="content">
-          <AccountMenu />
-        </div>
+        {#snippet trigger()}
+                <div class="trigger" >
+            {#if safeAppMode}<div class="safe-logo">
+                <SafeLogo />
+              </div>{/if}
+            <IdentityBadge
+              disableTooltip
+              hideAvatarOnMobile
+              disableLink
+              size="medium"
+              address={$wallet.address}
+            />
+          </div>
+              {/snippet}
+        {#snippet content()}
+                <div >
+            <AccountMenu />
+          </div>
+              {/snippet}
       </Flyout>
     </div>
     <div
       class="mobile-only"
       role="button"
       tabindex="0"
-      on:click={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
-      on:keydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+      onclick={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+      onkeydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
     >
       <IdentityBadge
         hideAvatarOnMobile
@@ -55,7 +59,7 @@
       disabled={$waitingForOnboardStore}
       loading={!$walletInitializedStore}
       icon={WalletIcon}
-      on:click={() => wallet.connect()}>Connect</Button
+      onclick={() => wallet.connect()}>Connect</Button
     >
   {/if}
 </div>

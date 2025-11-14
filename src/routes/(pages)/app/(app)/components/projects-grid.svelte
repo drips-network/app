@@ -6,7 +6,11 @@
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import getProjectColor from './project-color';
 
-  export let projects: DefaultExplorePageFeaturedProjectFragment[];
+  interface Props {
+    projects: DefaultExplorePageFeaturedProjectFragment[];
+  }
+
+  let { projects }: Props = $props();
 </script>
 
 <div class="projects-grid">

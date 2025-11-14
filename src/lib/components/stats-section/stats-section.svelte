@@ -2,8 +2,13 @@
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import Section from '../section/section.svelte';
 
-  export let collapsed = false;
-  export let collapsable = false;
+  interface Props {
+    collapsed?: boolean;
+    collapsable?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let { collapsed = $bindable(false), collapsable = $bindable(false), children }: Props = $props();
 
   let error = false;
 </script>
@@ -25,7 +30,7 @@
   }}
 >
   <div class="stats">
-    <slot />
+    {@render children?.()}
   </div>
 </Section>
 

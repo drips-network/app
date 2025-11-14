@@ -6,16 +6,20 @@
   const RESOLUTION_RATIO =
     browser && window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
 
-  export let speedMultiplier = 1;
-  export let vertical = false;
+  interface Props {
+    speedMultiplier?: number;
+    vertical?: boolean;
+  }
 
-  let canvasElem: HTMLCanvasElement;
+  let { speedMultiplier = 1, vertical = false }: Props = $props();
+
+  let canvasElem: HTMLCanvasElement = $state();
   let ctx: CanvasRenderingContext2D;
-  let containerSize: [number, number];
-  let container: HTMLDivElement;
+  let containerSize: [number, number] = $state();
+  let container: HTMLDivElement = $state();
 
-  let dripImg: HTMLImageElement;
-  let dripImgVertical: HTMLImageElement;
+  let dripImg: HTMLImageElement = $state();
+  let dripImgVertical: HTMLImageElement = $state();
 
   function rr(number: number): number {
     return number * RESOLUTION_RATIO;
@@ -176,17 +180,17 @@
   <canvas
     bind:this={canvasElem}
     style={`width: ${containerSize?.[0]}px; height: ${containerSize?.[1]}px;`}
-  />
+ ></canvas>
   <div style="display: none">
     <img
       bind:this={dripImg}
-      on:load={() => !vertical && draw(0)}
+      onload={() => !vertical && draw(0)}
       alt="rain drop"
       src="/assets/drip.webp"
     />
     <img
       bind:this={dripImgVertical}
-      on:load={() => vertical && draw(0)}
+      onload={() => vertical && draw(0)}
       alt="rain drop"
       src="/assets/drip-vertical.webp"
     />

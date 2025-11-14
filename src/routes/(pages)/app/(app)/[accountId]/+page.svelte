@@ -16,20 +16,20 @@
   import unreachable from '$lib/utils/unreachable';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let data;
+  let { data } = $props();
 
-  $: socialLinkValues = {
+  let socialLinkValues = $derived({
     'com.twitter': data.ensData?.records['com.twitter'],
     'com.github': data.ensData?.records['com.github'],
     url: data.ensData?.records.url,
-  };
+  });
 
-  let description: string | undefined;
-  $: description = data.ensData?.records.description;
+  let description: string | undefined = $derived(data.ensData?.records.description);
+  
 
-  $: isSelf =
-    data.profileData?.account.address &&
-    data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase();
+  let isSelf =
+    $derived(data.profileData?.account.address &&
+    data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase());
 </script>
 
 <HeadMeta title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined} />

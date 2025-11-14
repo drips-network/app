@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
     fragment DripVisualAddressDriverAccount on AddressDriverAccount {
       driver
@@ -49,6 +49,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import amtDeltaUnitStore, {
     FRIENDLY_NAMES,
     MULTIPLIERS,
@@ -76,32 +78,44 @@
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
 
-  export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
-  export let to:
+
+  interface Props {
+    from?: DripVisualAddressDriverAccountFragment | undefined;
+    to?: 
     | DripVisualNftDriverAccountFragment
     | DripVisualAddressDriverAccountFragment
     | DripVisualProjectFragment
     | DripVisualDripListFragment
     | DripVisualUserFragment
     | DripVisualEcosystemFragment
-    | undefined = undefined;
-  export let visual: 'stream' | 'donation' = 'stream';
-  export let disableLinks = false;
-  export let amountPerSecond: bigint | undefined = undefined;
-  export let halted = false;
+    | undefined;
+    visual?: 'stream' | 'donation';
+    disableLinks?: boolean;
+    amountPerSecond?: bigint | undefined;
+    halted?: boolean;
+    tokenInfo?: { decimals: number; symbol: string } | undefined;
+  }
 
-  export let tokenInfo: { decimals: number; symbol: string } | undefined = undefined;
+  let {
+    from = undefined,
+    to = undefined,
+    visual = 'stream',
+    disableLinks = false,
+    amountPerSecond = undefined,
+    halted = false,
+    tokenInfo = undefined
+  }: Props = $props();
 
   let animationSpeed = tweened(0, {
     duration: 500,
   });
 
-  $: {
+  run(() => {
     animationSpeed.set(to && amountPerSecond && !halted ? 1 : 0);
-  }
+  });
 
-  let windowWidth = (browser && window.innerWidth) || 0;
-  $: verticalAnimation = windowWidth <= 768;
+  let windowWidth = $state((browser && window.innerWidth) || 0);
+  let verticalAnimation = $derived(windowWidth <= 768);
 
   function getAmtPerSec() {
     const multiplier = MULTIPLIERS[$amtDeltaUnitStore];

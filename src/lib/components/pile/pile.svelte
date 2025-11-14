@@ -1,28 +1,33 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-
-  import { createEventDispatcher, type SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type Component, type SvelteComponent } from 'svelte';
   import { sineIn, sineOut } from 'svelte/easing';
-
-  export let transitionedOut = false;
-
-  export let maxItems = 4;
-  export let itemsClickable = false;
-
-  export let components: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: typeof SvelteComponent<any>;
-    props: Record<string, unknown>;
-  }[];
-  $: displayedComponents = components.slice(0, maxItems);
-  $: overflowAmount = components.length - maxItems;
 
   function getTransitionDelay(index: number, direction: 'in' | 'out') {
     return ((direction === 'in' ? components.length : 0) - index) * 15;
   }
 
-  export let overflowCounterClickable = false;
+  interface Props {
+    transitionedOut?: boolean;
+    maxItems?: number;
+    itemsClickable?: boolean;
+    components: {
+    component: Component<any>;
+    props: Record<string, unknown>;
+  }[];
+    overflowCounterClickable?: boolean;
+  }
+
+  let {
+    transitionedOut = false,
+    maxItems = 4,
+    itemsClickable = false,
+    components,
+    overflowCounterClickable = false
+  }: Props = $props();
   const dispatch = createEventDispatcher();
+  let displayedComponents = $derived(components.slice(0, maxItems));
+  let overflowAmount = $derived(components.length - maxItems);
 </script>
 
 {#if components.length !== 0}
@@ -45,12 +50,12 @@
             easing: sineOut,
           }}
         >
-          <svelte:component this={component.component} {...component.props} />
+          <component.component {...component.props} />
         </div>
       {/if}
     {/each}
     {#if overflowAmount > 0 && !transitionedOut}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <svelte:element
         this={overflowCounterClickable ? 'button' : 'div'}
         class="overflow typo-text-small focus-visible:ring-4 focus-visible:ring-primary-level-1"
@@ -66,7 +71,7 @@
           delay: getTransitionDelay(components.length - 1, 'in'),
           easing: sineOut,
         }}
-        on:click={() => dispatch('overflowCounterClick')}
+        onclick={() => dispatch('overflowCounterClick')}
       >
         +{overflowAmount}
       </svelte:element>

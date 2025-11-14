@@ -1,12 +1,18 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { Round } from '$lib/utils/rpgf/types/round';
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
-  export let round: Round;
+  interface Props {
+    round: Round;
+  }
 
-  $: url = `/app/rpgf/rounds/${round.urlSlug ?? round.id}`;
+  let { round }: Props = $props();
+
+  let url = $derived(`/app/rpgf/rounds/${round.urlSlug ?? round.id}`);
 
   enum EnrichedState {
     Draft,
@@ -17,9 +23,9 @@
     PendingResults,
     Results,
   }
-  let enrichedState: EnrichedState;
+  let enrichedState: EnrichedState = $state();
 
-  $: {
+  run(() => {
     if (!round.state) {
       enrichedState = EnrichedState.Draft;
     } else if (round.resultsPublished) {
@@ -44,7 +50,7 @@
           break;
       }
     }
-  }
+  });
 
   const stateLabels: Record<EnrichedState, string> = {
     [EnrichedState.Draft]: 'Draft',
@@ -56,7 +62,7 @@
     [EnrichedState.Results]: 'Results available',
   };
 
-  $: stateLabel = stateLabels[enrichedState];
+  let stateLabel = $derived(stateLabels[enrichedState]);
 </script>
 
 <PrimaryColorThemer colorHex={round.color}>

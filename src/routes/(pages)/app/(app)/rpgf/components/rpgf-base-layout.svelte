@@ -1,14 +1,24 @@
+<script lang="ts">
+  interface Props {
+    sidebar?: import('svelte').Snippet;
+    header?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
+
+  let { sidebar, header, children }: Props = $props();
+</script>
+
 <div class="rpgf-base-layout">
   <aside>
     <div class="sidebar-inner">
-      <slot name="sidebar" />
+      {@render sidebar?.()}
     </div>
   </aside>
   <div class="header">
-    <slot name="header" />
+    {@render header?.()}
   </div>
   <div class="content">
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

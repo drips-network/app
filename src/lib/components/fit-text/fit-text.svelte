@@ -4,11 +4,15 @@
 
   const MAX_SIZE = 16;
 
-  export let text: string;
+  interface Props {
+    text: string;
+  }
 
-  let containerElem: HTMLDivElement;
-  let contentElem: HTMLSpanElement;
-  let fontSize: number = MAX_SIZE;
+  let { text }: Props = $props();
+
+  let containerElem: HTMLDivElement = $state();
+  let contentElem: HTMLSpanElement = $state();
+  let fontSize: number = $state(MAX_SIZE);
   let contentWidth: number | undefined;
   let containerWidth: number | undefined;
 
@@ -18,7 +22,7 @@
     contentWidth = contentBox.width;
   }
 
-  let firstLetterOnly = false;
+  let firstLetterOnly = $state(false);
 
   async function fit() {
     fontSize = MAX_SIZE;

@@ -13,10 +13,14 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let applicationId: string;
+  interface Props {
+    context: Writable<State>;
+    applicationId: string;
+  }
 
-  let kycIdValue: string[] = [];
+  let { context, applicationId }: Props = $props();
+
+  let kycIdValue: string[] = $state([]);
 
   function handleLink() {
     dispatch('await', {
@@ -66,14 +70,16 @@
 
   <AnnotationBox>This action cannot be undone.</AnnotationBox>
 
-  <svelte:fragment slot="actions">
-    <Button
-      on:click={handleLink}
-      disabled={kycIdValue.length === 0}
-      variant="primary"
-      icon={CheckCircle}>Confirm</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        onclick={handleLink}
+        disabled={kycIdValue.length === 0}
+        variant="primary"
+        icon={CheckCircle}>Confirm</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

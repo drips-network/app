@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const STREAM_PAGE_STREAM_FRAGMENT = gql`
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     ${DRIP_VISUAL_DRIP_LIST_FRAGMENT}
@@ -112,30 +112,38 @@
   import StreamDeveloper from '$lib/components/developer-section/stream-developer.section.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
 
-  export let data: PageData;
-  let stream: StreamPageStreamFragment;
+  interface Props {
+    data: PageData;
+  }
 
-  $: stream = data.stream;
-  $: streamChainData = filterCurrentChainData(stream.sender.chainData);
+  let { data }: Props = $props();
+  let stream: StreamPageStreamFragment = $derived(data.stream);
 
-  $: currentStreamAmounts = streamCurrentAmountsStore(
-    stream.timeline,
-    stream.config.amountPerSecond.tokenAddress,
+  let streamChainData = $derived(filterCurrentChainData(stream.sender.chainData));
+
+  let currentStreamAmounts = $derived(
+    streamCurrentAmountsStore(stream.timeline, stream.config.amountPerSecond.tokenAddress),
   );
 
-  $: tokenAddress = stream.config.amountPerSecond.tokenAddress.toLowerCase();
-  $: token = $tokensStore && tokensStore.getByAddress(tokenAddress);
+  let tokenAddress = $derived(stream.config.amountPerSecond.tokenAddress.toLowerCase());
+  let token = $derived($tokensStore && tokensStore.getByAddress(tokenAddress));
 
-  $: endTimelineItem = stream.timeline.find((item) => item.type === TimelineItemType.End);
-  $: endDate = endTimelineItem?.timestamp ? new Date(endTimelineItem.timestamp) : undefined;
-  $: startDate = new Date(stream.config.startDate ?? stream.createdAt);
-
-  $: runsOutOfFundsTimelineItem = stream.timeline.find(
-    (item) => item.type === TimelineItemType.OutOfFunds,
+  let endTimelineItem = $derived(
+    stream.timeline.find((item) => item.type === TimelineItemType.End),
   );
-  $: runsOutOfFundsDate = runsOutOfFundsTimelineItem?.timestamp
-    ? new Date(runsOutOfFundsTimelineItem.timestamp)
-    : undefined;
+  let endDate = $derived(
+    endTimelineItem?.timestamp ? new Date(endTimelineItem.timestamp) : undefined,
+  );
+  let startDate = $derived(new Date(stream.config.startDate ?? stream.createdAt));
+
+  let runsOutOfFundsTimelineItem = $derived(
+    stream.timeline.find((item) => item.type === TimelineItemType.OutOfFunds),
+  );
+  let runsOutOfFundsDate = $derived(
+    runsOutOfFundsTimelineItem?.timestamp
+      ? new Date(runsOutOfFundsTimelineItem.timestamp)
+      : undefined,
+  );
 
   let elapsedDurationPercentage = tweened(0, { duration: 1000, easing: quintOut });
 
@@ -159,24 +167,32 @@
     return () => clearInterval(interval);
   });
 
-  $: senderOutgoingBalanceTimeline = streamChainData.balances.find(
-    (b) => b.tokenAddress.toLowerCase() === tokenAddress,
-  )?.outgoing;
-  $: senderOutgoingBalance = senderOutgoingBalanceTimeline
-    ? streamCurrentAmountsStore(senderOutgoingBalanceTimeline, tokenAddress)
-    : undefined;
+  let senderOutgoingBalanceTimeline = $derived(
+    streamChainData.balances.find((b) => b.tokenAddress.toLowerCase() === tokenAddress)?.outgoing,
+  );
+  let senderOutgoingBalance = $derived(
+    senderOutgoingBalanceTimeline
+      ? streamCurrentAmountsStore(senderOutgoingBalanceTimeline, tokenAddress)
+      : undefined,
+  );
 
-  $: isUnknownToken = tokensStore.customTokensLoaded && !token;
+  let isUnknownToken = $derived(tokensStore.customTokensLoaded && !token);
 
-  $: configuredToStartAt = stream.config.startDate ? new Date(stream.config.startDate) : null;
+  let configuredToStartAt = $derived(
+    stream.config.startDate ? new Date(stream.config.startDate) : null,
+  );
 
-  $: configuredToEndAt = stream.config.durationSeconds
-    ? new Date(startDate.getTime() + stream.config.durationSeconds * 1000)
-    : null;
-  $: runsOutOfFundsBeforeConfiguredEndDate = Boolean(
-    configuredToEndAt &&
-      runsOutOfFundsDate &&
-      runsOutOfFundsDate.getTime() < configuredToEndAt.getTime(),
+  let configuredToEndAt = $derived(
+    stream.config.durationSeconds
+      ? new Date(startDate.getTime() + stream.config.durationSeconds * 1000)
+      : null,
+  );
+  let runsOutOfFundsBeforeConfiguredEndDate = $derived(
+    Boolean(
+      configuredToEndAt &&
+        runsOutOfFundsDate &&
+        runsOutOfFundsDate.getTime() < configuredToEndAt.getTime(),
+    ),
   );
 </script>
 
@@ -200,24 +216,23 @@
       <div in:fade={{ duration: 300 }} class="actions">
         <Button
           icon={Pen}
-          on:click={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
+          onclick={() => modal.show(Stepper, undefined, editStreamFlowSteps(stream))}>Edit</Button
         >
         {#if stream.isPaused}
           <Button
             icon={Play}
-            on:click={() => modal.show(Stepper, undefined, unpauseFlowSteps(stream))}
-            >Unpause</Button
+            onclick={() => modal.show(Stepper, undefined, unpauseFlowSteps(stream))}>Unpause</Button
           >
         {:else}
           <Button
             icon={Pause}
-            on:click={() => modal.show(Stepper, undefined, pauseFlowSteps(stream))}>Pause</Button
+            onclick={() => modal.show(Stepper, undefined, pauseFlowSteps(stream))}>Pause</Button
           >
         {/if}
 
         <Button
           icon={Trash}
-          on:click={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}
+          onclick={() => modal.show(Stepper, undefined, deleteStreamFlowSteps(stream))}
           >Delete</Button
         >
       </div>
@@ -234,13 +249,13 @@
     <AnnotationBox type="warning">
       This stream is streaming a token that's not supported by default. To see stream details, add
       it as a custom token.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <Button
           variant="primary"
-          on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
+          onclick={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Add custom token</Button
         >
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   {:else}
     <div class="details">
@@ -312,7 +327,10 @@
                 </div>
               </div>
               <div class="absolute overlay flex flex-col sm:flex-row">
-                <div style:flex-basis="{$elapsedDurationPercentage}%" class="bg-primary-level-1" />
+                <div
+                  style:flex-basis="{$elapsedDurationPercentage}%"
+                  class="bg-primary-level-1"
+                ></div>
               </div>
             </div>
           </div>
@@ -330,9 +348,9 @@
               <h5 class="key greyed-out">Configured start date</h5>
               <Tooltip>
                 <InfoCircle style="height: 1.25rem" />
-                <svelte:fragment slot="tooltip-content">
+                {#snippet tooltip_content()}
                   The stream was configured to start streaming at this specific time.
-                </svelte:fragment>
+                {/snippet}
               </Tooltip>
             </div>
             <span class="value small-text">{formatDate(configuredToStartAt, 'verbose')}</span>
@@ -346,10 +364,10 @@
               {#if runsOutOfFundsBeforeConfiguredEndDate}
                 <Tooltip>
                   <ExclamationCircle style="height: 1.25rem; fill: var(--color-negative);" />
-                  <svelte:fragment slot="tooltip-content">
+                  {#snippet tooltip_content()}
                     This stream has an end date configured, but will run out of funds before the
                     configured end date.
-                  </svelte:fragment>
+                  {/snippet}
                 </Tooltip>
               {/if}
             </div>
@@ -366,12 +384,12 @@
               <h5 class="key greyed-out">{alreadyRanOut ? 'Ran' : 'Runs'} out of funds at</h5>
               <Tooltip>
                 <InfoCircle style="height: 1.25rem" />
-                <svelte:fragment slot="tooltip-content">
+                {#snippet tooltip_content()}
                   The date at which the sender's {token?.info.symbol} balance {alreadyRanOut
                     ? 'ran out'
                     : 'will run out'}, causing this stream to stop. The sender may top up their
                   balance at any point.
-                </svelte:fragment>
+                {/snippet}
               </Tooltip>
             </div>
             <span class="value small-text"
@@ -386,11 +404,11 @@
               <h5 class="key greyed-out">Senderʼs balance</h5>
               <Tooltip>
                 <InfoCircle style="height: 1.25rem" />
-                <svelte:fragment slot="tooltip-content">
+                {#snippet tooltip_content()}
                   The stream sender's currently remaining {token?.info.symbol} balance. When this cannot
                   cover all the sender's streams for this token anymore, all their streams for this token
                   will cease.
-                </svelte:fragment>
+                {/snippet}
               </Tooltip>
             </div>
 
@@ -403,7 +421,7 @@
                 {token.info.symbol}
               </span>
             {:else}
-              <div out:fade={{ duration: 200 }} class="loading value small-text tabular-nums" />
+              <div out:fade={{ duration: 200 }} class="loading value small-text tabular-nums"></div>
             {/if}
           </div>
         {/if}

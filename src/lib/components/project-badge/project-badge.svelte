@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { ProjectBadgeFragment } from './__generated__/gql.generated';
   import { gql } from 'graphql-request';
   import { PROJECT_AVATAR_FRAGMENT } from '../project-avatar/project-avatar.svelte';
@@ -47,21 +47,34 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
-  export let project: ProjectBadgeFragment;
+  interface Props {
+    project: ProjectBadgeFragment;
+    tooltip?: boolean;
+    /** display project as if it's unclaimed, even if it is claimed */
+    forceUnclaimed?: boolean;
+    hideAvatar?: boolean;
+    hideName?: boolean;
+    linkToNewTab?: boolean;
+    linkTo?: 'external-url' | 'project-page' | 'nothing';
+    size?: 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+    smallText?: boolean;
+    chainOverride?: SupportedChain | undefined;
+  }
 
-  export let tooltip = true;
-  /** display project as if it's unclaimed, even if it is claimed */
-  export let forceUnclaimed = false;
-  export let hideAvatar = false;
-  export let hideName = false;
-  export let linkToNewTab = false;
-  export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
-  export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
-  export let smallText = false;
-  export let chainOverride: SupportedChain | undefined = undefined;
+  let {
+    project,
+    tooltip = true,
+    forceUnclaimed = false,
+    hideAvatar = false,
+    hideName = false,
+    linkToNewTab = false,
+    linkTo = 'project-page',
+    size = 'small',
+    smallText = false,
+    chainOverride = undefined,
+  }: Props = $props();
 
-  let unclaimedProject: Project;
-  $: unclaimedProject = {
+  let unclaimedProject: Project = $derived({
     source: { ...project.source },
     chainData: [
       {
@@ -70,11 +83,13 @@
         verificationStatus: ProjectVerificationStatus.Unclaimed,
       },
     ],
-  } as Project;
+  } as Project);
 
-  $: processedProject = forceUnclaimed ? unclaimedProject : project;
+  let processedProject = $derived(forceUnclaimed ? unclaimedProject : project);
 
-  $: chainData = filterCurrentChainData(processedProject.chainData, undefined, chainOverride);
+  let chainData = $derived(
+    filterCurrentChainData(processedProject.chainData, undefined, chainOverride),
+  );
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(chainData) ? chainData.color : undefined}>
@@ -119,9 +134,9 @@
         />
       {/if}
     </svelte:element>
-    <svelte:fragment slot="tooltip-content">
+    {#snippet tooltip_content()}
       <ProjectTooltip project={processedProject} />
-    </svelte:fragment>
+    {/snippet}
   </Tooltip>
 </PrimaryColorThemer>
 

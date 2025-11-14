@@ -4,7 +4,11 @@
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import RpgfRoundGrid from './rpgf-round-grid.svelte';
 
-  export let rounds: Round[];
+  interface Props {
+    rounds: Round[];
+  }
+
+  let { rounds }: Props = $props();
 </script>
 
 {#if rounds.length > 0}

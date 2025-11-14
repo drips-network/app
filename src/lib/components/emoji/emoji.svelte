@@ -3,8 +3,12 @@
   import { CUSTOM_EMOJI_COMPONENTS } from './emoji';
   import twemoji from '$lib/utils/twemoji';
 
-  export let emoji: string;
-  export let size: 'small' | 'regular' | 'large' | 'huge' | 'massive';
+  interface Props {
+    emoji: string;
+    size: 'small' | 'regular' | 'large' | 'huge' | 'massive';
+  }
+
+  let { emoji, size }: Props = $props();
 
   const SIZES_PX = {
     small: 12,
@@ -14,15 +18,16 @@
     massive: 64,
   } as const;
 
-  $: sizePx = SIZES_PX[size];
+  let sizePx = $derived(SIZES_PX[size]);
 
-  let customEmoji: ComponentType | undefined;
-  $: customEmoji = CUSTOM_EMOJI_COMPONENTS[emoji];
+  let customEmoji: ComponentType | undefined = $derived(CUSTOM_EMOJI_COMPONENTS[emoji]);
+  
 </script>
 
 <div class="emoji">
   {#if customEmoji}
-    <svelte:component this={customEmoji} size={sizePx} />
+    {@const SvelteComponent = customEmoji}
+    <SvelteComponent size={sizePx} />
   {:else}
     {@html twemoji(emoji, {
       attributes: () => ({

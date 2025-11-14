@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (success to success_1) making the component unusable -->
 <script lang="ts">
   import FileIcon from '$lib/components/icons/File.svelte';
   import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
@@ -172,7 +173,7 @@
     </div>
     <Button
       variant={error ? 'destructive-outline' : 'normal'}
-      on:click={handleSelectFileButtonClick}>Select file</Button
+      onclick={handleSelectFileButtonClick}>Select file</Button
     >
   {/if}
 </div>

@@ -22,37 +22,38 @@
   import Copy from '$lib/components/icons/Copy.svelte';
   import cloneRpgfFormFlow from '$lib/flows/clone-rpgf-form-flow/clone-rpgf-form-flow';
 
-  export let data;
+  let { data } = $props();
 
   interface CategoryTableRow {
     name: string;
     formName: string;
-    deleteButton: ComponentProps<Button>;
+    deleteButton: ComponentProps<typeof Button>;
   }
 
-  let categoriesTableData: CategoryTableRow[];
-  $: categoriesTableData = data.applicationCategories.map((cat) => ({
-    name: cat.name,
-    formName: cat.applicationForm.name,
-    deleteButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Trash,
-      ariaLabel: 'Delete category',
-      // If round is published, mandate at least one category
-      disabled: data.round.published && data.applicationCategories.length <= 1,
-      onClick: () => {
-        doWithConfirmationModal(
-          'Are you sure you want to delete this category? This action cannot be undone.',
-          () =>
-            doWithErrorModal(async () => {
-              await deleteApplicationCategory(undefined, data.round.id, cat.id);
-              await invalidate('rpgf:round:applications:categories-and-forms');
-            }),
-        );
+  let categoriesTableData: CategoryTableRow[] = $derived(
+    data.applicationCategories.map((cat) => ({
+      name: cat.name,
+      formName: cat.applicationForm.name,
+      deleteButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Trash,
+        ariaLabel: 'Delete category',
+        // If round is published, mandate at least one category
+        disabled: data.round.published && data.applicationCategories.length <= 1,
+        onClick: () => {
+          doWithConfirmationModal(
+            'Are you sure you want to delete this category? This action cannot be undone.',
+            () =>
+              doWithErrorModal(async () => {
+                await deleteApplicationCategory(undefined, data.round.id, cat.id);
+                await invalidate('rpgf:round:applications:categories-and-forms');
+              }),
+          );
+        },
       },
-    },
-  }));
+    })),
+  );
 
   const categoryTableColumns: ColumnDef<CategoryTableRow>[] = [
     {
@@ -77,46 +78,47 @@
 
   interface FormTableRow {
     name: string;
-    deleteButton: ComponentProps<Button>;
-    editButton: ComponentProps<Button>;
+    deleteButton: ComponentProps<typeof Button>;
+    editButton: ComponentProps<typeof Button>;
   }
 
-  let formsTableData: FormTableRow[];
-  $: formsTableData = data.applicationForms.map((form) => ({
-    name: form.name,
-    deleteButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Trash,
-      ariaLabel: 'Delete form',
-      // disabled if assigned to a category
-      disabled: data.applicationCategories.some((cat) => cat.applicationForm.id === form.id),
-      onClick: () => {
-        doWithConfirmationModal(
-          'Are you sure you want to delete this form? This action cannot be undone.',
-          () =>
-            doWithErrorModal(async () => {
-              await deleteApplicationForm(undefined, data.round.id, form.id);
-              await invalidate('rpgf:round:applications:categories-and-forms');
-            }),
-        );
+  let formsTableData: FormTableRow[] = $derived(
+    data.applicationForms.map((form) => ({
+      name: form.name,
+      deleteButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Trash,
+        ariaLabel: 'Delete form',
+        // disabled if assigned to a category
+        disabled: data.applicationCategories.some((cat) => cat.applicationForm.id === form.id),
+        onClick: () => {
+          doWithConfirmationModal(
+            'Are you sure you want to delete this form? This action cannot be undone.',
+            () =>
+              doWithErrorModal(async () => {
+                await deleteApplicationForm(undefined, data.round.id, form.id);
+                await invalidate('rpgf:round:applications:categories-and-forms');
+              }),
+          );
+        },
       },
-    },
-    cloneButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Copy,
-      ariaLabel: 'Clone form',
-      onClick: () => modal.show(Stepper, undefined, cloneRpgfFormFlow(form, data.round.id)),
-    },
-    editButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Pen,
-      ariaLabel: 'Edit form',
-      href: `/app/rpgf/rounds/${data.round.id}/settings/application/forms/${form.id}`,
-    },
-  }));
+      cloneButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Copy,
+        ariaLabel: 'Clone form',
+        onClick: () => modal.show(Stepper, undefined, cloneRpgfFormFlow(form, data.round.id)),
+      },
+      editButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Pen,
+        ariaLabel: 'Edit form',
+        href: `/app/rpgf/rounds/${data.round.id}/settings/application/forms/${form.id}`,
+      },
+    })),
+  );
 
   const formTableColumns: ColumnDef<FormTableRow>[] = [
     {
@@ -170,7 +172,7 @@
 
     <Button
       icon={Plus}
-      on:click={() =>
+      onclick={() =>
         modal.show(
           Stepper,
           undefined,
@@ -202,7 +204,7 @@
 
     <Button
       icon={Plus}
-      on:click={() => modal.show(Stepper, undefined, createRpgfApplicationFormFlow(data.round.id))}
+      onclick={() => modal.show(Stepper, undefined, createRpgfApplicationFormFlow(data.round.id))}
       >Create new form</Button
     >
   </FormField>
@@ -217,9 +219,9 @@
       reconfigure this feature.
     </AnnotationBox>
 
-    <svelte:fragment slot="action">
+    {#snippet action()}
       <Toggle checked={Boolean(data.round.kycConfig)} disabled />
-    </svelte:fragment>
+    {/snippet}
 
     {#if data.round.kycConfig}
       <h5 style:margin-top="1rem">KYC Provider</h5>

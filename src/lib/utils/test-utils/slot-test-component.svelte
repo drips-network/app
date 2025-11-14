@@ -1,12 +1,18 @@
 <script lang="ts">
   import type { ComponentType } from 'svelte';
 
-  export let component: ComponentType;
-  export let text: string;
 
-  export let componentProps: { [propName: string]: unknown } | undefined = undefined;
+  interface Props {
+    component: ComponentType;
+    text: string;
+    componentProps?: { [propName: string]: unknown } | undefined;
+  }
+
+  let { component, text, componentProps = undefined }: Props = $props();
+
+  const SvelteComponent = $derived(component);
 </script>
 
-<svelte:component this={component} {...componentProps} on:click>
+<SvelteComponent {...componentProps} onclick>
   <span data-testid="slot">{text}</span>
-</svelte:component>
+</SvelteComponent>

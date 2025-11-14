@@ -1,20 +1,27 @@
-<script>
+<script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { getNetwork } from '$lib/stores/wallet/network';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ChevronDown from '../icons/ChevronDown.svelte';
   import TestnetFrame from '../icons/networks/TestnetFrame.svelte';
 
-  $: network = getNetwork($walletStore.network.chainId);
+  let network = $derived(getNetwork($walletStore.network.chainId));
 
   const isDev = false;
 
-  export let toggled = false;
+  interface Props {
+    toggled?: boolean;
+  }
+
+  let { toggled = false }: Props = $props();
 </script>
 
-<button class="wrapper" class:disabled={isDev} on:click>
+<button class="wrapper" class:disabled={isDev} onclick={bubble('click')}>
   <div class="network-picker">
     <div class="icon-wrapper">
-      <svelte:component this={network.icon} style="width: 2rem; height: 2rem;" />
+      <network.icon style="width: 2rem; height: 2rem;" />
     </div>
     {#if network.isTestnet}
       <div class="testnet-frame"><TestnetFrame style="width: 2rem; height: 2rem;" /></div>

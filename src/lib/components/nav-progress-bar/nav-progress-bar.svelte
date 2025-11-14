@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
 <!--
   Taken & slightly modified from https://github.com/prgm-dev/sveltekit-progress-bar. Credit to the authors 💦
 -->
@@ -256,7 +257,7 @@
     style={barStyle}
   >
     {#if running}
-      <div class="svelte-progress-bar-leader" style={leaderColorStyle} />
+      <div class="svelte-progress-bar-leader" style={leaderColorStyle}></div>
     {/if}
   </output>
 {/if}

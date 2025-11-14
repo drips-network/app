@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { createEventDispatcher, tick } from 'svelte';
   import type { ListEditorItem } from '../types';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
@@ -12,25 +14,39 @@
     deleteItem: void;
   }>();
 
-  export let item: ListEditorItem;
-  export let key: string;
-  export let weight: number;
 
-  export let weightsMode: boolean;
-  export let isEditable: boolean;
-  export let canDeleteItems: boolean;
-  export let hasBottomBorder: boolean;
 
-  export let allowEmptyPercentage = false;
 
-  export let highlight: boolean;
-  $: {
-    if (highlight) setTimeout(() => (highlight = false), 500);
+  interface Props {
+    item: ListEditorItem;
+    key: string;
+    weight: number;
+    weightsMode: boolean;
+    isEditable: boolean;
+    canDeleteItems: boolean;
+    hasBottomBorder: boolean;
+    allowEmptyPercentage?: boolean;
+    highlight: boolean;
   }
 
-  let inputElem: HTMLInputElement;
-  let inputValue: number | undefined;
-  let editingPercentage = false;
+  let {
+    item,
+    key,
+    weight,
+    weightsMode,
+    isEditable,
+    canDeleteItems,
+    hasBottomBorder,
+    allowEmptyPercentage = false,
+    highlight = $bindable()
+  }: Props = $props();
+  run(() => {
+    if (highlight) setTimeout(() => (highlight = false), 500);
+  });
+
+  let inputElem: HTMLInputElement = $state();
+  let inputValue: number | undefined = $state();
+  let editingPercentage = $state(false);
 
   async function startEditing() {
     if (!isEditable) return;
@@ -63,14 +79,14 @@
     dispatch('deleteItem');
   }
 
-  $: percentage = weight / 10000;
+  let percentage = $derived(weight / 10000);
 
   function formatPercentage(percentage: number) {
     return Number(percentage % 1 === 0 ? percentage.toFixed(0) : percentage.toFixed(8)).toString();
   }
 
-  let inputWidth: string;
-  $: {
+  let inputWidth: string = $state();
+  run(() => {
     const amountOfNumbersInInputValue = String(inputValue)
       .replaceAll(',', '')
       .replaceAll('.', '').length;
@@ -88,7 +104,7 @@
       amountOfNumbersInInputValue * NUMBER_WIDTH +
       (hasDecimalPoint ? DECIMAL_POINT_WIDTH : 0)
     }px`;
-  }
+  });
 </script>
 
 <div
@@ -117,13 +133,13 @@
 
   <div class="right">
     {#if weightsMode}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         class="percentage-editor tabular-nums"
         class:editable={isEditable}
         style:width={editingPercentage ? inputWidth : 'auto'}
-        on:click={startEditing}
+        onclick={startEditing}
         class:editing-percentage={editingPercentage}
         class:error={(!allowEmptyPercentage && weight === 0) || weight > 1000000}
         class:zero={allowEmptyPercentage && weight === 0}
@@ -137,15 +153,15 @@
           bind:this={inputElem}
           bind:value={inputValue}
           type="number"
-          on:focus={startEditing}
-          on:blur={stopEditing}
-          on:keydown={handleKeydown}
+          onfocus={startEditing}
+          onblur={stopEditing}
+          onkeydown={handleKeydown}
         />
       </div>
     {/if}
 
     {#if item.rightComponent}
-      <svelte:component this={item.rightComponent.component} {...item.rightComponent.props} />
+      <item.rightComponent.component {...item.rightComponent.props} />
     {/if}
 
     {#if isEditable && canDeleteItems}
@@ -154,7 +170,7 @@
         icon={Trash}
         size="small"
         variant="ghost"
-        on:click={handleDelete}
+        onclick={handleDelete}
       />
     {/if}
   </div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import BoxIcon from '$lib/components/icons/Box.svelte';
   import TrophyIcon from '$lib/components/icons/Trophy.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
@@ -29,31 +31,45 @@
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
 
-  export let projects: DefaultExplorePageFeaturedProjectFragment[];
-  export let featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
-  export let featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
-  export let blogPosts: z.infer<typeof postsListingSchema>;
-  export let featuredDripLists: ADripListFragment[];
-  export let totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
-  export let tlv: number;
+  interface Props {
+    projects: DefaultExplorePageFeaturedProjectFragment[];
+    featuredProjects: DefaultExplorePageFeaturedProjectFragment[];
+    featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
+    blogPosts: z.infer<typeof postsListingSchema>;
+    featuredDripLists: ADripListFragment[];
+    totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
+    tlv: number;
+  }
+
+  let {
+    projects,
+    featuredProjects,
+    featuredWeb3Projects,
+    blogPosts = $bindable(),
+    featuredDripLists,
+    totalDrippedPrices,
+    tlv
+  }: Props = $props();
 
   // 2 latest posts. Sort by date
-  $: blogPosts = blogPosts
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 2);
+  run(() => {
+    blogPosts = blogPosts
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 2);
+  });
 
-  let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation>;
+  let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation> = $state();
   function update() {
     totalDrippedAmounts = totalDrippedApproximation();
   }
   update();
 
-  $: formattedTlv = new Intl.NumberFormat('en-US', {
+  let formattedTlv = $derived(new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(Math.round(tlv));
+  }).format(Math.round(tlv)));
 
   let tickHandle: number;
   onMount(async () => {
@@ -63,7 +79,7 @@
     tickStore.deregister(tickHandle);
   });
 
-  $: enabledNetworks = Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet);
+  let enabledNetworks = $derived(Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet));
 </script>
 
 <div class="explore">
@@ -91,19 +107,21 @@
       </p>
     </div>
 
-    <svelte:fragment slot="actions">
-      <Button
-        variant="primary"
-        icon={ArrowUpRight}
-        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
-        target="_blank">Check it out</Button
-      >
-      <Button
-        icon={ArrowCounterClockwiseHeart}
-        href="https://www.drips.network/solutions/retro-pgf"
-        target="_blank">About RetroPGF on Drips</Button
-      >
-    </svelte:fragment>
+    {#snippet actions()}
+      
+        <Button
+          variant="primary"
+          icon={ArrowUpRight}
+          href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
+          target="_blank">Check it out</Button
+        >
+        <Button
+          icon={ArrowCounterClockwiseHeart}
+          href="https://www.drips.network/solutions/retro-pgf"
+          target="_blank">About RetroPGF on Drips</Button
+        >
+      
+      {/snippet}
   </FeatureCard>
 
   <Section
@@ -137,7 +155,7 @@
                   rel="noreferrer"
                   class="header"
                 >
-                  <svelte:component this={network.icon} />
+                  <network.icon />
                 </a>
               {/each}
             </div>

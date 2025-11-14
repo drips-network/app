@@ -16,11 +16,11 @@
   import { createRound } from '$lib/utils/rpgf/rpgf.js';
   import type { PossibleColor } from '$lib/utils/rpgf/types/round.js';
 
-  export let data;
-  $: ownRoundsAndDrafts = data.own ?? [];
-  $: otherRounds = data.rounds ?? [];
+  let { data } = $props();
+  let ownRoundsAndDrafts = $derived(data.own ?? []);
+  let otherRounds = $derived(data.rounds ?? []);
 
-  let loading = false;
+  let loading = $state(false);
 
   async function handleCreateRoundDraft() {
     doWithErrorModal(
@@ -81,23 +81,25 @@
       >
       Interested to run your round on Drips? Reach out to the team now.
 
-      <svelte:fragment slot="actions">
-        <Button
-          href="https://docs.drips.network/rpgf/overview"
-          target="_blank"
-          icon={ArrowBoxUpRight}
-        >
-          Learn more
-        </Button>
-        <Button
-          variant="primary"
-          href={INBOUND_LEAD_FORM_URL}
-          target="_blank"
-          icon={ArrowBoxUpRight}
-        >
-          Get in touch
-        </Button>
-      </svelte:fragment>
+      {#snippet actions()}
+          
+          <Button
+            href="https://docs.drips.network/rpgf/overview"
+            target="_blank"
+            icon={ArrowBoxUpRight}
+          >
+            Learn more
+          </Button>
+          <Button
+            variant="primary"
+            href={INBOUND_LEAD_FORM_URL}
+            target="_blank"
+            icon={ArrowBoxUpRight}
+          >
+            Get in touch
+          </Button>
+        
+          {/snippet}
     </AnnotationBox>
   {/if}
 

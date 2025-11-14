@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
 <!--
 	Adapted from https://github.com/probablykasper/date-picker-svelte
 	Credit to Kasper Henningsen & Contributors!

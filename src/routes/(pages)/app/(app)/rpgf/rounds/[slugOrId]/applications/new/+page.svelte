@@ -12,11 +12,11 @@
   import RpgfApplicationEditor from '$lib/components/rpgf-application-editor/rpgf-application-editor.svelte';
   import unreachable from '$lib/utils/unreachable.js';
 
-  export let data;
-  $: round = data.round;
+  let { data } = $props();
+  let round = $derived(data.round);
 
-  let readyToSubmit = false;
-  let formValue: ComponentProps<RpgfApplicationEditor>['value'];
+  let readyToSubmit = $state(false);
+  let formValue: ComponentProps<typeof RpgfApplicationEditor>['value'] = $state();
 
   async function handleSubmit() {
     if (!formValue) return;
@@ -46,7 +46,7 @@
     );
   }
 
-  let forceRevealAllErrors = false;
+  let forceRevealAllErrors = $state(false);
 </script>
 
 <HeadMeta title="Apply to {round.name}" />
@@ -81,34 +81,36 @@
       {#if !readyToSubmit}
         <AnnotationBox type="error">
           Some fields are invalid or missing.
-          <svelte:fragment slot="actions">
-            <Button
-              variant="normal"
-              on:click={async () => {
-                forceRevealAllErrors = true;
+          {#snippet actions()}
+                  
+              <Button
+                variant="normal"
+                onclick={async () => {
+                  forceRevealAllErrors = true;
 
-                // wait for the DOM to update before scrolling
-                await tick();
+                  // wait for the DOM to update before scrolling
+                  await tick();
 
-                const errorAnchor = document.getElementById('form-field-validation-error-anchor');
-                if (errorAnchor) {
-                  errorAnchor.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }
-              }}
-            >
-              Show all errors
-            </Button>
-          </svelte:fragment>
+                  const errorAnchor = document.getElementById('form-field-validation-error-anchor');
+                  if (errorAnchor) {
+                    errorAnchor.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }
+                }}
+              >
+                Show all errors
+              </Button>
+            
+                  {/snippet}
         </AnnotationBox>
       {/if}
 
       <Button
         icon={Wallet}
         disabled={!readyToSubmit}
-        on:click={handleSubmit}
+        onclick={handleSubmit}
         variant="primary"
         size="large"
       >

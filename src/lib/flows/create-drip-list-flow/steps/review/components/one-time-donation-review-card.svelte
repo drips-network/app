@@ -4,10 +4,14 @@
   import unreachable from '$lib/utils/unreachable';
   import tokensStore from '$lib/stores/tokens/tokens.store';
 
-  export let tokenAddress: string;
-  export let amount: bigint;
+  interface Props {
+    tokenAddress: string;
+    amount: bigint;
+  }
 
-  $: token = tokensStore.getByAddress(tokenAddress);
+  let { tokenAddress, amount }: Props = $props();
+
+  let token = $derived(tokensStore.getByAddress(tokenAddress));
 </script>
 
 <h4>One-Time Donation</h4>

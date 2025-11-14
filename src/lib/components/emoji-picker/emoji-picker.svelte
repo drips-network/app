@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import emoji from '$lib/utils/emoji/emoji';
   import twemoji from '$lib/utils/twemoji';
   import VirtualList from 'svelte-tiny-virtual-list';
 
-  export let selectedEmoji: string | undefined;
 
-  export let category = 'Smileys & Emotion';
+  interface Props {
+    selectedEmoji: string | undefined;
+    category?: string;
+  }
+
+  let { selectedEmoji = $bindable(), category = $bindable('Smileys & Emotion') }: Props = $props();
 
   const categories = [
     'Smileys & Emotion',
@@ -31,7 +37,7 @@
     Flags: '🏳️‍🌈',
   };
 
-  let searchTerm = '';
+  let searchTerm = $state('');
 
   // Approximate number of emojis per row based on the grid layout
   const EMOJIS_PER_ROW = 15;
@@ -40,10 +46,10 @@
   const CONTAINER_PADDING = 12; // 0.75rem padding in px
   const CATEGORIES_HEIGHT = 48; // Approximate height of categories section (buttons + margin)
 
-  let categoriesElement: HTMLDivElement | undefined;
-  let actualCategoriesHeight = CATEGORIES_HEIGHT;
+  let categoriesElement: HTMLDivElement | undefined = $state();
+  let actualCategoriesHeight = $state(CATEGORIES_HEIGHT);
 
-  $: filteredEmoji = emoji.filter((e) => {
+  let filteredEmoji = $derived(emoji.filter((e) => {
     let { tags, description, aliases, unicode } = e;
 
     return searchTerm
@@ -51,22 +57,24 @@
           a.toLowerCase().includes(searchTerm.toLowerCase()),
         )
       : e.category === category;
-  });
+  }));
 
   // Group emojis into rows for virtual scrolling
-  $: emojiRows = Array.from({ length: Math.ceil(filteredEmoji.length / EMOJIS_PER_ROW) }, (_, i) =>
+  let emojiRows = $derived(Array.from({ length: Math.ceil(filteredEmoji.length / EMOJIS_PER_ROW) }, (_, i) =>
     filteredEmoji.slice(i * EMOJIS_PER_ROW, (i + 1) * EMOJIS_PER_ROW),
-  );
+  ));
 
   // Calculate virtual list height accounting for categories section and padding
-  $: virtualListHeight = searchTerm
+  let virtualListHeight = $derived(searchTerm
     ? CONTAINER_HEIGHT - CONTAINER_PADDING * 2
-    : CONTAINER_HEIGHT - actualCategoriesHeight - CONTAINER_PADDING * 2;
+    : CONTAINER_HEIGHT - actualCategoriesHeight - CONTAINER_PADDING * 2);
 
   // Update actual categories height when element is available
-  $: if (categoriesElement) {
-    actualCategoriesHeight = categoriesElement.offsetHeight;
-  }
+  run(() => {
+    if (categoriesElement) {
+      actualCategoriesHeight = categoriesElement.offsetHeight;
+    }
+  });
 </script>
 
 <div class="emoji-picker">
@@ -78,7 +86,7 @@
           <button
             class="category typo-text-small"
             class:selected={category === c}
-            on:click={() => (category = c)}
+            onclick={() => (category = c)}
           >
             {categoryEmoji[c]}
           </button>
@@ -93,27 +101,29 @@
         itemCount={emojiRows.length}
         itemSize={ROW_HEIGHT}
       >
-        <div slot="item" let:index let:style {style}>
-          <div class="emojis-row">
-            {#each emojiRows[index] as e (e.unicode)}
-              <div class="emoji" class:selected={selectedEmoji === e.unicode}>
-                <input
-                  id={e.unicode}
-                  bind:group={selectedEmoji}
-                  value={e.unicode}
-                  name="emoji"
-                  type="radio"
-                  class="radio"
-                />
-                <label class="emoji-label" for={e.unicode}
-                  >{@html twemoji(e.unicode, {
-                    attributes: () => ({ loading: 'lazy' }),
-                  })}</label
-                >
-              </div>
-            {/each}
+        {#snippet item({ index, style })}
+                <div    {style}>
+            <div class="emojis-row">
+              {#each emojiRows[index] as e (e.unicode)}
+                <div class="emoji" class:selected={selectedEmoji === e.unicode}>
+                  <input
+                    id={e.unicode}
+                    bind:group={selectedEmoji}
+                    value={e.unicode}
+                    name="emoji"
+                    type="radio"
+                    class="radio"
+                  />
+                  <label class="emoji-label" for={e.unicode}
+                    >{@html twemoji(e.unicode, {
+                      attributes: () => ({ loading: 'lazy' }),
+                    })}</label
+                  >
+                </div>
+              {/each}
+            </div>
           </div>
-        </div>
+              {/snippet}
       </VirtualList>
     {/if}
   </div>

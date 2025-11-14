@@ -3,11 +3,15 @@
 	Credit to Kasper Henningsen & Contributors!
 -->
 <script lang="ts">
-  export let browseDate: Date;
-  export let timePrecision: 'minute' | 'second' | 'millisecond' | null;
-  export let browse: (d: Date) => void;
+  interface Props {
+    browseDate: Date;
+    timePrecision: 'minute' | 'second' | 'millisecond' | null;
+    browse: (d: Date) => void;
+  }
 
-  let fields: (HTMLSpanElement | undefined | null)[] = [];
+  let { browseDate, timePrecision, browse }: Props = $props();
+
+  let fields: (HTMLSpanElement | undefined | null)[] = $state([]);
 
   function select(node: Node) {
     const selection = window.getSelection();
@@ -128,7 +132,7 @@
   <div
     class="time-picker"
     role="none"
-    on:mousedown={(e) => {
+    onmousedown={(e) => {
       if (e.target instanceof HTMLElement && e.target.tagName === 'SPAN') {
         e.target.focus();
         e.preventDefault(); // prevent text dragging
@@ -141,9 +145,9 @@
       aria-label="Hours"
       tabindex="0"
       contenteditable
-      on:keydown={keydown}
-      on:input={input}
-      on:focus={focus}>{('00' + browseDate.getHours()).slice(-2)}</span
+      onkeydown={keydown}
+      oninput={input}
+      onfocus={focus}>{('00' + browseDate.getHours()).slice(-2)}</span
     >:
     <span
       bind:this={fields[1]}
@@ -151,9 +155,9 @@
       aria-label="Minutes"
       tabindex="0"
       contenteditable
-      on:keydown={keydown}
-      on:input={input}
-      on:focus={focus}>{('00' + browseDate.getMinutes()).slice(-2)}</span
+      onkeydown={keydown}
+      oninput={input}
+      onfocus={focus}>{('00' + browseDate.getMinutes()).slice(-2)}</span
     >
     {#if timePrecision !== 'minute'}
       :<span
@@ -162,9 +166,9 @@
         aria-label="Seconds"
         tabindex="0"
         contenteditable
-        on:keydown={keydown}
-        on:input={input}
-        on:focus={focus}>{('00' + browseDate.getSeconds()).slice(-2)}</span
+        onkeydown={keydown}
+        oninput={input}
+        onfocus={focus}>{('00' + browseDate.getSeconds()).slice(-2)}</span
       >
       {#if timePrecision !== 'second'}
         .<span
@@ -173,9 +177,9 @@
           aria-label="Milliseconds"
           tabindex="0"
           contenteditable
-          on:keydown={keydown}
-          on:input={input}
-          on:focus={focus}>{('000' + browseDate.getMilliseconds()).slice(-3)}</span
+          onkeydown={keydown}
+          oninput={input}
+          onfocus={focus}>{('000' + browseDate.getMilliseconds()).slice(-3)}</span
         >
       {/if}
     {/if}

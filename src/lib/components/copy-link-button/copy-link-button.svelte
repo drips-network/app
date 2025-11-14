@@ -13,11 +13,26 @@
     };
   }>();
 
-  export let url: string;
-  export let variant: ComponentProps<Button>['variant'] = 'normal';
+  interface Props {
+    url: string;
+    variant?: ComponentProps<typeof Button>['variant'];
+    success?: import('svelte').Snippet;
+    hover?: import('svelte').Snippet;
+    idle?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
 
-  let hovering = false;
-  let copySuccess = false;
+  let {
+    url,
+    variant = 'normal',
+    success,
+    hover,
+    idle,
+    children
+  }: Props = $props();
+
+  let hovering = $state(false);
+  let copySuccess = $state(false);
 
   function copyShareLink() {
     navigator.clipboard.writeText(url);
@@ -32,7 +47,7 @@
   on:focus={() => (hovering = true)}
   on:mouseleave={() => (hovering = false)}
   on:blur={() => (hovering = false)}
-  on:click={copyShareLink}
+  onclick={copyShareLink}
   justify="left"
   {variant}
 >
@@ -40,25 +55,25 @@
     <div class="icon">
       {#if copySuccess}
         <span transition:fade={{ duration: 200 }}>
-          <slot name="success">
+          {#if success}{@render success()}{:else}
             <CheckCircleIcon style="fill: var(--color-positive)" />
-          </slot>
+          {/if}
         </span>
       {:else if hovering}
         <span transition:fade={{ duration: 200 }}>
-          <slot name="hover">
+          {#if hover}{@render hover()}{:else}
             <CopyIcon style="fill: currentColor" />
-          </slot>
+          {/if}
         </span>
       {:else}
         <span transition:fade={{ duration: 200 }}>
-          <slot name="idle">
+          {#if idle}{@render idle()}{:else}
             <LinkIcon style="fill: currentColor" />
-          </slot>
+          {/if}
         </span>
       {/if}
     </div>
-    <slot>Copy link</slot>
+    {#if children}{@render children()}{:else}Copy link{/if}
   </div>
 </Button>
 

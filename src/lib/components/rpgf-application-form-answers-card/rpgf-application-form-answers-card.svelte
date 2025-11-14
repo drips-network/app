@@ -14,9 +14,13 @@
   import { browser } from '$app/environment';
   import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
-  export let canSeePrivateFields: boolean;
 
-  export let applicationVersion: ApplicationVersion;
+  interface Props {
+    canSeePrivateFields: boolean;
+    applicationVersion: ApplicationVersion;
+  }
+
+  let { canSeePrivateFields, applicationVersion }: Props = $props();
 
   let privateFieldsHidden = storedWritable(
     'rpgf-application-form-answers-card-private-fields-hidden',
@@ -27,11 +31,13 @@
 </script>
 
 <RpgfApplicationDetailsCard title="Form answers" key="form-answers">
-  <svelte:fragment slot="right">
-    {#if applicationVersion.answers.some((a) => a.field.private)}
-      <Toggle size="small" label="Hide private" bind:checked={$privateFieldsHidden} />
-    {/if}
-  </svelte:fragment>
+  {#snippet right()}
+  
+      {#if applicationVersion.answers.some((a) => a.field.private)}
+        <Toggle size="small" label="Hide private" bind:checked={$privateFieldsHidden} />
+      {/if}
+    
+  {/snippet}
 
   <div class="fields">
     {#if !canSeePrivateFields}

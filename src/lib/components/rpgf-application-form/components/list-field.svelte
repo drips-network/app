@@ -13,12 +13,21 @@
   import ListFieldAddItemModal from './list-field-add-item-modal.svelte';
   import assert from '$lib/utils/assert';
 
-  export let field: ApplicationListField;
 
-  export let forceRevealError: boolean | undefined = undefined;
 
-  export let valid: boolean = false;
-  export let answer: ApplicationListAnswerDto | undefined = undefined;
+  interface Props {
+    field: ApplicationListField;
+    forceRevealError?: boolean | undefined;
+    valid?: boolean;
+    answer?: ApplicationListAnswerDto | undefined;
+  }
+
+  let {
+    field,
+    forceRevealError = undefined,
+    valid = false,
+    answer = $bindable(undefined)
+  }: Props = $props();
 
   function addToValues(item: Record<string, string | number>) {
     if (!field.id) {
@@ -100,7 +109,7 @@
         </div>
         <Button
           variant="ghost"
-          on:click={(e) =>
+          onclick={(e) =>
             answer && answer.value ? deleteValue(e, answer.value.indexOf(item)) : undefined}
           icon={Trash}
         />
@@ -112,7 +121,7 @@
     <p class="list-field-empty">No items added yet.</p>
   {/if}
 
-  <Button on:click={handleAddItem} icon={Plus}>Add item</Button>
+  <Button onclick={handleAddItem} icon={Plus}>Add item</Button>
 </FormField>
 
 <style>

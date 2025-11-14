@@ -1,11 +1,11 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export type UsecaseIllustrationConfig = {
     headline: string;
     description: string;
     href: string;
-    icon: ComponentType;
+    icon: Component;
     sparkles: { x: string; y: string; delay: number }[];
-    illustration: ComponentType;
+    illustration: Component;
     illustrationOffset?: { x: string; y: string };
   };
 </script>
@@ -14,10 +14,14 @@
   import { fly } from 'svelte/transition';
   import Sparkle from './sparkle.svelte';
   import BezierEasing from 'bezier-easing';
-  import type { ComponentType } from 'svelte';
+  import type { Component, ComponentType } from 'svelte';
 
-  export let config: UsecaseIllustrationConfig;
-  export let active: boolean;
+  interface Props {
+    config: UsecaseIllustrationConfig;
+    active: boolean;
+  }
+
+  let { config, active }: Props = $props();
 
   const easing = BezierEasing(0.47, 0, 0.23, 2);
 </script>
@@ -32,7 +36,7 @@
         ?.y || '0'})"
       style:pointer-events="none"
     >
-      <svelte:component this={config.illustration} />
+      <config.illustration />
     </div>
   </div>
 {/if}

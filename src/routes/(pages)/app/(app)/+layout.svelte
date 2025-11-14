@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { navigating } from '$app/stores';
   import Header from '$lib/components/header/header.svelte';
   import Sidenav from '$lib/components/sidenav/sidenav.svelte';
@@ -21,12 +23,17 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
 
-  export let data: LayoutData;
+  interface Props {
+    data: LayoutData;
+    children?: import('svelte').Snippet;
+  }
 
-  let showLoadingSpinner = false;
-  let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined;
+  let { data, children }: Props = $props();
 
-  $: navItems = {
+  let showLoadingSpinner = $state(false);
+  let loadingSpinnerTimeout: ReturnType<typeof setTimeout> | undefined = $state();
+
+  let navItems = $derived({
     top: mapFilterUndefined(
       [
         {
@@ -93,9 +100,9 @@
         description: 'Read the Drips documentation.',
       },
     ],
-  };
+  });
 
-  $: {
+  run(() => {
     if ($navigating) {
       clearTimeout(loadingSpinnerTimeout);
       loadingSpinnerTimeout = setTimeout(() => (showLoadingSpinner = true), 300);
@@ -103,7 +110,7 @@
       showLoadingSpinner = false;
       clearTimeout(loadingSpinnerTimeout);
     }
-  }
+  });
 </script>
 
 <div
@@ -113,7 +120,7 @@
 >
   <div class="page">
     <div class="page-content">
-      <div class:loading={showLoadingSpinner} class="page-content-inner"><slot /></div>
+      <div class:loading={showLoadingSpinner} class="page-content-inner">{@render children?.()}</div>
     </div>
   </div>
 

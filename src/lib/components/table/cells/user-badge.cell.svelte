@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const USER_BADGE_CELL_USER_FRAGMENT = gql`
@@ -40,10 +40,14 @@
     UserBadgeCellEcosystemFragment,
   } from './__generated__/gql.generated';
 
-  export let userOrDripListOrEcosystem:
+  interface Props {
+    userOrDripListOrEcosystem: 
     | UserBadgeCellUserFragment
     | UserBadgeCellDripListFragment
     | UserBadgeCellEcosystemFragment;
+  }
+
+  let { userOrDripListOrEcosystem }: Props = $props();
 </script>
 
 {#if userOrDripListOrEcosystem.__typename === 'DripList'}

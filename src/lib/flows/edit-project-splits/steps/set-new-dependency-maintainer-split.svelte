@@ -13,7 +13,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
 
   function nextStep() {
     // If high level split says 0% for maintainers, we skip the next step
@@ -46,8 +50,10 @@
     ]}
     bind:percentages={$context.highLevelPercentages}
   />
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button icon={ArrowRight} variant="primary" on:click={nextStep}>Continue</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button icon={ArrowRight} variant="primary" onclick={nextStep}>Continue</Button>
+    
+  {/snippet}
 </StepLayout>

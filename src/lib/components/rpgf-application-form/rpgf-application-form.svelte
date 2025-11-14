@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type {
     ApplicationAnswerDto,
     ApplicationFormFields,
@@ -12,30 +14,42 @@
   import TextField from './components/text-field.svelte';
   import UrlField from './components/url-field.svelte';
 
-  export let fields: ApplicationFormFields;
-  export let disabled = false;
-  export let forceRevealErrors = false;
 
-  export let answers: ApplicationAnswerDto = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let internalAnswers: Record<string, any> = answers.reduce(
+  let internalAnswers: Record<string, any> = $state(answers.reduce(
     (acc, answer) => {
       acc[answer.fieldId] = answer;
       return acc;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     },
     {} as Record<string, any>,
-  );
+  ));
 
-  $: {
+  run(() => {
     answers = Object.values(internalAnswers).filter((a) => a !== undefined);
+  });
+
+  let fieldsValidStates: Record<string, boolean> = $state({});
+
+  interface Props {
+    fields: ApplicationFormFields;
+    disabled?: boolean;
+    forceRevealErrors?: boolean;
+    answers?: ApplicationAnswerDto;
+    valid?: boolean;
   }
 
-  let fieldsValidStates: Record<string, boolean> = {};
-
-  export let valid = false;
-  $: valid = Object.values(fieldsValidStates).every((v) => v);
+  let {
+    fields,
+    disabled = false,
+    forceRevealErrors = false,
+    answers = $bindable([]),
+    valid = $bindable(false)
+  }: Props = $props();
+  run(() => {
+    valid = Object.values(fieldsValidStates).every((v) => v);
+  });
 </script>
 
 <form class:disabled>

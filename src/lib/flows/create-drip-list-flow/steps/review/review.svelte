@@ -34,8 +34,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let connectedWalletHidden = false;
+  interface Props {
+    context: Writable<State>;
+    connectedWalletHidden?: boolean;
+  }
+
+  let { context, connectedWalletHidden = false }: Props = $props();
 
   async function createDripList() {
     const sdk = sdkManager.sdk;
@@ -87,11 +91,13 @@
 
 <StandaloneFlowStepLayout headline="Review" description="Here's everything you set up.">
   <FormField type="div" title="Your Drip List">
-    <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" onclick={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
+          >Edit</Button
+        >
+      
+      {/snippet}
     <h2 class="pixelated drip-list-title">{$context.dripList.title}</h2>
     {#if ($context.dripList.description ?? '').length > 0}
       <p class="my-4">{$context.dripList.description}</p>
@@ -105,11 +111,13 @@
 
   {#if $context.selectedSupportOption !== undefined}
     <FormField type="div" title="Your support">
-      <svelte:fragment slot="action">
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
-          >Edit</Button
-        >
-      </svelte:fragment>
+      {#snippet action()}
+          
+          <Button variant="ghost" onclick={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+            >Edit</Button
+          >
+        
+          {/snippet}
       {#if $context.selectedSupportOption === 1}
         <div class="card">
           <ContinuousSupportReviewCard
@@ -131,112 +139,125 @@
 
   {#if !connectedWalletHidden}
     <FormField type="div" title="Your connected wallet">
-      <svelte:fragment slot="action">
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
-          >Edit</Button
-        >
-      </svelte:fragment>
+      {#snippet action()}
+          
+          <Button variant="ghost" onclick={() => dispatch('goForward', { by: -4 })} icon={PenIcon}
+            >Edit</Button
+          >
+        
+          {/snippet}
       <AccountBox hideDisconnect />
     </FormField>
   {/if}
 
   <WhatsNextSection>
     <WhatsNextCard>
-      <svelte:fragment slot="title">On transaction confirmation…</svelte:fragment>
-      <svelte:fragment slot="items">
-        {#if $context.selectedSupportOption === 1}
-          {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
+      {#snippet title()}
+            On transaction confirmation…
+          {/snippet}
+      {#snippet items()}
+          
+          {#if $context.selectedSupportOption === 1}
+            {#if $context.continuousSupportConfig.topUpAmountValueParsed && $context.continuousSupportConfig.streamRateValueParsed && $context.continuousSupportConfig.listSelected[0]}
+              {@const token =
+                tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
+                unreachable()}
+              <WhatsNextItem icon={TransactionsIcon}>
+                <span class="typo-text-bold">
+                  {formatTokenAmount(
+                    $context.continuousSupportConfig.topUpAmountValueParsed,
+                    token.info.decimals,
+                    1n,
+                    false,
+                  )}
+                  {token.info.symbol} will be transferred from your wallet into your Drips account</span
+                >
+                and immediately begin streaming to your Drip List recipients at a rate of
+                <span class="typo-text-bold">
+                  {formatTokenAmount(
+                    $context.continuousSupportConfig.streamRateValueParsed,
+                    token.info.decimals,
+                    undefined,
+                    false,
+                  )}
+                  {token.info.symbol} per month</span
+                >.
+              </WhatsNextItem>
+            {/if}
+          {/if}
+          {#if $context.selectedSupportOption === 2}
             {@const token =
-              tokensStore.getByAddress($context.continuousSupportConfig.listSelected[0]) ??
-              unreachable()}
+              tokensStore.getByAddress(
+                $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
+              ) ?? unreachable()}
             <WhatsNextItem icon={TransactionsIcon}>
               <span class="typo-text-bold">
                 {formatTokenAmount(
-                  $context.continuousSupportConfig.topUpAmountValueParsed,
+                  $context.oneTimeDonationConfig.amount ?? unreachable(),
                   token.info.decimals,
                   1n,
                   false,
                 )}
-                {token.info.symbol} will be transferred from your wallet into your Drips account</span
+                {token.info.symbol} will be transferred from your wallet</span
               >
-              and immediately begin streaming to your Drip List recipients at a rate of
-              <span class="typo-text-bold">
-                {formatTokenAmount(
-                  $context.continuousSupportConfig.streamRateValueParsed,
-                  token.info.decimals,
-                  undefined,
-                  false,
-                )}
-                {token.info.symbol} per month</span
-              >.
+              and distributed to your list.
             </WhatsNextItem>
           {/if}
-        {/if}
-        {#if $context.selectedSupportOption === 2}
-          {@const token =
-            tokensStore.getByAddress(
-              $context.oneTimeDonationConfig.selectedTokenAddress?.[0] ?? unreachable(),
-            ) ?? unreachable()}
-          <WhatsNextItem icon={TransactionsIcon}>
-            <span class="typo-text-bold">
-              {formatTokenAmount(
-                $context.oneTimeDonationConfig.amount ?? unreachable(),
-                token.info.decimals,
-                1n,
-                false,
-              )}
-              {token.info.symbol} will be transferred from your wallet</span
-            >
-            and distributed to your list.
-          </WhatsNextItem>
-        {/if}
-        <WhatsNextItem icon={ListIcon}
-          >Your new Drip List will appear on your <span class="typo-text-bold">public profile</span
-          >.</WhatsNextItem
-        >
-      </svelte:fragment>
+          <WhatsNextItem icon={ListIcon}
+            >Your new Drip List will appear on your <span class="typo-text-bold">public profile</span
+            >.</WhatsNextItem
+          >
+        
+          {/snippet}
     </WhatsNextCard>
     <WhatsNextCard>
-      <svelte:fragment slot="title">After transaction confirmation…</svelte:fragment>
-      <svelte:fragment slot="items">
-        {#if $context.selectedSupportOption === 1}
-          <WhatsNextItem icon={CoinIcon}>
-            <span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
-            Drips dashboard.
-          </WhatsNextItem>
-          <WhatsNextItem icon={Pause}>
-            <span class="typo-text-bold">Pause or cancel</span> your support anytime.
-          </WhatsNextItem>
-          <WhatsNextItem icon={Heart}>
-            <span class="typo-text-bold">Create additional support streams</span> or make one-time donations
-            anytime.
-          </WhatsNextItem>
-        {/if}
-        {#if $context.selectedSupportOption === 2}
-          <WhatsNextItem icon={Heart}>
-            <span class="typo-text-bold">Make more one-time donations</span> or start a continuous support
-            stream anytime.
-          </WhatsNextItem>
-        {/if}
-        {#if $context.selectedSupportOption === undefined}
-          <WhatsNextItem icon={TokenStreams}>
-            You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
-          </WhatsNextItem>
-        {/if}
-        <WhatsNextItem icon={PenIcon}
-          ><span class="typo-text-bold">Edit</span> your Drip List anytime.</WhatsNextItem
-        >
-      </svelte:fragment>
+      {#snippet title()}
+            After transaction confirmation…
+          {/snippet}
+      {#snippet items()}
+          
+          {#if $context.selectedSupportOption === 1}
+            <WhatsNextItem icon={CoinIcon}>
+              <span class="typo-text-bold">Add funds</span> (or withdraw any unstreamed funds) from your
+              Drips dashboard.
+            </WhatsNextItem>
+            <WhatsNextItem icon={Pause}>
+              <span class="typo-text-bold">Pause or cancel</span> your support anytime.
+            </WhatsNextItem>
+            <WhatsNextItem icon={Heart}>
+              <span class="typo-text-bold">Create additional support streams</span> or make one-time donations
+              anytime.
+            </WhatsNextItem>
+          {/if}
+          {#if $context.selectedSupportOption === 2}
+            <WhatsNextItem icon={Heart}>
+              <span class="typo-text-bold">Make more one-time donations</span> or start a continuous support
+              stream anytime.
+            </WhatsNextItem>
+          {/if}
+          {#if $context.selectedSupportOption === undefined}
+            <WhatsNextItem icon={TokenStreams}>
+              You can <span class="typo-text-bold">start supporting</span> your Drip List anytime.
+            </WhatsNextItem>
+          {/if}
+          <WhatsNextItem icon={PenIcon}
+            ><span class="typo-text-bold">Edit</span> your Drip List anytime.</WhatsNextItem
+          >
+        
+          {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
 
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={goBack}>Back</Button>
+    <Button icon={ArrowLeft} onclick={goBack}>Back</Button>
   </svelte:fragment>
 
-  <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={createDripList}>Confirm in wallet</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button icon={WalletIcon} variant="primary" onclick={createDripList}>Confirm in wallet</Button>
+    
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { AuditLog } from '$lib/utils/rpgf/types/auditLog';
 
-  export let log: AuditLog;
+  interface Props {
+    log: AuditLog;
+  }
 
-  $: payload = log.payload;
+  let { log }: Props = $props();
+
+  let payload = $derived(log.payload);
 </script>
 
 <div class="log-detail-modal">

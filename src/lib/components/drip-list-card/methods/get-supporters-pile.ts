@@ -45,21 +45,21 @@ export const SUPPORTER_PILE_FRAGMENT = gql`
 type SupporterPileItem =
   | {
       component: typeof IdentityBadge;
-      props: ComponentProps<IdentityBadge>;
+      props: ComponentProps<typeof IdentityBadge>;
     }
   | {
       component: typeof ProjectAvatar;
-      props: ComponentProps<ProjectAvatar>;
+      props: ComponentProps<typeof ProjectAvatar>;
     };
 
 type ComponentSizes = {
   tiny: {
-    IdentityBadge: ComponentProps<IdentityBadge>['size'];
-    ProjectAvatar: ComponentProps<ProjectAvatar>['size'];
+    IdentityBadge: ComponentProps<typeof IdentityBadge>['size'];
+    ProjectAvatar: ComponentProps<typeof ProjectAvatar>['size'];
   };
   normal: {
-    IdentityBadge: ComponentProps<IdentityBadge>['size'];
-    ProjectAvatar: ComponentProps<ProjectAvatar>['size'];
+    IdentityBadge: ComponentProps<typeof IdentityBadge>['size'];
+    ProjectAvatar: ComponentProps<typeof ProjectAvatar>['size'];
   };
 };
 
@@ -137,8 +137,8 @@ export default function getSupportersPile(
         // Only dedupe IdentityBadge components by address
         if (item.component === IdentityBadge && i.component === IdentityBadge) {
           return (
-            (i.props as ComponentProps<IdentityBadge>).address ===
-            (item.props as ComponentProps<IdentityBadge>).address
+            (i.props as ComponentProps<typeof IdentityBadge>).address ===
+            (item.props as ComponentProps<typeof IdentityBadge>).address
           );
         }
         // For different component types or ProjectAvatar, don't dedupe

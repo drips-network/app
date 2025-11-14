@@ -1,5 +1,5 @@
 <a class="system-status-badge" href="https://status.drips.network/" target="_blank" rel="noreferrer">
-  <div class="status-circle" />
+  <div class="status-circle"></div>
   <span class="typo-text-small">All good</span>
 </a>
 

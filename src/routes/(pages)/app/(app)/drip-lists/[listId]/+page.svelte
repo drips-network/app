@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DRIP_LIST_PAGE_FRAGMENT = gql`
     ${DRIP_LIST_CARD_FRAGMENT}
     ${SUPPORT_CARD_DRIP_LIST_FRAGMENT}
@@ -49,16 +49,20 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
 
-  $: dripList = data.dripList;
-  $: votingRound = data.votingRounds.current;
+  let { data }: Props = $props();
+
+  let dripList = $derived(data.dripList);
+  let votingRound = $derived(data.votingRounds.current);
 
   function handleVotingRoundClick(votingRound: VotingRound) {
     modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));
   }
 
-  $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
+  let isOwnList = $derived(dripList && $walletStore && checkIsUser(dripList.owner.accountId));
 </script>
 
 {#if dripList?.name || votingRound?.name}
@@ -93,20 +97,22 @@
         target="_blank"
         href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
       >.
-      <svelte:fragment slot="actions">
-        {#if isOwnList}
-          <div class="flex gap-3">
-            <Button
-              size="small"
-              icon={Registered}
-              variant="primary"
-              on:click={() => {
-                modal.show(Stepper, undefined, editDripListSteps(dripList));
-              }}>Unhide it</Button
-            >
-          </div>
-        {/if}
-      </svelte:fragment>
+      {#snippet actions()}
+          
+          {#if isOwnList}
+            <div class="flex gap-3">
+              <Button
+                size="small"
+                icon={Registered}
+                variant="primary"
+                onclick={() => {
+                  modal.show(Stepper, undefined, editDripListSteps(dripList));
+                }}>Unhide it</Button
+              >
+            </div>
+          {/if}
+        
+          {/snippet}
     </AnnotationBox>
   </div>
 {/if}
@@ -154,7 +160,7 @@
         </p>
         <div class="voting-rounds">
           {#each data.votingRounds.past as votingRound}
-            <button on:click={() => handleVotingRoundClick(votingRound)} class="voting-round">
+            <button onclick={() => handleVotingRoundClick(votingRound)} class="voting-round">
               <div class="left">
                 <h4 class="typo-text">
                   {formatDate(new Date(votingRound.schedule.voting.endsAt), 'dayAndYear')}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import type {
     FatalGlobalAdvisory,
@@ -9,22 +11,22 @@
   import { fly } from 'svelte/transition';
   import LargeEmptyState from '../large-empty-state/large-empty-state.svelte';
 
-  let fatalAdvisory: FatalGlobalAdvisory | undefined;
-  let nonFatalAdvisories: NonFatalGlobalAdvisory[] = [];
+  let fatalAdvisory: FatalGlobalAdvisory | undefined = $state();
+  let nonFatalAdvisories: NonFatalGlobalAdvisory[] = $state([]);
 
-  $: {
+  run(() => {
     $globalErrorStore;
     fatalAdvisory = globalErrorStore.getAdvisories('fatal');
     nonFatalAdvisories = globalErrorStore.getAdvisories('non-fatal');
-  }
+  });
 
-  $: {
+  run(() => {
     if (browser && (fatalAdvisory || nonFatalAdvisories[0])) {
       scroll.lock();
     } else if (browser) {
       scroll.unlock();
     }
-  }
+  });
 </script>
 
 {#if fatalAdvisory}

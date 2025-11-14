@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const PAUSE_FLOW_STREAM_FRAGMENT = gql`
@@ -30,7 +30,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let stream: PauseFlowStreamFragment;
+  interface Props {
+    stream: PauseFlowStreamFragment;
+  }
+
+  let { stream }: Props = $props();
 
   onMount(() => {
     dispatch(

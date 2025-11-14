@@ -10,13 +10,17 @@
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
-  export let options: SupportButtonOptions;
-  export let data: SupportButtonData;
+  interface Props {
+    options: SupportButtonOptions;
+    data: SupportButtonData;
+  }
+
+  let { options, data }: Props = $props();
 
   const dripFill = '#5555ff';
   const dripStroke = 'white';
 
-  $: dependenciesStatement = getDependenciesStatement(data?.dependencies);
+  let dependenciesStatement = $derived(getDependenciesStatement(data?.dependencies));
 </script>
 
 <a

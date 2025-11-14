@@ -1,8 +1,12 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
-  export let metricsMap: Record<string, string>;
-  export let data: Record<string, string>;
+  interface Props {
+    metricsMap: Record<string, string>;
+    data: Record<string, string>;
+  }
+
+  let { metricsMap, data }: Props = $props();
 </script>
 
 <div class="grid">

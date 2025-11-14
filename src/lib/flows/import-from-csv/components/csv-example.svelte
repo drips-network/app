@@ -1,16 +1,20 @@
 <script lang="ts">
   import { DEFAULT_CSV_HEADERS } from '../import-from-csv-steps';
 
-  export let caption: string | undefined = undefined;
-  export let headers: Array<string> = DEFAULT_CSV_HEADERS;
-  export let data: Array<Array<unknown>> = [
+  interface Props {
+    caption?: string | undefined;
+    headers?: Array<string>;
+    data?: Array<Array<unknown>>;
+  }
+
+  let { caption = undefined, headers = DEFAULT_CSV_HEADERS, data = [
     ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
     ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],
     [
       'https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972',
       5,
     ],
-  ];
+  ] }: Props = $props();
 </script>
 
 <div class="wrapper">

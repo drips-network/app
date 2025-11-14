@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let numDependencies: number;
+  interface Props {
+    numDependencies: number;
+  }
+
+  let { numDependencies }: Props = $props();
 </script>
 
 <div class="ecosystem-distribution-dependencies">

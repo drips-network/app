@@ -12,8 +12,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let vote: Vote;
+  interface Props {
+    context: Writable<State>;
+    vote: Vote;
+  }
+
+  let { context, vote }: Props = $props();
 </script>
 
 <StepLayout>
@@ -23,9 +27,11 @@
     <span class="typo-text">Vote details</span>
   </div>
   <ListEditor isEditable={false} {...$context.listEditorConfig} />
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Close</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
+    
+  {/snippet}
 </StepLayout>
 
 <style>

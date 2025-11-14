@@ -1,7 +1,16 @@
+<script lang="ts">
+  interface Props {
+    title?: import('svelte').Snippet;
+    items?: import('svelte').Snippet;
+  }
+
+  let { title, items }: Props = $props();
+</script>
+
 <div class="card">
-  <h4><slot name="title" /></h4>
+  <h4>{@render title?.()}</h4>
   <ul>
-    <slot name="items" />
+    {@render items?.()}
   </ul>
 </div>
 

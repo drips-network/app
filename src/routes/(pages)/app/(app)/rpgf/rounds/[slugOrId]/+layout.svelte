@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
 
-  export let data;
+  let { data, children } = $props();
 </script>
 
 <PrimaryColorThemer colorHex={data.round.color}>
-  <slot></slot>
+  {@render children?.()}
 </PrimaryColorThemer>

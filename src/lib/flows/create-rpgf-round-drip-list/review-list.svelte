@@ -25,9 +25,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let roundName: string;
-  export let roundId: string;
-  export let context: Writable<State>;
+  interface Props {
+    roundName: string;
+    roundId: string;
+    context: Writable<State>;
+  }
+
+  let { roundName, roundId, context }: Props = $props();
 
   function handlePublish() {
     dispatch(
@@ -116,13 +120,15 @@
       Weights are calculated as percentages with a precision of 0.0001% based on the fraction of the
       total votes allocated to every particular project.
     </p>
-    <svelte:fragment slot="actions">
-      <Button
-        variant="ghost"
-        href="https://docs.drips.network/rpgf/administering-your-round#automatically-preparing-a-drip-list"
-        target="_blank">Learn more</Button
-      >
-    </svelte:fragment>
+    {#snippet actions()}
+      
+        <Button
+          variant="ghost"
+          href="https://docs.drips.network/rpgf/administering-your-round#automatically-preparing-a-drip-list"
+          target="_blank">Learn more</Button
+        >
+      
+      {/snippet}
   </AnnotationBox>
 
   <ListEditor
@@ -131,7 +137,9 @@
     items={$context.items ?? unreachable()}
   />
 
-  <svelte:fragment slot="actions">
-    <Button variant="primary" icon={Wallet} on:click={handlePublish}>Confirm in wallet</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button variant="primary" icon={Wallet} onclick={handlePublish}>Confirm in wallet</Button>
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

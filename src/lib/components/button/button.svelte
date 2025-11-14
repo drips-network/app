@@ -1,36 +1,63 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' =
-    'normal';
-  export let icon: ComponentType | undefined = undefined;
-  export let disabled = false;
-  export let ariaLabel: string | undefined = undefined;
-  export let size: 'small' | 'normal' | 'large' = 'normal';
-  export let loading = false;
-  export let dataTestId: string | undefined = undefined;
-  export let href: string | undefined = undefined;
-  export let target: string | undefined = undefined;
-  export let rel: string | undefined = undefined;
-  export let type: 'submit' | 'reset' | 'button' = 'button';
-  export let form: string | undefined = undefined;
-  export let justify: 'left' | 'right' | 'center' = 'center';
-  export let circular: boolean = false;
+  interface Props {
+    variant?: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost';
+    icon?: Component<any> | undefined;
+    disabled?: boolean;
+    ariaLabel?: string | undefined;
+    size?: 'small' | 'normal' | 'large';
+    loading?: boolean;
+    dataTestId?: string | undefined;
+    href?: string | undefined;
+    target?: string | undefined;
+    rel?: string | undefined;
+    type?: 'submit' | 'reset' | 'button';
+    form?: string | undefined;
+    justify?: 'left' | 'right' | 'center';
+    circular?: boolean;
+    children?: import('svelte').Snippet;
+    onclick?: ((event: MouseEvent) => void) | undefined;
+    onmouseenter?: ((event: MouseEvent) => void) | undefined;
+    onmouseleave?: ((event: MouseEvent) => void) | undefined;
+    onfocus?: ((event: FocusEvent) => void) | undefined;
+  }
 
-  //** in case props must be passed as object */
-  export let onClick: (() => void) | undefined = undefined;
+  let {
+    variant = 'normal',
+    icon = undefined,
+    disabled = false,
+    ariaLabel = undefined,
+    size = 'normal',
+    loading = false,
+    dataTestId = undefined,
+    href = undefined,
+    target = undefined,
+    rel = undefined,
+    type = 'button',
+    form = undefined,
+    justify = 'center',
+    circular = false,
+    children,
+    onclick = undefined,
+    onmouseenter = undefined,
+    onmouseleave = undefined,
+    onfocus = undefined,
+  }: Props = $props();
 
-  $: isDisabled = disabled || loading;
+  let isDisabled = $derived(disabled || loading);
 
-  let el: HTMLButtonElement | HTMLAnchorElement;
+  let el: HTMLButtonElement | HTMLAnchorElement | undefined = $state();
 
-  $: primaryColor = el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined;
+  let primaryColor = $derived(el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined);
 
-  let textColor = 'var(--color-foreground)';
-  $: {
+  let textColor = $state('var(--color-foreground)');
+  run(() => {
     if (variant === 'destructive-outline') {
       textColor = 'var(--color-negative-level-6)';
     } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
@@ -38,7 +65,7 @@
     } else {
       textColor = 'var(--color-foreground)';
     }
-  }
+  });
 </script>
 
 <svelte:element
@@ -55,31 +82,30 @@
   class:circular
   disabled={isDisabled}
   aria-disabled={isDisabled}
-  on:click
-  on:click={onClick}
+  {onclick}
   data-testid={dataTestId}
-  on:mouseenter|stopPropagation
-  on:mouseleave|stopPropagation
-  on:focus
+  {onmouseenter}
+  {onmouseleave}
+  {onfocus}
   role={href ? 'link' : 'button'}
   style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
   type={href ? null : type}
 >
   <div
-    class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
-    class:with-text={Boolean($$slots.default) && !icon}
+    class:with-icon-text={Boolean(icon) && Boolean(children)}
+    class:with-text={Boolean(children) && !icon}
     class="inner typo-text {variant}"
     style:color={textColor}
   >
     {#if icon}
-      <svelte:component
-        this={icon}
+      {@const SvelteComponent = icon}
+      <SvelteComponent
         style={variant === 'destructive' || variant === 'primary'
           ? `fill: ${textColor}; transition: fill 0.3s;`
           : 'fill: var(--color-foreground); transition: fill 0.3s;'}
       />
     {/if}
-    <slot />
+    {@render children?.()}
     {#if loading}
       <div out:fade={{ duration: 300 }} class="loading">
         <Spinner />

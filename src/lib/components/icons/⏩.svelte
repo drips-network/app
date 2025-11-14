@@ -1,4 +1,12 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<script lang="ts">
+  interface Props {
+    size: number;
+  }
+
+  let { size }: Props = $props();
+</script>
+
+<svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <g clip-path="url(#clip0_4565_7647)">
     <path
       d="M25.3917 25.4743C26.2564 24.6816 26.2564 23.3184 25.3917 22.5257L14.3515 12.4055C13.0686 11.2296 11 12.1396 11 13.8798V34.1202C11 35.8604 13.0686 36.7704 14.3514 35.5945L25.3917 25.4743Z"
@@ -15,7 +23,7 @@
   </g>
   <defs>
     <clipPath id="clip0_4565_7647">
-      <rect width="48" height="48" fill="var(--color-background)" />
+      <rect width={size} height={size} fill="var(--color-background)" />
     </clipPath>
   </defs>
 </svg>

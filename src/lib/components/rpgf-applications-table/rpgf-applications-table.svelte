@@ -8,31 +8,46 @@
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import ApplicationsTable from './components/applications-table.svelte';
 
-  export let searchable = true;
 
-  export let applications: ListingApplication[];
-  export let round: Round;
-  export let signedIn: boolean;
 
-  export let reviewMode = false;
-  export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 
-  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
-  export let ballotStore: Writable<InProgressBallot> = writable({});
 
-  export let horizontalScroll = false;
 
-  export let displayVisibilityNote = false;
+  interface Props {
+    searchable?: boolean;
+    applications: ListingApplication[];
+    round: Round;
+    signedIn: boolean;
+    reviewMode?: boolean;
+    decisions?: Record<string, 'approve' | 'reject' | null>;
+    voteStep?: 'build-ballot' | 'assign-votes' | null;
+    ballotStore?: Writable<InProgressBallot>;
+    horizontalScroll?: boolean;
+    displayVisibilityNote?: boolean;
+  }
 
-  let searchQuery = '';
+  let {
+    searchable = true,
+    applications,
+    round,
+    signedIn,
+    reviewMode = false,
+    decisions = $bindable({}),
+    voteStep = null,
+    ballotStore = writable({}),
+    horizontalScroll = false,
+    displayVisibilityNote = false
+  }: Props = $props();
 
-  $: filteredApplications = applications.filter((application) => {
+  let searchQuery = $state('');
+
+  let filteredApplications = $derived(applications.filter((application) => {
     return (
       !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  });
+  }));
 
-  $: includesResults = applications.some((a) => a.allocation !== null);
+  let includesResults = $derived(applications.some((a) => a.allocation !== null));
 </script>
 
 {#if searchable}
@@ -40,7 +55,7 @@
     <MagnifyingGlass />
     <input bind:value={searchQuery} placeholder="Search applications" type="text" />
     {#if searchQuery}
-      <button on:click={() => (searchQuery = '')} aria-label="Clear search">
+      <button onclick={() => (searchQuery = '')} aria-label="Clear search">
         <Cross />
       </button>
     {/if}

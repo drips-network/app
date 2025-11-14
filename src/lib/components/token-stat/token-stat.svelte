@@ -2,8 +2,15 @@
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
 
-  export let title: string;
-  export let tooltip: string | undefined;
+  interface Props {
+    title: string;
+    tooltip: string | undefined;
+    detail?: import('svelte').Snippet;
+    value?: import('svelte').Snippet;
+    actions?: import('svelte').Snippet;
+  }
+
+  let { title, tooltip, detail, value, actions }: Props = $props();
 </script>
 
 <section
@@ -16,25 +23,25 @@
       {#if tooltip}
         <Tooltip>
           <InfoCircle style="height: 1rem;" />
-          <svelte:fragment slot="tooltip-content">
+          {#snippet tooltip_content()}
             {tooltip}
-          </svelte:fragment>
+          {/snippet}
         </Tooltip>
       {/if}
     </div>
     <div>
-      <slot name="detail" />
+      {@render detail?.()}
     </div>
   </header>
 
   <!-- amount -->
   <div class="mt-10 text-right text-typo-header-1 font-mono font-bold">
-    <slot name="value" />
+    {@render value?.()}
   </div>
 
   <!-- actions -->
   <footer class="flex justify-end mt-5 -mr-1">
-    <slot name="actions" />
+    {@render actions?.()}
   </footer>
 </section>
 

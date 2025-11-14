@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let explorerName: string;
-  export let url: string | undefined = undefined;
+  interface Props {
+    explorerName: string;
+    url?: string | undefined;
+  }
+
+  let { explorerName, url = undefined }: Props = $props();
 </script>
 
 {#if url}

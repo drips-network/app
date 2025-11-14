@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
@@ -18,19 +20,9 @@
   import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
-  export let streamRateValue: string | undefined = undefined;
-  export let streamRateValueParsed: bigint | undefined = undefined;
-  export let topUpAmountValue: string | undefined = undefined;
-  export let topUpAmountValueParsed: bigint | undefined = undefined;
 
-  export let disabled = false;
-  export let selectedTokenAddress: string | undefined = undefined;
-  $: selectedToken = selectedTokenAddress
-    ? tokensStore.getByAddress(selectedTokenAddress)
-    : undefined;
 
-  let tokenListSelected = selectedTokenAddress ? [selectedTokenAddress] : [];
-  $: selectedTokenAddress = tokenListSelected[0];
+  let tokenListSelected = $state(selectedTokenAddress ? [selectedTokenAddress] : []);
 
   streamRateValue =
     streamRateValue ??
@@ -51,36 +43,13 @@
       : '');
 
   // If top up is disabled, the token list should only show available token balances to stream.
-  let tokenList: Items = {};
+  let tokenList: Items = $state({});
 
-  $: tokenList = Object.fromEntries(
-    $tokensStore?.map((token) => {
-      const { address, name, symbol } = token.info;
-
-      return [
-        address,
-        {
-          type: 'selectable',
-          label: name,
-          text: symbol,
-          searchString: [token.info.name, token.info.symbol],
-          image: {
-            component: Token,
-            props: {
-              show: 'none',
-              address: address,
-              size: 'small',
-            },
-          },
-        },
-      ];
-    }) ?? [],
-  );
 
   // –––––––––––––––––––––––––
   // FETCH ERC-20 BALANCES IN BACKGROUND
 
-  let fetchedBalances: { [tokenAddress: string]: bigint } = {};
+  let fetchedBalances: { [tokenAddress: string]: bigint } = $state({});
 
   function fetchSelectedErc20Balance() {
     const { address } = $walletStore;
@@ -93,83 +62,12 @@
     });
   }
 
-  $: {
-    if (selectedToken && !(selectedToken.info.address in fetchedBalances)) {
-      fetchSelectedErc20Balance().then((balance) => {
-        assert(selectedToken);
 
-        fetchedBalances = {
-          ...fetchedBalances,
-          [selectedToken.info.address]: balance,
-        };
-      });
-    }
-  }
 
-  // –––––––––––––––––––––––––
-  // STREAM RATE VALUE
+  let streamRateValueValidation: TextInputValidationState = $state();
 
-  $: {
-    if (selectedToken) {
-      streamRateValueParsed =
-        streamRateValue && selectedToken
-          ? parseTokenAmount(
-              streamRateValue,
-              selectedToken.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
-            )
-          : undefined;
-    }
-  }
 
-  let streamRateValueValidation: TextInputValidationState;
-  $: {
-    if (!streamRateValueParsed) {
-      streamRateValueValidation = {
-        type: 'unvalidated',
-      };
-    } else {
-      streamRateValueValidation = validateAmtPerSecInput(streamRateValueParsed);
-    }
-  }
-
-  // –––––––––––––––––––––––––
-  // TOP UP AMOUNT VALUE
-
-  $: {
-    if (selectedToken) {
-      topUpAmountValueParsed =
-        topUpAmountValue && selectedToken
-          ? parseTokenAmount(topUpAmountValue, selectedToken.info.decimals)
-          : undefined;
-    }
-  }
-
-  let topUpAmountValueValidation: TextInputValidationState;
-  $: {
-    if (topUpAmountValueParsed === undefined) {
-      topUpAmountValueValidation = {
-        type: 'unvalidated',
-      };
-    } else if (!selectedToken || fetchedBalances[selectedToken.info.address] === undefined) {
-      topUpAmountValueValidation = {
-        type: 'pending',
-      };
-    } else if (topUpAmountValueParsed > (fetchedBalances[selectedToken.info.address] ?? 0n)) {
-      topUpAmountValueValidation = {
-        type: 'invalid',
-        message: `You only have ${formatTokenAmount(
-          fetchedBalances[selectedToken.info.address],
-          selectedToken.info.decimals,
-          1n,
-          false,
-        )} ${selectedToken.info.symbol} available`,
-      };
-    } else {
-      topUpAmountValueValidation = {
-        type: 'valid',
-      };
-    }
-  }
+  let topUpAmountValueValidation: TextInputValidationState = $state();
 
   // –––––––––––––––––––––––––
   // STAGE LOGIC
@@ -181,18 +79,7 @@
     SET_TOP_UP_AMOUNT,
   }
 
-  let currentStage: Stage = 0;
-  $: {
-    if (disabled) {
-      currentStage = Stage.COMPLETELY_DISABLED;
-    } else if ($walletStore.connected && selectedToken && streamRateValue !== '') {
-      currentStage = Stage.SET_TOP_UP_AMOUNT;
-    } else if ($walletStore.connected && selectedToken) {
-      currentStage = Stage.SET_STREAM_RATE;
-    } else if ($walletStore.connected) {
-      currentStage = Stage.SELECT_TOKEN;
-    }
-  }
+  let currentStage: Stage = $state(0);
 
   // –––––––––––––––––––––––––
   // ACTIONS
@@ -216,14 +103,148 @@
   }
 
   // –––––––––––––––––––––––––
-  // FORM VALIDATION
+  
 
-  export let formValid: boolean;
-  $: formValid =
-    currentStage === 3 &&
-    streamRateValueValidation.type === 'valid' &&
-    (streamRateValueParsed ?? 0n) > 0n &&
-    topUpAmountValueValidation.type === 'valid';
+  interface Props {
+    streamRateValue?: string | undefined;
+    streamRateValueParsed?: bigint | undefined;
+    topUpAmountValue?: string | undefined;
+    topUpAmountValueParsed?: bigint | undefined;
+    disabled?: boolean;
+    selectedTokenAddress?: string | undefined;
+    // FORM VALIDATION
+    formValid: boolean;
+  }
+
+  let {
+    streamRateValue = $bindable(undefined),
+    streamRateValueParsed = $bindable(undefined),
+    topUpAmountValue = $bindable(undefined),
+    topUpAmountValueParsed = $bindable(undefined),
+    disabled = false,
+    selectedTokenAddress = $bindable(undefined),
+    formValid = $bindable()
+  }: Props = $props();
+  run(() => {
+    selectedTokenAddress = tokenListSelected[0];
+  });
+  let selectedToken = $derived(selectedTokenAddress
+    ? tokensStore.getByAddress(selectedTokenAddress)
+    : undefined);
+  run(() => {
+    tokenList = Object.fromEntries(
+      $tokensStore?.map((token) => {
+        const { address, name, symbol } = token.info;
+
+        return [
+          address,
+          {
+            type: 'selectable',
+            label: name,
+            text: symbol,
+            searchString: [token.info.name, token.info.symbol],
+            image: {
+              component: Token,
+              props: {
+                show: 'none',
+                address: address,
+                size: 'small',
+              },
+            },
+          },
+        ];
+      }) ?? [],
+    );
+  });
+  run(() => {
+    if (selectedToken && !(selectedToken.info.address in fetchedBalances)) {
+      fetchSelectedErc20Balance().then((balance) => {
+        assert(selectedToken);
+
+        fetchedBalances = {
+          ...fetchedBalances,
+          [selectedToken.info.address]: balance,
+        };
+      });
+    }
+  });
+  // –––––––––––––––––––––––––
+  // STREAM RATE VALUE
+
+  run(() => {
+    if (selectedToken) {
+      streamRateValueParsed =
+        streamRateValue && selectedToken
+          ? parseTokenAmount(
+              streamRateValue,
+              selectedToken.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
+            )
+          : undefined;
+    }
+  });
+  run(() => {
+    if (!streamRateValueParsed) {
+      streamRateValueValidation = {
+        type: 'unvalidated',
+      };
+    } else {
+      streamRateValueValidation = validateAmtPerSecInput(streamRateValueParsed);
+    }
+  });
+  // –––––––––––––––––––––––––
+  // TOP UP AMOUNT VALUE
+
+  run(() => {
+    if (selectedToken) {
+      topUpAmountValueParsed =
+        topUpAmountValue && selectedToken
+          ? parseTokenAmount(topUpAmountValue, selectedToken.info.decimals)
+          : undefined;
+    }
+  });
+  run(() => {
+    if (topUpAmountValueParsed === undefined) {
+      topUpAmountValueValidation = {
+        type: 'unvalidated',
+      };
+    } else if (!selectedToken || fetchedBalances[selectedToken.info.address] === undefined) {
+      topUpAmountValueValidation = {
+        type: 'pending',
+      };
+    } else if (topUpAmountValueParsed > (fetchedBalances[selectedToken.info.address] ?? 0n)) {
+      topUpAmountValueValidation = {
+        type: 'invalid',
+        message: `You only have ${formatTokenAmount(
+          fetchedBalances[selectedToken.info.address],
+          selectedToken.info.decimals,
+          1n,
+          false,
+        )} ${selectedToken.info.symbol} available`,
+      };
+    } else {
+      topUpAmountValueValidation = {
+        type: 'valid',
+      };
+    }
+  });
+  run(() => {
+    if (disabled) {
+      currentStage = Stage.COMPLETELY_DISABLED;
+    } else if ($walletStore.connected && selectedToken && streamRateValue !== '') {
+      currentStage = Stage.SET_TOP_UP_AMOUNT;
+    } else if ($walletStore.connected && selectedToken) {
+      currentStage = Stage.SET_STREAM_RATE;
+    } else if ($walletStore.connected) {
+      currentStage = Stage.SELECT_TOKEN;
+    }
+  });
+  run(() => {
+    formValid =
+      currentStage === 3 &&
+      streamRateValueValidation.type === 'valid' &&
+      (streamRateValueParsed ?? 0n) > 0n &&
+      topUpAmountValueValidation.type === 'valid';
+  });
 </script>
 
 <FormField type="div" disabled={currentStage < 1} title="Select a token to stream">
@@ -266,14 +287,14 @@
     suffix={selectedToken ? `${selectedToken.info.symbol}` : ''}
   />
   <div class="suggestions">
-    <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(1)}>1 month</Button>
-    <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(3)}>3 months</Button>
-    <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(6)}>6 months</Button>
-    <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(12)}>1 year</Button>
-    <Button disabled={currentStage < 3} on:click={() => applyTopUpSuggestion(24)}>2 years</Button>
+    <Button disabled={currentStage < 3} onclick={() => applyTopUpSuggestion(1)}>1 month</Button>
+    <Button disabled={currentStage < 3} onclick={() => applyTopUpSuggestion(3)}>3 months</Button>
+    <Button disabled={currentStage < 3} onclick={() => applyTopUpSuggestion(6)}>6 months</Button>
+    <Button disabled={currentStage < 3} onclick={() => applyTopUpSuggestion(12)}>1 year</Button>
+    <Button disabled={currentStage < 3} onclick={() => applyTopUpSuggestion(24)}>2 years</Button>
     <Button
       disabled={selectedToken && fetchedBalances[selectedToken?.info.address] === undefined}
-      on:click={applyMaxTopUp}>Max</Button
+      onclick={applyMaxTopUp}>Max</Button
     >
   </div>
 </FormField>

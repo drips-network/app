@@ -2,8 +2,13 @@
   import { onMount } from 'svelte';
   import Button from '../button/button.svelte';
   import { browser } from '$app/environment';
+  interface Props {
+    children?: import('svelte').Snippet<[any]>;
+  }
 
-  let expanded = false;
+  let { children }: Props = $props();
+
+  let expanded = $state(false);
 
   function toggleExpand() {
     expanded = !expanded;
@@ -16,10 +21,10 @@
     }
   }
 
-  let containerElem: HTMLDivElement;
-  let overflown = false;
+  let containerElem: HTMLDivElement = $state();
+  let overflown = $state(false);
 
-  let isLong = false;
+  let isLong = $state(false);
 
   function isOverflown() {
     return containerElem.scrollHeight > containerElem.clientHeight;
@@ -46,10 +51,10 @@
 </script>
 
 <div bind:this={containerElem} class="expandable-text" class:expanded>
-  <slot {isLong} />
+  {@render children?.({ isLong, })}
   {#if overflown || expanded}
     <div class="expand-button">
-      <Button on:click={toggleExpand}>
+      <Button onclick={toggleExpand}>
         {expanded ? 'Show less' : 'Show more'}
       </Button>
     </div>

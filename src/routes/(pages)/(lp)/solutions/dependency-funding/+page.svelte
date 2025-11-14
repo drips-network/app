@@ -18,26 +18,30 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Dependency Funding</svelte:fragment>
-  <svelte:fragment slot="headline">Sustain your dependencies, sustain your project</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet usecase_badge()}
+    Dependency Funding
+  {/snippet}
+  {#snippet headline()}
+    Sustain your dependencies, sustain your project
+  {/snippet}
+  {#snippet description()}
     Open-source software is the backbone of the digital world, but many projects we rely on are
     critically underfunded. With Drips, you can automate funding for the software you rely on,
     ensuring that it remains stable and secure.
-  </svelte:fragment>
+  {/snippet}
 </SolutionHeader>
 
 <SolutionCard>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsRecurringFunding />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">
+  {/snippet}
+  {#snippet headline()}
     Support open-source maintainers with predictable, recurring funding
-  </svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet description()}
     Drips makes it easy to fund open-source projects with predictable, recurring funding.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Coin}>
       Stream and split any ERC-20 token directly to any open-source GitHub repo - no ETH addresses
       required
@@ -48,25 +52,29 @@
     <SolutionLineItem icon={TokenStreams}>
       Make one-time donations, or fund continuously with a flexible stream
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionInterstitial>
-  <svelte:fragment slot="headline">Start funding your dependencies today</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet headline()}
+    Start funding your dependencies today
+  {/snippet}
+  {#snippet description()}
     Talk to us so we can design your bespoke Dependency Funding program together.
-  </svelte:fragment>
+  {/snippet}
 </SolutionInterstitial>
 
 <SolutionCard reverse>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsDependencyTree />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Funding flows down the dependency tree</svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Funding flows down the dependency tree
+  {/snippet}
+  {#snippet description()}
     On Drips, funds sent to projects are further split to that project's dependencies, and so on.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={DripList}>
       Worry only about your own dependencies, but still fund your entire dependency tree
     </SolutionLineItem>
@@ -76,5 +84,5 @@
     <SolutionLineItem icon={Ledger}>
       Funds automatically redirect as the dependency tree changes
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>

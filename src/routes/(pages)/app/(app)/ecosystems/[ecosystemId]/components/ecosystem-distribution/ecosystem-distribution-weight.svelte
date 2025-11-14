@@ -1,9 +1,13 @@
 <script lang="ts">
   import formatPercent from '$lib/utils/format-percent';
 
-  export let weight: number;
+  interface Props {
+    weight: number;
+  }
 
-  $: weightFormatted = formatPercent(weight);
+  let { weight }: Props = $props();
+
+  let weightFormatted = $derived(formatPercent(weight));
 </script>
 
 <div class="ecosystem-distribution-weight">

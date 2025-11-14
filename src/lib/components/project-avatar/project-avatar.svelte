@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const PROJECT_AVATAR_FRAGMENT = gql`
@@ -31,9 +31,13 @@
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import type { ComponentProps } from 'svelte';
 
-  export let project: ProjectAvatarFragment;
-  export let size: ComponentProps<EmojiOrIpfsAvatar>['size'] = 'small';
-  export let pendingAvatar = false;
+  interface Props {
+    project: ProjectAvatarFragment;
+    size?: ComponentProps<typeof EmojiOrIpfsAvatar>['size'];
+    pendingAvatar?: boolean;
+  }
+
+  let { project, size = 'small', pendingAvatar = false }: Props = $props();
 </script>
 
 <PrimaryColorThemer colorHex={isClaimed(project) ? project.color : undefined}>

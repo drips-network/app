@@ -1,7 +1,17 @@
 <script lang="ts">
-  export let title: string;
-  export let subtitle: string;
-  export let disabled: boolean = false;
+  interface Props {
+    title: string;
+    subtitle: string;
+    disabled?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    title,
+    subtitle,
+    disabled = false,
+    children
+  }: Props = $props();
 </script>
 
 <div class="setting" class:disabled>
@@ -9,7 +19,7 @@
     <h3>{title}</h3>
     <p>{subtitle}</p>
   </div>
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>

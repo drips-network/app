@@ -7,7 +7,7 @@ import type {
   ListEditorEcosystemFragment,
   ListEditorSubListFragment,
 } from './__generated__/gql.generated';
-import type { ComponentType } from 'svelte';
+import type { Component } from 'svelte';
 import { ECOSYSTEM_BADGE_FRAGMENT } from '../ecosystem-badge/ecosystem-badge.svelte';
 
 export const LIST_EDITOR_PROJECT_FRAGMENT = gql`
@@ -44,7 +44,7 @@ export const LIST_EDITOR_SUB_LIST_FRAGMENT = gql`
 
 type BaseItem = {
   rightComponent?: {
-    component: ComponentType;
+    component: Component<never>;
     props: Record<string, unknown>;
   };
 };

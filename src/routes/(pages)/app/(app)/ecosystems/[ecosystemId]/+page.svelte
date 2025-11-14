@@ -2,7 +2,11 @@
   import type { PageData } from './$types';
   import EcosytemProfile from './components/ecosystem-profile.svelte';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 </script>
 
 <EcosytemProfile ecosystem={data.ecosystem} ecosystemFragment={data.ecosystemChainData} />

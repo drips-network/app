@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const PROJECT_PROFILE_HEADER_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
@@ -38,14 +38,24 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let project: ProjectProfileHeaderFragment;
-  export let description: string | undefined = undefined;
-  export let editButton: string | undefined = undefined;
-  export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
 
-  export let pendingAvatar = false;
+  interface Props {
+    project: ProjectProfileHeaderFragment;
+    description?: string | undefined;
+    editButton?: string | undefined;
+    shareButton?: ComponentProps<typeof ShareButton> | undefined;
+    pendingAvatar?: boolean;
+  }
 
-  $: projectChainData = filterCurrentChainData(project.chainData);
+  let {
+    project,
+    description = undefined,
+    editButton = undefined,
+    shareButton = undefined,
+    pendingAvatar = false
+  }: Props = $props();
+
+  let projectChainData = $derived(filterCurrentChainData(project.chainData));
 
   const dispatch = createEventDispatcher<{ editButtonClick: void }>();
 </script>
@@ -78,7 +88,7 @@
           <ShareButton buttonVariant="normal" {...shareButton} />
         {/if}
         {#if editButton}
-          <Button icon={Pen} on:click={() => dispatch('editButtonClick')}>{editButton}</Button>
+          <Button icon={Pen} onclick={() => dispatch('editButtonClick')}>{editButton}</Button>
         {/if}
       </div>
     {/if}

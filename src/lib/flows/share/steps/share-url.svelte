@@ -20,13 +20,23 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let url: string;
-  export let downloadableImageUrl: string | undefined = undefined;
-  export let text: string | undefined = undefined;
-  export let shareModalText: string = 'Share this on a network of your choice below.';
-  export let supportButtonOptions:
+  interface Props {
+    url: string;
+    downloadableImageUrl?: string | undefined;
+    text?: string | undefined;
+    shareModalText?: string;
+    supportButtonOptions?: 
     | Parameters<typeof configureProjectSupportButtonSteps>[0]
-    | undefined = undefined;
+    | undefined;
+  }
+
+  let {
+    url,
+    downloadableImageUrl = undefined,
+    text = undefined,
+    shareModalText = 'Share this on a network of your choice below.',
+    supportButtonOptions = undefined
+  }: Props = $props();
 
   const shareText = text || '';
 
@@ -114,7 +124,7 @@
           <img src={downloadableImageUrl} alt="downloadable header" />
         </div>
         <span class="downloadable-image__button">
-          <Button on:click={downloadImage} variant="normal" icon={DownloadIcon}>Download</Button>
+          <Button onclick={downloadImage} variant="normal" icon={DownloadIcon}>Download</Button>
         </span>
       </div>
     {/if}
@@ -128,7 +138,7 @@
           <Button
             target="_blank"
             href={option.href}
-            on:click={option?.onClick?.bind(option)}
+            onclick={option?.onClick?.bind(option)}
             variant="normal"
             icon={option.icon}
             justify="left">{option.name}</Button
@@ -147,7 +157,7 @@
           style:justify-content="space-around"
           style:flex-direction="column"
         >
-          <Button icon={Settings} justify="left" on:click={handleEmbedButtonConfigureClick}
+          <Button icon={Settings} justify="left" onclick={handleEmbedButtonConfigureClick}
             >Configure</Button
           >
         </div>

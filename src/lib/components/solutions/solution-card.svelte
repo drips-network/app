@@ -2,27 +2,42 @@
   import Button from '../button/button.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
 
-  export let reverse = false;
-  export let illustrationPadding: string | undefined = undefined;
-
-  export let button:
+  interface Props {
+    reverse?: boolean;
+    illustrationPadding?: string | undefined;
+    button?: 
     | {
         text: string;
         href: string;
       }
-    | undefined = undefined;
+    | undefined;
+    illustration?: import('svelte').Snippet;
+    headline?: import('svelte').Snippet;
+    description?: import('svelte').Snippet;
+    line_items?: import('svelte').Snippet;
+  }
+
+  let {
+    reverse = false,
+    illustrationPadding = undefined,
+    button = undefined,
+    illustration,
+    headline,
+    description,
+    line_items
+  }: Props = $props();
 </script>
 
 <div class="solution-card" class:reverse>
   <div style:padding={illustrationPadding} class="illustration">
-    <slot name="illustration"></slot>
+    {@render illustration?.()}
   </div>
   <div class="content">
     <div class="inner">
-      <h2><slot name="headline"></slot></h2>
-      <p><slot name="description"></slot></p>
+      <h2>{@render headline?.()}</h2>
+      <p>{@render description?.()}</p>
       <div class="line-items">
-        <slot name="line-items"></slot>
+        {@render line_items?.()}
       </div>
       {#if button}
         <div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import ens from '$lib/stores/ens';
   import { ethers } from 'ethers';
@@ -8,19 +10,23 @@
   import assert from '$lib/utils/assert';
   import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
-  export let value: string | undefined = undefined;
-  export let validatedValue: string | undefined = undefined;
 
   type ExclusionGroup = {
     addresses: (string | undefined)[];
     msg: string;
   };
 
-  export let exclude: ExclusionGroup[] = [{ addresses: [], msg: 'You cannot use this address.' }];
+  interface Props {
+    value?: string | undefined;
+    validatedValue?: string | undefined;
+    exclude?: ExclusionGroup[];
+  }
+
+  let { value = $bindable(undefined), validatedValue = $bindable(undefined), exclude = [{ addresses: [], msg: 'You cannot use this address.' }] }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
-  let inputValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let inputValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
 
   async function validateInput(input: string | undefined) {
     if (!input) {
@@ -117,8 +123,12 @@
     validateInput(value).then(() => dispatch('validationChange', inputValidationState));
   }
 
-  $: validateInput(value);
-  $: dispatch('validationChange', inputValidationState);
+  run(() => {
+    validateInput(value);
+  });
+  run(() => {
+    dispatch('validationChange', inputValidationState);
+  });
 </script>
 
 <TextInput

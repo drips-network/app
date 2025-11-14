@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { tick, type ComponentType } from 'svelte';
 
   interface ComponentAndProps {
@@ -20,14 +20,20 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import StandaloneFlowSlot from './components/standalone-flow-slot.svelte';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import { fade } from 'svelte/transition';
 
-  export let slots: Slots;
+  interface Props {
+    slots: Slots;
+  }
 
-  let slotsElem: HTMLUListElement;
+  let { slots }: Props = $props();
+
+  let slotsElem: HTMLUListElement = $state();
 
   let wrapperHeight = tweened(0, {
     duration: 300,
@@ -45,11 +51,11 @@
     wrapperHeight.set(slotsElem?.offsetHeight ?? 0);
   }
 
-  let prevSlots = slots;
-  $: {
+  let prevSlots = $state(slots);
+  run(() => {
     if (JSON.stringify(prevSlots) !== JSON.stringify(slots)) updateHeight();
     prevSlots = slots;
-  }
+  });
 </script>
 
 <div class="overflow-hidden" style:height="{$wrapperHeight}px">

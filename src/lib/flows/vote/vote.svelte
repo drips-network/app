@@ -18,10 +18,14 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let votingRound: VotingRound;
+  interface Props {
+    context: Writable<State>;
+    votingRound: VotingRound;
+  }
 
-  let valid: boolean;
+  let { context, votingRound }: Props = $props();
+
+  let valid: boolean = $state();
 
   function submit() {
     dispatch('await', {
@@ -91,10 +95,12 @@
     />
   </FormField>
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button on:click={() => submit()} variant="primary" icon={Wallet} disabled={!valid}
-      >Confirm in wallet</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button onclick={() => submit()} variant="primary" icon={Wallet} disabled={!valid}
+        >Confirm in wallet</Button
+      >
+    
+  {/snippet}
 </StepLayout>

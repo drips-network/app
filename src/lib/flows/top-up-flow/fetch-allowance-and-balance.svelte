@@ -11,7 +11,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<TopUpFlowState>;
+  interface Props {
+    context: Writable<TopUpFlowState>;
+  }
+
+  let { context }: Props = $props();
 
   async function updateContext() {
     const { tokenAddress } = $context;

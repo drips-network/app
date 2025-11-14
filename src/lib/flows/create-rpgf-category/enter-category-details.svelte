@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -16,17 +18,21 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let roundId: string;
-  export let existingCategories: ApplicationCategory[];
-  export let existingApplicationForms: ApplicationForm[];
+  interface Props {
+    roundId: string;
+    existingCategories: ApplicationCategory[];
+    existingApplicationForms: ApplicationForm[];
+  }
 
-  $: canCreateCategory = existingApplicationForms.length > 0;
+  let { roundId, existingCategories, existingApplicationForms }: Props = $props();
 
-  let nameValue = '';
-  let assignedFormId: string | undefined = undefined;
+  let canCreateCategory = $derived(existingApplicationForms.length > 0);
 
-  let nameValidationState: TextInputValidationState;
-  $: {
+  let nameValue = $state('');
+  let assignedFormId: string | undefined = $state(undefined);
+
+  let nameValidationState: TextInputValidationState = $state();
+  run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
     } else if (nameValue.length > 255) {
@@ -41,7 +47,7 @@
     } else {
       nameValidationState = { type: 'valid' };
     }
-  }
+  });
 
   function handleCreate() {
     dispatch('await', {
@@ -91,13 +97,15 @@
     />
   </FormField>
 
-  <svelte:fragment slot="actions">
-    <Button
-      variant="primary"
-      disabled={!canCreateCategory || nameValidationState.type !== 'valid' || !assignedFormId}
-      type="submit"
-      icon={CheckCircle}
-      on:click={handleCreate}>Create category</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        variant="primary"
+        disabled={!canCreateCategory || nameValidationState.type !== 'valid' || !assignedFormId}
+        type="submit"
+        icon={CheckCircle}
+        onclick={handleCreate}>Create category</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

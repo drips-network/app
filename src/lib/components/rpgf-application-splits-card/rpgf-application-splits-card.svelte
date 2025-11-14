@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const RPGF_APPLICATION_SPLITS_CARD_PROJECT_FRAGMENT = gql`
@@ -30,8 +30,12 @@
   import ProjectBadge, { PROJECT_BADGE_FRAGMENT } from '../project-badge/project-badge.svelte';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
 
-  export let project: RpgfApplicationSplitsCardProjectFragment;
-  $: currentChainData = filterCurrentChainData(project.chainData);
+  interface Props {
+    project: RpgfApplicationSplitsCardProjectFragment;
+  }
+
+  let { project }: Props = $props();
+  let currentChainData = $derived(filterCurrentChainData(project.chainData));
 </script>
 
 {#if isClaimed(currentChainData)}

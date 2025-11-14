@@ -2,14 +2,18 @@
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
   import type { ComponentType } from 'svelte';
 
-  export let ecosystem: Ecosystem;
+  interface Props {
+    ecosystem: Ecosystem;
+  }
+
+  let { ecosystem }: Props = $props();
 
   const iconImports = import.meta.glob('$lib/components/icons/*.svelte') as Record<
     string,
     () => Promise<{ default: ComponentType }>
   >;
 
-  $: metadata = ecosystem.metadata || [];
+  let metadata = $derived(ecosystem.metadata || []);
 </script>
 
 <div class="card ecosystem-metadata">

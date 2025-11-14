@@ -21,10 +21,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<TopUpFlowState>;
+  interface Props {
+    context: Writable<TopUpFlowState>;
+  }
 
-  let tokenList: Items;
-  $: tokenList = {
+  let { context }: Props = $props();
+
+  let tokenList: Items = $derived({
     ...Object.fromEntries(
       $tokens?.map((token) => [
         token.info.address,
@@ -56,10 +59,11 @@
         props: {},
       },
     },
-  };
+  });
+  
 
-  let selected: string[] = [];
-  $: selectedToken = selected[0] ? tokens.getByAddress(selected[0]) : undefined;
+  let selected: string[] = $state([]);
+  let selectedToken = $derived(selected[0] ? tokens.getByAddress(selected[0]) : undefined);
 
   async function updateContext() {
     const tokenAddress = selected[0];
@@ -101,12 +105,14 @@
       <ListSelect bind:selected items={tokenList} type="tokens" />
     </div>
   </FormField>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" disabled={selected.length !== 1} on:click={submit}
-      >Add {selectedToken?.info.name ?? ''}</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button variant="primary" disabled={selected.length !== 1} onclick={submit}
+        >Add {selectedToken?.info.name ?? ''}</Button
+      >
+    
+  {/snippet}
 </StepLayout>
 
 <style>
