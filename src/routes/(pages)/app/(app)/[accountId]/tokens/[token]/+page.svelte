@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const TOKEN_PAGE_USER_BALANCES_FRAGMENT = gql`
     ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
     fragment TokenPageUserBalances on UserBalances {
@@ -21,6 +21,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import tokens from '$lib/stores/tokens';
   import Token from '$lib/components/token/token.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -48,30 +50,30 @@
     streamCurrentAmountsStore,
   } from '$lib/utils/current-amounts';
 
-  export let data;
+  let { data } = $props();
 
-  $: tokenBalances = data.balances.find(
+  let tokenBalances = $derived(data.balances.find(
     (balance) => balance.tokenAddress.toLowerCase() === data.tokenAddress?.toLowerCase(),
-  ) ?? { tokenAddress: data.tokenAddress, incoming: [], outgoing: [] };
+  ) ?? { tokenAddress: data.tokenAddress, incoming: [], outgoing: [] });
 
-  $: currentOutgoingAmountReadable = streamCurrentAmountsStore(
+  let currentOutgoingAmountReadable = $derived(streamCurrentAmountsStore(
     tokenBalances.outgoing,
     data.tokenAddress,
-  );
-  $: currentIncomingAmountReadable = streamCurrentAmountsStore(
+  ));
+  let currentIncomingAmountReadable = $derived(streamCurrentAmountsStore(
     tokenBalances.incoming,
     data.tokenAddress,
-  );
+  ));
 
-  $: token = $tokens?.find(
+  let token = $derived($tokens?.find(
     (token) =>
       token.info.address.toLowerCase() === data.tokenAddress ||
       token.info.symbol.toLowerCase() === data.tokenAddress,
-  );
+  ));
 
-  $: tokenAddress = token?.info.address.toLowerCase() ?? data.tokenAddress;
+  let tokenAddress = $derived(token?.info.address.toLowerCase() ?? data.tokenAddress);
 
-  $: accountId = $wallet.dripsAccountId;
+  let accountId = $derived($wallet.dripsAccountId);
 
   function openAddFundsModal() {
     modal.show(Stepper, undefined, topUpFlowSteps(tokenAddress));
@@ -81,7 +83,7 @@
     modal.show(Stepper, undefined, getWithdrawSteps(data.tokenAddress));
   }
 
-  let error: 'connected-to-wrong-user' | 'unknown-token' | undefined;
+  let error: 'connected-to-wrong-user' | 'unknown-token' | undefined = $state();
 
   async function checkUrlAccountId() {
     const decodedUrlAccountId = await decodeAccountId(data.accountId);
@@ -93,11 +95,11 @@
   }
 
   // redirect to connect page if disconnects
-  $: {
+  run(() => {
     $wallet.connected;
     $tokens;
     if (guardConnected()) checkUrlAccountId();
-  }
+  });
 </script>
 
 {#if token}
@@ -135,59 +137,69 @@
       <h2 class="sr-only">Your Balances</h2>
 
       <TokenStat title="Incoming" tooltip="Amount received from others since your last withdrawal.">
-        <svelte:fragment slot="detail">
-          <Amount
-            showSymbol={false}
-            amountPerSecond={$currentIncomingAmountReadable.currentDeltaPerSecond}
-          />
-        </svelte:fragment>
+        {#snippet detail()}
+                  
+            <Amount
+              showSymbol={false}
+              amountPerSecond={$currentIncomingAmountReadable.currentDeltaPerSecond}
+            />
+          
+                  {/snippet}
 
-        <svelte:fragment slot="value">
-          <div data-testid="incoming-balance">
-            <span class:text-foreground-level-4={true}>
-              <Amount
-                showSymbol={false}
-                amount={$currentIncomingAmountReadable.currentAmount}
-                amountClasses=""
-              />
-            </span>
-          </div>
-        </svelte:fragment>
+        {#snippet value()}
+                  
+            <div data-testid="incoming-balance">
+              <span class:text-foreground-level-4={true}>
+                <Amount
+                  showSymbol={false}
+                  amount={$currentIncomingAmountReadable.currentAmount}
+                  amountClasses=""
+                />
+              </span>
+            </div>
+          
+                  {/snippet}
       </TokenStat>
 
       <TokenStat title="Outgoing" tooltip="Tokens available for streaming to others.">
-        <svelte:fragment slot="detail">
-          <Amount
-            showSymbol={false}
-            amountPerSecond={$currentOutgoingAmountReadable.currentDeltaPerSecond}
-          />
-        </svelte:fragment>
+        {#snippet detail()}
+                  
+            <Amount
+              showSymbol={false}
+              amountPerSecond={$currentOutgoingAmountReadable.currentDeltaPerSecond}
+            />
+          
+                  {/snippet}
 
-        <svelte:fragment slot="value">
-          <div data-testid="outgoing-balance">
-            <span
-              class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount ===
-                0n}
-            >
-              <Amount
-                showSymbol={false}
-                amount={$currentOutgoingAmountReadable.currentAmount}
-                amountClasses=""
-              />
-            </span>
-          </div>
-        </svelte:fragment>
+        {#snippet value()}
+                  
+            <div data-testid="outgoing-balance">
+              <span
+                class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount ===
+                  0n}
+              >
+                <Amount
+                  showSymbol={false}
+                  amount={$currentOutgoingAmountReadable.currentAmount}
+                  amountClasses=""
+                />
+              </span>
+            </div>
+          
+                  {/snippet}
 
-        <svelte:fragment slot="actions">
-          <div class="flex gap-2">
-            <Button icon={Plus} on:click={openAddFundsModal}>Add</Button>
-            <Button
-              disabled={!$currentOutgoingAmountReadable.currentAmount.amount}
-              icon={Minus}
-              on:click={openWithdrawModal}>Withdraw</Button
-            >
-          </div>
-        </svelte:fragment>
+        {#snippet actions()}
+                  
+            <div class="flex gap-2">
+              <Button icon={Plus} onclick={openAddFundsModal}>Add</Button>
+              <Button
+                disabled={!$currentOutgoingAmountReadable.currentAmount.amount}
+                icon={Minus}
+                onclick={openWithdrawModal}>Withdraw</Button
+              >
+            </div>
+          
+                  {/snippet}
       </TokenStat>
     </section>
 

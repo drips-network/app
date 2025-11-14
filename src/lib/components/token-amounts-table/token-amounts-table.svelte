@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import modal from '$lib/stores/modal';
   import tokensStore from '$lib/stores/tokens/tokens.store';
@@ -14,22 +16,26 @@
     amount: bigint;
   }
 
-  export let amounts: Amount[];
-  $: tokenAddresses = amounts.map((a) => a.tokenAddress);
-  $: tokens = $tokensStore && tokenAddresses.map((a) => tokensStore.getByAddress(a));
+  interface Props {
+    amounts: Amount[];
+  }
 
-  $: priceStore = fiatEstimatesStore.price(tokenAddresses ?? []);
+  let { amounts }: Props = $props();
+  let tokenAddresses = $derived(amounts.map((a) => a.tokenAddress));
+  let tokens = $derived($tokensStore && tokenAddresses.map((a) => tokensStore.getByAddress(a)));
+
+  let priceStore = $derived(fiatEstimatesStore.price(tokenAddresses ?? []));
 
   const fiatEstimatesStarted = fiatEstimatesStore.started;
-  $: {
+  run(() => {
     if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0) {
       fiatEstimatesStore.track(tokenAddresses);
     }
-  }
+  });
 
-  let fiatEstimates: (number | 'pending' | 'unsupported' | undefined)[] = [];
+  let fiatEstimates: (number | 'pending' | 'unsupported' | undefined)[] = $state([]);
 
-  $: {
+  run(() => {
     amounts.forEach(({ tokenAddress, amount }, index) => {
       const token = tokensStore.getByAddress(tokenAddress);
 
@@ -44,7 +50,7 @@
         $priceStore,
       );
     });
-  }
+  });
 </script>
 
 <ul class="token-amounts-dropdown">
@@ -64,7 +70,7 @@
         </div>
       {:else if tokensStore.customTokensLoaded}
         <button
-          on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
+          onclick={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps(tokenAddress))}
           >Unknown token</button
         >
       {/if}

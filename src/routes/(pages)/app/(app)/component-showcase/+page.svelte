@@ -49,12 +49,12 @@
   import SuccessStep from '$lib/components/success-step/success-step.svelte';
 
   // Button
-  let disabled = false;
+  let disabled = $state(false);
 
   // List Select
-  let selectedTokens: string[];
-  let searchable = true;
-  let multiselect = false;
+  let selectedTokens: string[] = $state([]);
+  let searchable = $state(true);
+  let multiselect = $state(false);
   let exampleListItems: ListItems = {
     radicle: {
       type: 'selectable',
@@ -86,14 +86,14 @@
   };
 
   // Amount
-  let amount = '1000000000000000000';
-  let tokenAddress = '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984';
-  let includeExtraStreamPrecisionMultiplier = false;
+  let amount = $state('1000000000000000000');
+  let tokenAddress = $state('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984');
+  let includeExtraStreamPrecisionMultiplier = $state(false);
 
   // Project Badge
-  let projectVerified = true;
+  let projectVerified = $state(true);
   type SourceType = 'github';
-  let sourceType: SourceType = 'github';
+  let sourceType: SourceType = $state('github');
 
   const SOURCE_CONFIGS: { [key in SourceType]: Source } = {
     github: {
@@ -107,7 +107,7 @@
 
   // Splits
 
-  let draftMode = false;
+  let draftMode = $state(false);
 
   const MOCK_PROJECT_1: Project = {
     __typename: 'Project',
@@ -338,26 +338,26 @@
   const DEFAULT_PERCENTAGES = { 'option-1': 50, 'option-2': 45, 'option-3': 5 };
 
   // Section
-  let sectionLoaded = false;
-  let sectionEmpty = false;
-  let sectionError = false;
-  let sectionCollapsable = false;
-  let sectionCollapsed = false;
+  let sectionLoaded = $state(false);
+  let sectionEmpty = $state(false);
+  let sectionError = $state(false);
+  let sectionCollapsable = $state(false);
+  let sectionCollapsed = $state(false);
 
   // List editor
 
-  let isEditable = true;
-  let weightsMode = true;
-  let allowAddresses = true;
-  let allowProjects = true;
-  let allowDripLists = true;
+  let isEditable = $state(true);
+  let weightsMode = $state(true);
+  let allowAddresses = $state(true);
+  let allowProjects = $state(true);
+  let allowDripLists = $state(true);
 
   // Progress bar
-  let running = false;
-  let startTime = Date.now();
-  let durationMs = 30000;
-  let expectedDurationText = 'Usually < 30 seconds';
-  let progressFn = () => ({ progressFraction: 0 });
+  let running = $state(false);
+  let startTime = $state(Date.now());
+  let durationMs = $state(30000);
+  let expectedDurationText = $state('Usually < 30 seconds');
+  let progressFn = $state(() => ({ progressFraction: 0 }));
 
   // Transact step
   function startTransact() {
@@ -365,7 +365,7 @@
       steps: [
         makeStep({
           component: ExampleTransactStep,
-          props: undefined,
+          props: {},
         }),
       ],
     });
@@ -384,12 +384,12 @@
         makeStep({
           component: Step_1,
           props: {
-            testProp: 'test prop value',
+            testProp: 'Hello from the first step!',
           },
         }),
         makeStep({
           component: Step_2,
-          props: undefined,
+          props: {},
         }),
         makeStep({
           component: SuccessStep,
@@ -409,7 +409,7 @@
     Testing transact config willf first await a fake external TX that resolves after 1 minute, and
     then will send a zero value transaction on-chain
   </p>
-  <Button on:click={startTransact}>Start</Button>
+  <Button onclick={startTransact}>Start</Button>
 </div>
 
 <div class="showcase-item">
@@ -424,7 +424,7 @@
 
   <Button
     disabled={running}
-    on:click={() => {
+    onclick={() => {
       startTime = Date.now();
       running = true;
       progressFn = () =>
@@ -434,7 +434,7 @@
 
   <Button
     disabled={!running}
-    on:click={() => {
+    onclick={() => {
       progressFn = () =>
         predefinedDurationProgress(startTime, durationMs, true, expectedDurationText);
       running = false;
@@ -506,7 +506,7 @@
 <div class="showcase-item">
   <h2>Highlight</h2>
   <Button
-    on:click={() =>
+    onclick={() =>
       highlightStore.highlight({
         title: 'Highlight title',
         description: 'Description here',
@@ -516,7 +516,7 @@
       })}>Attach highlight to search button</Button
   >
   <Button
-    on:click={() =>
+    onclick={() =>
       highlightStore.highlight({
         title: 'Collect received funds',
         description: 'You can collect funds to your wallet here.',

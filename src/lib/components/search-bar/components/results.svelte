@@ -7,10 +7,19 @@
   import Cross from '$lib/components/icons/Cross.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
 
-  export let results: Result[];
-  export let loading: boolean;
-  export let error: boolean;
-  export let resultElems: HTMLElement[] = [];
+  interface Props {
+    results: Result[];
+    loading: boolean;
+    error: boolean;
+    resultElems?: HTMLElement[];
+  }
+
+  let {
+    results,
+    loading,
+    error,
+    resultElems = $bindable([])
+  }: Props = $props();
 </script>
 
 <TransitionedHeight transitionHeightChanges={true}>
@@ -32,7 +41,7 @@
     {:else}
       {#each results as result, index}
         <div class="result">
-          <ResultComponent bind:element={resultElems[index]} on:click item={result} on:click />
+          <ResultComponent bind:element={resultElems[index]} onclick item={result} onclick />
         </div>
       {/each}
     {/if}

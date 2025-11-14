@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const PROJECTS_PAGE_PROJECT_FRAGMENT = gql`
     ${PROJECTS_SECTION_PROJECT_FRAGMENT}
     fragment ProjectsPageProject on Project {
@@ -26,37 +26,43 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
-  export let data;
+  let { data } = $props();
 </script>
 
 <HeadMeta title="Projects" />
 
 <div class="page">
   <EduCard dismissableId="projects-page-intro" negativeMarginWhileCollapsed="-4rem">
-    <svelte:fragment slot="text">
-      <h1 class="pixelated">Projects on Drips</h1>
-      <p>
-        Projects are GitHub repositories associated with an Ethereum address, stored in a
-        FUNDING.json file. They include maintainers and dependencies, which the owner can choose to
-        split a percentage of any incoming funds to.
-        <a
-          class="typo-link"
-          href="https://docs.drips.network/get-support/claim-your-repository"
-          target="_blank">Learn more</a
+    {#snippet text()}
+      
+        <h1 class="pixelated">Projects on Drips</h1>
+        <p>
+          Projects are GitHub repositories associated with an Ethereum address, stored in a
+          FUNDING.json file. They include maintainers and dependencies, which the owner can choose to
+          split a percentage of any incoming funds to.
+          <a
+            class="typo-link"
+            href="https://docs.drips.network/get-support/claim-your-repository"
+            target="_blank">Learn more</a
+          >
+        </p>
+      
+      {/snippet}
+    {#snippet buttons()}
+      
+        <Button icon={Plus} variant="primary" onclick={() => launchClaimProject()}
+          >Claim your project</Button
         >
-      </p>
-    </svelte:fragment>
-    <svelte:fragment slot="buttons">
-      <Button icon={Plus} variant="primary" on:click={() => launchClaimProject()}
-        >Claim your project</Button
-      >
-    </svelte:fragment>
-    <svelte:fragment slot="illustration">
-      <div class="edu-card-illustration-bg"></div>
-      <div class="edu-card-illustration-wrapper">
-        <RepoGitProject />
-      </div>
-    </svelte:fragment>
+      
+      {/snippet}
+    {#snippet illustration()}
+      
+        <div class="edu-card-illustration-bg"></div>
+        <div class="edu-card-illustration-wrapper">
+          <RepoGitProject />
+        </div>
+      
+      {/snippet}
   </EduCard>
 
   <YourProjectsSection

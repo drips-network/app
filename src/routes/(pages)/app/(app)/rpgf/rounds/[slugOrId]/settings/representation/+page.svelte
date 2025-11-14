@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
@@ -12,26 +14,27 @@
   import TabbedBox from '$lib/components/tabbed-box/tabbed-box.svelte';
   import CustomAvatarUpload from '$lib/components/custom-avatar-upload/custom-avatar-upload.svelte';
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
+  import type { Round } from '$lib/utils/rpgf/types/round';
 
-  export let data;
-  $: isDraft = !data.round.published;
+  let { data } = $props();
+  let isDraft = $derived(!data.round.published);
 
-  let updatedRound = { ...data.round };
+  let updatedRound = $state<Round>({ ...data.round });
 
-  let urlSlugInputValue = updatedRound.urlSlug || '';
+  let urlSlugInputValue = $derived(updatedRound.urlSlug || '');
 
-  let urlSlugValidationState: TextInputValidationState = { type: 'valid' };
+  let urlSlugValidationState = $state<TextInputValidationState>({ type: 'valid' });
 
-  $: {
+  run(() => {
     if (!urlSlugInputValue) {
       updatedRound = {
         ...updatedRound,
         urlSlug: urlSlugInputValue,
       };
     }
-  }
+  });
 
-  $: {
+  run(() => {
     urlSlugInputValue;
 
     if (urlSlugInputValue === updatedRound.urlSlug) {
@@ -41,7 +44,7 @@
     }
 
     showUrlSuccess = false;
-  }
+  });
 
   async function validateSlug() {
     if (urlSlugInputValue === updatedRound.urlSlug) {
@@ -87,22 +90,22 @@
     }
   }
 
-  $: invalid = Boolean(
+  let invalid = $derived(Boolean(
     urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
-  );
+  ));
 
-  let showUrlSuccess = false;
+  let showUrlSuccess = $state(false);
 
-  let activeAvatarTab: 'tab-1' | 'tab-2' = updatedRound.customAvatarCid ? 'tab-2' : 'tab-1';
+  let activeAvatarTab: 'tab-1' | 'tab-2' = $derived(updatedRound.customAvatarCid ? 'tab-2' : 'tab-1');
 
-  $: {
+  run(() => {
     if (activeAvatarTab === 'tab-1') {
       updatedRound = {
         ...updatedRound,
         customAvatarCid: null,
       };
     }
-  }
+  });
 
   function handleAvatarUploaded(e: CustomEvent<{ ipfsCid: string }>) {
     if (activeAvatarTab !== 'tab-2') {
@@ -115,13 +118,13 @@
     };
   }
 
-  $: changesMade =
-    updatedRound.name !== data.round.name ||
+  let changesMade =
+    $derived(updatedRound.name !== data.round.name ||
     updatedRound.emoji !== data.round.emoji ||
     updatedRound.color !== data.round.color ||
     updatedRound.urlSlug !== data.round.urlSlug ||
     updatedRound.description !== data.round.description ||
-    updatedRound.customAvatarCid !== data.round.customAvatarCid;
+    updatedRound.customAvatarCid !== data.round.customAvatarCid);
 
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {
@@ -146,10 +149,12 @@
 
   <FormField title="Avatar*">
     <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
-      <svelte:fragment slot="tab-1">
+      <!-- @migration-task: migrate this slot by hand, `tab-1` is an invalid identifier -->
+  <svelte:fragment slot="tab-1">
         <EmojiPicker bind:selectedEmoji={updatedRound.emoji} />
       </svelte:fragment>
-      <svelte:fragment slot="tab-2">
+      <!-- @migration-task: migrate this slot by hand, `tab-2` is an invalid identifier -->
+  <svelte:fragment slot="tab-2">
         <CustomAvatarUpload on:uploaded={handleAvatarUploaded} />
       </svelte:fragment>
     </TabbedBox>

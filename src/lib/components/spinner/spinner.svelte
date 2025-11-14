@@ -2,9 +2,13 @@
   import Drip from '../illustrations/drip.svelte';
   import { onMount } from 'svelte';
 
-  export let visibilityDelay = 300; // so doesn't flash on loading site from cache
-  export let classes = 'w-6 h-6';
-  let render = false;
+  interface Props {
+    visibilityDelay?: number; // so doesn't flash on loading site from cache
+    classes?: string;
+  }
+
+  let { visibilityDelay = 300, classes = 'w-6 h-6' }: Props = $props();
+  let render = $state(false);
   onMount(() =>
     setTimeout(() => {
       render = true;

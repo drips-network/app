@@ -1,5 +1,5 @@
-<script lang="ts" context="module">
-  type Actions = { icon: ComponentType; handler: () => void }[];
+<script lang="ts" module>
+  type Actions = { icon: Component; handler: () => void }[];
 
   export type ActionsCellProps = {
     actions: Actions;
@@ -8,14 +8,18 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let actions: Actions;
+  interface Props {
+    actions: Actions;
+  }
+
+  let { actions }: Props = $props();
 </script>
 
 <div class="actions">
   {#each actions as action}
-    <Button on:click={action.handler} icon={action.icon} />
+    <Button onclick={action.handler} icon={action.icon} />
   {/each}
 </div>
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { preventDefault } from 'svelte/legacy';
+
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
@@ -20,37 +22,58 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_DECIMALS = 4;
 
-  export let context: Writable<State>;
-  export let headline: string;
-  export let description: string;
-  export let allowProjects: boolean = true;
-  export let allowAddresses: boolean = true;
-  export let allowDripLists: boolean = true;
-  // csvHeaders[0] should always be an address
-  export let csvHeaders: Array<string> = DEFAULT_CSV_HEADERS;
-  export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
-  export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
-  export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
-  export let exampleTableCaption: string | undefined = undefined;
-  export let addItem: (
+  
+  interface Props {
+    context: Writable<State>;
+    headline: string;
+    description: string;
+    allowProjects?: boolean;
+    allowAddresses?: boolean;
+    allowDripLists?: boolean;
+    // csvHeaders[0] should always be an address
+    csvHeaders?: Array<string>;
+    csvMaxEntries?: number;
+    exampleTableHeaders?: Array<string> | undefined;
+    exampleTableData?: Array<Array<unknown>> | undefined;
+    exampleTableCaption?: string | undefined;
+    addItem?: (
     key: AccountId,
     item: ListEditorItem,
     weight: number | undefined,
-  ) => undefined = () => undefined;
-  export let clearItems: () => undefined = () => undefined;
-  export let onItemsError: (errors: Array<AddItemSuberror>) => AddItemError = (errors) => {
+  ) => undefined;
+    clearItems?: () => undefined;
+    onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
+    blockedAccountIds?: string[];
+  }
+
+  let {
+    context,
+    headline,
+    description,
+    allowProjects = true,
+    allowAddresses = true,
+    allowDripLists = true,
+    csvHeaders = DEFAULT_CSV_HEADERS,
+    csvMaxEntries = DEFAULT_MAX_ENTRIES,
+    exampleTableHeaders = csvHeaders,
+    exampleTableData = undefined,
+    exampleTableCaption = undefined,
+    addItem = () => undefined,
+    clearItems = () => undefined,
+    onItemsError = (errors) => {
     return new AddItemError(
       'Some of your imported recipients were invalid',
       'error',
       'They won’t be included in your splits.',
       errors,
     );
-  };
-  export let blockedAccountIds: string[] = [];
+  },
+    blockedAccountIds = []
+  }: Props = $props();
 
-  let uploadForm: HTMLFormElement | undefined = undefined;
+  let uploadForm: HTMLFormElement | undefined = $state(undefined);
   let parsedFile: Array<Array<string>> = [];
-  let loading: boolean = false;
+  let loading: boolean = $state(false);
   let errors: Array<AddItemSuberror> = [];
 
   const customErrors: Array<string> = ['too-many-entries', 'wrong-filetype'] as const;
@@ -196,7 +219,7 @@
     data={exampleTableData ? exampleTableData : undefined}
     caption={exampleTableCaption}
   />
-  <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
+  <form id="upload-form" bind:this={uploadForm} onsubmit={preventDefault(submit)}>
     <DropZone
       validateCustom={validateFile}
       filetypes={['text/csv']}
@@ -204,25 +227,29 @@
       {loading}
       on:input={handleDropZoneInput}
     >
-      <svelte:fragment slot="loading">
+      <!-- @migration-task: migrate this slot by hand, `loading` would shadow a prop on the parent component -->
+  <svelte:fragment slot="loading">
         <Spinner />
         <p class="typo-text">We’re parsing your CSV and building your list…</p>
       </svelte:fragment>
-      <svelte:fragment slot="error" let:error let:defaultContent>
-        {#if error && customErrors.includes(error)}
-          <p class="typo-text-bold">{customErrorMessages[error]}</p>
-        {:else}
-          {@html defaultContent}
-        {/if}
-      </svelte:fragment>
+      {#snippet error({ error, defaultContent })}
+          
+          {#if error && customErrors.includes(error)}
+            <p class="typo-text-bold">{customErrorMessages[error]}</p>
+          {:else}
+            {@html defaultContent}
+          {/if}
+        
+          {/snippet}
     </DropZone>
   </form>
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
     <Button
       disabled={loading}
       variant="ghost"
       icon={ArrowLeft}
-      on:click={() => dispatch('conclude')}>Back</Button
+      onclick={() => dispatch('conclude')}>Back</Button
     >
   </svelte:fragment>
 </StepLayout>

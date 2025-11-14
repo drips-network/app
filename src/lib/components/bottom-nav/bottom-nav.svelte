@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
@@ -7,24 +9,21 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import Overflow from './overflow.svelte';
 
-  export let items: BottomNavItems;
+  interface Props {
+    items: BottomNavItems;
+  }
 
-  $: bottomNavItems = items.slice(0, 4);
-  $: isOverflowing = items.length > 4;
+  let { items }: Props = $props();
+
 
   interface ItemElems {
     [href: string]: HTMLAnchorElement;
   }
 
-  let itemElems: ItemElems = {};
-  $: activeElem = itemElems[$page.url.pathname];
-  $: {
-    activeElem;
-    updateSelectorPos();
-  }
+  let itemElems: ItemElems = $state({});
 
-  let selectorOffset: number | undefined = undefined;
-  let selectorWidth: number | undefined = undefined;
+  let selectorOffset: number | undefined = $state(undefined);
+  let selectorWidth: number | undefined = $state(undefined);
 
   let resizeObserver: ResizeObserver | undefined = undefined;
 
@@ -40,7 +39,6 @@
     resizeObserver.observe(elem);
   }
 
-  $: browser && updateResizeObserver(activeElem);
 
   function updateSelectorPos() {
     if (!activeElem) return;
@@ -51,9 +49,19 @@
   function handleOverflowClick() {
     cupertinoPaneStore.openSheet(Overflow, { items });
   }
+  let bottomNavItems = $derived(items.slice(0, 4));
+  let isOverflowing = $derived(items.length > 4);
+  let activeElem = $derived(itemElems[$page.url.pathname]);
+  run(() => {
+    activeElem;
+    updateSelectorPos();
+  });
+  run(() => {
+    browser && updateResizeObserver(activeElem);
+  });
 </script>
 
-<svelte:window on:resize={updateSelectorPos} />
+<svelte:window onresize={updateSelectorPos} />
 
 <div class="bottom-nav">
   <div class="items">
@@ -65,8 +73,7 @@
         bind:this={itemElems[item.href]}
         href={item.href}
       >
-        <svelte:component
-          this={item.icon}
+        <item.icon
           style="{$page.url.pathname === item.href
             ? 'fill: var(--color-primary-level-6)'
             : 'fill: var(--color-foreground)'}; transition: fill 0.3s;"
@@ -78,7 +85,7 @@
     {/each}
 
     {#if isOverflowing}
-      <button class="item typo-text-small-bold" on:click={handleOverflowClick}>
+      <button class="item typo-text-small-bold" onclick={handleOverflowClick}>
         <Ellipsis style="fill: var(--color-foreground)" />
         <span>More</span>
       </button>

@@ -9,7 +9,7 @@
   import LogDetailModal from './components/log-detail-modal.svelte';
   import LogActorCell from './components/log-actor-cell.svelte';
 
-  export let data;
+  let { data } = $props();
 
   const FRIENDLY_NAME_MAP: Record<AuditLogAction, string> = {
     round_created: 'Round created',
@@ -71,15 +71,15 @@
     },
   ];
 
-  $: logTableData = data.auditLog.map((entry) => ({
+  let logTableData = $derived(data.auditLog.map((entry) => ({
     actor: { actor: entry.actor },
     action: FRIENDLY_NAME_MAP[entry.action],
     createdAt: formatDate(entry.createdAt),
-  }));
+  })));
 
-  function handleRowClick(e: CustomEvent<RowClickEventPayload>) {
+  function handleRowClick(e: RowClickEventPayload) {
     modal.show(LogDetailModal, undefined, {
-      log: data.auditLog[e.detail.rowIndex],
+      log: data.auditLog[e.rowIndex],
     });
   }
 </script>
@@ -93,7 +93,7 @@
         columns: logTableColumns,
         getCoreRowModel: getCoreRowModel(),
       }}
-      on:rowClick={handleRowClick}
+      onRowClick={handleRowClick}
     />
   </PaddedHorizontalScroll>
 </RpgfSettingsForm>

@@ -6,9 +6,13 @@
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
 
-  export let hideDisconnect = false;
+  interface Props {
+    hideDisconnect?: boolean;
+  }
 
-  $: address = $walletStore.address;
+  let { hideDisconnect = false }: Props = $props();
+
+  let address = $derived($walletStore.address);
 
   async function connect() {
     await walletStore.connect();
@@ -22,13 +26,13 @@
   {#if address}
     <IdentityBadge disableLink {address} disableTooltip size="big" showFullAddress />
     {#if !hideDisconnect}
-      <Button variant="ghost" icon={CrossCircle} on:click={() => walletStore.disconnect()}
+      <Button variant="ghost" icon={CrossCircle} onclick={() => walletStore.disconnect()}
         >Disconnect</Button
       >
     {/if}
   {:else}
     Connect your Ethereum wallet to continue
-    <Button icon={Wallet} variant="primary" on:click={connect}>Connect wallet</Button>
+    <Button icon={Wallet} variant="primary" onclick={connect}>Connect wallet</Button>
   {/if}
 </div>
 

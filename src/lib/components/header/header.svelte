@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
   import { COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT } from '../collect-button/collect-button.svelte';
 
@@ -39,21 +39,25 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import { writable } from 'svelte/store';
 
-  export let user: HeaderUserFragment | null;
 
-  $: chainData = user?.chainData ? filterCurrentChainData(user.chainData) : undefined;
 
-  $: elevated = !$hideElevation && $scroll.pos > 16;
 
-  export let showLoadingIndicator = false;
+  interface Props {
+    user: HeaderUserFragment | null;
+    showLoadingIndicator?: boolean;
+  }
 
-  let searchMode = false;
+  let { user, showLoadingIndicator = false }: Props = $props();
 
-  let collectButtonPeeking: boolean;
+  let searchMode = $state(false);
 
-  let networkPickerExpanded = false;
-  $: connected = $walletStore.connected;
-  $: safeAppMode = Boolean($wallet.safe);
+  let collectButtonPeeking: boolean = $state();
+
+  let networkPickerExpanded = $state(false);
+  let chainData = $derived(user?.chainData ? filterCurrentChainData(user.chainData) : undefined);
+  let elevated = $derived(!$hideElevation && $scroll.pos > 16);
+  let connected = $derived($walletStore.connected);
+  let safeAppMode = $derived(Boolean($wallet.safe));
 </script>
 
 <header class:elevated class:search-mode={searchMode}>
@@ -89,7 +93,7 @@
       {#if !searchMode}
         <button
           class="header-button"
-          on:click={() => (searchMode = true)}
+          onclick={() => (searchMode = true)}
           transition:fly={{ duration: 300, x: -64, easing: quadInOut }}
           data-testid="search-button"
           data-highlightid="search"
@@ -103,15 +107,19 @@
           <div class="desktop-only">
             <div class="network-picker-flyout">
               <Flyout width="16rem" bind:visible={networkPickerExpanded}>
-                <div slot="trigger">
-                  <NetworkPicker
-                    toggled={networkPickerExpanded}
-                    on:click={() => (networkPickerExpanded = !networkPickerExpanded)}
-                  />
-                </div>
-                <div slot="content">
-                  <NetworkList />
-                </div>
+                {#snippet trigger()}
+                                <div >
+                    <NetworkPicker
+                      toggled={networkPickerExpanded}
+                      onclick={() => (networkPickerExpanded = !networkPickerExpanded)}
+                    />
+                  </div>
+                              {/snippet}
+                {#snippet content()}
+                                <div >
+                    <NetworkList />
+                  </div>
+                              {/snippet}
               </Flyout>
             </div>
           </div>
@@ -120,8 +128,8 @@
             class="mobile-only"
             role="button"
             tabindex="0"
-            on:click={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
-            on:keydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+            onclick={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+            onkeydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
           >
             <NetworkPicker />
           </div>
@@ -139,12 +147,12 @@
   </div>
 
   {#if searchMode}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="search-background"
       transition:fade={{ duration: 300 }}
-      on:click={() => (searchMode = false)}
+      onclick={() => (searchMode = false)}
    ></div>
   {/if}
 </header>

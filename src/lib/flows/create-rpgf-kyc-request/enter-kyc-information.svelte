@@ -16,14 +16,18 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let applicationId: string;
-  export let context: Writable<State>;
+  interface Props {
+    applicationId: string;
+    context: Writable<State>;
+  }
 
-  let verificationType: 'individual' | 'business' = 'individual';
-  let companyNameInput = '';
-  let firstNameInput = '';
-  let lastNameInput = '';
-  let emailInput = '';
+  let { applicationId, context }: Props = $props();
+
+  let verificationType: 'individual' | 'business' = $state('individual');
+  let companyNameInput = $state('');
+  let firstNameInput = $state('');
+  let lastNameInput = $state('');
+  let emailInput = $state('');
 
   async function createKyc() {
     dispatch('await', {
@@ -99,16 +103,16 @@
     }
   }
 
-  $: firstNameInputValidationState = validateName(firstNameInput);
-  $: lastNameInputValidationState = validateName(lastNameInput);
-  $: emailInputValidationState = validateEmail(emailInput);
-  $: companyNameInputValidationState = validateCompanyName(companyNameInput);
+  let firstNameInputValidationState = $derived(validateName(firstNameInput));
+  let lastNameInputValidationState = $derived(validateName(lastNameInput));
+  let emailInputValidationState = $derived(validateEmail(emailInput));
+  let companyNameInputValidationState = $derived(validateCompanyName(companyNameInput));
 
-  $: allValid =
-    firstNameInputValidationState.type === 'valid' &&
+  let allValid =
+    $derived(firstNameInputValidationState.type === 'valid' &&
     lastNameInputValidationState.type === 'valid' &&
     emailInputValidationState.type === 'valid' &&
-    companyNameInputValidationState.type === 'valid';
+    companyNameInputValidationState.type === 'valid');
 </script>
 
 <StandaloneFlowStepLayout
@@ -184,9 +188,11 @@
     />
   </FormField>
 
-  <svelte:fragment slot="actions">
-    <Button variant="primary" icon={ArrowRight} on:click={createKyc} disabled={!allValid}
-      >Confirm and continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button variant="primary" icon={ArrowRight} onclick={createKyc} disabled={!allValid}
+        >Confirm and continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

@@ -1,6 +1,10 @@
 <script lang="ts">
   import HamburgerIcon from '$lib/components/icons/Hamburger.svelte';
-  export let dragging = false;
+  interface Props {
+    dragging?: boolean;
+  }
+
+  let { dragging = false }: Props = $props();
 </script>
 
 <div class="knob" class:dragging>

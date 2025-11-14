@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (list-editor-action to list_editor_action) making the component unusable -->
 <script lang="ts" context="module">
   import type { Items, Weights } from '$lib/components/list-editor/types';
 

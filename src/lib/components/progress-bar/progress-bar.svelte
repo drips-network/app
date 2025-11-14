@@ -1,24 +1,30 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export type ProgressFn = () => { progressFraction: number; remainingText?: string };
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { tweened } from 'svelte/motion';
   import { fade, slide } from 'svelte/transition';
   import CheckCircle from '../icons/CheckCircle.svelte';
   import CrossCircle from '../icons/CrossCircle.svelte';
 
-  export let progressFn: ProgressFn;
-  export let updateFrequencyMs = 10;
-  export let errorMessage: string | undefined = undefined;
+  interface Props {
+    progressFn: ProgressFn;
+    updateFrequencyMs?: number;
+    errorMessage?: string | undefined;
+  }
 
-  let interval: ReturnType<typeof setInterval> | undefined;
+  let { progressFn, updateFrequencyMs = 10, errorMessage = undefined }: Props = $props();
 
-  let progressFractionRaw = 0;
+  let interval: ReturnType<typeof setInterval> | undefined = $state();
+
+  let progressFractionRaw = $state(0);
   let progressFraction = tweened(0, { duration: 200 });
-  let remainingText: string | undefined;
+  let remainingText: string | undefined = $state();
 
-  $: {
+  run(() => {
     clearInterval(interval);
 
     interval = setInterval(() => {
@@ -29,17 +35,17 @@
       progressFraction.set(newProgressFraction);
       remainingText = newRemainingText;
     }, updateFrequencyMs);
-  }
+  });
 
   // Should be 0.5 all the way until 80% progress, then start interpolating towards 0 at 100%
-  $: progressBorderRadius =
-    $progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2;
+  let progressBorderRadius =
+    $derived($progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2);
 
-  $: started = progressFractionRaw > 0;
-  $: done = errorMessage || progressFractionRaw >= 1;
+  let started = $derived(progressFractionRaw > 0);
+  let done = $derived(errorMessage || progressFractionRaw >= 1);
 
-  let progressBarColor: string;
-  $: {
+  let progressBarColor: string = $state();
+  run(() => {
     if (errorMessage) {
       progressBarColor = 'var(--color-negative)';
     } else if (done) {
@@ -47,10 +53,10 @@
     } else {
       progressBarColor = 'var(--color-primary)';
     }
-  }
+  });
 
-  let textColor: string;
-  $: {
+  let textColor: string = $state();
+  run(() => {
     if (errorMessage) {
       textColor = 'var(--color-negative-level-6)';
     } else if (done) {
@@ -58,7 +64,7 @@
     } else {
       textColor = 'var(--color-foreground-level-5)';
     }
-  }
+  });
 </script>
 
 <div class="progress-bar-wrapper">

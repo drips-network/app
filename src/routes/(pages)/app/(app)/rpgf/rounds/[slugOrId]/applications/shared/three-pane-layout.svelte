@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
@@ -29,16 +31,40 @@
   } from '$lib/utils/rpgf/ballot-validation-context';
   import z from 'zod';
 
-  export let round: Round;
-  export let ballot: Writable<InProgressBallot> & {
+  interface Props {
+    round: Round;
+    ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
-  export let voteMode: boolean;
-  export let reviewMode: boolean;
-  export let resultsMode: boolean;
-  export let existingBallot: WrappedBallot | null;
-  export let pageIsEmpty = false;
-  export let hideAppsPane = false;
+    voteMode: boolean;
+    reviewMode: boolean;
+    resultsMode: boolean;
+    existingBallot: WrappedBallot | null;
+    pageIsEmpty?: boolean;
+    hideAppsPane?: boolean;
+    apps?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    round,
+    ballot,
+    voteMode,
+    reviewMode,
+    resultsMode,
+    existingBallot,
+    pageIsEmpty = false,
+    hideAppsPane = false,
+    apps,
+    children
+  }: Props = $props();
+
+
+  let showResizer = $state(false);
+
+  run(() => {
+    showResizer = isDesktop && !hideAppsPane && !!apps;
+  });
 
   const ballotValidationErrors: BallotValidationErrorsStore = writable(new Set());
   setContext(ballotValidationContextKey, ballotValidationErrors);
@@ -105,9 +131,9 @@
     };
   });
 
-  $: approveCount = Object.values($decisionsStore).filter((v) => v === 'approve').length;
-  $: rejectCount = Object.values($decisionsStore).filter((v) => v === 'reject').length;
-  $: hasDecisions = approveCount + rejectCount > 0;
+  let approveCount = $derived(Object.values($decisionsStore).filter((v) => v === 'approve').length);
+  let rejectCount = $derived(Object.values($decisionsStore).filter((v) => v === 'reject').length);
+  let hasDecisions = $derived(approveCount + rejectCount > 0);
 
   async function handleSubmitReviewDecisions() {
     const mappedToDto: ApplicationReviewDto = mapFilterUndefined(
@@ -130,25 +156,25 @@
     await invalidate('rpgf:round:applications');
   }
 
-  $: ballotStore = ballot;
+  let ballotStore = $derived(ballot);
 
   const MIN_APPS_WIDTH_REM = 18;
   const MIN_PAGE_WIDTH_REM = 32;
   const KEYBOARD_STEP_REM = 1;
 
-  let containerEl: HTMLDivElement;
-  let appsEl: HTMLDivElement | null = null;
-  let pageEl: HTMLDivElement | null = null;
-  let sidebarEl: HTMLDivElement | null = null;
+  let containerEl: HTMLDivElement | undefined = $state();
+  let appsEl: HTMLDivElement | null = $state(null);
+  let pageEl: HTMLDivElement | null = $state(null);
+  let sidebarEl: HTMLDivElement | null = $state(null);
 
-  let appsColumnWidth: string | undefined;
-  let isResizing = false;
-  let isDesktop = true;
-  let hasMounted = false;
-  let accessibleMin: number | undefined;
-  let accessibleMax: number | undefined;
-  let accessibleNow: number | undefined;
-  let appsColumnWidthValue: string | undefined;
+  let appsColumnWidth: string | undefined = $state();
+  let isResizing = $state(false);
+  let isDesktop = $state(true);
+  let hasMounted = $state(false);
+  let accessibleMin: number | undefined = $state();
+  let accessibleMax: number | undefined = $state();
+  let accessibleNow: number | undefined = $state();
+  let appsColumnWidthValue: string | undefined = $derived(showResizer ? appsColumnWidth : undefined);
 
   type ResizeBounds = {
     min: number;
@@ -161,7 +187,7 @@
     pointerId: number;
   };
 
-  let resizeContext: ResizeContext | null = null;
+  let resizeContext: ResizeContext | null = $state(null);
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -376,17 +402,13 @@
       updateCurrentAppsWidth();
     }
   };
-
-  let showResizer = false;
-
-  $: showResizer = isDesktop && !hideAppsPane && !!$$slots.apps;
-
-  $: appsColumnWidthValue = showResizer ? appsColumnWidth : undefined;
-
-  $: if ((hideAppsPane || !$$slots.apps) && appsColumnWidth) {
-    appsColumnWidth = undefined;
-    resizeContext = null;
-  }
+  
+  run(() => {
+    if ((hideAppsPane || !apps) && appsColumnWidth) {
+      appsColumnWidth = undefined;
+      resizeContext = null;
+    }
+  });
 
   const syncAppsPaneWidth = (persistedWidth: number | null) => {
     if (!showResizer) {
@@ -406,13 +428,15 @@
     }
   };
 
-  $: if (showResizer && hasMounted) {
-    const persistedWidth = $appsPaneWidthStore;
+  run(() => {
+    if (showResizer && hasMounted) {
+      const persistedWidth = $appsPaneWidthStore;
 
-    tick().then(() => {
-      syncAppsPaneWidth(persistedWidth);
-    });
-  }
+      tick().then(() => {
+        syncAppsPaneWidth(persistedWidth);
+      });
+    }
+  });
 </script>
 
 <div
@@ -450,7 +474,7 @@
             <Button
               disabled={!hasDecisions}
               variant="primary"
-              on:click={() =>
+              onclick={() =>
                 doWithConfirmationModal(
                   "Are you sure you want to submit these decisions? You can't undo them later.",
                   async () => await doWithErrorModal(handleSubmitReviewDecisions),
@@ -482,16 +506,16 @@
     </div>
   {/if}
 
-  {#if $$slots.apps}
+  {#if apps}
     <div class="apps" bind:this={appsEl}>
       <div class="apps-sticky">
         <div class="apps-inner-wrapper">
           <div class="apps-inner">
-            <slot name="apps" />
+            {@render apps?.()}
           </div>
 
           {#if showResizer}
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-no-noninteractive-tabindex -->
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_no_noninteractive_tabindex -->
             <div
               class="apps-resizer"
               class:is-dragging={isResizing}
@@ -502,12 +526,12 @@
               aria-valuemax={accessibleMax}
               aria-valuenow={accessibleNow}
               tabindex="0"
-              on:pointerdown={startResize}
-              on:pointermove={handleResizeMove}
-              on:pointerup={stopResize}
-              on:pointercancel={stopResize}
-              on:keydown={handleKeyResize}
-              on:dblclick={resetAppsWidth}
+              onpointerdown={startResize}
+              onpointermove={handleResizeMove}
+              onpointerup={stopResize}
+              onpointercancel={stopResize}
+              onkeydown={handleKeyResize}
+              ondblclick={resetAppsWidth}
            ></div>
           {/if}
         </div>
@@ -516,7 +540,7 @@
   {/if}
 
   <div class="page" bind:this={pageEl}>
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

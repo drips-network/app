@@ -3,20 +3,12 @@
   import SplitComponent from './components/split/split.svelte';
   import { type Splits, type SplitGroup } from './types';
 
-  export let disableLinks = true;
 
-  export let list: Splits;
-  export let maxRows: number | undefined = undefined;
 
-  /** Set to false to hide the chevron next to split groups. */
-  export let groupsExpandable = true;
-  export let startExpanded = false;
+  
 
-  export let draft = false;
 
-  export let disableTooltips = false;
 
-  export let chainOverride: SupportedChain | undefined = undefined;
 
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
@@ -41,10 +33,34 @@
     return list.slice(0, clipIndex).concat(truncatedGroup);
   }
 
-  $: sortedList = truncateList(sortList(list));
 
-  export let linkToNewTab = false;
-  export let isGroup = false;
+  interface Props {
+    disableLinks?: boolean;
+    list: Splits;
+    maxRows?: number | undefined;
+    /** Set to false to hide the chevron next to split groups. */
+    groupsExpandable?: boolean;
+    startExpanded?: boolean;
+    draft?: boolean;
+    disableTooltips?: boolean;
+    chainOverride?: SupportedChain | undefined;
+    linkToNewTab?: boolean;
+    isGroup?: boolean;
+  }
+
+  let {
+    disableLinks = true,
+    list,
+    maxRows = undefined,
+    groupsExpandable = true,
+    startExpanded = false,
+    draft = false,
+    disableTooltips = false,
+    chainOverride = undefined,
+    linkToNewTab = false,
+    isGroup = false
+  }: Props = $props();
+  let sortedList = $derived(truncateList(sortList(list)));
 </script>
 
 <ul class="splits-list" class:group={isGroup}>

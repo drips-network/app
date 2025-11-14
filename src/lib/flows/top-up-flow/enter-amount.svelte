@@ -16,17 +16,21 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<TopUpFlowState>;
-  export let backButton: boolean;
+  interface Props {
+    context: Writable<TopUpFlowState>;
+    backButton: boolean;
+  }
 
-  $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined;
+  let { context, backButton }: Props = $props();
 
-  let amount: bigint | undefined = undefined;
+  let tokenAddress = $derived($context.tokenAddress);
+  let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined);
 
-  let validationState: TextInputValidationState = {
+  let amount: bigint | undefined = $state(undefined);
+
+  let validationState: TextInputValidationState = $state({
     type: 'unvalidated',
-  };
+  });
 
   function submit() {
     if (!amount) return;
@@ -66,26 +70,28 @@
     bind:validationState
   />
   <SafeAppDisclaimer disclaimerType="drips" />
-  <svelte:fragment slot="actions">
-    {#if backButton}
-      <Button
-        on:click={() => {
-          context.set({
-            tokenAddress: undefined,
-            amountValue: '',
-            topUpMax: false,
-          });
-          dispatch('goBackward');
-        }}
-        variant="ghost"
-      >
-        Back
-      </Button>
-    {/if}
-    <span data-testid="confirm-amount-button">
-      <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
-        >Add {tokenInfo?.info.symbol ?? ''}</Button
-      >
-    </span>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      {#if backButton}
+        <Button
+          onclick={() => {
+            context.set({
+              tokenAddress: undefined,
+              amountValue: '',
+              topUpMax: false,
+            });
+            dispatch('goBackward');
+          }}
+          variant="ghost"
+        >
+          Back
+        </Button>
+      {/if}
+      <span data-testid="confirm-amount-button">
+        <Button variant="primary" onclick={submit} disabled={validationState.type !== 'valid'}
+          >Add {tokenInfo?.info.symbol ?? ''}</Button
+        >
+      </span>
+    
+  {/snippet}
 </StepLayout>

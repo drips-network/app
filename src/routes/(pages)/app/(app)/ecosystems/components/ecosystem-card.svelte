@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ECOSYTEM_CARD_FRAGMENT = gql`
     fragment EcosystemCard on EcosystemMainAccount {
       name
@@ -24,11 +24,21 @@
   import { gql } from 'graphql-request';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystem: EcosystemsListItem;
-  export let ecosystemChainData: EcosystemCardFragment | undefined;
-  export let isHidden: boolean = false;
+  interface Props {
+    ecosystem: EcosystemsListItem;
+    ecosystemChainData: EcosystemCardFragment | undefined;
+    isHidden?: boolean;
+    banner?: import('svelte').Snippet;
+  }
 
-  $: projectsCountFormatted = formatNumber(ecosystem.nodeCount ?? 0);
+  let {
+    ecosystem,
+    ecosystemChainData,
+    isHidden = false,
+    banner
+  }: Props = $props();
+
+  let projectsCountFormatted = $derived(formatNumber(ecosystem.nodeCount ?? 0));
 </script>
 
 <a
@@ -38,9 +48,9 @@
 >
   <div class="ecosystem-card" class:hidden-project={isHidden}>
     <div class="background"></div>
-    {#if $$slots.banner}
+    {#if banner}
       <div class="banner">
-        <slot name="banner" />
+        {@render banner?.()}
       </div>
     {/if}
     <div class="header">

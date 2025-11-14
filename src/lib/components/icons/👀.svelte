@@ -1,6 +1,11 @@
 <script lang="ts">
-  // make the eyelid blink randomly
   import { onMount } from 'svelte';
+
+  interface Props {
+    size: number;
+  }
+
+  let { size }: Props = $props();
 
   onMount(() => {
     const eyelids = document.querySelectorAll<SVGPathElement>('.eyelid');
@@ -34,7 +39,7 @@
   });
 </script>
 
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path
     d="M35.9361 41.281C41.5583 41.281 46.1161 33.6698 46.1161 24.281C46.1161 14.8922 41.5583 7.28101 35.9361 7.28101C30.3138 7.28101 25.756 14.8922 25.756 24.281C25.756 33.6698 30.3138 41.281 35.9361 41.281Z"
     fill="white"

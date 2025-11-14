@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export interface RowClickEventPayload {
     rowIndex: number;
     event: MouseEvent;
@@ -13,26 +13,23 @@
   import { createEventDispatcher } from 'svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export let options: TableOptions<any>;
-  export let rowHeight: number | undefined = undefined;
-  $: table = createSvelteTable(options);
+  interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: TableOptions<any>;
+    rowHeight?: number | undefined;
+    isRowClickable?: boolean;
+    onRowClick?: (payload: RowClickEventPayload) => void;
+  }
 
-  export let isRowClickable = false;
+  let { options, rowHeight = undefined, isRowClickable = false, onRowClick }: Props = $props();
 
-  type Events = {
-    rowClick: RowClickEventPayload;
-  };
-
-  const dispatch = createEventDispatcher<Events>();
-
-  function onRowClick(index: number, e: MouseEvent) {
+  function handleRowClick(index: number, e: MouseEvent) {
     if (isRowClickable) {
-      dispatch('rowClick', { rowIndex: index, event: e });
+      onRowClick?.({ rowIndex: index, event: e });
     }
   }
 
-  let rowElems: HTMLTableRowElement[] = [];
+  let rowElems: HTMLTableRowElement[] = $state([]);
 
   function handleKeyboard(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.code === 'Space') {
@@ -54,9 +51,10 @@
       );
     }
   }
+  let table = $derived(createSvelteTable(options));
 </script>
 
-<svelte:window on:keydown={handleKeyboard} />
+<svelte:window onkeydown={handleKeyboard} />
 
 <table>
   <thead>
@@ -64,7 +62,7 @@
       <tr>
         {#each headerGroup.headers as header}
           <th
-            on:click={header.column.getToggleSortingHandler()}
+            onclick={header.column.getToggleSortingHandler()}
             class:sortable={header.column.getCanSort()}
             style={`width: ${header.column.getSize()}%`}
           >
@@ -78,9 +76,9 @@
                     {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
                       <Tooltip>
                         <InfoCircle style="height: 1rem;" />
-                        <svelte:fragment slot="tooltip-content">
+                        {#snippet tooltip_content()}
                           {header.column.columnDef.meta['tooltipMessage']}
-                        </svelte:fragment>
+                        {/snippet}
                       </Tooltip>
                     {/if}
                   {/if}
@@ -101,23 +99,21 @@
     {#each $table.getRowModel().rows as row, index}
       <tr
         style:height="{rowHeight}px"
-        on:click={(e) => onRowClick(index, e)}
-        on:auxclick={(e) => onRowClick(index, e)}
+        onclick={(e) => handleRowClick(index, e)}
+        onauxclick={(e) => handleRowClick(index, e)}
         class:cursor-pointer={isRowClickable}
         tabindex={isRowClickable ? 0 : -1}
         bind:this={rowElems[index]}
       >
         {#each row.getVisibleCells() as cell}
           {@const props = cell.getContext().getValue()}
+          {@const SvelteComponent = flexRender(cell.column.columnDef.cell, props)}
           <td
             class:typo-text-bold={cell.column.getIsSorted()}
             class:sorted={cell.column.getIsSorted()}
           >
             <div>
-              <svelte:component
-                this={flexRender(cell.column.columnDef.cell, props)}
-                {...typeof props === 'object' ? props : {}}
-              />
+              <SvelteComponent {...typeof props === 'object' ? props : {}} />
             </div>
           </td>
         {/each}
@@ -130,9 +126,11 @@
         {#each footerGroup.headers as header}
           <th>
             {#if !header.isPlaceholder}
-              <svelte:component
-                this={flexRender(header.column.columnDef.footer, header.getContext())}
-              />
+              {@const SvelteComponent_1 = flexRender(
+                header.column.columnDef.footer,
+                header.getContext(),
+              )}
+              <SvelteComponent_1 />
             {/if}
           </th>
         {/each}

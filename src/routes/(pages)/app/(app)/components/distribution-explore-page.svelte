@@ -16,10 +16,11 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import FeaturedRpgfRounds from './featured-rpgf-rounds.svelte';
 
-  export let blogPosts: z.infer<typeof postsListingSchema>;
-  export let projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
-  export let featuredDripLists: ComponentProps<DripListsGrid>['dripLists'];
-  export let welcomeCardConfig: {
+  interface Props {
+    blogPosts: z.infer<typeof postsListingSchema>;
+    projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
+    featuredDripLists: ComponentProps<typeof DripListsGrid>['dripLists'];
+    welcomeCardConfig: {
     title: string;
     description: string;
     docsButton?: {
@@ -27,7 +28,16 @@
       href: string;
     };
   };
-  export let featuredRpgfRounds: Round[] = [];
+    featuredRpgfRounds?: Round[];
+  }
+
+  let {
+    blogPosts,
+    projects,
+    featuredDripLists,
+    welcomeCardConfig,
+    featuredRpgfRounds = []
+  }: Props = $props();
 </script>
 
 <div class="explore">
@@ -37,7 +47,7 @@
         <div class="illustration">
           <div class="background"></div>
           <div class="filecoin-logo-wrapper">
-            <svelte:component this={network.icon} style="height: 3rem; width: 3rem;" />
+            <network.icon style="height: 3rem; width: 3rem;" />
           </div>
         </div>
         <div class="content">

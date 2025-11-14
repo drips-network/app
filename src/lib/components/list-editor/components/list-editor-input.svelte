@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import type {
     ListEditorDripListFragment,
@@ -25,22 +27,36 @@
     errorDismissed: void;
   }>();
 
-  export let maxItemsReached: boolean;
-  export let existingKeys: string[];
-  export let blockedAccountIds: string[];
 
-  export let allowDripLists: boolean;
-  export let allowProjects: boolean;
-  export let allowAddresses: boolean;
 
-  export let weightsMode: boolean;
 
-  export let addOnMount: string | undefined;
 
-  export let errors: Array<AddItemError> = [];
+  interface Props {
+    maxItemsReached: boolean;
+    existingKeys: string[];
+    blockedAccountIds: string[];
+    allowDripLists: boolean;
+    allowProjects: boolean;
+    allowAddresses: boolean;
+    weightsMode: boolean;
+    addOnMount: string | undefined;
+    errors?: Array<AddItemError>;
+  }
 
-  let inputElem: HTMLInputElement;
-  let inputValue = addOnMount ?? '';
+  let {
+    maxItemsReached,
+    existingKeys,
+    blockedAccountIds,
+    allowDripLists,
+    allowProjects,
+    allowAddresses,
+    weightsMode,
+    addOnMount,
+    errors = $bindable([])
+  }: Props = $props();
+
+  let inputElem: HTMLInputElement = $state();
+  let inputValue = $state(addOnMount ?? '');
 
   onMount(() => {
     if (addOnMount) {
@@ -48,10 +64,10 @@
     }
   });
 
-  $: validInput =
-    (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
+  let validInput =
+    $derived((allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
-    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
+    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)));
 
   function createInvalidMessage(type: string, value: string): string {
     switch (type) {
@@ -128,13 +144,13 @@
     errors = [];
   }
 
-  $: {
+  run(() => {
     inputValue;
     if (inputValue !== '') clearError();
-  }
+  });
 
-  let inputPlaceholder: string;
-  $: {
+  let inputPlaceholder: string = $state();
+  run(() => {
     const allowed = mapFilterUndefined(
       [
         allowProjects && ('GitHub URL' as const),
@@ -153,9 +169,9 @@
         .filter((_, i, a) => i !== a.length - 1)
         .join(', ')}, or ${allowed.pop()}`;
     }
-  }
+  });
 
-  let loading = false;
+  let loading = $state(false);
 
   function handleKeydown(e: KeyboardEvent) {
     if (validInput && e.key === 'Enter') {
@@ -230,8 +246,8 @@
   <input
     data-testid="list-editor-input"
     bind:this={inputElem}
-    on:keydown={handleKeydown}
-    on:paste={handlePaste}
+    onkeydown={handleKeydown}
+    onpaste={handlePaste}
     disabled={loading}
     bind:value={inputValue}
     type="text"
@@ -243,7 +259,7 @@
     disabled={loading || !validInput || maxItemsReached}
     variant={validInput ? 'primary' : undefined}
     {loading}
-    on:click={() => handleSubmit(inputValue)}>Add</Button
+    onclick={() => handleSubmit(inputValue)}>Add</Button
   >
 </div>
 

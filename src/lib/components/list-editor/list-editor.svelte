@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { AccountId, Items, ListEditorItem, Weights } from './types';
   import ListEditorInput from './components/list-editor-input.svelte';
   import ListEditorItemComponent from './components/list-editor-item.svelte';
@@ -15,40 +17,48 @@
 
   const MAX_WEIGHT = 1000000;
 
-  export let items: Items = {};
-
-  export let weightsMode = true;
-  export let weights: Weights = {};
   onMount(() => (weights = adjustWeights(weights)));
 
-  export let isEditable = true;
-  export let canDeleteItems = true;
-  export let maxItems = 200;
-  // These can't be deleted even if canDeleteItems is true
-  export let protectedItems: AccountId[] = [];
+  interface Props {
+    items?: Items;
+    weightsMode?: boolean;
+    weights?: Weights;
+    isEditable?: boolean;
+    canDeleteItems?: boolean;
+    maxItems?: number;
+    // These can't be deleted even if canDeleteItems is true
+    protectedItems?: AccountId[];
+    allowDripLists?: boolean;
+    allowProjects?: boolean;
+    allowAddresses?: boolean;
+    allowEmptyPercentages?: boolean;
+    blockedAccountIds?: string[];
+    addOnMount?: string | undefined;
+    outline?: boolean;
+    forceBottomBorderOnItems?: boolean;
+    inputErrors?: Array<AddItemError>;
+    valid?: boolean;
+  }
 
-  export let allowDripLists = true;
-  export let allowProjects = true;
-  export let allowAddresses = true;
-
-  export let allowEmptyPercentages = false;
-
-  export let blockedAccountIds: string[] = [];
-
-  export let addOnMount: string | undefined = undefined;
-
-  export let outline = true;
-  export let forceBottomBorderOnItems = false;
-
-  export let inputErrors: Array<AddItemError> = [];
-
-  $: totalWeight = Object.values(weights).reduce((acc, weight) => acc + weight, 0);
-
-  export let valid = false;
-  $: valid = weightsMode
-    ? totalWeight === MAX_WEIGHT &&
-      (allowEmptyPercentages || !Object.values(weights).some((v) => v === 0))
-    : Object.keys(items).length > 0;
+  let {
+    items = $bindable({}),
+    weightsMode = true,
+    weights = $bindable({}),
+    isEditable = true,
+    canDeleteItems = true,
+    maxItems = 200,
+    protectedItems = [],
+    allowDripLists = true,
+    allowProjects = true,
+    allowAddresses = true,
+    allowEmptyPercentages = false,
+    blockedAccountIds = [],
+    addOnMount = undefined,
+    outline = true,
+    forceBottomBorderOnItems = false,
+    inputErrors = [],
+    valid = $bindable(false),
+  }: Props = $props();
 
   let percentagesManuallyChanged = false;
 
@@ -86,8 +96,8 @@
     return adjustWeights(result);
   }
 
-  let itemsContainer: HTMLDivElement;
-  let highlightedItemKey: AccountId | undefined = undefined;
+  let itemsContainer: HTMLDivElement | undefined = $state();
+  let highlightedItemKey: AccountId | undefined = $state(undefined);
 
   async function addItem(key: AccountId, item: ListEditorItem) {
     items = {
@@ -103,7 +113,7 @@
 
     await tick();
 
-    itemsContainer.scroll({ top: 0, behavior: 'smooth' });
+    itemsContainer?.scroll({ top: 0, behavior: 'smooth' });
     highlightedItemKey = key;
   }
 
@@ -151,11 +161,6 @@
     weights = weights;
   }
 
-  $: distributeEquallyActionAvailable = Object.keys(items).length > 0;
-  $: distributeRemainingActionAvailable =
-    Object.values(weights).some((v) => v > 0) && Object.values(weights).some((v) => v === 0);
-  $: clearAllActionAvailable = Object.keys(items).length > 0;
-
   function handleDistributeEquallyAction() {
     weights = equallyDistributeWeights(Object.keys(items));
   }
@@ -181,6 +186,18 @@
   function handleClearAllAction() {
     weights = Object.fromEntries(Object.keys(items).map((key) => [key, 0]));
   }
+  let totalWeight = $derived(Object.values(weights).reduce((acc, weight) => acc + weight, 0));
+  run(() => {
+    valid = weightsMode
+      ? totalWeight === MAX_WEIGHT &&
+        (allowEmptyPercentages || !Object.values(weights).some((v) => v === 0))
+      : Object.keys(items).length > 0;
+  });
+  let distributeEquallyActionAvailable = $derived(Object.keys(items).length > 0);
+  let distributeRemainingActionAvailable = $derived(
+    Object.values(weights).some((v) => v > 0) && Object.values(weights).some((v) => v === 0),
+  );
+  let clearAllActionAvailable = $derived(Object.keys(items).length > 0);
 </script>
 
 <div class="list-editor" class:with-outline={outline}>
@@ -205,6 +222,7 @@
 
     {#if Object.keys(items).length > 0}
       {@const itemArray = Object.entries(items)}
+
       <div class="items" bind:this={itemsContainer}>
         <VirtualList
           height={Math.min(itemArray.length * 56, 384)}
@@ -213,23 +231,26 @@
           itemSize={56}
           getKey={(index) => itemArray[index][0]}
         >
-          <div slot="item" let:index let:style {style}>
+          {#snippet item({ index, style })}
             {@const [key, item] = itemArray[index]}
-            <ListEditorItemComponent
-              hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
-              allowEmptyPercentage={allowEmptyPercentages}
-              canDeleteItems={canDeleteItems &&
-                (protectedItems ? !protectedItems.includes(key) : true)}
-              {key}
-              highlight={highlightedItemKey === key}
-              {weightsMode}
-              {isEditable}
-              on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
-              on:deleteItem={() => handleItemDelete(key)}
-              {item}
-              weight={weights[key]}
-            />
-          </div>
+
+            <div {style}>
+              <ListEditorItemComponent
+                hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
+                allowEmptyPercentage={allowEmptyPercentages}
+                canDeleteItems={canDeleteItems &&
+                  (protectedItems ? !protectedItems.includes(key) : true)}
+                {key}
+                highlight={highlightedItemKey === key}
+                {weightsMode}
+                {isEditable}
+                on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
+                on:deleteItem={() => handleItemDelete(key)}
+                {item}
+                weight={weights[key]}
+              />
+            </div>
+          {/snippet}
         </VirtualList>
       </div>
     {/if}
@@ -241,18 +262,18 @@
         <Button
           size="small"
           disabled={!distributeEquallyActionAvailable}
-          on:click={handleDistributeEquallyAction}
+          onclick={handleDistributeEquallyAction}
         >
           <span class="typo-text-small">Split evenly</span>
         </Button>
         <Button
           size="small"
           disabled={!distributeRemainingActionAvailable}
-          on:click={handleDistributeRemainingAction}
+          onclick={handleDistributeRemainingAction}
         >
           <span class="typo-text-small">Split remaining</span>
         </Button>
-        <Button size="small" disabled={!clearAllActionAvailable} on:click={handleClearAllAction}>
+        <Button size="small" disabled={!clearAllActionAvailable} onclick={handleClearAllAction}>
           <span class="typo-text-small">Clear</span>
         </Button>
       </div>

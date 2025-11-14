@@ -10,25 +10,30 @@
   import { fade } from 'svelte/transition';
   import ArrowCollapse from '$lib/components/icons/ArrowCollapse.svelte';
 
-  export let ecosystem: Ecosystem;
+  interface Props {
+    ecosystem: Ecosystem;
+    banner?: import('svelte').Snippet;
+  }
 
-  let ecosystemCardElement: HTMLDivElement;
-  let expanded: boolean = false;
+  let { ecosystem, banner }: Props = $props();
+
+  let ecosystemCardElement: HTMLDivElement = $state();
+  let expanded: boolean = $state(false);
 
   // let the graph decide
-  let zoom: number = 1;
+  let zoom: number = $state(1);
   let selectedProjectData:
     | {
         repoOwner: string;
         repoName: string;
         forge: string;
       }
-    | undefined = undefined;
+    | undefined = $state(undefined);
   let selectedProjectMetadata:
     | {
         absoluteWeight: number;
       }
-    | undefined = undefined;
+    | undefined = $state(undefined);
 
   const ZOOM_INCREMENT = 0.33;
   function zoomIn(event: MouseEvent) {
@@ -133,21 +138,21 @@
   }
 </script>
 
-<svelte:window on:keydown={(event) => stopKeyScroll(event)} />
+<svelte:window onkeydown={(event) => stopKeyScroll(event)} />
 <div class="ecosystem-card-wrapper" class:expanded>
   <div
     class="ecosystem-card"
     bind:this={ecosystemCardElement}
-    on:wheel={(event) => stopScroll(event)}
-    on:touchmove={(event) => stopTouchScroll(event)}
+    onwheel={(event) => stopScroll(event)}
+    ontouchmove={(event) => stopTouchScroll(event)}
   >
     <div class="background"></div>
     <div class="graph">
       <EcosystemGraph {ecosystem} bind:zoom on:nodeSelectionChanged={handleNodeSelectionChanged} />
     </div>
-    {#if $$slots.banner}
+    {#if banner}
       <div class="banner">
-        <slot name="banner" />
+        {@render banner?.()}
       </div>
     {/if}
     <div class="details">
@@ -155,8 +160,8 @@
         <!-- <SearchInput small placeholder="Search" /> -->
       </div>
       <div class="surface top-right">
-        <button class="mobile-graph-expander" on:click={handleClickExpand}></button>
-        <Button on:click={handleClickExpand}>
+        <button class="mobile-graph-expander" onclick={handleClickExpand}></button>
+        <Button onclick={handleClickExpand}>
           {#if expanded}
             <ArrowCollapse style="fill: var(--color-foreground)" />Collapse
           {:else}
@@ -173,10 +178,10 @@
         </div>
       {/if}
       <div class="surface bottom-right">
-        <Button circular on:click={(event) => zoomIn(event)}
+        <Button circular onclick={(event) => zoomIn(event)}
           ><Plus style="fill: var(--color-foreground)" /></Button
         >
-        <Button circular on:click={(event) => zoomOut(event)}
+        <Button circular onclick={(event) => zoomOut(event)}
           ><Minus style="fill: var(--color-foreground)" /></Button
         >
       </div>

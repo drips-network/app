@@ -2,9 +2,13 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
 
-  export let disclaimerType: 'splits' | 'drips';
+  interface Props {
+    disclaimerType: 'splits' | 'drips';
+  }
 
-  $: safeAppMode = Boolean($walletStore.safe);
+  let { disclaimerType }: Props = $props();
+
+  let safeAppMode = $derived(Boolean($walletStore.safe));
 </script>
 
 {#if safeAppMode}

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ECOSYSTEMS_LISTINGS_ITEM_FRAGMENT = gql`
     fragment EcosystemsListingsItem on EcosystemMainAccount {
       owner {
@@ -14,6 +14,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import walletStore from '$lib/stores/wallet/wallet.store';
   import guardConnected from '$lib/utils/guard-connected';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -25,34 +27,40 @@
   import EduCardIllustration from '$lib/components/edu-card/edu-card-illustration.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
 
-  export let data;
+  let { data } = $props();
 
-  $: {
+  run(() => {
     $walletStore.connected;
     guardConnected();
-  }
+  });
 </script>
 
 <HeadMeta title="Ecosystems" />
 
 <div class="page">
   <EduCard dismissableId="ecosystems-page-intro" negativeMarginWhileCollapsed="-4rem">
-    <svelte:fragment slot="text">
-      <h1 class="pixelated">Ecosystems</h1>
-      <p>
-        Ecosystems are large collections of claimed and unclaimed projects networked together using
-        Drips AI. Sending funds to a single ecosystem is an efficient way to easily fund hundreds of
-        projects at once, supporting a whole community in one go.
-      </p>
-    </svelte:fragment>
-    <svelte:fragment slot="buttons">
-      <Button icon={ArrowBoxUpRight}>Learn more</Button>
-    </svelte:fragment>
-    <svelte:fragment slot="illustration">
-      <EduCardIllustration>
-        <Ecosystem />
-      </EduCardIllustration>
-    </svelte:fragment>
+    {#snippet text()}
+      
+        <h1 class="pixelated">Ecosystems</h1>
+        <p>
+          Ecosystems are large collections of claimed and unclaimed projects networked together using
+          Drips AI. Sending funds to a single ecosystem is an efficient way to easily fund hundreds of
+          projects at once, supporting a whole community in one go.
+        </p>
+      
+      {/snippet}
+    {#snippet buttons()}
+      
+        <Button icon={ArrowBoxUpRight}>Learn more</Button>
+      
+      {/snippet}
+    {#snippet illustration()}
+      
+        <EduCardIllustration>
+          <Ecosystem />
+        </EduCardIllustration>
+      
+      {/snippet}
   </EduCard>
 
   <div class="section">

@@ -1,22 +1,38 @@
+https://svelte.dev/e/attribute_invalid_name -->
 <script lang="ts">
+  import { createBubbler, stopPropagation } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { onMount, tick } from 'svelte';
   import Copyable from '../copyable/copyable.svelte';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
   import { fade } from 'svelte/transition';
 
-  export let text: string | undefined = undefined;
-  export let copyable = false;
-  export let disabled = false;
+  interface Props {
+    text?: string | undefined;
+    copyable?: boolean;
+    disabled?: boolean;
+    children?: import('svelte').Snippet;
+    tooltip_content?: import('svelte').Snippet;
+  }
 
-  let tooltipElem: HTMLSpanElement;
-  let contentElem: HTMLSpanElement;
-  let expanded = false;
+  let {
+    text = undefined,
+    copyable = false,
+    disabled = false,
+    children,
+    tooltip_content
+  }: Props = $props();
 
-  let tooltipPos = {
+  let tooltipElem: HTMLSpanElement | undefined = $state();
+  let contentElem: HTMLSpanElement | undefined = $state();
+  let expanded = $state(false);
+
+  let tooltipPos = $state({
     left: 0,
     right: 0,
     top: 0,
-  };
+  });
 
   const TOOLTIP_MARGIN = 0;
 
@@ -56,6 +72,8 @@
   async function updatePos() {
     await tick();
 
+    if (!tooltipElem || !contentElem) return;
+
     const triggerPos = tooltipElem.getBoundingClientRect();
     let contentPos = contentElem.getBoundingClientRect();
 
@@ -94,6 +112,7 @@
   }
 
   function setContentFocussable(canFocus: boolean) {
+    if (!contentElem) return;
     setTabIndexRecursively(contentElem, canFocus ? '0' : '-1');
   }
 
@@ -110,19 +129,19 @@
   });
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <span
   bind:this={tooltipElem}
   class="tooltip"
   class:disabled
-  on:pointerover={(e) => {
+  onpointerover={(e) => {
     if (!disabled && e.pointerType !== 'touch') handleHover(true);
   }}
-  on:pointerleave={() => !disabled && handleHover(false)}
+  onpointerleave={() => !disabled && handleHover(false)}
 >
-  <div class="trigger"><slot /></div>
+  <div class="trigger">{@render children?.()}</div>
   {#if expanded}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       transition:fade={{ duration: 200 }}
       bind:this={contentElem}
@@ -130,17 +149,17 @@
       style:left={`${tooltipPos.left}px`}
       style:right={`${tooltipPos.right}px`}
       style:top={`${tooltipPos.top}px`}
-      on:click|stopPropagation
-      on:keydown|stopPropagation
+      onclick={stopPropagation(bubble('click'))}
+      onkeydown={stopPropagation(bubble('keydown'))}
     >
       <div class="target-buffer"></div>
       <div class="tooltip-content typo-text" style:max-width={MAX_WIDTH}>
         {#if copyable && text}
           <Copyable alwaysVisible value={text}
-            ><div class="inner"><slot name="tooltip-content" /></div></Copyable
+            ><div class="inner">{@render tooltip_content?.()}</div></Copyable
           >
         {:else}
-          <div class="inner"><slot name="tooltip-content" /></div>
+          <div class="inner">{@render tooltip_content?.()}</div>
         {/if}
       </div>
     </div>

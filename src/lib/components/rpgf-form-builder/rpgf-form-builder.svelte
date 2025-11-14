@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import { flip } from 'svelte/animate';
@@ -18,18 +20,24 @@
   import Stepper from '../stepper/stepper.svelte';
   import addRpgfFormFieldFlow from '$lib/flows/add-rpgf-form-field/add-rpgf-form-field-flow';
 
-  export let fields: ApplicationFieldDto[] = [];
+  interface Props {
+    fields?: ApplicationFieldDto[];
+  }
 
-  let applicationFormatWithKeys = fields.map((field) => ({
+  let { fields = $bindable([]) }: Props = $props();
+
+  let applicationFormatWithKeys = $state(fields.map((field) => ({
     ...field,
     key: `${crypto.randomUUID()}`,
-  }));
-  $: fields = applicationFormatWithKeys.map<ApplicationFieldDto>((field) => {
-    // Remove the key from the field
-    const newField: ApplicationFieldDto & { key?: string } = { ...field };
-    delete newField.key;
+  })));
+  run(() => {
+    fields = applicationFormatWithKeys.map<ApplicationFieldDto>((field) => {
+      // Remove the key from the field
+      const newField: ApplicationFieldDto & { key?: string } = { ...field };
+      delete newField.key;
 
-    return newField;
+      return newField;
+    });
   });
 
   const COMPONENT_MAP = {
@@ -41,7 +49,7 @@
     textarea: TextAreaField,
     url: UrlField,
     email: EmailField,
-  };
+  } as const;
 
   function move(index: number, direction: 'up' | 'down') {
     const newIndex = direction === 'up' ? index - 1 : index + 1;
@@ -97,12 +105,12 @@
     );
   }
 
-  $: slugs = mapFilterUndefined(applicationFormatWithKeys, (field) => {
+  let slugs = $derived(mapFilterUndefined(applicationFormatWithKeys, (field) => {
     if ('slug' in field && field.slug) {
       return field.slug;
     }
     return undefined;
-  });
+  }));
 
   function getSlugsWithout(slug: string | undefined) {
     return slugs.filter((s) => s !== slug);
@@ -131,14 +139,14 @@
         {/if}
 
         <div class="add-item-row">
-          <Button on:click={() => addItem(index)} size="small" variant="ghost" icon={Plus}></Button>
+          <Button onclick={() => addItem(index)} size="small" variant="ghost" icon={Plus}></Button>
         </div>
       </div>
     {/each}
 
     {#if applicationFormatWithKeys.length === 0}
       <div class="add-item-row">
-        <Button on:click={() => addItem(-1)} size="small" variant="ghost" icon={Plus}>
+        <Button onclick={() => addItem(-1)} size="small" variant="ghost" icon={Plus}>
           Add first field
         </Button>
       </div>

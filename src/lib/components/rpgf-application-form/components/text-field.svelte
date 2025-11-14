@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type {
@@ -6,32 +8,43 @@
     ApplicationTextField,
   } from '$lib/utils/rpgf/types/application';
 
-  export let field: ApplicationTextField;
-  export let answer: ApplicationTextAnswerDto | undefined = undefined;
-  export let valid: boolean = false;
-  export let forceRevealError: boolean | undefined = undefined;
-
-  let value: string | undefined = answer?.value ?? undefined;
-  $: if (value) {
-    answer = {
-      fieldId: field.id,
-      value: value,
-    };
-  } else {
-    answer = undefined;
+  interface Props {
+    field: ApplicationTextField;
+    answer?: ApplicationTextAnswerDto | undefined;
+    valid?: boolean;
+    forceRevealError?: boolean | undefined;
   }
 
-  $: {
+  let {
+    field,
+    answer = $bindable(undefined),
+    valid = $bindable(false),
+    forceRevealError = undefined
+  }: Props = $props();
+
+  let value: string | undefined = $state(answer?.value ?? undefined);
+  run(() => {
+    if (value) {
+      answer = {
+        fieldId: field.id,
+        value: value,
+      };
+    } else {
+      answer = undefined;
+    }
+  });
+
+  run(() => {
     if (field.required) {
       valid = value !== undefined && value.trim() !== '' && value.length <= 5000;
     } else {
       valid = value == undefined || value.length <= 5000;
     }
-  }
+  });
 
-  let beenFocussed = false;
+  let beenFocussed = $state(false);
 
-  $: tooLong = value != undefined && value.length > 5000;
+  let tooLong = $derived(value != undefined && value.length > 5000);
 </script>
 
 <FormField

@@ -1,14 +1,21 @@
 <script lang="ts">
+  import { createBubbler, stopPropagation } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import SelectedDot from '../selected-dot/selected-dot.svelte';
 
-  export let checked: boolean;
-  export let label: string | undefined = undefined;
-  export let size: 'normal' | 'big' = 'normal';
+  interface Props {
+    checked: boolean;
+    label?: string | undefined;
+    size?: 'normal' | 'big';
+  }
+
+  let { checked = $bindable(), label = undefined, size = 'normal' }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<label class="toggle {size}" on:click|stopPropagation>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<label class="toggle {size}" onclick={stopPropagation(bubble('click'))}>
   <input tabindex="0" type="checkbox" bind:checked />
   <SelectedDot type="check" bind:selected={checked} />
   {#if label}<span class="typo-text-bold">{label}</span>{/if}

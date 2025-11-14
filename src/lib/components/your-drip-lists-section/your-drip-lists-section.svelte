@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
   import { DRIP_LIST_CARD_FRAGMENT } from '../drip-list-card/drip-list-card.svelte';
 
@@ -25,35 +25,47 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchCreateDripList from '../../utils/launch-create-drip-list';
 
-  export let dripLists: DripListsSectionDripListFragment[];
-  export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
-  export let withCreateButton = false;
 
-  export let collapsed = false;
-  export let collapsable = false;
-  export let showCreateNewListCard = false;
-  export let showVisibilityToggle = false;
+  interface Props {
+    dripLists: DripListsSectionDripListFragment[];
+    votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
+    withCreateButton?: boolean;
+    collapsed?: boolean;
+    collapsable?: boolean;
+    showCreateNewListCard?: boolean;
+    showVisibilityToggle?: boolean;
+  }
+
+  let {
+    dripLists,
+    votingRounds,
+    withCreateButton = false,
+    collapsed = $bindable(false),
+    collapsable = $bindable(false),
+    showCreateNewListCard = false,
+    showVisibilityToggle = false
+  }: Props = $props();
 
   let error = false;
 
-  let showHidden: boolean = false;
-  $: hiddenListsCount = dripLists.filter((dl) => !dl.isVisible).length ?? 0;
+  let showHidden: boolean = $state(false);
+  let hiddenListsCount = $derived(dripLists.filter((dl) => !dl.isVisible).length ?? 0);
 
-  $: items = [...dripLists, ...votingRounds];
+  let items = $derived([...dripLists, ...votingRounds]);
 
-  $: visibleDripListsAndVotingRounds = items
+  let visibleDripListsAndVotingRounds = $derived(items
     .filter((i) => ('isVisible' in i ? i.isVisible : true))
     .map((i) =>
       '__typename' in i
         ? { ...i, type: 'drip-list' as const }
         : { ...i, type: 'voting-round' as const },
-    );
+    ));
 
-  $: hiddenDripListsAndVotingRounds = showHidden
+  let hiddenDripListsAndVotingRounds = $derived(showHidden
     ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
-    : [];
+    : []);
 
-  $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
+  let isOwner = $derived($walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId));
 </script>
 
 <Section
@@ -122,7 +134,7 @@
             <h6 class="typo-text-bold">Got a new idea?</h6>
             <p>You can create as many Drip Lists as you like.</p>
             <div class="mt-2">
-              <Button icon={Plus} on:click={launchCreateDripList}>Create a new Drip List</Button>
+              <Button icon={Plus} onclick={launchCreateDripList}>Create a new Drip List</Button>
             </div>
           </div>
         </div>

@@ -2,7 +2,11 @@
   import EyeClosed from '$lib/components/icons/EyeClosed.svelte';
   import EyeOpen from '$lib/components/icons/EyeOpen.svelte';
 
-  export let visible: boolean;
+  interface Props {
+    visible: boolean;
+  }
+
+  let { visible }: Props = $props();
 </script>
 
 {#if visible}

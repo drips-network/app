@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let sideMargin = 0;
+  interface Props {
+    sideMargin?: number;
+  }
 
-  $: widthStyle = sideMargin < 0 ? `calc(100% + ${-sideMargin * 2}rem)` : '100%';
+  let { sideMargin = 0 }: Props = $props();
+
+  let widthStyle = $derived(sideMargin < 0 ? `calc(100% + ${-sideMargin * 2}rem)` : '100%');
 </script>
 
 <div class="divider" style={`margin: 0.25rem ${sideMargin}rem; width: ${widthStyle}`}></div>

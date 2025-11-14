@@ -1,52 +1,50 @@
 <script lang="ts">
+  import { handlers } from 'svelte/legacy';
+
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import EyeClosedIcon from '$lib/components/icons/EyeClosed.svelte';
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
 
-  export let items: Items;
-  export let type: 'tokens' | 'generic' = 'generic';
-  export let searchable = true;
-  export let multiselect = false;
-  export let blockInteraction = false;
-  export let hideUnselected = false;
-  export let showEmptyState = true;
-  export let emptyStateText = 'Nothing to see here';
-  export let maxSelected = 10;
-  export let blockSelecting = false;
 
-  let searchString = '';
+  let searchString = $state('');
 
-  $: filteredItems = Object.fromEntries(
-    Object.entries(items).filter((entry) => {
-      const item = entry[1];
-      if (item.type === 'interstitial') return;
 
-      const itemSearchString =
-        (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
 
-      const searchStrings = Array.isArray(itemSearchString) ? itemSearchString : [itemSearchString];
 
-      const startsWithSearchString = searchStrings.some((s) =>
-        s.toLowerCase().startsWith(searchString.toLowerCase()),
-      );
+  interface Props {
+    items: Items;
+    type?: 'tokens' | 'generic';
+    searchable?: boolean;
+    multiselect?: boolean;
+    blockInteraction?: boolean;
+    hideUnselected?: boolean;
+    showEmptyState?: boolean;
+    emptyStateText?: string;
+    maxSelected?: number;
+    blockSelecting?: boolean;
+    selected?: string[];
+    percentages?: { [slug: string]: number };
+  }
 
-      return startsWithSearchString || item.type === 'action';
-    }),
-  );
-
-  $: noItems = Object.keys(items).length === 0;
-  $: listIsEmpty =
-    Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0;
-
-  export let selected: string[] = [];
-
-  export let percentages: { [slug: string]: number } = {};
+  let {
+    items,
+    type = 'generic',
+    searchable = true,
+    multiselect = false,
+    blockInteraction = false,
+    hideUnselected = false,
+    showEmptyState = true,
+    emptyStateText = 'Nothing to see here',
+    maxSelected = 10,
+    blockSelecting = false,
+    selected = $bindable([]),
+    percentages = $bindable({})
+  }: Props = $props();
 
   let lastSelectedSlug: string | undefined;
 
-  $: canSelectAnother = selected.length < maxSelected;
 
   function selectItem(slug: string, shiftKey = false) {
     if (!canSelectAnother && !selected.includes(slug)) return;
@@ -109,9 +107,9 @@
     e.preventDefault();
   };
 
-  let searchBarElem: HTMLDivElement;
-  let itemElements: { [slug: string]: HTMLDivElement } = {};
-  let focussedSlug: string | undefined;
+  let searchBarElem: HTMLDivElement = $state();
+  let itemElements: { [slug: string]: HTMLDivElement } = $state({});
+  let focussedSlug: string | undefined = $state();
 
   function handleArrowKeys(e: KeyboardEvent) {
     const focussedElem = document.activeElement;
@@ -161,9 +159,30 @@
       (item.disabled || (!canSelectAnother && !selected.includes(slug)))
     );
   }
+  let filteredItems = $derived(Object.fromEntries(
+    Object.entries(items).filter((entry) => {
+      const item = entry[1];
+      if (item.type === 'interstitial') return;
+
+      const itemSearchString =
+        (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
+
+      const searchStrings = Array.isArray(itemSearchString) ? itemSearchString : [itemSearchString];
+
+      const startsWithSearchString = searchStrings.some((s) =>
+        s.toLowerCase().startsWith(searchString.toLowerCase()),
+      );
+
+      return startsWithSearchString || item.type === 'action';
+    }),
+  ));
+  let noItems = $derived(Object.keys(items).length === 0);
+  let listIsEmpty =
+    $derived(Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0);
+  let canSelectAnother = $derived(selected.length < maxSelected);
 </script>
 
-<svelte:window on:keydown={handleArrowKeys} on:keydown={handleArrowKeys} />
+<svelte:window onkeydown={handlers(handleArrowKeys, handleArrowKeys)} />
 
 <div
   role="listbox"
@@ -206,17 +225,17 @@
         class:selected={selected.includes(slug)}
         class:disabled={isItemDisabled(slug)}
         class:hidden={!Object.values(filteredItems).includes(item)}
-        on:click={isItemDisabled(slug) || blockSelecting
+        onclick={isItemDisabled(slug) || blockSelecting
           ? undefined
           : (e) => handleItemClick(e, slug)}
-        on:keydown={isItemDisabled(slug) || blockSelecting
+        onkeydown={isItemDisabled(slug) || blockSelecting
           ? undefined
           : (e) => handleKeypress(e, slug)}
         tabindex={isItemDisabled(slug) || blockSelecting || blockInteraction ? undefined : 0}
         data-testid={`item-${slug}`}
         bind:this={itemElements[slug]}
-        on:focus={() => (focussedSlug = slug)}
-        on:blur={() => (focussedSlug = undefined)}
+        onfocus={() => (focussedSlug = slug)}
+        onblur={() => (focussedSlug = undefined)}
       >
         {#if item.type === 'selectable' && !hideUnselected && !blockSelecting}
           <div class="check-icon">
@@ -232,7 +251,7 @@
             {#if typeof item.image === 'string'}
               <img src={item.image} alt="List item" />
             {:else if item.image}
-              <svelte:component this={item.image.component} {...item.image.props} />
+              <item.image.component {...item.image.props} />
             {/if}
           </div>
         {/if}
@@ -243,7 +262,7 @@
           {#if typeof item.label === 'string'}
             <span class="label typo-text pr-4">{item.label}</span>
           {:else}
-            <svelte:component this={item.label.component} {...item.label.props} />
+            <item.label.component {...item.label.props} />
           {/if}
           <div class="right">
             {#if item.type === 'selectable' && item.text}
@@ -252,7 +271,7 @@
                   {item.text}
                 </span>
               {:else}
-                <svelte:component this={item.text.component} {...item.text.props} />
+                <item.text.component {...item.text.props} />
               {/if}
             {/if}
             {#if item.type === 'selectable' && item.editablePercentage}
@@ -294,7 +313,7 @@
     border-bottom: none;
   }
 
-  .item:has(+ .interstitial) {
+  .item:has(:global(+ .interstitial)) {
     border-bottom: none;
   }
 

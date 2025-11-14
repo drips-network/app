@@ -8,7 +8,11 @@
     e.stopImmediatePropagation();
   }
 
-  export let tokenAddress: string;
+  interface Props {
+    tokenAddress: string;
+  }
+
+  let { tokenAddress }: Props = $props();
 </script>
 
-<button on:click={handleClick}>Unknown token</button>
+<button onclick={handleClick}>Unknown token</button>

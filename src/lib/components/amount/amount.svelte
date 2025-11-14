@@ -13,26 +13,40 @@
     tokenAddress: string;
   }
 
-  export let amount: Amount | undefined = undefined;
-  export let amountPerSecond: Amount | undefined = undefined;
-  export let showSymbol = true;
-  export let showPlusMinus = true;
-  export let multiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER);
 
-  export let amountClasses = 'typo-text tabular-nums';
-  export let amountPerSecClasses = 'typo-text-small tabular-nums text-foreground-level-4';
 
-  /** Manually set token information to display. Used on the landing page's mock dashboard. */
-  export let overrideToDisplay:
+  
+  interface Props {
+    amount?: Amount | undefined;
+    amountPerSecond?: Amount | undefined;
+    showSymbol?: boolean;
+    showPlusMinus?: boolean;
+    multiplier?: any;
+    amountClasses?: string;
+    amountPerSecClasses?: string;
+    /** Manually set token information to display. Used on the landing page's mock dashboard. */
+    overrideToDisplay?: 
     | {
         symbol: string;
         decimals: number;
       }
-    | undefined = undefined;
+    | undefined;
+  }
 
-  $: amountTokenInfo = $tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined;
-  $: amountPerSecondTokenInfo =
-    $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined;
+  let {
+    amount = undefined,
+    amountPerSecond = undefined,
+    showSymbol = true,
+    showPlusMinus = true,
+    multiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
+    amountClasses = 'typo-text tabular-nums',
+    amountPerSecClasses = 'typo-text-small tabular-nums text-foreground-level-4',
+    overrideToDisplay = undefined
+  }: Props = $props();
+
+  let amountTokenInfo = $derived($tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined);
+  let amountPerSecondTokenInfo =
+    $derived($tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined);
 
   function format(
     amount: Amount,

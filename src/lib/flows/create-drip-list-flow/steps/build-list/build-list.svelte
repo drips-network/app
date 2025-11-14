@@ -20,12 +20,16 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
 
   const { searchParams } = $page.url;
   const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
 
-  let listValid = false;
+  let listValid = $state(false);
 
   function handleImportCSV() {
     dispatch(
@@ -64,19 +68,24 @@
       on:errorDismissed={handleErrorDismissed}
       addOnMount={urlToAdd}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+      
+      {/snippet}
   </FormField>
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!listValid}
-      icon={Check}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        disabled={!listValid}
+        icon={Check}
+        variant="primary"
+        onclick={() => dispatch('goForward')}>Continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

@@ -7,7 +7,7 @@
 
   const modalStore = modal.store;
 
-  $: store = $modalStore;
+  let store = $derived($modalStore);
 
   const clickOutside = () => {
     modal.hide();
@@ -19,20 +19,20 @@
     }
   };
 
-  let modalContainer: HTMLDivElement;
+  let modalContainer: HTMLDivElement = $state();
 </script>
 
-<svelte:window on:keydown={pressEscapeKey} />
+<svelte:window onkeydown={pressEscapeKey} />
 
 {#if store.overlay !== null}
   <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="overlay"
       transition:fade={{ duration: 200 }}
-      on:click={clickOutside}
-      on:keydown={clickOutside}
+      onclick={clickOutside}
+      onkeydown={clickOutside}
    ></div>
     <div class="content">
       <div
@@ -41,8 +41,7 @@
         out:scale|global={{ start: 0.97, duration: 200 }}
       >
         <Modal>
-          <svelte:component
-            this={store.overlay.modalComponent}
+          <store.overlay.modalComponent
             {...store.overlay.modalComponentProps}
           />
           {#if store.hideable}
@@ -50,7 +49,7 @@
               <button
                 transition:fly={{ duration: 200, y: -4, x: 4 }}
                 class="close-button"
-                on:click={modal.hide}
+                onclick={modal.hide}
               >
                 <Cross style="fill: var(--color-foreground)" />
               </button>

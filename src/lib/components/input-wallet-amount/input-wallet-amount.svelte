@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
@@ -10,25 +12,39 @@
   import Spinner from '../spinner/spinner.svelte';
   import { formatUnits } from 'ethers';
 
-  export let tokenAddress: string | undefined;
-  export let tokenBalance: bigint | undefined;
-  export let loading = false;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
 
-  export let inputValue: string;
 
-  export let validationState: TextInputValidationState = {
-    type: 'unvalidated',
-  };
 
-  export let topUpMax = false;
 
-  $: if (topUpMax && tokenInfo) {
-    inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
+
+  interface Props {
+    tokenAddress: string | undefined;
+    tokenBalance: bigint | undefined;
+    loading?: boolean;
+    inputValue: string;
+    validationState?: TextInputValidationState;
+    topUpMax?: boolean;
+    amount?: bigint | undefined;
   }
 
-  export let amount: bigint | undefined = undefined;
-  $: {
+  let {
+    tokenAddress,
+    tokenBalance,
+    loading = false,
+    inputValue = $bindable(),
+    validationState = $bindable({
+    type: 'unvalidated',
+  }),
+    topUpMax = $bindable(false),
+    amount = $bindable(undefined)
+  }: Props = $props();
+  let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
+  run(() => {
+    if (topUpMax && tokenInfo) {
+      inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
+    }
+  });
+  run(() => {
     if (tokenBalance === undefined) {
       inputValue = '0';
     }
@@ -57,7 +73,7 @@
     } else {
       validationState = { type: 'unvalidated' };
     }
-  }
+  });
 </script>
 
 <FormField title="Wallet balance">
@@ -93,7 +109,9 @@
     suffix={tokenInfo?.info.symbol}
     disabled={topUpMax || !tokenAddress}
   />
-  <svelte:fragment slot="action">
-    <Toggle bind:checked={topUpMax} label="Max" />
-  </svelte:fragment>
+  {#snippet action()}
+  
+      <Toggle bind:checked={topUpMax} label="Max" />
+    
+  {/snippet}
 </FormField>

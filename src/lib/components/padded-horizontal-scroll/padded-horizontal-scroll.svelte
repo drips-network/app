@@ -1,12 +1,17 @@
 <script lang="ts">
-  export let disableScroll = false;
-  export let innerElem: HTMLDivElement | undefined = undefined;
+  interface Props {
+    disableScroll?: boolean;
+    innerElem?: HTMLDivElement | undefined;
+    children?: import('svelte').Snippet;
+  }
+
+  let { disableScroll = false, innerElem = $bindable(undefined), children }: Props = $props();
 </script>
 
 <div class="wrapper" class:disable-scroll={disableScroll}>
   <div class="inner" bind:this={innerElem}>
     <div class="content">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
   <div class="gradient left-edge"></div>

@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let repoName: string;
-  export let repoOwner: string;
+  interface Props {
+    repoName: string;
+    repoOwner: string;
+  }
+
+  let { repoName, repoOwner }: Props = $props();
 
   const forge = 'github';
 </script>

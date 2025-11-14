@@ -1,9 +1,9 @@
-import type { ComponentType } from 'svelte';
+import type { Component } from 'svelte';
 
 export interface BottomNavItem {
   label: string;
   description?: string;
-  icon: ComponentType;
+  icon: Component<never>;
   href: string;
 }
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import CloseIcon from '$lib/components/icons/CrossSmall.svelte';
 
@@ -12,39 +14,43 @@
   import InfoCircle from '../icons/InfoCircle.svelte';
   import { browser } from '$app/environment';
 
-  let searchTerm: string | undefined;
+  let searchTerm: string | undefined = $state();
 
-  let searchElem: HTMLDivElement;
+  let searchElem: HTMLDivElement = $state();
 
-  export let searchOpen = false;
+  interface Props {
+    searchOpen?: boolean;
+  }
+
+  let { searchOpen = $bindable(false) }: Props = $props();
 
   async function focusOnSearch() {
     await tick();
     searchElem.focus();
   }
 
-  $: {
+  run(() => {
     if (searchOpen && browser) {
       scroll.lock();
       focusOnSearch();
     } else if (browser) {
       scroll.unlock();
     }
-  }
+  });
 
-  $: {
+  run(() => {
     if (!searchOpen) searchTerm = undefined;
-  }
+  });
 
   function closeSearch() {
     searchOpen = false;
   }
 
-  let loading = false;
-  let error = false;
+  let loading = $state(false);
+  let error = $state(false);
 
-  let results: Result[] = [];
-  let resultElems: HTMLElement[] = [];
+  let results: Result[] = $state([]);
+  let resultElems: HTMLElement[] = $state([]);
 
   let searchTimeout: ReturnType<typeof setTimeout>;
   let searchNumber = 0;
@@ -80,7 +86,9 @@
       }
     }, 300);
   }
-  $: handleSearchTermChange(searchTerm);
+  run(() => {
+    handleSearchTermChange(searchTerm);
+  });
 
   function handleKeyboard(e: KeyboardEvent) {
     if (e.metaKey && e.key === 'k') {
@@ -118,7 +126,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeyboard} />
+<svelte:window onkeydown={handleKeyboard} />
 
 {#if searchOpen}
   <div
@@ -136,7 +144,7 @@
         autocomplete="off"
       />
       {#if searchOpen}<div transition:fly={{ duration: 300, y: 4 }}>
-          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
+          <CloseIcon style="cursor: pointer;" onclick={closeSearch} />
         </div>{/if}
     </div>
     {#if searchOpen}
@@ -155,7 +163,7 @@
         class="results"
         data-testid="search-results"
       >
-        <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
+        <Results bind:resultElems {results} {loading} {error} onclick={closeSearch} />
       </div>
     {/if}
   </div>

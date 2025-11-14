@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const IDENTITY_CARD_DRIP_LIST_FRAGMENT = gql`
     fragment IdentityCardDripList on DripList {
       account {
@@ -38,6 +38,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -57,19 +59,32 @@
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
 
-  // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
-  export let address: string | undefined = undefined;
-  export let dripList: IdentityCardDripListFragment | undefined = undefined;
-  export let project: IdentityCardProjectFragment | undefined = undefined;
-  export let ecosystem: IdentityCardEcosystemFragment | undefined = undefined;
-  export let loading = false;
-  export let title: string | undefined = undefined;
-  export let disableLink = false;
+  
+  interface Props {
+    // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
+    address?: string | undefined;
+    dripList?: IdentityCardDripListFragment | undefined;
+    project?: IdentityCardProjectFragment | undefined;
+    ecosystem?: IdentityCardEcosystemFragment | undefined;
+    loading?: boolean;
+    title?: string | undefined;
+    disableLink?: boolean;
+  }
 
-  let avatarImgElem: HTMLImageElement | undefined;
+  let {
+    address = undefined,
+    dripList = undefined,
+    project = undefined,
+    ecosystem = undefined,
+    loading = false,
+    title = undefined,
+    disableLink = false
+  }: Props = $props();
 
-  let link: string | undefined;
-  $: {
+  let avatarImgElem: HTMLImageElement | undefined = $state();
+
+  let link: string | undefined = $state();
+  run(() => {
     switch (true) {
       case disableLink:
         link = undefined;
@@ -84,7 +99,7 @@
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
         break;
     }
-  }
+  });
 </script>
 
 <svelte:element

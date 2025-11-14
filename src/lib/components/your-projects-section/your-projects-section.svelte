@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const PROJECTS_SECTION_PROJECT_FRAGMENT = gql`
     ${PROJECT_CARD_FRAGMENT}
     fragment ProjectsSectionProject on Project {
@@ -22,23 +22,33 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
-  export let projects: ProjectsSectionProjectFragment[];
-  export let withClaimProjectButton = false;
-  export let showVisibilityToggle = false;
 
   let error = false;
 
-  export let collapsed = false;
-  export let collapsable = false;
+  interface Props {
+    projects: ProjectsSectionProjectFragment[];
+    withClaimProjectButton?: boolean;
+    showVisibilityToggle?: boolean;
+    collapsed?: boolean;
+    collapsable?: boolean;
+  }
 
-  let showHidden: boolean = false;
-  $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
+  let {
+    projects,
+    withClaimProjectButton = false,
+    showVisibilityToggle = false,
+    collapsed = $bindable(false),
+    collapsable = $bindable(false)
+  }: Props = $props();
 
-  $: visibleProjects = projects.filter((p) => p.isVisible);
+  let showHidden: boolean = $state(false);
+  let hiddenProjectsCount = $derived(projects.filter((p) => !p.isVisible).length ?? 0);
 
-  $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
+  let visibleProjects = $derived(projects.filter((p) => p.isVisible));
 
-  $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
+  let hiddenProjects = $derived(showHidden ? projects.filter((p) => !p.isVisible) : []);
+
+  let isOwner = $derived($walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId));
 </script>
 
 <Section

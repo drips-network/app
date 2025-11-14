@@ -2,7 +2,11 @@
   import RpgfRoundCard from '$lib/components/rpgf-round-card/rpgf-round-card.svelte';
   import type { Round } from '$lib/utils/rpgf/types/round';
 
-  export let rounds: Round[];
+  interface Props {
+    rounds: Round[];
+  }
+
+  let { rounds }: Props = $props();
 </script>
 
 <div class="drip-list-cards-grid">

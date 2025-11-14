@@ -3,18 +3,30 @@
   import Button from '../button/button.svelte';
   import RpgfSiweButton from '../rpgf-siwe-button/rpgf-siwe-button.svelte';
 
-  export let emoji: string;
-  export let headline: string;
-  export let description: string | undefined = undefined;
-  export let learnMoreLink:
+  interface Props {
+    emoji: string;
+    headline: string;
+    description?: string | undefined;
+    learnMoreLink?: 
     | {
         label: string;
         url: string;
       }
-    | undefined = undefined;
-  export let button: { label: string; handler: () => void } | undefined = undefined;
-  export let secondaryButton: { label: string; handler: () => void } | undefined = undefined;
-  export let showSiweButton = false;
+    | undefined;
+    button?: { label: string; handler: () => void } | undefined;
+    secondaryButton?: { label: string; handler: () => void } | undefined;
+    showSiweButton?: boolean;
+  }
+
+  let {
+    emoji,
+    headline,
+    description = undefined,
+    learnMoreLink = undefined,
+    button = undefined,
+    secondaryButton = undefined,
+    showSiweButton = false
+  }: Props = $props();
 </script>
 
 <div class="large-empty-state">
@@ -29,12 +41,12 @@
         rel="noreferrer">{learnMoreLink.label}</a
       >{/if}
     <div class="buttons">
-      {#if secondaryButton}<Button on:click={secondaryButton.handler}
+      {#if secondaryButton}<Button onclick={secondaryButton.handler}
           >{secondaryButton.label}</Button
         >{/if}
       {#if button}<Button
           variant={secondaryButton ? 'primary' : undefined}
-          on:click={button.handler}>{button.label}</Button
+          onclick={button.handler}>{button.label}</Button
         >{/if}
       {#if showSiweButton}
         <RpgfSiweButton on:signIn></RpgfSiweButton>

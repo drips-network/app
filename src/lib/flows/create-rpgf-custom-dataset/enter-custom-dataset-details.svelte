@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -14,13 +16,17 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let roundId: string;
-  export let existingCustomDatasets: CustomDataset[];
+  interface Props {
+    roundId: string;
+    existingCustomDatasets: CustomDataset[];
+  }
 
-  let nameValue = '';
+  let { roundId, existingCustomDatasets }: Props = $props();
 
-  let nameValidationState: TextInputValidationState;
-  $: {
+  let nameValue = $state('');
+
+  let nameValidationState: TextInputValidationState = $state();
+  run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
     } else if (nameValue.length > 255) {
@@ -35,7 +41,7 @@
     } else {
       nameValidationState = { type: 'valid' };
     }
-  }
+  });
 
   function handleCreate() {
     dispatch('await', {
@@ -64,13 +70,15 @@
     You'll be able to upload the CSV for the dataset after creating it.
   </AnnotationBox>
 
-  <svelte:fragment slot="actions">
-    <Button
-      variant="primary"
-      disabled={nameValidationState.type !== 'valid'}
-      type="submit"
-      icon={CheckCircle}
-      on:click={handleCreate}>Create custom dataset</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        variant="primary"
+        disabled={nameValidationState.type !== 'valid'}
+        type="submit"
+        icon={CheckCircle}
+        onclick={handleCreate}>Create custom dataset</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

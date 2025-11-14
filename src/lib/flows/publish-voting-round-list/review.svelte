@@ -24,8 +24,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let votingRoundId: string;
+  interface Props {
+    context: Writable<State>;
+    votingRoundId: string;
+  }
+
+  let { context, votingRoundId }: Props = $props();
 
   function submit() {
     dispatch(
@@ -116,32 +120,38 @@
 
   <WhatsNextSection>
     <WhatsNextCard>
-      <svelte:fragment slot="title">After transaction confirmation…</svelte:fragment>
-      <svelte:fragment slot="items">
-        <WhatsNextItem icon={DripList}
-          >The published Drip List will appear on your <span class="typo-text-bold"
-            >public profile</span
-          >.</WhatsNextItem
-        >
-        <WhatsNextItem icon={TokenStreams}
-          >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
-          or one-time donations.</WhatsNextItem
-        >
-        <WhatsNextItem icon={Pen}
-          >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
-          round.</WhatsNextItem
-        >
-      </svelte:fragment>
+      {#snippet title()}
+            After transaction confirmation…
+          {/snippet}
+      {#snippet items()}
+          
+          <WhatsNextItem icon={DripList}
+            >The published Drip List will appear on your <span class="typo-text-bold"
+              >public profile</span
+            >.</WhatsNextItem
+          >
+          <WhatsNextItem icon={TokenStreams}
+            >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
+            or one-time donations.</WhatsNextItem
+          >
+          <WhatsNextItem icon={Pen}
+            >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
+            round.</WhatsNextItem
+          >
+        
+          {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button
-      on:click={() => submit()}
-      variant="primary"
-      disabled={Object.keys($context.dripListConfig.weights).length === 0}
-      icon={Wallet}>Confirm in wallet</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button
+        onclick={() => submit()}
+        variant="primary"
+        disabled={Object.keys($context.dripListConfig.weights).length === 0}
+        icon={Wallet}>Confirm in wallet</Button
+      >
+    
+  {/snippet}
 </StepLayout>

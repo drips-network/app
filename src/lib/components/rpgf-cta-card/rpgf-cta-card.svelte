@@ -9,11 +9,15 @@
   import Divider from '../divider/divider.svelte';
   import ArrowRight from '../icons/ArrowRight.svelte';
 
-  export let hasExistingBallot: boolean;
-  export let round: Round;
-  export let signedInUserId: string | null;
-  $: state = round.state;
-  $: isRoundVoter = round.isVoter;
+  interface Props {
+    hasExistingBallot: boolean;
+    round: Round;
+    signedInUserId: string | null;
+  }
+
+  let { hasExistingBallot, round, signedInUserId }: Props = $props();
+  let state = $derived(round.state);
+  let isRoundVoter = $derived(round.isVoter);
 
   const localApplicationDraftExists = signedInUserId
     ? locallyStoredApplicationExists(round.id, signedInUserId)

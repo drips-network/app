@@ -1,12 +1,26 @@
 <script lang="ts">
+  import { stopPropagation } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  export let direction: 'left' | 'right' = 'left';
-  export let width = '24rem';
 
-  export let visible = false;
-  let triggerElem: HTMLDivElement;
+  interface Props {
+    direction?: 'left' | 'right';
+    width?: string;
+    visible?: boolean;
+    trigger?: import('svelte').Snippet;
+    content?: import('svelte').Snippet;
+  }
+
+  let {
+    direction = 'left',
+    width = '24rem',
+    visible = $bindable(false),
+    trigger,
+    content
+  }: Props = $props();
+  let triggerElem: HTMLDivElement = $state();
 
   let timerId: NodeJS.Timeout;
 
@@ -42,22 +56,22 @@
     class="trigger"
     tabindex="0"
     bind:this={triggerElem}
-    on:mouseenter={() => handleHover(true)}
-    on:mouseleave={() => handleHover(false)}
+    onmouseenter={() => handleHover(true)}
+    onmouseleave={() => handleHover(false)}
   >
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="trigger-content"
-      on:keydown={() => handleHover(true)}
-      on:click|stopPropagation={() => handleHover(true)}
+      onkeydown={() => handleHover(true)}
+      onclick={stopPropagation(() => handleHover(true))}
     >
-      <slot name="trigger" />
+      {@render trigger?.()}
     </div>
     {#if visible}
       <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'} style:width>
         <div class="margin"></div>
         <div class="wrapper">
-          <slot name="content" />
+          {@render content?.()}
         </div>
       </div>
     {/if}

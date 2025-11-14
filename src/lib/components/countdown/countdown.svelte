@@ -1,20 +1,26 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 
   const dispatch = createEventDispatcher<{ end: void }>();
 
-  export let targetDate: Date;
+  interface Props {
+    targetDate: Date;
+  }
 
-  let interval: ReturnType<typeof setInterval>;
+  let { targetDate }: Props = $props();
 
-  $: timeLeft = targetDate.getTime() - Date.now();
+  let interval: ReturnType<typeof setInterval> = $state();
 
-  $: {
+  let timeLeft = $derived(targetDate.getTime() - Date.now());
+
+  run(() => {
     if (timeLeft <= 0) {
       clearInterval(interval);
       timeLeft = 0;
     }
-  }
+  });
 
   onMount(() => {
     interval = setInterval(() => {

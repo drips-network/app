@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (tab-1 to tab_1) making the component unusable -->
 <script lang="ts">
   import SegmentedControl from '../segmented-control/segmented-control.svelte';
 

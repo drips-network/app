@@ -21,19 +21,18 @@
   import editRpgfCustomDatasetFlow from '$lib/flows/edit-rpgf-custom-dataset/edit-rpgf-custom-dataset-flow';
   import uploadRpgfCustomDatasetCsvFlow from '$lib/flows/upload-rpgf-custom-dataset-csv/upload-rpgf-custom-dataset-csv-flow';
 
-  export let data;
+  let { data } = $props();
 
   interface CustomDatasetTableRow {
     name: string;
-    visibilityIcon: ComponentProps<VisibilityIcon>;
+    visibilityIcon: ComponentProps<typeof VisibilityIcon>;
     rowCount: string;
-    editButton: ComponentProps<Button>;
-    uploadButton: ComponentProps<Button>;
-    deleteButton: ComponentProps<Button>;
+    editButton: ComponentProps<typeof Button>;
+    uploadButton: ComponentProps<typeof Button>;
+    deleteButton: ComponentProps<typeof Button>;
   }
 
-  let customDatasetTableData: CustomDatasetTableRow[];
-  $: customDatasetTableData = data.customDatasets.map((cds) => ({
+  let customDatasetTableData: CustomDatasetTableRow[] = $derived(data.customDatasets.map((cds) => ({
     name: cds.name,
     visibilityIcon: {
       visible: cds.isPublic,
@@ -73,7 +72,8 @@
         );
       },
     },
-  }));
+  })));
+  
 
   const customDatasetTableColumns: ColumnDef<CustomDatasetTableRow>[] = [
     {
@@ -139,7 +139,7 @@
 
     <Button
       icon={Plus}
-      on:click={() =>
+      onclick={() =>
         modal.show(
           Stepper,
           undefined,

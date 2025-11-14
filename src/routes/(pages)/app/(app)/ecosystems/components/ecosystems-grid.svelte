@@ -7,8 +7,12 @@
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { EcosystemCardFragment } from './__generated__/gql.generated';
 
-  export let ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
-  export let big: boolean = false;
+  interface Props {
+    ecosystems: Array<[EcosystemsListItem, EcosystemCardFragment | undefined]>;
+    big?: boolean;
+  }
+
+  let { ecosystems, big = false }: Props = $props();
 
   const annotation =
     'We’re launching ecosystems with funding from Vitalik, targeting the entire Ethereum community.';
@@ -18,14 +22,18 @@
   {#each ecosystems as ecosystem}
     <PrimaryColorThemer colorHex={ecosystem[0].color}>
       <EcosystemCard ecosystem={ecosystem[0]} ecosystemChainData={ecosystem[1]}>
-        <svelte:fragment slot="banner">
-          <AnnotationBox type="info" overlay size="small">
-            {annotation}
-            <svelte:fragment slot="actions">
-              <Button variant="primary" icon={EcosystemIcon}>View ecosystem</Button>
-            </svelte:fragment>
-          </AnnotationBox>
-        </svelte:fragment>
+        {#snippet banner()}
+              
+            <AnnotationBox type="info" overlay size="small">
+              {annotation}
+              {#snippet actions()}
+                      
+                  <Button variant="primary" icon={EcosystemIcon}>View ecosystem</Button>
+                
+                      {/snippet}
+            </AnnotationBox>
+          
+              {/snippet}
       </EcosystemCard>
     </PrimaryColorThemer>
   {/each}

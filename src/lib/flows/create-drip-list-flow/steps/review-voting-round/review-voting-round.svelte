@@ -26,9 +26,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: formValid = $walletStore.connected;
+  let { context }: Props = $props();
+
+  let formValid = $derived($walletStore.connected);
 
   function submit() {
     dispatch('await', {
@@ -110,11 +114,13 @@
 >
   <FormField title="Name">
     <span class="typo-text">{$context.dripList.title}</span>
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -7 })}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
+          >Edit</Button
+        >
+      
+      {/snippet}
   </FormField>
 
   <FormField title="Description">
@@ -123,11 +129,13 @@
     {:else}
       <span class="typo-text">{$context.dripList.description}</span>
     {/if}
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -7 })}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
+          >Edit</Button
+        >
+      
+      {/snippet}
   </FormField>
 
   <FormField title="Collaborators">
@@ -136,11 +144,13 @@
       weightsMode={false}
       isEditable={false}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+          >Edit</Button
+        >
+      
+      {/snippet}
   </FormField>
 
   <FormField title="Voting ends">
@@ -150,11 +160,13 @@
     <p class="typo-text-small">
       That's {formatDate($context.votingRoundConfig.votingEnds ?? unreachable(), 'verbose')} your time.
     </p>
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+          >Edit</Button
+        >
+      
+      {/snippet}
   </FormField>
 
   <FormField title="Allowed recipients">
@@ -167,47 +179,60 @@
     {:else}
       <span class="typo-text" style:color="var(--color-foreground-level-4)">Any recipient</span>
     {/if}
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={Pen} on:click={() => dispatch('goForward', { by: -6 })}
-        >Edit</Button
-      >
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+          >Edit</Button
+        >
+      
+      {/snippet}
   </FormField>
 
   <WhatsNextSection>
     <WhatsNextCard>
-      <svelte:fragment slot="title">Once confirmed…</svelte:fragment>
-      <svelte:fragment slot="items">
-        <WhatsNextItem icon={Proposals}>
-          Collaborators can begin <span class="typo-text-bold"
-            >voting on which projects and people should receive what percentage of funds</span
-          >.
-        </WhatsNextItem>
-        <WhatsNextItem icon={DripList}>
-          The Drip List will appear on your <span class="typo-text-bold">public profile</span>.
-        </WhatsNextItem>
-      </svelte:fragment>
+      {#snippet title()}
+            Once confirmed…
+          {/snippet}
+      {#snippet items()}
+          
+          <WhatsNextItem icon={Proposals}>
+            Collaborators can begin <span class="typo-text-bold"
+              >voting on which projects and people should receive what percentage of funds</span
+            >.
+          </WhatsNextItem>
+          <WhatsNextItem icon={DripList}>
+            The Drip List will appear on your <span class="typo-text-bold">public profile</span>.
+          </WhatsNextItem>
+        
+          {/snippet}
     </WhatsNextCard>
     <WhatsNextCard>
-      <svelte:fragment slot="title">After the voting period…</svelte:fragment>
-      <svelte:fragment slot="items">
-        <WhatsNextItem icon={ArrowUp}>
-          You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.
-        </WhatsNextItem>
-        <WhatsNextItem icon={Pen}>
-          <span class="typo-text-bold">Edit your Drip List</span> anytime.
-        </WhatsNextItem>
-      </svelte:fragment>
+      {#snippet title()}
+            After the voting period…
+          {/snippet}
+      {#snippet items()}
+          
+          <WhatsNextItem icon={ArrowUp}>
+            You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.
+          </WhatsNextItem>
+          <WhatsNextItem icon={Pen}>
+            <span class="typo-text-bold">Edit your Drip List</span> anytime.
+          </WhatsNextItem>
+        
+          {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
 
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
 
-  <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={Wallet} variant="primary" on:click={submit}
-      >Confirm in wallet</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button disabled={!formValid} icon={Wallet} variant="primary" onclick={submit}
+        >Confirm in wallet</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

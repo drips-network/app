@@ -3,7 +3,11 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   const posts = data.posts;
 </script>

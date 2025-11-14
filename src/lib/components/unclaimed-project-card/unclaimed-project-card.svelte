@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const UNCLAIMED_PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     ${MERGE_WITHDRAWABLE_BALANCES_FRAGMENT}
@@ -42,42 +42,57 @@
 
   const dispatch = createEventDispatcher();
 
-  export let project: UnclaimedProjectCardFragment;
-  export let projectMetadata:
+
+
+
+
+
+
+
+  
+
+  
+  interface Props {
+    project: UnclaimedProjectCardFragment;
+    projectMetadata?: 
     | {
         description?: string | undefined;
         starCount: number;
         forkCount: number;
       }
-    | undefined = undefined;
+    | undefined;
+    unclaimedTokensExpandable?: boolean;
+    unclaimedTokensExpanded?: boolean;
+    showClaimButton?: boolean;
+    claimableTokensKey?: string;
+    /** Show which tokens are collectable / splittable */
+    detailedTokenBreakdown?: boolean;
+    /** Show the project badge with project name */
+    showProjectBadge?: boolean;
+  }
 
-  $: projectChainData = filterCurrentChainData(project.chainData) as UnClaimedProjectData;
-
-  $: collectableFunds = mergeCollectableFunds(projectChainData.withdrawableBalances);
-  $: splittableFunds = mergeSplittableFunds(projectChainData.withdrawableBalances);
-
-  $: mergedUnclaimedFunds = mergeAmounts(collectableFunds, splittableFunds);
-
-  $: hasClaimableFunds = mergedUnclaimedFunds.length > 0;
-
-  $: unclaimedTokenPile = mergedUnclaimedFunds?.map((fund) => ({
+  let {
+    project,
+    projectMetadata = undefined,
+    unclaimedTokensExpandable = true,
+    unclaimedTokensExpanded = $bindable(false),
+    showClaimButton = false,
+    claimableTokensKey = 'Tokens',
+    detailedTokenBreakdown = false,
+    showProjectBadge = true
+  }: Props = $props();
+  let projectChainData = $derived(filterCurrentChainData(project.chainData) as UnClaimedProjectData);
+  let collectableFunds = $derived(mergeCollectableFunds(projectChainData.withdrawableBalances));
+  let splittableFunds = $derived(mergeSplittableFunds(projectChainData.withdrawableBalances));
+  let mergedUnclaimedFunds = $derived(mergeAmounts(collectableFunds, splittableFunds));
+  let hasClaimableFunds = $derived(mergedUnclaimedFunds.length > 0);
+  let unclaimedTokenPile = $derived(mergedUnclaimedFunds?.map((fund) => ({
     component: Token,
     props: {
       address: fund.tokenAddress,
       show: 'none',
     },
-  }));
-
-  export let unclaimedTokensExpandable = true;
-  export let unclaimedTokensExpanded = false;
-  export let showClaimButton = false;
-  export let claimableTokensKey = 'Tokens';
-
-  /** Show which tokens are collectable / splittable */
-  export let detailedTokenBreakdown = false;
-
-  /** Show the project badge with project name */
-  export let showProjectBadge = true;
+  })));
 </script>
 
 <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>
@@ -103,7 +118,7 @@
               {#if unclaimedTokensExpandable}
                 <button
                   class="expand-chevron"
-                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                  onclick={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
                   style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
                 >
                   <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
@@ -125,7 +140,7 @@
 
       {#if hasClaimableFunds && showClaimButton}
         <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
-          <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
+          <Button icon={Wallet} variant="normal" onclick={() => dispatch('claimButtonClick')}
             >Claim funds</Button
           >
         </div>

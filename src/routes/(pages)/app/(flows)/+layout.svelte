@@ -1,6 +1,11 @@
-<script>
+<script lang="ts">
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 </script>
 
 <div class="flow-base-layout">
@@ -8,7 +13,7 @@
     <DripsLogo />
   </a>
   <div class="content">
-    <slot />
+    {@render children?.()}
   </div>
   <LegalLinks />
 </div>

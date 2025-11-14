@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const PROJECTS_LISTINGS_ITEM_FRAGMENT = gql`
@@ -98,11 +98,15 @@
   import onClickGoto from '$lib/utils/on-click-goto';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
   interface ProjectsTableRow {
     badge: { project: ProjectsListingsItemFragment };
-    supportersPile: ComponentProps<Pile>;
-    dependenciesPile: ComponentProps<Pile>;
+    supportersPile: ComponentProps<typeof Pile>;
+    dependenciesPile: ComponentProps<typeof Pile>;
   }
 
   const projectsTableData: ProjectsTableRow[] = data.content.projects

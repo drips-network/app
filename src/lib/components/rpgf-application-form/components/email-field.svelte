@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type {
@@ -7,39 +9,50 @@
   } from '$lib/utils/rpgf/types/application';
   import type { ComponentProps } from 'svelte';
 
-  export let field: ApplicationEmailField;
-  export let answer: ApplicationEmailAnswerDto | undefined = undefined;
-  export let valid: boolean = false;
-  export let forceRevealError: boolean | undefined = undefined;
-
-  let value: string | undefined = answer?.value ?? undefined;
-
-  $: if (value) {
-    answer = {
-      fieldId: field.id,
-      value: value,
-    };
-  } else {
-    answer = undefined;
+  interface Props {
+    field: ApplicationEmailField;
+    answer?: ApplicationEmailAnswerDto | undefined;
+    valid?: boolean;
+    forceRevealError?: boolean | undefined;
   }
 
-  $: hasValidEmail =
-    value !== undefined && value.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  $: {
+  let {
+    field,
+    answer = $bindable(undefined),
+    valid = $bindable(false),
+    forceRevealError = undefined
+  }: Props = $props();
+
+  let value: string | undefined = $state(answer?.value ?? undefined);
+
+  run(() => {
+    if (value) {
+      answer = {
+        fieldId: field.id,
+        value: value,
+      };
+    } else {
+      answer = undefined;
+    }
+  });
+
+  let hasValidEmail =
+    $derived(value !== undefined && value.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+  run(() => {
     if (field.required) {
       valid = hasValidEmail;
     } else {
       valid = true;
     }
-  }
+  });
 
-  let beenFocussed = false;
-  let formFieldValidationState: ComponentProps<FormField>['validationState'];
-  $: formFieldValidationState = valid
+  let beenFocussed = $state(false);
+  let formFieldValidationState: ComponentProps<typeof FormField>['validationState'] = $derived(valid
     ? { type: 'valid' }
     : beenFocussed || forceRevealError
       ? { type: 'invalid', message: 'This field is required and must be a valid email address.' }
-      : { type: 'valid' };
+      : { type: 'valid' });
+  
 </script>
 
 <FormField

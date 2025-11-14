@@ -1,9 +1,13 @@
 <script lang="ts">
   import CheckIcon from '$lib/components/icons/CheckSmall.svelte';
   import { scale } from 'svelte/transition';
-  export let selected: boolean;
-  export let type: 'radio' | 'check' = 'radio';
-  export let focussed = false;
+  interface Props {
+    selected: boolean;
+    type?: 'radio' | 'check';
+    focussed?: boolean;
+  }
+
+  let { selected, type = 'radio', focussed = false }: Props = $props();
 </script>
 
 {#if type === 'radio'}

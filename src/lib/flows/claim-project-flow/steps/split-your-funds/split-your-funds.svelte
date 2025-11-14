@@ -14,7 +14,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
 
   const formValid = true;
 </script>
@@ -42,17 +46,20 @@
     <InfoCircle style="fill: var(--color-foreground-level-6)" />
     <p class="typo-text-small">You’ll list your maintainers and dependencies in the next step.</p>
   </div>
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRight}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        disabled={!formValid}
+        icon={ArrowRight}
+        variant="primary"
+        onclick={() => dispatch('goForward')}>Continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

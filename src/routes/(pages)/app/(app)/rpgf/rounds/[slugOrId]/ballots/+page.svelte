@@ -13,21 +13,21 @@
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import type { ComponentProps } from 'svelte';
 
-  export let data;
+  let { data } = $props();
 
   interface BallotTableRow {
-    voter: ComponentProps<IdentityBadge>;
+    voter: ComponentProps<typeof IdentityBadge>;
     submittedAt: string;
     votesAssigned: string;
   }
 
-  $: tableData = data.ballots.map<BallotTableRow>((ballot) => ({
+  let tableData = $derived(data.ballots.map<BallotTableRow>((ballot) => ({
     voter: {
       address: ballot.user.walletAddress,
     },
     submittedAt: formatDate(ballot.createdAt),
     votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
-  }));
+  })));
 
   const tableColumns: ColumnDef<BallotTableRow>[] = [
     {
@@ -50,11 +50,11 @@
     },
   ];
 
-  $: tableOptions = {
+  let tableOptions = $derived({
     data: tableData,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-  };
+  });
 
   async function handleDownload() {
     const csvContent = await getBallotsCsv(undefined, data.round.id);
@@ -75,7 +75,7 @@
 
   <div class="header">
     <h1>Ballots</h1>
-    <Button icon={Download} variant="ghost" on:click={() => doWithErrorModal(handleDownload)}
+    <Button icon={Download} variant="ghost" onclick={() => doWithErrorModal(handleDownload)}
       >Download CSV</Button
     >
   </div>

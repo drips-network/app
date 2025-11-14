@@ -14,14 +14,23 @@
   import Stepper from '../stepper/stepper.svelte';
   import OrDivider from './components/or-divider.svelte';
 
-  export let roundId: string;
-  export let roundName: string;
-  export let resultsCalculated: boolean;
-  export let resultsPublished: boolean;
+  interface Props {
+    roundId: string;
+    roundName: string;
+    resultsCalculated: boolean;
+    resultsPublished: boolean;
+  }
 
-  let calcMethod = 'avg';
+  let {
+    roundId,
+    roundName,
+    resultsCalculated,
+    resultsPublished
+  }: Props = $props();
 
-  let loading = false;
+  let calcMethod = $state('avg');
+
+  let loading = $state(false);
   async function handleCalculateResults() {
     await doWithErrorModal(
       async () => {
@@ -66,7 +75,7 @@
     );
   }
 
-  let step: 'calculate' | 'publish' | 'published' | 'linked';
+  let step: 'calculate' | 'publish' | 'published' | 'linked' = $state();
   if (resultsPublished) {
     step = 'published';
   } else if (resultsCalculated) {
@@ -101,7 +110,7 @@
       bind:value={calcMethod}
     />
 
-    <Button on:click={handleCalculateResults} {loading} size="large" variant="primary">
+    <Button onclick={handleCalculateResults} {loading} size="large" variant="primary">
       Calculate results
     </Button>
   {:else if step === 'publish'}
@@ -116,13 +125,13 @@
       Filter the view by allocation amount or download a CSV of the results for review on the left.
     </AnnotationBox>
 
-    <Button on:click={handlePublishResults} {loading} size="large" variant="primary">
+    <Button onclick={handlePublishResults} {loading} size="large" variant="primary">
       Publish results
     </Button>
 
     <OrDivider />
 
-    <Button icon={ArrowLeft} on:click={() => (step = 'calculate')} variant="ghost"
+    <Button icon={ArrowLeft} onclick={() => (step = 'calculate')} variant="ghost"
       >Recalculate results</Button
     >
   {:else if step === 'published'}
@@ -134,7 +143,7 @@
     </p>
 
     <Button
-      on:click={() =>
+      onclick={() =>
         modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundId, roundName))}
       icon={DripList}
       size="large"
@@ -144,7 +153,7 @@
     <OrDivider />
 
     <Button
-      on:click={() => modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundId, []))}
+      onclick={() => modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundId, []))}
       >Manually link Drip Lists</Button
     >
   {/if}

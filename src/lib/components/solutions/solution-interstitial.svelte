@@ -1,11 +1,17 @@
-<script>
+<script lang="ts">
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import Button from '../button/button.svelte';
+  interface Props {
+    headline?: import('svelte').Snippet;
+    description?: import('svelte').Snippet;
+  }
+
+  let { headline, description }: Props = $props();
 </script>
 
 <div class="solution-interstitial">
-  <h2 class="pixelated"><slot name="headline"></slot></h2>
-  <p><slot name="description"></slot></p>
+  <h2 class="pixelated">{@render headline?.()}</h2>
+  <p>{@render description?.()}</p>
   <div>
     <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank" rel="noreferrer"
       >Get in touch</Button

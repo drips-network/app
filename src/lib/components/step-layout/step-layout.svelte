@@ -1,18 +1,30 @@
 <script lang="ts">
-  export let center = false;
+  interface Props {
+    center?: boolean;
+    children?: import('svelte').Snippet;
+    left_actions?: import('svelte').Snippet;
+    actions?: import('svelte').Snippet;
+  }
+
+  let {
+    center = false,
+    children,
+    left_actions,
+    actions
+  }: Props = $props();
 </script>
 
 <div class="step-layout" class:center>
   <div class="content">
-    <slot />
+    {@render children?.()}
   </div>
-  {#if $$slots['left-actions'] || $$slots.actions}
+  {#if left_actions || actions}
     <footer class="flex justify-between gap-4">
       <div class="flex gap-2">
-        <slot name="left-actions" />
+        {@render left_actions?.()}
       </div>
       <div class="flex gap-2">
-        <slot name="actions" />
+        {@render actions?.()}
       </div>
     </footer>
   {/if}

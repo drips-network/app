@@ -11,7 +11,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let draftId: string;
+  interface Props {
+    draftId: string;
+  }
+
+  let { draftId }: Props = $props();
 
   async function handleConfirm() {
     dispatch('await', {
@@ -36,8 +40,10 @@
   <AnnotationBox type="warning">
     After publishing, you will no longer be able to edit the round's URL or schedule.
   </AnnotationBox>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => modal.hide()} variant="ghost">Cancel</Button>
-    <Button on:click={handleConfirm} variant="primary">Publish round</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
+      <Button onclick={handleConfirm} variant="primary">Publish round</Button>
+    
+  {/snippet}
 </StepLayout>

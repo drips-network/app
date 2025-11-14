@@ -3,6 +3,10 @@
 </script>
 
 <Flyout>
-  <div slot="trigger">Trigger</div>
-  <div slot="content">Content</div>
+  {#snippet trigger()}
+    <div >Trigger</div>
+  {/snippet}
+  {#snippet content()}
+    <div >Content</div>
+  {/snippet}
 </Flyout>

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const WITHDRAW_FLOW_ENTER_AMOUNT_STEP_BALANCES_FRAGMENT = gql`
     ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
     fragment WithdrawFlowEnterAmountStepBalances on UserBalances {
@@ -11,6 +11,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Button from '$lib/components/button/button.svelte';
   import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -39,22 +41,28 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<WithdrawFlowState>;
+  interface Props {
+    context: Writable<WithdrawFlowState>;
+  }
 
-  $: balance =
-    $context.userOutgoingTokenBalances.find(
+  let { context }: Props = $props();
+
+  let balance =
+    $derived($context.userOutgoingTokenBalances.find(
       (balance) => balance.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
-    ) ?? unreachable();
+    ) ?? unreachable());
 
-  $: currentAmountsStore = streamCurrentAmountsStore(balance.outgoing, $context.tokenAddress);
+  let currentAmountsStore = $derived(streamCurrentAmountsStore(balance.outgoing, $context.tokenAddress));
 
-  $: tokenInfo = tokens.getByAddress($context.tokenAddress) ?? unreachable();
+  let tokenInfo = $derived(tokens.getByAddress($context.tokenAddress) ?? unreachable());
 
-  let amountWei: bigint | undefined;
-  $: if ($context.amount) amountWei = parseTokenAmount($context.amount, tokenInfo.info.decimals);
+  let amountWei: bigint | undefined = $state();
+  run(() => {
+    if ($context.amount) amountWei = parseTokenAmount($context.amount, tokenInfo.info.decimals);
+  });
 
-  let validationState: TextInputValidationState;
-  $: {
+  let validationState: TextInputValidationState = $state();
+  run(() => {
     if ($context.withdrawAll && $currentAmountsStore.currentAmount.amount > 0n) {
       validationState = { type: 'valid' };
     } else if (amountWei && amountWei > 0n) {
@@ -74,7 +82,7 @@
     } else {
       validationState = { type: 'unvalidated' };
     }
-  }
+  });
 
   function triggerWithdraw() {
     dispatch(
@@ -148,15 +156,19 @@
         {validationState}
       />
     {/if}
-    <svelte:fragment slot="action">
-      <Toggle bind:checked={$context.withdrawAll} label="Max" />
-    </svelte:fragment>
+    {#snippet action()}
+      
+        <Toggle bind:checked={$context.withdrawAll} label="Max" />
+      
+      {/snippet}
   </FormField>
   <SafeAppDisclaimer disclaimerType="drips" />
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" disabled={validationState.type !== 'valid'} on:click={triggerWithdraw}
-      >Withdraw</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button variant="primary" disabled={validationState.type !== 'valid'} onclick={triggerWithdraw}
+        >Withdraw</Button
+      >
+    
+  {/snippet}
 </StepLayout>

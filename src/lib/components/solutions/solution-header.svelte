@@ -1,9 +1,19 @@
+<script lang="ts">
+  interface Props {
+    usecase_badge?: import('svelte').Snippet;
+    headline?: import('svelte').Snippet;
+    description?: import('svelte').Snippet;
+  }
+
+  let { usecase_badge, headline, description }: Props = $props();
+</script>
+
 <div class="solution-header">
   <div class="usecase-badge">
-    <span class="typo-header-5"><slot name="usecase-badge"></slot></span>
+    <span class="typo-header-5">{@render usecase_badge?.()}</span>
   </div>
-  <h1><slot name="headline"></slot></h1>
-  <p><slot name="description"></slot></p>
+  <h1>{@render headline?.()}</h1>
+  <p>{@render description?.()}</p>
 </div>
 
 <style>

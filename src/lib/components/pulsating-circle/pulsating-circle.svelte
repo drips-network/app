@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let visible: boolean = true;
-  export let element: HTMLElement | null = null;
-  export let pulseColor = 'var(--color-primary-level-2)';
+  interface Props {
+    visible?: boolean;
+    element?: HTMLElement | null;
+    pulseColor?: string;
+  }
+
+  let { visible = true, element = $bindable(null), pulseColor = 'var(--color-primary-level-2)' }: Props = $props();
 </script>
 
 <div style="--pulse-color: {pulseColor}" class="circle" class:visible bind:this={element}></div>

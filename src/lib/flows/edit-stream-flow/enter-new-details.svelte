@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const EDIT_STREAM_FLOW_STREAM = gql`
@@ -61,35 +61,39 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let stream: EditStreamFlowStreamFragment;
 
-  export let context: Writable<EditStreamFlowState>;
+  interface Props {
+    stream: EditStreamFlowStreamFragment;
+    context: Writable<EditStreamFlowState>;
+  }
+
+  let { stream, context }: Props = $props();
 
   const token = tokens.getByAddress(stream.config.amountPerSecond.tokenAddress) ?? unreachable();
 
-  $: amountLocked = stream.isPaused === true;
+  let amountLocked = $derived(stream.isPaused === true);
 
-  $: newAmountValueParsed = $context.newAmountValue
+  let newAmountValueParsed = $derived($context.newAmountValue
     ? parseTokenAmount(
         $context.newAmountValue,
         token.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
       )
-    : undefined;
+    : undefined);
 
-  $: newAmountPerSecond = newAmountValueParsed
+  let newAmountPerSecond = $derived(newAmountValueParsed
     ? newAmountValueParsed / BigInt($context.newSelectedMultiplier)
-    : undefined;
+    : undefined);
 
-  $: amountValidationState = validateAmtPerSecInput(newAmountPerSecond);
+  let amountValidationState = $derived(validateAmtPerSecInput(newAmountPerSecond));
 
-  $: nameUpdated = $context.newName !== stream.name;
-  $: amountUpdated =
-    newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString();
-  $: canUpdate =
-    newAmountValueParsed &&
+  let nameUpdated = $derived($context.newName !== stream.name);
+  let amountUpdated =
+    $derived(newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString());
+  let canUpdate =
+    $derived(newAmountValueParsed &&
     $context.newName &&
     (nameUpdated || amountUpdated) &&
-    amountValidationState?.type === 'valid';
+    amountValidationState?.type === 'valid');
 
   function updateStream() {
     dispatch(
@@ -195,12 +199,14 @@
     <p class="typo-text">Currently, the stream rate can not be edited for paused streams.</p>
   {/if}
   <SafeAppDisclaimer disclaimerType="drips" />
-  <svelte:fragment slot="actions">
-    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
-    <Button variant="primary" icon={Wallet} on:click={updateStream} disabled={!canUpdate}
-      >Confirm changes</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={modal.hide} variant="ghost">Cancel</Button>
+      <Button variant="primary" icon={Wallet} onclick={updateStream} disabled={!canUpdate}
+        >Confirm changes</Button
+      >
+    
+  {/snippet}
 </StepLayout>
 
 <style>

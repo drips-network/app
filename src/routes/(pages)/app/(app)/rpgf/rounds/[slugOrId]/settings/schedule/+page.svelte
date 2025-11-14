@@ -5,21 +5,21 @@
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
   import { updateRound } from '$lib/utils/rpgf/rpgf.js';
 
-  export let data;
+  let { data } = $props();
 
-  $: published = data.round.published;
+  let published = $derived(data.round.published);
 
-  let updatedRound = { ...data.round };
+  let updatedRound = $state({ ...data.round });
 
   let now = new Date();
 
-  $: changesMade =
-    updatedRound.applicationPeriodStart?.getTime() !==
+  let changesMade =
+    $derived(updatedRound.applicationPeriodStart?.getTime() !==
       data.round.applicationPeriodStart?.getTime() ||
     updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
     updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
     updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
-    updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime();
+    updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime());
 
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {

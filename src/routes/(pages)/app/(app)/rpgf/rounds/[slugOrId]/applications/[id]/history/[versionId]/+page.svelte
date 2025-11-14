@@ -6,9 +6,9 @@
   import RpgfApplicationFormAnswersCard from '$lib/components/rpgf-application-form-answers-card/rpgf-application-form-answers-card.svelte';
   import RpgfApplicationSubmissionDetailsCard from '$lib/components/rpgf-application-submission-details-card/rpgf-application-submission-details-card.svelte';
 
-  export let data;
+  let { data } = $props();
 
-  $: isSubmitter = data.application.submitter.id === data.rpgfUserData?.userId;
+  let isSubmitter = $derived(data.application.submitter.id === data.rpgfUserData?.userId);
 </script>
 
 <div class="page">
@@ -22,12 +22,14 @@
 
   <AnnotationBox type="info">
     You are viewing a historical version of this application.
-    <svelte:fragment slot="actions">
-      <Button
-        href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
-        >View latest version</Button
-      >
-    </svelte:fragment>
+    {#snippet actions()}
+      
+        <Button
+          href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
+          >View latest version</Button
+        >
+      
+      {/snippet}
   </AnnotationBox>
 
   <RpgfApplicationFormAnswersCard

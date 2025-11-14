@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const SUPPORT_CARD_DRIP_LIST_FRAGMENT = gql`
     ${CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT}
     ${DRIP_LIST_BADGE_FRAGMENT}
@@ -51,6 +51,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Heart from '$lib/components/icons/Heart.svelte';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -90,20 +92,30 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
 
-  export let project: SupportCardProjectFragment | undefined = undefined;
-  export let dripList: SupportCardDripListFragment | undefined = undefined;
-  export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
 
-  export let draftListMode = false;
 
-  export let disabled = false;
-  $: {
-    if (!project && !dripList && !ecosystem) disabled = true;
+  interface Props {
+    project?: SupportCardProjectFragment | undefined;
+    dripList?: SupportCardDripListFragment | undefined;
+    ecosystem?: SupportCardEcosystemFragment | undefined;
+    draftListMode?: boolean;
+    disabled?: boolean;
   }
 
-  let type: 'dripList' | 'project' | 'ecosystem' = 'dripList';
+  let {
+    project = undefined,
+    dripList = undefined,
+    ecosystem = undefined,
+    draftListMode = false,
+    disabled = $bindable(false)
+  }: Props = $props();
+  run(() => {
+    if (!project && !dripList && !ecosystem) disabled = true;
+  });
 
-  $: {
+  let type: 'dripList' | 'project' | 'ecosystem' = $state('dripList');
+
+  run(() => {
     switch (true) {
       case !!project:
         type = 'project';
@@ -114,12 +126,12 @@
       default:
         type = 'dripList';
     }
-  }
+  });
 
-  let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
+  let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = $state(undefined);
 
-  let supportUrl: string;
-  $: {
+  let supportUrl: string | undefined = $state();
+  run(() => {
     switch (true) {
       case !!project:
         supportUrl = project.source.url;
@@ -133,9 +145,9 @@
       default:
         supportUrl = '/';
     }
-  }
+  });
 
-  let updating = true;
+  let updating = $state(true);
   async function updateState() {
     updating = true;
 
@@ -181,10 +193,10 @@
 
     updating = false;
   }
-  $: {
+  run(() => {
     $walletStore.connected;
     updateState();
-  }
+  });
 
   function onClickNewStream() {
     let donationFlowStepsInput: Parameters<typeof createStreamFlowSteps>[1];
@@ -208,7 +220,7 @@
   }
 
   async function onClickAddToDripList() {
-    if (!project && !dripList) return;
+    if (!project && !dripList || !supportUrl) return;
 
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
@@ -237,7 +249,7 @@
     return modal.show(Stepper, undefined, createDonationFlowSteps(donationFlowStepsInput));
   }
 
-  let supportMenuOpen = false;
+  let supportMenuOpen = $state(false);
   async function onClickConnectWallet() {
     await walletStore.connect();
     supportMenuOpen = true;

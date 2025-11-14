@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const COLLECT_BUTTON_WITHDRAWABLE_BALANCE_FRAGMENT = gql`
@@ -12,6 +12,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Download from '$lib/components/icons/Download.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { tick } from 'svelte';
@@ -29,42 +31,50 @@
   import Stepper from '../stepper/stepper.svelte';
   import type { CollectButtonWithdrawableBalanceFragment } from './__generated__/gql.generated';
 
-  export let withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
 
-  /** If true, the collectable amount will only briefly peek on screen when updated, rather than staying forever. */
-  export let peekAmount = false;
+  
 
-  /** Bind to this to understand whether the collect button is currently peeking an amount. */
-  export let isPeeking = false;
+  
+  interface Props {
+    withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
+    /** If true, the collectable amount will only briefly peek on screen when updated, rather than staying forever. */
+    peekAmount?: boolean;
+    /** Bind to this to understand whether the collect button is currently peeking an amount. */
+    isPeeking?: boolean;
+  }
 
-  let amountElem: HTMLDivElement;
+  let { withdrawableBalances, peekAmount = false, isPeeking = $bindable(false) }: Props = $props();
+
+  let amountElem: HTMLDivElement = $state();
   let amountElemWidth = tweened(0, { duration: 400, easing: quintInOut });
 
-  $: tokenAddresses = withdrawableBalances?.reduce<string[]>((acc, { tokenAddress }) => {
+  let tokenAddresses = $derived(withdrawableBalances?.reduce<string[]>((acc, { tokenAddress }) => {
     if (tokenAddress) {
       acc.push(tokenAddress);
     }
     return acc;
-  }, []);
+  }, []));
 
   const fiatEstimatesStarted = fiatEstimates.started;
 
-  $: amounts = withdrawableBalances
+  let amounts = $derived(withdrawableBalances
     ?.map(({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
       tokenAddress,
       amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
     }))
-    .filter(({ amount }) => amount > 0n);
+    .filter(({ amount }) => amount > 0n));
 
-  $: tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
-  $: priceReadable =
-    $fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined;
-  $: amount = amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined;
+  run(() => {
+    tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
+  });
+  let priceReadable =
+    $derived($fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined);
+  let amount = $derived(amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined);
 
-  let amountTransitioning = false;
-  let amountToShow: ReturnType<typeof aggregateFiatEstimate> | undefined;
+  let amountTransitioning = $state(false);
+  let amountToShow: ReturnType<typeof aggregateFiatEstimate> | undefined = $state();
 
-  $: loading = !amount || typeof $amount?.fiatEstimateCents !== 'number';
+  let loading = $derived(!amount || typeof $amount?.fiatEstimateCents !== 'number');
 
   async function updateAmountToShow(hide = false) {
     await tick();
@@ -104,15 +114,15 @@
     }
   }
 
-  $: {
+  run(() => {
     $amount;
     loading;
     if (browser && $amount) {
       updateAmountToShow();
     }
-  }
+  });
 
-  $: nothingToCollect = amountToShow?.fiatEstimateCents === 0;
+  let nothingToCollect = $derived(amountToShow?.fiatEstimateCents === 0);
 
   function handleClick() {
     if (amounts) modal.show(Stepper, undefined, globalCollectFlowSteps(amounts));
@@ -121,7 +131,7 @@
 
 <button
   data-testid="global-collect-button"
-  on:click={handleClick}
+  onclick={handleClick}
   disabled={loading}
   class:nothing-to-collect={nothingToCollect}
 >

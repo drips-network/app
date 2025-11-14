@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let isValid = false;` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script lang="ts" context="module">
   export const EDIT_DRIP_LIST_STEP_DRIP_LIST_TO_ADD_FRAGMENT = gql`
     ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
@@ -160,12 +162,12 @@
     bind:isVisible={$state.isVisible}
   >
     <svelte:fragment slot="list-editor-action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
     </svelte:fragment>
   </DripListEditor>
   <svelte:fragment slot="actions">
-    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
-    <Button on:click={submit} disabled={!isValid} icon={Wallet} variant="primary"
+    <Button onclick={modal.hide} variant="ghost">Cancel</Button>
+    <Button onclick={submit} disabled={!isValid} icon={Wallet} variant="primary"
       >Confirm changes</Button
     >
   </svelte:fragment>

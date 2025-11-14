@@ -10,11 +10,15 @@
   import type { Collaborator, VotingRound } from '$lib/utils/multiplayer/schemas';
   import unreachable from '$lib/utils/unreachable';
 
-  export let votingRound: VotingRound;
-  export let collaboratorAddress: string;
-  export let collaborator: Collaborator;
+  interface Props {
+    votingRound: VotingRound;
+    collaboratorAddress: string;
+    collaborator: Collaborator;
+  }
 
-  $: isOwnVote = collaboratorAddress.toLowerCase() === $walletStore.address?.toLowerCase();
+  let { votingRound, collaboratorAddress, collaborator }: Props = $props();
+
+  let isOwnVote = $derived(collaboratorAddress.toLowerCase() === $walletStore.address?.toLowerCase());
 </script>
 
 <div style:display="flex" style:justify-content="center" style:gap="0.5rem">
@@ -29,7 +33,7 @@
     <Button
       icon={collaborator.hasVoted ? undefined : Proposals}
       variant="primary"
-      on:click={() =>
+      onclick={() =>
         modal.show(Stepper, undefined, voteFlowSteps(votingRound, collaborator ?? undefined))}
     >
       {#if collaborator.hasVoted}
@@ -40,7 +44,7 @@
     </Button>
   {:else if collaborator.latestVote}
     <Button
-      on:click={() =>
+      onclick={() =>
         modal.show(
           Stepper,
           undefined,

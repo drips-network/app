@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DRIP_LIST_BADGE_FRAGMENT = gql`
     fragment DripListBadge on DripList {
       chain
@@ -15,6 +15,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import ensStore from '$lib/stores/ens';
   import formatAddress from '$lib/utils/format-address';
   import { gql } from 'graphql-request';
@@ -22,22 +24,38 @@
   import DripListAvatar from '../drip-list-avatar/drip-list-avatar.svelte';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
-  export let dripList: DripListBadgeFragment | undefined;
 
-  export let showOwner = true;
-  export let showName = true;
-  export let isLinked = true;
-  export let showAvatar = true;
-  export let avatarSize: 'tiny' | 'small' = 'small';
-  export let disabled = false;
-  export let outline = false;
-  export let linkToNewTab = false;
+  interface Props {
+    dripList: DripListBadgeFragment | undefined;
+    showOwner?: boolean;
+    showName?: boolean;
+    isLinked?: boolean;
+    showAvatar?: boolean;
+    avatarSize?: 'tiny' | 'small';
+    disabled?: boolean;
+    outline?: boolean;
+    linkToNewTab?: boolean;
+  }
+
+  let {
+    dripList,
+    showOwner = true,
+    showName = true,
+    isLinked = true,
+    showAvatar = true,
+    avatarSize = 'small',
+    disabled = false,
+    outline = false,
+    linkToNewTab = false
+  }: Props = $props();
 
   // lookup ens name if owner is provided
-  $: showOwner && dripList && ensStore.lookup(dripList.owner.address);
-  $: ens = showOwner && dripList ? $ensStore[dripList.owner.address] : {};
-  $: username =
-    ens?.name ?? (dripList && showOwner && formatAddress(dripList.owner.address)) ?? undefined;
+  run(() => {
+    showOwner && dripList && ensStore.lookup(dripList.owner.address);
+  });
+  let ens = $derived(showOwner && dripList ? $ensStore[dripList.owner.address] : {});
+  let username =
+    $derived(ens?.name ?? (dripList && showOwner && formatAddress(dripList.owner.address)) ?? undefined);
 </script>
 
 <svelte:element

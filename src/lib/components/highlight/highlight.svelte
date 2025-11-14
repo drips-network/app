@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import highlightStore from '$lib/stores/highlight/highlight.store';
   import scrollStore from '$lib/stores/scroll/scroll.store';
@@ -7,24 +9,26 @@
   import FocusTrap from '../focus-trap/focus-trap.svelte';
   import Button from '../button/button.svelte';
 
-  let highlightBB = $highlightStore?.element.getBoundingClientRect();
+  let highlightBB = $state($highlightStore?.element.getBoundingClientRect());
   function updateBB() {
     highlightBB = $highlightStore?.element.getBoundingClientRect();
   }
 
-  $: $highlightStore && updateBB();
+  run(() => {
+    $highlightStore && updateBB();
+  });
 
   function dismiss() {
     highlightStore.clearHighlight();
   }
 
-  $: {
+  run(() => {
     if ($highlightStore && browser) {
       scrollStore.lock();
     } else if (browser) {
       scrollStore.unlock();
     }
-  }
+  });
 
   onDestroy(() => {
     browser && scrollStore.unlock();
@@ -38,7 +42,7 @@
         textAlignment: 'left' | 'right';
         alignment: 'top' | 'bottom' | 'left' | 'right';
       }
-    | undefined;
+    | undefined = $state();
   function updateHighlightPos() {
     if (!highlightBB) return;
 
@@ -106,11 +110,11 @@
       alignment,
     };
   }
-  $: {
+  run(() => {
     if ($highlightStore && highlightBB) {
       updateHighlightPos();
     }
-  }
+  });
 
   const ARROWS = {
     left: '←',
@@ -135,8 +139,8 @@
   };
 
   // Observe target element resizes and re-run calculations
-  let observer: ResizeObserver | undefined;
-  $: {
+  let observer: ResizeObserver | undefined = $state();
+  run(() => {
     if ($highlightStore && highlightBB) {
       observer?.disconnect();
       observer = new ResizeObserver(() => {
@@ -147,7 +151,7 @@
     } else {
       observer?.disconnect();
     }
-  }
+  });
 
   function handleClickCatcherEvent(e: MouseEvent | KeyboardEvent) {
     if (
@@ -172,10 +176,10 @@
     }
   }
 
-  let wrapperElem: HTMLDivElement;
+  let wrapperElem: HTMLDivElement = $state();
 </script>
 
-<svelte:window on:keydown={handleWindowKeyboardEvent} />
+<svelte:window onkeydown={handleWindowKeyboardEvent} />
 
 <FocusTrap containers={new Set([wrapperElem])} enabled={Boolean($highlightStore)} />
 
@@ -203,13 +207,13 @@
       <div class="content">
         <h3>{$highlightStore.title}</h3>
         <p style:margin-bottom="0.5rem">{$highlightStore.description}</p>
-        <Button on:click={dismiss}>Got it</Button>
+        <Button onclick={dismiss}>Got it</Button>
       </div>
     </div>
     <!-- Dismisses clicks outside the target -->
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div class="click-preventer" on:click={dismiss}></div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="click-preventer" onclick={dismiss}></div>
     <!-- Catches & forwards clicks on the target -->
     <div
       role="button"
@@ -219,10 +223,10 @@
       style:left="{highlightBB.left - $highlightStore.paddingPx}px"
       style:height="{highlightBB.height + $highlightStore.paddingPx * 2}px"
       style:width="{highlightBB.width + $highlightStore.paddingPx * 2}px"
-      on:mouseenter={handleClickCatcherEvent}
-      on:mouseleave={handleClickCatcherEvent}
-      on:click={handleClickCatcherEvent}
-      on:keydown={handleClickCatcherEvent}
+      onmouseenter={handleClickCatcherEvent}
+      onmouseleave={handleClickCatcherEvent}
+      onclick={handleClickCatcherEvent}
+      onkeydown={handleClickCatcherEvent}
       style:border-radius={$highlightStore.borderRadius}
    ></div>
   </div>

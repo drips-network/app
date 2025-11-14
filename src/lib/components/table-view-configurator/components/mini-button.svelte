@@ -1,16 +1,30 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import { createBubbler } from 'svelte/legacy';
 
-  export let icon: ComponentType;
-  export let highlight = false;
+  const bubble = createBubbler();
+  import type { Component } from 'svelte';
 
-  export let label: string;
 
-  export let open = false;
+
+  interface Props {
+    icon: Component;
+    highlight?: boolean;
+    label: string;
+    open?: boolean;
+  }
+
+  let {
+    icon,
+    highlight = false,
+    label,
+    open = false
+  }: Props = $props();
+
+  const SvelteComponent = $derived(icon);
 </script>
 
-<button class:highlight class:open on:click aria-label={label}>
-  <svelte:component this={icon} style="fill: var(--color-foreground)" />
+<button class:highlight class:open onclick={bubble('click')} aria-label={label}>
+  <SvelteComponent style="fill: var(--color-foreground)" />
 </button>
 
 <style>

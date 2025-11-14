@@ -4,12 +4,16 @@
   import addCustomTokenFlowSteps from '$lib/flows/add-custom-token/add-custom-token-flow-steps';
   import type { createEventDispatcher } from 'svelte';
 
-  export let dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>;
-  export let tokenAddress: string;
+  interface Props {
+    dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>;
+    tokenAddress: string;
+  }
+
+  let { dispatch, tokenAddress }: Props = $props();
 
   function triggerAddTokenSidestep() {
     dispatch('sidestep', addCustomTokenFlowSteps(tokenAddress));
   }
 </script>
 
-<Button variant="normal" on:click={triggerAddTokenSidestep}>Add as custom token</Button>
+<Button variant="normal" onclick={triggerAddTokenSidestep}>Add as custom token</Button>

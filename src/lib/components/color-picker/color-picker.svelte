@@ -1,7 +1,11 @@
 <script lang="ts">
   import possibleColors from '$lib/utils/project/possible-colors';
 
-  export let selectedColor: string | undefined;
+  interface Props {
+    selectedColor: string | undefined;
+  }
+
+  let { selectedColor = $bindable() }: Props = $props();
 </script>
 
 <div class="colors">

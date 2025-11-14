@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -15,13 +17,17 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let customDataset: CustomDataset;
-  export let existingCustomDatasets: CustomDataset[];
+  interface Props {
+    customDataset: CustomDataset;
+    existingCustomDatasets: CustomDataset[];
+  }
 
-  let nameValue = customDataset.name;
+  let { customDataset, existingCustomDatasets }: Props = $props();
 
-  let nameValidationState: TextInputValidationState;
-  $: {
+  let nameValue = $state(customDataset.name);
+
+  let nameValidationState: TextInputValidationState = $state();
+  run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
     } else if (nameValue.length > 255) {
@@ -38,9 +44,9 @@
     } else {
       nameValidationState = { type: 'valid' };
     }
-  }
+  });
 
-  let visible: boolean = customDataset.isPublic;
+  let visible: boolean = $state(customDataset.isPublic);
 
   function handleCreate() {
     dispatch('await', {
@@ -82,13 +88,15 @@
     To edit the dataset contents, click the CSV upload button.
   </AnnotationBox>
 
-  <svelte:fragment slot="actions">
-    <Button
-      variant="primary"
-      disabled={nameValidationState.type !== 'valid'}
-      type="submit"
-      icon={CheckCircle}
-      on:click={handleCreate}>Update custom dataset</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        variant="primary"
+        disabled={nameValidationState.type !== 'valid'}
+        type="submit"
+        icon={CheckCircle}
+        onclick={handleCreate}>Update custom dataset</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

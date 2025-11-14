@@ -1,9 +1,13 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
 
-  export let emoji: string | undefined = undefined;
-  export let headline: string | undefined = undefined;
-  export let description: string | undefined = undefined;
+  interface Props {
+    emoji?: string | undefined;
+    headline?: string | undefined;
+    description?: string | undefined;
+  }
+
+  let { emoji = undefined, headline = undefined, description = undefined }: Props = $props();
 </script>
 
 <div class="step-header">

@@ -10,8 +10,12 @@
     dismiss: void;
   }>();
 
-  export let error: AddItemError | undefined = undefined;
-  let expanded: boolean = false;
+  interface Props {
+    error?: AddItemError | undefined;
+  }
+
+  let { error = undefined }: Props = $props();
+  let expanded: boolean = $state(false);
 </script>
 
 {#if error}
@@ -31,7 +35,7 @@
     <div>
       <button
         transition:slide={{ duration: 300 }}
-        on:click={() => (expanded = !expanded)}
+        onclick={() => (expanded = !expanded)}
         aria-expanded={expanded}
         class="error {error.severity} has-suberrors"
         class:expanded
@@ -49,7 +53,7 @@
               style="fill: var(--color-negative-level-2); width: 1.5rem; height: 1.5rem;"
             />
           </span>
-          <Button variant="destructive" on:click={() => dispatch('dismiss')}>Dismiss</Button>
+          <Button variant="destructive" onclick={() => dispatch('dismiss')}>Dismiss</Button>
         </div>
       </button>
       {#key expanded}

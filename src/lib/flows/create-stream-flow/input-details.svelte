@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const CREATE_STREAM_FLOW_DETAILS_NFT_DRIVER_ACCOUNT_FRAGMENT = gql`
     ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
     fragment CreateStreamFlowDetailsNftDriverAccount on NftDriverAccount {
@@ -82,23 +82,26 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<CreateStreamFlowState>;
+  interface Props {
+    context: Writable<CreateStreamFlowState>;
+  }
 
-  $: nameInputHidden =
-    $context.receiver?.__typename === 'NftDriverAccount' ||
-    $context.receiver?.__typename === 'EcosystemMainAccount';
+  let { context }: Props = $props();
+
+  let nameInputHidden =
+    $derived($context.receiver?.__typename === 'NftDriverAccount' ||
+    $context.receiver?.__typename === 'EcosystemMainAccount');
 
   // Recipient Address
 
-  let recipientInputValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let recipientInputValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
   function onRecipientInputValidationChange(event: CustomEvent) {
     recipientInputValidationState = event.detail ?? { type: 'unvalidated' };
   }
 
   // Token dropdown
 
-  let tokenList: Items;
-  $: tokenList = Object.fromEntries(
+  let tokenList: Items = $derived(Object.fromEntries(
     mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
       const token = tokens.getByAddress(b.tokenAddress);
       if (!token) return undefined;
@@ -128,7 +131,8 @@
         },
       ];
     }),
-  );
+  ));
+  
 
   onMount(() => {
     if ($context.selectedTokenAddress && $context.selectedTokenAddress.length !== 0) return;
@@ -137,69 +141,69 @@
     if (firstToken) $context.selectedTokenAddress = [firstToken];
   });
 
-  $: selectedToken =
-    $context.selectedTokenAddress?.length === 1
+  let selectedToken =
+    $derived($context.selectedTokenAddress?.length === 1
       ? tokens.getByAddress($context.selectedTokenAddress[0])
-      : undefined;
+      : undefined);
 
   // Amount input
 
-  $: amountValueParsed =
-    $context.amountValue && selectedToken
+  let amountValueParsed =
+    $derived($context.amountValue && selectedToken
       ? parseTokenAmount(
           $context.amountValue,
           selectedToken?.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
-      : undefined;
+      : undefined);
 
   // Amount per second
 
-  $: amountPerSecond =
-    amountValueParsed && $context.selectedMultiplier && selectedToken
+  let amountPerSecond =
+    $derived(amountValueParsed && $context.selectedMultiplier && selectedToken
       ? amountValueParsed / BigInt($context.selectedMultiplier)
-      : undefined;
+      : undefined);
 
-  $: amountValidationState = validateAmtPerSecInput(amountPerSecond);
+  let amountValidationState = $derived(validateAmtPerSecInput(amountPerSecond));
 
   // Stream start date
-  $: streamStartDate = parseDate($context.streamStartDateValue).date;
-  $: streamStartDateValidationState = parseDate($context.streamStartDateValue).validationState;
+  let streamStartDate = $derived(parseDate($context.streamStartDateValue).date);
+  let streamStartDateValidationState = $derived(parseDate($context.streamStartDateValue).validationState);
 
   // Stream start time
-  $: streamStartTime = parseTime($context.streamStartTimeValue).time;
-  $: streamStartTimeValidationState = parseTime($context.streamStartTimeValue).validationState;
+  let streamStartTime = $derived(parseTime($context.streamStartTimeValue).time);
+  let streamStartTimeValidationState = $derived(parseTime($context.streamStartTimeValue).validationState);
 
   // Stream end date
-  $: streamEndDate = parseDate($context.streamEndDateValue).date;
-  $: streamEndDateValidationState = parseDate($context.streamEndDateValue).validationState;
+  let streamEndDate = $derived(parseDate($context.streamEndDateValue).date);
+  let streamEndDateValidationState = $derived(parseDate($context.streamEndDateValue).validationState);
 
   // Stream end time
-  $: streamEndTime = parseTime($context.streamEndTimeValue).time;
-  $: streamEndTimeValidationState = parseTime($context.streamEndTimeValue).validationState;
+  let streamEndTime = $derived(parseTime($context.streamEndTimeValue).time);
+  let streamEndTimeValidationState = $derived(parseTime($context.streamEndTimeValue).validationState);
 
-  $: combinedStartDate =
-    streamStartDate &&
+  let combinedStartDate =
+    $derived(streamStartDate &&
     streamStartTime &&
-    combineDateAndTime(streamStartDate ?? unreachable(), streamStartTime ?? unreachable());
+    combineDateAndTime(streamStartDate ?? unreachable(), streamStartTime ?? unreachable()));
 
-  $: combinedEndDate =
-    streamEndDate &&
+  let combinedEndDate =
+    $derived(streamEndDate &&
     streamEndTime &&
-    combineDateAndTime(streamEndDate ?? unreachable(), streamEndTime ?? unreachable());
+    combineDateAndTime(streamEndDate ?? unreachable(), streamEndTime ?? unreachable()));
 
-  $: timeRangeValid =
-    !$context.setStartAndEndDate ||
+  let timeRangeValid =
+    $derived(!$context.setStartAndEndDate ||
     (combinedStartDate &&
       combinedEndDate &&
       combinedStartDate.getTime() > new Date().getTime() &&
-      combinedStartDate?.getTime() < combinedEndDate?.getTime());
+      combinedStartDate?.getTime() < combinedEndDate?.getTime()));
 
-  $: formValid =
-    streamEndDateValidationState.type !== 'invalid' &&
+  let formValid =
+    $derived(streamEndDateValidationState.type !== 'invalid' &&
     ($context.receiver || recipientInputValidationState.type === 'valid') &&
     amountValidationState?.type === 'valid' &&
     (nameInputHidden || $context.streamNameValue) &&
-    timeRangeValid;
+    timeRangeValid);
 
   function submit() {
     dispatch(
@@ -416,28 +420,34 @@
     <WhatsNextSection>
       {@const nextSettlementDate = network.settlement.nextSettlementDate}
       <WhatsNextCard>
-        <svelte:fragment slot="title">When your continuous donation begins...</svelte:fragment>
-        <svelte:fragment slot="items">
-          <WhatsNextItem icon={TransactionsIcon}>
-            Funds sent to {$context.receiver?.__typename === 'EcosystemMainAccount'
-              ? 'Ecosystems'
-              : 'Drip Lists'} on {network.label} are distributed among its recipients
-            <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-          </WhatsNextItem>
-          <WhatsNextItem icon={CalendarIcon}>
-            The next date that accumulated funds will be distributed is <span class="typo-text-bold"
-              >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-            >.
-          </WhatsNextItem>
-        </svelte:fragment>
+        {#snippet title()}
+                When your continuous donation begins...
+              {/snippet}
+        {#snippet items()}
+              
+            <WhatsNextItem icon={TransactionsIcon}>
+              Funds sent to {$context.receiver?.__typename === 'EcosystemMainAccount'
+                ? 'Ecosystems'
+                : 'Drip Lists'} on {network.label} are distributed among its recipients
+              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+            </WhatsNextItem>
+            <WhatsNextItem icon={CalendarIcon}>
+              The next date that accumulated funds will be distributed is <span class="typo-text-bold"
+                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
+              >.
+            </WhatsNextItem>
+          
+              {/snippet}
       </WhatsNextCard>
     </WhatsNextSection>
   {/if}
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button variant="primary" onclick={submit} disabled={!formValid}>Create stream</Button>
+    
+  {/snippet}
 </StepLayout>
 
 <style>

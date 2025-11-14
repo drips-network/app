@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
 
-  let isTouchscreenDevice = false;
+  let isTouchscreenDevice = $state(false);
 
   onMount(() => {
     isTouchscreenDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   });
 
-  let mousePosX = 0;
+  let mousePosX = $state(0);
 
   function handleMouseMove(e: MouseEvent) {
     mousePosX = e.clientX;
@@ -21,7 +23,7 @@
     };
   });
 
-  let coins: SVGGElement[] = [];
+  let coins: SVGGElement[] = $state([]);
   const initialCoinPositions: number[] = [];
 
   onMount(() => {
@@ -34,7 +36,7 @@
 
   const COIN_POS_MULTIPLIERS = [1.9, 0.5, 0.6, 0.3, 1.7];
 
-  $: {
+  run(() => {
     if (!isTouchscreenDevice) {
       coins.forEach((coin, index) => {
         // Multiplier should be min 0, max 40, depending on how far away the mouse is from the coin (the further the mouse, the less the coin moves)
@@ -45,7 +47,7 @@
         coin.style.transform = `translateX(${(distance / 200) * COIN_POS_MULTIPLIERS[index]}px)`;
       });
     }
-  }
+  });
 </script>
 
 <svg

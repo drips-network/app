@@ -5,7 +5,11 @@
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import { slide } from 'svelte/transition';
 
-  export let dismissableId: string;
+  interface Props {
+    dismissableId: string;
+  }
+
+  let { dismissableId }: Props = $props();
 
   async function handleDismiss() {
     dismissablesStore.dismiss(dismissableId);
@@ -19,16 +23,18 @@
         >Please ensure you only split funds to self-custodial ETH addresses. Funds sent directly to
         exchange-managed addresses (e.g. Coinbase) may be lost.</span
       >
-      <svelte:fragment slot="actions">
-        <Button
-          variant="ghost"
-          href="https://docs.drips.network/faq/#can-i-split-or-stream-funds-directly-to-exchange-managed-ethereum-addresses"
-          target="_blank">Learn more</Button
-        >
-        <Button icon={ThumbsUpIcon} variant="destructive" on:click={handleDismiss}
-          >I understand</Button
-        >
-      </svelte:fragment>
+      {#snippet actions()}
+          
+          <Button
+            variant="ghost"
+            href="https://docs.drips.network/faq/#can-i-split-or-stream-funds-directly-to-exchange-managed-ethereum-addresses"
+            target="_blank">Learn more</Button
+          >
+          <Button icon={ThumbsUpIcon} variant="destructive" onclick={handleDismiss}
+            >I understand</Button
+          >
+        
+          {/snippet}
     </AnnotationBox>
   </div>
 {/if}

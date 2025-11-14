@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ADD_ETHEREUM_ADDRESS_STEP_PROJECT_FRAGMENT = gql`
     fragment AddEthereumAddressStepProject on Project {
       source {
@@ -33,20 +33,24 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: network = $walletStore.network.name
+  let { context }: Props = $props();
+
+  let network = $derived($walletStore.network.name
     ? $walletStore.network.name === 'homestead'
       ? 'ethereum'
       : $walletStore.network.name
-    : unreachable();
-  $: editing = $context.funding.object && Object.keys($context.funding.object).length > 0;
-  $: description = editing
+    : unreachable());
+  let editing = $derived($context.funding.object && Object.keys($context.funding.object).length > 0);
+  let description = $derived(editing
     ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
-    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`;
-  $: checkboxLabel = editing
+    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`);
+  let checkboxLabel = $derived(editing
     ? 'I edited the FUNDING.json file'
-    : 'I added the FUNDING.json file to the root of my repo.';
+    : 'I added the FUNDING.json file to the root of my repo.');
 
   onMount(() => {
     $context.linkedToRepo = false;
@@ -127,8 +131,8 @@
     });
   }
 
-  let checked = false;
-  $: formValid = $walletStore.connected && checked;
+  let checked = $state(false);
+  let formValid = $derived($walletStore.connected && checked);
 </script>
 
 <StandaloneFlowStepLayout headline="Verify project ownership" {description}>
@@ -141,12 +145,15 @@
     {editing}
   />
   <Checkbox bind:checked label={checkboxLabel} />
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" on:click={verify}
-      >Verify now</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" onclick={verify}
+        >Verify now</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

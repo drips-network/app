@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { page } from '$app/stores';
   import { fade, fly } from 'svelte/transition';
   import SidenavItem from './components/sidenav-item.svelte';
@@ -6,24 +8,23 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import { forceCollapsed } from './sidenav-store';
 
-  export let items: {
+  interface Props {
+    items: {
     top: SidenavItems;
     bottom: SidenavItems;
   };
+  }
+
+  let { items }: Props = $props();
 
   interface ItemElems {
     [href: string]: HTMLDivElement;
   }
 
-  let itemElems: ItemElems = {};
+  let itemElems: ItemElems = $state({});
 
-  $: activeElem = itemElems[$page.url.pathname];
-  $: {
-    activeElem;
-    updateSelectorPos();
-  }
 
-  let selectorPos: number | undefined = undefined;
+  let selectorPos: number | undefined = $state(undefined);
 
   function updateSelectorPos() {
     if (activeElem) {
@@ -33,25 +34,30 @@
     }
   }
 
-  $: shouldShowTooltips = $forceCollapsed || $breakpointsStore?.breakpoint === 'desktop';
 
-  let hoveringOver: string | undefined = undefined;
+  let hoveringOver: string | undefined = $state(undefined);
+  let activeElem = $derived(itemElems[$page.url.pathname]);
+  run(() => {
+    activeElem;
+    updateSelectorPos();
+  });
+  let shouldShowTooltips = $derived($forceCollapsed || $breakpointsStore?.breakpoint === 'desktop');
 </script>
 
-<svelte:window on:resize={updateSelectorPos} />
+<svelte:window onresize={updateSelectorPos} />
 
 <nav class="sidenav" class:force-collapsed={$forceCollapsed}>
   {#each Object.values(items) as block}
     <div class="block">
       {#each block as item}
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
           style="position: relative"
           bind:this={itemElems[item.href]}
-          on:mouseenter={() => (hoveringOver = item.href)}
-          on:focusin={() => (hoveringOver = item.href)}
-          on:mouseleave={() => (hoveringOver = undefined)}
-          on:focusout={() => (hoveringOver = undefined)}
+          onmouseenter={() => (hoveringOver = item.href)}
+          onfocusin={() => (hoveringOver = item.href)}
+          onmouseleave={() => (hoveringOver = undefined)}
+          onfocusout={() => (hoveringOver = undefined)}
         >
           <SidenavItem {...item} active={$page.url.pathname === item.href} />
           {#if shouldShowTooltips && hoveringOver === item.href}

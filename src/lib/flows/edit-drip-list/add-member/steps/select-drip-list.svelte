@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let selected: string[] = [];` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script context="module">
   export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
@@ -175,16 +177,16 @@
     </div>
     <Button
       icon={Plus}
-      on:click={() => {
+      onclick={() => {
         modal.hide();
         goto(buildUrl('/app/funder-onboarding', { urlToAdd }));
       }}>Create new Drip List</Button
     >
   </FormField>
   <svelte:fragment slot="actions">
-    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
+    <Button onclick={modal.hide} variant="ghost">Cancel</Button>
     <Button
-      on:click={submit}
+      onclick={submit}
       disabled={selected[0] === undefined}
       icon={DripListIcon}
       variant="primary">Add</Button

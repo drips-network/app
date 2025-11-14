@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
-  import type { ComponentType } from 'svelte';
+<script lang="ts" module>
+  import type { Component } from 'svelte';
 
   export type TDropdownOption = {
-    icon?: ComponentType;
+    icon?: Component;
     label: string;
   };
 
@@ -10,29 +10,38 @@
 </script>
 
 <script lang="ts" generics="TOptions extends TDropdownOptions">
+  import { run } from 'svelte/legacy';
+
   import { fly } from 'svelte/transition';
 
   import Check from '$lib/components/icons/Check.svelte';
   import MiniButton from './mini-button.svelte';
 
-  export let icon: ComponentType;
-
-  export let options: TOptions;
-  export let value: keyof TOptions | null = null;
-
-  export let label: string;
-
-  export let allowNull = false;
-
-  export let open = false;
-
-  export let highlightIfSet = false;
-
-  export let disabled = false;
-
-  export let onOptionClick:
+  interface Props {
+    icon: Component;
+    options: TOptions;
+    value?: keyof TOptions | null;
+    label: string;
+    allowNull?: boolean;
+    open?: boolean;
+    highlightIfSet?: boolean;
+    disabled?: boolean;
+    onOptionClick?: 
     | ((key: keyof TOptions, selectFn: () => void, isSelected: boolean) => void)
-    | undefined = undefined;
+    | undefined;
+  }
+
+  let {
+    icon,
+    options,
+    value = $bindable(null),
+    label,
+    allowNull = false,
+    open = $bindable(false),
+    highlightIfSet = false,
+    disabled = false,
+    onOptionClick = undefined
+  }: Props = $props();
 
   function handleClick() {
     open = !open;
@@ -57,9 +66,9 @@
     selectFn(key);
   }
 
-  let dropdownElem: HTMLUListElement | undefined = undefined;
-  let toggleButtonElem: HTMLButtonElement | undefined = undefined;
-  let dropdownPosition = { top: 0, right: 0 };
+  let dropdownElem: HTMLUListElement | undefined = $state(undefined);
+  let toggleButtonElem: HTMLButtonElement | undefined = $state(undefined);
+  let dropdownPosition = $state({ top: 0, right: 0 });
 
   function updateDropdownPosition() {
     if (toggleButtonElem && typeof window !== 'undefined') {
@@ -86,14 +95,16 @@
     open = false;
   }
 
-  $: if (open && toggleButtonElem) {
-    updateDropdownPosition();
-  }
+  run(() => {
+    if (open && toggleButtonElem) {
+      updateDropdownPosition();
+    }
+  });
 
   const ariaSlug = `mini-dropdown-${Math.random().toString(36).substring(2, 15)}`;
 </script>
 
-<svelte:window on:click={handleWindowClick} on:resize={handleWindowResize} />
+<svelte:window onclick={handleWindowClick} onresize={handleWindowResize} />
 
 <div class="mini-dropdown" class:open class:highlight={highlightIfSet && value}>
   <button
@@ -102,7 +113,7 @@
     role="combobox"
     aria-controls="select-dropdown-{ariaSlug}"
     aria-expanded={open}
-    on:click={handleClick}
+    onclick={handleClick}
     aria-label="Toggle dropdown"
     bind:this={toggleButtonElem}
   >
@@ -129,15 +140,15 @@
           role="option"
           aria-selected={value === key}
           class:selected={value === key}
-          on:click={() => handleOptionClick(key)}
-          on:keydown={(e) => {
+          onclick={() => handleOptionClick(key)}
+          onkeydown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               handleOptionClick(key);
             }
           }}
         >
           {#if item.icon}
-            <svelte:component this={item.icon} style="fill: var(--color-foreground)" />
+            <item.icon style="fill: var(--color-foreground)" />
           {/if}
 
           <button>

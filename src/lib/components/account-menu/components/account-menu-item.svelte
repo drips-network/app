@@ -1,26 +1,44 @@
 <script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import type { ComponentType } from 'svelte';
 
-  export let disabled = false;
-  export let icon: ComponentType | undefined = undefined;
-  export let href: string | undefined = undefined;
+  interface Props {
+    disabled?: boolean;
+    icon?: ComponentType | undefined;
+    href?: string | undefined;
+    left?: import('svelte').Snippet;
+    title?: import('svelte').Snippet;
+    right?: import('svelte').Snippet;
+  }
+
+  let {
+    disabled = false,
+    icon = undefined,
+    href = undefined,
+    left,
+    title,
+    right
+  }: Props = $props();
 </script>
 
-<a {href} on:click class:disabled class:clickable={href} class="account-menu-item-wrapper">
+<a {href} onclick={bubble('click')} class:disabled class:clickable={href} class="account-menu-item-wrapper">
   {#if !icon}
-    <slot name="left" />
+    {@render left?.()}
   {:else}
     <div class="icon-wrapper">
-      {#if icon}<svelte:component this={icon} style="fill: var(--color-background)" />{/if}
+      {#if icon}{@const SvelteComponent = icon}
+      {#if icon}<SvelteComponent style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
   <div class="description typo-text">
-    <slot name="title" />
+    {@render title?.()}
   </div>
-  <slot name="right">
+  {#if right}{@render right()}{:else}
     <ChevronRight />
-  </slot>
+  {/if}
 </a>
 
 <style>

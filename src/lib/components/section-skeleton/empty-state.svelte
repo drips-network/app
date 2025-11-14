@@ -2,9 +2,13 @@
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import { fade } from 'svelte/transition';
 
-  export let emoji: string = '🫙';
-  export let headline: string | undefined = 'Nothing to see here';
-  export let text: string | undefined = 'Please add stuff to this section to see it here.';
+  interface Props {
+    emoji?: string;
+    headline?: string | undefined;
+    text?: string | undefined;
+  }
+
+  let { emoji = '🫙', headline = 'Nothing to see here', text = 'Please add stuff to this section to see it here.' }: Props = $props();
 </script>
 
 <div class="notice empty-state" in:fade={{ duration: 250 }}>

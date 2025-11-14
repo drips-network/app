@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import type { DripListResult, ProjectResult, Result as ResultType } from '../types';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import network from '$lib/stores/wallet/network';
@@ -7,9 +10,13 @@
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
 
-  export let item: ResultType;
 
-  export let element: HTMLElement;
+  interface Props {
+    item: ResultType;
+    element: HTMLElement;
+  }
+
+  let { item, element = $bindable() }: Props = $props();
 
   function splitGitHubUrl(url: string) {
     const [owner, repo] = url.split('/').slice(-2);
@@ -77,7 +84,7 @@
     bind:this={element}
     class="search-result typo-text"
     href={`/app/projects/github/${owner}/${repo}?exact`}
-    on:click
+    onclick={bubble('click')}
   >
     {#if avatarConfig.__typename === 'ClaimedProjectData'}
       <div style:margin-right="-1.25rem">
@@ -94,7 +101,7 @@
     bind:this={element}
     class="search-result typo-text"
     href={`/app/drip-lists/${item.id}`}
-    on:click
+    onclick={bubble('click')}
   >
     <span style:display="flex" style:align-items="center" style:min-width="0">
       <DripListBadge showName={false} dripList={makeFakeDripListBadgeType(item)} />
@@ -104,7 +111,7 @@
     </span>
   </a>
 {:else if item.type === 'address'}
-  <a bind:this={element} class="search-result typo-text" href={`/app/${item.address}`} on:click>
+  <a bind:this={element} class="search-result typo-text" href={`/app/${item.address}`} onclick={bubble('click')}>
     <IdentityBadge size="medium" disableTooltip={true} address={item.address} />
   </a>
 {/if}

@@ -4,9 +4,19 @@
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import { fade } from 'svelte/transition';
 
-  export let title: string;
-  export let isPrivate: boolean = false;
-  export let hidden: boolean = false;
+  interface Props {
+    title: string;
+    isPrivate?: boolean;
+    hidden?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    title,
+    isPrivate = false,
+    hidden = false,
+    children
+  }: Props = $props();
 </script>
 
 <div class="field">
@@ -16,9 +26,12 @@
     {#if isPrivate}
       <div style:cursor="help" style:width="fit-content">
         <Tooltip>
-          <svelte:fragment slot="tooltip-content">
-            This field is private and only visible to admins or the applicant.
-          </svelte:fragment>
+          <!-- @migration-task: migrate this slot by hand, `tooltip-content` is an invalid identifier -->
+  {#snippet tooltip_content()}
+                  
+              This field is private and only visible to admins or the applicant.
+            
+                  {/snippet}
           <Lock />
         </Tooltip>
       </div>
@@ -28,7 +41,7 @@
   <span class="typo-text content">
     <div class="inner">
       <div class="wrapper" class:is-hidden={hidden}>
-        <slot />
+        {@render children?.()}
       </div>
 
       {#if hidden}

@@ -6,12 +6,15 @@
   import type { ComponentProps } from 'svelte';
   import Button from './button.svelte';
 
-  export let label: string;
-  export let onClick: () => void;
+  interface Props {
+    label: string;
+    onClick: () => void;
+    buttonProps?: ComponentProps<typeof Button>;
+  }
 
-  export let buttonProps: ComponentProps<Button> = {};
+  let { label, onClick, buttonProps = {} }: Props = $props();
 </script>
 
-<Button on:click={onClick} {...buttonProps}>
+<Button onclick={onClick} {...buttonProps}>
   {label}
 </Button>

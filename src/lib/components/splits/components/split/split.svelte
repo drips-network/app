@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -21,34 +23,54 @@
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
-  export let split: SplitsComponentSplitsReceiver | SplitGroup;
-  export let disableLink = true;
-  export let linkToNewTab = false;
-  export let isNested = false;
-  export let draft = false;
 
-  /** Set to false to hide the chevron next to split groups. */
-  export let groupsExpandable = true;
+  
 
-  /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
-  export let isLast = false;
-  /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
-  export let isFirst = false;
+  
+  
 
-  export let disableTooltip = false;
 
-  /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
-  export let chainOverride: SupportedChain | undefined = undefined;
+  
 
-  let element: HTMLDivElement;
+  let element: HTMLDivElement = $state();
 
-  export let groupExpanded = false;
+  interface Props {
+    split: SplitsComponentSplitsReceiver | SplitGroup;
+    disableLink?: boolean;
+    linkToNewTab?: boolean;
+    isNested?: boolean;
+    draft?: boolean;
+    /** Set to false to hide the chevron next to split groups. */
+    groupsExpandable?: boolean;
+    /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
+    isLast?: boolean;
+    /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
+    isFirst?: boolean;
+    disableTooltip?: boolean;
+    /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
+    chainOverride?: SupportedChain | undefined;
+    groupExpanded?: boolean;
+  }
 
-  $: primaryColor = element
+  let {
+    split,
+    disableLink = true,
+    linkToNewTab = false,
+    isNested = false,
+    draft = false,
+    groupsExpandable = true,
+    isLast = false,
+    isFirst = false,
+    disableTooltip = false,
+    chainOverride = undefined,
+    groupExpanded = $bindable(false)
+  }: Props = $props();
+
+  let primaryColor = $derived(element
     ? getComputedStyle(element).getPropertyValue('--color-primary')
-    : undefined;
+    : undefined);
 
-  $: percentageTextColor = primaryColor ? getContrastColor(primaryColor) : 'white';
+  let percentageTextColor = $derived(primaryColor ? getContrastColor(primaryColor) : 'white');
 
   function calcGroupWeight(group: SplitGroup): number {
     return group.list.reduce(
@@ -112,11 +134,11 @@
   }
 
   const GROUP_EXPAND_DURATION = 300;
-  let groupElem: HTMLDivElement | undefined;
+  let groupElem: HTMLDivElement | undefined = $state();
   let groupHeight = tweened(48, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
-  let groupHeightAnimating = false;
+  let groupHeightAnimating = $state(false);
 
-  let groupPileElem: HTMLDivElement | undefined;
+  let groupPileElem: HTMLDivElement | undefined = $state();
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
   async function alignGroupName() {
@@ -126,7 +148,9 @@
 
   // Align group name on mount, when splits change, and on a mutation of groupPileElem
   onMount(alignGroupName);
-  $: split && alignGroupName();
+  run(() => {
+    split && alignGroupName();
+  });
 
   async function toggleGroup() {
     if (!groupElem) return;
@@ -222,7 +246,7 @@
           bind:this={groupElem}
           style:height={groupHeightAnimating ? `${$groupHeight}px` : 'auto'}
         >
-          <button class="name" on:click={toggleGroup}>
+          <button class="name" onclick={toggleGroup}>
             <div class="pile" bind:this={groupPileElem}>
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>

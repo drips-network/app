@@ -1,9 +1,13 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
 
-  export let src: string;
+  interface Props {
+    src: string;
+  }
 
-  let consented = false;
+  let { src }: Props = $props();
+
+  let consented = $state(false);
 </script>
 
 <div class="video-container">
@@ -14,7 +18,7 @@
           This content is provided by YouTube. By loading the video, you consent to YouTube's Terms
           of Service and Privacy Policy.
         </p>
-        <Button on:click={() => (consented = true)}>Load YouTube video</Button>
+        <Button onclick={() => (consented = true)}>Load YouTube video</Button>
       </div>
     </div>
   {:else}

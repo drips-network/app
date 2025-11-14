@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { fly } from 'svelte/transition';
   import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
   import type {
@@ -19,28 +21,40 @@
 
   const dispatch = createEventDispatcher<{ stepChange: void }>();
 
-  export let steps: Steps;
-  export let context: (() => Writable<unknown>) | undefined = undefined;
   const resolvedContext = context?.();
-  export let minHeightPx = 0;
 
-  export let noTransitions = browser
+
+  let stepElement: HTMLDivElement = $state();
+
+  let internalSteps = $state(steps);
+
+  let resolvedSteps = $state(internalSteps.map((someStep) => someStep((i) => i)));
+  run(() => {
+    resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
+  });
+
+  interface Props {
+    steps: Steps;
+    context?: (() => Writable<unknown>) | undefined;
+    minHeightPx?: number;
+    noTransitions?: any;
+    currentStepIndex?: any;
+  }
+
+  let {
+    steps,
+    context = undefined,
+    minHeightPx = 0,
+    noTransitions = browser
     ? window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true
-    : false;
+    : false,
+    currentStepIndex = $bindable(nextValidStepIndex(0, 'forward'))
+  }: Props = $props();
+  let currentStep = $derived(resolvedSteps[currentStepIndex]);
 
-  let stepElement: HTMLDivElement;
-
-  let internalSteps = steps;
-
-  let resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
-  $: resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
-
-  export let currentStepIndex = nextValidStepIndex(0, 'forward');
-  $: currentStep = resolvedSteps[currentStepIndex];
-
-  let prevStepIndex = 0;
-  let direction: 'forward' | 'backward' = 'forward';
-  $: {
+  let prevStepIndex = $state(0);
+  let direction: 'forward' | 'backward' = $state('forward');
+  run(() => {
     if (currentStepIndex > prevStepIndex) {
       direction = 'forward';
     } else if (currentStepIndex < prevStepIndex) {
@@ -48,7 +62,7 @@
     }
 
     prevStepIndex = currentStepIndex;
-  }
+  });
 
   function nextValidStepIndex(startIndex: number, direction: 'forward' | 'backward') {
     let index = startIndex;
@@ -112,7 +126,7 @@
     return { x, duration: 300, easing: cubicInOut };
   }
 
-  let transitioning = false;
+  let transitioning = $state(false);
   let transitionEndListener: (() => void) | undefined = undefined;
 
   function setTransitioning(newVal: boolean) {
@@ -157,8 +171,8 @@
     move(event.detail?.by ?? 1);
   }
 
-  let awaiting: AwaitPendingPayload | undefined;
-  let awaitError: Error | undefined;
+  let awaiting: AwaitPendingPayload | undefined = $state();
+  let awaitError: Error | undefined = $state();
 
   function handleAwait(event: CustomEvent<AwaitPendingPayload>) {
     if (transacting) {
@@ -184,7 +198,7 @@
     awaitError = undefined;
   }
 
-  let transacting: SomeTransactPayload | undefined;
+  let transacting: SomeTransactPayload | undefined = $state();
 
   function handleTransact(event: CustomEvent<SomeTransactPayload>) {
     if (awaiting) {
@@ -276,13 +290,13 @@
     }
   }
 
-  $: {
+  run(() => {
     currentStep;
     awaitError;
     awaiting;
     transacting;
     updateMutationObserver();
-  }
+  });
 
   onMount(() => {
     const windowResizeListener = () => updateContainerHeight();
@@ -296,8 +310,7 @@
 
 {#if currentStep?.staticHeaderComponent}
   <div class="static-header">
-    <svelte:component
-      this={currentStep.staticHeaderComponent.component}
+    <currentStep.staticHeaderComponent.component
       {...currentStep.staticHeaderComponent.props}
     />
   </div>
@@ -312,8 +325,8 @@
     <div
       in:fly={(() => getTransition('in'))()}
       out:fly={(() => getTransition('out'))()}
-      on:outrostart={() => setTransitioning(true)}
-      on:introend={() => setTransitioning(false)}
+      onoutrostart={() => setTransitioning(true)}
+      onintroend={() => setTransitioning(false)}
       class="step-wrapper"
     >
       <div class="step" bind:this={stepElement}>
@@ -328,8 +341,7 @@
             on:startOver={handleTransactStartOver}
           />
         {:else}
-          <svelte:component
-            this={currentStep.component}
+          <currentStep.component
             on:await={handleAwait}
             on:transact={handleTransact}
             on:goForward={handleGoForward}

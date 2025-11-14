@@ -1,37 +1,48 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import Button from '../button/button.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 
-  export let icon: ComponentType | undefined = undefined;
-  export let label: string;
-  export let actions: {
-    handler?: (event: MouseEvent) => void;
-    href?: string;
-    target?: string;
-    label?: string;
-    icon?: ComponentType;
-    variant?: 'primary';
-    disabled?: boolean;
-    loading?: boolean;
-  }[] = [];
-  export let actionsDisabled = false;
-  export let anchorTarget: string | undefined = undefined;
+  interface Props {
+    icon?: Component | undefined;
+    label: string;
+    actions?: {
+      handler?: (event: MouseEvent) => void;
+      href?: string;
+      target?: string;
+      label?: string;
+      icon?: Component;
+      variant?: 'primary';
+      disabled?: boolean;
+      loading?: boolean;
+    }[];
+    actionsDisabled?: boolean;
+    anchorTarget?: string | undefined;
+    infoTooltip?: string | undefined;
+    collapsed?: boolean;
+    collapsable?: boolean;
+  }
 
-  export let infoTooltip: string | undefined = undefined;
-
-  export let collapsed = true;
-  export let collapsable = false;
+  let {
+    icon = undefined,
+    label,
+    actions = [],
+    actionsDisabled = false,
+    anchorTarget = undefined,
+    infoTooltip = undefined,
+    collapsed = $bindable(true),
+    collapsable = $bindable(false),
+  }: Props = $props();
 </script>
 
-<!--svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!--svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="section-header"
   class:has-actions={actions.length > 0}
-  on:click={() => (collapsable ? (collapsed = !collapsed) : undefined)}
+  onclick={() => (collapsable ? (collapsed = !collapsed) : undefined)}
   class:collapsed
   class:collapsable
 >
@@ -41,17 +52,18 @@
 
   <div class="title">
     {#if icon}
+      {@const SvelteComponent = icon}
       <div data-testid="section-icon" class="icon-wrapper icon-primary">
-        <svelte:component this={icon} style="fill: var(--color-primary-level-6)" />
+        <SvelteComponent style="fill: var(--color-primary-level-6)" />
       </div>
     {/if}
     <h3>{label}</h3>
     {#if infoTooltip}
       <Tooltip>
         <InfoCircle style="height: 1.5rem; width: 1.5rem;" />
-        <svelte:fragment slot="tooltip-content">
+        {#snippet tooltip_content()}
           {infoTooltip}
-        </svelte:fragment>
+        {/snippet}
       </Tooltip>
     {/if}
     {#if collapsable}
@@ -69,7 +81,7 @@
         icon={action.icon}
         href={action.href}
         target={action.target}
-        on:click={action.handler}>{action.label}</Button
+        onclick={action.handler}>{action.label}</Button
       >
     {/each}
   </div>

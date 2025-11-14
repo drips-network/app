@@ -12,7 +12,7 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  $: formValid = $walletStore.connected;
+  let formValid = $derived($walletStore.connected);
 </script>
 
 <StandaloneFlowStepLayout
@@ -27,15 +27,18 @@
       </div>
     {/if}
   </FormField>
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={ArrowRightIcon}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        disabled={!formValid}
+        icon={ArrowRightIcon}
+        variant="primary"
+        onclick={() => dispatch('goForward')}>Continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>

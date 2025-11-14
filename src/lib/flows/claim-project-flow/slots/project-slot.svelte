@@ -2,7 +2,11 @@
   import type { ProjectBadgeFragment } from '$lib/components/project-badge/__generated__/gql.generated';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
 
-  export let project: ProjectBadgeFragment;
+  interface Props {
+    project: ProjectBadgeFragment;
+  }
+
+  let { project }: Props = $props();
 </script>
 
 <ProjectBadge linkToNewTab {project} />

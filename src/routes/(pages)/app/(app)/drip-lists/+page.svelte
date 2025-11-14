@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT = gql`
     ${DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT}
     fragment DripListsPageDripList on DripList {
@@ -26,37 +26,47 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import launchCreateDripList from '../../../../../lib/utils/launch-create-drip-list';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 </script>
 
 <HeadMeta title="Drip List" />
 
 <div class="page">
   <EduCard dismissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
-    <svelte:fragment slot="text">
-      <h1 class="pixelated">What’s a Drip List?</h1>
-      <p>
-        A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
-        address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
-        determines the amount of funds they receive when funds are sent to the list.
-        <a
-          class="typo-link"
-          href="https://docs.drips.network/support-your-dependencies/overview"
-          target="_blank">Learn more</a
+    {#snippet text()}
+      
+        <h1 class="pixelated">What’s a Drip List?</h1>
+        <p>
+          A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
+          address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
+          determines the amount of funds they receive when funds are sent to the list.
+          <a
+            class="typo-link"
+            href="https://docs.drips.network/support-your-dependencies/overview"
+            target="_blank">Learn more</a
+          >
+        </p>
+      
+      {/snippet}
+    {#snippet buttons()}
+      
+        <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
+          >Create a Drip List</Button
         >
-      </p>
-    </svelte:fragment>
-    <svelte:fragment slot="buttons">
-      <Button icon={Plus} variant="primary" on:click={launchCreateDripList}
-        >Create a Drip List</Button
-      >
-    </svelte:fragment>
-    <svelte:fragment slot="illustration">
-      <div class="edu-card-illustration-bg"></div>
-      <div class="edu-card-illustration-wrapper">
-        <DripList />
-      </div>
-    </svelte:fragment>
+      
+      {/snippet}
+    {#snippet illustration()}
+      
+        <div class="edu-card-illustration-bg"></div>
+        <div class="edu-card-illustration-wrapper">
+          <DripList />
+        </div>
+      
+      {/snippet}
   </EduCard>
 
   <YourDripListsSection

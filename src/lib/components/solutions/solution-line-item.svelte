@@ -1,12 +1,19 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let icon: ComponentType;
+  interface Props {
+    icon: Component;
+    children?: import('svelte').Snippet;
+  }
+
+  let { icon, children }: Props = $props();
+
+  const SvelteComponent = $derived(icon);
 </script>
 
 <div class="solution-line-item">
-  <svelte:component this={icon} />
-  <slot></slot>
+  <SvelteComponent />
+  {@render children?.()}
 </div>
 
 <style>
@@ -15,9 +22,5 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0;
-  }
-
-  .solution-line-item > * {
-    flex-shrink: 0;
   }
 </style>

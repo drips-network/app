@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { PROJECT_PROFILE_HEADER_FRAGMENT } from '../project-profile-header/project-profile-header.svelte';
 
   export const PROJECT_CUSTOMIZER_FRAGMENT = gql`
@@ -24,6 +24,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
   import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
@@ -36,40 +38,40 @@
   import EmojiPicker from '../emoji-picker/emoji-picker.svelte';
   import ColorPicker from '../color-picker/color-picker.svelte';
 
-  export let originalProject: ProjectCustomizerFragment;
-  export let newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
 
   let activeTab: 'tab-1' | 'tab-2' =
-    $newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2';
+    $state($newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2');
 
   let selectedEmoji =
-    $newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧';
+    $state($newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧');
   function handleEmojiChange(newEmoji: string) {
     $newProjectData.avatar = {
       __typename: 'EmojiAvatar',
       emoji: newEmoji,
     };
   }
-  $: handleEmojiChange(selectedEmoji);
+  run(() => {
+    handleEmojiChange(selectedEmoji);
+  });
 
-  let selectedColor = $newProjectData.color;
+  let selectedColor = $state($newProjectData.color);
   function handleColorChange(newColor: string) {
     $newProjectData.color = newColor;
   }
-  $: handleColorChange(selectedColor);
+  run(() => {
+    handleColorChange(selectedColor);
+  });
 
-  let isVisible = $newProjectData.isProjectVisible;
+  let isVisible = $state($newProjectData.isProjectVisible);
   function handleIsVisibleChange(isVisible: boolean) {
     $newProjectData.isProjectVisible = isVisible;
   }
-  $: handleIsVisibleChange(isVisible);
+  run(() => {
+    handleIsVisibleChange(isVisible);
+  });
 
   let lastUploadedCid =
-    $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined;
+    $state($newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined);
   function handleFileUpload(e: CustomEvent<{ ipfsCid: string }>) {
     if (activeTab !== 'tab-2') {
       return;
@@ -101,10 +103,24 @@
       return;
     }
   }
-  $: handleTabChange(activeTab, lastUploadedCid);
+  run(() => {
+    handleTabChange(activeTab, lastUploadedCid);
+  });
 
-  export let valid = false;
-  $: valid = Boolean(activeTab === 'tab-1' || lastUploadedCid);
+  interface Props {
+    originalProject: ProjectCustomizerFragment;
+    newProjectData: Writable<
+    ReturnType<
+      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+    > & { isProjectVisible: boolean }
+  >;
+    valid?: boolean;
+  }
+
+  let { originalProject, newProjectData, valid = $bindable(false) }: Props = $props();
+  run(() => {
+    valid = Boolean(activeTab === 'tab-1' || lastUploadedCid);
+  });
 </script>
 
 <div class="project-customizer">
@@ -121,10 +137,12 @@
   </FormField>
 
   <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>
-    <svelte:fragment slot="tab-1">
+    <!-- @migration-task: migrate this slot by hand, `tab-1` is an invalid identifier -->
+  <svelte:fragment slot="tab-1">
       <EmojiPicker bind:selectedEmoji />
     </svelte:fragment>
-    <svelte:fragment slot="tab-2">
+    <!-- @migration-task: migrate this slot by hand, `tab-2` is an invalid identifier -->
+  <svelte:fragment slot="tab-2">
       <FileUpload on:uploaded={handleFileUpload} />
     </svelte:fragment>
   </TabbedBox>

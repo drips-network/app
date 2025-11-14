@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let formDataHasBeenRestored = false;` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script lang="ts" context="module">
   export const RPGF_APPLICATION_EDITOR_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
@@ -209,7 +211,7 @@
       <svelte:fragment slot="actions">
         <Button
           variant="destructive"
-          on:click={() => {
+          onclick={() => {
             doWithConfirmationModal(
               'Are you sure you want to clear all fields? This action cannot be undone.',
               () => {
@@ -237,7 +239,7 @@
   <div slot="action">
     <Button
       icon={Plus}
-      on:click={() =>
+      onclick={() =>
         modal.show(ClaimProjectStepper, undefined, {
           skipWalletConnect: true,
           linkToProjectPageOnSuccess: false,

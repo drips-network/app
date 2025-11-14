@@ -11,17 +11,22 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let formValid: boolean;
+  let { context }: Props = $props();
+
+  let formValid: boolean = $state();
 </script>
 
 <StandaloneFlowStepLayout
   headline="One-time donation"
   description="Choose a token and how much you would like to donate."
 >
+  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
   <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
   </svelte:fragment>
   <OneTimeDonationEditor
     bind:formValid
@@ -30,14 +35,16 @@
     bind:topUpMax={$context.oneTimeDonationConfig.topUpMax}
     bind:amount={$context.oneTimeDonationConfig.amount}
   />
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!formValid}
-      icon={Check}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
-    >
-  </svelte:fragment>
+  {#snippet actions()}
+  
+      <Button
+        disabled={!formValid}
+        icon={Check}
+        variant="primary"
+        onclick={() => dispatch('goForward')}>Continue</Button
+      >
+    
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

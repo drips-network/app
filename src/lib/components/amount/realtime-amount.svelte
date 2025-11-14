@@ -17,21 +17,31 @@
   } from '$lib/utils/__generated__/gql.generated';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
-  export let timeline: (
+
+
+
+  interface Props {
+    timeline: (
     | CurrentAmountsTimelineItemFragment
     | CurrentAmountsUserBalanceTimelineItemFragment
   )[];
-  export let tokenAddress: string;
+    tokenAddress: string;
+    showFiatValue?: boolean;
+    unknownTokenButton?: boolean;
+    showDelta?: boolean;
+  }
 
-  export let showFiatValue = false;
+  let {
+    timeline,
+    tokenAddress,
+    showFiatValue = false,
+    unknownTokenButton = true,
+    showDelta = true
+  }: Props = $props();
 
-  export let unknownTokenButton = true;
-
-  export let showDelta = true;
-
-  $: currentAmountsStore = streamCurrentAmountsStore(timeline, tokenAddress);
-  $: token =
-    $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress);
+  let currentAmountsStore = $derived(streamCurrentAmountsStore(timeline, tokenAddress));
+  let token =
+    $derived($tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress));
 
   function applyAmtPerSecMultiplier(amount: bigint, multiplier: number) {
     return amount * BigInt(multiplier);
@@ -86,7 +96,7 @@
     <button
       class="typo-text"
       style:color="var(--color-foreground-level-5)"
-      on:click={(e) => {
+      onclick={(e) => {
         if (!unknownTokenButton) return;
 
         e.stopImmediatePropagation();

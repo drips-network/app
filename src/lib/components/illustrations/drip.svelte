@@ -1,8 +1,17 @@
 <script lang="ts">
-  export let height = '38px';
-  export let fill = 'var(--color-primary)';
-  export let stroke: string | undefined = undefined;
-  export let strokeWidth: string | undefined = undefined;
+  interface Props {
+    height?: string;
+    fill?: string;
+    stroke?: string | undefined;
+    strokeWidth?: string | undefined;
+  }
+
+  let {
+    height = '38px',
+    fill = 'var(--color-primary)',
+    stroke = undefined,
+    strokeWidth = undefined
+  }: Props = $props();
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 38" {height}
