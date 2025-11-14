@@ -14,7 +14,7 @@ import type {
 import { redis } from '../../../redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 import isClaimed from '$lib/utils/orcids/is-claimed';
-import { fetchOrcid } from '$lib/utils/orcids/fetch-orcid';
+import { fetchOrcid, orcidIdToSandoxOrcidId } from '$lib/utils/orcids/fetch-orcid';
 import { getClaimingUrlAddress } from '$lib/utils/orcids/verify-orcid';
 import { Forge } from '$lib/utils/sdk/sdk-types';
 import { buildRequestOwnerUpdateTx } from '../build-txs';
@@ -131,7 +131,10 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const claimOrcidTx = await buildRequestOwnerUpdateTx(Forge.orcidId, orcid);
+  const claimOrcidTx = await buildRequestOwnerUpdateTx(
+    Forge.orcidId,
+    orcidIdToSandoxOrcidId(orcid),
+  );
 
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),

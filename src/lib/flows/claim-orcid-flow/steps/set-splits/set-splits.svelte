@@ -29,6 +29,7 @@
     getCallerNonce,
   } from '$lib/utils/sdk/caller/caller';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
+  import { orcidIdToSandoxOrcidId } from '$lib/utils/orcids/fetch-orcid';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -163,7 +164,7 @@
       assert(address, 'Wallet address is not defined');
 
       const { claimTx: claimOrcidTx } = await sdk.linkedIdentities.prepareClaimOrcid({
-        orcidId: orcid,
+        orcidId: orcidIdToSandoxOrcidId(orcid),
       });
 
       transactions.push(
@@ -224,7 +225,7 @@
           );
 
           const { setSplitsTx } = await sdk.linkedIdentities.prepareClaimOrcid({
-            orcidId: $context.claimableId,
+            orcidId: orcidIdToSandoxOrcidId($context.claimableId),
           });
 
           txs.push({
