@@ -1,4 +1,9 @@
+import network from '$lib/stores/wallet/network';
 import { fetchOrcid } from './fetch-orcid';
+
+export function getNetworkLinkName() {
+  return encodeURIComponent(network.name);
+}
 
 export function getClaimingUrlAddress(claimingUrl: string) {
   let claimingUrlParsed;
@@ -8,7 +13,7 @@ export function getClaimingUrlAddress(claimingUrl: string) {
     return null;
   }
 
-  return claimingUrlParsed.searchParams.get('ethereum_owned_by') ?? '';
+  return claimingUrlParsed.searchParams.get(getNetworkLinkName()) ?? '';
 }
 
 export default async function verifyOrcidClaim(orcidId: string, expectedAddress: string) {
@@ -25,15 +30,14 @@ export default async function verifyOrcidClaim(orcidId: string, expectedAddress:
 
   const urlAddress = getClaimingUrlAddress(orcidProfile.claimingUrl);
   if (urlAddress === null) {
-    // TODO: refine
     throw new Error(
-      'The link in your ORCID profile is invalid. Ensure that it matches http://0.0.0.0/?ethereum_owned_by={eth address}&orcid={ORCID iD}',
+      `The link in your ORCID profile is invalid. Ensure that it matches http://0.0.0.0/?${getNetworkLinkName()}={${network.label} address}&orcid={ORCID iD}`,
     );
   }
 
   if (urlAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
     throw new Error(
-      'Expected Ethereum address not found in link. If you just edited the file, it may take a few moments for GitHub to process your changes, so please try again in a minute.',
+      `Expected ${network.label} address not found in link. If you just edited the file, it may take a few moments for GitHub to process your changes, so please try again in a minute.`,
     );
   }
 }
