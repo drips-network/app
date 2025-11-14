@@ -13,10 +13,32 @@ import type {
   OrcidByAccountIdQueryVariables,
 } from './__generated__/gql.generated';
 
+/**
+ * Prefixes an ORCID iD with 'sandbox-' if using the sandbox API. Necessary
+ * for calls to requestUpdateOwner and calcAccountId.
+ *
+ * @param orcidId An ORCID iD
+ * @returns The ORCID iD prefixed with 'sandbox-' if using the sandbox API or
+ *  the plain ORCID iD otherwise.
+ */
+export function orcidIdToSandoxOrcidId(orcidId: string) {
+  if (/sandbox\.orcid\.org/.test(PUBLIC_ORCID_API_URL)) {
+    return `sandbox-${orcidId}`;
+  }
+
+  return orcidId;
+}
+
+/**
+ * Return the account ID for an ORCID iD by calling calcAccountId.
+ *
+ * @param orcidId An ORCID iD.
+ * @returns The corresponding account ID.
+ */
 export function orcidIdToAccountId(orcidId: string) {
   return executeRepoDriverReadMethod({
     functionName: 'calcAccountId',
-    args: [Forge.orcidId, hexlify(toUtf8Bytes(orcidId)) as OxString],
+    args: [Forge.orcidId, hexlify(toUtf8Bytes(orcidIdToSandoxOrcidId(orcidId))) as OxString],
   });
 }
 
