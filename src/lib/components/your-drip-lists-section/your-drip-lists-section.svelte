@@ -28,6 +28,7 @@
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
   export let withCreateButton = false;
+  export let label = 'Your Drip Lists';
 
   export let collapsed = false;
   export let collapsable = false;
@@ -61,7 +62,7 @@
   bind:collapsable
   header={{
     icon: DripListIcon,
-    label: 'Your Drip Lists',
+    label,
     actionsDisabled: !dripLists,
     actions: withCreateButton
       ? [
