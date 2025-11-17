@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
@@ -61,7 +59,7 @@
       });
     }
   }
-  run(() => {
+  $effect(() => {
     updateBallot(picked);
   });
 
@@ -165,9 +163,6 @@
       };
     }
   }
-  run(() => {
-    updateVoteAmount(voteAmountInput);
-  });
 
   onDestroy(() => {
     updateValidationErrors({ type: 'unvalidated' });
@@ -208,6 +203,7 @@
         onclick={(e) => e.preventDefault()}
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
+        oninput={() => updateVoteAmount(voteAmountInput)}
         variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
         placeholder={votePlaceholder ?? '0+'}
       />

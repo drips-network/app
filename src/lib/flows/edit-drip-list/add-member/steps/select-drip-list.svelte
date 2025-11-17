@@ -56,7 +56,6 @@
 </script>
 
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import DripListBadge, {
     DRIP_LIST_BADGE_FRAGMENT,
@@ -170,12 +169,8 @@
         )}
       />
     </div>
-    <Button
-      icon={Plus}
-      onclick={() => {
-        modal.hide();
-        goto(buildUrl('/app/funder-onboarding', { urlToAdd }));
-      }}>Create new Drip List</Button
+    <Button icon={Plus} href={buildUrl('/app/funder-onboarding', { urlToAdd })} onclick={modal.hide}
+      >Create new Drip List</Button
     >
   </FormField>
   {#snippet actions()}

@@ -28,7 +28,6 @@
 
   import type { Writable } from 'svelte/store';
   import FormField from '../form-field/form-field.svelte';
-  import ProjectProfileHeader from '../project-profile-header/project-profile-header.svelte';
   import { gql } from 'graphql-request';
   import type { ProjectCustomizerFragment } from './__generated__/gql.generated';
   import FileUpload from '../custom-avatar-upload/custom-avatar-upload.svelte';
@@ -39,7 +38,6 @@
   import ColorPicker from '../color-picker/color-picker.svelte';
 
   interface Props {
-    originalProject: ProjectCustomizerFragment;
     newProjectData: Writable<
       ReturnType<
         typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
@@ -48,7 +46,7 @@
     valid?: boolean;
   }
 
-  let { originalProject, newProjectData, valid = $bindable(false) }: Props = $props();
+  let { newProjectData, valid = $bindable(false) }: Props = $props();
 
   let activeTab: 'tab1' | 'tab2' = $state(
     $newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab1' : 'tab2',
@@ -127,18 +125,6 @@
 </script>
 
 <div class="project-customizer">
-  <FormField type="div">
-    <div style:pointer-events="none">
-      <ProjectProfileHeader
-        pendingAvatar={activeTab === 'tab2' && !lastUploadedCid}
-        project={{
-          ...originalProject,
-          chainData: [$newProjectData],
-        }}
-      />
-    </div>
-  </FormField>
-
   <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>
     {#snippet tab1()}
       <EmojiPicker bind:selectedEmoji />

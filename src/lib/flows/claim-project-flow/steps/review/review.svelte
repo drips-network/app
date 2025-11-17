@@ -134,7 +134,7 @@
               : { type: 'image', cid: avatar.cid };
           $context.projectColor = color;
         },
-        { originalProject: project, newProjectData: newProjectDataWritable },
+        { newProjectData: newProjectDataWritable },
       );
     }
   }

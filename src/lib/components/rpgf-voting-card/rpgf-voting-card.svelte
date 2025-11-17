@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import Button from '../button/button.svelte';
@@ -41,7 +39,7 @@
   );
 
   let voteStep: 'build-ballot' | 'assign-votes' | null = $state(null);
-  run(() => {
+  $effect(() => {
     if (!voterGuidelinesSeen) {
       voteStep = null;
     } else if ($page.url.pathname.includes('/applications/ballot')) {

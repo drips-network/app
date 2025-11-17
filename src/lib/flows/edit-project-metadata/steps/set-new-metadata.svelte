@@ -57,6 +57,7 @@
   }
 
   let { project }: Props = $props();
+
   let projectChainData = $derived(filterCurrentChainData(project.chainData, 'claimed'));
 
   let projectDataWritable = $derived(
@@ -128,7 +129,7 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer bind:valid originalProject={project} newProjectData={projectDataWritable} />
+  <ProjectCustomizer bind:valid newProjectData={projectDataWritable} />
   {#snippet actions()}
     <Button onclick={submit} disabled={!valid} variant="primary" icon={Wallet}
       >Confirm changes</Button

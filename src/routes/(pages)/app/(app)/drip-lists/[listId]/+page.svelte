@@ -56,7 +56,7 @@
   let { data }: Props = $props();
 
   let dripList = $derived(data.dripList);
-  let votingRound = $derived(data.votingRounds.current);
+  let votingRound = $derived(data.votingRounds?.current);
 
   function handleVotingRoundClick(votingRound: VotingRound) {
     modal.show(Stepper, undefined, viewVotingRoundFlowSteps(votingRound));

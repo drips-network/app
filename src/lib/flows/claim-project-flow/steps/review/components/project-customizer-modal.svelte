@@ -8,7 +8,6 @@
   import type filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
   interface Props {
-    originalProject: ProjectCustomizerFragment;
     newProjectData: Writable<
       ReturnType<
         typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
@@ -16,11 +15,11 @@
     >;
   }
 
-  let { originalProject, newProjectData }: Props = $props();
+  let { newProjectData }: Props = $props();
 </script>
 
 <div class="project-customizer-modal">
-  <ProjectCustomizer {originalProject} {newProjectData} />
+  <ProjectCustomizer {newProjectData} />
   <div class="actions">
     <Button icon={CheckCircle} onclick={modal.hide}>Confirm</Button>
   </div>

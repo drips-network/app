@@ -40,11 +40,11 @@
     <div class="content">
       <div
         class="modal-wrapper"
-        in:scale|global={{ start: 0.97, duration: 300, delay: 150 }}
-        out:scale|global={{ start: 0.97, duration: 200 }}
+        in:scale={{ start: 0.97, duration: 300, delay: 150 }}
+        out:scale={{ start: 0.97, duration: 200 }}
       >
         <Modal>
-          <store.overlay.modalComponent {...store.overlay.modalComponentProps} />
+          <store.overlay.modalComponent {...store.overlay?.modalComponentProps ?? {}} />
           {#if store.hideable}
             <div class="close-button-wrapper">
               <button
