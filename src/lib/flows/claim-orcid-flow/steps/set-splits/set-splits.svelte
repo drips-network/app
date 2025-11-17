@@ -53,7 +53,7 @@
       CheckOrcidVerificationStatusQuery,
       CheckOrcidVerificationStatusQueryVariables
     >(checkOrcidVerificationStatusQuery, {
-      orcid: $context.claimableId,
+      orcid: orcidIdToSandoxOrcidId($context.claimableId),
       chain: network.gqlName,
     });
 
@@ -270,7 +270,7 @@
           await expect(
             () =>
               query<OrcidIsClaimedQuery, OrcidIsClaimedQueryVariables>(orcidClaimedQuery, {
-                orcid: $context.claimableId,
+                orcid: orcidIdToSandoxOrcidId($context.claimableId),
                 chain: network.gqlName,
               }),
             (result) =>

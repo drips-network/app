@@ -2,7 +2,7 @@ import { type Page, expect } from '@playwright/test';
 import type { ConnectedSession } from './ConnectedSession';
 import { OrcidClaimManager } from './OrcidClaimManager';
 import { execa } from 'execa';
-import { orcidIdToAccountId, orcidIdToSandoxOrcidId } from '$lib/utils/orcids/fetch-orcid';
+import { gqlClient } from './gqlClient';
 
 export class Orcid {
   public readonly page: Page;
@@ -39,8 +39,17 @@ export class Orcid {
   }
 
   private async _populateAccountId(orcidId: string): Promise<string> {
-    const accountIdBigInt = await orcidIdToAccountId(orcidIdToSandoxOrcidId(orcidId));
-    this.accountId = accountIdBigInt.toString();
+    const accountIdResult = await gqlClient.request(`
+      query GetOrcidAccountId {
+        orcidLinkedIdentityByOrcid(orcid: "sandbox-${orcidId}", chain: LOCALTESTNET) {
+          account {
+            accountId
+          }
+        }
+      }`);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.accountId = (accountIdResult as any).orcidLinkedIdentityByOrcid?.account?.accountId;
 
     if (!this.accountId) {
       throw new Error(`Account ID not found for ORCID ${orcidId}`);
