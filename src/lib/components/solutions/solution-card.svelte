@@ -20,7 +20,9 @@
   <div class="content">
     <div class="inner">
       <h2><slot name="headline"></slot></h2>
-      <p><slot name="description"></slot></p>
+      {#if $$slots.description}
+        <p><slot name="description"></slot></p>
+      {/if}
       <div class="line-items">
         <slot name="line-items"></slot>
       </div>

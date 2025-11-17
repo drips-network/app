@@ -60,6 +60,7 @@
         { title: 'RetroPGF Voting & Distribution', href: '/solutions/retro-pgf' },
         { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Ecosystem funding', href: '/solutions/ecosystem-funding' },
+        { title: 'Wave', href: '/solutions/wave' },
         { title: 'Hackathons', href: '/solutions/hackathons' },
       ],
     },
