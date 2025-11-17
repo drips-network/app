@@ -83,19 +83,22 @@
       },
     ],
   });
-  
 
-  let dependencyRepresentationalSplits = $derived(mapSplitsFromListEditorData(
-    $context.dependencySplits.items,
-    $context.dependencySplits.weights,
-    $context.highLevelPercentages['dependencies'],
-  ));
+  let dependencyRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.dependencySplits.items,
+      $context.dependencySplits.weights,
+      $context.highLevelPercentages['dependencies'],
+    ),
+  );
 
-  let maintainerRepresentationalSplits = $derived(mapSplitsFromListEditorData(
-    $context.maintainerSplits.items,
-    $context.maintainerSplits.weights,
-    $context.highLevelPercentages['maintainers'],
-  ));
+  let maintainerRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.maintainerSplits.items,
+      $context.maintainerSplits.weights,
+      $context.highLevelPercentages['maintainers'],
+    ),
+  );
 
   async function submit() {
     dispatch('goForward');
@@ -138,12 +141,14 @@
 
   let projectChainData = $derived(filterCurrentChainData(project.chainData, 'unclaimed'));
 
-  let hasCollectableAmount =
-    $derived(projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
-    0);
-  let hasSplittableAmount =
-    $derived(projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
-    0);
+  let hasCollectableAmount = $derived(
+    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
+      0,
+  );
+  let hasSplittableAmount = $derived(
+    projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
+      0,
+  );
 </script>
 
 <StandaloneFlowStepLayout
@@ -161,14 +166,12 @@
   </FormField>
   <FormField type="div" title="Owned by">
     {#snippet action()}
-      
-        {#if canEditWalletConnection}
-          <Button variant="ghost" onclick={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
-            >Edit</Button
-          >
-        {/if}
-      
-      {/snippet}
+      {#if canEditWalletConnection}
+        <Button variant="ghost" onclick={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+          >Edit</Button
+        >
+      {/if}
+    {/snippet}
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
@@ -180,12 +183,10 @@
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
     {#snippet action()}
-      
-        <Button variant="ghost" onclick={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" onclick={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+        >Edit</Button
+      >
+    {/snippet}
     <div class="card">
       <!-- TODO: Show the total amount that will be split on tx confirmation -->
       <div class="drip-icon">
@@ -214,65 +215,61 @@
     {#if hasCollectableAmount || hasSplittableAmount}
       <WhatsNextCard>
         {#snippet title()}
-                On transaction confirmation...
-              {/snippet}
+          On transaction confirmation...
+        {/snippet}
         {#snippet items()}
-              
-            {#if hasCollectableAmount && hasSplittableAmount}
-              <WhatsNextItem icon={Download}
-                >Some of your claimable funds will be <span class="typo-text-bold"
-                  >collected directly to your connected wallet</span
-                > as shown above.</WhatsNextItem
-              >
-              <WhatsNextItem icon={SplitsIcon}
-                >Remaining claimable funds will be <span class="typo-text-bold"
-                  >immediately split</span
-                > as shown above.</WhatsNextItem
-              >
-            {:else if hasCollectableAmount}
-              <WhatsNextItem icon={SplitsIcon}
-                >Claimable funds will be <span class="typo-text-bold"
-                  >collected directly to your connected wallet</span
-                > as shown above.</WhatsNextItem
-              >
-            {:else if hasSplittableAmount}
-              <WhatsNextItem icon={SplitsIcon}
-                >All claimable funds will be <span class="typo-text-bold"
-                  >immediately split as shown above</span
-                >.</WhatsNextItem
-              >
-            {/if}
-          
-              {/snippet}
+          {#if hasCollectableAmount && hasSplittableAmount}
+            <WhatsNextItem icon={Download}
+              >Some of your claimable funds will be <span class="typo-text-bold"
+                >collected directly to your connected wallet</span
+              > as shown above.</WhatsNextItem
+            >
+            <WhatsNextItem icon={SplitsIcon}
+              >Remaining claimable funds will be <span class="typo-text-bold"
+                >immediately split</span
+              > as shown above.</WhatsNextItem
+            >
+          {:else if hasCollectableAmount}
+            <WhatsNextItem icon={SplitsIcon}
+              >Claimable funds will be <span class="typo-text-bold"
+                >collected directly to your connected wallet</span
+              > as shown above.</WhatsNextItem
+            >
+          {:else if hasSplittableAmount}
+            <WhatsNextItem icon={SplitsIcon}
+              >All claimable funds will be <span class="typo-text-bold"
+                >immediately split as shown above</span
+              >.</WhatsNextItem
+            >
+          {/if}
+        {/snippet}
       </WhatsNextCard>
     {/if}
     <WhatsNextCard>
       {#snippet title()}
-            After transaction confirmation...
-          {/snippet}
+        After transaction confirmation...
+      {/snippet}
       {#snippet items()}
-          
-          <WhatsNextItem icon={EyeOpenIcon}
-            >Anyone can support or split to your project on Drips.</WhatsNextItem
-          >
-          <WhatsNextItem icon={WalletIcon}
-            >You can <span class="typo-text-bold">collect your tokens</span> from your
-            <span class="typo-text-bold">Drips dashboard</span>.</WhatsNextItem
-          >
-          <WhatsNextItem icon={TokenStreamsIcon}>
-            {@html sanitize(network.settlement.recipientsExplainerHtml, {
-              allowedTags: ['span'],
-              allowedAttributes: {
-                span: ['class'],
-              },
-            })}</WhatsNextItem
-          >
-        
-          {/snippet}
+        <WhatsNextItem icon={EyeOpenIcon}
+          >Anyone can support or split to your project on Drips.</WhatsNextItem
+        >
+        <WhatsNextItem icon={WalletIcon}
+          >You can <span class="typo-text-bold">collect your tokens</span> from your
+          <span class="typo-text-bold">Drips dashboard</span>.</WhatsNextItem
+        >
+        <WhatsNextItem icon={TokenStreamsIcon}>
+          {@html sanitize(network.settlement.recipientsExplainerHtml, {
+            allowedTags: ['span'],
+            allowedAttributes: {
+              span: ['class'],
+            },
+          })}</WhatsNextItem
+        >
+      {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button
       icon={ArrowLeft}
       onclick={() =>
@@ -280,11 +277,9 @@
           by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
         })}>Back</Button
     >
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button icon={WalletIcon} variant="primary" onclick={submit}>Confirm in wallet</Button>
-    
+    <Button icon={WalletIcon} variant="primary" onclick={submit}>Confirm in wallet</Button>
   {/snippet}
 </StandaloneFlowStepLayout>
 

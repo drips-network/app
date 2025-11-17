@@ -194,8 +194,8 @@
     },
   ];
 
-  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
-    const { project } = projectsTableData[event.detail.rowIndex].badge;
+  function onRowClick(event: RowClickEventPayload) {
+    const { project } = projectsTableData[event.rowIndex].badge;
     const chainData = filterCurrentChainData(project.chainData);
 
     if (!chainData || !isClaimed(chainData)) return;
@@ -204,7 +204,7 @@
 
     onClickGoto(
       buildProjectUrl(source.forge, source.ownerName, source.repoName, true),
-      event.detail.event,
+      event.event,
     );
   }
 </script>
@@ -235,7 +235,7 @@
         getCoreRowModel: getCoreRowModel(),
       }}
       isRowClickable={true}
-      on:rowClick={onRowClick}
+      {onRowClick}
     />
   </Section>
 </article>

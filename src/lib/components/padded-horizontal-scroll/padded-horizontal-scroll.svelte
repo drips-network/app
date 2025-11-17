@@ -5,7 +5,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let { disableScroll = false, innerElem = $bindable(undefined), children }: Props = $props();
+  let { disableScroll = false, innerElem = $bindable(), children }: Props = $props();
 </script>
 
 <div class="wrapper" class:disable-scroll={disableScroll}>

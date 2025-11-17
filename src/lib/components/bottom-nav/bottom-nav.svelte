@@ -15,7 +15,6 @@
 
   let { items }: Props = $props();
 
-
   interface ItemElems {
     [href: string]: HTMLAnchorElement;
   }
@@ -38,7 +37,6 @@
     resizeObserver.disconnect();
     resizeObserver.observe(elem);
   }
-
 
   function updateSelectorPos() {
     if (!activeElem) return;
@@ -97,7 +95,7 @@
           class="selector"
           transition:fade={{ duration: 300 }}
           style={`left: ${selectorOffset}px; width: ${selectorWidth}px`}
-       ></div>
+        ></div>
       {/if}
     </div>
   </div>

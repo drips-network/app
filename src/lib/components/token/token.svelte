@@ -8,8 +8,6 @@
   import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';
 
-
-  
   interface Props {
     address: string;
     show?: 'name' | 'symbol' | 'none';
@@ -17,13 +15,13 @@
     fontSize?: string;
     animateOnMount?: boolean;
     /** Manually set token information to display. Used on the landing page's mock dashboard. */
-    overrideToDisplay?: 
-    | {
-        name: string;
-        logoURI?: string;
-        symbol: string;
-      }
-    | undefined;
+    overrideToDisplay?:
+      | {
+          name: string;
+          logoURI?: string;
+          symbol: string;
+        }
+      | undefined;
   }
 
   let {
@@ -32,7 +30,7 @@
     size = 'normal',
     fontSize = 'typo-text',
     animateOnMount = false,
-    overrideToDisplay = undefined
+    overrideToDisplay = undefined,
   }: Props = $props();
 
   const sizes = {
@@ -40,7 +38,6 @@
     normal: 32,
     huge: 48,
   };
-
 
   function adjustSrcSize(src: string) {
     // Most token URLs are Coingecko assets using the "thumb" quality, which is very low-res.
@@ -53,22 +50,24 @@
 
   let imageFailed = $state(false);
 
-
-
   let loaded = $state(false);
 
-  let imgElem: HTMLImageElement = $state();
+  let imgElem = $state<HTMLImageElement>();
 
   onMount(() => {
     if (imgElem && imgElem.complete) loaded = true;
   });
   let token = $derived($tokens ? tokens.getByAddress(address) : undefined);
   let tokenInfo = $derived(overrideToDisplay ?? ($tokens ? token?.info : undefined));
-  let src = $derived(tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined);
+  let src = $derived(
+    tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined,
+  );
   let shouldAnimate = $derived(Boolean(tokenInfo));
-  let placeholderColor = $derived(tokenInfo
-    ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
-    : 'var(--color-foreground-level-2)');
+  let placeholderColor = $derived(
+    tokenInfo
+      ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
+      : 'var(--color-foreground-level-2)',
+  );
 </script>
 
 <div class="token size-{size}">

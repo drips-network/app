@@ -17,7 +17,7 @@
 
   let { ecosystem, banner }: Props = $props();
 
-  let ecosystemCardElement: HTMLDivElement = $state();
+  let ecosystemCardElement: HTMLDivElement;
   let expanded: boolean = $state(false);
 
   // let the graph decide
@@ -160,7 +160,8 @@
         <!-- <SearchInput small placeholder="Search" /> -->
       </div>
       <div class="surface top-right">
-        <button class="mobile-graph-expander" onclick={handleClickExpand}></button>
+        <button aria-label="Expand graph" class="mobile-graph-expander" onclick={handleClickExpand}
+        ></button>
         <Button onclick={handleClickExpand}>
           {#if expanded}
             <ArrowCollapse style="fill: var(--color-foreground)" />Collapse

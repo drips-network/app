@@ -23,7 +23,7 @@
 
   let nameValue = $state('');
 
-  let nameValidationState: TextInputValidationState = $state();
+  let nameValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
   run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
@@ -62,14 +62,12 @@
   <AnnotationBox type="info">You can add fields to the form after creating it.</AnnotationBox>
 
   {#snippet actions()}
-  
-      <Button
-        variant="primary"
-        disabled={nameValidationState.type !== 'valid'}
-        type="submit"
-        icon={CheckCircle}
-        onclick={handleCreate}>Create form</Button
-      >
-    
+    <Button
+      variant="primary"
+      disabled={nameValidationState.type !== 'valid'}
+      type="submit"
+      icon={CheckCircle}
+      onclick={handleCreate}>Create form</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

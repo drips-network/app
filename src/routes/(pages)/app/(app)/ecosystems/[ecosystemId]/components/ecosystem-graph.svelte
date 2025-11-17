@@ -1,6 +1,6 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let sigmaInstance: Sigma;` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount, tick } from 'svelte';
   import Graph from 'graphology';
   import forceAtlas2 from 'graphology-layout-forceatlas2';
@@ -23,14 +23,18 @@
     nodeSelectionChanged: NodeSelectionChangedPayload;
   }>();
 
-  export let ecosystem: Ecosystem;
-  export let zoom: number = 1;
+  interface Props {
+    ecosystem: Ecosystem;
+    zoom?: number;
+  }
+
+  let { ecosystem, zoom = $bindable(1) }: Props = $props();
 
   const ROOT_NODE_ID = 'N/A';
   const ROOT_EDGE_SOURCE = 'root';
 
   let graph: Graph;
-  let sigmaInstance: Sigma;
+  let sigmaInstance = $state<Sigma>();
   let graphContainer: HTMLDivElement;
 
   let programaticZoom: boolean = false;
@@ -43,13 +47,10 @@
   let colorForegroundLevel3: string;
   let colorForegroundLevel2: string;
 
-  let w: number = 0;
-  let h: number = 0;
-  let lastW: number = w;
-  let lastH: number = h;
-
-  // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, detectCollapseAndDeselectNode(), refreshGraphDebounced();
+  let w: number = $state(0);
+  let h: number = $state(0);
+  let lastW: number = $state(0);
+  let lastH: number = $state(0);
 
   interface State {
     isDragging?: boolean;
@@ -69,7 +70,7 @@
     hoveredEdge?: string;
     hoveredEdgeExtremities?: Set<string>;
   }
-  const state: State = { searchQuery: '' };
+  const graphState: State = $state({ searchQuery: '' });
 
   // TODO: be less cutty
   function detectCollapseAndDeselectNode() {
@@ -127,10 +128,8 @@
     programaticZoom = false;
   }
 
-  $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
-
   function setSelectedNode(node?: string) {
-    if (node && state.selectedNode !== node) {
+    if (node && graphState.selectedNode !== node) {
       // bring all the node's edges to the front
       // to draw over other edges
       const edges = graph.edges(node);
@@ -138,25 +137,25 @@
         bringEdgeToFront(graph, edge);
       }
 
-      state.selectedNode = node;
-      state.selectedNeighbors = new Set(graph.neighbors(node));
+      graphState.selectedNode = node;
+      graphState.selectedNeighbors = new Set(graph.neighbors(node));
     } else {
-      state.selectedNode = undefined;
-      state.selectedNeighbors = undefined;
+      graphState.selectedNode = undefined;
+      graphState.selectedNeighbors = undefined;
     }
 
-    dispatch('nodeSelectionChanged', { nodeId: state.selectedNode });
+    dispatch('nodeSelectionChanged', { nodeId: graphState.selectedNode });
 
     refreshGraph();
   }
 
   function setHoveredNode(node?: string) {
     if (node) {
-      state.hoveredNode = node;
-      state.hoveredNeighbors = new Set(graph.neighbors(node));
+      graphState.hoveredNode = node;
+      graphState.hoveredNeighbors = new Set(graph.neighbors(node));
     } else {
-      state.hoveredNode = undefined;
-      state.hoveredNeighbors = undefined;
+      graphState.hoveredNode = undefined;
+      graphState.hoveredNeighbors = undefined;
     }
 
     refreshGraph();
@@ -164,11 +163,11 @@
 
   function setHoveredEdge(edge?: string) {
     if (edge) {
-      state.hoveredEdge = edge;
-      state.hoveredEdgeExtremities = new Set(graph.extremities(edge));
+      graphState.hoveredEdge = edge;
+      graphState.hoveredEdgeExtremities = new Set(graph.extremities(edge));
     } else {
-      state.hoveredEdge = undefined;
-      state.hoveredEdgeExtremities = undefined;
+      graphState.hoveredEdge = undefined;
+      graphState.hoveredEdgeExtremities = undefined;
     }
 
     refreshGraph();
@@ -187,8 +186,8 @@
   function nodeReducer(node: string, data: Attributes): Partial<DisplayData> {
     const res: Partial<NodeDisplayData> = { ...data };
 
-    if (state.selectedNeighbors) {
-      if (state.selectedNeighbors.has(node) || state.selectedNode === node) {
+    if (graphState.selectedNeighbors) {
+      if (graphState.selectedNeighbors.has(node) || graphState.selectedNode === node) {
         res.color = colorPrimary;
         res.zIndex = 2;
       } else {
@@ -196,24 +195,24 @@
       }
     }
 
-    if (state.hoveredNode === node || state.hoveredEdgeExtremities?.has(node)) {
+    if (graphState.hoveredNode === node || graphState.hoveredEdgeExtremities?.has(node)) {
       // @ts-expect-error: might be undefined
       res.label = res.projectName;
       res.highlighted = true;
     }
 
     if (
-      state.hoveredNode === node ||
-      state.selectedNode === node ||
-      state.hoveredEdgeExtremities?.has(node)
+      graphState.hoveredNode === node ||
+      graphState.selectedNode === node ||
+      graphState.hoveredEdgeExtremities?.has(node)
     ) {
       // @ts-expect-error: borderSize doesn't exist
       res.borderSize = 5;
       res.color = colorPrimary;
       // @ts-expect-error: might be undefined
       res.size = res.size + 5;
-    } else if (state.suggestions) {
-      if (state.suggestions.has(node)) {
+    } else if (graphState.suggestions) {
+      if (graphState.suggestions.has(node)) {
         res.forceLabel = true;
       } else {
         res.label = '';
@@ -229,12 +228,12 @@
 
     switch (true) {
       // highlight and label edge if it's the hovered one
-      case state.hoveredEdge && state.hoveredEdge === edge:
+      case graphState.hoveredEdge && graphState.hoveredEdge === edge:
         res.color = colorPrimary;
         res.forceLabel = true;
         break;
       // show edge labels around selected node
-      case state.selectedNode && graph.extremities(edge).includes(state.selectedNode):
+      case graphState.selectedNode && graph.extremities(edge).includes(graphState.selectedNode):
         res.color = colorPrimary;
         res.forceLabel = true;
         break;
@@ -245,8 +244,9 @@
 
     // TODO: not yet specified
     if (
-      state.suggestions &&
-      (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
+      graphState.suggestions &&
+      (!graphState.suggestions.has(graph.source(edge)) ||
+        !graphState.suggestions.has(graph.target(edge)))
     ) {
       res.hidden = true;
     }
@@ -276,6 +276,7 @@
   const MIN_CAMERA_RATIO = 0.25;
   async function initializeGraphViewport() {
     requestAnimationFrame(async () => {
+      if (!sigmaInstance) return;
       await fitViewportToNodes(sigmaInstance, graph.nodes(), { animate: true });
       const camera = sigmaInstance.getCamera();
       const state = camera.getState();
@@ -464,10 +465,10 @@
       setSelectedNode(undefined);
     });
     sigmaInstance.getMouseCaptor().on('mousedown', () => {
-      state.isDragging = true;
+      graphState.isDragging = true;
     });
     sigmaInstance.getMouseCaptor().on('mouseup', () => {
-      state.isDragging = false;
+      graphState.isDragging = false;
     });
 
     sigmaInstance.setSetting('defaultDrawNodeHover', drawDiscNodeHover);
@@ -479,13 +480,23 @@
   }
 
   onMount(initializeGraph);
+  // for expanding and collapsing, refresh instance to get most up to date view
+  run(() => {
+    w;
+    h;
+    (detectCollapseAndDeselectNode(), refreshGraphDebounced());
+  });
+  run(() => {
+    zoom;
+    sigmaInstance && setZoom(sigmaInstance, zoom);
+  });
 </script>
 
 <div
   class="ecosystem-graph"
-  class:hovered-node={state.hoveredNode}
-  class:hovered-edge={state.hoveredEdge}
-  class:dragging={state.isDragging}
+  class:hovered-node={graphState.hoveredNode}
+  class:hovered-edge={graphState.hoveredEdge}
+  class:dragging={graphState.isDragging}
   bind:this={graphContainer}
   bind:clientWidth={w}
   bind:clientHeight={h}

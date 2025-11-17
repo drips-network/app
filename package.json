@@ -138,22 +138,8 @@
     "twemoji": "^14.0.2",
     "zod": "^3.23.8"
   },
-  "overrides": {
-    "@web3-onboard/core": {
-      "svelte-i18n": "^4.0.0",
-      "intl-messageformat": "^10.5.1",
-      "bnc-sdk": {
-        "rxjs": "^7.8.1"
-      }
-    }
-  },
   "optionalDependencies": {
-    "@esbuild/linux-arm64": "^0.25.0",
-    "@esbuild/linux-x64": "0.24.0",
-    "@resvg/resvg-js-linux-arm64-gnu": "^2.6.2",
-    "@resvg/resvg-js-linux-x64-gnu": "^2.6.2",
-    "@rollup/rollup-linux-arm64-gnu": "^4.31.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.31.0"
+
   },
   "type": "module"
 }

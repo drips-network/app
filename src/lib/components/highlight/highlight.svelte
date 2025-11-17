@@ -176,12 +176,15 @@
     }
   }
 
-  let wrapperElem: HTMLDivElement = $state();
+  let wrapperElem: HTMLDivElement | undefined = $state();
 </script>
 
 <svelte:window onkeydown={handleWindowKeyboardEvent} />
 
-<FocusTrap containers={new Set([wrapperElem])} enabled={Boolean($highlightStore)} />
+<FocusTrap
+  containers={wrapperElem ? new Set([wrapperElem]) : new Set()}
+  enabled={Boolean($highlightStore)}
+/>
 
 {#if $highlightStore && highlightBB && highlightPos}
   <div
@@ -228,7 +231,7 @@
       onclick={handleClickCatcherEvent}
       onkeydown={handleClickCatcherEvent}
       style:border-radius={$highlightStore.borderRadius}
-   ></div>
+    ></div>
   </div>
 {/if}
 

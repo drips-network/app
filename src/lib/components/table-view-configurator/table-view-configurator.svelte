@@ -12,11 +12,6 @@
     type TDropdownOptions as _TDropdownOptions,
   } from './components/mini-dropdown.svelte';
 
-
-
-
-
-
   interface Props {
     sortByOptions: TSortByOptions;
     filterOptions: TFilterOptions;
@@ -25,24 +20,24 @@
     onDownload?: ((filetype: 'csv' | 'xlsx') => void) | undefined;
     sortBy?: keyof TSortByOptions | null;
     filterBy?: keyof TFilterOptions | null;
-    onFilterChange?: 
-    | ((filterBy: keyof TFilterOptions | null, selectFn: () => void) => Promise<void>)
-    | undefined;
-    onSortChange?: 
-    | ((sortBy: keyof TSortByOptions | null, selectFn: () => void) => Promise<void>)
-    | undefined;
+    onFilterChange?:
+      | ((filterBy: keyof TFilterOptions | null, selectFn: () => void) => Promise<void>)
+      | undefined;
+    onSortChange?:
+      | ((sortBy: keyof TSortByOptions | null, selectFn: () => void) => Promise<void>)
+      | undefined;
   }
 
   let {
     sortByOptions,
     filterOptions,
     loading = false,
-    el = $bindable(undefined),
+    el = $bindable(),
     onDownload = undefined,
     sortBy = null,
     filterBy = null,
     onFilterChange = undefined,
-    onSortChange = undefined
+    onSortChange = undefined,
   }: Props = $props();
 
   function handleOptionClick(

@@ -27,9 +27,9 @@
 
   interface Props {
     splittable: {
-    tokenAddress: string;
-    amount: bigint;
-  }[];
+      tokenAddress: string;
+      amount: bigint;
+    }[];
   }
 
   let { splittable }: Props = $props();
@@ -42,60 +42,60 @@
       : '';
   }
 
-
-
-
-
-  let selected =
-    $state(mapFilterUndefined(splittable, (s) => {
+  let selected = $state(
+    mapFilterUndefined(splittable, (s) => {
       const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
 
       return unknownToken ? undefined : s.tokenAddress;
-    }) ?? []);
+    }) ?? [],
+  );
 
   function submit() {
     batchCollect(selected, dispatch, shouldAutoUnwrap);
   }
-  let selectorItems =
-    $derived($tokensStore &&
-    Object.fromEntries(
-      mapFilterUndefined(splittable ?? [], (s) => {
-        const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
+  let selectorItems = $derived(
+    $tokensStore &&
+      Object.fromEntries(
+        mapFilterUndefined(splittable ?? [], (s) => {
+          const unknownToken = tokensStore.getByAddress(s.tokenAddress) === undefined;
 
-        return [
-          s.tokenAddress,
-          {
-            type: 'selectable' as const,
-            text: unknownToken
-              ? {
-                  component: AddCustomTokenButton,
-                  props: {
-                    dispatch,
-                    tokenAddress: s.tokenAddress,
-                  },
-                }
-              : getListItemDescription(s),
-            label: {
-              component: Token,
-              props: {
-                address: s.tokenAddress,
+          return [
+            s.tokenAddress,
+            {
+              type: 'selectable' as const,
+              text: unknownToken
+                ? {
+                    component: AddCustomTokenButton,
+                    props: {
+                      dispatch,
+                      tokenAddress: s.tokenAddress,
+                    },
+                  }
+                : getListItemDescription(s),
+              label: {
+                component: Token,
+                props: {
+                  address: s.tokenAddress,
+                },
               },
             },
-          },
-        ];
-      }),
-    ));
+          ];
+        }),
+      ),
+  );
   let canCollect = $derived(Object.values(selectorItems ?? {}).length > 0);
-  let shouldShowAutoUnwrapToggle = $derived(splittable.some((s) => {
-    // Not all chains have the unwrapping helper contract deployed
-    if (!network.contracts.NATIVE_TOKEN_UNWRAPPER) return false;
+  let shouldShowAutoUnwrapToggle = $derived(
+    splittable.some((s) => {
+      // Not all chains have the unwrapping helper contract deployed
+      if (!network.contracts.NATIVE_TOKEN_UNWRAPPER) return false;
 
-    const token = tokensStore.getByAddress(s.tokenAddress);
+      const token = tokensStore.getByAddress(s.tokenAddress);
 
-    return network.autoUnwrapPairs?.find(
-      (p) => p.nativeSymbol === token?.info.symbol || p.wrappedSymbol === token?.info.symbol,
-    );
-  }));
+      return network.autoUnwrapPairs?.find(
+        (p) => p.nativeSymbol === token?.info.symbol || p.wrappedSymbol === token?.info.symbol,
+      );
+    }),
+  );
   let shouldAutoUnwrap = $derived(shouldShowAutoUnwrapToggle);
 </script>
 
@@ -123,20 +123,17 @@
       <p>Next settlement</p>
       <Tooltip>
         <InfoCircle />
-        <!-- @migration-task: migrate this slot by hand, `tooltip-content` is an invalid identifier -->
-  {#snippet tooltip_content()}
-              
-            <p>
-              {network.settlement.explainerText}
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://docs.drips.network/get-support/claim-your-repository#settlement-of-future-funds"
-                class="learn-more">Learn more</a
-              >
-            </p>
-          
-              {/snippet}
+        {#snippet tooltip_content()}
+          <p>
+            {network.settlement.explainerText}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://docs.drips.network/get-support/claim-your-repository#settlement-of-future-funds"
+              class="learn-more">Learn more</a
+            >
+          </p>
+        {/snippet}
       </Tooltip>
     </div>
     <p class="typo-text-bold">
@@ -157,16 +154,14 @@
     </div>
   {/if}
   {#snippet actions()}
-  
-      {#if canCollect}
-        <Button onclick={modal.hide} variant="ghost">Never mind</Button>
-        <Button onclick={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
-          >Confirm in wallet</Button
-        >
-      {:else}
-        <Button onclick={modal.hide}>Close</Button>
-      {/if}
-    
+    {#if canCollect}
+      <Button onclick={modal.hide} variant="ghost">Never mind</Button>
+      <Button onclick={submit} icon={Wallet} disabled={selected.length === 0} variant="primary"
+        >Confirm in wallet</Button
+      >
+    {:else}
+      <Button onclick={modal.hide}>Close</Button>
+    {/if}
   {/snippet}
 </StepLayout>
 

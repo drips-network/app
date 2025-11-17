@@ -28,10 +28,11 @@
 
   let collaboratorsListValid = $state(false);
   let restrictedRecipientsListValid = $state(false);
-  let isValid =
-    $derived(collaboratorsListValid &&
-    $context.votingRoundConfig.votingEnds &&
-    (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid));
+  let isValid = $derived(
+    collaboratorsListValid &&
+      $context.votingRoundConfig.votingEnds &&
+      (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid),
+  );
 
   function handleImportCSV() {
     dispatch(
@@ -107,10 +108,8 @@
       maxItems={5000}
     />
     {#snippet action()}
-      
-        <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
-      
-      {/snippet}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
 
   <FormField
@@ -129,10 +128,8 @@
     description="If you hide collaborators, only you as the publisher may see the list of collaborators and their votes. At the end of the voting period, only the vote's results will be made public."
   >
     {#snippet action()}
-      
-        <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
-      
-      {/snippet}
+      <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
+    {/snippet}
   </FormField>
 
   <FormField
@@ -140,10 +137,8 @@
     description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."
   >
     {#snippet action()}
-      
-        <Toggle bind:checked={$context.votingRoundConfig.areRecipientsRestricted} />
-      
-      {/snippet}
+      <Toggle bind:checked={$context.votingRoundConfig.areRecipientsRestricted} />
+    {/snippet}
     {#if $context.votingRoundConfig.areRecipientsRestricted}
       <div transition:slide={{ duration: 300 }}>
         <ListEditor
@@ -158,18 +153,12 @@
     {/if}
   </FormField>
 
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+  {#snippet left_actions()}
     <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        disabled={!isValid}
-        icon={Check}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button disabled={!isValid} icon={Check} variant="primary" onclick={() => dispatch('goForward')}
+      >Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

@@ -47,12 +47,15 @@
 
   let { context }: Props = $props();
 
-  let balance =
-    $derived($context.userOutgoingTokenBalances.find(
+  let balance = $derived(
+    $context.userOutgoingTokenBalances.find(
       (balance) => balance.tokenAddress.toLowerCase() === $context.tokenAddress.toLowerCase(),
-    ) ?? unreachable());
+    ) ?? unreachable(),
+  );
 
-  let currentAmountsStore = $derived(streamCurrentAmountsStore(balance.outgoing, $context.tokenAddress));
+  let currentAmountsStore = $derived(
+    streamCurrentAmountsStore(balance.outgoing, $context.tokenAddress),
+  );
 
   let tokenInfo = $derived(tokens.getByAddress($context.tokenAddress) ?? unreachable());
 
@@ -61,7 +64,7 @@
     if ($context.amount) amountWei = parseTokenAmount($context.amount, tokenInfo.info.decimals);
   });
 
-  let validationState: TextInputValidationState = $state();
+  let validationState: TextInputValidationState | undefined = $state();
   run(() => {
     if ($context.withdrawAll && $currentAmountsStore.currentAmount.amount > 0n) {
       validationState = { type: 'valid' };
@@ -157,18 +160,14 @@
       />
     {/if}
     {#snippet action()}
-      
-        <Toggle bind:checked={$context.withdrawAll} label="Max" />
-      
-      {/snippet}
+      <Toggle bind:checked={$context.withdrawAll} label="Max" />
+    {/snippet}
   </FormField>
   <SafeAppDisclaimer disclaimerType="drips" />
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button variant="primary" disabled={validationState.type !== 'valid'} onclick={triggerWithdraw}
-        >Withdraw</Button
-      >
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" disabled={validationState?.type !== 'valid'} onclick={triggerWithdraw}
+      >Withdraw</Button
+    >
   {/snippet}
 </StepLayout>

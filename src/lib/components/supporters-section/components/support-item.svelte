@@ -1,21 +1,26 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (amount-value to amount_value) making the component unusable -->
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let title: {
-    component: ComponentType;
-    props: Record<string, unknown>;
-  };
-  export let href: string | undefined = undefined;
+  interface Props {
+    title: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      component: Component<any>;
+      props: Record<string, unknown>;
+    };
+    href?: string | undefined;
+    subtitle?: string | undefined;
+    amount_value?: import('svelte').Snippet;
+    amount_sub?: import('svelte').Snippet;
+  }
 
-  export let subtitle: string | undefined = undefined;
+  let { title, href = undefined, subtitle = undefined, amount_value, amount_sub }: Props = $props();
 </script>
 
 <svelte:element this={href ? 'a' : 'div'} class="support-item" {href} class:has-href={href}>
   <div class="left">
     <div class="content">
       <div class="title">
-        <svelte:component this={title.component} {...title.props} />
+        <title.component {...title.props} />
       </div>
       {#if subtitle}
         <div class="subtitle muted">{subtitle}</div>
@@ -24,10 +29,10 @@
   </div>
   <div class="amount">
     <div class="value">
-      <slot name="amount-value" />
+      {@render amount_value?.()}
     </div>
-    <div class="amount-sub muted typo-text-small tabular-nums">
-      <slot name="amount-sub" />
+    <div class="amount_sub muted typo-text-small tabular-nums">
+      {@render amount_sub?.()}
     </div>
   </div>
 </svelte:element>

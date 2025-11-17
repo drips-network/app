@@ -14,9 +14,6 @@
     deleteItem: void;
   }>();
 
-
-
-
   interface Props {
     item: ListEditorItem;
     key: string;
@@ -38,13 +35,13 @@
     canDeleteItems,
     hasBottomBorder,
     allowEmptyPercentage = false,
-    highlight = $bindable()
+    highlight = $bindable(),
   }: Props = $props();
   run(() => {
     if (highlight) setTimeout(() => (highlight = false), 500);
   });
 
-  let inputElem: HTMLInputElement = $state();
+  let inputElem = $state<HTMLInputElement>();
   let inputValue: number | undefined = $state();
   let editingPercentage = $state(false);
 
@@ -55,8 +52,8 @@
     await tick();
 
     inputValue = Number(formatPercentage(percentage));
-    inputElem.focus();
-    inputElem.select();
+    inputElem?.focus();
+    inputElem?.select();
   }
 
   function stopEditing() {
@@ -85,7 +82,7 @@
     return Number(percentage % 1 === 0 ? percentage.toFixed(0) : percentage.toFixed(8)).toString();
   }
 
-  let inputWidth: string = $state();
+  let inputWidth = $state<string>();
   run(() => {
     const amountOfNumbersInInputValue = String(inputValue)
       .replaceAll(',', '')

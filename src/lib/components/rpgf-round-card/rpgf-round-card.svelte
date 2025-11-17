@@ -23,7 +23,7 @@
     PendingResults,
     Results,
   }
-  let enrichedState: EnrichedState = $state();
+  let enrichedState = $state<EnrichedState>();
 
   run(() => {
     if (!round.state) {
@@ -62,7 +62,7 @@
     [EnrichedState.Results]: 'Results available',
   };
 
-  let stateLabel = $derived(stateLabels[enrichedState]);
+  let stateLabel = $derived(enrichedState ? stateLabels[enrichedState] : undefined);
 </script>
 
 <PrimaryColorThemer colorHex={round.color}>

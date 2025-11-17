@@ -29,17 +29,16 @@
     noBorder = false,
     options,
     dropdownWidth = undefined,
-    toggle = undefined
+    toggle = undefined,
   }: Props = $props();
 
   let selectedOptionIndex = $derived(options.findIndex((o) => o.value === value));
   let selectedOption: Option | undefined = $derived(options[selectedOptionIndex]);
-  
 
-  let wrapperElem: HTMLDivElement = $state();
-  let dropdownElem: HTMLDivElement = $state();
-  let optionsElem: HTMLDivElement = $state();
-  let optionElems: HTMLDivElement[] = $state([]);
+  let wrapperElem: HTMLDivElement;
+  let dropdownElem: HTMLDivElement;
+  let optionsElem = $state<HTMLDivElement | undefined>(undefined);
+  let optionElems: HTMLDivElement[] = [];
 
   let expanded = $state(false);
 
@@ -75,6 +74,8 @@
   }
 
   async function handleWindowKeydown(e: KeyboardEvent) {
+    if (!optionsElem) return;
+
     if (e.key === 'Escape' && expanded) {
       e.preventDefault();
       setExpanded(false);

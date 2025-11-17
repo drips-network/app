@@ -17,9 +17,9 @@
 
   let {
     field,
-    answer = $bindable(undefined),
+    answer = $bindable(),
     valid = $bindable(false),
-    forceRevealError = undefined
+    forceRevealError = undefined,
   }: Props = $props();
 
   let value: string | undefined = $state(answer?.value ?? undefined);
@@ -59,7 +59,7 @@
     ? 'Data in this field is private and will only be shared with the admins of the round.'
     : undefined}
 >
-  <TextInput bind:value on:blur={() => (beenFocussed = true)} />
+  <TextInput bind:value onblur={() => (beenFocussed = true)} />
   <div class="char-count">
     <span class:too-long={tooLong}>{value ? value.length : 0} / 5.000</span>
   </div>

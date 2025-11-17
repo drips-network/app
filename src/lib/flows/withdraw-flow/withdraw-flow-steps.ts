@@ -14,11 +14,11 @@ export default function getWithdrawSteps(tokenAddress: string) {
     steps: [
       makeStep({
         component: FetchData,
-        props: undefined,
+        props: {},
       }),
       makeStep({
         component: EnterAmount,
-        props: undefined,
+        props: {},
       }),
       makeStep({
         component: SuccessStep,

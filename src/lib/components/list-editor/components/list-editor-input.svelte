@@ -27,10 +27,6 @@
     errorDismissed: void;
   }>();
 
-
-
-
-
   interface Props {
     maxItemsReached: boolean;
     existingKeys: string[];
@@ -52,10 +48,10 @@
     allowAddresses,
     weightsMode,
     addOnMount,
-    errors = $bindable([])
+    errors = $bindable([]),
   }: Props = $props();
 
-  let inputElem: HTMLInputElement = $state();
+  let inputElem: HTMLInputElement;
   let inputValue = $state(addOnMount ?? '');
 
   onMount(() => {
@@ -64,10 +60,11 @@
     }
   });
 
-  let validInput =
-    $derived((allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
-    (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
-    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)));
+  let validInput = $derived(
+    (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
+      (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
+      (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)),
+  );
 
   function createInvalidMessage(type: string, value: string): string {
     switch (type) {
@@ -149,7 +146,7 @@
     if (inputValue !== '') clearError();
   });
 
-  let inputPlaceholder: string = $state();
+  let inputPlaceholder = $state<string>();
   run(() => {
     const allowed = mapFilterUndefined(
       [

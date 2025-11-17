@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
-
+  import type { Component } from 'svelte';
 
   interface Props {
-    component: ComponentType;
+    component: Component;
     text: string;
     componentProps?: { [propName: string]: unknown } | undefined;
   }

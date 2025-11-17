@@ -1,5 +1,4 @@
 <script lang="ts">
-
   interface Props {
     src?: string | undefined;
     placeholderSrc?: string | undefined;
@@ -11,7 +10,7 @@
     src = undefined,
     placeholderSrc = undefined,
     size = 24,
-    imgElem = $bindable(undefined)
+    imgElem = $bindable(),
   }: Props = $props();
 
   let loaded = $state(false);

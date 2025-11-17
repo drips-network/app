@@ -1,16 +1,26 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (tab-1 to tab_1) making the component unusable -->
 <script lang="ts">
   import SegmentedControl from '../segmented-control/segmented-control.svelte';
 
-  export let tabs = {
-    1: 'Emoji',
-    2: 'Custom image',
-  };
+  interface Props {
+    tabs?: Record<1 | 2, string>;
+    ariaLabel: string;
+    border?: boolean;
+    activeTab?: string;
+    tab1?: import('svelte').Snippet;
+    tab2?: import('svelte').Snippet;
+  }
 
-  export let ariaLabel: string;
-  export let border = false;
-
-  export let activeTab = 'tab-1';
+  let {
+    tabs = {
+      1: 'Emoji',
+      2: 'Custom image',
+    },
+    ariaLabel,
+    border = false,
+    activeTab = $bindable('tab1'),
+    tab1,
+    tab2,
+  }: Props = $props();
 </script>
 
 <div class="tabbed-box whitespace-nowrap relative" class:with-border={border}>
@@ -21,18 +31,18 @@
       containerRole="tablist"
       {ariaLabel}
       options={[
-        { title: tabs[1], value: 'tab-1' },
-        { title: tabs[2], value: 'tab-2' },
+        { title: tabs[1], value: 'tab1' },
+        { title: tabs[2], value: 'tab2' },
       ]}
     />
   </div>
-  {#if activeTab === 'tab-1'}
+  {#if activeTab === 'tab1'}
     <div role="tabpanel">
-      <slot name="tab-1" />
+      {@render tab1?.()}
     </div>
-  {:else if activeTab === 'tab-2'}
+  {:else if activeTab === 'tab2'}
     <div role="tabpanel">
-      <slot name="tab-2" />
+      {@render tab2?.()}
     </div>
   {/if}
 </div>

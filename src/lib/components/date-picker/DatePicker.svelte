@@ -3,13 +3,41 @@
 	Credit to Kasper Henningsen & Contributors!
 -->
 <script lang="ts">
-  import { run, createBubbler } from 'svelte/legacy';
+  import { run } from 'svelte/legacy';
 
-  const bubble = createBubbler();
   import TimePicker from './TimePicker.svelte';
   import { getMonthLength, getCalendarDays, type CalendarDay } from './date-utils.js';
   import { getInnerLocale, type Locale } from './locale.js';
   import { createEventDispatcher } from 'svelte';
+
+  /** Default Date to use */
+  const defaultDate = new Date();
+
+  interface Props {
+    /** Date value. It's `null` if no date is selected */
+    value?: Date | null;
+    /** Show a time picker with the specified precision */
+    timePrecision?: 'minute' | 'second' | 'millisecond' | null;
+    /** The earliest year the user can select */
+    min?: Date;
+    /** The latest year the user can select */
+    max?: Date;
+    /** Locale object for internationalization */
+    locale?: Locale;
+    /** Wait with updating the date until a date is selected */
+    browseWithoutSelecting?: boolean;
+    onfocusout?: (e: FocusEvent) => void;
+  }
+
+  let {
+    value = $bindable(null),
+    timePrecision = null,
+    min = new Date(defaultDate.getFullYear() - 20, 0, 1),
+    max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999),
+    locale = {},
+    browseWithoutSelecting = false,
+    onfocusout = undefined,
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     /** Fires when the user selects a new value by clicking on a date or by pressing enter */
@@ -19,8 +47,6 @@
   function cloneDate(d: Date) {
     return new Date(d.getTime());
   }
-
-  
 
   function setValue(d: Date) {
     if (d.getTime() !== value?.getTime()) {
@@ -39,12 +65,6 @@
 
   const todayDate = new Date();
 
-  /** Default Date to use */
-  const defaultDate = new Date();
-
-  
-  
-  
   function clamp(d: Date, min: Date, max: Date) {
     if (d > max) {
       return cloneDate(max);
@@ -71,32 +91,6 @@
     }
     return years;
   }
-
-  
-  
-  interface Props {
-    /** Date value. It's `null` if no date is selected */
-    value?: Date | null;
-    /** Show a time picker with the specified precision */
-    timePrecision?: 'minute' | 'second' | 'millisecond' | null;
-    /** The earliest year the user can select */
-    min?: any;
-    /** The latest year the user can select */
-    max?: any;
-    /** Locale object for internationalization */
-    locale?: Locale;
-    /** Wait with updating the date until a date is selected */
-    browseWithoutSelecting?: boolean;
-  }
-
-  let {
-    value = $bindable(null),
-    timePrecision = null,
-    min = new Date(defaultDate.getFullYear() - 20, 0, 1),
-    max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999),
-    locale = {},
-    browseWithoutSelecting = false
-  }: Props = $props();
 
   function setYear(newYear: number) {
     browseDate.setFullYear(newYear);
@@ -127,7 +121,6 @@
       ),
     );
   }
-
 
   function selectDay(calendarDay: CalendarDay) {
     if (dayIsInRange(calendarDay, min, max)) {
@@ -249,7 +242,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="date-time-picker" onfocusout={bubble('focusout')} tabindex="0" onkeydown={keydown}>
+<div class="date-time-picker" {onfocusout} tabindex="0" onkeydown={keydown}>
   <div class="tab-container" tabindex="-1">
     <div class="top">
       <button
@@ -257,6 +250,7 @@
         class="page-button"
         tabindex="-1"
         onclick={() => setMonth(browseDate.getMonth() - 1)}
+        aria-label="Previous month"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
           ><path
@@ -320,6 +314,7 @@
         class="page-button"
         tabindex="-1"
         onclick={() => setMonth(browseDate.getMonth() + 1)}
+        aria-label="Next month"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
           ><path d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z" /></svg

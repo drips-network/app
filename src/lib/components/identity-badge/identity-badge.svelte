@@ -37,7 +37,7 @@
     linkToNewTab = false,
     showFullAddress = false,
     muted = false,
-    avatarImgElem = $bindable(undefined),
+    avatarImgElem = $bindable(),
     isReverse = false,
     tag = undefined,
   }: Props = $props();

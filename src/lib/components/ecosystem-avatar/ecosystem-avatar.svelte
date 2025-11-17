@@ -19,7 +19,6 @@
   import EcosystemIcon from '../icons/Ecosystem.svelte';
   import type { EcosystemAvatarFragment } from './__generated__/gql.generated';
 
-
   type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'huge';
   interface Props {
     ecosystem: EcosystemAvatarFragment | undefined;
@@ -28,12 +27,7 @@
     outline?: boolean;
   }
 
-  let {
-    ecosystem,
-    disabled = false,
-    size = 'small',
-    outline = true
-  }: Props = $props();
+  let { ecosystem, disabled = false, size = 'small', outline = true }: Props = $props();
 
   const CONTAINER_SIZES: Record<Size, string> = {
     micro: '0.8rem',
@@ -46,12 +40,14 @@
   };
   let containerSize = $derived(CONTAINER_SIZES[size]);
 
-  let pendingAvatar =
-    $derived(!ecosystem?.avatar ||
-    ecosystem.avatar.__typename !== 'EmojiAvatar' ||
-    !ecosystem.avatar.emoji.trim());
-  let emojiElem =
-    $derived(ecosystem?.avatar?.__typename === 'EmojiAvatar' ? twemoji(ecosystem.avatar.emoji) : undefined);
+  let pendingAvatar = $derived(
+    !ecosystem?.avatar ||
+      ecosystem.avatar.__typename !== 'EmojiAvatar' ||
+      !ecosystem.avatar.emoji.trim(),
+  );
+  let emojiElem = $derived(
+    ecosystem?.avatar?.__typename === 'EmojiAvatar' ? twemoji(ecosystem.avatar.emoji) : undefined,
+  );
 </script>
 
 <PrimaryColorThemer colorHex={ecosystem?.color}>
@@ -106,11 +102,6 @@
   .ecosystem-avatar .inner {
     height: 60%;
     width: 60%;
-  }
-
-  .ecosystem-avatar .inner * {
-    height: 100%;
-    width: 100%;
   }
 
   .with-outline {

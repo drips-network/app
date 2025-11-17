@@ -16,7 +16,7 @@
 
   let searchTerm: string | undefined = $state();
 
-  let searchElem: HTMLDivElement = $state();
+  let searchElem = $state<HTMLDivElement>();
 
   interface Props {
     searchOpen?: boolean;
@@ -26,7 +26,7 @@
 
   async function focusOnSearch() {
     await tick();
-    searchElem.focus();
+    searchElem?.focus();
   }
 
   run(() => {
@@ -119,7 +119,7 @@
     if (nextElem) {
       (nextElem as HTMLElement)?.focus();
     } else if (selectedIndex === 0 && changeIndexBy === -1) {
-      searchElem.focus();
+      searchElem?.focus();
     }
 
     e.preventDefault();
@@ -143,9 +143,13 @@
         bind:value={searchTerm}
         autocomplete="off"
       />
-      {#if searchOpen}<div transition:fly={{ duration: 300, y: 4 }}>
-          <CloseIcon style="cursor: pointer;" onclick={closeSearch} />
-        </div>{/if}
+      {#if searchOpen}
+        <div transition:fly={{ duration: 300, y: 4 }}>
+          <button aria-label="Close search" tabindex="0" onclick={closeSearch}>
+            <CloseIcon style="cursor: pointer;" />
+          </button>
+        </div>
+      {/if}
     </div>
     {#if searchOpen}
       <div

@@ -28,7 +28,7 @@
 
   let { context }: Props = $props();
 
-  let formValid: boolean = $state();
+  let formValid: boolean = $state(false);
 
   onMount(async () => {
     if ($context.highLevelPercentages['dependencies'] === 0) {
@@ -102,23 +102,19 @@
       maxItems={DEFAULT_MAX_ENTRIES - maintainerKeys.length}
     />
     {#snippet action()}
-      
-        <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
-      
-      {/snippet}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={goBackward}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        disabled={!formValid}
-        icon={ArrowRightIcon}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button
+      disabled={!formValid}
+      icon={ArrowRightIcon}
+      variant="primary"
+      onclick={() => dispatch('goForward')}>Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

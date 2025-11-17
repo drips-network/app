@@ -115,12 +115,10 @@
   <FormField title="Name">
     <span class="typo-text">{$context.dripList.title}</span>
     {#snippet action()}
-      
-        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
+        >Edit</Button
+      >
+    {/snippet}
   </FormField>
 
   <FormField title="Description">
@@ -130,12 +128,10 @@
       <span class="typo-text">{$context.dripList.description}</span>
     {/if}
     {#snippet action()}
-      
-        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -7 })}
+        >Edit</Button
+      >
+    {/snippet}
   </FormField>
 
   <FormField title="Collaborators">
@@ -145,12 +141,10 @@
       isEditable={false}
     />
     {#snippet action()}
-      
-        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+        >Edit</Button
+      >
+    {/snippet}
   </FormField>
 
   <FormField title="Voting ends">
@@ -161,12 +155,10 @@
       That's {formatDate($context.votingRoundConfig.votingEnds ?? unreachable(), 'verbose')} your time.
     </p>
     {#snippet action()}
-      
-        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+        >Edit</Button
+      >
+    {/snippet}
   </FormField>
 
   <FormField title="Allowed recipients">
@@ -180,59 +172,50 @@
       <span class="typo-text" style:color="var(--color-foreground-level-4)">Any recipient</span>
     {/if}
     {#snippet action()}
-      
-        <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
-          >Edit</Button
-        >
-      
-      {/snippet}
+      <Button variant="ghost" icon={Pen} onclick={() => dispatch('goForward', { by: -6 })}
+        >Edit</Button
+      >
+    {/snippet}
   </FormField>
 
   <WhatsNextSection>
     <WhatsNextCard>
       {#snippet title()}
-            Once confirmed…
-          {/snippet}
+        Once confirmed…
+      {/snippet}
       {#snippet items()}
-          
-          <WhatsNextItem icon={Proposals}>
-            Collaborators can begin <span class="typo-text-bold"
-              >voting on which projects and people should receive what percentage of funds</span
-            >.
-          </WhatsNextItem>
-          <WhatsNextItem icon={DripList}>
-            The Drip List will appear on your <span class="typo-text-bold">public profile</span>.
-          </WhatsNextItem>
-        
-          {/snippet}
+        <WhatsNextItem icon={Proposals}>
+          Collaborators can begin <span class="typo-text-bold"
+            >voting on which projects and people should receive what percentage of funds</span
+          >.
+        </WhatsNextItem>
+        <WhatsNextItem icon={DripList}>
+          The Drip List will appear on your <span class="typo-text-bold">public profile</span>.
+        </WhatsNextItem>
+      {/snippet}
     </WhatsNextCard>
     <WhatsNextCard>
       {#snippet title()}
-            After the voting period…
-          {/snippet}
+        After the voting period…
+      {/snippet}
       {#snippet items()}
-          
-          <WhatsNextItem icon={ArrowUp}>
-            You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.
-          </WhatsNextItem>
-          <WhatsNextItem icon={Pen}>
-            <span class="typo-text-bold">Edit your Drip List</span> anytime.
-          </WhatsNextItem>
-        
-          {/snippet}
+        <WhatsNextItem icon={ArrowUp}>
+          You can <span class="typo-text-bold">publish the Drip List</span> and begin supporting.
+        </WhatsNextItem>
+        <WhatsNextItem icon={Pen}>
+          <span class="typo-text-bold">Edit your Drip List</span> anytime.
+        </WhatsNextItem>
+      {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
 
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
 
   {#snippet actions()}
-  
-      <Button disabled={!formValid} icon={Wallet} variant="primary" onclick={submit}
-        >Confirm in wallet</Button
-      >
-    
+    <Button disabled={!formValid} icon={Wallet} variant="primary" onclick={submit}
+      >Confirm in wallet</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

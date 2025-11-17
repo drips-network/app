@@ -133,21 +133,19 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import formatNumber from '$lib/utils/format-number';
 
-
   // "partial" is reduced version w/ link to Drip List page for listing contexts
   // "minimal" is similar, but further reduced to just title, owner, description,
-  
 
   interface Props {
     data: {
-    dripList?: DripListCardFragment | null;
-    votingRound?:
-      | (VotingRound & {
-          splits?: SplitsComponentSplitsReceiver[];
-          allowedReceiversListEditorItems?: Items;
-        })
-      | null;
-  };
+      dripList?: DripListCardFragment | null;
+      votingRound?:
+        | (VotingRound & {
+            splits?: SplitsComponentSplitsReceiver[];
+            allowedReceiversListEditorItems?: Items;
+          })
+        | null;
+    };
     //  total funded, and number of splits
     variant?: 'full' | 'partial' | 'minimal';
     isHidden?: boolean;
@@ -170,23 +168,17 @@
     clampTitle = true,
     openInNewTab = false,
     maxSplitRows = undefined,
-    chainOverride = undefined
+    chainOverride = undefined,
   }: Props = $props();
-
-
-
-
-
 
   function triggerEditModal() {
     if (!dripList) return;
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  let activeTab: string = $state();
+  let activeTab = $state<string>();
 
-
-  let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[] = $state();
+  let incomingStreamsTotalStreamed = $state<{ tokenAddress: string; amount: bigint }[]>();
   function updateIncomingStreamsTotalStreamed() {
     if (!dripList) return;
 
@@ -215,11 +207,6 @@
     return () => tickStore.deregister(tick);
   });
 
-
-
-
-
-
   run(() => {
     assert(
       data.dripList || data.votingRound,
@@ -246,23 +233,31 @@
     }
   });
   let isOwnVotingRound = $derived(votingRound?.publisherAddress === $walletStore?.address);
-  let totalEarned = $derived(mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []));
-  let urlBase = $derived(chainOverride
-    ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
-    : '');
-  let dripListUrl = $derived(dripList
-    ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
-    : votingRound
-      ? `${urlBase}/app/drip-lists/${votingRound.id}`
-      : undefined);
-  let downloadableImageUrl = $derived(dripList
-    ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
-    : votingRound
-      ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
-      : undefined);
-  let votingEnded = $derived(votingRound
-    ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
-    : undefined);
+  let totalEarned = $derived(
+    mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []),
+  );
+  let urlBase = $derived(
+    chainOverride
+      ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
+      : '',
+  );
+  let dripListUrl = $derived(
+    dripList
+      ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
+      : votingRound
+        ? `${urlBase}/app/drip-lists/${votingRound.id}`
+        : undefined,
+  );
+  let downloadableImageUrl = $derived(
+    dripList
+      ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+      : votingRound
+        ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
+        : undefined,
+  );
+  let votingEnded = $derived(
+    votingRound ? new Date() >= new Date(votingRound.schedule.voting.endsAt) : undefined,
+  );
   let splitsFormatted = $derived(formatNumber(dripList?.splits?.length || 0));
 </script>
 

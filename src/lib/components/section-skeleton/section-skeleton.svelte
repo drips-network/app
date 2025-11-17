@@ -9,7 +9,6 @@
   import type { ComponentProps } from 'svelte';
   import Button from '../button/button.svelte';
 
-
   let highlit = $state(false);
 
   export const highlightSection = () => {
@@ -18,8 +17,6 @@
       highlit = false;
     }, 500);
   };
-
-
 
   interface Props {
     loaded?: boolean;
@@ -54,10 +51,10 @@
     disconnectedStateEmoji = '🫙',
     disconnectedStateHeadline = 'You are disconnected',
     disconnectedStateText = undefined,
-    children
+    children,
   }: Props = $props();
 
-  let placeholderContainerElem: HTMLDivElement = $state();
+  let placeholderContainerElem: HTMLDivElement | undefined = $state();
 
   let contentTransitonedIn = $state(loaded);
 </script>
@@ -143,7 +140,7 @@
       in:scale={{ duration: 300, start: 0.9 }}
       out:scale={{ duration: 300, start: 1.05 }}
       class="highlight-overlay"
-   ></div>
+    ></div>
   {/if}
 </div>
 

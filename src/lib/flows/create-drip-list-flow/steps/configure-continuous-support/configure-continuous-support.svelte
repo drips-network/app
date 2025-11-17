@@ -18,7 +18,7 @@
 
   let { context }: Props = $props();
 
-  let formValid: boolean = $state();
+  let formValid: boolean = $state(false);
 </script>
 
 <StandaloneFlowStepLayout
@@ -43,19 +43,17 @@
     bind:topUpAmountValueParsed={$context.continuousSupportConfig.topUpAmountValueParsed}
     bind:selectedTokenAddress={$context.continuousSupportConfig.listSelected[0]}
   />
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        disabled={!formValid}
-        icon={Check}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button
+      disabled={!formValid}
+      icon={Check}
+      variant="primary"
+      onclick={() => dispatch('goForward')}>Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>
 

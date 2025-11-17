@@ -1,19 +1,19 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
-  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import { createEventDispatcher, type Component } from 'svelte';
 
   const dispatch = createEventDispatcher<{ edit: { stepIndex: number } }>();
 
   interface ComponentAndProps {
-    component: ComponentType;
+    component: Component;
     props: Record<string, unknown>;
   }
 
   interface Props {
     leftComponent?: ComponentAndProps | undefined;
     rightComponent?: ComponentAndProps | undefined;
-    icon?: ComponentType | undefined;
+    icon?: Component | undefined;
     title?: string | undefined;
     editStepIndex?: number | undefined;
   }
@@ -23,7 +23,7 @@
     rightComponent = undefined,
     icon = undefined,
     title = undefined,
-    editStepIndex = undefined
+    editStepIndex = undefined,
   }: Props = $props();
 </script>
 

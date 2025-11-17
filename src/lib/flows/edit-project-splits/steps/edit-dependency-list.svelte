@@ -28,7 +28,7 @@
 
   let { context }: Props = $props();
 
-  let formValid: boolean = $state();
+  let formValid = $state(false);
 
   function handleImportCSV() {
     dispatch(
@@ -85,23 +85,19 @@
       maxItems={DEFAULT_MAX_ENTRIES - maintainerKeys.length}
     />
     {#snippet action()}
-      
-        <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
-      
-      {/snippet}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeft} onclick={goBackward}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        disabled={!formValid}
-        icon={ArrowRight}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button
+      disabled={!formValid}
+      icon={ArrowRight}
+      variant="primary"
+      onclick={() => dispatch('goForward')}>Continue</Button
+    >
   {/snippet}
 </StepLayout>

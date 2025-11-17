@@ -116,7 +116,7 @@ describe('stepper.svelte', () => {
         steps: [
           makeStep({
             component: TriggerAwaitEvent,
-            props: undefined,
+            props: {},
           }),
           makeStep({
             component: OnlyText,

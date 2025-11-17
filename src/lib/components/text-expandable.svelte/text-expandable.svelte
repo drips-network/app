@@ -47,10 +47,11 @@
     >{/if}
   {#if isClamped && isExpandable}
     <button
+      aria-label="Expand text"
       class="absolute overlay focus-visible:bg-primary-level-1 rounded"
       onclick={() => {
         expanded = true;
       }}
-   ></button>
+    ></button>
   {/if}
 </div>

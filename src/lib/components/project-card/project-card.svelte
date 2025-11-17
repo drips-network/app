@@ -107,10 +107,6 @@
         size="tiny"
         {project}
       />
-      <!-- TODO: Add descriptions to product cards · Issue #1579 -->
-      <!-- {#if projectChainData.description}
-        <p class="typo-text-small line-clamp-2">{projectChainData.description}</p>
-      {/if} -->
     </div>
     <div class="cubbies">
       {#if isClaimed(projectChainData)}

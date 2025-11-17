@@ -1,26 +1,19 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
   import Emoji from '$lib/components/emoji/emoji.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     selected: boolean;
     emoji: string;
     title: string;
-    attributes?: { icon: ComponentType; text: string }[];
+    attributes?: { icon: Component; text: string }[];
+    onclick?: () => void;
   }
 
-  let {
-    selected,
-    emoji,
-    title,
-    attributes = []
-  }: Props = $props();
+  let { selected, emoji, title, attributes = [], onclick = () => {} }: Props = $props();
 </script>
 
-<button onclick={bubble('click')} class="option" class:selected role="radio" aria-checked={selected}>
+<button {onclick} class="option" class:selected role="radio" aria-checked={selected}>
   <div class="icon">
     <Emoji {emoji} size="huge" />
   </div>

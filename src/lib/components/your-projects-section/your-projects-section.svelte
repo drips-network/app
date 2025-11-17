@@ -22,7 +22,6 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
-
   let error = false;
 
   interface Props {
@@ -38,7 +37,7 @@
     withClaimProjectButton = false,
     showVisibilityToggle = false,
     collapsed = $bindable(false),
-    collapsable = $bindable(false)
+    collapsable = $bindable(false),
   }: Props = $props();
 
   let showHidden: boolean = $state(false);
@@ -48,7 +47,9 @@
 
   let hiddenProjects = $derived(showHidden ? projects.filter((p) => !p.isVisible) : []);
 
-  let isOwner = $derived($walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId));
+  let isOwner = $derived(
+    $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId),
+  );
 </script>
 
 <Section
@@ -70,7 +71,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: showVisibilityToggle ? projects.length === 0 : visibleProjects.length === 0,
+    empty: showVisibilityToggle ? projects?.length === 0 : visibleProjects?.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',

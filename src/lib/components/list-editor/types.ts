@@ -44,7 +44,8 @@ export const LIST_EDITOR_SUB_LIST_FRAGMENT = gql`
 
 type BaseItem = {
   rightComponent?: {
-    component: Component<never>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: Component<any>;
     props: Record<string, unknown>;
   };
 };

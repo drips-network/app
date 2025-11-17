@@ -19,24 +19,25 @@
 
   let {
     field,
-    answer = $bindable(undefined),
+    answer = $bindable(),
     valid = $bindable(false),
     forceRevealError = undefined,
-    blockInteraction = false
+    blockInteraction = false,
   }: Props = $props();
 
-  let items: Items = $derived(Object.fromEntries(
-    field.options.map((option) => {
-      return [
-        option.value,
-        {
-          type: 'selectable',
-          label: option.label,
-        },
-      ];
-    }),
-  ));
-  
+  let items: Items = $derived(
+    Object.fromEntries(
+      field.options.map((option) => {
+        return [
+          option.value,
+          {
+            type: 'selectable',
+            label: option.label,
+          },
+        ];
+      }),
+    ),
+  );
 
   let beenFocussed = false;
 

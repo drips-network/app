@@ -26,7 +26,7 @@
 
   let { announcementBanner = undefined }: Props = $props();
 
-  let wrapper: Element = $state();
+  let wrapper: Element;
 
   let firstRender = $state(true);
   onMount(() => {
@@ -38,11 +38,12 @@
   function dismissAnnouncement() {
     dismissablesStore.dismiss(dismissableKey);
   }
-  let announcementBannerVisible =
-    $derived(announcementBanner &&
-    !$dismissablesStore.includes(dismissableKey) &&
-    !firstRender &&
-    !scrolledDown);
+  let announcementBannerVisible = $derived(
+    announcementBanner &&
+      !$dismissablesStore.includes(dismissableKey) &&
+      !firstRender &&
+      !scrolledDown,
+  );
 
   let openMenu: string | 'all' | null = $state(null);
   let menuXOffset: number | null = $state(null);
@@ -173,8 +174,7 @@
       </nav>
     </div>
     <div data-sveltekit-preload-code="eager" data-sveltekit-reload>
-      <Button variant="primary" href="/app" on:mouseenter={() => (openMenu = null)}>Open app</Button
-      >
+      <Button variant="primary" href="/app" onmouseenter={() => (openMenu = null)}>Open app</Button>
     </div>
   </div>
   {#if openMenu}
@@ -237,7 +237,9 @@
           style:text-decoration="underline"
           style:white-space="nowrap">Learn more</a
         >
-        <Cross onclick={dismissAnnouncement} style="fill: white; cursor: pointer;" />
+        <button aria-label="Dismiss announcement" onclick={dismissAnnouncement}>
+          <Cross style="fill: white;" />
+        </button>
       </div>
     </div>
   {/if}

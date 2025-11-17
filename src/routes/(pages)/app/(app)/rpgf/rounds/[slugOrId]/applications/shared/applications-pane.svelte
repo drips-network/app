@@ -22,8 +22,8 @@
   interface Props {
     round: Round;
     ballotStore: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+      clear: () => void;
+    };
     sortByParam: SortByParam;
     filterParam: FilterParam | null;
     loggedIn: boolean;
@@ -44,7 +44,7 @@
     voteMode,
     reviewMode,
     allApplications,
-    tableConfiguratorEl = $bindable(undefined)
+    tableConfiguratorEl = $bindable(),
   }: Props = $props();
 
   async function handleDownload(format: 'csv' | 'xlsx') {
@@ -103,7 +103,6 @@
 
     ...Object.fromEntries(categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }])),
   } as Record<FilterParam, TDropdownOption>);
-  
 </script>
 
 <div>
@@ -116,10 +115,8 @@
       Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
       private data if you're an admin.
       {#snippet actions()}
-          
-          <RpgfSiweButton />
-        
-          {/snippet}
+        <RpgfSiweButton />
+      {/snippet}
     </AnnotationBox>
   </div>
 {/if}

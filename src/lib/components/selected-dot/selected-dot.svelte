@@ -7,7 +7,7 @@
     focussed?: boolean;
   }
 
-  let { selected, type = 'radio', focussed = false }: Props = $props();
+  let { selected = $bindable(false), type = 'radio', focussed = false }: Props = $props();
 </script>
 
 {#if type === 'radio'}

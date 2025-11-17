@@ -22,14 +22,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    url,
-    variant = 'normal',
-    success,
-    hover,
-    idle,
-    children
-  }: Props = $props();
+  let { url, variant = 'normal', success, hover, idle, children }: Props = $props();
 
   let hovering = $state(false);
   let copySuccess = $state(false);
@@ -43,10 +36,10 @@
 </script>
 
 <Button
-  on:mouseenter={() => (hovering = true)}
-  on:focus={() => (hovering = true)}
-  on:mouseleave={() => (hovering = false)}
-  on:blur={() => (hovering = false)}
+  onmouseenter={() => (hovering = true)}
+  onfocus={() => (hovering = true)}
+  onmouseleave={() => (hovering = false)}
+  onblur={() => (hovering = false)}
   onclick={copyShareLink}
   justify="left"
   {variant}

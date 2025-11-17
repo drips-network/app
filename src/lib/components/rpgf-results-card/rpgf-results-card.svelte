@@ -21,12 +21,7 @@
     resultsPublished: boolean;
   }
 
-  let {
-    roundId,
-    roundName,
-    resultsCalculated,
-    resultsPublished
-  }: Props = $props();
+  let { roundId, roundName, resultsCalculated, resultsPublished }: Props = $props();
 
   let calcMethod = $state('avg');
 
@@ -75,7 +70,7 @@
     );
   }
 
-  let step: 'calculate' | 'publish' | 'published' | 'linked' = $state();
+  let step: 'calculate' | 'publish' | 'published' | 'linked' | undefined = $state();
   if (resultsPublished) {
     step = 'published';
   } else if (resultsCalculated) {

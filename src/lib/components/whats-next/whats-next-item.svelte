@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import UlIconLi from '../ul-icon-li/ul-icon-li.svelte';
 
   interface Props {
-    icon: ComponentType;
+    icon: Component;
     children?: import('svelte').Snippet;
   }
 

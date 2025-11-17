@@ -38,12 +38,25 @@
   import EmojiPicker from '../emoji-picker/emoji-picker.svelte';
   import ColorPicker from '../color-picker/color-picker.svelte';
 
+  interface Props {
+    originalProject: ProjectCustomizerFragment;
+    newProjectData: Writable<
+      ReturnType<
+        typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+      > & { isProjectVisible: boolean }
+    >;
+    valid?: boolean;
+  }
 
-  let activeTab: 'tab-1' | 'tab-2' =
-    $state($newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab-1' : 'tab-2');
+  let { originalProject, newProjectData, valid = $bindable(false) }: Props = $props();
 
-  let selectedEmoji =
-    $state($newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧');
+  let activeTab: 'tab1' | 'tab2' = $state(
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? 'tab1' : 'tab2',
+  );
+
+  let selectedEmoji = $state(
+    $newProjectData.avatar.__typename === 'EmojiAvatar' ? $newProjectData.avatar.emoji : '💧',
+  );
   function handleEmojiChange(newEmoji: string) {
     $newProjectData.avatar = {
       __typename: 'EmojiAvatar',
@@ -70,10 +83,11 @@
     handleIsVisibleChange(isVisible);
   });
 
-  let lastUploadedCid =
-    $state($newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined);
+  let lastUploadedCid = $state(
+    $newProjectData.avatar.__typename === 'ImageAvatar' ? $newProjectData.avatar.cid : undefined,
+  );
   function handleFileUpload(e: CustomEvent<{ ipfsCid: string }>) {
-    if (activeTab !== 'tab-2') {
+    if (activeTab !== 'tab2') {
       return;
     }
 
@@ -85,13 +99,13 @@
     };
   }
 
-  function handleTabChange(newTab: 'tab-1' | 'tab-2', lastUploadedCid: string | undefined) {
-    if (newTab === 'tab-1') {
+  function handleTabChange(newTab: 'tab1' | 'tab2', lastUploadedCid: string | undefined) {
+    if (newTab === 'tab1') {
       $newProjectData.avatar = {
         __typename: 'EmojiAvatar',
         emoji: selectedEmoji,
       };
-    } else if (newTab === 'tab-2' && lastUploadedCid) {
+    } else if (newTab === 'tab2' && lastUploadedCid) {
       $newProjectData = {
         ...$newProjectData,
         avatar: {
@@ -107,19 +121,8 @@
     handleTabChange(activeTab, lastUploadedCid);
   });
 
-  interface Props {
-    originalProject: ProjectCustomizerFragment;
-    newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
-    valid?: boolean;
-  }
-
-  let { originalProject, newProjectData, valid = $bindable(false) }: Props = $props();
   run(() => {
-    valid = Boolean(activeTab === 'tab-1' || lastUploadedCid);
+    valid = Boolean(activeTab === 'tab1' || lastUploadedCid);
   });
 </script>
 
@@ -127,7 +130,7 @@
   <FormField type="div">
     <div style:pointer-events="none">
       <ProjectProfileHeader
-        pendingAvatar={activeTab === 'tab-2' && !lastUploadedCid}
+        pendingAvatar={activeTab === 'tab2' && !lastUploadedCid}
         project={{
           ...originalProject,
           chainData: [$newProjectData],
@@ -137,14 +140,12 @@
   </FormField>
 
   <TabbedBox bind:activeTab ariaLabel="Avatar settings" border={true}>
-    <!-- @migration-task: migrate this slot by hand, `tab-1` is an invalid identifier -->
-  <svelte:fragment slot="tab-1">
+    {#snippet tab1()}
       <EmojiPicker bind:selectedEmoji />
-    </svelte:fragment>
-    <!-- @migration-task: migrate this slot by hand, `tab-2` is an invalid identifier -->
-  <svelte:fragment slot="tab-2">
+    {/snippet}
+    {#snippet tab2()}
       <FileUpload on:uploaded={handleFileUpload} />
-    </svelte:fragment>
+    {/snippet}
   </TabbedBox>
 
   <FormField type="div" title="Color">

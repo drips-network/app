@@ -39,18 +39,26 @@
 
   let { context }: Props = $props();
 
-  let network = $derived($walletStore.network.name
-    ? $walletStore.network.name === 'homestead'
-      ? 'ethereum'
-      : $walletStore.network.name
-    : unreachable());
-  let editing = $derived($context.funding.object && Object.keys($context.funding.object).length > 0);
-  let description = $derived(editing
-    ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
-    : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`);
-  let checkboxLabel = $derived(editing
-    ? 'I edited the FUNDING.json file'
-    : 'I added the FUNDING.json file to the root of my repo.');
+  let network = $derived(
+    $walletStore.network.name
+      ? $walletStore.network.name === 'homestead'
+        ? 'ethereum'
+        : $walletStore.network.name
+      : unreachable(),
+  );
+  let editing = $derived(
+    $context.funding.object && Object.keys($context.funding.object).length > 0,
+  );
+  let description = $derived(
+    editing
+      ? `To verify you are the owner of this project, please add your owner address for ${network} to your FUNDING.json file.`
+      : `To verify you are the owner of this project, please add a FUNDING.json file with your owner address for ${network} to the default branch of your repository.`,
+  );
+  let checkboxLabel = $derived(
+    editing
+      ? 'I edited the FUNDING.json file'
+      : 'I added the FUNDING.json file to the root of my repo.',
+  );
 
   onMount(() => {
     $context.linkedToRepo = false;
@@ -145,15 +153,13 @@
     {editing}
   />
   <Checkbox bind:checked label={checkboxLabel} />
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" onclick={verify}
-        >Verify now</Button
-      >
-    
+    <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" onclick={verify}
+      >Verify now</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

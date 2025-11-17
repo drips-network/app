@@ -40,6 +40,9 @@
   });
 
   function updateTimeline() {
+    if (!timelineElem || activeItemIndex === undefined) {
+      return;
+    }
 
     updatedOnce = true;
 
@@ -53,8 +56,8 @@
     const offsetY = activeItemTop - timelineTop + 4;
     timelineCircleOffsetY.set(offsetY);
   }
-  let schedule =
-    $derived((round.applicationPeriodStart &&
+  let schedule = $derived(
+    (round.applicationPeriodStart &&
       round.applicationPeriodEnd &&
       round.votingPeriodStart &&
       round.votingPeriodEnd &&
@@ -65,16 +68,19 @@
         votingPeriodEnd: new Date(round.votingPeriodEnd),
         resultsPeriodStart: new Date(round.resultsPeriodStart),
       }) ||
-    null);
-  let timeline = $derived(schedule
-    ? [
-        { date: schedule.applicationPeriodStart, title: 'Registration' },
-        { date: schedule.applicationPeriodEnd, title: 'Review' },
-        { date: schedule.votingPeriodStart, title: 'Voting' },
-        { date: schedule.votingPeriodEnd, title: 'Tallying' },
-        { date: schedule.resultsPeriodStart, title: 'Distribution' },
-      ]
-    : null);
+      null,
+  );
+  let timeline = $derived(
+    schedule
+      ? [
+          { date: schedule.applicationPeriodStart, title: 'Registration' },
+          { date: schedule.applicationPeriodEnd, title: 'Review' },
+          { date: schedule.votingPeriodStart, title: 'Voting' },
+          { date: schedule.votingPeriodEnd, title: 'Tallying' },
+          { date: schedule.resultsPeriodStart, title: 'Distribution' },
+        ]
+      : null,
+  );
   run(() => {
     if (!timeline) {
       activeItemIndex = -1;
@@ -115,7 +121,7 @@
           {date}
           isActive={i === activeItemIndex}
           expanded={i === activeItemIndex}
-          isDone={i < activeItemIndex}
+          isDone={activeItemIndex === undefined ? false : i < activeItemIndex}
           until={timeline[i + 1]?.date}
           onExpandChange={() => updateTimeline()}
           fuzzy={title === 'Distribution'}

@@ -14,7 +14,7 @@ WORKDIR /app
 # Copies both package.json and package-lock.json
 COPY package*.json ./
 # Install dependencies
-RUN npm ci --ignore-scripts;
+RUN npm i --ignore-scripts;
 RUN rm -rf .svelte-kit
 
 EXPOSE 5173

@@ -18,9 +18,6 @@
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
 
-
-
-
   interface Props {
     round: Round;
     application: ListingApplication;
@@ -35,10 +32,10 @@
     round,
     application,
     reviewMode,
-    decision = $bindable(null),
+    decision = $bindable(),
     voteStep = null,
     ballotStore,
-    ellipsis = false
+    ellipsis = false,
   }: Props = $props();
 
   /** If true, only the application name and icon are clickable, otherwise entire row.
@@ -68,8 +65,9 @@
     updateBallot(picked);
   });
 
-  let voteAmountInput: string | undefined =
-    $state($ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]));
+  let voteAmountInput: string | undefined = $state(
+    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]),
+  );
   let voteAmountInputValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
 
   const ballotValidationErrors = getContext<BallotValidationErrorsStore | undefined>(
@@ -97,14 +95,15 @@
     updateValidationErrors(state);
   }
 
-  let votePlaceholder =
-    $derived(round.minVotesPerProjectPerVoter !== null && round.maxVotesPerProjectPerVoter !== null
+  let votePlaceholder = $derived(
+    round.minVotesPerProjectPerVoter !== null && round.maxVotesPerProjectPerVoter !== null
       ? `${round.minVotesPerProjectPerVoter}-${round.maxVotesPerProjectPerVoter}`
       : round.minVotesPerProjectPerVoter !== null
         ? `${round.minVotesPerProjectPerVoter}+`
         : round.maxVotesPerProjectPerVoter !== null
           ? `0-${round.maxVotesPerProjectPerVoter}`
-          : undefined);
+          : undefined,
+  );
 
   function updateVoteAmount(voteAmountInput: string | undefined) {
     if (voteStep !== 'assign-votes') {
@@ -176,9 +175,11 @@
 
   let active = $derived($page.url.href.includes(`/applications/${application.id}`));
 
-  let link = $derived(`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
-    voteStep === 'assign-votes' ? '?backToBallot' : ''
-  }${$page.url.search}`);
+  let link = $derived(
+    `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
+      voteStep === 'assign-votes' ? '?backToBallot' : ''
+    }${$page.url.search}`,
+  );
 </script>
 
 <svelte:element
@@ -204,7 +205,7 @@
   {#if voteStep === 'assign-votes' && application.state === 'approved'}
     <div class="vote-count-input">
       <TextInput
-        on:click={(e) => e.preventDefault()}
+        onclick={(e) => e.preventDefault()}
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
         variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}

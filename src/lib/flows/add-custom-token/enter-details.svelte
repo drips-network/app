@@ -24,7 +24,7 @@
   }
 
   let { tokenAddress = $bindable('') }: Props = $props();
-  let tokenAddressValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
+  let tokenAddressValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
 
   let tokenName: string | undefined = $state(undefined);
   let tokenSymbol: string | undefined = $state(undefined);
@@ -33,13 +33,14 @@
 
   let urlValid = $derived(tokenLogoUrl ? validateUrl(tokenLogoUrl) : true);
 
-  let formValid =
-    $derived(tokenAddressValidationState.type === 'valid' &&
-    tokenName &&
-    tokenSymbol &&
-    tokenDecimals &&
-    tokenDecimals > 0 &&
-    urlValid);
+  let formValid = $derived(
+    tokenAddressValidationState.type === 'valid' &&
+      tokenName &&
+      tokenSymbol &&
+      tokenDecimals &&
+      tokenDecimals > 0 &&
+      urlValid,
+  );
 
   async function updateTokenInfo() {
     tokenAddressValidationState = { type: 'pending' };
@@ -139,10 +140,8 @@
     <TextInput placeholder="https://foo.com/token.png" bind:value={tokenLogoUrl} />
   </FormField>
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button variant="primary" disabled={!formValid} onclick={submit}>Add custom token</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" disabled={!formValid} onclick={submit}>Add custom token</Button>
   {/snippet}
 </StepLayout>
 

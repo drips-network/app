@@ -1,8 +1,9 @@
-import type { Component } from 'svelte';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Component, ComponentProps } from 'svelte';
 
 interface ComponentAndProps {
-  component: Component<never>;
-  props: { [propName: string]: unknown };
+  component: Component<any>;
+  props: ComponentProps<Component<any>>;
 }
 
 type SearchString = string | string[];
@@ -32,8 +33,8 @@ export interface ActionItem {
   image?:
     | string
     | {
-        component: Component<never>;
-        props: { [propName: string]: unknown };
+        component: Component<any>;
+        props: ComponentProps<Component<any>>;
       };
 }
 

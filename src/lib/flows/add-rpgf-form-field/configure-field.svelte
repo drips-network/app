@@ -31,7 +31,7 @@
 
   let fieldSettings = $derived($context.field ?? unreachable());
 
-  let valid: boolean = $state();
+  let valid = $state(false);
   run(() => {
     const normalizedFieldSettings = {
       ...fieldSettings,
@@ -49,12 +49,13 @@
   });
 
   let listSelectAddItemInput = $state('');
-  let listSelectAddItemInputValid =
-    $derived(listSelectAddItemInput.trim() !== '' &&
-    fieldSettings.type === 'select' &&
-    !fieldSettings.options?.some(
-      (option) => option.value.toLowerCase() === listSelectAddItemInput.trim().toLowerCase(),
-    ));
+  let listSelectAddItemInputValid = $derived(
+    listSelectAddItemInput.trim() !== '' &&
+      fieldSettings.type === 'select' &&
+      !fieldSettings.options?.some(
+        (option) => option.value.toLowerCase() === listSelectAddItemInput.trim().toLowerCase(),
+      ),
+  );
 
   function handleAddSelectOption() {
     if (fieldSettings.type !== 'select') return;

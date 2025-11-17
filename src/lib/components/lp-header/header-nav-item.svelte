@@ -3,9 +3,6 @@
   import ChevronDown from '../icons/ChevronDown.svelte';
   import { page } from '$app/stores';
 
-
-
-
   interface Props {
     dropdown?: boolean;
     tonedDown?: boolean;
@@ -21,10 +18,10 @@
     dropdownActive = false,
     href = null,
     elem = $bindable(null),
-    children
+    children,
   }: Props = $props();
 
-  let element: HTMLDivElement = $state();
+  let element: HTMLDivElement;
 
   const dispatch = createEventDispatcher<{ activate: Element; navigate: void }>();
 

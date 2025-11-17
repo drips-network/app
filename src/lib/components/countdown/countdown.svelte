@@ -11,7 +11,7 @@
 
   let { targetDate }: Props = $props();
 
-  let interval: ReturnType<typeof setInterval> = $state();
+  let interval = $state<ReturnType<typeof setInterval>>();
 
   let timeLeft = $derived(targetDate.getTime() - Date.now());
 

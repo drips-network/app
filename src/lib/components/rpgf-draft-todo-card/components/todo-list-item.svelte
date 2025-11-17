@@ -4,12 +4,11 @@
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import { fly } from 'svelte/transition';
 
-
   interface Props {
-    icon: ComponentType;
+    icon: Component;
     done: boolean;
     optional?: boolean;
     title: string;
@@ -17,16 +16,9 @@
     href: string;
   }
 
-  let {
-    icon,
-    done,
-    optional = false,
-    title,
-    error = false,
-    href
-  }: Props = $props();
+  let { icon, done, optional = false, title, error = false, href }: Props = $props();
 
-  let iconFillColor: string = $state();
+  let iconFillColor: string | undefined = $state();
   run(() => {
     if (error) {
       iconFillColor = 'var(--color-caution)';

@@ -31,10 +31,6 @@
   import Stepper from '../stepper/stepper.svelte';
   import type { CollectButtonWithdrawableBalanceFragment } from './__generated__/gql.generated';
 
-
-  
-
-  
   interface Props {
     withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
     /** If true, the collectable amount will only briefly peek on screen when updated, rather than staying forever. */
@@ -45,31 +41,38 @@
 
   let { withdrawableBalances, peekAmount = false, isPeeking = $bindable(false) }: Props = $props();
 
-  let amountElem: HTMLDivElement = $state();
+  let amountElem: HTMLDivElement;
   let amountElemWidth = tweened(0, { duration: 400, easing: quintInOut });
 
-  let tokenAddresses = $derived(withdrawableBalances?.reduce<string[]>((acc, { tokenAddress }) => {
-    if (tokenAddress) {
-      acc.push(tokenAddress);
-    }
-    return acc;
-  }, []));
+  let tokenAddresses = $derived(
+    withdrawableBalances?.reduce<string[]>((acc, { tokenAddress }) => {
+      if (tokenAddress) {
+        acc.push(tokenAddress);
+      }
+      return acc;
+    }, []),
+  );
 
   const fiatEstimatesStarted = fiatEstimates.started;
 
-  let amounts = $derived(withdrawableBalances
-    ?.map(({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
-      tokenAddress,
-      amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
-    }))
-    .filter(({ amount }) => amount > 0n));
+  let amounts = $derived(
+    withdrawableBalances
+      ?.map(({ tokenAddress, splittableAmount, receivableAmount, collectableAmount }) => ({
+        tokenAddress,
+        amount: BigInt(splittableAmount) + BigInt(receivableAmount) + BigInt(collectableAmount),
+      }))
+      .filter(({ amount }) => amount > 0n),
+  );
 
   run(() => {
     tokenAddresses && $fiatEstimatesStarted && fiatEstimates.track(tokenAddresses);
   });
-  let priceReadable =
-    $derived($fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined);
-  let amount = $derived(amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined);
+  let priceReadable = $derived(
+    $fiatEstimatesStarted && tokenAddresses ? fiatEstimates.price(tokenAddresses) : undefined,
+  );
+  let amount = $derived(
+    amounts ? aggregateFiatEstimateReadable(priceReadable, amounts) : undefined,
+  );
 
   let amountTransitioning = $state(false);
   let amountToShow: ReturnType<typeof aggregateFiatEstimate> | undefined = $state();

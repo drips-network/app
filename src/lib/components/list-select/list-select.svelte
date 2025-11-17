@@ -1,17 +1,11 @@
 <script lang="ts">
-  import { handlers } from 'svelte/legacy';
-
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import EyeClosedIcon from '$lib/components/icons/EyeClosed.svelte';
   import type { Items } from './list-select.types';
   import SelectedDot from '../selected-dot/selected-dot.svelte';
   import PercentageEditor from '$lib/components/percentage-editor/percentage-editor.svelte';
 
-
   let searchString = $state('');
-
-
-
 
   interface Props {
     items: Items;
@@ -40,11 +34,10 @@
     maxSelected = 10,
     blockSelecting = false,
     selected = $bindable([]),
-    percentages = $bindable({})
+    percentages = $bindable({}),
   }: Props = $props();
 
   let lastSelectedSlug: string | undefined;
-
 
   function selectItem(slug: string, shiftKey = false) {
     if (!canSelectAnother && !selected.includes(slug)) return;
@@ -107,7 +100,7 @@
     e.preventDefault();
   };
 
-  let searchBarElem: HTMLDivElement = $state();
+  let searchBarElem = $state<HTMLDivElement>();
   let itemElements: { [slug: string]: HTMLDivElement } = $state({});
   let focussedSlug: string | undefined = $state();
 
@@ -141,7 +134,7 @@
         if (previousElem) {
           previousElem.focus();
         } else {
-          searchBarElem.focus();
+          searchBarElem?.focus();
         }
 
         break;
@@ -159,30 +152,35 @@
       (item.disabled || (!canSelectAnother && !selected.includes(slug)))
     );
   }
-  let filteredItems = $derived(Object.fromEntries(
-    Object.entries(items).filter((entry) => {
-      const item = entry[1];
-      if (item.type === 'interstitial') return;
+  let filteredItems = $derived(
+    Object.fromEntries(
+      Object.entries(items).filter((entry) => {
+        const item = entry[1];
+        if (item.type === 'interstitial') return;
 
-      const itemSearchString =
-        (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
+        const itemSearchString =
+          (item.searchString ?? (typeof item.label === 'string' && item.label)) || '';
 
-      const searchStrings = Array.isArray(itemSearchString) ? itemSearchString : [itemSearchString];
+        const searchStrings = Array.isArray(itemSearchString)
+          ? itemSearchString
+          : [itemSearchString];
 
-      const startsWithSearchString = searchStrings.some((s) =>
-        s.toLowerCase().startsWith(searchString.toLowerCase()),
-      );
+        const startsWithSearchString = searchStrings.some((s) =>
+          s.toLowerCase().startsWith(searchString.toLowerCase()),
+        );
 
-      return startsWithSearchString || item.type === 'action';
-    }),
-  ));
+        return startsWithSearchString || item.type === 'action';
+      }),
+    ),
+  );
   let noItems = $derived(Object.keys(items).length === 0);
-  let listIsEmpty =
-    $derived(Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0);
+  let listIsEmpty = $derived(
+    Object.values(filteredItems).filter((item) => item.type !== 'action').length === 0,
+  );
   let canSelectAnother = $derived(selected.length < maxSelected);
 </script>
 
-<svelte:window onkeydown={handlers(handleArrowKeys, handleArrowKeys)} />
+<svelte:window onkeydown={handleArrowKeys} />
 
 <div
   role="listbox"

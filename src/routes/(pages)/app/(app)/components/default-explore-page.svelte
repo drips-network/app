@@ -48,7 +48,7 @@
     blogPosts = $bindable(),
     featuredDripLists,
     totalDrippedPrices,
-    tlv
+    tlv,
   }: Props = $props();
 
   // 2 latest posts. Sort by date
@@ -58,18 +58,20 @@
       .slice(0, 2);
   });
 
-  let totalDrippedAmounts: ReturnType<typeof totalDrippedApproximation> = $state();
+  let totalDrippedAmounts = $state<ReturnType<typeof totalDrippedApproximation>>();
   function update() {
     totalDrippedAmounts = totalDrippedApproximation();
   }
   update();
 
-  let formattedTlv = $derived(new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Math.round(tlv)));
+  let formattedTlv = $derived(
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Math.round(tlv)),
+  );
 
   let tickHandle: number;
   onMount(async () => {
@@ -79,7 +81,7 @@
     tickStore.deregister(tickHandle);
   });
 
-  let enabledNetworks = $derived(Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet));
+  let enabledNetworks = Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet);
 </script>
 
 <div class="explore">
@@ -108,20 +110,18 @@
     </div>
 
     {#snippet actions()}
-      
-        <Button
-          variant="primary"
-          icon={ArrowUpRight}
-          href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
-          target="_blank">Check it out</Button
-        >
-        <Button
-          icon={ArrowCounterClockwiseHeart}
-          href="https://www.drips.network/solutions/retro-pgf"
-          target="_blank">About RetroPGF on Drips</Button
-        >
-      
-      {/snippet}
+      <Button
+        variant="primary"
+        icon={ArrowUpRight}
+        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
+        target="_blank">Check it out</Button
+      >
+      <Button
+        icon={ArrowCounterClockwiseHeart}
+        href="https://www.drips.network/solutions/retro-pgf"
+        target="_blank">About RetroPGF on Drips</Button
+      >
+    {/snippet}
   </FeatureCard>
 
   <Section

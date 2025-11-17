@@ -19,6 +19,7 @@ import type {
   AddDripListMemberFlowListsFragment,
   AddDripListMemberFlowProjectToAddFragment,
 } from './__generated__/gql.generated';
+import type { Items, Weights } from '$lib/components/list-editor/types';
 
 export const ADD_DRIP_LIST_MEMBER_FLOW_LISTS_FRAGMENT = gql`
   ${SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT}
@@ -45,6 +46,17 @@ export const ADD_DRIP_LIST_MEMBER_FLOW_DRIP_LIST_TO_ADD_FRAGMENT = gql`
   }
 `;
 
+export type ContextType = {
+  listEditorConfig: {
+    items: Items;
+    weights: Weights;
+  };
+  name: string;
+  description?: string;
+  dripListAccountId?: string;
+  isVisible: boolean;
+};
+
 export default (
   /** The current user's Drip Lists. */
   dripLists: AddDripListMemberFlowListsFragment[],
@@ -56,7 +68,7 @@ export default (
     'Must provide either a project or a drip list to add to the drip list.',
   );
 
-  const state = writable({
+  const context = writable<ContextType>({
     listEditorConfig: {
       items: {},
       weights: {},
@@ -68,13 +80,12 @@ export default (
   });
 
   return {
-    context: undefined,
+    context: () => context,
     steps: [
       makeStep({
         component: SelectDripList,
         props: {
           dripLists,
-          state,
           projectOrDripListToAdd: projectToAdd ?? dripListToAdd ?? unreachable(),
         },
       }),
@@ -83,7 +94,6 @@ export default (
         props: {
           projectToAdd,
           dripListToAdd,
-          state,
         },
       }),
       makeStep({

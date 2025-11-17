@@ -87,16 +87,14 @@
       ],
     }}
   />
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button onclick={supportLater}>Support later</Button>
-      <Button disabled={!formValid} icon={ArrowRight} variant="primary" onclick={submit}
-        >Continue</Button
-      >
-    
+    <Button onclick={supportLater}>Support later</Button>
+    <Button disabled={!formValid} icon={ArrowRight} variant="primary" onclick={submit}
+      >Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

@@ -17,17 +17,16 @@
 
   let { context }: Props = $props();
 
-  let formValid: boolean = $state();
+  let formValid = $state(false);
 </script>
 
 <StandaloneFlowStepLayout
   headline="One-time donation"
   description="Choose a token and how much you would like to donate."
 >
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   <OneTimeDonationEditor
     bind:formValid
     bind:selectedTokenAddress={$context.oneTimeDonationConfig.selectedTokenAddress}
@@ -36,14 +35,12 @@
     bind:amount={$context.oneTimeDonationConfig.amount}
   />
   {#snippet actions()}
-  
-      <Button
-        disabled={!formValid}
-        icon={Check}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button
+      disabled={!formValid}
+      icon={Check}
+      variant="primary"
+      onclick={() => dispatch('goForward')}>Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>
 

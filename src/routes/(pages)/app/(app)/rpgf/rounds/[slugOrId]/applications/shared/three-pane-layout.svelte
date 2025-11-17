@@ -34,8 +34,8 @@
   interface Props {
     round: Round;
     ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+      clear: () => void;
+    };
     voteMode: boolean;
     reviewMode: boolean;
     resultsMode: boolean;
@@ -56,11 +56,12 @@
     pageIsEmpty = false,
     hideAppsPane = false,
     apps,
-    children
+    children,
   }: Props = $props();
 
-
   let showResizer = $state(false);
+
+  let isDesktop = $state(true);
 
   run(() => {
     showResizer = isDesktop && !hideAppsPane && !!apps;
@@ -169,12 +170,13 @@
 
   let appsColumnWidth: string | undefined = $state();
   let isResizing = $state(false);
-  let isDesktop = $state(true);
   let hasMounted = $state(false);
   let accessibleMin: number | undefined = $state();
   let accessibleMax: number | undefined = $state();
   let accessibleNow: number | undefined = $state();
-  let appsColumnWidthValue: string | undefined = $derived(showResizer ? appsColumnWidth : undefined);
+  let appsColumnWidthValue: string | undefined = $derived(
+    showResizer ? appsColumnWidth : undefined,
+  );
 
   type ResizeBounds = {
     min: number;
@@ -402,7 +404,7 @@
       updateCurrentAppsWidth();
     }
   };
-  
+
   run(() => {
     if ((hideAppsPane || !apps) && appsColumnWidth) {
       appsColumnWidth = undefined;
@@ -515,7 +517,8 @@
           </div>
 
           {#if showResizer}
-            <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_no_noninteractive_tabindex -->
+            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
             <div
               class="apps-resizer"
               class:is-dragging={isResizing}
@@ -532,7 +535,7 @@
               onpointercancel={stopResize}
               onkeydown={handleKeyResize}
               ondblclick={resetAppsWidth}
-           ></div>
+            ></div>
           {/if}
         </div>
       </div>

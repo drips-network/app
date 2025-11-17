@@ -11,12 +11,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    title,
-    isPrivate = false,
-    hidden = false,
-    children
-  }: Props = $props();
+  let { title, isPrivate = false, hidden = false, children }: Props = $props();
 </script>
 
 <div class="field">
@@ -26,12 +21,9 @@
     {#if isPrivate}
       <div style:cursor="help" style:width="fit-content">
         <Tooltip>
-          <!-- @migration-task: migrate this slot by hand, `tooltip-content` is an invalid identifier -->
-  {#snippet tooltip_content()}
-                  
-              This field is private and only visible to admins or the applicant.
-            
-                  {/snippet}
+          {#snippet tooltip_content()}
+            This field is private and only visible to admins or the applicant.
+          {/snippet}
           <Lock />
         </Tooltip>
       </div>

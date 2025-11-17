@@ -13,7 +13,7 @@
 
 <script lang="ts">
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+  import { createEventDispatcher, onMount, type Component } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
   import { isHttpError } from '@sveltejs/kit';
 
@@ -23,16 +23,16 @@
     message: string;
     subtitle?: string | undefined;
     link?: { url: string; label: string } | undefined;
-    icon?: { component: ComponentType; props: Record<string, unknown> } | undefined;
+    icon?: { component: Component; props: Record<string, unknown> } | undefined;
     promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
   }
 
   let {
     message = $bindable(),
-    subtitle = $bindable(undefined),
-    link = $bindable(undefined),
-    icon = $bindable(undefined),
-    promise
+    subtitle = $bindable(),
+    link = $bindable(),
+    icon = $bindable(),
+    promise,
   }: Props = $props();
 
   const updateFn: UpdateAwaitStepFn = (params) => {

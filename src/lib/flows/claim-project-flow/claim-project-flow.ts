@@ -84,7 +84,7 @@ export interface State {
   recipientErrors: Array<AddItemError>;
 }
 
-export const state = () =>
+export const flowState = () =>
   writable<State>({
     isPartiallyClaimed: false,
     linkedToRepo: false,
@@ -176,7 +176,7 @@ export const steps = (
   makeStep({
     component: ChooseNetwork,
     staticHeaderComponent,
-    props: undefined,
+    props: {},
     condition: () => !skipNetworkSelection,
   }),
   makeStep({
@@ -192,29 +192,29 @@ export const steps = (
     : [
         makeStep({
           component: ConnectWallet,
-          props: undefined,
+          props: {},
           staticHeaderComponent,
         }),
       ]),
   makeStep({
     component: AddEthereumAddress,
-    props: undefined,
+    props: {},
     staticHeaderComponent,
   }),
   makeStep({
     component: SplitYourFunds,
-    props: undefined,
+    props: {},
     staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureMaintainers,
-    props: undefined,
+    props: {},
     condition: () => get(state).highLevelPercentages.maintainers > 0,
     staticHeaderComponent,
   }),
   makeStep({
     component: ConfigureDependencies,
-    props: undefined,
+    props: {},
     condition: () => get(state).highLevelPercentages.dependencies > 0,
     staticHeaderComponent,
   }),
@@ -228,7 +228,7 @@ export const steps = (
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,
-    props: undefined,
+    props: {},
     staticHeaderComponent,
   }),
   makeStep({

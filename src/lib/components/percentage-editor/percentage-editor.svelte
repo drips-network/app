@@ -15,7 +15,7 @@
     percentage = $bindable(0),
     disabled = false,
     editable = true,
-    emptyIsError = true
+    emptyIsError = true,
   }: Props = $props();
 
   let error = $state(false);
@@ -25,7 +25,7 @@
   let percentageValue: string | number = $state((Math.round(percentage * 100) / 100).toString());
 
   let prevPercentage: number = $state(percentage);
-  let prevPercentageValue = $state(Number(percentageValue));
+  let prevPercentageValue = $state(percentage);
 
   run(() => {
     const percentageChanged = prevPercentage !== percentage;
@@ -69,7 +69,7 @@
 
   let focus = $state(false);
 
-  let inputElem: HTMLInputElement = $state();
+  let inputElem: HTMLInputElement;
 
   const dispatch = createEventDispatcher<{
     /** Fired when the user blurs the input after selecting or hits enter to confirm. */

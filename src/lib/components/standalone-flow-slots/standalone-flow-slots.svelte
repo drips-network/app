@@ -1,13 +1,15 @@
 <script lang="ts" module>
-  import { tick, type ComponentType } from 'svelte';
+  import { tick, type Component } from 'svelte';
 
   interface ComponentAndProps {
-    component: ComponentType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: Component<any>;
     props: Record<string, unknown>;
   }
 
   export interface Slot {
-    icon?: ComponentType | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon?: Component<any> | undefined;
     title?: string | undefined;
     leftComponent?: ComponentAndProps | undefined;
     rightComponent?: ComponentAndProps | undefined;
@@ -33,7 +35,7 @@
 
   let { slots }: Props = $props();
 
-  let slotsElem: HTMLUListElement = $state();
+  let slotsElem = $state<HTMLUListElement>();
 
   let wrapperHeight = tweened(0, {
     duration: 300,

@@ -11,7 +11,7 @@
 <script lang="ts">
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     data: PageData;
@@ -19,7 +19,8 @@
 
   let { data }: Props = $props();
 
-  let component = $derived(EXPLORE_PAGE_VARIANT_COMPONENTS[data.variant] as ComponentType);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let component = $derived<Component<any>>(EXPLORE_PAGE_VARIANT_COMPONENTS[data.variant]);
 
   const SvelteComponent = $derived(component);
 </script>

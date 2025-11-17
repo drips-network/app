@@ -17,12 +17,12 @@
 
   let isLightTheme = $derived($themeStore.currentTheme === 'light');
 
-  let colorVars: {
+  let colorVars = $state<{
     primary: string;
     'primary-level-1': string;
     'primary-level-2': string;
     'primary-level-6': string;
-  } = $state();
+  }>();
 
   run(() => {
     if (colorHex && SUPPORTED_COLORS.includes(colorHex)) {

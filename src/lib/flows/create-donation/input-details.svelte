@@ -79,26 +79,27 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-
   interface Props {
     context: Writable<CreateDonationFlowState>;
-    receiver: 
-    | CreateDonationDetailsStepAddressDriverAccountFragment
-    | CreateDonationDetailsStepNftDriverAccountFragment
-    | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    receiver:
+      | CreateDonationDetailsStepAddressDriverAccountFragment
+      | CreateDonationDetailsStepNftDriverAccountFragment
+      | CreateDonationDetailsStepProjectFragment
+      | CreateDonationDetailsStepEcosystemFragment;
   }
 
   let { context, receiver }: Props = $props();
 
   let selectedTokenAllowance: bigint | undefined = $state();
 
-  let formValid: boolean = $state();
+  let formValid = $state(false);
 
   let amount: bigint | undefined = $state();
 
   let selectedTokenAddress = $derived($context.selectedTokenAddress?.[0]);
-  let selectedToken = $derived(selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null);
+  let selectedToken = $derived(
+    selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null,
+  );
 
   let receiverTypeLabel = $state('Drip List');
   run(() => {
@@ -170,48 +171,44 @@
       <WhatsNextSection>
         <WhatsNextCard>
           {#snippet title()}
-                    On transaction confirmation...
-                  {/snippet}
+            On transaction confirmation...
+          {/snippet}
           {#snippet items()}
-                  
+            {#if amount}
               <WhatsNextItem icon={TransactionsIcon}
                 >{formatTokenAmount(amount, selectedToken.info.decimals, 1n, false)}
                 {selectedToken?.info.symbol} will be
                 <span class="typo-text-bold">immediately sent from your wallet</span>
                 to this {receiverTypeLabel}.</WhatsNextItem
               >
-            
-                  {/snippet}
+            {/if}
+          {/snippet}
         </WhatsNextCard>
         <WhatsNextCard>
           {#snippet title()}
-                    After your donation...
-                  {/snippet}
+            After your donation...
+          {/snippet}
           {#snippet items()}
-                  
-              <WhatsNextItem icon={TransactionsIcon}>
-                Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
-                <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-              </WhatsNextItem>
-              <WhatsNextItem icon={CalendarIcon}>
-                The next date that accumulated funds will be distributed is <span
-                  class="typo-text-bold"
-                  >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-                >.
-              </WhatsNextItem>
-            
-                  {/snippet}
+            <WhatsNextItem icon={TransactionsIcon}>
+              Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
+              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+            </WhatsNextItem>
+            <WhatsNextItem icon={CalendarIcon}>
+              The next date that accumulated funds will be distributed is <span
+                class="typo-text-bold"
+                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
+              >.
+            </WhatsNextItem>
+          {/snippet}
         </WhatsNextCard>
       </WhatsNextSection>
     </TransitionedHeight>
   {/if}
 
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button variant="primary" icon={WalletIcon} onclick={submit} disabled={!formValid}
-        >Confirm in your wallet</Button
-      >
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" icon={WalletIcon} onclick={submit} disabled={!formValid}
+      >Confirm in your wallet</Button
+    >
   {/snippet}
 </StepLayout>

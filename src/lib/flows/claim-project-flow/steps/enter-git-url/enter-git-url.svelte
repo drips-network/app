@@ -64,7 +64,7 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  let validationState: TextInputValidationState = $state({ type: 'unvalidated' });
+  let validationState = $state<TextInputValidationState>({ type: 'unvalidated' });
 
   let formValid = $derived(validationState.type === 'valid');
 
@@ -254,10 +254,11 @@
     }
   }
 
-  let inputSubmittable =
-    $derived(isSupportedGitUrl($context.gitUrl) &&
-    validationState.type !== 'valid' &&
-    validationState.type !== 'pending');
+  let inputSubmittable = $derived(
+    isSupportedGitUrl($context.gitUrl) &&
+      validationState.type !== 'valid' &&
+      validationState.type !== 'pending',
+  );
 
   async function onPaste() {
     // need to wait some time for value to be available ¯\_(ツ)_/¯
@@ -290,9 +291,9 @@
     disabled={validationState.type === 'valid' || validationState.type === 'pending'}
     {validationState}
     showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
-    on:clear={clearProject}
-    on:keydown={(e) => e.key === 'Enter' && submitInput()}
-    on:paste={onPaste}
+    onclear={clearProject}
+    onkeydown={(e) => e.key === 'Enter' && submitInput()}
+    onpaste={onPaste}
   />
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
@@ -312,23 +313,21 @@
     {/if}
   {/if}
   {#snippet actions()}
-  
-      {#if formValid}
-        <Button icon={ArrowRightIcon} variant="primary" onclick={goForward}>Continue</Button>
-      {:else}
-        <Button
-          disabled={!inputSubmittable}
-          icon={MagnifyingGlass}
-          variant="primary"
-          onclick={() => submitInput()}>Search</Button
-        >
-      {/if}
-    
+    {#if formValid}
+      <Button icon={ArrowRightIcon} variant="primary" onclick={goForward}>Continue</Button>
+    {:else}
+      <Button
+        disabled={!inputSubmittable}
+        icon={MagnifyingGlass}
+        variant="primary"
+        onclick={() => submitInput()}>Search</Button
+      >
+    {/if}
   {/snippet}
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     {#if showBackButton}
       <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
     {/if}
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

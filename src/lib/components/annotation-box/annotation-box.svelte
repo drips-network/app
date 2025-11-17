@@ -1,12 +1,12 @@
 <script lang="ts">
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   interface Props {
     type?: 'warning' | 'info' | 'error';
     size?: 'normal' | 'small';
     overlay?: boolean;
-    icon?: ComponentType | undefined;
+    icon?: Component | undefined;
     children?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
   }
@@ -17,7 +17,7 @@
     overlay = false,
     icon = undefined,
     children,
-    actions
+    actions,
   }: Props = $props();
 </script>
 

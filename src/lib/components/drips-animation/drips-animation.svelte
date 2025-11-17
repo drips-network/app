@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import assert from '$lib/utils/assert';
   import { browser } from '$app/environment';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   const RESOLUTION_RATIO =
     browser && window?.devicePixelRatio ? Math.min(window?.devicePixelRatio, 2) : 2;
@@ -13,13 +14,13 @@
 
   let { speedMultiplier = 1, vertical = false }: Props = $props();
 
-  let canvasElem: HTMLCanvasElement = $state();
+  let canvasElem: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
-  let containerSize: [number, number] = $state();
-  let container: HTMLDivElement = $state();
+  let containerSize = $state<[number, number]>();
+  let container: HTMLDivElement;
 
-  let dripImg: HTMLImageElement = $state();
-  let dripImgVertical: HTMLImageElement = $state();
+  let dripImg: HTMLImageElement;
+  let dripImgVertical: HTMLImageElement;
 
   function rr(number: number): number {
     return number * RESOLUTION_RATIO;
@@ -28,7 +29,7 @@
   let drips: Drip[] = [];
   let maxDripsOnScreen: number;
 
-  function generateDrip(maxX = 0): Drip {
+  function generateDrip(maxX = 0, containerSize: [number, number]): Drip {
     const maxOffset = rr(vertical ? containerSize[0] : containerSize[1]) - rr(32);
 
     const x = Math.floor(Math.random() * rr(maxX) - 48);
@@ -53,9 +54,11 @@
 
     const orientationChanged = previouslyVertical !== vertical;
 
-    if (drips.length === 0 || orientationChanged) {
+    if (containerSize && (drips.length === 0 || orientationChanged)) {
       maxDripsOnScreen = Math.min(Math.max(Math.floor(containerSize[0] / 25), 1), 20);
-      drips = [...Array(maxDripsOnScreen).keys()].map(() => generateDrip(containerSize[0]));
+      drips = mapFilterUndefined([...Array(maxDripsOnScreen).keys()], () =>
+        containerSize ? generateDrip(containerSize[0], containerSize) : undefined,
+      );
     } else {
       // Delete any drips outside of the new bounds
 
@@ -123,7 +126,7 @@
   let lastAnimationHandle: number | undefined = undefined;
 
   function draw(timer: number) {
-    if (!canvasElem) return;
+    if (!canvasElem || !containerSize) return;
 
     const millisecondsSinceLastDraw = timer - lastDraw;
 
@@ -159,7 +162,7 @@
       if (
         (vertical ? drip.pos.y : drip.pos.x) > rr(vertical ? containerSize[1] : containerSize[0])
       ) {
-        drips.splice(drips.indexOf(drip), 1, generateDrip());
+        drips.splice(drips.indexOf(drip), 1, generateDrip(undefined, containerSize));
         drips = drips;
       }
     }
@@ -180,7 +183,7 @@
   <canvas
     bind:this={canvasElem}
     style={`width: ${containerSize?.[0]}px; height: ${containerSize?.[1]}px;`}
- ></canvas>
+  ></canvas>
   <div style="display: none">
     <img
       bind:this={dripImg}

@@ -10,7 +10,6 @@
   import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import { createEventDispatcher } from 'svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
 
   interface Props {
@@ -77,7 +76,8 @@
                       <Tooltip>
                         <InfoCircle style="height: 1rem;" />
                         {#snippet tooltip_content()}
-                          {header.column.columnDef.meta['tooltipMessage']}
+                          {// eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (header.column.columnDef.meta as any).tooltipMessage}
                         {/snippet}
                       </Tooltip>
                     {/if}

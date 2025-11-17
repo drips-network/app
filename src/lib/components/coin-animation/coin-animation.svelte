@@ -19,7 +19,7 @@
     animateOnMount = false,
     playSound = false,
     animateOnHover = true,
-    children
+    children,
   }: Props = $props();
 
   const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
@@ -29,12 +29,12 @@
     if (enable && animateOnMount) animate(false);
   });
 
-  let containerElem: HTMLDivElement = $state();
+  let containerElem = $state<HTMLDivElement>();
   let tokenRotationDeg = tweened(0);
   let sparkle1Scale = tweened(0);
   let sparkle2Scale = tweened(0);
 
-  let sparkleFontSize = $derived(containerElem?.offsetWidth / 6);
+  let sparkleFontSize = $derived(containerElem ? containerElem?.offsetWidth / 6 : undefined);
 
   async function animate(click: boolean) {
     if (!enable) return;

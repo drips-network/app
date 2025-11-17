@@ -3,6 +3,7 @@
   import Button from '../button/button.svelte';
   import { browser } from '$app/environment';
   interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     children?: import('svelte').Snippet<[any]>;
   }
 
@@ -21,7 +22,7 @@
     }
   }
 
-  let containerElem: HTMLDivElement = $state();
+  let containerElem: HTMLDivElement;
   let overflown = $state(false);
 
   let isLong = $state(false);
@@ -51,7 +52,7 @@
 </script>
 
 <div bind:this={containerElem} class="expandable-text" class:expanded>
-  {@render children?.({ isLong, })}
+  {@render children?.({ isLong })}
   {#if overflown || expanded}
     <div class="expand-button">
       <Button onclick={toggleExpand}>

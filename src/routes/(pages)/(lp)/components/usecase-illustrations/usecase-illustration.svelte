@@ -14,7 +14,7 @@
   import { fly } from 'svelte/transition';
   import Sparkle from './sparkle.svelte';
   import BezierEasing from 'bezier-easing';
-  import type { Component, ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     config: UsecaseIllustrationConfig;

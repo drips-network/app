@@ -1,4 +1,3 @@
-https://svelte.dev/e/attribute_invalid_name -->
 <script lang="ts">
   import { createBubbler, stopPropagation } from 'svelte/legacy';
 
@@ -21,7 +20,7 @@ https://svelte.dev/e/attribute_invalid_name -->
     copyable = false,
     disabled = false,
     children,
-    tooltip_content
+    tooltip_content,
   }: Props = $props();
 
   let tooltipElem: HTMLSpanElement | undefined = $state();

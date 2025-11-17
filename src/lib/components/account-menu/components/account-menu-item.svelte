@@ -1,36 +1,34 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     disabled?: boolean;
-    icon?: ComponentType | undefined;
+    icon?: Component | undefined;
     href?: string | undefined;
     left?: import('svelte').Snippet;
     title?: import('svelte').Snippet;
     right?: import('svelte').Snippet;
+    onclick?: (e: MouseEvent) => void;
   }
 
   let {
     disabled = false,
-    icon = undefined,
+    icon: Icon = undefined,
     href = undefined,
     left,
     title,
-    right
+    right,
+    onclick,
   }: Props = $props();
 </script>
 
-<a {href} onclick={bubble('click')} class:disabled class:clickable={href} class="account-menu-item-wrapper">
-  {#if !icon}
+<a {href} {onclick} class:disabled class:clickable={href} class="account-menu-item-wrapper">
+  {#if !Icon}
     {@render left?.()}
   {:else}
     <div class="icon-wrapper">
-      {#if icon}{@const SvelteComponent = icon}
-      {#if icon}<SvelteComponent style="fill: var(--color-background)" />{/if}
+      {#if Icon}<Icon style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
   <div class="description typo-text">

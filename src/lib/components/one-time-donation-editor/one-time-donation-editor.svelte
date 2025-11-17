@@ -14,7 +14,6 @@
   import type { OxString } from '$lib/utils/sdk/sdk-types';
   import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
 
-
   // Token list
 
   let tokenList: Items = $derived({
@@ -39,13 +38,9 @@
     ),
   });
 
-  
-
-
   let amountValidationState: TextInputValidationState = $state({
     type: 'unvalidated',
   });
-
 
   let loadingToken = $state(false);
 
@@ -73,7 +68,6 @@
     prevTokenAddress = tokenAddress;
   }
 
-
   interface Props {
     selectedTokenAddress?: string[];
     // Amount input
@@ -88,13 +82,13 @@
   let {
     selectedTokenAddress = $bindable([]),
     amountInputValue = $bindable(),
-    amount = $bindable(undefined),
+    amount = $bindable(),
     topUpMax = $bindable(),
-    selectedTokenBalance = $bindable(undefined),
-    selectedTokenAllowance = $bindable(undefined),
-    formValid = $bindable()
+    selectedTokenBalance = $bindable(),
+    selectedTokenAllowance = $bindable(),
+    formValid = $bindable(),
   }: Props = $props();
-  
+
   run(() => {
     selectedTokenAddress;
     getSelectedTokenBalance();

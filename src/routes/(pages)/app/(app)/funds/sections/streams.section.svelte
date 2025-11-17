@@ -74,11 +74,6 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { decodeStreamId } from '$lib/utils/streams/make-stream-id';
 
-
-
-
-
-
   interface Props {
     accountId: string | undefined;
     disableActions?: boolean;
@@ -102,26 +97,32 @@
     collapsable = $bindable(false),
     hideIncoming = false,
     emptyStateHeadline = 'No streams',
-    userStreams
+    userStreams,
   }: Props = $props();
-  let incoming = $derived(userStreams.incoming.filter((s) =>
-    tokenAddress
-      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
-      : true,
-  ));
-  let outgoing = $derived(userStreams.outgoing.filter((s) =>
-    tokenAddress
-      ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
-      : true,
-  ));
+  let incoming = $derived(
+    userStreams.incoming.filter((s) =>
+      tokenAddress
+        ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+        : true,
+    ),
+  );
+  let outgoing = $derived(
+    userStreams.outgoing.filter((s) =>
+      tokenAddress
+        ? s.config.amountPerSecond.tokenAddress.toLowerCase() === tokenAddress.toLowerCase()
+        : true,
+    ),
+  );
 
   let isSelf = $derived(accountId === $walletStore.dripsAccountId);
 
   let token = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
 
-  let emptyStateText = $derived(`${isSelf ? "You aren't" : "This user isn't"} streaming ${
-    token?.info.name ? `any ${token.info.name}` : tokenAddress ? 'this token' : 'any tokens'
-  }.`);
+  let emptyStateText = $derived(
+    `${isSelf ? "You aren't" : "This user isn't"} streaming ${
+      token?.info.name ? `any ${token.info.name}` : tokenAddress ? 'this token' : 'any tokens'
+    }.`,
+  );
 
   interface OutgoingStreamTableRow {
     streamId: string;
@@ -139,45 +140,47 @@
     token: ComponentProps<typeof Token>;
   }
 
-  let outgoingTableData: OutgoingStreamTableRow[] = $derived(outgoing.map((s) => ({
-    name: {
-      stream: s,
-    },
-    to: {
-      userOrDripListOrEcosystem: s.receiver,
-    },
-    token: {
-      address: s.config.amountPerSecond.tokenAddress,
-      show: 'symbol',
-      size: 'small',
-    },
-    amount: {
-      timeline: s.timeline,
-      tokenAddress: s.config.amountPerSecond.tokenAddress,
-    },
-    streamId: s.id,
-  })));
-  
+  let outgoingTableData: OutgoingStreamTableRow[] = $derived(
+    outgoing.map((s) => ({
+      name: {
+        stream: s,
+      },
+      to: {
+        userOrDripListOrEcosystem: s.receiver,
+      },
+      token: {
+        address: s.config.amountPerSecond.tokenAddress,
+        show: 'symbol',
+        size: 'small',
+      },
+      amount: {
+        timeline: s.timeline,
+        tokenAddress: s.config.amountPerSecond.tokenAddress,
+      },
+      streamId: s.id,
+    })),
+  );
 
-  let incomingTableData: IncomingStreamTableRow[] = $derived(incoming.map((s) => ({
-    name: {
-      stream: s,
-    },
-    from: {
-      userOrDripListOrEcosystem: s.sender,
-    },
-    token: {
-      address: s.config.amountPerSecond.tokenAddress,
-      show: 'symbol',
-      size: 'small',
-    },
-    amount: {
-      timeline: s.timeline,
-      tokenAddress: s.config.amountPerSecond.tokenAddress,
-    },
-    streamId: s.id,
-  })));
-  
+  let incomingTableData: IncomingStreamTableRow[] = $derived(
+    incoming.map((s) => ({
+      name: {
+        stream: s,
+      },
+      from: {
+        userOrDripListOrEcosystem: s.sender,
+      },
+      token: {
+        address: s.config.amountPerSecond.tokenAddress,
+        show: 'symbol',
+        size: 'small',
+      },
+      amount: {
+        timeline: s.timeline,
+        tokenAddress: s.config.amountPerSecond.tokenAddress,
+      },
+      streamId: s.id,
+    })),
+  );
 
   const outgoingTableColumns: ColumnDef<OutgoingStreamTableRow>[] = [
     {
@@ -261,7 +264,6 @@
     columns: outgoingTableColumns,
     getCoreRowModel: getCoreRowModel(),
   });
-  
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let optionsIncoming: TableOptions<any> = $derived({
@@ -269,19 +271,18 @@
     columns: incomingTableColumns,
     getCoreRowModel: getCoreRowModel(),
   });
-  
 
   function onRowClick(
     tableData: OutgoingStreamTableRow[] | IncomingStreamTableRow[],
-    event: CustomEvent<RowClickEventPayload>,
+    event: RowClickEventPayload,
   ) {
     // go to token page by address
-    const streamId = tableData[event.detail.rowIndex].streamId;
+    const streamId = tableData[event.rowIndex].streamId;
     const parsedId = decodeStreamId(streamId);
 
     onClickGoto(
       `/app/${parsedId.senderAccountId}/tokens/${parsedId.tokenAddress}/streams/${parsedId.dripId}`,
-      event.detail.event,
+      event.event,
     );
   }
 </script>
@@ -321,7 +322,7 @@
         rowHeight={76}
         options={optionsIncoming}
         isRowClickable
-        on:rowClick={(e) => onRowClick(incomingTableData, e)}
+        onRowClick={(e) => onRowClick(incomingTableData, e)}
       />
     </div>
   {/if}
@@ -334,7 +335,7 @@
         rowHeight={76}
         options={optionsOutgoing}
         isRowClickable
-        on:rowClick={(e) => onRowClick(outgoingTableData, e)}
+        onRowClick={(e) => onRowClick(outgoingTableData, e)}
       />
     </div>
   {/if}

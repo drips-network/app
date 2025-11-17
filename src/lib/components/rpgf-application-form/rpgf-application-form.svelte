@@ -14,24 +14,6 @@
   import TextField from './components/text-field.svelte';
   import UrlField from './components/url-field.svelte';
 
-
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let internalAnswers: Record<string, any> = $state(answers.reduce(
-    (acc, answer) => {
-      acc[answer.fieldId] = answer;
-      return acc;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    },
-    {} as Record<string, any>,
-  ));
-
-  run(() => {
-    answers = Object.values(internalAnswers).filter((a) => a !== undefined);
-  });
-
-  let fieldsValidStates: Record<string, boolean> = $state({});
-
   interface Props {
     fields: ApplicationFormFields;
     disabled?: boolean;
@@ -45,11 +27,29 @@
     disabled = false,
     forceRevealErrors = false,
     answers = $bindable([]),
-    valid = $bindable(false)
+    valid = $bindable(false),
   }: Props = $props();
   run(() => {
     valid = Object.values(fieldsValidStates).every((v) => v);
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let internalAnswers: Record<string, any> = $state(
+    answers.reduce(
+      (acc, answer) => {
+        acc[answer.fieldId] = answer;
+        return acc;
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {} as Record<string, any>,
+    ),
+  );
+
+  run(() => {
+    answers = Object.values(internalAnswers).filter((a) => a !== undefined);
+  });
+
+  let fieldsValidStates: Record<string, boolean> = $state({});
 </script>
 
 <form class:disabled>

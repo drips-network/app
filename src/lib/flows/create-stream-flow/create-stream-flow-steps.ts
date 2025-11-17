@@ -22,11 +22,11 @@ export default (
   steps: [
     makeStep({
       component: FetchData,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: InputDetails,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: SuccessStep,

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
-
   import Button from '$lib/components/button/button.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
@@ -22,7 +20,6 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_DECIMALS = 4;
 
-  
   interface Props {
     context: Writable<State>;
     headline: string;
@@ -36,11 +33,7 @@
     exampleTableHeaders?: Array<string> | undefined;
     exampleTableData?: Array<Array<unknown>> | undefined;
     exampleTableCaption?: string | undefined;
-    addItem?: (
-    key: AccountId,
-    item: ListEditorItem,
-    weight: number | undefined,
-  ) => undefined;
+    addItem?: (key: AccountId, item: ListEditorItem, weight: number | undefined) => undefined;
     clearItems?: () => undefined;
     onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
     blockedAccountIds?: string[];
@@ -61,14 +54,14 @@
     addItem = () => undefined,
     clearItems = () => undefined,
     onItemsError = (errors) => {
-    return new AddItemError(
-      'Some of your imported recipients were invalid',
-      'error',
-      'They won’t be included in your splits.',
-      errors,
-    );
-  },
-    blockedAccountIds = []
+      return new AddItemError(
+        'Some of your imported recipients were invalid',
+        'error',
+        'They won’t be included in your splits.',
+        errors,
+      );
+    },
+    blockedAccountIds = [],
   }: Props = $props();
 
   let uploadForm: HTMLFormElement | undefined = $state(undefined);
@@ -96,7 +89,9 @@
     return parsedFile.length > csvMaxEntries ? 'too-many-entries' : false;
   }
 
-  async function submit() {
+  async function submit(e: Event) {
+    e.preventDefault();
+
     try {
       loading = true;
 
@@ -219,7 +214,7 @@
     data={exampleTableData ? exampleTableData : undefined}
     caption={exampleTableCaption}
   />
-  <form id="upload-form" bind:this={uploadForm} onsubmit={preventDefault(submit)}>
+  <form id="upload-form" bind:this={uploadForm} onsubmit={submit}>
     <DropZone
       validateCustom={validateFile}
       filetypes={['text/csv']}
@@ -227,31 +222,25 @@
       {loading}
       on:input={handleDropZoneInput}
     >
-      <!-- @migration-task: migrate this slot by hand, `loading` would shadow a prop on the parent component -->
-  <svelte:fragment slot="loading">
+      {#snippet loadingSlot()}
         <Spinner />
         <p class="typo-text">We’re parsing your CSV and building your list…</p>
-      </svelte:fragment>
-      {#snippet error({ error, defaultContent })}
-          
-          {#if error && customErrors.includes(error)}
-            <p class="typo-text-bold">{customErrorMessages[error]}</p>
-          {:else}
-            {@html defaultContent}
-          {/if}
-        
-          {/snippet}
+      {/snippet}
+      {#snippet errorSlot({ error, defaultContent })}
+        {#if error && customErrors.includes(error)}
+          <p class="typo-text-bold">{customErrorMessages[error]}</p>
+        {:else}
+          {@html defaultContent}
+        {/if}
+      {/snippet}
     </DropZone>
   </form>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
-    <Button
-      disabled={loading}
-      variant="ghost"
-      icon={ArrowLeft}
-      onclick={() => dispatch('conclude')}>Back</Button
+
+  {#snippet left_actions()}
+    <Button disabled={loading} variant="ghost" icon={ArrowLeft} onclick={() => dispatch('conclude')}
+      >Back</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>

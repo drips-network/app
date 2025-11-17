@@ -1,14 +1,10 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
-  import { run, createBubbler } from 'svelte/legacy';
+  import { run } from 'svelte/legacy';
 
-  const bubble = createBubbler();
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { onMount } from 'svelte';
-
-
-
 
   interface Props {
     resizable?: boolean;
@@ -17,17 +13,27 @@
     value?: string | undefined | null;
     placeholder?: string | undefined;
     validationState?: TextInputValidationState;
+    onchange?: (event: Event) => void;
+    onclick?: (event: Event) => void;
+    oninput?: (event: Event) => void;
+    onblur?: (event: Event) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
   }
 
   let {
     resizable = false,
     caption = undefined,
     textareaStyle = undefined,
-    value = $bindable(undefined),
+    value = $bindable(),
     placeholder = undefined,
     validationState = {
-    type: 'unvalidated',
-  }
+      type: 'unvalidated',
+    },
+    onchange = undefined,
+    onclick = undefined,
+    oninput = undefined,
+    onblur = undefined,
+    onkeydown = undefined,
   }: Props = $props();
 
   let textareaElement: HTMLTextAreaElement | undefined = $state(undefined);
@@ -64,13 +70,12 @@
     class="typo-text"
     class:resizable
     {placeholder}
-    onchange={bubble('change')}
-    onclick={bubble('click')}
-    oninput={bubble('input')}
-    onblur={bubble('blur')}
-    onkeydown={bubble('keydown')}
-    onkeypress={bubble('keypress')}
- ></textarea>
+    {onchange}
+    {onclick}
+    {oninput}
+    {onblur}
+    {onkeydown}
+  ></textarea>
 
   {#if caption && validationState.type !== 'invalid'}
     <p class="caption typo-text-small">

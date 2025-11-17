@@ -6,7 +6,6 @@
   import EyeOpenIcon from '$lib/components/icons/EyeOpen.svelte';
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
 
-
   interface Props {
     blogPosts: z.infer<typeof postsListingSchema>;
     title?: string;
@@ -15,9 +14,11 @@
   let { blogPosts, title = 'Latest news' }: Props = $props();
 
   // 2 latest posts. Sort by date
-  let sortedPosts = $derived(blogPosts
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 2));
+  let sortedPosts = $derived(
+    blogPosts
+      .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 2),
+  );
 </script>
 
 <Section

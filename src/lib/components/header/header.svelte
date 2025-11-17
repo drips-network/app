@@ -39,9 +39,6 @@
   import wallet from '$lib/stores/wallet/wallet.store';
   import { writable } from 'svelte/store';
 
-
-
-
   interface Props {
     user: HeaderUserFragment | null;
     showLoadingIndicator?: boolean;
@@ -51,7 +48,7 @@
 
   let searchMode = $state(false);
 
-  let collectButtonPeeking: boolean = $state();
+  let collectButtonPeeking = $state(false);
 
   let networkPickerExpanded = $state(false);
   let chainData = $derived(user?.chainData ? filterCurrentChainData(user.chainData) : undefined);
@@ -108,18 +105,18 @@
             <div class="network-picker-flyout">
               <Flyout width="16rem" bind:visible={networkPickerExpanded}>
                 {#snippet trigger()}
-                                <div >
+                  <div>
                     <NetworkPicker
                       toggled={networkPickerExpanded}
                       onclick={() => (networkPickerExpanded = !networkPickerExpanded)}
                     />
                   </div>
-                              {/snippet}
+                {/snippet}
                 {#snippet content()}
-                                <div >
+                  <div>
                     <NetworkList />
                   </div>
-                              {/snippet}
+                {/snippet}
               </Flyout>
             </div>
           </div>
@@ -153,7 +150,7 @@
       class="search-background"
       transition:fade={{ duration: 300 }}
       onclick={() => (searchMode = false)}
-   ></div>
+    ></div>
   {/if}
 </header>
 

@@ -1,21 +1,29 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let currentStepIndex = skipNetworkSelection ? 1 : 0;` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
-  import { slotsTemplate, state, steps } from './claim-project-flow';
+  import { slotsTemplate, flowState, steps } from './claim-project-flow';
 
-  export let projectUrl: string | undefined = undefined;
-  export let skipWalletConnect = false;
-  export let skipNetworkSelection = false;
-  export let linkToProjectPageOnSuccess = true;
-  export let displaySlots = false;
+  interface Props {
+    projectUrl?: string | undefined;
+    skipWalletConnect?: boolean;
+    skipNetworkSelection?: boolean;
+    linkToProjectPageOnSuccess?: boolean;
+    displaySlots?: boolean;
+  }
 
-  let currentStepIndex = skipNetworkSelection ? 1 : 0;
+  let {
+    projectUrl = undefined,
+    skipWalletConnect = false,
+    skipNetworkSelection = false,
+    linkToProjectPageOnSuccess = true,
+    displaySlots = false,
+  }: Props = $props();
 
-  const myState = state();
+  let currentStepIndex = $state(skipNetworkSelection ? 1 : 0);
 
-  $: slots = slotsTemplate($myState, currentStepIndex);
+  const myState = flowState();
+
+  let slots = $derived(slotsTemplate($myState, currentStepIndex));
 
   function handleSlotEdit(e: CustomEvent<{ stepIndex: number }>) {
     currentStepIndex = e.detail.stepIndex;

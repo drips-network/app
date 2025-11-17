@@ -9,7 +9,7 @@
   import { fade } from 'svelte/transition';
   import SplitsListComponent from '../../splits.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
-  import { tick, type SvelteComponent, onMount } from 'svelte';
+  import { tick, onMount, type Component, type ComponentProps } from 'svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
@@ -23,16 +23,7 @@
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
-
-  
-
-  
-  
-
-
-  
-
-  let element: HTMLDivElement = $state();
+  let element: HTMLDivElement | undefined = $state();
 
   interface Props {
     split: SplitsComponentSplitsReceiver | SplitGroup;
@@ -63,12 +54,12 @@
     isFirst = false,
     disableTooltip = false,
     chainOverride = undefined,
-    groupExpanded = $bindable(false)
+    groupExpanded = $bindable(false),
   }: Props = $props();
 
-  let primaryColor = $derived(element
-    ? getComputedStyle(element).getPropertyValue('--color-primary')
-    : undefined);
+  let primaryColor = $derived(
+    element ? getComputedStyle(element).getPropertyValue('--color-primary') : undefined,
+  );
 
   let percentageTextColor = $derived(primaryColor ? getContrastColor(primaryColor) : 'white');
 
@@ -91,8 +82,9 @@
 
   interface ComponentAndProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: typeof SvelteComponent<any>;
-    props: Record<string, unknown>;
+    component: Component<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    props: ComponentProps<Component<any>>;
   }
 
   function getPileComponents(list: Splits): ComponentAndProps[] {
@@ -109,7 +101,7 @@
               size: 'medium',
               disableLink: true,
             },
-          } as ComponentAndProps;
+          };
         case 'DripListReceiver':
           return {
             component: DripListBadge,
@@ -119,7 +111,7 @@
               showName: false,
               isLinked: !disableLink,
             },
-          } as ComponentAndProps;
+          };
         case 'ProjectReceiver':
           return {
             component: ProjectAvatar,
@@ -128,7 +120,7 @@
               project: filterCurrentChainData(s.project.chainData, undefined, chainOverride),
               outline: true,
             },
-          } as ComponentAndProps;
+          };
       }
     });
   }

@@ -1,5 +1,6 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (success to success_1) making the component unusable -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FileIcon from '$lib/components/icons/File.svelte';
   import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -14,39 +15,44 @@
 
   let fileInput: HTMLInputElement;
 
-  export let instructions = 'Drop a file here to upload';
-  export let filetypes = ['text/plain'];
-  export let maxFileSize = 1024 * 1024 * 5; // 5MB
-  export let validateCustom: (file: File) => Promise<string | false> = () => Promise.resolve(false);
-
-  let draggingOver = false;
+  let draggingOver = $state(false);
 
   function validateFiletype(file: File) {
     return filetypes.includes(file.type);
   }
 
-  export let error: 'wrong-filetype' | 'too-large' | 'too-many-files' | string | undefined =
-    undefined;
   let errorMessages: { [key: string]: string } = {
     'wrong-filetype': 'File type is unsupported',
     'too-large': 'File exceeds 5MB',
     'too-many-files': 'Only drop a single file',
   } as const;
 
-  export let loading = false;
-
-  $: if (error) {
-    loading = false;
+  interface Props {
+    instructions?: string;
+    filetypes?: string[];
+    maxFileSize?: number;
+    validateCustom?: (file: File) => Promise<string | false>;
+    error?: 'wrong-filetype' | 'too-large' | 'too-many-files' | string | undefined;
+    loading?: boolean;
+    success?: boolean;
+    successSlot?: import('svelte').Snippet;
+    loadingSlot?: import('svelte').Snippet;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    errorSlot?: import('svelte').Snippet<[any]>;
   }
 
-  export let success = false;
-  $: {
-    if (success) {
-      setTimeout(() => {
-        success = false;
-      }, 2000);
-    }
-  }
+  let {
+    instructions = 'Drop a file here to upload',
+    filetypes = ['text/plain'],
+    maxFileSize = 1024 * 1024 * 5,
+    validateCustom = () => Promise.resolve(false),
+    error = $bindable(),
+    loading = $bindable(false),
+    success = $bindable(false),
+    successSlot,
+    loadingSlot,
+    errorSlot,
+  }: Props = $props();
 
   function handleDrop(e: DragEvent) {
     e.preventDefault();
@@ -119,11 +125,23 @@
 
     dispatch('input', { file });
   }
+  run(() => {
+    if (error) {
+      loading = false;
+    }
+  });
+  run(() => {
+    if (success) {
+      setTimeout(() => {
+        success = false;
+      }, 2000);
+    }
+  });
 </script>
 
 <input
   bind:this={fileInput}
-  on:change={handleFileSelected}
+  onchange={handleFileSelected}
   class="file-input"
   type="file"
   accept={filetypes.join(',')}
@@ -137,23 +155,23 @@
   class:loading
   class:error
   class:success
-  on:drop={handleDrop}
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
+  ondrop={handleDrop}
+  ondragover={handleDragOver}
+  ondragleave={handleDragLeave}
 >
   {#if draggingOver}
     <FileIcon style="height: 2rem; width: 2rem; fill: var(--color-primary-level-6)" />
     <p class="typo-text">Drop file to upload</p>
   {:else if success}
-    <slot name="success">
+    {#if successSlot}{@render successSlot()}{:else}
       <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
       <p class="typo-text">Operation successful</p>
-    </slot>
+    {/if}
   {:else if loading}
-    <slot name="loading">
+    {#if loadingSlot}{@render loadingSlot()}{:else}
       <Spinner />
       <p class="typo-text">Loading…</p>
-    </slot>
+    {/if}
   {:else}
     <FileIcon
       style={`
@@ -165,15 +183,14 @@
     <div>
       {#if error}
         {@const defaultContent = `<p class="typo-text-bold">${errorMessages[error]}</p>`}
-        <slot name="error" {error} {defaultContent}>
+        {#if errorSlot}{@render errorSlot({ error, defaultContent })}{:else}
           {@html defaultContent}
-        </slot>
+        {/if}
       {/if}
       <p class="typo-text">{instructions}, or…</p>
     </div>
-    <Button
-      variant={error ? 'destructive-outline' : 'normal'}
-      onclick={handleSelectFileButtonClick}>Select file</Button
+    <Button variant={error ? 'destructive-outline' : 'normal'} onclick={handleSelectFileButtonClick}
+      >Select file</Button
     >
   {/if}
 </div>

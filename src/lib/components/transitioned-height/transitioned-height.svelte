@@ -10,46 +10,39 @@
   // ___________
   // PROPS
 
-  
-
-  
-
-  
-
-  
   interface Props {
     /** Force a height of 0, and optionally apply `negativeMarginWhileCollapsed`. */
     collapsed?: boolean;
     /**
-   * If true, all content height changes are transitioned. If false, only collapsing and expanding
-   * the content is transitioned.
-   */
+     * If true, all content height changes are transitioned. If false, only collapsing and expanding
+     * the content is transitioned.
+     */
     transitionHeightChanges?: boolean;
     /**
-   * Force a negative margin while collapsed. This is useful when you use `transitionedHeight`
-   * in the context of some layout where there's further content below.
-   */
+     * Force a negative margin while collapsed. This is useful when you use `transitionedHeight`
+     * in the context of some layout where there's further content below.
+     */
     negativeMarginWhileCollapsed?: string | undefined;
     /**
-   * If true, when `collapsed`, all content will be removed from the tab index, and restored
-   * when the section is expanded again.
-   */
+     * If true, when `collapsed`, all content will be removed from the tab index, and restored
+     * when the section is expanded again.
+     */
     removeFromTabIndexWhileCollapsed?: boolean;
     children?: import('svelte').Snippet;
   }
 
   let {
-    collapsed = false,
+    collapsed = $bindable(false),
     transitionHeightChanges = false,
     negativeMarginWhileCollapsed = undefined,
     removeFromTabIndexWhileCollapsed = true,
-    children
+    children,
   }: Props = $props();
 
   // ____________
   // VARS
 
-  let contentContainerElem: HTMLDivElement = $state();
+  let contentContainerElem: HTMLDivElement;
 
   /*
     During SSR, the server cannot determine the actual DOM node height of the content, so

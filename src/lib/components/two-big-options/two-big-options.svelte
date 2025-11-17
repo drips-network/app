@@ -1,13 +1,12 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import Option from './components/option.svelte';
 
   interface OptionConfig {
     emoji: string;
     title: string;
-    attributes: { icon: ComponentType; text: string }[];
+    attributes: { icon: Component; text: string }[];
   }
-
 
   interface Props {
     option1: OptionConfig;
@@ -15,7 +14,7 @@
     selected?: 1 | 2 | undefined;
   }
 
-  let { option1, option2, selected = $bindable(undefined) }: Props = $props();
+  let { option1, option2, selected = $bindable() }: Props = $props();
 </script>
 
 <div class="options" role="radiogroup">

@@ -19,9 +19,9 @@
 
   let {
     field,
-    answer = $bindable(undefined),
+    answer = $bindable(),
     valid = $bindable(false),
-    forceRevealError = undefined
+    forceRevealError = undefined,
   }: Props = $props();
 
   let value: string | undefined = $state(answer?.value ?? undefined);
@@ -57,16 +57,17 @@
   });
 
   let beenFocussed = $state(false);
-  let formFieldValidationState: ComponentProps<typeof FormField>['validationState'] = $derived(valid
-    ? { type: 'valid' }
-    : beenFocussed || forceRevealError
-      ? {
-          type: 'invalid',
-          message:
-            'This field is required and must be a full, valid URL without spaces, including https://.',
-        }
-      : { type: 'valid' });
-  
+  let formFieldValidationState: ComponentProps<typeof FormField>['validationState'] = $derived(
+    valid
+      ? { type: 'valid' }
+      : beenFocussed || forceRevealError
+        ? {
+            type: 'invalid',
+            message:
+              'This field is required and must be a full, valid URL without spaces, including https://.',
+          }
+        : { type: 'valid' },
+  );
 </script>
 
 <FormField
@@ -77,5 +78,5 @@
     ? 'Data in this field is private and will only be shared with the admins of the round.'
     : undefined}
 >
-  <TextInput bind:value on:blur={() => (beenFocussed = true)} />
+  <TextInput bind:value onblur={() => (beenFocussed = true)} />
 </FormField>

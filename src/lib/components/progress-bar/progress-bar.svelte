@@ -38,13 +38,14 @@
   });
 
   // Should be 0.5 all the way until 80% progress, then start interpolating towards 0 at 100%
-  let progressBorderRadius =
-    $derived($progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2);
+  let progressBorderRadius = $derived(
+    $progressFraction < 0.8 ? 0.5 : 0.5 - (0.5 * Math.max(0, $progressFraction - 0.8)) / 0.2,
+  );
 
   let started = $derived(progressFractionRaw > 0);
   let done = $derived(errorMessage || progressFractionRaw >= 1);
 
-  let progressBarColor: string = $state();
+  let progressBarColor = $state<string>();
   run(() => {
     if (errorMessage) {
       progressBarColor = 'var(--color-negative)';
@@ -55,7 +56,7 @@
     }
   });
 
-  let textColor: string = $state();
+  let textColor = $state<string>();
   run(() => {
     if (errorMessage) {
       textColor = 'var(--color-negative-level-6)';

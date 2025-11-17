@@ -1,6 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let isValid = false;` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const EDIT_DRIP_LIST_STEP_DRIP_LIST_TO_ADD_FRAGMENT = gql`
     ${LIST_EDITOR_DRIP_LIST_FRAGMENT}
     fragment EditDripListStepDripListToAdd on DripList {
@@ -58,37 +56,40 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let state: Writable<{
-    listEditorConfig: {
-      items: Items;
-      weights: Weights;
-    };
-    name: string;
-    description: string | undefined;
-    dripListAccountId: string | undefined;
-    isVisible: boolean;
-  }>;
+  interface Props {
+    context: Writable<{
+      listEditorConfig: {
+        items: Items;
+        weights: Weights;
+      };
+      name: string;
+      description: string | undefined;
+      dripListAccountId: string | undefined;
+      isVisible: boolean;
+    }>;
+    projectToAdd?: EditDripListStepProjectToAddFragment | undefined;
+    dripListToAdd?: EditDripListStepDripListToAddFragment | undefined;
+  }
 
-  export let projectToAdd: EditDripListStepProjectToAddFragment | undefined = undefined;
-  export let dripListToAdd: EditDripListStepDripListToAddFragment | undefined = undefined;
+  let { context, projectToAdd = undefined, dripListToAdd = undefined }: Props = $props();
 
   if (projectToAdd) {
-    $state.listEditorConfig.items[projectToAdd.account.accountId] = {
+    $context.listEditorConfig.items[projectToAdd.account.accountId] = {
       type: 'project',
       project: projectToAdd,
     };
-    $state.listEditorConfig.weights[projectToAdd.account.accountId] = 0;
+    $context.listEditorConfig.weights[projectToAdd.account.accountId] = 0;
   }
 
   if (dripListToAdd) {
-    $state.listEditorConfig.items[dripListToAdd.account.accountId] = {
+    $context.listEditorConfig.items[dripListToAdd.account.accountId] = {
       type: 'drip-list',
       dripList: dripListToAdd,
     };
-    $state.listEditorConfig.weights[dripListToAdd.account.accountId] = 0;
+    $context.listEditorConfig.weights[dripListToAdd.account.accountId] = 0;
   }
 
-  let isValid = false;
+  let isValid = $state(false);
 
   // TODO: Auto-refresh UI when splits change
   function submit() {
@@ -101,16 +102,16 @@
         },
         headline: 'Edit your Drip List',
         before: async () => {
-          const listId = $state.dripListAccountId;
+          const listId = $context.dripListAccountId;
           assert(listId, 'Drip List account ID is not set');
 
           const updateResult = await buildDripListUpdateTxs({
             dripListAccountId: listId,
-            name: $state.name,
-            description: $state.description,
-            isVisible: $state.isVisible,
-            weights: $state.listEditorConfig.weights,
-            items: $state.listEditorConfig.items,
+            name: $context.name,
+            description: $context.description,
+            isVisible: $context.isVisible,
+            weights: $context.listEditorConfig.weights,
+            items: $context.listEditorConfig.items,
           });
 
           return {
@@ -140,8 +141,8 @@
           'Your CSV file should simply be formatted by first listing the recipient, then listing the percentage allocation. For example:',
         exampleTableCaption:
           'A recipient can be a wallet address, GitHub repo URL, or Drip List URL. Maximum 200 recipients. Any previously configured recipients will be overwritten with the CSV contents.',
-        addItem: createAddItemFunction(state, 'listEditorConfig'),
-        clearItems: createClearItemsFunction(state, 'listEditorConfig'),
+        addItem: createAddItemFunction(context, 'listEditorConfig'),
+        clearItems: createClearItemsFunction(context, 'listEditorConfig'),
       }),
     );
   }
@@ -155,20 +156,20 @@
   />
   <DripListEditor
     bind:isValid
-    bind:name={$state.name}
-    bind:description={$state.description}
-    bind:weights={$state.listEditorConfig.weights}
-    bind:items={$state.listEditorConfig.items}
-    bind:isVisible={$state.isVisible}
+    bind:name={$context.name}
+    bind:description={$context.description}
+    bind:weights={$context.listEditorConfig.weights}
+    bind:items={$context.listEditorConfig.items}
+    bind:isVisible={$context.isVisible}
   >
-    <svelte:fragment slot="list-editor-action">
+    {#snippet list_editor_action()}
       <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {/snippet}
   </DripListEditor>
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button onclick={modal.hide} variant="ghost">Cancel</Button>
     <Button onclick={submit} disabled={!isValid} icon={Wallet} variant="primary"
       >Confirm changes</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>

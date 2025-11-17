@@ -19,37 +19,32 @@
   import { browser } from '$app/environment';
   import TransactStep from './components/transact-step.svelte';
 
-  const dispatch = createEventDispatcher<{ stepChange: void }>();
-
-  const resolvedContext = context?.();
-
-
-  let stepElement: HTMLDivElement = $state();
-
-  let internalSteps = $state(steps);
-
-  let resolvedSteps = $state(internalSteps.map((someStep) => someStep((i) => i)));
-  run(() => {
-    resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
-  });
-
   interface Props {
     steps: Steps;
     context?: (() => Writable<unknown>) | undefined;
     minHeightPx?: number;
-    noTransitions?: any;
-    currentStepIndex?: any;
+    noTransitions?: boolean;
+    currentStepIndex?: number;
   }
 
   let {
     steps,
     context = undefined,
     minHeightPx = 0,
+    currentStepIndex = $bindable(0),
     noTransitions = browser
-    ? window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true
-    : false,
-    currentStepIndex = $bindable(nextValidStepIndex(0, 'forward'))
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches === true
+      : false,
   }: Props = $props();
+
+  const dispatch = createEventDispatcher<{ stepChange: void }>();
+
+  const resolvedContext = context?.();
+
+  let stepElement: HTMLDivElement | undefined = $state();
+
+  let internalSteps = $state(steps);
+  let resolvedSteps = $derived(internalSteps.map((someStep) => someStep((i) => i)));
   let currentStep = $derived(resolvedSteps[currentStepIndex]);
 
   let prevStepIndex = $state(0);
@@ -310,9 +305,7 @@
 
 {#if currentStep?.staticHeaderComponent}
   <div class="static-header">
-    <currentStep.staticHeaderComponent.component
-      {...currentStep.staticHeaderComponent.props}
-    />
+    <currentStep.staticHeaderComponent.component {...currentStep.staticHeaderComponent.props} />
   </div>
 {/if}
 

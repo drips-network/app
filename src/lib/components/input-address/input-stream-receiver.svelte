@@ -10,7 +10,6 @@
   import assert from '$lib/utils/assert';
   import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
-
   type ExclusionGroup = {
     addresses: (string | undefined)[];
     msg: string;
@@ -22,7 +21,11 @@
     exclude?: ExclusionGroup[];
   }
 
-  let { value = $bindable(undefined), validatedValue = $bindable(undefined), exclude = [{ addresses: [], msg: 'You cannot use this address.' }] }: Props = $props();
+  let {
+    value = $bindable(),
+    validatedValue = $bindable(),
+    exclude = [{ addresses: [], msg: 'You cannot use this address.' }],
+  }: Props = $props();
 
   const dispatch = createEventDispatcher();
 

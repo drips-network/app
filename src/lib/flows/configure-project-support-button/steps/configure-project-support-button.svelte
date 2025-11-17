@@ -154,29 +154,22 @@
       </div>
     </div>
 
-    <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+    {#snippet left_actions()}
       <Button onclick={onClickCancel}>Never mind</Button>
-    </svelte:fragment>
+    {/snippet}
 
     {#snippet actions()}
-      
-        <CopyLinkButton url={embedCode} variant="primary" on:linkCopied={cacheInitialState}>
-          Copy embed code
-          {#snippet idle()}
-              
-              <CopyIcon style="fill: currentColor" />
-            
-              {/snippet}
-          <!-- hover is the same as idle in this case -->
-          {#snippet success()}
-              
-              <CheckCircleIcon style="fill: currentColor" />
-            
-              {/snippet}
-        </CopyLinkButton>
-      
-      {/snippet}
+      <CopyLinkButton url={embedCode} variant="primary" on:linkCopied={cacheInitialState}>
+        Copy embed code
+        {#snippet idle()}
+          <CopyIcon style="fill: currentColor" />
+        {/snippet}
+        <!-- hover is the same as idle in this case -->
+        {#snippet success()}
+          <CheckCircleIcon style="fill: currentColor" />
+        {/snippet}
+      </CopyLinkButton>
+    {/snippet}
   </StepLayout>
 </PrimaryColorThemer>
 

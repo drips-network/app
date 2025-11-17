@@ -10,8 +10,8 @@
 
   let { text }: Props = $props();
 
-  let containerElem: HTMLDivElement = $state();
-  let contentElem: HTMLSpanElement = $state();
+  let containerElem: HTMLDivElement;
+  let contentElem: HTMLSpanElement;
   let fontSize: number = $state(MAX_SIZE);
   let contentWidth: number | undefined;
   let containerWidth: number | undefined;

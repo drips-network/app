@@ -48,7 +48,7 @@ export interface TransactPayload<T> {
   headline: string;
   description?: string;
   icon?: {
-    component: Component;
+    component: Component<any>;
     props?: Record<string, unknown>;
   };
   messages?: {

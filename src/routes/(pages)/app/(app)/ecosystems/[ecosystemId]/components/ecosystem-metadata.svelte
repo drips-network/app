@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Ecosystem } from '$lib/utils/ecosystems/schemas';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     ecosystem: Ecosystem;
@@ -10,7 +10,7 @@
 
   const iconImports = import.meta.glob('$lib/components/icons/*.svelte') as Record<
     string,
-    () => Promise<{ default: ComponentType }>
+    () => Promise<{ default: Component }>
   >;
 
   let metadata = $derived(ecosystem.metadata || []);

@@ -1,12 +1,21 @@
 import { DRIPS_DEFAULT_TOKEN_LIST } from './token-list';
 
-import type { TokenInfo } from '@uniswap/token-lists';
 import { derived, get, writable } from 'svelte/store';
 import * as storedTokens from './stored-custom-tokens';
 import assert from '$lib/utils/assert';
 import { browser } from '$app/environment';
 import network, { isSupportedChainId } from '../wallet/network';
 import { getAddress, toBigInt } from 'ethers';
+
+export interface TokenInfo {
+  readonly chainId: number;
+  readonly address: string;
+  readonly name: string;
+  readonly decimals: number;
+  readonly symbol: string;
+  readonly logoURI?: string;
+  readonly tags?: string[];
+}
 
 interface DefaultTokenInfoWrapper {
   info: TokenInfo;

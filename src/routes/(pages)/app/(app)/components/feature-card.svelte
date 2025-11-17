@@ -9,7 +9,7 @@
 
   let { imageUrl, children, actions }: Props = $props();
 
-  let imageEl: HTMLImageElement = $state();
+  let imageEl: HTMLImageElement;
   let imageLoaded = $state(false);
 
   onMount(() => {

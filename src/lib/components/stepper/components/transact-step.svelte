@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+  import { createEventDispatcher, onMount, type Component } from 'svelte';
   import type {
     BeforeFunc,
     ExternalTransaction,
@@ -87,7 +87,7 @@
   let duringBeforeMsg: string | undefined = $state();
   let icon:
     | {
-        component: ComponentType;
+        component: Component;
         props?: Record<string, unknown>;
       }
     | undefined = $state();
@@ -209,8 +209,9 @@
     isExecutionCompleted = true;
   }
 
-  let gaslessRelayAvailable =
-    $derived(networkConfig.gaslessTransactions && networkConfig.gelatoRelayAvailable);
+  let gaslessRelayAvailable = $derived(
+    networkConfig.gaslessTransactions && networkConfig.gelatoRelayAvailable,
+  );
 
   async function handleEoaTransactions(
     network: { chainId: number; name: string },
@@ -874,8 +875,8 @@
     </div>
     <!-- </TransitionedHeight> -->
   </div>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button
       icon={ArrowLeft}
       variant="ghost"
@@ -884,18 +885,16 @@
     >
       Back
     </Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        icon={ArrowRight}
-        variant="primary"
-        disabled={!isExecutionCompleted}
-        onclick={() => dispatchResult('result', { success: true })}
-      >
-        Continue
-      </Button>
-    
+    <Button
+      icon={ArrowRight}
+      variant="primary"
+      disabled={!isExecutionCompleted}
+      onclick={() => dispatchResult('result', { success: true })}
+    >
+      Continue
+    </Button>
   {/snippet}
 </StepLayout>
 

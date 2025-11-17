@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
 <!--
   Taken & slightly modified from https://github.com/prgm-dev/sveltekit-progress-bar. Credit to the authors 💦
 -->

@@ -28,7 +28,7 @@
 
   let { context }: Props = $props();
 
-  let formValid: boolean = $state();
+  let formValid = $state<boolean>(false);
 
   let dependencyKeys = $derived(Object.keys($context.dependencySplits.items));
 
@@ -93,20 +93,16 @@
       blockedAccountIds={dependencyKeys}
     />
     {#snippet action()}
-      
-        <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
-      
-      {/snippet}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={goForward}
-        >Continue</Button
-      >
-    
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={goForward}
+      >Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

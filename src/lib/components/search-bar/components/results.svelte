@@ -12,13 +12,15 @@
     loading: boolean;
     error: boolean;
     resultElems?: HTMLElement[];
+    onclick?: () => void;
   }
 
   let {
     results,
     loading,
     error,
-    resultElems = $bindable([])
+    resultElems = $bindable([]),
+    onclick = () => {},
   }: Props = $props();
 </script>
 
@@ -41,7 +43,7 @@
     {:else}
       {#each results as result, index}
         <div class="result">
-          <ResultComponent bind:element={resultElems[index]} onclick item={result} onclick />
+          <ResultComponent bind:element={resultElems[index]} {onclick} item={result} />
         </div>
       {/each}
     {/if}

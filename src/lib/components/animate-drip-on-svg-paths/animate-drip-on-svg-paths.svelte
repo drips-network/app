@@ -110,7 +110,7 @@
     element: SVGPathElement;
     reverse: boolean;
   }[] = [];
-  let contentEl: HTMLDivElement = $state();
+  let contentEl: HTMLDivElement;
 
   onMount(() => {
     paths = Array.from(contentEl.querySelectorAll('path[data-drip-path]')).map((el) => ({

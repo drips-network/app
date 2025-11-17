@@ -1,17 +1,14 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
-  import { run, createBubbler } from 'svelte/legacy';
+  import { run } from 'svelte/legacy';
 
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import KeyHint from '$lib/components/key-hint/KeyHint.svelte';
   import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
-  import { createEventDispatcher, tick, type Component } from 'svelte';
+  import { tick, type Component } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
-
-  const dispatch = createEventDispatcher<{ clear: void }>();
-  const bubble = createBubbler();
 
   interface Props {
     variant?: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number };
@@ -34,12 +31,22 @@
     suffix?: string | undefined;
     inputElement?: HTMLInputElement | undefined;
     validationState?: TextInputValidationState;
+    onchange?: (e: Event) => void;
+    onclick?: (e: Event) => void;
+    oninput?: (e: Event) => void;
+    onfocus?: (e: FocusEvent) => void;
+    onkeydown?: (e: KeyboardEvent) => void;
+    onkeypress?: (e: KeyboardEvent) => void;
+    onmousedown?: (e: MouseEvent) => void;
+    onpaste?: (e: ClipboardEvent) => void;
+    onclear?: () => void;
+    onblur?: (e: FocusEvent) => void;
   }
 
   let {
     variant = {
-    type: 'text',
-  },
+      type: 'text',
+    },
     spellcheck = false,
     autocapitalize = true,
     autocorrect = true,
@@ -53,14 +60,24 @@
     icon = undefined,
     inputStyle = undefined,
     style = undefined,
-    value = $bindable(undefined),
+    value = $bindable(),
     placeholder = undefined,
     hint = undefined,
     suffix = undefined,
-    inputElement = $bindable(undefined),
+    inputElement = $bindable(),
     validationState = {
-    type: 'unvalidated',
-  }
+      type: 'unvalidated',
+    },
+    onchange,
+    onclick,
+    oninput,
+    onfocus,
+    onmousedown,
+    onkeydown,
+    onkeypress,
+    onpaste,
+    onclear,
+    onblur,
   }: Props = $props();
 
   export const focus = (): void => {
@@ -86,7 +103,7 @@
 
   async function clear() {
     value = '';
-    dispatch('clear');
+    onclear?.();
     // wait a tick in case parent has some disabling logic (enter-git-url)
     await tick();
     return inputElement?.focus();
@@ -117,14 +134,15 @@
     {readonly}
     bind:value
     bind:this={inputElement}
-    onchange={bubble('change')}
-    onclick={bubble('click')}
-    oninput={bubble('input')}
-    onfocus={bubble('focus')}
-    onkeydown={bubble('keydown')}
-    onkeypress={bubble('keypress')}
-    onpaste={bubble('paste')}
-    onblur={bubble('blur')}
+    {onchange}
+    {onclick}
+    {oninput}
+    {onfocus}
+    {onkeydown}
+    {onmousedown}
+    {onkeypress}
+    {onpaste}
+    {onblur}
     autocomplete={autocomplete ? 'on' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}

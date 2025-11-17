@@ -56,7 +56,7 @@ export interface State {
   dripListId: string | undefined;
 }
 
-export const state = () =>
+export const flowState = () =>
   writable<State>({
     dripList: { title: 'My Drip List', weights: {}, items: {}, description: undefined },
     recipientErrors: [],
@@ -171,7 +171,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: BuildListStep,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 1;
     },
@@ -179,7 +179,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: ConfigureVotingRound,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 2;
     },
@@ -187,13 +187,13 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: ConnectWalletStep,
-    props: undefined,
+    props: {},
     condition: () => !skipWalletConnect,
     staticHeaderComponent,
   }),
   makeStep({
     component: ChooseSupportTypeStep,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 1;
     },
@@ -201,7 +201,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: ConfigureContinuousSupportStep,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 1;
     },
@@ -209,7 +209,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: ConfigureOneTimeDonation,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 1 && get(state).selectedSupportOption === 2;
     },
@@ -227,7 +227,7 @@ export const steps = (state: Writable<State>, skipWalletConnect = false, isModal
   }),
   makeStep({
     component: ReviewVotingRound,
-    props: undefined,
+    props: {},
     condition: () => {
       return get(state).selectedCreationMode === 2;
     },

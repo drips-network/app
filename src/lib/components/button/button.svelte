@@ -8,6 +8,7 @@
 
   interface Props {
     variant?: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon?: Component<any> | undefined;
     disabled?: boolean;
     ariaLabel?: string | undefined;
@@ -26,6 +27,7 @@
     onmouseenter?: ((event: MouseEvent) => void) | undefined;
     onmouseleave?: ((event: MouseEvent) => void) | undefined;
     onfocus?: ((event: FocusEvent) => void) | undefined;
+    onblur?: ((event: FocusEvent) => void) | undefined;
   }
 
   let {
@@ -48,13 +50,16 @@
     onmouseenter = undefined,
     onmouseleave = undefined,
     onfocus = undefined,
+    onblur = undefined,
   }: Props = $props();
 
   let isDisabled = $derived(disabled || loading);
 
   let el: HTMLButtonElement | HTMLAnchorElement | undefined = $state();
 
-  let primaryColor = $derived(el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined);
+  let primaryColor = $derived(
+    el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined,
+  );
 
   let textColor = $state('var(--color-foreground)');
   run(() => {
@@ -87,6 +92,7 @@
   {onmouseenter}
   {onmouseleave}
   {onfocus}
+  {onblur}
   role={href ? 'link' : 'button'}
   style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
   type={href ? null : type}

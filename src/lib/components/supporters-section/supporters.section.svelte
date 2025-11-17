@@ -123,14 +123,8 @@
   import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
 
+  let emptyStateText: string | undefined = $state();
 
-
-
-
-  let emptyStateText: string = $state();
-
-
-  
   interface Props {
     supportItems: SupportersSectionSupportItemFragment[];
     ownerAccountId?: string | undefined;
@@ -153,7 +147,7 @@
     collapsed = $bindable(false),
     collapsable = $bindable(false),
     infoTooltip = undefined,
-    sectionSkeleton = $bindable(undefined)
+    sectionSkeleton = $bindable(),
   }: Props = $props();
   run(() => {
     switch (type) {
@@ -210,12 +204,10 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <!-- @migration-task: migrate this slot by hand, `amount-value` is an invalid identifier -->
-  <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={[item.amount]} />
-            </svelte:fragment>
-            <!-- @migration-task: migrate this slot by hand, `amount-sub` is an invalid identifier -->
-  <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               {@const amount = item.amount}
               {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
               {#if token}
@@ -237,7 +229,7 @@
                 <!-- Placeholder for right height during SSR -->
                 <span>⠀</span>
               {/if}
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'StreamSupport'}
@@ -263,8 +255,7 @@
               },
             }}
           >
-            <!-- @migration-task: migrate this slot by hand, `amount-value` is an invalid identifier -->
-  <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <RealtimeAmount
                 unknownTokenButton={false}
                 showFiatValue
@@ -272,9 +263,8 @@
                 timeline={stream.timeline}
                 tokenAddress={stream.config.amountPerSecond.tokenAddress}
               />
-            </svelte:fragment>
-            <!-- @migration-task: migrate this slot by hand, `amount-sub` is an invalid identifier -->
-  <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               {@const token =
                 $tokensStore &&
                 tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
@@ -290,7 +280,7 @@
                 <!-- Placeholder for right height during SSR -->
                 <span>⠀</span>
               {/if}
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'DripListSupport'}
@@ -306,14 +296,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <!-- @migration-task: migrate this slot by hand, `amount-value` is an invalid identifier -->
-  <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <!-- @migration-task: migrate this slot by hand, `amount-sub` is an invalid identifier -->
-  <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'ProjectSupport'}
@@ -332,14 +320,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <!-- @migration-task: migrate this slot by hand, `amount-value` is an invalid identifier -->
-  <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <!-- @migration-task: migrate this slot by hand, `amount-sub` is an invalid identifier -->
-  <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'EcosystemSupport'}
@@ -355,14 +341,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <!-- @migration-task: migrate this slot by hand, `amount-value` is an invalid identifier -->
-  <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <!-- @migration-task: migrate this slot by hand, `amount-sub` is an invalid identifier -->
-  <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
       {/each}

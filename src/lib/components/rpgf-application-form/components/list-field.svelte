@@ -13,8 +13,6 @@
   import ListFieldAddItemModal from './list-field-add-item-modal.svelte';
   import assert from '$lib/utils/assert';
 
-
-
   interface Props {
     field: ApplicationListField;
     forceRevealError?: boolean | undefined;
@@ -26,7 +24,7 @@
     field,
     forceRevealError = undefined,
     valid = false,
-    answer = $bindable(undefined)
+    answer = $bindable(),
   }: Props = $props();
 
   function addToValues(item: Record<string, string | number>) {

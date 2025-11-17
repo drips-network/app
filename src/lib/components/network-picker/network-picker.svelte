@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
   import { getNetwork } from '$lib/stores/wallet/network';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import ChevronDown from '../icons/ChevronDown.svelte';
@@ -13,12 +10,13 @@
 
   interface Props {
     toggled?: boolean;
+    onclick?: () => void;
   }
 
-  let { toggled = false }: Props = $props();
+  let { toggled = false, onclick }: Props = $props();
 </script>
 
-<button class="wrapper" class:disabled={isDev} onclick={bubble('click')}>
+<button class="wrapper" class:disabled={isDev} {onclick}>
   <div class="network-picker">
     <div class="icon-wrapper">
       <network.icon style="width: 2rem; height: 2rem;" />

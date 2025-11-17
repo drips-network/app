@@ -27,7 +27,7 @@
     validationState = undefined,
     children,
     action,
-    private_notice
+    private_notice,
   }: Props = $props();
 </script>
 
@@ -40,7 +40,7 @@
           style:visibility="hidden"
           style:position="absolute"
           style:top="-230px"
-       ></div>
+        ></div>
         <AnnotationBox type="error">
           {validationState.message}
         </AnnotationBox>
@@ -75,10 +75,9 @@
             </span>
             <Lock />
           </div>
-          <!-- @migration-task: migrate this slot by hand, `tooltip-content` is an invalid identifier -->
-  <svelte:fragment slot="tooltip_content">
+          {#snippet tooltip_content()}
             {privateNoticeText}
-          </svelte:fragment>
+          {/snippet}
         </Tooltip>
       {/if}
     </div>

@@ -12,11 +12,6 @@
   import Spinner from '../spinner/spinner.svelte';
   import { formatUnits } from 'ethers';
 
-
-
-
-
-
   interface Props {
     tokenAddress: string | undefined;
     tokenBalance: bigint | undefined;
@@ -33,10 +28,10 @@
     loading = false,
     inputValue = $bindable(),
     validationState = $bindable({
-    type: 'unvalidated',
-  }),
+      type: 'unvalidated',
+    }),
     topUpMax = $bindable(false),
-    amount = $bindable(undefined)
+    amount = $bindable(),
   }: Props = $props();
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
   run(() => {
@@ -110,8 +105,6 @@
     disabled={topUpMax || !tokenAddress}
   />
   {#snippet action()}
-  
-      <Toggle bind:checked={topUpMax} label="Max" />
-    
+    <Toggle bind:checked={topUpMax} label="Max" />
   {/snippet}
 </FormField>

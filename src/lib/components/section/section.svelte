@@ -18,8 +18,8 @@
     skeleton,
     collapsable = $bindable(false),
     collapsed = $bindable(false),
-    skeletonInstance = $bindable(undefined),
-    children
+    skeletonInstance = $bindable(),
+    children,
   }: Props = $props();
 </script>
 

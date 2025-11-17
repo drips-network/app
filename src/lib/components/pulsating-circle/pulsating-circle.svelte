@@ -5,7 +5,11 @@
     pulseColor?: string;
   }
 
-  let { visible = true, element = $bindable(null), pulseColor = 'var(--color-primary-level-2)' }: Props = $props();
+  let {
+    visible = true,
+    element = $bindable(),
+    pulseColor = 'var(--color-primary-level-2)',
+  }: Props = $props();
 </script>
 
 <div style="--pulse-color: {pulseColor}" class="circle" class:visible bind:this={element}></div>

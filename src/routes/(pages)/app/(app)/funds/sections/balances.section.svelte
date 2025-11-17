@@ -44,8 +44,6 @@
     streaming: ComponentProps<typeof RealtimeAmount>;
   }
 
-
-
   interface Props {
     userBalances: UserBalancesFragment[];
     accountId: string | undefined;
@@ -59,7 +57,7 @@
     accountId,
     disableActions = true,
     collapsed = $bindable(false),
-    collapsable = $bindable(false)
+    collapsable = $bindable(false),
   }: Props = $props();
 
   let tableData: TokenTableRow[] = $state([]);
@@ -126,11 +124,10 @@
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
   });
-  
 
-  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
+  function onRowClick(event: RowClickEventPayload) {
     // go to token page by address
-    const tokenAddress = tableData[event.detail.rowIndex].token.address;
+    const tokenAddress = tableData[event.rowIndex].token.address;
     assert(accountId);
     const address = extractAddressFromAccountId(accountId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
@@ -164,5 +161,5 @@
     empty: tableData.length === 0,
   }}
 >
-  <Table {options} isRowClickable={isSelf} on:rowClick={onRowClick} />
+  <Table {options} isRowClickable={isSelf} {onRowClick} />
 </Section>

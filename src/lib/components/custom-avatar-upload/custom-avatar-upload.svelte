@@ -64,13 +64,11 @@
   {error}
   on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
 >
-  <!-- @migration-task: migrate this slot by hand, `loading` would shadow a prop on the parent component -->
-  <svelte:fragment slot="loading">
+  {#snippet loadingSlot()}
     <Spinner />
     <p class="typo-text">Uploading…</p>
-  </svelte:fragment>
-  <!-- @migration-task: migrate this slot by hand, `error` would shadow a prop on the parent component -->
-  <svelte:fragment slot="error" let:error let:defaultContent>
+  {/snippet}
+  {#snippet errorSlot({ error, defaultContent })}
     {#if error === 'wrong-filetype'}
       <p class="typo-text-bold">File must be a JPG or PNG</p>
     {:else if error == 'upload-failed'}
@@ -78,12 +76,11 @@
     {:else}
       {@html defaultContent}
     {/if}
-  </svelte:fragment>
-  <!-- @migration-task: migrate this slot by hand, `success` would shadow a prop on the parent component -->
-  <svelte:fragment slot="success">
+  {/snippet}
+  {#snippet successSlot()}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
     <p class="typo-text">Upload successful</p>
-  </svelte:fragment>
+  {/snippet}
 </DropZone>
 
 <style>

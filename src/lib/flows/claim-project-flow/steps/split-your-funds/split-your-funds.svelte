@@ -46,19 +46,17 @@
     <InfoCircle style="fill: var(--color-foreground-level-6)" />
     <p class="typo-text-small">You’ll list your maintainers and dependencies in the next step.</p>
   </div>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button
-        disabled={!formValid}
-        icon={ArrowRight}
-        variant="primary"
-        onclick={() => dispatch('goForward')}>Continue</Button
-      >
-    
+    <Button
+      disabled={!formValid}
+      icon={ArrowRight}
+      variant="primary"
+      onclick={() => dispatch('goForward')}>Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>
 

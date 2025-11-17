@@ -90,13 +90,17 @@
     }
   }
 
-  let invalid = $derived(Boolean(
-    urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
-  ));
+  let invalid = $derived(
+    Boolean(
+      urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
+    ),
+  );
 
   let showUrlSuccess = $state(false);
 
-  let activeAvatarTab: 'tab-1' | 'tab-2' = $derived(updatedRound.customAvatarCid ? 'tab-2' : 'tab-1');
+  let activeAvatarTab: 'tab-1' | 'tab-2' = $derived(
+    updatedRound.customAvatarCid ? 'tab-2' : 'tab-1',
+  );
 
   run(() => {
     if (activeAvatarTab === 'tab-1') {
@@ -118,13 +122,14 @@
     };
   }
 
-  let changesMade =
-    $derived(updatedRound.name !== data.round.name ||
-    updatedRound.emoji !== data.round.emoji ||
-    updatedRound.color !== data.round.color ||
-    updatedRound.urlSlug !== data.round.urlSlug ||
-    updatedRound.description !== data.round.description ||
-    updatedRound.customAvatarCid !== data.round.customAvatarCid);
+  let changesMade = $derived(
+    updatedRound.name !== data.round.name ||
+      updatedRound.emoji !== data.round.emoji ||
+      updatedRound.color !== data.round.color ||
+      updatedRound.urlSlug !== data.round.urlSlug ||
+      updatedRound.description !== data.round.description ||
+      updatedRound.customAvatarCid !== data.round.customAvatarCid,
+  );
 
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {
@@ -149,14 +154,12 @@
 
   <FormField title="Avatar*">
     <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
-      <!-- @migration-task: migrate this slot by hand, `tab-1` is an invalid identifier -->
-  <svelte:fragment slot="tab-1">
+      {#snippet tab1()}
         <EmojiPicker bind:selectedEmoji={updatedRound.emoji} />
-      </svelte:fragment>
-      <!-- @migration-task: migrate this slot by hand, `tab-2` is an invalid identifier -->
-  <svelte:fragment slot="tab-2">
+      {/snippet}
+      {#snippet tab2()}
         <CustomAvatarUpload on:uploaded={handleAvatarUploaded} />
-      </svelte:fragment>
+      {/snippet}
     </TabbedBox>
   </FormField>
 
@@ -169,7 +172,7 @@
       <span>{network.subdomain}/</span>
       <TextInput
         showSuccessCheck={showUrlSuccess}
-        on:blur={validateSlug}
+        onblur={validateSlug}
         validationState={urlSlugValidationState}
         bind:value={urlSlugInputValue}
         placeholder="my-rpgf-round"

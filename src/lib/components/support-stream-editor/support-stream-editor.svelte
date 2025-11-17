@@ -20,7 +20,26 @@
   import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
 
+  interface Props {
+    streamRateValue?: string | undefined;
+    streamRateValueParsed?: bigint | undefined;
+    topUpAmountValue?: string | undefined;
+    topUpAmountValueParsed?: bigint | undefined;
+    disabled?: boolean;
+    selectedTokenAddress?: string | undefined;
+    // FORM VALIDATION
+    formValid: boolean;
+  }
 
+  let {
+    streamRateValue = $bindable(),
+    streamRateValueParsed = $bindable(),
+    topUpAmountValue = $bindable(),
+    topUpAmountValueParsed = $bindable(),
+    disabled = false,
+    selectedTokenAddress = $bindable(),
+    formValid = $bindable(),
+  }: Props = $props();
 
   let tokenListSelected = $state(selectedTokenAddress ? [selectedTokenAddress] : []);
 
@@ -45,7 +64,6 @@
   // If top up is disabled, the token list should only show available token balances to stream.
   let tokenList: Items = $state({});
 
-
   // –––––––––––––––––––––––––
   // FETCH ERC-20 BALANCES IN BACKGROUND
 
@@ -62,12 +80,9 @@
     });
   }
 
+  let streamRateValueValidation = $state<TextInputValidationState>({ type: 'unvalidated' });
 
-
-  let streamRateValueValidation: TextInputValidationState = $state();
-
-
-  let topUpAmountValueValidation: TextInputValidationState = $state();
+  let topUpAmountValueValidation = $state<TextInputValidationState>({ type: 'unvalidated' });
 
   // –––––––––––––––––––––––––
   // STAGE LOGIC
@@ -103,34 +118,13 @@
   }
 
   // –––––––––––––––––––––––––
-  
 
-  interface Props {
-    streamRateValue?: string | undefined;
-    streamRateValueParsed?: bigint | undefined;
-    topUpAmountValue?: string | undefined;
-    topUpAmountValueParsed?: bigint | undefined;
-    disabled?: boolean;
-    selectedTokenAddress?: string | undefined;
-    // FORM VALIDATION
-    formValid: boolean;
-  }
-
-  let {
-    streamRateValue = $bindable(undefined),
-    streamRateValueParsed = $bindable(undefined),
-    topUpAmountValue = $bindable(undefined),
-    topUpAmountValueParsed = $bindable(undefined),
-    disabled = false,
-    selectedTokenAddress = $bindable(undefined),
-    formValid = $bindable()
-  }: Props = $props();
   run(() => {
     selectedTokenAddress = tokenListSelected[0];
   });
-  let selectedToken = $derived(selectedTokenAddress
-    ? tokensStore.getByAddress(selectedTokenAddress)
-    : undefined);
+  let selectedToken = $derived(
+    selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : undefined,
+  );
   run(() => {
     tokenList = Object.fromEntries(
       $tokensStore?.map((token) => {

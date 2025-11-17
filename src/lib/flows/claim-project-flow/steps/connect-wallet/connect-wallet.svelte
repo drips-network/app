@@ -39,15 +39,13 @@
   <FormField type="div" title="Project Owner Ethereum Address">
     <AccountBox />
   </FormField>
-  <!-- @migration-task: migrate this slot by hand, `left-actions` is an invalid identifier -->
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   {#snippet actions()}
-  
-      <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={verifyProject}
-        >Continue</Button
-      >
-    
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={verifyProject}
+      >Continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

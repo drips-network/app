@@ -1,19 +1,14 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
   interface Props {
     size?: 'small' | 'normal' | 'large';
     color?: 'caution' | 'positive' | 'foreground' | 'negative' | 'primary';
-    icon?: ComponentType | undefined;
+    icon?: Component | undefined;
     children?: import('svelte').Snippet;
   }
 
-  let {
-    size = 'normal',
-    color = 'foreground',
-    icon = undefined,
-    children
-  }: Props = $props();
+  let { size = 'normal', color = 'foreground', icon = undefined, children }: Props = $props();
 
   const textClasses = {
     small: 'typo-text-small',
@@ -25,13 +20,13 @@
 <div class="status-badge {size}" style:background-color={`var(--color-${color}-level-1`}>
   {#if icon}
     {@const SvelteComponent = icon}
-    <SvelteComponent
-      style="fill: var(--color-{color}-level-6); width:18px; height:18px"
-    />
+    <SvelteComponent style="fill: var(--color-{color}-level-6); width:18px; height:18px" />
   {:else}
     <div class="dot" style:background-color={`var(--color-${color}-level-6)`}></div>
   {/if}
-  <span class={textClasses[size]} style:color={`var(--color-${color}-level-6)`}>{@render children?.()}</span>
+  <span class={textClasses[size]} style:color={`var(--color-${color}-level-6)`}
+    >{@render children?.()}</span
+  >
 </div>
 
 <style>

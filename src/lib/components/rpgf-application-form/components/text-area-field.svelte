@@ -17,9 +17,9 @@
 
   let {
     field,
-    answer = $bindable(undefined),
+    answer = $bindable(),
     valid = $bindable(false),
-    forceRevealError = undefined
+    forceRevealError = undefined,
   }: Props = $props();
 
   let value: string | undefined = $state(answer?.value ?? undefined);
@@ -59,7 +59,7 @@
     ? 'Data in this field is private and will only be shared with the admins of the round.'
     : undefined}
 >
-  <TextArea bind:value resizable on:blur={() => (beenFocussed = true)} />
+  <TextArea bind:value resizable onblur={() => (beenFocussed = true)} />
   <div class="char-count">
     Markdown supported · <span class:too-long={tooLong}>{value ? value.length : 0} / 10.000</span>
   </div>

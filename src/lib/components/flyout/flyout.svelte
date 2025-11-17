@@ -4,7 +4,6 @@
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
-
   interface Props {
     direction?: 'left' | 'right';
     width?: string;
@@ -18,9 +17,9 @@
     width = '24rem',
     visible = $bindable(false),
     trigger,
-    content
+    content,
   }: Props = $props();
-  let triggerElem: HTMLDivElement = $state();
+  let triggerElem: HTMLDivElement;
 
   let timerId: NodeJS.Timeout;
 

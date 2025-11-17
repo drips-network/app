@@ -19,13 +19,16 @@
     }
   };
 
-  let modalContainer: HTMLDivElement = $state();
+  let modalContainer: HTMLDivElement | undefined = $state();
 </script>
 
 <svelte:window onkeydown={pressEscapeKey} />
 
 {#if store.overlay !== null}
-  <FocusTrap enabled={store.focusTrapped} containers={new Set([modalContainer])} />
+  <FocusTrap
+    enabled={store.focusTrapped}
+    containers={modalContainer ? new Set([modalContainer]) : new Set()}
+  />
   <div bind:this={modalContainer} class="modal-layout" data-cy="modal-layout">
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
@@ -33,7 +36,7 @@
       transition:fade={{ duration: 200 }}
       onclick={clickOutside}
       onkeydown={clickOutside}
-   ></div>
+    ></div>
     <div class="content">
       <div
         class="modal-wrapper"
@@ -41,9 +44,7 @@
         out:scale|global={{ start: 0.97, duration: 200 }}
       >
         <Modal>
-          <store.overlay.modalComponent
-            {...store.overlay.modalComponentProps}
-          />
+          <store.overlay.modalComponent {...store.overlay.modalComponentProps} />
           {#if store.hideable}
             <div class="close-button-wrapper">
               <button

@@ -6,7 +6,6 @@
 
   type Option<V extends keyof T> = { title: string; value: V }[];
 
-
   interface Props {
     options: Option<keyof T>;
     active: keyof T;
@@ -22,15 +21,15 @@
     disabled = false,
     containerRole = 'radiogroup',
     itemRole = 'radio',
-    ariaLabel = undefined
+    ariaLabel = undefined,
   }: Props = $props();
 
   const dispatch = createEventDispatcher<{ select: keyof T }>();
 
   let optionElems: Partial<{ [key in keyof T]: HTMLDivElement }> = $state({});
 
-  let selectorWidth: number = $state();
-  let selectorOffset: number = $state();
+  let selectorWidth = $state<number>();
+  let selectorOffset = $state<number>();
 
   let transition = $state(false);
 
@@ -91,7 +90,7 @@
     class:at-beginning={options.findIndex((o) => o.value === active) === 0}
     class:at-end={options.findIndex((o) => o.value === active) === options.length - 1}
     style="transform: translateX({selectorOffset}px); width: {selectorWidth}px;"
- ></div>
+  ></div>
 </div>
 
 <style>

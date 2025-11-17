@@ -56,7 +56,7 @@
     addOnMount = undefined,
     outline = true,
     forceBottomBorderOnItems = false,
-    inputErrors = [],
+    inputErrors = $bindable([]),
     valid = $bindable(false),
   }: Props = $props();
 

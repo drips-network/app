@@ -31,7 +31,7 @@
   let nameValue = $state('');
   let assignedFormId: string | undefined = $state(undefined);
 
-  let nameValidationState: TextInputValidationState = $state();
+  let nameValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
   run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
@@ -98,14 +98,12 @@
   </FormField>
 
   {#snippet actions()}
-  
-      <Button
-        variant="primary"
-        disabled={!canCreateCategory || nameValidationState.type !== 'valid' || !assignedFormId}
-        type="submit"
-        icon={CheckCircle}
-        onclick={handleCreate}>Create category</Button
-      >
-    
+    <Button
+      variant="primary"
+      disabled={!canCreateCategory || nameValidationState.type !== 'valid' || !assignedFormId}
+      type="submit"
+      icon={CheckCircle}
+      onclick={handleCreate}>Create category</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

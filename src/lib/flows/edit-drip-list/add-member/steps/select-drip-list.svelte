@@ -1,6 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let selected: string[] = [];` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
-<script context="module">
+<script module>
   export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
     ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
@@ -82,36 +80,31 @@
     SelectDripListStepListsFragment,
   } from './__generated__/gql.generated';
   import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '../../edit-members/edit-drip-list-steps';
-  import type { Items, Weights } from '$lib/components/list-editor/types';
   import {
     mapSplitReceiversToEditorConfig,
     type SplitReceiver,
   } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
+  import type { ContextType } from '../add-drip-list-member-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let dripLists: SelectDripListStepListsFragment[];
+  interface Props {
+    dripLists: SelectDripListStepListsFragment[];
+    context: Writable<ContextType>;
+    projectOrDripListToAdd:
+      | SelectDripListDripListToAddFragment
+      | SelectDripListProjectToAddFragment;
+  }
 
-  export let state: Writable<{
-    listEditorConfig: {
-      items: Items;
-      weights: Weights;
-    };
-    name: string;
-    description: string | undefined;
-    dripListAccountId: string | undefined;
-  }>;
+  let { dripLists, context, projectOrDripListToAdd }: Props = $props();
 
-  export let projectOrDripListToAdd:
-    | SelectDripListDripListToAddFragment
-    | SelectDripListProjectToAddFragment;
-
-  $: urlToAdd =
+  let urlToAdd = $derived(
     'source' in projectOrDripListToAdd
       ? projectOrDripListToAdd.source.url
-      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`;
+      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`,
+  );
 
-  let selected: string[] = [];
+  let selected: string[] = $state([]);
 
   function isAlreadyInList(listSplits: SelectDripListStepListsFragment['splits']) {
     const accountIdToAdd = projectOrDripListToAdd.account.accountId;
@@ -123,18 +116,20 @@
     const selectedDripList =
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
-    $state = {
+    $context = {
       listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits as SplitReceiver[]),
       name: selectedDripList.name,
       description: selectedDripList.description || undefined,
       dripListAccountId: selectedDripList.account.accountId,
+      isVisible: selectedDripList.isVisible,
     };
 
     dispatch('goForward');
   }
 
-  $: subjectName =
-    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
+  let subjectName = $derived(
+    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project',
+  );
 </script>
 
 <StepLayout>
@@ -183,7 +178,7 @@
       }}>Create new Drip List</Button
     >
   </FormField>
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button onclick={modal.hide} variant="ghost">Cancel</Button>
     <Button
       onclick={submit}
@@ -191,7 +186,7 @@
       icon={DripListIcon}
       variant="primary">Add</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>

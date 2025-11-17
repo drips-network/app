@@ -25,7 +25,7 @@
 
   let nameValue = $state('');
 
-  let nameValidationState: TextInputValidationState = $state();
+  let nameValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
   run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
@@ -71,14 +71,12 @@
   </AnnotationBox>
 
   {#snippet actions()}
-  
-      <Button
-        variant="primary"
-        disabled={nameValidationState.type !== 'valid'}
-        type="submit"
-        icon={CheckCircle}
-        onclick={handleCreate}>Create custom dataset</Button
-      >
-    
+    <Button
+      variant="primary"
+      disabled={nameValidationState.type !== 'valid'}
+      type="submit"
+      icon={CheckCircle}
+      onclick={handleCreate}>Create custom dataset</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

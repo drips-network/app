@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { createEventDispatcher, type Component, type SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type Component, type ComponentProps } from 'svelte';
   import { sineIn, sineOut } from 'svelte/easing';
 
   function getTransitionDelay(index: number, direction: 'in' | 'out') {
@@ -12,9 +12,11 @@
     maxItems?: number;
     itemsClickable?: boolean;
     components: {
-    component: Component<any>;
-    props: Record<string, unknown>;
-  }[];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      component: Component<any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      props: ComponentProps<Component<any>>;
+    }[];
     overflowCounterClickable?: boolean;
   }
 
@@ -23,7 +25,7 @@
     maxItems = 4,
     itemsClickable = false,
     components,
-    overflowCounterClickable = false
+    overflowCounterClickable = false,
   }: Props = $props();
   const dispatch = createEventDispatcher();
   let displayedComponents = $derived(components.slice(0, maxItems));

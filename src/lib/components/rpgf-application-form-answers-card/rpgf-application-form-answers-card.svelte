@@ -14,7 +14,6 @@
   import { browser } from '$app/environment';
   import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
-
   interface Props {
     canSeePrivateFields: boolean;
     applicationVersion: ApplicationVersion;
@@ -32,11 +31,9 @@
 
 <RpgfApplicationDetailsCard title="Form answers" key="form-answers">
   {#snippet right()}
-  
-      {#if applicationVersion.answers.some((a) => a.field.private)}
-        <Toggle size="small" label="Hide private" bind:checked={$privateFieldsHidden} />
-      {/if}
-    
+    {#if applicationVersion.answers.some((a) => a.field.private)}
+      <Toggle size="small" label="Hide private" bind:checked={$privateFieldsHidden} />
+    {/if}
   {/snippet}
 
   <div class="fields">
