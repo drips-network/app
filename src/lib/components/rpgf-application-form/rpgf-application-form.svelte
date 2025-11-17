@@ -22,11 +22,13 @@
     valid?: boolean;
   }
 
+  let fieldsValidStates: Record<string, boolean> = $state({});
+
   let {
     fields,
     disabled = false,
     forceRevealErrors = false,
-    answers = $bindable([]),
+    answers = $bindable(),
     valid = $bindable(false),
   }: Props = $props();
   run(() => {
@@ -35,21 +37,19 @@
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let internalAnswers: Record<string, any> = $state(
-    answers.reduce(
+    answers?.reduce(
       (acc, answer) => {
         acc[answer.fieldId] = answer;
         return acc;
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {} as Record<string, any>,
-    ),
+    ) ?? {},
   );
 
   run(() => {
     answers = Object.values(internalAnswers).filter((a) => a !== undefined);
   });
-
-  let fieldsValidStates: Record<string, boolean> = $state({});
 </script>
 
 <form class:disabled>

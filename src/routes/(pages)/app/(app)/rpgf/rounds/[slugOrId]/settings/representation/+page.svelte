@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
@@ -23,27 +21,23 @@
 
   let urlSlugInputValue = $derived(updatedRound.urlSlug || '');
 
-  let urlSlugValidationState = $state<TextInputValidationState>({ type: 'valid' });
+  let showUrlSuccess = $state(false);
 
-  run(() => {
-    if (!urlSlugInputValue) {
-      updatedRound = {
-        ...updatedRound,
-        urlSlug: urlSlugInputValue,
-      };
-    }
-  });
+  // $effect(() => {
+  //   if (!urlSlugInputValue) {
+  //     updatedRound = {
+  //       ...updatedRound,
+  //       urlSlug: urlSlugInputValue,
+  //     };
+  //   }
+  // });
 
-  run(() => {
-    urlSlugInputValue;
-
+  let urlSlugValidationState = $derived.by<TextInputValidationState>(() => {
     if (urlSlugInputValue === updatedRound.urlSlug) {
-      urlSlugValidationState = { type: 'valid' };
+      return { type: 'valid' };
     } else {
-      urlSlugValidationState = { type: 'unvalidated' };
+      return { type: 'unvalidated' };
     }
-
-    showUrlSuccess = false;
   });
 
   async function validateSlug() {
@@ -96,23 +90,21 @@
     ),
   );
 
-  let showUrlSuccess = $state(false);
+  let activeAvatarTab: 'tab1' | 'tab2' = $derived(updatedRound.customAvatarCid ? 'tab2' : 'tab1');
 
-  let activeAvatarTab: 'tab-1' | 'tab-2' = $derived(
-    updatedRound.customAvatarCid ? 'tab-2' : 'tab-1',
-  );
+  function handleTabChange(tab: 'tab1' | 'tab2') {
+    activeAvatarTab = tab;
 
-  run(() => {
-    if (activeAvatarTab === 'tab-1') {
+    if (tab === 'tab1') {
       updatedRound = {
         ...updatedRound,
         customAvatarCid: null,
       };
     }
-  });
+  }
 
   function handleAvatarUploaded(e: CustomEvent<{ ipfsCid: string }>) {
-    if (activeAvatarTab !== 'tab-2') {
+    if (activeAvatarTab !== 'tab2') {
       return;
     }
 
@@ -153,7 +145,7 @@
   </FormField>
 
   <FormField title="Avatar*">
-    <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
+    <TabbedBox onTabChange={handleTabChange} ariaLabel="Avatar settings" border={true}>
       {#snippet tab1()}
         <EmojiPicker bind:selectedEmoji={updatedRound.emoji} />
       {/snippet}

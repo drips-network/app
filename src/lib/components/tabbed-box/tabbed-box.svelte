@@ -5,9 +5,10 @@
     tabs?: Record<1 | 2, string>;
     ariaLabel: string;
     border?: boolean;
-    activeTab?: string;
+    activeTab?: 'tab1' | 'tab2';
     tab1?: import('svelte').Snippet;
     tab2?: import('svelte').Snippet;
+    onTabChange?: (tab: 'tab1' | 'tab2') => void;
   }
 
   let {
@@ -20,12 +21,14 @@
     activeTab = $bindable('tab1'),
     tab1,
     tab2,
+    onTabChange = undefined,
   }: Props = $props();
 </script>
 
 <div class="tabbed-box whitespace-nowrap relative" class:with-border={border}>
   <div class="tabs">
     <SegmentedControl
+      {onTabChange}
       bind:active={activeTab}
       itemRole="tab"
       containerRole="tablist"

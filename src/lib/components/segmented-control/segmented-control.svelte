@@ -13,6 +13,7 @@
     containerRole?: string;
     itemRole?: string;
     ariaLabel?: string | undefined;
+    onTabChange?: (tab: keyof T) => void;
   }
 
   let {
@@ -22,6 +23,7 @@
     containerRole = 'radiogroup',
     itemRole = 'radio',
     ariaLabel = undefined,
+    onTabChange = undefined,
   }: Props = $props();
 
   const dispatch = createEventDispatcher<{ select: keyof T }>();
@@ -51,6 +53,7 @@
   });
 
   run(() => {
+    onTabChange && onTabChange(active);
     dispatch('select', active);
   });
 

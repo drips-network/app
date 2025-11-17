@@ -24,7 +24,7 @@
 
 <svelte:window onkeydown={pressEscapeKey} />
 
-{#if store.overlay !== null}
+{#if store.overlay}
   <FocusTrap
     enabled={store.focusTrapped}
     containers={modalContainer ? new Set([modalContainer]) : new Set()}
@@ -48,6 +48,7 @@
           {#if store.hideable}
             <div class="close-button-wrapper">
               <button
+                aria-label="Close modal"
                 transition:fly={{ duration: 200, y: -4, x: 4 }}
                 class="close-button"
                 onclick={modal.hide}

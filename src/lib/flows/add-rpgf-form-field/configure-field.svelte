@@ -29,10 +29,10 @@
 
   let { context, unavailableSlugs, onAdd }: Props = $props();
 
-  let fieldSettings = $derived($context.field ?? unreachable());
+  let fieldSettings = $state($context.field ?? unreachable());
 
   let valid = $state(false);
-  run(() => {
+  $effect(() => {
     const normalizedFieldSettings = {
       ...fieldSettings,
       slug: 'slug' in fieldSettings ? fieldSettings.slug.toLowerCase().trim() : '',

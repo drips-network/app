@@ -18,7 +18,7 @@
   let {
     field,
     answer = $bindable(),
-    valid = $bindable(false),
+    valid = $bindable(),
     forceRevealError = undefined,
   }: Props = $props();
 

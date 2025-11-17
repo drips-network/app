@@ -37,7 +37,6 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import DateInput from '$lib/components/date-picker/DateInput.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
-  import PropsOnlyButton from '$lib/components/button/props-only-button.svelte';
   import User from '$lib/components/icons/User.svelte';
   import network from '$lib/stores/wallet/network';
   import type { Splits } from '$lib/components/splits/types';
@@ -483,10 +482,10 @@
         type: 'address',
         address: '0x99505B669C6064BA2B2f26f2E4fffa5e8d906299',
         rightComponent: {
-          component: PropsOnlyButton,
+          component: Button,
           props: {
             label: 'Right button',
-            onClick: () => alert('action done'),
+            onclick: () => alert('action done'),
             buttonProps: {
               icon: User,
               size: 'small',

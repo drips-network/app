@@ -92,7 +92,7 @@
         ariaLabel: 'Delete form',
         // disabled if assigned to a category
         disabled: data.applicationCategories.some((cat) => cat.applicationForm.id === form.id),
-        onClick: () => {
+        onclick: () => {
           doWithConfirmationModal(
             'Are you sure you want to delete this form? This action cannot be undone.',
             () =>
@@ -108,7 +108,7 @@
         circular: true,
         icon: Copy,
         ariaLabel: 'Clone form',
-        onClick: () => modal.show(Stepper, undefined, cloneRpgfFormFlow(form, data.round.id)),
+        onclick: () => modal.show(Stepper, undefined, cloneRpgfFormFlow(form, data.round.id)),
       },
       editButton: {
         variant: 'ghost',

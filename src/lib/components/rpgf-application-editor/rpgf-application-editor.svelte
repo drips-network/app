@@ -79,7 +79,7 @@
     forceRevealErrors = false,
     noPersistance = false,
     readyToSubmit = $bindable(),
-    value = $bindable(null),
+    value = $bindable(),
   }: Props = $props();
 
   const INITIAL_STATE = {
@@ -166,6 +166,10 @@
 
   let formDataValid = $state(false);
 
+  let applicationNameValidationState = $derived(
+    applicationNameValidator($applicationState.projectName),
+  );
+
   // "Hack" to avoid update loops on applicationState
   let applicationStateCategoryId = $derived($applicationState.categoryId[0]);
   run(() => {
@@ -192,11 +196,6 @@
     }
   });
 
-  // Validation
-
-  let applicationNameValidationState = $derived(
-    applicationNameValidator($applicationState.projectName),
-  );
   let projectSelected = $derived($applicationState.dripsAccountId !== null);
   let applicationNameValid = $derived(applicationNameValidationState.type === 'valid');
   let categorySelected = $derived($applicationState.categoryId !== null);

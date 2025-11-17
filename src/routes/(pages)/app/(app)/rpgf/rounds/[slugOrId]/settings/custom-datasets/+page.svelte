@@ -45,7 +45,7 @@
         icon: Pen,
         ariaLabel: 'Edit dataset',
         // If round is published, mandate at least one category
-        onClick: () =>
+        onclick: () =>
           modal.show(Stepper, undefined, editRpgfCustomDatasetFlow(cds, data.customDatasets)),
       },
       uploadButton: {
@@ -54,7 +54,7 @@
         icon: Sharrow,
         ariaLabel: 'Upload dataset CSV',
         // If round is published, mandate at least one category
-        onClick: () => modal.show(Stepper, undefined, uploadRpgfCustomDatasetCsvFlow(cds)),
+        onclick: () => modal.show(Stepper, undefined, uploadRpgfCustomDatasetCsvFlow(cds)),
       },
       deleteButton: {
         variant: 'ghost',
@@ -62,7 +62,7 @@
         icon: Trash,
         ariaLabel: 'Delete dataset',
         // If round is published, mandate at least one category
-        onClick: () => {
+        onclick: () => {
           doWithConfirmationModal(
             'Are you sure you want to delete this custom dataset? This action cannot be undone.',
             () =>

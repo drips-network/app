@@ -10,7 +10,7 @@
     decision?: 'approve' | 'reject' | null;
   }
 
-  let { applicationId, decision = $bindable(null) }: Props = $props();
+  let { applicationId, decision = $bindable() }: Props = $props();
 
   let checkboxSlugPrefix = $derived(`application-decision-${applicationId}`);
 
