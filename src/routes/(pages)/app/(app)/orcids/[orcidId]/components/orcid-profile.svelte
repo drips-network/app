@@ -27,7 +27,7 @@
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
   import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
-  // for bio
+  // for bio, unsandboxed iD
   export let orcid: Orcid;
   // for everything else
   export let orcidAccount: OrcidProfileFragment;
@@ -40,7 +40,7 @@
   $: support = orcidAccount.support ?? [];
 
   function claimOrcid() {
-    launchClaimOrcid(orcidAccount.orcid);
+    launchClaimOrcid(orcid.id);
   }
 </script>
 
@@ -52,7 +52,7 @@
 />
 
 <svelte:head>
-  <link rel="canonical" href={`https://drips.network/app/orcids/${orcidAccount.orcid}`} />
+  <link rel="canonical" href={`https://drips.network/app/orcids/${orcid.id}`} />
 </svelte:head>
 
 <PrimaryColorThemer colorHex={undefined}>
@@ -68,10 +68,7 @@
           later.{/if}
         <svelte:fragment slot="actions">
           <div class="flex gap-3">
-            <CopyLinkButton
-              url={buildOrcidUrl(orcidAccount.orcid, { absolute: true })}
-              variant="ghost"
-            />
+            <CopyLinkButton url={buildOrcidUrl(orcid.id, { absolute: true })} variant="ghost" />
             <Button size="small" icon={Registered} variant="primary" on:click={claimOrcid}
               >Claim ORCID iD</Button
             >
@@ -88,7 +85,7 @@
           {orcid}
           {orcidAccount}
           shareButton={{
-            url: buildOrcidUrl(orcidAccount.orcid, { absolute: true }),
+            url: buildOrcidUrl(orcid.id, { absolute: true }),
             downloadableImageUrl: `${imageBaseUrl}?target=og`,
           }}
         />
@@ -135,7 +132,7 @@
                 unclaimedTokensExpanded={withdrawableBalances.length > 0}
                 showClaimButton={!orcidAccount.isClaimed}
                 on:claimButtonClick={() =>
-                  goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcidAccount.orcid }))}
+                  goto(buildUrl('/app/claim-orcid', { orcidToClaim: orcid.id }))}
               />
             </div>
           </SectionSkeleton>

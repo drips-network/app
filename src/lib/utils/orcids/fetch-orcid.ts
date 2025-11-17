@@ -13,6 +13,17 @@ import type {
   OrcidByAccountIdQueryVariables,
 } from './__generated__/gql.generated';
 
+const ORCID_SANDBOX_PREFIX = 'sandbox-';
+
+/**
+ * Determine if the ORCID API url is pointing to the sandbox environment.
+ *
+ * @returns true if the ORCID API url is pointing to the sandbox, false otherwise.
+ */
+function isSandboxOrcidEnv() {
+  return PUBLIC_ORCID_API_URL.startsWith('https://pub.sandbox.orcid.org');
+}
+
 /**
  * Prefixes an ORCID iD with 'sandbox-' if using the sandbox API. Necessary
  * for calls to requestUpdateOwner and calcAccountId.
@@ -22,8 +33,8 @@ import type {
  *  the plain ORCID iD otherwise.
  */
 export function orcidIdToSandoxOrcidId(orcidId: string) {
-  if (/sandbox\.orcid\.org/.test(PUBLIC_ORCID_API_URL)) {
-    return `sandbox-${orcidId}`;
+  if (isSandboxOrcidEnv()) {
+    return `${ORCID_SANDBOX_PREFIX}${orcidId}`;
   }
 
   return orcidId;
@@ -81,11 +92,11 @@ const getOrcidQuery = gql`
   }
 `;
 
-export async function fetchOrcidAccount(accountId: string, fetch?: typeof global.fetch) {
+export async function fetchOrcidAccount(orcidId: string, fetch?: typeof global.fetch) {
   return query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
     getOrcidQuery,
     {
-      orcid: accountId,
+      orcid: orcidIdToSandoxOrcidId(orcidId),
       chain: network.gqlName,
     },
     fetch,
