@@ -26,7 +26,6 @@
     ECOSYSTEM_AVATAR_FRAGMENT,
   } from '../ecosystem-avatar/ecosystem-avatar.svelte';
 
-
   interface Props {
     ecosystem: EcosystemBadgeFragment | undefined;
     showOwner?: boolean;
@@ -48,7 +47,7 @@
     avatarSize = 'small',
     disabled = false,
     outline = false,
-    linkToNewTab = false
+    linkToNewTab = false,
   }: Props = $props();
 
   // lookup ens name if owner is provided
@@ -56,8 +55,9 @@
     showOwner && ecosystem && ensStore.lookup(ecosystem.owner.address);
   });
   let ens = $derived(showOwner && ecosystem ? $ensStore[ecosystem.owner.address] : {});
-  let username =
-    $derived(ens?.name ?? (ecosystem && showOwner && formatAddress(ecosystem.owner.address)) ?? undefined);
+  let username = $derived(
+    ens?.name ?? (ecosystem && showOwner && formatAddress(ecosystem.owner.address)) ?? undefined,
+  );
 </script>
 
 <svelte:element

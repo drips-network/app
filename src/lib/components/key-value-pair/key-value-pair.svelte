@@ -6,12 +6,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    key,
-    size = 'large',
-    highlight = false,
-    children
-  }: Props = $props();
+  let { key, size = 'large', highlight = false, children }: Props = $props();
 </script>
 
 <div class="key-value-pair typo-text size-{size}" class:highlight>

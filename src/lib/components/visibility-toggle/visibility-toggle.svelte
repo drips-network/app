@@ -7,7 +7,11 @@
     message?: string;
   }
 
-  let { hiddenItemsCount, showHidden = $bindable(false), message = 'Show hidden' }: Props = $props();
+  let {
+    hiddenItemsCount,
+    showHidden = $bindable(false),
+    message = 'Show hidden',
+  }: Props = $props();
 </script>
 
 {#if hiddenItemsCount}

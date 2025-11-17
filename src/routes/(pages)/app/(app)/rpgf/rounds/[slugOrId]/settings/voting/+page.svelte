@@ -24,17 +24,19 @@
   let isDraft = $derived(!data.round.published);
 
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let voterItems: Items = $state(Object.fromEntries(
-    data.roundVoters.map((u) => {
-      return [
-        getAddress(u.walletAddress),
-        {
-          type: 'address',
-          address: getAddress(u.walletAddress),
-        },
-      ];
-    }) ?? [],
-  ));
+  let voterItems: Items = $state(
+    Object.fromEntries(
+      data.roundVoters.map((u) => {
+        return [
+          getAddress(u.walletAddress),
+          {
+            type: 'address',
+            address: getAddress(u.walletAddress),
+          },
+        ];
+      }) ?? [],
+    ),
+  );
 
   run(() => {
     updatedVoterAddresses = mapFilterUndefined(
@@ -133,11 +135,13 @@
   });
 
   // Voters can not be updated after voting has started
-  let canUpdateVoters = $derived(data.round.state
-    ? data.round.state !== 'pending-results' &&
-      data.round.state !== 'results' &&
-      data.round.state !== 'voting'
-    : true);
+  let canUpdateVoters = $derived(
+    data.round.state
+      ? data.round.state !== 'pending-results' &&
+          data.round.state !== 'results' &&
+          data.round.state !== 'voting'
+      : true,
+  );
 
   let voterGuidelinesLinkValidationState = $state<TextInputValidationState>({ type: 'valid' });
   run(() => {
@@ -153,22 +157,25 @@
     }
   });
 
-  let valid = $derived(Boolean(
-    votesPerVoterValidationState.type !== 'invalid' &&
-      maxVotesPerProjectValidationState.type !== 'invalid' &&
-      minVotesPerProjectValidationState.type !== 'invalid' &&
-      voterGuidelinesLinkValidationState.type !== 'invalid',
-  ));
+  let valid = $derived(
+    Boolean(
+      votesPerVoterValidationState.type !== 'invalid' &&
+        maxVotesPerProjectValidationState.type !== 'invalid' &&
+        minVotesPerProjectValidationState.type !== 'invalid' &&
+        voterGuidelinesLinkValidationState.type !== 'invalid',
+    ),
+  );
 
-  let changesMade =
-    $derived(updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
-    updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
-    updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
-    updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
-    !areStringArraysEqual(
-      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
-    ));
+  let changesMade = $derived(
+    updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
+      updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
+      updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
+      updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
+      !areStringArraysEqual(
+        updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
+        data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
+      ),
+  );
 
   function normalizeOptionalNumberInput(value: unknown): number | null {
     if (value === '' || value === null || value === undefined) {

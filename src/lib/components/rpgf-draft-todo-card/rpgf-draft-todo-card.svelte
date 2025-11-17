@@ -21,14 +21,18 @@
   let { round, amountOfVoters }: Props = $props();
 
   let nameAndDescriptionDone = $derived(Boolean(round.name && round.urlSlug));
-  let scheduleDone = $derived(Boolean(
-    round.applicationPeriodStart &&
-      round.applicationPeriodEnd &&
-      round.votingPeriodStart &&
-      round.votingPeriodEnd &&
-      round.resultsPeriodStart,
-  ));
-  let votingConfigDone = $derived(Boolean(round.maxVotesPerProjectPerVoter && round.maxVotesPerVoter));
+  let scheduleDone = $derived(
+    Boolean(
+      round.applicationPeriodStart &&
+        round.applicationPeriodEnd &&
+        round.votingPeriodStart &&
+        round.votingPeriodEnd &&
+        round.resultsPeriodStart,
+    ),
+  );
+  let votingConfigDone = $derived(
+    Boolean(round.maxVotesPerProjectPerVoter && round.maxVotesPerVoter),
+  );
 
   function handlePublish() {
     modal.show(Stepper, undefined, publishRpgfRoundFlowSteps(round.id));

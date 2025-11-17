@@ -21,13 +21,15 @@
     votesAssigned: string;
   }
 
-  let tableData = $derived(data.ballots.map<BallotTableRow>((ballot) => ({
-    voter: {
-      address: ballot.user.walletAddress,
-    },
-    submittedAt: formatDate(ballot.createdAt),
-    votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
-  })));
+  let tableData = $derived(
+    data.ballots.map<BallotTableRow>((ballot) => ({
+      voter: {
+        address: ballot.user.walletAddress,
+      },
+      submittedAt: formatDate(ballot.createdAt),
+      votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
+    })),
+  );
 
   const tableColumns: ColumnDef<BallotTableRow>[] = [
     {

@@ -22,8 +22,9 @@
 
   let votingRoundUrl = `${BASE_URL}/app/drip-lists/${votingRound.id}`;
 
-  let isPublisher =
-    $derived($walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase());
+  let isPublisher = $derived(
+    $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase(),
+  );
 </script>
 
 {#if votingRound.status === 'Started'}
@@ -31,15 +32,13 @@
     <AnnotationBox type="info" icon={Proposals}>
       This list is in voting.
       {#snippet actions()}
-          
-          <ShareButton
-            shareLabel="Share with collaborators"
-            buttonVariant="primary"
-            url={votingRoundUrl}
-            downloadableImageUrl="{votingRoundUrl}.png?target=og"
-          />
-        
-          {/snippet}
+        <ShareButton
+          shareLabel="Share with collaborators"
+          buttonVariant="primary"
+          url={votingRoundUrl}
+          downloadableImageUrl="{votingRoundUrl}.png?target=og"
+        />
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && !votingRound.result}
@@ -47,21 +46,19 @@
     <AnnotationBox type="error" icon={Proposals}>
       Voting has ended but no collaborators voted.
       {#snippet actions()}
-              
-          {#if isPublisher}
-            <Button
-              icon={Trash}
-              variant="destructive"
-              onclick={() =>
-                modal.show(
-                  Stepper,
-                  undefined,
-                  deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                )}>Delete voting round</Button
-            >
-          {/if}
-        
-              {/snippet}
+        {#if isPublisher}
+          <Button
+            icon={Trash}
+            variant="destructive"
+            onclick={() =>
+              modal.show(
+                Stepper,
+                undefined,
+                deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
+              )}>Delete voting round</Button
+          >
+        {/if}
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && isPublisher}
@@ -69,23 +66,21 @@
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. You can now publish.
       {#snippet actions()}
-                  
-          <Button
-            onclick={() =>
-              modal.show(
-                Stepper,
-                undefined,
-                publishVotingRoundListFlowSteps(
-                  votingRound.id,
-                  votingRound.name,
-                  votingRound.description ?? undefined,
-                ),
-              )}
-            variant="primary"
-            icon={Wallet}>Publish Drip List</Button
-          >
-        
-                  {/snippet}
+        <Button
+          onclick={() =>
+            modal.show(
+              Stepper,
+              undefined,
+              publishVotingRoundListFlowSteps(
+                votingRound.id,
+                votingRound.name,
+                votingRound.description ?? undefined,
+              ),
+            )}
+          variant="primary"
+          icon={Wallet}>Publish Drip List</Button
+        >
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}

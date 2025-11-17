@@ -28,7 +28,6 @@
   import { invalidate } from '$app/navigation';
   import { clearLocallyStoredApplication } from '../../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
 
-
   interface Props {
     context: Writable<{ applicationId: string | null }>;
     applicationData: CreateApplicationDto;
@@ -50,7 +49,7 @@
     roundName,
     userId,
     categoryName,
-    isUpdateForApplication
+    isUpdateForApplication,
   }: Props = $props();
 
   type SubmissionExtras = {
@@ -233,7 +232,9 @@
     });
   }
 
-  let shouldAttest = $derived(network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled);
+  let shouldAttest = $derived(
+    network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled,
+  );
 
   function handleConfirm() {
     if (shouldAttest) {
@@ -283,16 +284,14 @@
     </p>
   </div>
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-      <Button icon={shouldAttest ? Wallet : CheckCircle} onclick={handleConfirm} variant="primary">
-        {#if shouldAttest}
-          Confirm in wallet
-        {:else}
-          Submit application
-        {/if}
-      </Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
+    <Button icon={shouldAttest ? Wallet : CheckCircle} onclick={handleConfirm} variant="primary">
+      {#if shouldAttest}
+        Confirm in wallet
+      {:else}
+        Submit application
+      {/if}
+    </Button>
   {/snippet}
 </StepLayout>
 

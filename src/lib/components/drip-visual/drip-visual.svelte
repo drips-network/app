@@ -78,17 +78,16 @@
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
 
-
   interface Props {
     from?: DripVisualAddressDriverAccountFragment | undefined;
-    to?: 
-    | DripVisualNftDriverAccountFragment
-    | DripVisualAddressDriverAccountFragment
-    | DripVisualProjectFragment
-    | DripVisualDripListFragment
-    | DripVisualUserFragment
-    | DripVisualEcosystemFragment
-    | undefined;
+    to?:
+      | DripVisualNftDriverAccountFragment
+      | DripVisualAddressDriverAccountFragment
+      | DripVisualProjectFragment
+      | DripVisualDripListFragment
+      | DripVisualUserFragment
+      | DripVisualEcosystemFragment
+      | undefined;
     visual?: 'stream' | 'donation';
     disableLinks?: boolean;
     amountPerSecond?: bigint | undefined;
@@ -103,7 +102,7 @@
     disableLinks = false,
     amountPerSecond = undefined,
     halted = false,
-    tokenInfo = undefined
+    tokenInfo = undefined,
   }: Props = $props();
 
   let animationSpeed = tweened(0, {

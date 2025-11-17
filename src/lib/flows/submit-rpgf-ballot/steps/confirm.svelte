@@ -15,8 +15,8 @@
 
   interface Props {
     ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+      clear: () => void;
+    };
     roundId: string;
     round: Round;
   }
@@ -51,9 +51,7 @@
     details and confirm.
   </AnnotationBox>
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-      <Button icon={Wallet} onclick={handleConfirm} variant="primary">Yes, cast my ballot</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
+    <Button icon={Wallet} onclick={handleConfirm} variant="primary">Yes, cast my ballot</Button>
   {/snippet}
 </StepLayout>

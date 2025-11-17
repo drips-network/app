@@ -120,7 +120,9 @@
 >
   <div class="page">
     <div class="page-content">
-      <div class:loading={showLoadingSpinner} class="page-content-inner">{@render children?.()}</div>
+      <div class:loading={showLoadingSpinner} class="page-content-inner">
+        {@render children?.()}
+      </div>
     </div>
   </div>
 

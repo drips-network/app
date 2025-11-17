@@ -34,20 +34,22 @@
     },
   ];
 
-  let historyTableData = $derived(data.history.map((version) => ({
-    timestamp: formatDate(version.createdAt),
-    applicationBadge: {
-      application: {
-        id: data.application.id,
-        projectName: version.projectName,
-        dripsProjectDataSnapshot: version.dripsProjectDataSnapshot,
-        allocation: null,
+  let historyTableData = $derived(
+    data.history.map((version) => ({
+      timestamp: formatDate(version.createdAt),
+      applicationBadge: {
+        application: {
+          id: data.application.id,
+          projectName: version.projectName,
+          dripsProjectDataSnapshot: version.dripsProjectDataSnapshot,
+          allocation: null,
+        },
+        hideState: true,
+        excludeFromViewTransition: true,
+        size: 'small' as ComponentProps<typeof RpgfApplicationBadge>['size'],
       },
-      hideState: true,
-      excludeFromViewTransition: true,
-      size: 'small' as ComponentProps<typeof RpgfApplicationBadge>['size'],
-    },
-  })));
+    })),
+  );
 
   function handleRowClick({ rowIndex }: RowClickEventPayload) {
     const version = data.history[rowIndex];

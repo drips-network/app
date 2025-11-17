@@ -60,7 +60,6 @@
       },
     },
   });
-  
 
   let selected: string[] = $state([]);
   let selectedToken = $derived(selected[0] ? tokens.getByAddress(selected[0]) : undefined);
@@ -106,12 +105,10 @@
     </div>
   </FormField>
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button variant="primary" disabled={selected.length !== 1} onclick={submit}
-        >Add {selectedToken?.info.name ?? ''}</Button
-      >
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" disabled={selected.length !== 1} onclick={submit}
+      >Add {selectedToken?.info.name ?? ''}</Button
+    >
   {/snippet}
 </StepLayout>
 

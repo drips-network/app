@@ -101,7 +101,9 @@
   const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id)}.png`;
 
   // all nodes except the root node
-  let recipientsFormatted = $derived(formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0));
+  let recipientsFormatted = $derived(
+    formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0),
+  );
 </script>
 
 <HeadMeta

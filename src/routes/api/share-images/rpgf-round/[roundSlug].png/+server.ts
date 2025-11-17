@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, fetch, params }) => {
   if (!round) {
     return error(404, 'Round not found');
   }
- 
+
   const { emoji, customAvatarCid, color, name } = round;
 
   const target = url.searchParams.get('target');

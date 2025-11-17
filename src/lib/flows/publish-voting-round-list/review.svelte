@@ -121,37 +121,33 @@
   <WhatsNextSection>
     <WhatsNextCard>
       {#snippet title()}
-            After transaction confirmation…
-          {/snippet}
+        After transaction confirmation…
+      {/snippet}
       {#snippet items()}
-          
-          <WhatsNextItem icon={DripList}
-            >The published Drip List will appear on your <span class="typo-text-bold"
-              >public profile</span
-            >.</WhatsNextItem
-          >
-          <WhatsNextItem icon={TokenStreams}
-            >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
-            or one-time donations.</WhatsNextItem
-          >
-          <WhatsNextItem icon={Pen}
-            >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
-            round.</WhatsNextItem
-          >
-        
-          {/snippet}
+        <WhatsNextItem icon={DripList}
+          >The published Drip List will appear on your <span class="typo-text-bold"
+            >public profile</span
+          >.</WhatsNextItem
+        >
+        <WhatsNextItem icon={TokenStreams}
+          >You or anyone else can <span class="typo-text-bold">support the Drip List</span> with continuous
+          or one-time donations.</WhatsNextItem
+        >
+        <WhatsNextItem icon={Pen}
+          >You can <span class="typo-text-bold">edit the Drip List</span> anytime, or start another voting
+          round.</WhatsNextItem
+        >
+      {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
 
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button
-        onclick={() => submit()}
-        variant="primary"
-        disabled={Object.keys($context.dripListConfig.weights).length === 0}
-        icon={Wallet}>Confirm in wallet</Button
-      >
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button
+      onclick={() => submit()}
+      variant="primary"
+      disabled={Object.keys($context.dripListConfig.weights).length === 0}
+      icon={Wallet}>Confirm in wallet</Button
+    >
   {/snippet}
 </StepLayout>

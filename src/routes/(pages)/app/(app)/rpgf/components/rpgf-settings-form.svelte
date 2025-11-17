@@ -8,7 +8,6 @@
   import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
-
   interface Props {
     saveHandler?: (() => Promise<void>) | undefined;
     saveEnabled?: boolean;
@@ -16,12 +15,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    saveHandler = undefined,
-    saveEnabled = true,
-    invalid = false,
-    children
-  }: Props = $props();
+  let { saveHandler = undefined, saveEnabled = true, invalid = false, children }: Props = $props();
 
   let saving = $state(false);
   let success = $state(false);

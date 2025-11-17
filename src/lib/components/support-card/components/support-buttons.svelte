@@ -8,9 +8,6 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { fade } from 'svelte/transition';
 
-
-
-
   interface Props {
     type: 'dripList' | 'project' | 'ecosystem';
     transitions?: boolean;
@@ -28,7 +25,7 @@
     onClickNewStream = undefined,
     onClickAddToDripList = undefined,
     onClickNewDonation = undefined,
-    supportMenuOpen = $bindable(false)
+    supportMenuOpen = $bindable(false),
   }: Props = $props();
 </script>
 
@@ -61,8 +58,7 @@
     {/if}
     <Button size="large" icon={Droplet} onclick={onClickNewDonation}>One-time donation</Button>
     {#if type !== 'ecosystem'}
-      <Button onclick={onClickAddToDripList} size="large" icon={DripList}
-        >Add to a Drip List</Button
+      <Button onclick={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button
       >
     {/if}
   </div>

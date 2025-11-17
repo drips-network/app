@@ -4,9 +4,6 @@
   import type { z } from 'zod';
   import type { authorSchema } from '../../../../routes/api/blog/posts/schema';
 
-
-
-
   interface Props {
     title: string;
     excerpt: string;
@@ -36,14 +33,16 @@
     newTab = false,
     first = false,
     link = true,
-    shareButton = false
+    shareButton = false,
   }: Props = $props();
 
-  let formattedDate = $derived(new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }));
+  let formattedDate = $derived(
+    new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+  );
 </script>
 
 <svelte:element

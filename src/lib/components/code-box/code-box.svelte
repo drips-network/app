@@ -26,27 +26,31 @@
     highlight = [null, null],
     editing = false,
     height = undefined,
-    width = undefined
+    width = undefined,
   }: Props = $props();
 
   let headerElem: HTMLElement | undefined = $state();
 
-  let primaryColor = $derived(headerElem
-    ? getComputedStyle(headerElem).getPropertyValue('--color-primary')
-    : undefined);
+  let primaryColor = $derived(
+    headerElem ? getComputedStyle(headerElem).getPropertyValue('--color-primary') : undefined,
+  );
 
   let textColor = $derived(primaryColor ? getContrastColor(primaryColor) : undefined);
 
-  let sanitizedCode = $derived(sanitize(code, {
-    allowedTags: [],
-    allowedAttributes: {},
-  }));
-  let displayCode = $derived(highlight.some((v) => v === null)
-    ? sanitizedCode
-    : insertTextAtIndices(sanitizedCode, {
-        [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
-        [highlight[1] as number]: '</mark>',
-      }));
+  let sanitizedCode = $derived(
+    sanitize(code, {
+      allowedTags: [],
+      allowedAttributes: {},
+    }),
+  );
+  let displayCode = $derived(
+    highlight.some((v) => v === null)
+      ? sanitizedCode
+      : insertTextAtIndices(sanitizedCode, {
+          [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
+          [highlight[1] as number]: '</mark>',
+        }),
+  );
   let ctaText = $derived(editing ? 'Edit on GitHub' : 'Add to your repo');
 
   let copySuccess = $state(false);
@@ -58,9 +62,11 @@
   }
 
   // TODO: add support for Gitlab.
-  let gitHubProposalUrl = $derived(editing
-    ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json`
-    : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`);
+  let gitHubProposalUrl = $derived(
+    editing
+      ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json`
+      : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`,
+  );
 </script>
 
 <section

@@ -10,15 +10,14 @@
   import type { State } from '../../../claim-project-flow';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-
   interface Props {
     context: Writable<State>;
     originalProject: ProjectCustomizerFragment;
     newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
+      ReturnType<
+        typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+      > & { isProjectVisible: boolean }
+    >;
   }
 
   let { context, originalProject, newProjectData }: Props = $props();

@@ -26,10 +26,12 @@
 
   let { fields = $bindable([]) }: Props = $props();
 
-  let applicationFormatWithKeys = $state(fields.map((field) => ({
-    ...field,
-    key: `${crypto.randomUUID()}`,
-  })));
+  let applicationFormatWithKeys = $state(
+    fields.map((field) => ({
+      ...field,
+      key: `${crypto.randomUUID()}`,
+    })),
+  );
   run(() => {
     fields = applicationFormatWithKeys.map<ApplicationFieldDto>((field) => {
       // Remove the key from the field
@@ -105,12 +107,14 @@
     );
   }
 
-  let slugs = $derived(mapFilterUndefined(applicationFormatWithKeys, (field) => {
-    if ('slug' in field && field.slug) {
-      return field.slug;
-    }
-    return undefined;
-  }));
+  let slugs = $derived(
+    mapFilterUndefined(applicationFormatWithKeys, (field) => {
+      if ('slug' in field && field.slug) {
+        return field.slug;
+      }
+      return undefined;
+    }),
+  );
 
   function getSlugsWithout(slug: string | undefined) {
     return slugs.filter((s) => s !== slug);

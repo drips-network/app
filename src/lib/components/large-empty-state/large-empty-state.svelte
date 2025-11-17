@@ -7,12 +7,12 @@
     emoji: string;
     headline: string;
     description?: string | undefined;
-    learnMoreLink?: 
-    | {
-        label: string;
-        url: string;
-      }
-    | undefined;
+    learnMoreLink?:
+      | {
+          label: string;
+          url: string;
+        }
+      | undefined;
     button?: { label: string; handler: () => void } | undefined;
     secondaryButton?: { label: string; handler: () => void } | undefined;
     showSiweButton?: boolean;
@@ -25,7 +25,7 @@
     learnMoreLink = undefined,
     button = undefined,
     secondaryButton = undefined,
-    showSiweButton = false
+    showSiweButton = false,
   }: Props = $props();
 </script>
 
@@ -41,12 +41,10 @@
         rel="noreferrer">{learnMoreLink.label}</a
       >{/if}
     <div class="buttons">
-      {#if secondaryButton}<Button onclick={secondaryButton.handler}
-          >{secondaryButton.label}</Button
+      {#if secondaryButton}<Button onclick={secondaryButton.handler}>{secondaryButton.label}</Button
         >{/if}
-      {#if button}<Button
-          variant={secondaryButton ? 'primary' : undefined}
-          onclick={button.handler}>{button.label}</Button
+      {#if button}<Button variant={secondaryButton ? 'primary' : undefined} onclick={button.handler}
+          >{button.label}</Button
         >{/if}
       {#if showSiweButton}
         <RpgfSiweButton on:signIn></RpgfSiweButton>

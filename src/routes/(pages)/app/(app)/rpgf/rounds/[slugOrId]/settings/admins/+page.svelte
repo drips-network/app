@@ -19,17 +19,19 @@
   ]);
 
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let adminItems: Items = $state(Object.fromEntries(
-    data.roundAdmins.map((u) => {
-      return [
-        getAddress(u.walletAddress),
-        {
-          type: 'address',
-          address: getAddress(u.walletAddress),
-        },
-      ];
-    }),
-  ));
+  let adminItems: Items = $state(
+    Object.fromEntries(
+      data.roundAdmins.map((u) => {
+        return [
+          getAddress(u.walletAddress),
+          {
+            type: 'address',
+            address: getAddress(u.walletAddress),
+          },
+        ];
+      }),
+    ),
+  );
 
   run(() => {
     if (adminItems) {

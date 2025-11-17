@@ -51,9 +51,7 @@
     bind:percentages={$context.highLevelPercentages}
   />
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button icon={ArrowRight} variant="primary" onclick={nextStep}>Continue</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button icon={ArrowRight} variant="primary" onclick={nextStep}>Continue</Button>
   {/snippet}
 </StepLayout>

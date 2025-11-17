@@ -55,9 +55,7 @@
     description="Are you sure that you want to delete this voting round? You can't undo this."
   />
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button onclick={() => submit()} variant="destructive" icon={Wallet}>Confirm in wallet</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button onclick={() => submit()} variant="destructive" icon={Wallet}>Confirm in wallet</Button>
   {/snippet}
 </StepLayout>

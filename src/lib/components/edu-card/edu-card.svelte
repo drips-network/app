@@ -17,7 +17,7 @@
     negativeMarginWhileCollapsed = undefined,
     text,
     buttons,
-    illustration
+    illustration,
   }: Props = $props();
 </script>
 

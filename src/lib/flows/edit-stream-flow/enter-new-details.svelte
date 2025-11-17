@@ -61,7 +61,6 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-
   interface Props {
     stream: EditStreamFlowStreamFragment;
     context: Writable<EditStreamFlowState>;
@@ -73,27 +72,33 @@
 
   let amountLocked = $derived(stream.isPaused === true);
 
-  let newAmountValueParsed = $derived($context.newAmountValue
-    ? parseTokenAmount(
-        $context.newAmountValue,
-        token.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
-      )
-    : undefined);
+  let newAmountValueParsed = $derived(
+    $context.newAmountValue
+      ? parseTokenAmount(
+          $context.newAmountValue,
+          token.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
+        )
+      : undefined,
+  );
 
-  let newAmountPerSecond = $derived(newAmountValueParsed
-    ? newAmountValueParsed / BigInt($context.newSelectedMultiplier)
-    : undefined);
+  let newAmountPerSecond = $derived(
+    newAmountValueParsed
+      ? newAmountValueParsed / BigInt($context.newSelectedMultiplier)
+      : undefined,
+  );
 
   let amountValidationState = $derived(validateAmtPerSecInput(newAmountPerSecond));
 
   let nameUpdated = $derived($context.newName !== stream.name);
-  let amountUpdated =
-    $derived(newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString());
-  let canUpdate =
-    $derived(newAmountValueParsed &&
-    $context.newName &&
-    (nameUpdated || amountUpdated) &&
-    amountValidationState?.type === 'valid');
+  let amountUpdated = $derived(
+    newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString(),
+  );
+  let canUpdate = $derived(
+    newAmountValueParsed &&
+      $context.newName &&
+      (nameUpdated || amountUpdated) &&
+      amountValidationState?.type === 'valid',
+  );
 
   function updateStream() {
     dispatch(
@@ -200,12 +205,10 @@
   {/if}
   <SafeAppDisclaimer disclaimerType="drips" />
   {#snippet actions()}
-  
-      <Button onclick={modal.hide} variant="ghost">Cancel</Button>
-      <Button variant="primary" icon={Wallet} onclick={updateStream} disabled={!canUpdate}
-        >Confirm changes</Button
-      >
-    
+    <Button onclick={modal.hide} variant="ghost">Cancel</Button>
+    <Button variant="primary" icon={Wallet} onclick={updateStream} disabled={!canUpdate}
+      >Confirm changes</Button
+    >
   {/snippet}
 </StepLayout>
 

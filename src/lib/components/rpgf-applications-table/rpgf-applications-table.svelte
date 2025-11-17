@@ -8,11 +8,6 @@
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import ApplicationsTable from './components/applications-table.svelte';
 
-
-
-
-
-
   interface Props {
     searchable?: boolean;
     applications: ListingApplication[];
@@ -36,16 +31,18 @@
     voteStep = null,
     ballotStore = writable({}),
     horizontalScroll = false,
-    displayVisibilityNote = false
+    displayVisibilityNote = false,
   }: Props = $props();
 
   let searchQuery = $state('');
 
-  let filteredApplications = $derived(applications.filter((application) => {
-    return (
-      !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }));
+  let filteredApplications = $derived(
+    applications.filter((application) => {
+      return (
+        !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }),
+  );
 
   let includesResults = $derived(applications.some((a) => a.allocation !== null));
 </script>

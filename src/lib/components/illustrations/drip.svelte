@@ -10,7 +10,7 @@
     height = '38px',
     fill = 'var(--color-primary)',
     stroke = undefined,
-    strokeWidth = undefined
+    strokeWidth = undefined,
   }: Props = $props();
 </script>
 

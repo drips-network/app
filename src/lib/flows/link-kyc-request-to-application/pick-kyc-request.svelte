@@ -71,14 +71,12 @@
   <AnnotationBox>This action cannot be undone.</AnnotationBox>
 
   {#snippet actions()}
-  
-      <Button
-        onclick={handleLink}
-        disabled={kycIdValue.length === 0}
-        variant="primary"
-        icon={CheckCircle}>Confirm</Button
-      >
-    
+    <Button
+      onclick={handleLink}
+      disabled={kycIdValue.length === 0}
+      variant="primary"
+      icon={CheckCircle}>Confirm</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>
 

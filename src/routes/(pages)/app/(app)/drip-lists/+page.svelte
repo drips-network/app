@@ -38,35 +38,29 @@
 <div class="page">
   <EduCard dismissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
     {#snippet text()}
-      
-        <h1 class="pixelated">What’s a Drip List?</h1>
-        <p>
-          A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
-          address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
-          determines the amount of funds they receive when funds are sent to the list.
-          <a
-            class="typo-link"
-            href="https://docs.drips.network/support-your-dependencies/overview"
-            target="_blank">Learn more</a
-          >
-        </p>
-      
-      {/snippet}
-    {#snippet buttons()}
-      
-        <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
-          >Create a Drip List</Button
+      <h1 class="pixelated">What’s a Drip List?</h1>
+      <p>
+        A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
+        address, or other Drip Lists. Each recipient in the list is assigned a percentage, which
+        determines the amount of funds they receive when funds are sent to the list.
+        <a
+          class="typo-link"
+          href="https://docs.drips.network/support-your-dependencies/overview"
+          target="_blank">Learn more</a
         >
-      
-      {/snippet}
+      </p>
+    {/snippet}
+    {#snippet buttons()}
+      <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
+        >Create a Drip List</Button
+      >
+    {/snippet}
     {#snippet illustration()}
-      
-        <div class="edu-card-illustration-bg"></div>
-        <div class="edu-card-illustration-wrapper">
-          <DripList />
-        </div>
-      
-      {/snippet}
+      <div class="edu-card-illustration-bg"></div>
+      <div class="edu-card-illustration-wrapper">
+        <DripList />
+      </div>
+    {/snippet}
   </EduCard>
 
   <YourDripListsSection

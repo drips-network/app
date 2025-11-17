@@ -59,9 +59,9 @@
   let { project }: Props = $props();
   let projectChainData = $derived(filterCurrentChainData(project.chainData, 'claimed'));
 
-  let projectDataWritable = $derived(writable(
-    structuredClone({ ...projectChainData, isProjectVisible: project.isVisible }),
-  ));
+  let projectDataWritable = $derived(
+    writable(structuredClone({ ...projectChainData, isProjectVisible: project.isVisible })),
+  );
 
   let valid = $state(false);
 
@@ -130,10 +130,8 @@
 <StepLayout>
   <ProjectCustomizer bind:valid originalProject={project} newProjectData={projectDataWritable} />
   {#snippet actions()}
-  
-      <Button onclick={submit} disabled={!valid} variant="primary" icon={Wallet}
-        >Confirm changes</Button
-      >
-    
+    <Button onclick={submit} disabled={!valid} variant="primary" icon={Wallet}
+      >Confirm changes</Button
+    >
   {/snippet}
 </StepLayout>

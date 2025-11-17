@@ -8,7 +8,11 @@
     text?: string | undefined;
   }
 
-  let { emoji = '🫙', headline = 'Nothing to see here', text = 'Please add stuff to this section to see it here.' }: Props = $props();
+  let {
+    emoji = '🫙',
+    headline = 'Nothing to see here',
+    text = 'Please add stuff to this section to see it here.',
+  }: Props = $props();
 </script>
 
 <div class="notice empty-state" in:fade={{ duration: 250 }}>

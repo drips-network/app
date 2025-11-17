@@ -6,7 +6,6 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
-
   interface Props {
     includesResults: boolean;
     applications: ListingApplication[];
@@ -32,7 +31,7 @@
     ballotStore,
     reviewMode = false,
     round,
-    decisions = $bindable({})
+    decisions = $bindable({}),
   }: Props = $props();
 </script>
 

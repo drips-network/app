@@ -90,17 +90,15 @@
 
     <FormField title="CSV example" type="div">
       {#snippet action()}
-          
-          <a
-            class="typo-text typo-link"
-            href="https://docs.drips.network/rpgf/advanced/custom-datasets"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Full documentation
-          </a>
-        
-          {/snippet}
+        <a
+          class="typo-text typo-link"
+          href="https://docs.drips.network/rpgf/advanced/custom-datasets"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Full documentation
+        </a>
+      {/snippet}
 
       <PaddedHorizontalScroll>
         <CsvExample
@@ -148,15 +146,13 @@
   {/if}
 
   {#snippet actions()}
-  
-      <Button
-        variant="primary"
-        disabled={valid === false}
-        type="submit"
-        icon={Sharrow}
-        loading={uploading}
-        onclick={handleUpload}>Upload data</Button
-      >
-    
+    <Button
+      variant="primary"
+      disabled={valid === false}
+      type="submit"
+      icon={Sharrow}
+      loading={uploading}
+      onclick={handleUpload}>Upload data</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

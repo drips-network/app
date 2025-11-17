@@ -10,7 +10,7 @@
     checked = $bindable(),
     label = undefined,
     size = 'normal',
-    disabled = false
+    disabled = false,
   }: Props = $props();
 
   let focus = $state(false);

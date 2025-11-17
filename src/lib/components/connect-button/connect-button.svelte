@@ -19,7 +19,7 @@
     <div class="desktop-only">
       <Flyout>
         {#snippet trigger()}
-                <div class="trigger" >
+          <div class="trigger">
             {#if safeAppMode}<div class="safe-logo">
                 <SafeLogo />
               </div>{/if}
@@ -31,12 +31,12 @@
               address={$wallet.address}
             />
           </div>
-              {/snippet}
+        {/snippet}
         {#snippet content()}
-                <div >
+          <div>
             <AccountMenu />
           </div>
-              {/snippet}
+        {/snippet}
       </Flyout>
     </div>
     <div

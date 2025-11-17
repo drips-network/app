@@ -45,10 +45,8 @@
         Sign in as the applicant or a round admin to see private fields, identity verification
         status, and more.
         {#snippet actions()}
-              
-            <RpgfSiweButton />
-          
-              {/snippet}
+          <RpgfSiweButton />
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}

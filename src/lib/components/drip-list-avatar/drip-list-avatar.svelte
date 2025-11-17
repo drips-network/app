@@ -3,7 +3,6 @@
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
 
-  
   interface Props {
     size?: Size;
     outline?: boolean;

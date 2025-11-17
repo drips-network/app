@@ -46,14 +46,12 @@
 
 <ThreePaneLayout {...data} pageIsEmpty>
   {#snippet apps()}
-  
-      <ApplicationsPane
-        bind:tableConfiguratorEl
-        {...data}
-        {ballotStore}
-        loggedIn={data.rpgfUserData !== null}
-      />
-    
+    <ApplicationsPane
+      bind:tableConfiguratorEl
+      {...data}
+      {ballotStore}
+      loggedIn={data.rpgfUserData !== null}
+    />
   {/snippet}
 
   <div class="empty">

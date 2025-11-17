@@ -42,25 +42,15 @@
 
   const dispatch = createEventDispatcher();
 
-
-
-
-
-
-
-
-  
-
-  
   interface Props {
     project: UnclaimedProjectCardFragment;
-    projectMetadata?: 
-    | {
-        description?: string | undefined;
-        starCount: number;
-        forkCount: number;
-      }
-    | undefined;
+    projectMetadata?:
+      | {
+          description?: string | undefined;
+          starCount: number;
+          forkCount: number;
+        }
+      | undefined;
     unclaimedTokensExpandable?: boolean;
     unclaimedTokensExpanded?: boolean;
     showClaimButton?: boolean;
@@ -79,20 +69,24 @@
     showClaimButton = false,
     claimableTokensKey = 'Tokens',
     detailedTokenBreakdown = false,
-    showProjectBadge = true
+    showProjectBadge = true,
   }: Props = $props();
-  let projectChainData = $derived(filterCurrentChainData(project.chainData) as UnClaimedProjectData);
+  let projectChainData = $derived(
+    filterCurrentChainData(project.chainData) as UnClaimedProjectData,
+  );
   let collectableFunds = $derived(mergeCollectableFunds(projectChainData.withdrawableBalances));
   let splittableFunds = $derived(mergeSplittableFunds(projectChainData.withdrawableBalances));
   let mergedUnclaimedFunds = $derived(mergeAmounts(collectableFunds, splittableFunds));
   let hasClaimableFunds = $derived(mergedUnclaimedFunds.length > 0);
-  let unclaimedTokenPile = $derived(mergedUnclaimedFunds?.map((fund) => ({
-    component: Token,
-    props: {
-      address: fund.tokenAddress,
-      show: 'none',
-    },
-  })));
+  let unclaimedTokenPile = $derived(
+    mergedUnclaimedFunds?.map((fund) => ({
+      component: Token,
+      props: {
+        address: fund.tokenAddress,
+        show: 'none',
+      },
+    })),
+  );
 </script>
 
 <div class="project-info" transition:fly={{ y: 8, duration: 300 }}>

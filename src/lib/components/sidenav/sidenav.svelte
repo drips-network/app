@@ -10,9 +10,9 @@
 
   interface Props {
     items: {
-    top: SidenavItems;
-    bottom: SidenavItems;
-  };
+      top: SidenavItems;
+      bottom: SidenavItems;
+    };
   }
 
   let { items }: Props = $props();
@@ -23,7 +23,6 @@
 
   let itemElems: ItemElems = $state({});
 
-
   let selectorPos: number | undefined = $state(undefined);
 
   function updateSelectorPos() {
@@ -33,7 +32,6 @@
       selectorPos = undefined;
     }
   }
-
 
   let hoveringOver: string | undefined = $state(undefined);
   let activeElem = $derived(itemElems[$page.url.pathname]);

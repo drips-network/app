@@ -16,7 +16,7 @@
     toggleOnce = false,
     relative = true,
     label,
-    children
+    children,
   }: Props = $props();
 
   let active = $state(false);

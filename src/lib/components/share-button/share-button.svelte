@@ -9,7 +9,6 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { browser } from '$app/environment';
 
-
   interface Props {
     text?: string | undefined;
     url: string;
@@ -17,9 +16,7 @@
     downloadableImageUrl?: string;
     shareModalText?: string | undefined;
     buttonVariant?: ComponentProps<typeof Button>['variant'];
-    supportButtonOptions?: 
-    | Parameters<typeof shareSteps>[0]['supportButtonOptions']
-    | undefined;
+    supportButtonOptions?: Parameters<typeof shareSteps>[0]['supportButtonOptions'] | undefined;
     shareLabel?: string;
   }
 
@@ -31,7 +28,7 @@
     shareModalText = undefined,
     buttonVariant = 'ghost',
     supportButtonOptions = undefined,
-    shareLabel = 'Share'
+    shareLabel = 'Share',
   }: Props = $props();
 
   async function preloadImage(url: string) {

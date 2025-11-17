@@ -12,7 +12,6 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import ShareButton from '../share-button/share-button.svelte';
 
-
   interface Props {
     round: Round;
     interactive?: boolean;

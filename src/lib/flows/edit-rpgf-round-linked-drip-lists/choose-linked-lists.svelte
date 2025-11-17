@@ -22,15 +22,17 @@
 
   let { linkedDripLists, roundId }: Props = $props();
 
-  let items: Items = $state(Object.fromEntries(
-    linkedDripLists.map((dripList) => [
-      dripList.account.accountId,
-      {
-        type: 'drip-list',
-        dripList,
-      },
-    ]),
-  ));
+  let items: Items = $state(
+    Object.fromEntries(
+      linkedDripLists.map((dripList) => [
+        dripList.account.accountId,
+        {
+          type: 'drip-list',
+          dripList,
+        },
+      ]),
+    ),
+  );
 
   function handleSubmit() {
     dispatch('await', {
@@ -62,10 +64,8 @@
   </FormField>
 
   {#snippet actions()}
-  
-      <Button variant="primary" onclick={handleSubmit} icon={CheckCircle}>
-        Update linked Drip Lists
-      </Button>
-    
+    <Button variant="primary" onclick={handleSubmit} icon={CheckCircle}>
+      Update linked Drip Lists
+    </Button>
   {/snippet}
 </StandaloneFlowStepLayout>

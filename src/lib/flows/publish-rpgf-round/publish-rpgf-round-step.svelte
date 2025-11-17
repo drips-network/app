@@ -41,9 +41,7 @@
     After publishing, you will no longer be able to edit the round's URL or schedule.
   </AnnotationBox>
   {#snippet actions()}
-  
-      <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
-      <Button onclick={handleConfirm} variant="primary">Publish round</Button>
-    
+    <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
+    <Button onclick={handleConfirm} variant="primary">Publish round</Button>
   {/snippet}
 </StepLayout>

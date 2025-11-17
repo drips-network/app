@@ -92,8 +92,6 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
 
-
-
   interface Props {
     project?: SupportCardProjectFragment | undefined;
     dripList?: SupportCardDripListFragment | undefined;
@@ -107,7 +105,7 @@
     dripList = undefined,
     ecosystem = undefined,
     draftListMode = false,
-    disabled = $bindable(false)
+    disabled = $bindable(false),
   }: Props = $props();
   run(() => {
     if (!project && !dripList && !ecosystem) disabled = true;
@@ -220,7 +218,7 @@
   }
 
   async function onClickAddToDripList() {
-    if (!project && !dripList || !supportUrl) return;
+    if ((!project && !dripList) || !supportUrl) return;
 
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));

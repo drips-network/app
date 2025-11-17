@@ -21,7 +21,9 @@
   let projectGitHubUrl = $state('');
 
   // must be a valid URL on host github.com and path /<owner>/<repo>
-  let projectGitHubUrlValid = $derived(projectGitHubUrl.match(/^https:\/\/github\.com\/[^/]+\/[^/]+$/));
+  let projectGitHubUrlValid = $derived(
+    projectGitHubUrl.match(/^https:\/\/github\.com\/[^/]+\/[^/]+$/),
+  );
 
   let txInProgress = false;
   async function requestUpdateOwner(gitHubUrl: string) {

@@ -6,12 +6,7 @@
     actions?: import('svelte').Snippet;
   }
 
-  let {
-    center = false,
-    children,
-    left_actions,
-    actions
-  }: Props = $props();
+  let { center = false, children, left_actions, actions }: Props = $props();
 </script>
 
 <div class="step-layout" class:center>

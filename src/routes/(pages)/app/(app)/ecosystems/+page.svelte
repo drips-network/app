@@ -40,27 +40,21 @@
 <div class="page">
   <EduCard dismissableId="ecosystems-page-intro" negativeMarginWhileCollapsed="-4rem">
     {#snippet text()}
-      
-        <h1 class="pixelated">Ecosystems</h1>
-        <p>
-          Ecosystems are large collections of claimed and unclaimed projects networked together using
-          Drips AI. Sending funds to a single ecosystem is an efficient way to easily fund hundreds of
-          projects at once, supporting a whole community in one go.
-        </p>
-      
-      {/snippet}
+      <h1 class="pixelated">Ecosystems</h1>
+      <p>
+        Ecosystems are large collections of claimed and unclaimed projects networked together using
+        Drips AI. Sending funds to a single ecosystem is an efficient way to easily fund hundreds of
+        projects at once, supporting a whole community in one go.
+      </p>
+    {/snippet}
     {#snippet buttons()}
-      
-        <Button icon={ArrowBoxUpRight}>Learn more</Button>
-      
-      {/snippet}
+      <Button icon={ArrowBoxUpRight}>Learn more</Button>
+    {/snippet}
     {#snippet illustration()}
-      
-        <EduCardIllustration>
-          <Ecosystem />
-        </EduCardIllustration>
-      
-      {/snippet}
+      <EduCardIllustration>
+        <Ecosystem />
+      </EduCardIllustration>
+    {/snippet}
   </EduCard>
 
   <div class="section">

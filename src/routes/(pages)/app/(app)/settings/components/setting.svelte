@@ -6,12 +6,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    title,
-    subtitle,
-    disabled = false,
-    children
-  }: Props = $props();
+  let { title, subtitle, disabled = false, children }: Props = $props();
 </script>
 
 <div class="setting" class:disabled>

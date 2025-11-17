@@ -16,20 +16,18 @@
     emoji = '🫙',
     headline = 'You are disconnected',
     text = 'Please connect your wallet to see this section.',
-    requireRpgfSignIn = false
+    requireRpgfSignIn = false,
   }: Props = $props();
 </script>
 
 <ActionableEmptyState {emoji} {headline} description={text}>
   {#snippet actions()}
-  
-      {#if requireRpgfSignIn && $wallet.signer}
-        <RpgfSiweButton />
-      {:else}
-        <Button icon={Wallet} variant="primary" onclick={() => wallet.connect()}>
-          Connect wallet
-        </Button>
-      {/if}
-    
+    {#if requireRpgfSignIn && $wallet.signer}
+      <RpgfSiweButton />
+    {:else}
+      <Button icon={Wallet} variant="primary" onclick={() => wallet.connect()}>
+        Connect wallet
+      </Button>
+    {/if}
   {/snippet}
 </ActionableEmptyState>

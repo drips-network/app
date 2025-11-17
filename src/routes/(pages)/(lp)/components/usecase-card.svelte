@@ -15,6 +15,7 @@
     href: string;
     headline?: import('svelte').Snippet;
     description?: import('svelte').Snippet;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     illustration?: import('svelte').Snippet<[any]>;
     onMouseEnter?: () => void;
     onMouseLeave?: () => void;
@@ -92,7 +93,7 @@
       </div>
     </div>
     <div class="illustration">
-      {@render illustration?.({ active, })}
+      {@render illustration?.({ active })}
     </div>
   </div>
 </div>

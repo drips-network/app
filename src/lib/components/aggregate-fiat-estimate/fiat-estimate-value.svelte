@@ -7,14 +7,15 @@
 
   let { forceLoading = false, fiatEstimateCents = 'pending', compact = false }: Props = $props();
 
-  let formattedFiatEstimate =
-    $derived(typeof fiatEstimateCents === 'number'
+  let formattedFiatEstimate = $derived(
+    typeof fiatEstimateCents === 'number'
       ? fiatEstimateCents.toLocaleString('en-US', {
           style: 'currency',
           currency: 'USD',
           ...(compact && { notation: 'compact', compactDisplay: 'short' }),
         })
-      : undefined);
+      : undefined,
+  );
 </script>
 
 <div class="tabular-nums">

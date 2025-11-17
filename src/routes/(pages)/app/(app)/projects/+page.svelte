@@ -34,35 +34,29 @@
 <div class="page">
   <EduCard dismissableId="projects-page-intro" negativeMarginWhileCollapsed="-4rem">
     {#snippet text()}
-      
-        <h1 class="pixelated">Projects on Drips</h1>
-        <p>
-          Projects are GitHub repositories associated with an Ethereum address, stored in a
-          FUNDING.json file. They include maintainers and dependencies, which the owner can choose to
-          split a percentage of any incoming funds to.
-          <a
-            class="typo-link"
-            href="https://docs.drips.network/get-support/claim-your-repository"
-            target="_blank">Learn more</a
-          >
-        </p>
-      
-      {/snippet}
-    {#snippet buttons()}
-      
-        <Button icon={Plus} variant="primary" onclick={() => launchClaimProject()}
-          >Claim your project</Button
+      <h1 class="pixelated">Projects on Drips</h1>
+      <p>
+        Projects are GitHub repositories associated with an Ethereum address, stored in a
+        FUNDING.json file. They include maintainers and dependencies, which the owner can choose to
+        split a percentage of any incoming funds to.
+        <a
+          class="typo-link"
+          href="https://docs.drips.network/get-support/claim-your-repository"
+          target="_blank">Learn more</a
         >
-      
-      {/snippet}
+      </p>
+    {/snippet}
+    {#snippet buttons()}
+      <Button icon={Plus} variant="primary" onclick={() => launchClaimProject()}
+        >Claim your project</Button
+      >
+    {/snippet}
     {#snippet illustration()}
-      
-        <div class="edu-card-illustration-bg"></div>
-        <div class="edu-card-illustration-wrapper">
-          <RepoGitProject />
-        </div>
-      
-      {/snippet}
+      <div class="edu-card-illustration-bg"></div>
+      <div class="edu-card-illustration-wrapper">
+        <RepoGitProject />
+      </div>
+    {/snippet}
   </EduCard>
 
   <YourProjectsSection

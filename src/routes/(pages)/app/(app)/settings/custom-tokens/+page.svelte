@@ -67,7 +67,8 @@
     },
   ];
 
-  let tokenTableData: TokenTableRow[] = $derived($tokens
+  let tokenTableData: TokenTableRow[] = $derived(
+    $tokens
       ?.filter((t) => t.source === 'custom')
       .map((t) => ({
         token: {
@@ -90,8 +91,8 @@
             },
           ],
         },
-      })) ?? []);
-  
+      })) ?? [],
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let options: TableOptions<any> = $derived({
@@ -99,7 +100,6 @@
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
   });
-  
 </script>
 
 <HeadMeta title="Custom tokens" />

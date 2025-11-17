@@ -45,7 +45,6 @@
 
   let blockDivs: { [id: string]: HTMLDivElement } = $state({});
 
-
   let dragging = false;
   let draggingIndex: number | undefined = $state();
   let startDraggingAtXPos: number | undefined;
@@ -155,7 +154,6 @@
     prevPercentages = { ...percentages };
   }
 
-
   function handleConfirmPercentageInput(id: string) {
     const percentagesWithoutRemainder = Object.fromEntries(
       Object.entries(percentages)
@@ -188,11 +186,12 @@
   }
   /** The last item provided always takes the remainder of all previous percentages. */
   let remainderItem = $derived(items[items.length - 1]);
-  let overflownBlockDivs =
-    $derived(percentageElems &&
-    Object.fromEntries(
-      Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
-    ));
+  let overflownBlockDivs = $derived(
+    percentageElems &&
+      Object.fromEntries(
+        Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
+      ),
+  );
   run(() => {
     updatePercentageInputs(percentages);
   });

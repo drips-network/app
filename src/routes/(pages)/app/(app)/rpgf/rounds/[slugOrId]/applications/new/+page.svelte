@@ -82,28 +82,26 @@
         <AnnotationBox type="error">
           Some fields are invalid or missing.
           {#snippet actions()}
-                  
-              <Button
-                variant="normal"
-                onclick={async () => {
-                  forceRevealAllErrors = true;
+            <Button
+              variant="normal"
+              onclick={async () => {
+                forceRevealAllErrors = true;
 
-                  // wait for the DOM to update before scrolling
-                  await tick();
+                // wait for the DOM to update before scrolling
+                await tick();
 
-                  const errorAnchor = document.getElementById('form-field-validation-error-anchor');
-                  if (errorAnchor) {
-                    errorAnchor.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }
-                }}
-              >
-                Show all errors
-              </Button>
-            
-                  {/snippet}
+                const errorAnchor = document.getElementById('form-field-validation-error-anchor');
+                if (errorAnchor) {
+                  errorAnchor.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }
+              }}
+            >
+              Show all errors
+            </Button>
+          {/snippet}
         </AnnotationBox>
       {/if}
 

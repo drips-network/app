@@ -61,7 +61,7 @@
     style:background-color={isClaimed(chainData)
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
- ></div>
+  ></div>
   <div class="header">
     <ProjectAvatar project={chainData} size="large" />
     <a

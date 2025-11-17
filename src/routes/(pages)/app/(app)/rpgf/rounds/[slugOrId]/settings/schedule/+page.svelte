@@ -13,13 +13,14 @@
 
   let now = new Date();
 
-  let changesMade =
-    $derived(updatedRound.applicationPeriodStart?.getTime() !==
+  let changesMade = $derived(
+    updatedRound.applicationPeriodStart?.getTime() !==
       data.round.applicationPeriodStart?.getTime() ||
-    updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
-    updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
-    updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
-    updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime());
+      updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
+      updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
+      updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
+      updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime(),
+  );
 
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {

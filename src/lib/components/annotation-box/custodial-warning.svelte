@@ -24,17 +24,15 @@
         exchange-managed addresses (e.g. Coinbase) may be lost.</span
       >
       {#snippet actions()}
-          
-          <Button
-            variant="ghost"
-            href="https://docs.drips.network/faq/#can-i-split-or-stream-funds-directly-to-exchange-managed-ethereum-addresses"
-            target="_blank">Learn more</Button
-          >
-          <Button icon={ThumbsUpIcon} variant="destructive" onclick={handleDismiss}
-            >I understand</Button
-          >
-        
-          {/snippet}
+        <Button
+          variant="ghost"
+          href="https://docs.drips.network/faq/#can-i-split-or-stream-funds-directly-to-exchange-managed-ethereum-addresses"
+          target="_blank">Learn more</Button
+        >
+        <Button icon={ThumbsUpIcon} variant="destructive" onclick={handleDismiss}
+          >I understand</Button
+        >
+      {/snippet}
     </AnnotationBox>
   </div>
 {/if}

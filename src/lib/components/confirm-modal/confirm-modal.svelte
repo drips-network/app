@@ -4,7 +4,6 @@
   import { onMount } from 'svelte';
   import Emoji from '../emoji/emoji.svelte';
 
-
   interface Props {
     message: string;
     onConfirm: () => unknown | Promise<unknown>;

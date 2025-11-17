@@ -21,13 +21,13 @@
     projects: DefaultExplorePageFeaturedProjectFragment[] | null | undefined;
     featuredDripLists: ComponentProps<typeof DripListsGrid>['dripLists'];
     welcomeCardConfig: {
-    title: string;
-    description: string;
-    docsButton?: {
-      label: string;
-      href: string;
+      title: string;
+      description: string;
+      docsButton?: {
+        label: string;
+        href: string;
+      };
     };
-  };
     featuredRpgfRounds?: Round[];
   }
 
@@ -36,7 +36,7 @@
     projects,
     featuredDripLists,
     welcomeCardConfig,
-    featuredRpgfRounds = []
+    featuredRpgfRounds = [],
   }: Props = $props();
 </script>
 

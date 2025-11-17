@@ -38,40 +38,34 @@
 
 <RpgfBaseLayout>
   {#snippet sidebar()}
-  
-      {#if round.state}
-        <RpgfCtaCard
-          hasExistingBallot={Boolean(data.existingBallot)}
-          signedInUserId={data.rpgfUserData?.userId ?? null}
-          {round}
-        />
-      {/if}
+    {#if round.state}
+      <RpgfCtaCard
+        hasExistingBallot={Boolean(data.existingBallot)}
+        signedInUserId={data.rpgfUserData?.userId ?? null}
+        {round}
+      />
+    {/if}
 
-      {#if !round.published}
-        <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
-      {/if}
-      <RpgfScheduleCard {round} />
-    
+    {#if !round.published}
+      <RpgfDraftTodoCard {round} amountOfVoters={data.ballotStats?.numberOfVoters ?? 0} />
+    {/if}
+    <RpgfScheduleCard {round} />
   {/snippet}
 
   {#snippet header()}
-  
-      <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
-        {#if !data.rpgfUserData}
-          <div transition:fade={{ duration: 300 }}>
-            <AnnotationBox type="info">
-              Sign in to RetroPGF on Drips to view your own applications and other private data.
-              {#snippet actions()}
-                      
-                  <RpgfSiweButton />
-                
-                      {/snippet}
-            </AnnotationBox>
-          </div>
-        {/if}
-      </TransitionedHeight>
-      <RpgfHeaderCard {round} />
-    
+    <TransitionedHeight transitionHeightChanges negativeMarginWhileCollapsed="-1rem">
+      {#if !data.rpgfUserData}
+        <div transition:fade={{ duration: 300 }}>
+          <AnnotationBox type="info">
+            Sign in to RetroPGF on Drips to view your own applications and other private data.
+            {#snippet actions()}
+              <RpgfSiweButton />
+            {/snippet}
+          </AnnotationBox>
+        </div>
+      {/if}
+    </TransitionedHeight>
+    <RpgfHeaderCard {round} />
   {/snippet}
 
   {#if round.description}

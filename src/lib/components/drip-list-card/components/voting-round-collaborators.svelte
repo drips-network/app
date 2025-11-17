@@ -9,7 +9,6 @@
   import * as multiplayer from '$lib/utils/multiplayer';
   import VoteButton from './vote-button.svelte';
 
-
   interface Props {
     votingRound: VotingRound;
     noButtons?: boolean;
@@ -17,8 +16,9 @@
 
   let { votingRound, noButtons = false }: Props = $props();
 
-  let isOwnVotingRound =
-    $derived(votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase());
+  let isOwnVotingRound = $derived(
+    votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase(),
+  );
 
   let revealedVotes: Vote[] | undefined = $state(undefined);
 

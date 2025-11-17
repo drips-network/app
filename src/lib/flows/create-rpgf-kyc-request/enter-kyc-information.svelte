@@ -108,11 +108,12 @@
   let emailInputValidationState = $derived(validateEmail(emailInput));
   let companyNameInputValidationState = $derived(validateCompanyName(companyNameInput));
 
-  let allValid =
-    $derived(firstNameInputValidationState.type === 'valid' &&
-    lastNameInputValidationState.type === 'valid' &&
-    emailInputValidationState.type === 'valid' &&
-    companyNameInputValidationState.type === 'valid');
+  let allValid = $derived(
+    firstNameInputValidationState.type === 'valid' &&
+      lastNameInputValidationState.type === 'valid' &&
+      emailInputValidationState.type === 'valid' &&
+      companyNameInputValidationState.type === 'valid',
+  );
 </script>
 
 <StandaloneFlowStepLayout
@@ -189,10 +190,8 @@
   </FormField>
 
   {#snippet actions()}
-  
-      <Button variant="primary" icon={ArrowRight} onclick={createKyc} disabled={!allValid}
-        >Confirm and continue</Button
-      >
-    
+    <Button variant="primary" icon={ArrowRight} onclick={createKyc} disabled={!allValid}
+      >Confirm and continue</Button
+    >
   {/snippet}
 </StandaloneFlowStepLayout>

@@ -59,7 +59,6 @@
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
 
-  
   interface Props {
     // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
     address?: string | undefined;
@@ -78,7 +77,7 @@
     ecosystem = undefined,
     loading = false,
     title = undefined,
-    disableLink = false
+    disableLink = false,
   }: Props = $props();
 
   let avatarImgElem: HTMLImageElement | undefined = $state();

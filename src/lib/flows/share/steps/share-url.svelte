@@ -25,9 +25,7 @@
     downloadableImageUrl?: string | undefined;
     text?: string | undefined;
     shareModalText?: string;
-    supportButtonOptions?: 
-    | Parameters<typeof configureProjectSupportButtonSteps>[0]
-    | undefined;
+    supportButtonOptions?: Parameters<typeof configureProjectSupportButtonSteps>[0] | undefined;
   }
 
   let {
@@ -35,7 +33,7 @@
     downloadableImageUrl = undefined,
     text = undefined,
     shareModalText = 'Share this on a network of your choice below.',
-    supportButtonOptions = undefined
+    supportButtonOptions = undefined,
   }: Props = $props();
 
   const shareText = text || '';

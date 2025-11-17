@@ -25,7 +25,6 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchCreateDripList from '../../utils/launch-create-drip-list';
 
-
   interface Props {
     dripLists: DripListsSectionDripListFragment[];
     votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -43,7 +42,7 @@
     collapsed = $bindable(false),
     collapsable = $bindable(false),
     showCreateNewListCard = false,
-    showVisibilityToggle = false
+    showVisibilityToggle = false,
   }: Props = $props();
 
   let error = false;
@@ -53,17 +52,21 @@
 
   let items = $derived([...dripLists, ...votingRounds]);
 
-  let visibleDripListsAndVotingRounds = $derived(items
-    .filter((i) => ('isVisible' in i ? i.isVisible : true))
-    .map((i) =>
-      '__typename' in i
-        ? { ...i, type: 'drip-list' as const }
-        : { ...i, type: 'voting-round' as const },
-    ));
+  let visibleDripListsAndVotingRounds = $derived(
+    items
+      .filter((i) => ('isVisible' in i ? i.isVisible : true))
+      .map((i) =>
+        '__typename' in i
+          ? { ...i, type: 'drip-list' as const }
+          : { ...i, type: 'voting-round' as const },
+      ),
+  );
 
-  let hiddenDripListsAndVotingRounds = $derived(showHidden
-    ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
-    : []);
+  let hiddenDripListsAndVotingRounds = $derived(
+    showHidden
+      ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
+      : [],
+  );
 
   let isOwner = $derived($walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId));
 </script>

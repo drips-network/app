@@ -52,24 +52,26 @@
 
   let { data } = $props();
 
-  let tokenBalances = $derived(data.balances.find(
-    (balance) => balance.tokenAddress.toLowerCase() === data.tokenAddress?.toLowerCase(),
-  ) ?? { tokenAddress: data.tokenAddress, incoming: [], outgoing: [] });
+  let tokenBalances = $derived(
+    data.balances.find(
+      (balance) => balance.tokenAddress.toLowerCase() === data.tokenAddress?.toLowerCase(),
+    ) ?? { tokenAddress: data.tokenAddress, incoming: [], outgoing: [] },
+  );
 
-  let currentOutgoingAmountReadable = $derived(streamCurrentAmountsStore(
-    tokenBalances.outgoing,
-    data.tokenAddress,
-  ));
-  let currentIncomingAmountReadable = $derived(streamCurrentAmountsStore(
-    tokenBalances.incoming,
-    data.tokenAddress,
-  ));
+  let currentOutgoingAmountReadable = $derived(
+    streamCurrentAmountsStore(tokenBalances.outgoing, data.tokenAddress),
+  );
+  let currentIncomingAmountReadable = $derived(
+    streamCurrentAmountsStore(tokenBalances.incoming, data.tokenAddress),
+  );
 
-  let token = $derived($tokens?.find(
-    (token) =>
-      token.info.address.toLowerCase() === data.tokenAddress ||
-      token.info.symbol.toLowerCase() === data.tokenAddress,
-  ));
+  let token = $derived(
+    $tokens?.find(
+      (token) =>
+        token.info.address.toLowerCase() === data.tokenAddress ||
+        token.info.symbol.toLowerCase() === data.tokenAddress,
+    ),
+  );
 
   let tokenAddress = $derived(token?.info.address.toLowerCase() ?? data.tokenAddress);
 
@@ -138,68 +140,58 @@
 
       <TokenStat title="Incoming" tooltip="Amount received from others since your last withdrawal.">
         {#snippet detail()}
-                  
-            <Amount
-              showSymbol={false}
-              amountPerSecond={$currentIncomingAmountReadable.currentDeltaPerSecond}
-            />
-          
-                  {/snippet}
+          <Amount
+            showSymbol={false}
+            amountPerSecond={$currentIncomingAmountReadable.currentDeltaPerSecond}
+          />
+        {/snippet}
 
         {#snippet value()}
-                  
-            <div data-testid="incoming-balance">
-              <span class:text-foreground-level-4={true}>
-                <Amount
-                  showSymbol={false}
-                  amount={$currentIncomingAmountReadable.currentAmount}
-                  amountClasses=""
-                />
-              </span>
-            </div>
-          
-                  {/snippet}
+          <div data-testid="incoming-balance">
+            <span class:text-foreground-level-4={true}>
+              <Amount
+                showSymbol={false}
+                amount={$currentIncomingAmountReadable.currentAmount}
+                amountClasses=""
+              />
+            </span>
+          </div>
+        {/snippet}
       </TokenStat>
 
       <TokenStat title="Outgoing" tooltip="Tokens available for streaming to others.">
         {#snippet detail()}
-                  
-            <Amount
-              showSymbol={false}
-              amountPerSecond={$currentOutgoingAmountReadable.currentDeltaPerSecond}
-            />
-          
-                  {/snippet}
+          <Amount
+            showSymbol={false}
+            amountPerSecond={$currentOutgoingAmountReadable.currentDeltaPerSecond}
+          />
+        {/snippet}
 
         {#snippet value()}
-                  
-            <div data-testid="outgoing-balance">
-              <span
-                class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount ===
-                  0n}
-              >
-                <Amount
-                  showSymbol={false}
-                  amount={$currentOutgoingAmountReadable.currentAmount}
-                  amountClasses=""
-                />
-              </span>
-            </div>
-          
-                  {/snippet}
+          <div data-testid="outgoing-balance">
+            <span
+              class:text-foreground-level-4={$currentOutgoingAmountReadable.currentAmount.amount ===
+                0n}
+            >
+              <Amount
+                showSymbol={false}
+                amount={$currentOutgoingAmountReadable.currentAmount}
+                amountClasses=""
+              />
+            </span>
+          </div>
+        {/snippet}
 
         {#snippet actions()}
-                  
-            <div class="flex gap-2">
-              <Button icon={Plus} onclick={openAddFundsModal}>Add</Button>
-              <Button
-                disabled={!$currentOutgoingAmountReadable.currentAmount.amount}
-                icon={Minus}
-                onclick={openWithdrawModal}>Withdraw</Button
-              >
-            </div>
-          
-                  {/snippet}
+          <div class="flex gap-2">
+            <Button icon={Plus} onclick={openAddFundsModal}>Add</Button>
+            <Button
+              disabled={!$currentOutgoingAmountReadable.currentAmount.amount}
+              icon={Minus}
+              onclick={openWithdrawModal}>Withdraw</Button
+            >
+          </div>
+        {/snippet}
       </TokenStat>
     </section>
 

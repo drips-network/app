@@ -17,14 +17,11 @@
   } from '$lib/utils/__generated__/gql.generated';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
-
-
-
   interface Props {
     timeline: (
-    | CurrentAmountsTimelineItemFragment
-    | CurrentAmountsUserBalanceTimelineItemFragment
-  )[];
+      | CurrentAmountsTimelineItemFragment
+      | CurrentAmountsUserBalanceTimelineItemFragment
+    )[];
     tokenAddress: string;
     showFiatValue?: boolean;
     unknownTokenButton?: boolean;
@@ -36,12 +33,13 @@
     tokenAddress,
     showFiatValue = false,
     unknownTokenButton = true,
-    showDelta = true
+    showDelta = true,
   }: Props = $props();
 
   let currentAmountsStore = $derived(streamCurrentAmountsStore(timeline, tokenAddress));
-  let token =
-    $derived($tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress));
+  let token = $derived(
+    $tokensStore && tokensStore.getByAddress($currentAmountsStore.currentAmount.tokenAddress),
+  );
 
   function applyAmtPerSecMultiplier(amount: bigint, multiplier: number) {
     return amount * BigInt(multiplier);

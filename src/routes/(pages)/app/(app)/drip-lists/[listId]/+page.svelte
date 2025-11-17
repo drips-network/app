@@ -98,21 +98,19 @@
         href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
       >.
       {#snippet actions()}
-          
-          {#if isOwnList}
-            <div class="flex gap-3">
-              <Button
-                size="small"
-                icon={Registered}
-                variant="primary"
-                onclick={() => {
-                  modal.show(Stepper, undefined, editDripListSteps(dripList));
-                }}>Unhide it</Button
-              >
-            </div>
-          {/if}
-        
-          {/snippet}
+        {#if isOwnList}
+          <div class="flex gap-3">
+            <Button
+              size="small"
+              icon={Registered}
+              variant="primary"
+              onclick={() => {
+                modal.show(Stepper, undefined, editDripListSteps(dripList));
+              }}>Unhide it</Button
+            >
+          </div>
+        {/if}
+      {/snippet}
     </AnnotationBox>
   </div>
 {/if}

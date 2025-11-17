@@ -54,30 +54,26 @@
         <AnnotationBox>
           To claim on {selectedNetwork.label}, switch your current network.
           {#snippet actions()}
-                  
-              <Button
-                variant="primary"
-                target="_self"
-                href={getChainDeploymentUrl(selectedNetwork.chainId)}
-                >Switch to {selectedNetwork.label}</Button
-              >
-            
-                  {/snippet}
+            <Button
+              variant="primary"
+              target="_self"
+              href={getChainDeploymentUrl(selectedNetwork.chainId)}
+              >Switch to {selectedNetwork.label}</Button
+            >
+          {/snippet}
         </AnnotationBox>
       </div>
     {/if}
   </div>
   {#snippet actions()}
-  
-      <Button
-        variant="primary"
-        icon={ArrowRight}
-        disabled={selectedNetworkId !== network.chainId}
-        onclick={() => dispatch('goForward')}
-      >
-        Continue
-      </Button>
-    
+    <Button
+      variant="primary"
+      icon={ArrowRight}
+      disabled={selectedNetworkId !== network.chainId}
+      onclick={() => dispatch('goForward')}
+    >
+      Continue
+    </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
 

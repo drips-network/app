@@ -71,11 +71,13 @@
     },
   ];
 
-  let logTableData = $derived(data.auditLog.map((entry) => ({
-    actor: { actor: entry.actor },
-    action: FRIENDLY_NAME_MAP[entry.action],
-    createdAt: formatDate(entry.createdAt),
-  })));
+  let logTableData = $derived(
+    data.auditLog.map((entry) => ({
+      actor: { actor: entry.actor },
+      action: FRIENDLY_NAME_MAP[entry.action],
+      createdAt: formatDate(entry.createdAt),
+    })),
+  );
 
   function handleRowClick(e: RowClickEventPayload) {
     modal.show(LogDetailModal, undefined, {

@@ -31,7 +31,9 @@
     };
   });
 
-  let settingsBaseUrl = $derived(`/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}/settings`);
+  let settingsBaseUrl = $derived(
+    `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}/settings`,
+  );
 
   let backLink = $derived(`/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}`);
 

@@ -23,13 +23,11 @@
   <AnnotationBox type="info">
     You are viewing a historical version of this application.
     {#snippet actions()}
-      
-        <Button
-          href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
-          >View latest version</Button
-        >
-      
-      {/snippet}
+      <Button
+        href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
+        >View latest version</Button
+      >
+    {/snippet}
   </AnnotationBox>
 
   <RpgfApplicationFormAnswersCard

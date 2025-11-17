@@ -25,11 +25,11 @@
   });
 
   let description: string | undefined = $derived(data.ensData?.records.description);
-  
 
-  let isSelf =
-    $derived(data.profileData?.account.address &&
-    data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase());
+  let isSelf = $derived(
+    data.profileData?.account.address &&
+      data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase(),
+  );
 </script>
 
 <HeadMeta title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined} />

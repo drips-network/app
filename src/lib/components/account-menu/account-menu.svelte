@@ -25,35 +25,34 @@
   {#if $wallet.address}
     <AccountMenuItem>
       {#snippet left()}
-            <IdentityBadge
-            size="big"
-            disableLink
-            address={$wallet.address}
-            showIdentity={false}
-            disableSelection
-            disableTooltip
-          />
-          {/snippet}
+        <IdentityBadge
+          size="big"
+          disableLink
+          address={$wallet.address}
+          showIdentity={false}
+          disableSelection
+          disableTooltip
+        />
+      {/snippet}
       {#snippet title()}
-            <IdentityBadge
-            disableSelection
-            disableLink
-            address={$wallet.address}
-            showAvatar={false}
-            disableTooltip
-          />
-          {/snippet}
+        <IdentityBadge
+          disableSelection
+          disableLink
+          address={$wallet.address}
+          showAvatar={false}
+          disableTooltip
+        />
+      {/snippet}
       {#snippet right()}
-          
-          <Button
-            disabled={safeAppMode}
-            variant="ghost"
-            onclick={() => {
-              cupertinoPaneStore.closeSheet();
-              wallet.disconnect();
-            }}>Disconnect</Button
-          >
-          {/snippet}
+        <Button
+          disabled={safeAppMode}
+          variant="ghost"
+          onclick={() => {
+            cupertinoPaneStore.closeSheet();
+            wallet.disconnect();
+          }}>Disconnect</Button
+        >
+      {/snippet}
     </AccountMenuItem>
     {#if safeAppMode}
       <div class="connected-to-safe">
@@ -78,13 +77,13 @@
         href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
       >
         {#snippet title()}
-                Profile
-              {/snippet}
+          Profile
+        {/snippet}
       </AccountMenuItem>
       <AccountMenuItem icon={Settings} href="/app/settings">
         {#snippet title()}
-                Settings
-              {/snippet}
+          Settings
+        {/snippet}
       </AccountMenuItem>
     </div>
     <Divider sideMargin={0.5} />

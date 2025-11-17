@@ -12,7 +12,7 @@
     emoji = undefined,
     headline = undefined,
     description = undefined,
-    actions
+    actions,
   }: Props = $props();
 </script>
 

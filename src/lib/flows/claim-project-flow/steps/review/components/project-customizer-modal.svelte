@@ -10,10 +10,10 @@
   interface Props {
     originalProject: ProjectCustomizerFragment;
     newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
+      ReturnType<
+        typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+      > & { isProjectVisible: boolean }
+    >;
   }
 
   let { originalProject, newProjectData }: Props = $props();

@@ -26,24 +26,19 @@
 
   interface Props {
     ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+      clear: () => void;
+    };
     round: Round;
     previouslyCastBallot: WrappedBallot | null;
     ballotValidationErrors: BallotValidationErrorsStore;
   }
 
-  let {
-    ballot,
-    round,
-    previouslyCastBallot,
-    ballotValidationErrors
-  }: Props = $props();
+  let { ballot, round, previouslyCastBallot, ballotValidationErrors }: Props = $props();
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
-  let voterGuidelinesSeen = $derived(round.voterGuidelinesLink
-    ? $dismissablesStore.includes(guidelinesDismissbleId)
-    : true);
+  let voterGuidelinesSeen = $derived(
+    round.voterGuidelinesLink ? $dismissablesStore.includes(guidelinesDismissbleId) : true,
+  );
 
   let voteStep: 'build-ballot' | 'assign-votes' | null = $state(null);
   run(() => {
@@ -60,10 +55,14 @@
 
   let ballotHasEntries = $derived(Object.keys($ballot).length > 0);
 
-  let amountOfVotesAssigned = $derived(Object.values($ballot)
-    .filter((vote) => vote !== null)
-    .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0));
-  let percentageOfVotesAssigned = $derived(amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable()));
+  let amountOfVotesAssigned = $derived(
+    Object.values($ballot)
+      .filter((vote) => vote !== null)
+      .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0),
+  );
+  let percentageOfVotesAssigned = $derived(
+    amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable()),
+  );
   let hasValidationErrors = $derived($ballotValidationErrors.size > 0);
 
   async function handleSubmitBallot() {
@@ -74,13 +73,14 @@
     modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
   }
 
-  let localStoredBallotIsDifferentFromRemote =
-    $derived(previouslyCastBallot === null
+  let localStoredBallotIsDifferentFromRemote = $derived(
+    previouslyCastBallot === null
       ? ballotHasEntries
       : Object.keys($ballot).length !== Object.keys(previouslyCastBallot.ballot).length ||
-        Object.entries($ballot).some(
-          ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
-        ));
+          Object.entries($ballot).some(
+            ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
+          ),
+  );
 
   let clearingLocalBallot = $state(false);
   async function clearLocalBallotHandler() {
@@ -124,13 +124,11 @@
       We're saving your progress locally on your browser. You can leave this page and come back
       later to continue voting.
       {#snippet actions()}
-          
-          <Button
-            variant="primary"
-            onclick={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
-          >
-        
-          {/snippet}
+        <Button
+          variant="primary"
+          onclick={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
+        >
+      {/snippet}
     </AnnotationBox>
   {/if}
 
@@ -139,12 +137,10 @@
       Changes to your ballot have not yet been submitted.
 
       {#snippet actions()}
-          
-          <Button onclick={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
-            >Clear changes</Button
-          >
-        
-          {/snippet}
+        <Button onclick={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
+          >Clear changes</Button
+        >
+      {/snippet}
     </AnnotationBox>
   {/if}
 

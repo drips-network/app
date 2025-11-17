@@ -14,7 +14,6 @@
 <script lang="ts">
   import type { ProjectNameFragment } from './__generated__/gql.generated';
 
-
   interface Props {
     showSource?: boolean;
     pixelated?: boolean;
@@ -22,12 +21,7 @@
     project: ProjectNameFragment;
   }
 
-  let {
-    showSource = true,
-    pixelated = false,
-    tiny = false,
-    project
-  }: Props = $props();
+  let { showSource = true, pixelated = false, tiny = false, project }: Props = $props();
 
   let pixelatedClasses = $derived(pixelated ? 'pixelated' : '');
   let textClasses = $derived(tiny ? 'typo-text-small' : '');

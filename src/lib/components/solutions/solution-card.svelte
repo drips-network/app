@@ -5,12 +5,12 @@
   interface Props {
     reverse?: boolean;
     illustrationPadding?: string | undefined;
-    button?: 
-    | {
-        text: string;
-        href: string;
-      }
-    | undefined;
+    button?:
+      | {
+          text: string;
+          href: string;
+        }
+      | undefined;
     illustration?: import('svelte').Snippet;
     headline?: import('svelte').Snippet;
     description?: import('svelte').Snippet;
@@ -24,7 +24,7 @@
     illustration,
     headline,
     description,
-    line_items
+    line_items,
   }: Props = $props();
 </script>
 

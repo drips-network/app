@@ -15,17 +15,17 @@
   }>();
 
   interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: Component<any>;
     fieldProp: ApplicationFieldDto;
   }
 
-  let { component: Component, fieldProp }: Props = $props();
-
+  let { component: PassedComponent, fieldProp }: Props = $props();
 </script>
 
 <div class="component-wrapper">
   <div class="content">
-    <Component field={fieldProp} blockInteraction ></Component>
+    <PassedComponent field={fieldProp} blockInteraction></PassedComponent>
   </div>
   <div class="bottom-row">
     <h5>{fieldProp.type}</h5>

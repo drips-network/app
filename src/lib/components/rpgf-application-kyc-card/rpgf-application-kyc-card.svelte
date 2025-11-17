@@ -30,7 +30,7 @@
     applicationId,
     roundId,
     isOwnApplication,
-    isRoundAdmin
+    isRoundAdmin,
   }: Props = $props();
 
   let refreshing = $state(false);
@@ -75,17 +75,15 @@
 
 <RpgfApplicationDetailsCard title="Identity verification" key="kyc">
   {#snippet right()}
-  
-      <Button
-        variant="ghost"
-        ariaLabel="Refresh"
-        icon={Refresh}
-        loading={refreshing}
-        onclick={handleRefreshKyc}
-      >
-        Refresh status
-      </Button>
-    
+    <Button
+      variant="ghost"
+      ariaLabel="Refresh"
+      icon={Refresh}
+      loading={refreshing}
+      onclick={handleRefreshKyc}
+    >
+      Refresh status
+    </Button>
   {/snippet}
 
   {#if !isOwnApplication && isRoundAdmin}

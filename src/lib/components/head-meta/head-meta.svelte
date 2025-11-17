@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-
   interface Props {
     title?: string;
     image?: string;
@@ -15,7 +14,9 @@
     image = '/assets/share/og-generic.png',
     twitterImage = '/assets/share/twitter-summary.png',
     description = 'Drips is the easiest way to fund Open Source in your ecosystem. Fund your dependencies with built-in dependency splitting, run RetroPGF rounds, and achieve any funding mechanism you can dream of.',
-    twitterCardType = twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image'
+    twitterCardType = twitterImage === '/assets/share/twitter-summary.png'
+      ? 'summary'
+      : 'summary_large_image',
   }: Props = $props();
 
   let fullTitle = $derived(`${title}${title?.startsWith('Drips') ? '' : ' | Drips'}`);

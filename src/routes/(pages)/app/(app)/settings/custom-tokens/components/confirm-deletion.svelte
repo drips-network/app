@@ -29,11 +29,9 @@
       description={`"${tokenName}" will be removed from your custom tokens. Any streams streaming this token will show up as "Unknown token".`}
     />
     {#snippet actions()}
-      
-        <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
-        <Button variant="destructive" onclick={deleteToken}>Delete token</Button>
-      
-      {/snippet}
+      <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
+      <Button variant="destructive" onclick={deleteToken}>Delete token</Button>
+    {/snippet}
   </StepLayout>
 </div>
 

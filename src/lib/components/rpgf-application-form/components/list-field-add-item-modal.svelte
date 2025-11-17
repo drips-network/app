@@ -19,24 +19,26 @@
     modal.hide();
   }
 
-  let filledOut = $derived(formFields.every((field) => {
-    const value = values[field.label];
-    const type = field.type;
+  let filledOut = $derived(
+    formFields.every((field) => {
+      const value = values[field.label];
+      const type = field.type;
 
-    if (type === 'number') {
-      return value !== undefined && value.toString().trim() !== '' && !isNaN(Number(value));
-    }
+      if (type === 'number') {
+        return value !== undefined && value.toString().trim() !== '' && !isNaN(Number(value));
+      }
 
-    if (type === 'url') {
-      return (
-        value !== undefined &&
-        value.toString().trim() !== '' &&
-        /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value.toString().trim())
-      );
-    }
+      if (type === 'url') {
+        return (
+          value !== undefined &&
+          value.toString().trim() !== '' &&
+          /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value.toString().trim())
+        );
+      }
 
-    return value !== undefined && value.toString().trim() !== '';
-  }));
+      return value !== undefined && value.toString().trim() !== '';
+    }),
+  );
 </script>
 
 <div class="modal">

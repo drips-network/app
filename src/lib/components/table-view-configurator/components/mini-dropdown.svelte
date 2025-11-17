@@ -26,9 +26,9 @@
     open?: boolean;
     highlightIfSet?: boolean;
     disabled?: boolean;
-    onOptionClick?: 
-    | ((key: keyof TOptions, selectFn: () => void, isSelected: boolean) => void)
-    | undefined;
+    onOptionClick?:
+      | ((key: keyof TOptions, selectFn: () => void, isSelected: boolean) => void)
+      | undefined;
   }
 
   let {
@@ -40,7 +40,7 @@
     open = $bindable(false),
     highlightIfSet = false,
     disabled = false,
-    onOptionClick = undefined
+    onOptionClick = undefined,
   }: Props = $props();
 
   function handleClick() {

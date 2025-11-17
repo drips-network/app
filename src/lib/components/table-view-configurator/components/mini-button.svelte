@@ -4,8 +4,6 @@
   const bubble = createBubbler();
   import type { Component } from 'svelte';
 
-
-
   interface Props {
     icon: Component;
     highlight?: boolean;
@@ -13,12 +11,7 @@
     open?: boolean;
   }
 
-  let {
-    icon,
-    highlight = false,
-    label,
-    open = false
-  }: Props = $props();
+  let { icon, highlight = false, label, open = false }: Props = $props();
 
   const SvelteComponent = $derived(icon);
 </script>

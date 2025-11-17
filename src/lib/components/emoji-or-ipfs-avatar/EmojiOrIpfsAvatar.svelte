@@ -4,7 +4,7 @@
   import twemoji from '$lib/utils/twemoji';
   import { onMount, type Component } from 'svelte';
   import Question from '../icons/Question.svelte';
-  import Spinner from '../spinner/spinner.svelte';  
+  import Spinner from '../spinner/spinner.svelte';
 
   type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'huge';
   interface Props {
@@ -19,7 +19,7 @@
     emoji = undefined,
     ipfsCid = undefined,
     placeholderIcon = undefined,
-    size = 'small'
+    size = 'small',
   }: Props = $props();
 
   let outline = $derived(Boolean(ipfsCid || emoji));
@@ -89,9 +89,7 @@
     </div>
   {:else if placeholderIcon}
     {@const SvelteComponent = placeholderIcon}
-    <SvelteComponent
-      style="width: min(80%, 3rem); height: min(80%, 3rem)"
-    />
+    <SvelteComponent style="width: min(80%, 3rem); height: min(80%, 3rem)" />
   {:else}
     <Question style="width: min(80%, 3rem); height: min(80%, 3rem)" />
   {/if}

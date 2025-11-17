@@ -9,9 +9,11 @@
   let { data } = $props();
   let ballotStore = $derived(data.ballot);
 
-  let selectedApplications = $derived(mapFilterUndefined(Object.keys($ballotStore), (id) => {
-    return data.allApplications.find((app) => app.id === id);
-  }));
+  let selectedApplications = $derived(
+    mapFilterUndefined(Object.keys($ballotStore), (id) => {
+      return data.allApplications.find((app) => app.id === id);
+    }),
+  );
 </script>
 
 <HeadMeta title="Your ballot" />

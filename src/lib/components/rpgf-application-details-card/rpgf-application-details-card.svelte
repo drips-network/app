@@ -14,12 +14,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    key,
-    title,
-    right,
-    children
-  }: Props = $props();
+  let { key, title, right, children }: Props = $props();
 
   const isOpen = storedWritable(
     `rpgf-application-details-card-${key}-open`,

@@ -118,19 +118,15 @@
         icon={config.icon}
       >
         {#snippet headline()}
-                {config.headline}
-              {/snippet}
+          {config.headline}
+        {/snippet}
         {#snippet description()}
-              
-            {config.description}
-          
-              {/snippet}
+          {config.description}
+        {/snippet}
 
         {#snippet illustration({ active })}
-              
-            <UsecaseIllustration {active} {config} />
-          
-              {/snippet}
+          <UsecaseIllustration {active} {config} />
+        {/snippet}
       </UsecaseCard>
     </div>
   {/each}

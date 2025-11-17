@@ -23,7 +23,6 @@
   import type { StreamStateBadgeStreamFragment } from './__generated__/gql.generated';
   import { streamCurrentAmountsStore } from '$lib/utils/current-amounts';
 
-
   interface Props {
     stream: StreamStateBadgeStreamFragment;
     hideActive?: boolean;

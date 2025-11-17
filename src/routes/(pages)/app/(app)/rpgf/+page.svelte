@@ -82,24 +82,22 @@
       Interested to run your round on Drips? Reach out to the team now.
 
       {#snippet actions()}
-          
-          <Button
-            href="https://docs.drips.network/rpgf/overview"
-            target="_blank"
-            icon={ArrowBoxUpRight}
-          >
-            Learn more
-          </Button>
-          <Button
-            variant="primary"
-            href={INBOUND_LEAD_FORM_URL}
-            target="_blank"
-            icon={ArrowBoxUpRight}
-          >
-            Get in touch
-          </Button>
-        
-          {/snippet}
+        <Button
+          href="https://docs.drips.network/rpgf/overview"
+          target="_blank"
+          icon={ArrowBoxUpRight}
+        >
+          Learn more
+        </Button>
+        <Button
+          variant="primary"
+          href={INBOUND_LEAD_FORM_URL}
+          target="_blank"
+          icon={ArrowBoxUpRight}
+        >
+          Get in touch
+        </Button>
+      {/snippet}
     </AnnotationBox>
   {/if}
 

@@ -54,8 +54,6 @@
   {/if}
 
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
   {/snippet}
 </StepLayout>

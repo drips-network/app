@@ -28,9 +28,7 @@
   </div>
   <ListEditor isEditable={false} {...$context.listEditorConfig} />
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
   {/snippet}
 </StepLayout>
 

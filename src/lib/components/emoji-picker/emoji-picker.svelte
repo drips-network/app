@@ -5,7 +5,6 @@
   import twemoji from '$lib/utils/twemoji';
   import VirtualList from 'svelte-tiny-virtual-list';
 
-
   interface Props {
     selectedEmoji: string | undefined;
     category?: string;
@@ -49,25 +48,31 @@
   let categoriesElement: HTMLDivElement | undefined = $state();
   let actualCategoriesHeight = $state(CATEGORIES_HEIGHT);
 
-  let filteredEmoji = $derived(emoji.filter((e) => {
-    let { tags, description, aliases, unicode } = e;
+  let filteredEmoji = $derived(
+    emoji.filter((e) => {
+      let { tags, description, aliases, unicode } = e;
 
-    return searchTerm
-      ? [...tags, ...aliases, description, unicode].some((a) =>
-          a.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-      : e.category === category;
-  }));
+      return searchTerm
+        ? [...tags, ...aliases, description, unicode].some((a) =>
+            a.toLowerCase().includes(searchTerm.toLowerCase()),
+          )
+        : e.category === category;
+    }),
+  );
 
   // Group emojis into rows for virtual scrolling
-  let emojiRows = $derived(Array.from({ length: Math.ceil(filteredEmoji.length / EMOJIS_PER_ROW) }, (_, i) =>
-    filteredEmoji.slice(i * EMOJIS_PER_ROW, (i + 1) * EMOJIS_PER_ROW),
-  ));
+  let emojiRows = $derived(
+    Array.from({ length: Math.ceil(filteredEmoji.length / EMOJIS_PER_ROW) }, (_, i) =>
+      filteredEmoji.slice(i * EMOJIS_PER_ROW, (i + 1) * EMOJIS_PER_ROW),
+    ),
+  );
 
   // Calculate virtual list height accounting for categories section and padding
-  let virtualListHeight = $derived(searchTerm
-    ? CONTAINER_HEIGHT - CONTAINER_PADDING * 2
-    : CONTAINER_HEIGHT - actualCategoriesHeight - CONTAINER_PADDING * 2);
+  let virtualListHeight = $derived(
+    searchTerm
+      ? CONTAINER_HEIGHT - CONTAINER_PADDING * 2
+      : CONTAINER_HEIGHT - actualCategoriesHeight - CONTAINER_PADDING * 2,
+  );
 
   // Update actual categories height when element is available
   run(() => {
@@ -102,7 +107,7 @@
         itemSize={ROW_HEIGHT}
       >
         {#snippet item({ index, style })}
-                <div    {style}>
+          <div {style}>
             <div class="emojis-row">
               {#each emojiRows[index] as e (e.unicode)}
                 <div class="emoji" class:selected={selectedEmoji === e.unicode}>
@@ -123,7 +128,7 @@
               {/each}
             </div>
           </div>
-              {/snippet}
+        {/snippet}
       </VirtualList>
     {/if}
   </div>

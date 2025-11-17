@@ -5,19 +5,14 @@
     key: string;
     value?: string | number | undefined;
     explorerItems?: {
-    base: string;
-    dripsContract: string;
-    icon: ConstructorOfATypedSvelteComponent;
-  }[];
+      base: string;
+      dripsContract: string;
+      icon: ConstructorOfATypedSvelteComponent;
+    }[];
     children?: import('svelte').Snippet;
   }
 
-  let {
-    key,
-    value = undefined,
-    explorerItems = [],
-    children
-  }: Props = $props();
+  let { key, value = undefined, explorerItems = [], children }: Props = $props();
 
   let formattedValue = $derived(typeof value === 'number' ? formatNumber(value) : value);
 </script>

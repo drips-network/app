@@ -15,7 +15,7 @@
     label = undefined,
     removeFromTabIndexWhileCollapsed = true,
     showToggle = true,
-    children
+    children,
   }: Props = $props();
 
   let collapsed = $derived(!toggled);

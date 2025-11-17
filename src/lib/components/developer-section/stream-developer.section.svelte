@@ -21,7 +21,7 @@
     tokenDecimals = undefined,
     startDate = undefined,
     createdAt = undefined,
-    rawTimeline = undefined
+    rawTimeline = undefined,
   }: Props = $props();
 </script>
 

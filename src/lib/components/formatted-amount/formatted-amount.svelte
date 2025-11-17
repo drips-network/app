@@ -3,9 +3,9 @@
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
   interface Props {
-    amount?: any;
+    amount?: bigint;
     decimals: number;
-    multiplier?: any;
+    multiplier?: bigint;
     preserveTrailingZeroes?: boolean;
   }
 
@@ -13,7 +13,7 @@
     amount = 0n,
     decimals,
     multiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
-    preserveTrailingZeroes = true
+    preserveTrailingZeroes = true,
   }: Props = $props();
 </script>
 

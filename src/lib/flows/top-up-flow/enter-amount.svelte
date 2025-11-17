@@ -24,7 +24,9 @@
   let { context, backButton }: Props = $props();
 
   let tokenAddress = $derived($context.tokenAddress);
-  let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) ?? unreachable() : undefined);
+  let tokenInfo = $derived(
+    tokenAddress ? (tokens.getByAddress(tokenAddress) ?? unreachable()) : undefined,
+  );
 
   let amount: bigint | undefined = $state(undefined);
 
@@ -71,27 +73,25 @@
   />
   <SafeAppDisclaimer disclaimerType="drips" />
   {#snippet actions()}
-  
-      {#if backButton}
-        <Button
-          onclick={() => {
-            context.set({
-              tokenAddress: undefined,
-              amountValue: '',
-              topUpMax: false,
-            });
-            dispatch('goBackward');
-          }}
-          variant="ghost"
-        >
-          Back
-        </Button>
-      {/if}
-      <span data-testid="confirm-amount-button">
-        <Button variant="primary" onclick={submit} disabled={validationState.type !== 'valid'}
-          >Add {tokenInfo?.info.symbol ?? ''}</Button
-        >
-      </span>
-    
+    {#if backButton}
+      <Button
+        onclick={() => {
+          context.set({
+            tokenAddress: undefined,
+            amountValue: '',
+            topUpMax: false,
+          });
+          dispatch('goBackward');
+        }}
+        variant="ghost"
+      >
+        Back
+      </Button>
+    {/if}
+    <span data-testid="confirm-amount-button">
+      <Button variant="primary" onclick={submit} disabled={validationState.type !== 'valid'}
+        >Add {tokenInfo?.info.symbol ?? ''}</Button
+      >
+    </span>
   {/snippet}
 </StepLayout>

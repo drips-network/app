@@ -175,7 +175,7 @@
     },
   ];
 
-  function onRowClick(event:RowClickEventPayload) {
+  function onRowClick(event: RowClickEventPayload) {
     const { dripList } = tableData[event.rowIndex].badge;
 
     onClickGoto('/app/drip-lists/' + dripList.account.accountId, event.event);
@@ -208,7 +208,7 @@
         getCoreRowModel: getCoreRowModel(),
       }}
       isRowClickable={true}
-      onRowClick={onRowClick}
+      {onRowClick}
     />
   </Section>
 </article>

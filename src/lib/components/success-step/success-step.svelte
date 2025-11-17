@@ -13,7 +13,6 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-
   interface Props {
     message: string | (() => string);
     action?: 'close' | 'hide-modal' | 'continue' | 'none' | 'link';
@@ -31,7 +30,7 @@
     linkText = 'Continue',
     onAction = undefined,
     safeAppMode = false,
-    safeDescription = undefined
+    safeDescription = undefined,
   }: Props = $props();
 
   function handleConfirm() {
@@ -61,14 +60,12 @@
     {:else}
       <ConfettiOnClick alsoOnMount>
         {#snippet label()}
-              
-            <CoinAnimation animateOnMount>
-              <div class="circle">
-                <Emoji size="huge" emoji="🎉" />
-              </div>
-            </CoinAnimation>
-          
-              {/snippet}
+          <CoinAnimation animateOnMount>
+            <div class="circle">
+              <Emoji size="huge" emoji="🎉" />
+            </div>
+          </CoinAnimation>
+        {/snippet}
 
         <Confetti
           x={[-1, 1]}
@@ -87,26 +84,24 @@
       />
     {/if}
     {#snippet actions()}
-      
-        {#if action === 'link'}
-          <Button
-            variant="primary"
-            href={typeof href === 'function' ? href() : href}
-            icon={ArrowRight}
-            onclick={() => {
-              onAction?.();
-              dispatch('conclude');
-            }}
-          >
-            {linkText}
-          </Button>
-        {:else if action !== 'none'}
-          <Button variant="primary" onclick={handleConfirm}
-            >{action === 'close' ? 'Got it' : 'Continue'}</Button
-          >
-        {/if}
-      
-      {/snippet}
+      {#if action === 'link'}
+        <Button
+          variant="primary"
+          href={typeof href === 'function' ? href() : href}
+          icon={ArrowRight}
+          onclick={() => {
+            onAction?.();
+            dispatch('conclude');
+          }}
+        >
+          {linkText}
+        </Button>
+      {:else if action !== 'none'}
+        <Button variant="primary" onclick={handleConfirm}
+          >{action === 'close' ? 'Got it' : 'Continue'}</Button
+        >
+      {/if}
+    {/snippet}
   </StepLayout>
 </div>
 

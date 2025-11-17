@@ -26,11 +26,10 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-
   interface Props {
     inProgressBallot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+      clear: () => void;
+    };
     round: Round;
   }
 

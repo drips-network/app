@@ -10,12 +10,7 @@
     children?: import('svelte').Snippet;
   }
 
-  let {
-    value,
-    alwaysVisible = false,
-    disabled = false,
-    children
-  }: Props = $props();
+  let { value, alwaysVisible = false, disabled = false, children }: Props = $props();
 
   let success = $state(false);
   let visible = $state(false);

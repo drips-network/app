@@ -7,9 +7,7 @@
 
 <ThreePaneLayout {...data}>
   {#snippet apps()}
-  
-      <ApplicationsPane {...data} ballotStore={data.ballot} loggedIn={data.rpgfUserData !== null} />
-    
+    <ApplicationsPane {...data} ballotStore={data.ballot} loggedIn={data.rpgfUserData !== null} />
   {/snippet}
 
   {@render children?.()}

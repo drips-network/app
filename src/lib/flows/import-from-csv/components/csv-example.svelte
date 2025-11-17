@@ -7,14 +7,18 @@
     data?: Array<Array<unknown>>;
   }
 
-  let { caption = undefined, headers = DEFAULT_CSV_HEADERS, data = [
-    ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
-    ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],
-    [
-      'https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972',
-      5,
+  let {
+    caption = undefined,
+    headers = DEFAULT_CSV_HEADERS,
+    data = [
+      ['0x79756b6C2f913271fc0ee29A877fbd98258972BF', 20],
+      ['https://github.com/graphdeco-inria/hierarchical-3d-gaussians', 75],
+      [
+        'https://www.drips.network/app/drip-lists/31017209032870028068280040871339261037749177808773684797297972107972',
+        5,
+      ],
     ],
-  ] }: Props = $props();
+  }: Props = $props();
 </script>
 
 <div class="wrapper">

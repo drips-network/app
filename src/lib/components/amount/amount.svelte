@@ -13,24 +13,21 @@
     tokenAddress: string;
   }
 
-
-
-  
   interface Props {
     amount?: Amount | undefined;
     amountPerSecond?: Amount | undefined;
     showSymbol?: boolean;
     showPlusMinus?: boolean;
-    multiplier?: any;
+    multiplier?: bigint;
     amountClasses?: string;
     amountPerSecClasses?: string;
     /** Manually set token information to display. Used on the landing page's mock dashboard. */
-    overrideToDisplay?: 
-    | {
-        symbol: string;
-        decimals: number;
-      }
-    | undefined;
+    overrideToDisplay?:
+      | {
+          symbol: string;
+          decimals: number;
+        }
+      | undefined;
   }
 
   let {
@@ -41,12 +38,15 @@
     multiplier = BigInt(contractConstants.AMT_PER_SEC_MULTIPLIER),
     amountClasses = 'typo-text tabular-nums',
     amountPerSecClasses = 'typo-text-small tabular-nums text-foreground-level-4',
-    overrideToDisplay = undefined
+    overrideToDisplay = undefined,
   }: Props = $props();
 
-  let amountTokenInfo = $derived($tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined);
-  let amountPerSecondTokenInfo =
-    $derived($tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined);
+  let amountTokenInfo = $derived(
+    $tokens && amount ? tokens.getByAddress(amount.tokenAddress) : undefined,
+  );
+  let amountPerSecondTokenInfo = $derived(
+    $tokens && amountPerSecond ? tokens.getByAddress(amountPerSecond.tokenAddress) : undefined,
+  );
 
   function format(
     amount: Amount,

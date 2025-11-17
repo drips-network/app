@@ -31,12 +31,7 @@
     banner?: import('svelte').Snippet;
   }
 
-  let {
-    ecosystem,
-    ecosystemChainData,
-    isHidden = false,
-    banner
-  }: Props = $props();
+  let { ecosystem, ecosystemChainData, isHidden = false, banner }: Props = $props();
 
   let projectsCountFormatted = $derived(formatNumber(ecosystem.nodeCount ?? 0));
 </script>

@@ -3,13 +3,6 @@
   import SplitComponent from './components/split/split.svelte';
   import { type Splits, type SplitGroup } from './types';
 
-
-
-  
-
-
-
-
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
     list.sort((a, b) => {
@@ -32,7 +25,6 @@
     };
     return list.slice(0, clipIndex).concat(truncatedGroup);
   }
-
 
   interface Props {
     disableLinks?: boolean;
@@ -58,7 +50,7 @@
     disableTooltips = false,
     chainOverride = undefined,
     linkToNewTab = false,
-    isGroup = false
+    isGroup = false,
   }: Props = $props();
   let sortedList = $derived(truncateList(sortList(list)));
 </script>

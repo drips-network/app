@@ -83,9 +83,7 @@
     description="Are you sure that you want to delete this stream? It will immediately stop streaming, and be irreversibly erased."
   />
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-      <Button onclick={startDeleting} variant="destructive">Delete stream</Button>
-    
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button onclick={startDeleting} variant="destructive">Delete stream</Button>
   {/snippet}
 </StepLayout>

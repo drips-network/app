@@ -8,27 +8,21 @@
 
 <EduCard>
   {#snippet text()}
-  
-      <p>Connect your wallet to claim your open-source project, create a Drip List, and more.</p>
-    
+    <p>Connect your wallet to claim your open-source project, create a Drip List, and more.</p>
   {/snippet}
   {#snippet buttons()}
-  
-      <Button icon={Wallet} variant="primary" onclick={() => walletStore.connect()}
-        >Connect wallet</Button
-      >
-      <Button href="https://docs.drips.network" target="_blank">Learn more</Button>
-    
+    <Button icon={Wallet} variant="primary" onclick={() => walletStore.connect()}
+      >Connect wallet</Button
+    >
+    <Button href="https://docs.drips.network" target="_blank">Learn more</Button>
   {/snippet}
   {#snippet illustration()}
-  
-      <div class="edu-card-illustration-bg"></div>
-      <div class="edu-card-illustration-wrapper">
-        <div class="inner">
-          <OneContract />
-        </div>
+    <div class="edu-card-illustration-bg"></div>
+    <div class="edu-card-illustration-wrapper">
+      <div class="inner">
+        <OneContract />
       </div>
-    
+    </div>
   {/snippet}
 </EduCard>
 

@@ -23,17 +23,13 @@
     <PrimaryColorThemer colorHex={ecosystem[0].color}>
       <EcosystemCard ecosystem={ecosystem[0]} ecosystemChainData={ecosystem[1]}>
         {#snippet banner()}
-              
-            <AnnotationBox type="info" overlay size="small">
-              {annotation}
-              {#snippet actions()}
-                      
-                  <Button variant="primary" icon={EcosystemIcon}>View ecosystem</Button>
-                
-                      {/snippet}
-            </AnnotationBox>
-          
-              {/snippet}
+          <AnnotationBox type="info" overlay size="small">
+            {annotation}
+            {#snippet actions()}
+              <Button variant="primary" icon={EcosystemIcon}>View ecosystem</Button>
+            {/snippet}
+          </AnnotationBox>
+        {/snippet}
       </EcosystemCard>
     </PrimaryColorThemer>
   {/each}

@@ -4,9 +4,9 @@
 
 <Flyout>
   {#snippet trigger()}
-    <div >Trigger</div>
+    <div>Trigger</div>
   {/snippet}
   {#snippet content()}
-    <div >Content</div>
+    <div>Content</div>
   {/snippet}
 </Flyout>

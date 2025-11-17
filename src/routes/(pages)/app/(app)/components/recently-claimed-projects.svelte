@@ -33,11 +33,13 @@
 
   let { projects }: Props = $props();
 
-  let projectsWithoutJasonTests = $derived(projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
-  ));
+  let projectsWithoutJasonTests = $derived(
+    projects.filter((p) => !p.source.repoName.includes('drips-test-repo')),
+  );
 
-  let recentlyClaimedProjects = $derived(projectsWithoutJasonTests.filter((p) => p.isVisible).slice(0, 4));
+  let recentlyClaimedProjects = $derived(
+    projectsWithoutJasonTests.filter((p) => p.isVisible).slice(0, 4),
+  );
 </script>
 
 {#if recentlyClaimedProjects.length > 0}

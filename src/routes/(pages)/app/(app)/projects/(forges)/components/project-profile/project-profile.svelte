@@ -162,7 +162,6 @@
   import { page } from '$app/stores';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
-
   interface RepoInfo {
     url: string;
     repoName: string;
@@ -177,17 +176,13 @@
     repoExists: boolean;
   }
 
-  let {
-    project,
-    description,
-    newRepo,
-    correctCasingRepo,
-    repoExists
-  }: Props = $props();
+  let { project, description, newRepo, correctCasingRepo, repoExists }: Props = $props();
 
   let ownAccountId = $derived($walletStore.dripsAccountId);
   let chainData = $derived(filterCurrentChainData(project.chainData));
-  let isOwnProject = $derived(ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined));
+  let isOwnProject = $derived(
+    ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined),
+  );
 
   type ExtractFragment<T, Condition> = T extends Condition ? T : never;
 
@@ -237,8 +232,9 @@
     });
   }
 
-  let mobileView =
-    $derived($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet');
+  let mobileView = $derived(
+    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet',
+  );
 
   let collectHintTriggered = $state(false);
 
@@ -279,7 +275,9 @@
   let splitsSectionSkeleton: SectionSkeleton | undefined = $state();
   let supportersSectionSkeleton: SectionSkeleton | undefined = $state();
 
-  let imageBaseUrl = $derived(`/api/share-images/project/${encodeURIComponent(project.source.url)}.png`);
+  let imageBaseUrl = $derived(
+    `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`,
+  );
 
   let origin = $derived(browser ? window.location.origin : '');
   let supportButtonStepConfig = $derived({
@@ -336,15 +334,13 @@
       <AnnotationBox>
         The GitHub repo for this project has been renamed to {newRepo.ownerName}/{newRepo.repoName}.
         {#snippet actions()}
-              
-            <Button
-              icon={ArrowRight}
-              variant="primary"
-              href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
-              >Go to the new project</Button
-            >
-          
-              {/snippet}
+          <Button
+            icon={ArrowRight}
+            variant="primary"
+            href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
+            >Go to the new project</Button
+          >
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -354,20 +350,18 @@
         This project resolves to a GitHub repo with different casing ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName}).
         Any new splits to this misnamed project will automatically be routed to the correct project.
         {#snippet actions()}
-              
-            <Button
-              size="small"
-              icon={EyeOpen}
-              variant="primary"
-              href={buildProjectUrl(
-                Forge.GitHub,
-                correctCasingRepo.ownerName,
-                correctCasingRepo.repoName,
-                false,
-              )}>View correct project</Button
-            >
-          
-              {/snippet}
+          <Button
+            size="small"
+            icon={EyeOpen}
+            variant="primary"
+            href={buildProjectUrl(
+              Forge.GitHub,
+              correctCasingRepo.ownerName,
+              correctCasingRepo.repoName,
+              false,
+            )}>View correct project</Button
+          >
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -383,22 +377,20 @@
           project is unclaimed on {network.label}, but can still receive funds that the owner can
           collect later.{/if}
         {#snippet actions()}
-              
-            <div class="flex gap-3">
-              <ShareButton
-                url={browser ? window.location.href : ''}
-                downloadableImageUrl="{imageBaseUrl}?target=og"
-                supportButtonOptions={supportButtonStepConfig}
-              />
-              <Button
-                size="small"
-                icon={Registered}
-                variant="primary"
-                onclick={() => launchClaimProject(project.source.url)}>Claim project</Button
-              >
-            </div>
-          
-              {/snippet}
+          <div class="flex gap-3">
+            <ShareButton
+              url={browser ? window.location.href : ''}
+              downloadableImageUrl="{imageBaseUrl}?target=og"
+              supportButtonOptions={supportButtonStepConfig}
+            />
+            <Button
+              size="small"
+              icon={Registered}
+              variant="primary"
+              onclick={() => launchClaimProject(project.source.url)}>Claim project</Button
+            >
+          </div>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -427,21 +419,19 @@
           href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
         >.
         {#snippet actions()}
-              
-            {#if isOwnProject}
-              <div class="flex gap-3">
-                <Button
-                  size="small"
-                  icon={Registered}
-                  variant="primary"
-                  onclick={() => {
-                    modal.show(Stepper, undefined, editProjectMetadataSteps(project));
-                  }}>Unhide it</Button
-                >
-              </div>
-            {/if}
-          
-              {/snippet}
+          {#if isOwnProject}
+            <div class="flex gap-3">
+              <Button
+                size="small"
+                icon={Registered}
+                variant="primary"
+                onclick={() => {
+                  modal.show(Stepper, undefined, editProjectMetadataSteps(project));
+                }}>Unhide it</Button
+              >
+            </div>
+          {/if}
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -515,12 +505,10 @@
           <AnnotationBox type="info">
             Embed a support button on your website.
             {#snippet actions()}
-                      
-                <Button variant="primary" icon={Settings} onclick={handleEmbedButtonConfigureClick}
-                  >Configure</Button
-                >
-              
-                      {/snippet}
+              <Button variant="primary" icon={Settings} onclick={handleEmbedButtonConfigureClick}
+                >Configure</Button
+              >
+            {/snippet}
           </AnnotationBox>
         {/if}
       {/if}

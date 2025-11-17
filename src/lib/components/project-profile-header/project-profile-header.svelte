@@ -38,7 +38,6 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-
   interface Props {
     project: ProjectProfileHeaderFragment;
     description?: string | undefined;
@@ -52,7 +51,7 @@
     description = undefined,
     editButton = undefined,
     shareButton = undefined,
-    pendingAvatar = false
+    pendingAvatar = false,
   }: Props = $props();
 
   let projectChainData = $derived(filterCurrentChainData(project.chainData));

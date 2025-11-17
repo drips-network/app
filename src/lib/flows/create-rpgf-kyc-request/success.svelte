@@ -38,8 +38,6 @@
   </Button>
 
   {#snippet actions()}
-  
-      <Button onclick={() => dispatch('conclude')}>Close</Button>
-    
+    <Button onclick={() => dispatch('conclude')}>Close</Button>
   {/snippet}
 </StandaloneFlowStepLayout>

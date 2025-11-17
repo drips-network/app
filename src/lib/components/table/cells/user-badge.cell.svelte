@@ -41,10 +41,10 @@
   } from './__generated__/gql.generated';
 
   interface Props {
-    userOrDripListOrEcosystem: 
-    | UserBadgeCellUserFragment
-    | UserBadgeCellDripListFragment
-    | UserBadgeCellEcosystemFragment;
+    userOrDripListOrEcosystem:
+      | UserBadgeCellUserFragment
+      | UserBadgeCellDripListFragment
+      | UserBadgeCellEcosystemFragment;
   }
 
   let { userOrDripListOrEcosystem }: Props = $props();

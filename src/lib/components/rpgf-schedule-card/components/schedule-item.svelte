@@ -5,10 +5,6 @@
   import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
 
-
-
-
-
   interface Props {
     title: string;
     date: Date;
@@ -32,7 +28,7 @@
     elem = $bindable(),
     expanded = $bindable(false),
     onExpandChange = () => {},
-    children
+    children,
   }: Props = $props();
   run(() => {
     // trigger expanded after 0.3s transition

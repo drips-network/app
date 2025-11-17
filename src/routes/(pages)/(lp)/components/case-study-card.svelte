@@ -10,11 +10,11 @@
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
   interface Props {
-    blogPost: 
-    | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
-        slug: string;
-      })
-    | undefined;
+    blogPost:
+      | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
+          slug: string;
+        })
+      | undefined;
     orgName: string;
     logoSrc: string;
     logoAlt: string;
@@ -32,7 +32,7 @@
     description,
     dripList,
     maxSplitRows = undefined,
-    chainOverride = undefined
+    chainOverride = undefined,
   }: Props = $props();
 
   onMount(fiatEstimates.start);

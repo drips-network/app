@@ -10,19 +10,20 @@
 
   let { categories, selected = $bindable([]) }: Props = $props();
 
-  let categoryItems: Items = $derived(Object.fromEntries(
-    categories.map((category) => {
-      return [
-        category.id,
-        {
-          type: 'selectable',
-          label: category.name,
-          searchString: [category.name, category.description || ''],
-        },
-      ];
-    }),
-  ));
-  
+  let categoryItems: Items = $derived(
+    Object.fromEntries(
+      categories.map((category) => {
+        return [
+          category.id,
+          {
+            type: 'selectable',
+            label: category.name,
+            searchString: [category.name, category.description || ''],
+          },
+        ];
+      }),
+    ),
+  );
 </script>
 
 <ListSelect bind:selected items={categoryItems} searchable={false} />

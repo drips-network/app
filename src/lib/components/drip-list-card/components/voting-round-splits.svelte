@@ -14,16 +14,17 @@
 
   interface Props {
     votingRound: VotingRound & {
-    splits?: SplitsComponentSplitsReceiver[];
-  };
+      splits?: SplitsComponentSplitsReceiver[];
+    };
     maxRows?: number | undefined;
     listingMode: boolean;
   }
 
   let { votingRound, maxRows = undefined, listingMode }: Props = $props();
 
-  let isOwnVotingRound =
-    $derived(votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase());
+  let isOwnVotingRound = $derived(
+    votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase(),
+  );
 
   let revealedResultsSplits: SplitsComponentSplitsReceiver[] | undefined = $state();
 

@@ -24,7 +24,6 @@
   import DripListAvatar from '../drip-list-avatar/drip-list-avatar.svelte';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
 
-
   interface Props {
     dripList: DripListBadgeFragment | undefined;
     showOwner?: boolean;
@@ -46,7 +45,7 @@
     avatarSize = 'small',
     disabled = false,
     outline = false,
-    linkToNewTab = false
+    linkToNewTab = false,
   }: Props = $props();
 
   // lookup ens name if owner is provided
@@ -54,8 +53,9 @@
     showOwner && dripList && ensStore.lookup(dripList.owner.address);
   });
   let ens = $derived(showOwner && dripList ? $ensStore[dripList.owner.address] : {});
-  let username =
-    $derived(ens?.name ?? (dripList && showOwner && formatAddress(dripList.owner.address)) ?? undefined);
+  let username = $derived(
+    ens?.name ?? (dripList && showOwner && formatAddress(dripList.owner.address)) ?? undefined,
+  );
 </script>
 
 <svelte:element

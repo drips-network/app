@@ -21,7 +21,7 @@
     hideState = false,
     inline = false,
     size = 'small',
-    short = false
+    short = false,
   }: Props = $props();
 
   let projectSnapshot = $derived(application.dripsProjectDataSnapshot);

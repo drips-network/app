@@ -121,14 +121,12 @@
       total votes allocated to every particular project.
     </p>
     {#snippet actions()}
-      
-        <Button
-          variant="ghost"
-          href="https://docs.drips.network/rpgf/administering-your-round#automatically-preparing-a-drip-list"
-          target="_blank">Learn more</Button
-        >
-      
-      {/snippet}
+      <Button
+        variant="ghost"
+        href="https://docs.drips.network/rpgf/administering-your-round#automatically-preparing-a-drip-list"
+        target="_blank">Learn more</Button
+      >
+    {/snippet}
   </AnnotationBox>
 
   <ListEditor
@@ -138,8 +136,6 @@
   />
 
   {#snippet actions()}
-  
-      <Button variant="primary" icon={Wallet} onclick={handlePublish}>Confirm in wallet</Button>
-    
+    <Button variant="primary" icon={Wallet} onclick={handlePublish}>Confirm in wallet</Button>
   {/snippet}
 </StandaloneFlowStepLayout>

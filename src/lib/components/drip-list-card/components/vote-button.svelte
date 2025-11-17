@@ -18,7 +18,9 @@
 
   let { votingRound, collaboratorAddress, collaborator }: Props = $props();
 
-  let isOwnVote = $derived(collaboratorAddress.toLowerCase() === $walletStore.address?.toLowerCase());
+  let isOwnVote = $derived(
+    collaboratorAddress.toLowerCase() === $walletStore.address?.toLowerCase(),
+  );
 </script>
 
 <div style:display="flex" style:justify-content="center" style:gap="0.5rem">

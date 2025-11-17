@@ -3,7 +3,6 @@
 
   const bubble = createBubbler();
   import type { Component } from 'svelte';
-  import IconWrapper from '$lib/components/icons/IconWrapper.svelte';
 
   interface Props {
     label: string;
@@ -14,14 +13,7 @@
     backgroundOnActive?: boolean;
   }
 
-  let {
-    label,
-    href,
-    active,
-    icon,
-    external = false,
-    backgroundOnActive = false
-  }: Props = $props();
+  let { label, href, active, icon, external = false, backgroundOnActive = false }: Props = $props();
 
   const IconComponent = $derived(icon);
 </script>
