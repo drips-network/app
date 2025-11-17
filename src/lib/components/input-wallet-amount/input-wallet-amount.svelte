@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import tokens from '$lib/stores/tokens';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
@@ -34,12 +32,12 @@
     amount = $bindable(),
   }: Props = $props();
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
-  run(() => {
+  $effect(() => {
     if (topUpMax && tokenInfo) {
       inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
     }
   });
-  run(() => {
+  $effect(() => {
     if (tokenBalance === undefined) {
       inputValue = '0';
     }

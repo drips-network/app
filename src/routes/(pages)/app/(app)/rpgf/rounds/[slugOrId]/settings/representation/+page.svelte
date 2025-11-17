@@ -23,15 +23,6 @@
 
   let showUrlSuccess = $state(false);
 
-  // $effect(() => {
-  //   if (!urlSlugInputValue) {
-  //     updatedRound = {
-  //       ...updatedRound,
-  //       urlSlug: urlSlugInputValue,
-  //     };
-  //   }
-  // });
-
   let urlSlugValidationState = $derived.by<TextInputValidationState>(() => {
     if (urlSlugInputValue === updatedRound.urlSlug) {
       return { type: 'valid' };
