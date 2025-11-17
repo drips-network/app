@@ -18,6 +18,7 @@
 
   export let round: Round;
   export let application: ListingApplication;
+  export let hideState = false;
 
   export let reviewMode: boolean;
   export let decision: ComponentProps<ApplicationDecisionButtons>['decision'] = null;
@@ -172,7 +173,7 @@
   data-testid="application-line-item-{application.id}"
 >
   <svelte:element this={smallLink ? 'a' : 'div'} href={link} class:ellipsis>
-    <RpgfApplicationBadge short {application} />
+    <RpgfApplicationBadge {hideState} short {application} />
   </svelte:element>
 
   {#if reviewMode && application.state === 'pending'}

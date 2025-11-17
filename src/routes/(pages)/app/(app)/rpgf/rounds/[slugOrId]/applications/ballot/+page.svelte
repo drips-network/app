@@ -34,6 +34,7 @@
       {ballotStore}
       applications={selectedApplications}
       signedIn={data.rpgfUserData !== undefined}
+      hideState
     />
   </div>
 </ThreePaneLayout>
