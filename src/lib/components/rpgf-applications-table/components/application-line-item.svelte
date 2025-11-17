@@ -230,5 +230,6 @@
 
   .vote-count-input {
     width: 8rem;
+    flex-shrink: 0;
   }
 </style>
