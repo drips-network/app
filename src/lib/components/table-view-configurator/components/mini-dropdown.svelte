@@ -53,11 +53,11 @@
     } else {
       value = key;
     }
-
-    open = false;
   }
 
   function handleOptionClick(key: keyof TOptions) {
+    open = false;
+
     if (onOptionClick) {
       onOptionClick(key, () => selectFn(key), value === key);
       return;

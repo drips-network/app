@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -70,13 +70,14 @@
   async function handleTableOptsChange({
     sortBy,
     filterBy,
-    selectFn,
   }: {
     sortBy: string | null;
     filterBy: string | null;
-    selectFn: () => void;
   }) {
     let sortByToSet = sortBy ?? 'createdAt';
+
+    selectedSortBy = sortByToSet as SortByParam;
+    selectedFilter = filterBy as FilterParam | null;
 
     await goto(
       buildUrl($page.url.pathname, {
@@ -85,13 +86,6 @@
       }),
       { replaceState: true, noScroll: true },
     );
-
-    await invalidate('rpgf:round:listing-applications');
-
-    selectedSortBy = sortByToSet as SortByParam;
-    selectedFilter = filterBy as FilterParam | null;
-
-    selectFn();
   }
 
   let filterOptions: Record<FilterParam, TDropdownOption> = $derived({
@@ -139,10 +133,8 @@
         onDownload={handleDownload}
         sortBy={selectedSortBy}
         filterBy={selectedFilter}
-        onFilterChange={(filterBy, selectFn) =>
-          handleTableOptsChange({ sortBy: selectedSortBy, filterBy, selectFn })}
-        onSortChange={(sortBy, selectFn) =>
-          handleTableOptsChange({ sortBy, filterBy: selectedFilter, selectFn })}
+        onFilterChange={(filterBy) => handleTableOptsChange({ sortBy: selectedSortBy, filterBy })}
+        onSortChange={(sortBy) => handleTableOptsChange({ sortBy, filterBy: selectedFilter })}
       />
     </div>
   </div>
