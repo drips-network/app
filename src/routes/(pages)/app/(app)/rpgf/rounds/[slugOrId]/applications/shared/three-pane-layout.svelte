@@ -232,7 +232,8 @@
   }
 
   @media (max-width: 1400px) {
-    .applications-layout.three-column {
+    .applications-layout.three-column,
+    .applications-layout.three-column.apps-pane-hidden {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
       grid-template-areas: 'sidebar' 'page';
