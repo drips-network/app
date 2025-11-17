@@ -21,7 +21,12 @@ const ORCID_SANDBOX_PREFIX = 'sandbox-';
  * @returns true if the ORCID API url is pointing to the sandbox, false otherwise.
  */
 function isSandboxOrcidEnv() {
-  return PUBLIC_ORCID_API_URL.startsWith('https://pub.sandbox.orcid.org');
+  try {
+    const url = new URL(PUBLIC_ORCID_API_URL);
+    return url.host === 'pub.sandbox.orcid.org';
+  } catch {
+    return false;
+  }
 }
 
 /**
