@@ -56,10 +56,12 @@
       title: 'Solutions',
       type: 'dropdown',
       entries: [
+        { title: 'Contribution bounties', href: '/solutions/wave' },
+        { title: 'RetroPGF voting & distribution', href: '/solutions/retro-pgf' },
+        { title: 'Proactive grants', href: '/solutions/pro-pgf' },
         { title: 'Dependency Funding', href: '/solutions/dependency-funding' },
-        { title: 'RetroPGF Voting & Distribution', href: '/solutions/retro-pgf' },
-        { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Ecosystem funding', href: '/solutions/ecosystem-funding' },
+        { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Hackathons', href: '/solutions/hackathons' },
       ],
     },
@@ -112,7 +114,7 @@
 {#if openMenu}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)} />
+  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)}></div>
 {/if}
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
