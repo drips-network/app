@@ -67,18 +67,14 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
 
     const accountIdsToClear = [
       projectAccountId,
-      ...chainData.support
-        .filter((support) => 'account' in support)
-        .map((support) => support.account.accountId),
+      ...chainData.support.map((support) => support.account.accountId),
       ...(isClaimed(chainData)
         ? chainData.splits.dependencies
             .filter((dependency) => 'account' in dependency)
             .map((dependency) => dependency.account.accountId)
         : []),
       ...(isClaimed(chainData)
-        ? chainData.splits.maintainers
-            .filter((maintainer) => 'account' in maintainer)
-            .map((maintainer) => maintainer.account.accountId)
+        ? chainData.splits.maintainers.map((maintainer) => maintainer.account.accountId)
         : []),
       ...(isClaimed(chainData) ? [chainData.owner.accountId] : []),
     ];
@@ -108,9 +104,7 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
     const accountIdsToClear = [
       nftDriverAccountId,
       dripList.owner.accountId,
-      ...dripList.support
-        .filter((support) => 'account' in support)
-        .map((support) => support.account.accountId),
+      ...dripList.support.map((support) => support.account.accountId),
       ...dripList.splits
         .filter((split) => 'account' in split)
         .map((split) => split.account.accountId),
@@ -134,9 +128,7 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
     const accountIdsToClear = [
       nftDriverAccountId,
       ecosystemMainAccount.owner.accountId,
-      ...ecosystemMainAccount.support
-        .filter((support) => 'account' in support)
-        .map((support) => support.account.accountId),
+      ...ecosystemMainAccount.support.map((support) => support.account.accountId),
       ...ecosystemMainAccount.splits
         .filter((split) => 'account' in split)
         .map((split) => split.account.accountId),
