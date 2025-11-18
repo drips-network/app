@@ -22,25 +22,26 @@
 
 <!-- on the server, don't render <img>, then fade it in once loaded client-side -->
 {#if browser}
-<img
-  bind:this={imageEl}
-  src={getImageTheme($themeStore.currentTheme) === 'dark' && srcDark ? srcDark : srcLight}
-  alt={alt}
-  class="themed-raster-image"
-  class:loaded
-  on:load={() => {
-    loaded = true;
-  }}
-/>
+  <img
+    bind:this={imageEl}
+    src={getImageTheme($themeStore.currentTheme) === 'dark' && srcDark ? srcDark : srcLight}
+    {alt}
+    class="themed-raster-image"
+    class:loaded
+    on:load={() => {
+      loaded = true;
+    }}
+  />
 {/if}
 
 <style>
   .themed-raster-image {
+    height: 100%;
     width: 100%;
-    height: auto;
+    object-fit: contain;
     display: block;
   }
-  
+
   .themed-raster-image.loaded {
     opacity: 1;
     transition: opacity 0.5s ease-in;

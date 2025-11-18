@@ -1,18 +1,15 @@
 <script>
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import Calendar from '$lib/components/icons/Calendar.svelte';
-  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
-  import Git from '$lib/components/icons/Git.svelte';
-  import Github from '$lib/components/icons/Github.svelte';
+  import ArrowClockwiseHeart from '$lib/components/icons/ArrowClockwiseHeart.svelte';
+  import Ledger from '$lib/components/icons/Ledger.svelte';
+  import Proposals from '$lib/components/icons/Proposals.svelte';
+  import ThumbsUp from '$lib/components/icons/ThumbsUp.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
-  import Trophy from '$lib/components/icons/Trophy.svelte';
-  import User from '$lib/components/icons/User.svelte';
-  import SolutionsEcosystemGraph from '$lib/components/illustrations/solutions-ecosystem-graph.svelte';
-  import SolutionsEcosystemsDistribution from '$lib/components/illustrations/solutions-ecosystems-distribution.svelte';
-  import SolutionsWaveWhatItEnables from '$lib/components/illustrations/solutions-wave-what-it-enables.svelte';
+  import Transactions from '$lib/components/icons/Transactions.svelte';
+  import Wave from '$lib/components/icons/Wave.svelte';
+  import SolutionsPropgfEverythingYouNeed from '$lib/components/illustrations/solutions-propgf-everything-you-need.svelte';
   import SolutionCard from '$lib/components/solutions/solution-card.svelte';
   import SolutionHeader from '$lib/components/solutions/solution-header.svelte';
-  import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
   import ThemedRasterImage from '$lib/components/themed-raster-image/themed-raster-image.svelte';
 </script>
@@ -23,61 +20,70 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Wave</svelte:fragment>
-  <svelte:fragment slot="headline">Reward open-source contributions fairly and transparently</svelte:fragment>
+  <svelte:fragment slot="usecase-badge">Pro-PGF</svelte:fragment>
+  <svelte:fragment slot="headline"
+    >Proactive, community-led public goods funding on-chain</svelte:fragment
+  >
   <svelte:fragment slot="description">
-    Waves turn open-source sprints into on-chain funding cycles. Ecosystems launch recurring Waves
-    to reward measurable impact — all tracked from issue to fund distribution.
+    Pro-PGF gives ecosystems a structured, transparent way to fund essential public goods. It
+    supports new initiatives and ongoing projects that keep your ecosystem healthy and growing.
   </svelte:fragment>
 </SolutionHeader>
 
-<SolutionCard>
+<SolutionCard illustrationScale="1.1">
   <svelte:fragment slot="illustration">
     <ThemedRasterImage
-      srcLight="/assets/solutions/wave/what-it-enables/light.png"
-      srcDark="/assets/solutions/wave/what-it-enables/dark.png"
+      srcLight="/assets/solutions/pro-pgf/streamline/light.png"
+      srcDark="/assets/solutions/pro-pgf/streamline/dark.png"
       alt="Wave solution illustration"
     />
   </svelte:fragment>
-  <svelte:fragment slot="headline">What It Enables</svelte:fragment>
+  <svelte:fragment slot="headline">Streamline how your ecosystem funds public goods</svelte:fragment
+  >
+  <svelte:fragment slot="description">
+    Run curated funding rounds that combine expert review with community oversight all tracked and
+    executed on-chain.
+  </svelte:fragment>
   <svelte:fragment slot="line-items">
-    <SolutionLineItem icon={Calendar}>
-      Launch monthly “Waves” with a USD-denominated reward pool tied to approved repositories.
+    <SolutionLineItem icon={Ledger}>
+      Proactively fund new and existing projects aligned with ecosystem priorities
     </SolutionLineItem>
-    <SolutionLineItem icon={Github}>
-      Vet and sync GitHub projects through transparent onboarding.
-    </SolutionLineItem>
-    <SolutionLineItem icon={Git}>
-      Contributors earn points for merged PRs, and every point translates into a share of the reward.
-    </SolutionLineItem>
-    <SolutionLineItem icon={Trophy}>
-      Live leaderboard displays contributor activity, repositories, and merged pull-requests in real time.
+    <SolutionLineItem icon={Proposals}>
+      Use a dedicated selection committee to review proposals and guide allocation
     </SolutionLineItem>
     <SolutionLineItem icon={TokenStreams}>
-      At the end of each cycle rewards are distributed to maintainers on-chain.
+      Make every proposal, review and payout fully transparent and verifiable
+    </SolutionLineItem>
+    <SolutionLineItem icon={ArrowClockwiseHeart}>
+      Complement retroactive funding with a forward-looking Pro-PGF program
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>
 
-<SolutionInterstitial>
-  <svelte:fragment slot="headline">Want fair, on-chain rewards for your community?</svelte:fragment>
-  <svelte:fragment slot="description">
-    Our team can walk you through how Drips fits into your workflow, help you design repeatable funding cycles, and show you how to reward meaningful work with full on-chain accountability.
-  </svelte:fragment>
-</SolutionInterstitial>
-
-<SolutionCard reverse>
+<SolutionCard reverse illustrationScale="1.1">
   <svelte:fragment slot="illustration">
-    <SolutionsEcosystemGraph />
+    <SolutionsPropgfEverythingYouNeed />
   </svelte:fragment>
-  <svelte:fragment slot="headline">Who It's For</svelte:fragment>
+  <svelte:fragment slot="headline"
+    >Everything you need for accountable, scalable Pro-PGF</svelte:fragment
+  >
+
+  <svelte:fragment slot="description">
+    As a fully decentralized on-chain protocol, Drips can be composed with any other contract.
+  </svelte:fragment>
 
   <svelte:fragment slot="line-items">
-    <SolutionLineItem icon={Ecosystem}>
-      Ecosystems: Drive developer activity, launch recurring funding cycles, manage applicants and payouts in a unified flow.
+    <SolutionLineItem icon={ArrowClockwiseHeart}>
+      Run clearly scoped funding batches with defined themes and budgets
     </SolutionLineItem>
-    <SolutionLineItem icon={User}>
-      Maintainers: Attract high-quality contributors, grow the community, set issue priorities, sync repos, and track contribution transparently.
+    <SolutionLineItem icon={Transactions}>
+      Streamline proposal intake, review and approvals in one place
+    </SolutionLineItem>
+    <SolutionLineItem icon={ThumbsUp}>
+      Publish decisions and payouts on-chain for full accountability
+    </SolutionLineItem>
+    <SolutionLineItem icon={Wave}>
+      Build a continuous Pro-PGF pipeline that funds high-impact work from idea to execution
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>

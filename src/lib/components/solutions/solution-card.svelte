@@ -4,6 +4,7 @@
 
   export let reverse = false;
   export let illustrationPadding: string | undefined = undefined;
+  export let illustrationScale: string | undefined = undefined;
 
   export let button:
     | {
@@ -14,7 +15,11 @@
 </script>
 
 <div class="solution-card" class:reverse>
-  <div style:padding={illustrationPadding} class="illustration">
+  <div
+    style:padding={illustrationPadding}
+    class="illustration"
+    style:--illustration-scale={illustrationScale}
+  >
     <slot name="illustration"></slot>
   </div>
   <div class="content">
@@ -62,6 +67,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transform: scale(var(--illustration-scale, 1));
   }
 
   .content {
@@ -105,6 +111,7 @@
       margin: 0 auto;
       margin-top: -3rem;
       margin-bottom: 1rem;
+      transform: none;
     }
   }
 </style>
