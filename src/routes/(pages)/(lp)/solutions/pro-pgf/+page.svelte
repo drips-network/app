@@ -15,8 +15,8 @@
 </script>
 
 <HeadMeta
-  title="Wave"
-  description="Waves turn open-source sprints into on-chain funding cycles. Ecosystems launch recurring Waves to reward measurable impact — all tracked from issue to fund distribution."
+  title="Pro-PGF"
+  description="Pro-PGF gives ecosystems a structured, transparent way to fund essential public goods. It supports new initiatives and ongoing projects that keep your ecosystem healthy and growing."
 />
 
 <SolutionHeader>
