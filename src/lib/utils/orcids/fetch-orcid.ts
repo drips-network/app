@@ -107,13 +107,11 @@ export async function fetchOrcidAccount(orcidId: string, fetch?: typeof global.f
     fetch,
   );
 
-  if (!result.orcidLinkedIdentityByOrcid) {
-    return null;
+  if (result.orcidLinkedIdentityByOrcid) {
+    // For sandboxed ORCID iDs, strip the 'sandbox-' prefix before returning to the caller
+    // for the sake of front-end continuity.
+    result.orcidLinkedIdentityByOrcid.orcid = orcidId;
   }
-
-  // For sandboxed ORCID iDs, strip the 'sandbox-' prefix before returning to the caller
-  // for the sake of front-end continuity.
-  result.orcidLinkedIdentityByOrcid.orcid = orcidId;
 
   return result;
 }
