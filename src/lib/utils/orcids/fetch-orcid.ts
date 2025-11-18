@@ -98,7 +98,7 @@ const getOrcidQuery = gql`
 `;
 
 export async function fetchOrcidAccount(orcidId: string, fetch?: typeof global.fetch) {
-  return query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
+  const result = await query<OrcidByAccountIdQuery, OrcidByAccountIdQueryVariables>(
     getOrcidQuery,
     {
       orcid: orcidIdToSandoxOrcidId(orcidId),
@@ -106,4 +106,14 @@ export async function fetchOrcidAccount(orcidId: string, fetch?: typeof global.f
     },
     fetch,
   );
+
+  if (!result.orcidLinkedIdentityByOrcid) {
+    return null;
+  }
+
+  // For sandboxed ORCID iDs, strip the 'sandbox-' prefix before returning to the caller
+  // for the sake of front-end continuity.
+  result.orcidLinkedIdentityByOrcid.orcid = orcidId;
+
+  return result;
 }
