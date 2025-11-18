@@ -79,7 +79,7 @@
   <svelte:fragment slot="line-items">
     <SolutionLineItem icon={Ecosystem}>
       Ecosystems: Drive developer activity, launch recurring funding cycles, manage applicants and
-      payouts in a unified flow.
+      distributions in a unified flow.
     </SolutionLineItem>
     <SolutionLineItem icon={User}>
       Maintainers: Attract high-quality contributors, grow the community, set issue priorities, sync

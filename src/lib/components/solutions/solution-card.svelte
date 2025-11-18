@@ -48,6 +48,7 @@
     margin-top: 2rem;
     border: 1px solid var(--color-foreground-level-2);
     border-radius: 2rem 0 2rem 2rem;
+    gap: 1rem;
   }
 
   .solution-card.reverse {
