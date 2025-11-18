@@ -10,6 +10,7 @@
   import SolutionsPropgfEverythingYouNeed from '$lib/components/illustrations/solutions-propgf-everything-you-need.svelte';
   import SolutionCard from '$lib/components/solutions/solution-card.svelte';
   import SolutionHeader from '$lib/components/solutions/solution-header.svelte';
+  import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
   import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
   import ThemedRasterImage from '$lib/components/themed-raster-image/themed-raster-image.svelte';
 </script>
@@ -59,6 +60,14 @@
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>
+
+<SolutionInterstitial>
+  <svelte:fragment slot="headline">Want fair, on-chain rewards for your community?</svelte:fragment>
+  <svelte:fragment slot="description">
+    Our team can walk you through how Drips fits into your workflow, help you design repeatable
+    funding cycles, and show you how to reward meaningful work with full on-chain accountability.
+  </svelte:fragment>
+</SolutionInterstitial>
 
 <SolutionCard reverse illustrationScale="1.1">
   <svelte:fragment slot="illustration">
