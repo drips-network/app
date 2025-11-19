@@ -13,6 +13,7 @@
   export let applications: ListingApplication[];
   export let round: Round;
   export let signedIn: boolean;
+  export let hideState = false;
 
   export let reviewMode = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
@@ -21,6 +22,8 @@
   export let ballotStore: Writable<InProgressBallot> = writable({});
 
   export let horizontalScroll = false;
+
+  export let displayVisibilityNote = false;
 
   let searchQuery = '';
 
@@ -56,7 +59,9 @@
       {reviewMode}
       {round}
       {signedIn}
+      {displayVisibilityNote}
       bind:decisions
+      {hideState}
     />
   </PaddedHorizontalScroll>
 {:else}
@@ -71,6 +76,8 @@
     {signedIn}
     bind:decisions
     ellipsis={true}
+    {displayVisibilityNote}
+    {hideState}
   />
 {/if}
 

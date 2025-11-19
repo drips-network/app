@@ -33,8 +33,8 @@
       round={data.round}
       {ballotStore}
       applications={selectedApplications}
-      horizontalScroll
       signedIn={data.rpgfUserData !== undefined}
+      hideState
     />
   </div>
 </ThreePaneLayout>

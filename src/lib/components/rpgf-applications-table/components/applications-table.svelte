@@ -4,12 +4,15 @@
   import ApplicationLineItem from './application-line-item.svelte';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import type { Round } from '$lib/utils/rpgf/types/round';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   export let includesResults: boolean;
   export let applications: ListingApplication[];
   export let filteredApplications: ListingApplication[];
   export let ellipsis: boolean = false;
   export let signedIn: boolean;
+  export let displayVisibilityNote = false;
+  export let hideState = false;
 
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot>;
@@ -35,6 +38,7 @@
           {reviewMode}
           {round}
           {application}
+          {hideState}
           bind:decision={decisions[application.id]}
         />
       {/each}
@@ -44,6 +48,13 @@
         </div>
       {/if}
     </div>
+    {#if displayVisibilityNote}
+      <AnnotationBox type="info">
+        <span class="typo-text-small-bold">Don't see your application?</span>
+        Only round admins can see applications before they've been approved. To check on the status of
+        your own applications, ensure you're signed in with the wallet address you used to submit it.
+      </AnnotationBox>
+    {/if}
   </div>
 </div>
 

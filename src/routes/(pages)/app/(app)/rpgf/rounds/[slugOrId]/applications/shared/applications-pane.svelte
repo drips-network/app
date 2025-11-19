@@ -141,6 +141,7 @@
     {ballotStore}
     applications={allApplications}
     signedIn={loggedIn}
+    displayVisibilityNote={!round.isAdmin}
   />
 </div>
 

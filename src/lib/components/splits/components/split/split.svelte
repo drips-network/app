@@ -107,6 +107,19 @@
               outline: true,
             },
           } as ComponentAndProps;
+        case 'LinkedIdentityReceiver':
+          if (s.linkedIdentity.owner?.address) {
+            return {
+              component: IdentityBadge,
+              props: {
+                showIdentity: false,
+                address: s.linkedIdentity.owner.address,
+                size: 'medium',
+                disableLink: true,
+              },
+            } as ComponentAndProps;
+          }
+          return undefined;
       }
     });
   }
@@ -215,7 +228,21 @@
             {linkToNewTab}
             project={split.project}
           />
+          project={split.project}
+          />
         </PrimaryColorThemer>
+      {:else if split.__typename === 'LinkedIdentityReceiver'}
+        {#if split.linkedIdentity.owner?.address}
+          <IdentityBadge
+            {disableTooltip}
+            {disableLink}
+            {linkToNewTab}
+            address={split.linkedIdentity.owner.address}
+            size="medium"
+          />
+        {:else}
+          <div class="typo-text-small">{split.linkedIdentity.orcid}</div>
+        {/if}
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"

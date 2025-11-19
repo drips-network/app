@@ -31,7 +31,13 @@ import {
   type ListingApplication,
   type UpdateApplicationDto,
 } from './types/application';
-import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
+import {
+  ballotSchema,
+  wrappedBallotSchema,
+  type Ballot,
+  type SubmitBallotDto,
+  type WrappedBallot,
+} from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
 import { auditLogSchema, type AuditLog } from './types/auditLog';
 import {
@@ -40,6 +46,7 @@ import {
   type KycRequest,
 } from './types/kyc';
 import { customDatasetSchema, type CustomDataset } from './types/customDataset';
+import { signBallot } from './sign-ballot';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -168,12 +175,9 @@ export async function createRound(f = fetch, draft: CreateRoundDto): Promise<Rou
 
 export async function updateRound(f = fetch, id: string, draft: PatchRoundDto): Promise<Round> {
   // strip empty fields
-  const strippedDraft: PatchRoundDto = Object.fromEntries(
-    Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
-  );
-
-  // ...except customAvatarCid, which can be null
-  strippedDraft.customAvatarCid = draft.customAvatarCid ?? null;
+  const strippedDraft = Object.fromEntries(
+    Object.entries(draft).filter(([_, value]) => value !== undefined && value !== ''),
+  ) as PatchRoundDto;
 
   const res = await authenticatedRpgfServerCall(`/rounds/${id}`, 'PATCH', strippedDraft, f);
 
@@ -351,13 +355,76 @@ export async function castBallot(
   roundSlug: string,
   ballot: Ballot,
 ): Promise<WrappedBallot> {
+  const { signature, chainId } = await signBallot(ballot);
+
   const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots`,
     'PUT',
     {
       ballot,
-    },
+      signature,
+      chainId,
+    } satisfies SubmitBallotDto,
     f,
+  );
+
+  const parsed = wrappedBallotSchema.parse(await res.json());
+  return parsed;
+}
+
+type SpreadsheetFormat = 'csv' | 'xlsx';
+type SpreadsheetBody = string | ArrayBuffer;
+
+const SPREADSHEET_CONTENT_TYPE: Record<
+  SpreadsheetFormat,
+  Parameters<typeof authenticatedRpgfServerCall>[6]
+> = {
+  csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+};
+
+export async function parseBallotSpreadsheet(
+  f = fetch,
+  roundSlug: string,
+  data: SpreadsheetBody,
+  format: SpreadsheetFormat,
+): Promise<Ballot> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/parse-spreadsheet?format=${format}`,
+    'POST',
+    data,
+    f,
+    true,
+    false,
+    SPREADSHEET_CONTENT_TYPE[format],
+  );
+
+  return z.object({ ballot: ballotSchema }).parse(await res.json()).ballot;
+}
+
+async function submitSpreadsheetBallot(
+  f = fetch,
+  roundSlug: string,
+  data: SpreadsheetBody,
+  format: SpreadsheetFormat,
+): Promise<WrappedBallot> {
+  const ballot = await parseBallotSpreadsheet(f, roundSlug, data, format);
+  const { signature, chainId } = await signBallot(ballot);
+
+  const query = new URLSearchParams({
+    format,
+    signature,
+    chainId: chainId.toString(),
+  });
+
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/spreadsheet?${query.toString()}`,
+    'POST',
+    data,
+    f,
+    true,
+    false,
+    SPREADSHEET_CONTENT_TYPE[format],
   );
 
   const parsed = wrappedBallotSchema.parse(await res.json());
@@ -369,18 +436,7 @@ export async function castBallotAsCsv(
   roundSlug: string,
   data: string,
 ): Promise<WrappedBallot> {
-  const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots/spreadsheet?format=csv`,
-    'POST',
-    data,
-    f,
-    true,
-    false,
-    'text/csv',
-  );
-
-  const parsed = wrappedBallotSchema.parse(await res.json());
-  return parsed;
+  return submitSpreadsheetBallot(f, roundSlug, data, 'csv');
 }
 
 export async function castBallotAsXlsx(
@@ -388,18 +444,7 @@ export async function castBallotAsXlsx(
   roundSlug: string,
   data: ArrayBuffer,
 ): Promise<WrappedBallot> {
-  const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots/spreadsheet?format=xlsx`,
-    'POST',
-    data,
-    f,
-    true,
-    false,
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  );
-
-  const parsed = wrappedBallotSchema.parse(await res.json());
-  return parsed;
+  return submitSpreadsheetBallot(f, roundSlug, data, 'xlsx');
 }
 
 export async function getOwnBallot(f = fetch, roundSlug: string): Promise<WrappedBallot | null> {

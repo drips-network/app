@@ -86,13 +86,7 @@
       <ChevronRight style="fill: var(--color-foreground)" />
     </div>
     <div class="header">
-      <div
-        class="avatar"
-        style:width="fit-content"
-        style:view-transition-name="project-avatar-{project.source.ownerName}-{project.source
-          .repoName}"
-        style:view-transition-class="element-handover"
-      >
+      <div class="avatar" style:width="fit-content">
         <ProjectAvatar project={projectChainData} size="large" />
       </div>
     </div>

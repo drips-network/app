@@ -10,9 +10,15 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import { page } from '$app/stores';
+  import { getContext, onDestroy } from 'svelte';
+  import {
+    ballotValidationContextKey,
+    type BallotValidationErrorsStore,
+  } from '$lib/utils/rpgf/ballot-validation-context';
 
   export let round: Round;
   export let application: ListingApplication;
+  export let hideState = false;
 
   export let reviewMode: boolean;
   export let decision: ComponentProps<ApplicationDecisionButtons>['decision'] = null;
@@ -47,46 +53,109 @@
   }
   $: updateBallot(picked);
 
-  let voteAmountInput: string | undefined = String($ballotStore[application.id]);
-  let voteAmountInputValidationState: TextInputValidationState;
+  let voteAmountInput: string | undefined =
+    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]);
+  let voteAmountInputValidationState: TextInputValidationState = { type: 'unvalidated' };
+
+  const ballotValidationErrors = getContext<BallotValidationErrorsStore | undefined>(
+    ballotValidationContextKey,
+  );
+
+  function updateValidationErrors(state: TextInputValidationState) {
+    if (!ballotValidationErrors) return;
+
+    ballotValidationErrors.update((current) => {
+      const next = new Set(current);
+
+      if (state.type === 'invalid') {
+        next.add(application.id);
+      } else {
+        next.delete(application.id);
+      }
+
+      return next;
+    });
+  }
+
+  function setValidationState(state: TextInputValidationState) {
+    voteAmountInputValidationState = state;
+    updateValidationErrors(state);
+  }
+
+  $: votePlaceholder =
+    round.minVotesPerProjectPerVoter !== null && round.maxVotesPerProjectPerVoter !== null
+      ? `${round.minVotesPerProjectPerVoter}-${round.maxVotesPerProjectPerVoter}`
+      : round.minVotesPerProjectPerVoter !== null
+        ? `${round.minVotesPerProjectPerVoter}+`
+        : round.maxVotesPerProjectPerVoter !== null
+          ? `0-${round.maxVotesPerProjectPerVoter}`
+          : undefined;
 
   function updateVoteAmount(voteAmountInput: string | undefined) {
-    if (voteStep !== 'assign-votes') return;
-    if (!picked) return;
+    if (voteStep !== 'assign-votes') {
+      setValidationState({ type: 'unvalidated' });
+      return;
+    }
 
-    if (voteAmountInput == undefined || Number.isNaN(Number(voteAmountInput))) {
-      voteAmountInputValidationState = { type: 'unvalidated' };
+    if (!picked) {
+      setValidationState({ type: 'unvalidated' });
+      return;
+    }
+
+    const parsedValue = Number(voteAmountInput);
+
+    if (!voteAmountInput || !parsedValue || Number.isNaN(parsedValue)) {
+      setValidationState({ type: 'unvalidated' });
       $ballotStore = {
         ...$ballotStore,
         [application.id]: null,
       };
-    } else if (Number(voteAmountInput) < 0) {
-      voteAmountInputValidationState = {
+    } else if (parsedValue < 0) {
+      setValidationState({
         type: 'invalid',
         message: 'Vote amount must be a positive number.',
-      };
+      });
       $ballotStore = {
         ...$ballotStore,
         [application.id]: null,
       };
-    } else if (Number(voteAmountInput) > (round.maxVotesPerProjectPerVoter ?? 0)) {
-      voteAmountInputValidationState = {
+    } else if (
+      !!round.minVotesPerProjectPerVoter &&
+      parsedValue < round.minVotesPerProjectPerVoter
+    ) {
+      setValidationState({
+        type: 'invalid',
+        message: `Vote amount must be at least ${round.minVotesPerProjectPerVoter}.`,
+      });
+      $ballotStore = {
+        ...$ballotStore,
+        [application.id]: null,
+      };
+    } else if (
+      !!round.maxVotesPerProjectPerVoter &&
+      parsedValue > round.maxVotesPerProjectPerVoter
+    ) {
+      setValidationState({
         type: 'invalid',
         message: `Vote amount must not exceed ${round.maxVotesPerProjectPerVoter}.`,
-      };
+      });
       $ballotStore = {
         ...$ballotStore,
         [application.id]: null,
       };
     } else {
-      voteAmountInputValidationState = { type: 'valid' };
+      setValidationState({ type: 'valid' });
       $ballotStore = {
         ...$ballotStore,
-        [application.id]: Number(voteAmountInput),
+        [application.id]: parsedValue,
       };
     }
   }
   $: updateVoteAmount(voteAmountInput);
+
+  onDestroy(() => {
+    updateValidationErrors({ type: 'unvalidated' });
+  });
 
   $: active = $page.url.href.includes(`/applications/${application.id}`);
 
@@ -104,7 +173,7 @@
   data-testid="application-line-item-{application.id}"
 >
   <svelte:element this={smallLink ? 'a' : 'div'} href={link} class:ellipsis>
-    <RpgfApplicationBadge short {application} />
+    <RpgfApplicationBadge {hideState} short {application} />
   </svelte:element>
 
   {#if reviewMode && application.state === 'pending'}
@@ -121,8 +190,8 @@
         on:click={(e) => e.preventDefault()}
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
-        variant={{ type: 'number', min: 0 }}
-        placeholder="0-{round.maxVotesPerProjectPerVoter}"
+        variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
+        placeholder={votePlaceholder ?? '0+'}
       />
     </div>
   {/if}
@@ -162,5 +231,6 @@
 
   .vote-count-input {
     width: 8rem;
+    flex-shrink: 0;
   }
 </style>

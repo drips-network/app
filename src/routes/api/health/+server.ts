@@ -25,11 +25,17 @@ async function checkRpc() {
 }
 
 async function checkLp(f: typeof fetch) {
-  await f('/', { signal: AbortSignal.timeout(10000) });
+  const response = await f('/', { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) {
+    throw new Error(`Landing page returned status ${response.status}`);
+  }
 }
 
 async function checkExplore(f: typeof fetch) {
-  await f('/app', { signal: AbortSignal.timeout(10000) });
+  const response = await f('/app', { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) {
+    throw new Error(`Explore page returned status ${response.status}`);
+  }
 }
 
 export const GET = async ({ fetch }) => {
@@ -38,7 +44,8 @@ export const GET = async ({ fetch }) => {
   const checks = [
     { name: 'GraphQL API', fn: checkGqlApi },
     { name: 'RPC', fn: checkRpc },
-    { name: 'Landing Page', fn: () => checkLp(fetch) },
+    // Skip LP check if in alternative chain mode (redirects to /app)
+    ...(network.alternativeChainMode ? [] : [{ name: 'Landing Page', fn: () => checkLp(fetch) }]),
     { name: 'Explore', fn: () => checkExplore(fetch) },
   ];
 
@@ -59,7 +66,19 @@ export const GET = async ({ fetch }) => {
   );
 
   const errors = results
-    .map((result) => (result.status === 'rejected' ? result.reason : null))
+    .map((result) => {
+      if (result.status === 'rejected') {
+        const { error } = result.reason;
+        if (!error) {
+          return result.reason;
+        }
+
+        // Ensure error properly serialized later when returning failing status.
+        return JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      }
+
+      return null;
+    })
     .filter((error) => error !== null);
 
   if (errors.length > 0) {

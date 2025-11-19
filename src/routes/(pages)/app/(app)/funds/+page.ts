@@ -5,12 +5,9 @@ import { redirect } from '@sveltejs/kit';
 import { USER_BALANCES_FRAGMENT } from './sections/balances.section.svelte';
 import buildUrl from '$lib/utils/build-url';
 import getConnectedAddress from '$lib/utils/get-connected-address';
-import { makeFetchedDataCache } from '$lib/stores/fetched-data-cache/fetched-data-cache.store';
 import type { UserStreamsQuery, UserStreamsQueryVariables } from './__generated__/gql.generated';
 import network from '$lib/stores/wallet/network';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
-
-const fetchedDataCache = makeFetchedDataCache<UserStreamsQuery>('dashboard:funds');
 
 export const load = async ({ fetch }) => {
   const connectedAddress = getConnectedAddress();
@@ -37,18 +34,14 @@ export const load = async ({ fetch }) => {
     }
   `;
 
-  const res =
-    fetchedDataCache.read() ??
-    (await query<UserStreamsQuery, UserStreamsQueryVariables>(
-      streamsQuery,
-      {
-        connectedAddress,
-        chains: [network.gqlName],
-      },
-      fetch,
-    ));
-
-  fetchedDataCache.write(res);
+  const res = await query<UserStreamsQuery, UserStreamsQueryVariables>(
+    streamsQuery,
+    {
+      connectedAddress,
+      chains: [network.gqlName],
+    },
+    fetch,
+  );
 
   const chainData = filterCurrentChainData(res.userByAddress.chainData);
 

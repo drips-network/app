@@ -18,8 +18,12 @@
   import type { InProgressBallot, WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import unreachable from '$lib/utils/unreachable.js';
-  import { onMount } from 'svelte';
-  import type { Writable } from 'svelte/store';
+  import { onMount, setContext } from 'svelte';
+  import { writable, type Writable } from 'svelte/store';
+  import {
+    ballotValidationContextKey,
+    type BallotValidationErrorsStore,
+  } from '$lib/utils/rpgf/ballot-validation-context';
 
   export let round: Round;
   export let ballot: Writable<InProgressBallot> & {
@@ -31,6 +35,9 @@
   export let existingBallot: WrappedBallot | null;
   export let pageIsEmpty = false;
   export let hideAppsPane = false;
+
+  const ballotValidationErrors: BallotValidationErrorsStore = writable(new Set());
+  setContext(ballotValidationContextKey, ballotValidationErrors);
 
   onMount(() => {
     forceCollapsed.set(true);
@@ -111,7 +118,12 @@
         {/if}
 
         {#if voteMode}
-          <RpgfVotingCard previouslyCastBallot={existingBallot} {round} ballot={ballotStore} />
+          <RpgfVotingCard
+            previouslyCastBallot={existingBallot}
+            {round}
+            ballot={ballotStore}
+            {ballotValidationErrors}
+          />
         {/if}
 
         {#if resultsMode}
@@ -199,6 +211,8 @@
     gap: 1rem;
     position: sticky;
     top: 6rem;
+    view-transition-name: rpgf-applications-sidebar;
+    view-transition-class: element-handover;
   }
 
   .sidebar-card {
@@ -208,8 +222,6 @@
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
-    view-transition-name: rpgf-applications-sidebar-card;
-    view-transition-class: element-handover;
   }
 
   .page {
@@ -220,7 +232,8 @@
   }
 
   @media (max-width: 1400px) {
-    .applications-layout.three-column {
+    .applications-layout.three-column,
+    .applications-layout.three-column.apps-pane-hidden {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
       grid-template-areas: 'sidebar' 'page';

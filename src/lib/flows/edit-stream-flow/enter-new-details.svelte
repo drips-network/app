@@ -53,7 +53,7 @@
   import { buildEditStreamBatch } from '$lib/utils/streams/streams';
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
-  import { invalidateAll } from '$lib/stores/fetched-data-cache/invalidate';
+  import { invalidateAll } from '$app/navigation';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import { populateCallerWriteTx } from '$lib/utils/sdk/caller/caller';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
