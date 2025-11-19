@@ -12,6 +12,7 @@
   export let ellipsis: boolean = false;
   export let signedIn: boolean;
   export let displayVisibilityNote = false;
+  export let hideState = false;
 
   export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
   export let ballotStore: Writable<InProgressBallot>;
@@ -37,6 +38,7 @@
           {reviewMode}
           {round}
           {application}
+          {hideState}
           bind:decision={decisions[application.id]}
         />
       {/each}

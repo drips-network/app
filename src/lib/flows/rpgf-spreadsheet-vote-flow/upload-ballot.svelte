@@ -7,7 +7,7 @@
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import FileCSV from '$lib/components/icons/FileCSV.svelte';
   import FileXLSX from '$lib/components/icons/FileXLSX.svelte';
-  import Sharrow from '$lib/components/icons/Sharrow.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
@@ -91,7 +91,7 @@
 
   function handleSubmit() {
     dispatch('await', {
-      message: 'Submitting ballot…',
+      message: 'Please confirm your ballot in your wallet...',
       promise: async () => {
         if (!loadedFile || !fileData || !filetype) return;
 
@@ -256,7 +256,7 @@
         {/if}
 
         <div class="actions" style:margin-top="1rem">
-          <Button icon={Sharrow} disabled={!fileData} variant="primary" on:click={handleSubmit}
+          <Button icon={Wallet} disabled={!fileData} variant="primary" on:click={handleSubmit}
             >Submit ballot</Button
           >
         </div>
