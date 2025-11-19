@@ -7,7 +7,9 @@
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
+    ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT}
+    ${SPLITS_COMPONENT_LINKED_IDENTITY_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${SUPPORTER_PILE_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
@@ -38,6 +40,9 @@
         }
         ... on SubListReceiver {
           ...SplitsComponentSubListReceiver
+        }
+        ... on LinkedIdentityReceiver {
+          ...SplitsComponentLinkedIdentityReceiver
         }
       }
       totalEarned {
@@ -123,6 +128,7 @@
     type SplitsComponentSplitsReceiver,
     SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT,
+    SPLITS_COMPONENT_LINKED_IDENTITY_RECEIVER_FRAGMENT,
   } from '../splits/types';
   import { invalidateAll } from '$app/navigation';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';

@@ -33,8 +33,8 @@
       round={data.round}
       {ballotStore}
       applications={selectedApplications}
-      horizontalScroll
       signedIn={data.rpgfUserData !== undefined}
+      hideState
     />
   </div>
 </ThreePaneLayout>
@@ -44,8 +44,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    max-width: 1024px;
-    margin: 0 auto;
   }
 
   .header {

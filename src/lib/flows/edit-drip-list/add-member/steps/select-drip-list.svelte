@@ -31,6 +31,11 @@
             accountId
           }
         }
+        ... on LinkedIdentityReceiver {
+          account {
+            accountId
+          }
+        }
       }
     }
   `;

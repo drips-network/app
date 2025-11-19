@@ -12,6 +12,7 @@ import type {
   SplitReceiversToListEditorConfigProjectReceiverFragment,
   SplitReceiversToListEditorConfigEcosystemReceiverFragment,
   SplitReceiversToListEditorConfigSubListReceiverFragment,
+  SplitReceiversToListEditorConfigLinkedIdentityReceiverFragment,
 } from './__generated__/gql.generated';
 
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT = gql`
@@ -82,13 +83,31 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
   }
 `;
 
+export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_LINKED_IDENTITY_RECEIVER_FRAGMENT = gql`
+  fragment SplitReceiversToListEditorConfigLinkedIdentityReceiver on LinkedIdentityReceiver {
+    weight
+    account {
+      accountId
+    }
+    linkedIdentity {
+      ... on OrcidLinkedIdentity {
+        orcid
+        owner {
+          address
+        }
+      }
+    }
+  }
+`;
+
 // cannot yet split to an ecosystem
 export type SplitReceiver =
   | SplitReceiversToListEditorConfigAddressReceiverFragment
   | SplitReceiversToListEditorConfigDripListReceiverFragment
   | SplitReceiversToListEditorConfigProjectReceiverFragment
   | SplitReceiversToListEditorConfigEcosystemReceiverFragment
-  | SplitReceiversToListEditorConfigSubListReceiverFragment;
+  | SplitReceiversToListEditorConfigSubListReceiverFragment
+  | SplitReceiversToListEditorConfigLinkedIdentityReceiverFragment;
 
 function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
   switch (input.__typename) {
@@ -102,6 +121,9 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
       return { type: 'ecosystem', ecosystem: input.ecosystemMainAccount };
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
+    case 'LinkedIdentityReceiver':
+      // TODO: Add support for linked identities in the list editor
+      throw new Error('LinkedIdentityReceiver not supported in list editor');
   }
 }
 
@@ -117,6 +139,8 @@ function extractAccountId(input: SplitReceiver) {
       return input.ecosystemMainAccount.account.accountId;
     case 'SubListReceiver':
       return input.subList.account.accountId;
+    case 'LinkedIdentityReceiver':
+      return input.account.accountId;
   }
 }
 
