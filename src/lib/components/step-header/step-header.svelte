@@ -7,6 +7,7 @@
 </script>
 
 <div class="step-header">
+  <slot name="emoji" />
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
   {#if headline}<h1>{headline}</h1>{/if}
   {#if description}<p>{description}</p>{/if}

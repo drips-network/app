@@ -8,6 +8,7 @@ import type {
   CreateStreamFlowAddressDriverAccountFragment,
   CreateStreamFlowDetailsNftDriverAccountFragment,
   CreateStreamFlowEcosystemAccountFragment,
+  CreateStreamFlowOrcidAccountFragment,
 } from './__generated__/gql.generated';
 import FetchData from './fetch-data.svelte';
 
@@ -16,7 +17,8 @@ export default (
   receiver?:
     | CreateStreamFlowDetailsNftDriverAccountFragment
     | CreateStreamFlowAddressDriverAccountFragment
-    | CreateStreamFlowEcosystemAccountFragment,
+    | CreateStreamFlowEcosystemAccountFragment
+    | CreateStreamFlowOrcidAccountFragment,
 ) => ({
   context: () => createStreamFlowState(receiver, tokenAddress),
   steps: [

@@ -12,7 +12,7 @@ import type {
   SplitReceiversToListEditorConfigProjectReceiverFragment,
   SplitReceiversToListEditorConfigEcosystemReceiverFragment,
   SplitReceiversToListEditorConfigSubListReceiverFragment,
-  SplitReceiversToListEditorConfigLinkedIdentityReceiverFragment,
+  SplitReceiversToListEditorConfigOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT = gql`
@@ -83,18 +83,18 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = 
   }
 `;
 
-export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_LINKED_IDENTITY_RECEIVER_FRAGMENT = gql`
-  fragment SplitReceiversToListEditorConfigLinkedIdentityReceiver on LinkedIdentityReceiver {
+export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
+  fragment SplitReceiversToListEditorConfigOrcidReceiver on LinkedIdentityReceiver {
     weight
-    account {
-      accountId
-    }
     linkedIdentity {
       ... on OrcidLinkedIdentity {
-        orcid
-        owner {
-          address
+        areSplitsValid
+        isClaimed
+        chain
+        account {
+          accountId
         }
+        orcid
       }
     }
   }
@@ -107,7 +107,7 @@ export type SplitReceiver =
   | SplitReceiversToListEditorConfigProjectReceiverFragment
   | SplitReceiversToListEditorConfigEcosystemReceiverFragment
   | SplitReceiversToListEditorConfigSubListReceiverFragment
-  | SplitReceiversToListEditorConfigLinkedIdentityReceiverFragment;
+  | SplitReceiversToListEditorConfigOrcidReceiverFragment;
 
 function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
   switch (input.__typename) {
@@ -122,8 +122,10 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
     case 'SubListReceiver':
       return { type: 'subList', subList: input.subList };
     case 'LinkedIdentityReceiver':
-      // TODO: Add support for linked identities in the list editor
-      throw new Error('LinkedIdentityReceiver not supported in list editor');
+      return {
+        type: 'orcid',
+        orcid: input.linkedIdentity,
+      };
   }
 }
 
@@ -140,7 +142,7 @@ function extractAccountId(input: SplitReceiver) {
     case 'SubListReceiver':
       return input.subList.account.accountId;
     case 'LinkedIdentityReceiver':
-      return input.account.accountId;
+      return input.linkedIdentity.account.accountId;
   }
 }
 

@@ -39,6 +39,3 @@
     >
   </svelte:fragment>
 </StandaloneFlowStepLayout>
-
-<style>
-</style>

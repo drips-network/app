@@ -14,7 +14,7 @@ import type {
   EditProjectSplitsFlowProjectReceiverFragment,
   EditProjectSplitsFlowEcosystemReceiverFragment,
   EditProjectSplitsFlowSubListReceiverFragment,
-  EditProjectSplitsFlowLinkedIdentityReceiverFragment,
+  EditProjectSplitsFlowOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 import {
   mapSplitReceiversToEditorConfig,
@@ -23,7 +23,7 @@ import {
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ECOSYSTEM_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_LINKED_IDENTITY_RECEIVER_FRAGMENT,
+  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 import type { AddItemError } from '$lib/components/list-editor/errors';
 
@@ -69,10 +69,10 @@ export const EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT = gql`
   }
 `;
 
-export const EDIT_PROJECT_SPLITS_FLOW_LINKED_IDENTITY_RECEIVER_FRAGMENT = gql`
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_LINKED_IDENTITY_RECEIVER_FRAGMENT}
-  fragment EditProjectSplitsFlowLinkedIdentityReceiver on LinkedIdentityReceiver {
-    ...SplitReceiversToListEditorConfigLinkedIdentityReceiver
+export const EDIT_PROJECT_SPLITS_FLOW_ORCID_RECEIVER_FRAGMENT = gql`
+  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT}
+  fragment EditProjectSplitsFlowOrcidReceiver on LinkedIdentityReceiver {
+    ...SplitReceiversToListEditorConfigOrcidReceiver
   }
 `;
 
@@ -82,7 +82,7 @@ type SplitReceiver =
   | EditProjectSplitsFlowProjectReceiverFragment
   | EditProjectSplitsFlowEcosystemReceiverFragment
   | EditProjectSplitsFlowSubListReceiverFragment
-  | EditProjectSplitsFlowLinkedIdentityReceiverFragment;
+  | EditProjectSplitsFlowOrcidReceiverFragment;
 
 type Splits = {
   maintainers: EditProjectSplitsFlowAddressReceiverFragment[];

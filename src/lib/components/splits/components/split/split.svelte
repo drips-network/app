@@ -20,6 +20,8 @@
   import unreachable from '$lib/utils/unreachable';
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
+  import OrcidBadge from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 
   export let split: SplitsComponentSplitsReceiver | SplitGroup;
   export let disableLink = true;
@@ -108,18 +110,10 @@
             },
           } as ComponentAndProps;
         case 'LinkedIdentityReceiver':
-          if (s.linkedIdentity.owner?.address) {
-            return {
-              component: IdentityBadge,
-              props: {
-                showIdentity: false,
-                address: s.linkedIdentity.owner.address,
-                size: 'medium',
-                disableLink: true,
-              },
-            } as ComponentAndProps;
-          }
-          return undefined;
+          return {
+            component: OrcidAvatar,
+            props: { size: 'small' },
+          } as ComponentAndProps;
       }
     });
   }
@@ -232,17 +226,7 @@
           />
         </PrimaryColorThemer>
       {:else if split.__typename === 'LinkedIdentityReceiver'}
-        {#if split.linkedIdentity.owner?.address}
-          <IdentityBadge
-            {disableTooltip}
-            {disableLink}
-            {linkToNewTab}
-            address={split.linkedIdentity.owner.address}
-            size="medium"
-          />
-        {:else}
-          <div class="typo-text-small">{split.linkedIdentity.orcid}</div>
-        {/if}
+        <OrcidBadge {chainOverride} orcid={split.linkedIdentity} />
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"

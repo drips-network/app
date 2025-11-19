@@ -7,7 +7,7 @@ import type {
   SplitsComponentProjectReceiverFragment,
   SplitsComponentEcosystemReceiverFragment,
   SplitsComponentSubListReceiverFragment,
-  SplitsComponentLinkedIdentityReceiverFragment,
+  SplitsComponentOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
 
@@ -99,14 +99,21 @@ export const SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT = gql`
   }
 `;
 
-export const SPLITS_COMPONENT_LINKED_IDENTITY_RECEIVER_FRAGMENT = gql`
-  fragment SplitsComponentLinkedIdentityReceiver on LinkedIdentityReceiver {
+export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
+  fragment SplitsComponentOrcidReceiver on LinkedIdentityReceiver {
     weight
     linkedIdentity {
       ... on OrcidLinkedIdentity {
+        chain
+        isClaimed
+        areSplitsValid
+        account {
+          accountId
+        }
         orcid
-        owner {
-          address
+        orcidMetadata {
+          givenName
+          familyName
         }
       }
     }
@@ -120,7 +127,7 @@ export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
   ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
   ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
   ${SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT}
-  ${SPLITS_COMPONENT_LINKED_IDENTITY_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT}
   fragment SplitsComponentProjectSplits on ProjectData {
     ... on ClaimedProjectData {
       splits {
@@ -141,7 +148,7 @@ export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
             ...SplitsComponentSubListReceiver
           }
           ... on LinkedIdentityReceiver {
-            ...SplitsComponentLinkedIdentityReceiver
+            ...SplitsComponentOrcidReceiver
           }
         }
         maintainers {
@@ -160,7 +167,7 @@ export type SplitsComponentSplitsReceiver =
   | SplitsComponentProjectReceiverFragment
   | SplitsComponentEcosystemReceiverFragment
   | SplitsComponentSubListReceiverFragment
-  | SplitsComponentLinkedIdentityReceiverFragment;
+  | SplitsComponentOrcidReceiverFragment;
 
 export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
 

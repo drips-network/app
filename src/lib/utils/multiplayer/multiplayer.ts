@@ -16,6 +16,7 @@ import {
   revealResultsResponseSchema,
   ecosystemSchema,
   subListSchema,
+  orcidSchema,
 } from './schemas';
 import type { ethers } from 'ethers';
 import {
@@ -125,6 +126,7 @@ export function startVotingRound(
       | typeof dripListSchema
       | typeof ecosystemSchema
       | typeof subListSchema
+      | typeof orcidSchema
     >[];
   } & ({ dripListId: string } | { name: string; description?: string }),
   fetch = window.fetch,
