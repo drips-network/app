@@ -52,12 +52,20 @@
     } else if (updatedRound.maxVotesPerVoter < 1) {
       votesPerVoterValidationState = { type: 'invalid', message: 'Must be at least 1' };
     } else if (
+      updatedRound.minVotesPerProjectPerVoter &&
+      Number(updatedRound.maxVotesPerVoter) < Number(updatedRound.minVotesPerProjectPerVoter)
+    ) {
+      votesPerVoterValidationState = {
+        type: 'invalid',
+        message: `Must be at least ${Number(updatedRound.minVotesPerProjectPerVoter)} (minimum votes per project)`,
+      };
+    } else if (
       updatedRound.maxVotesPerProjectPerVoter &&
       Number(updatedRound.maxVotesPerVoter) < Number(updatedRound.maxVotesPerProjectPerVoter)
     ) {
       votesPerVoterValidationState = {
         type: 'invalid',
-        message: 'Must be equal or higher than max votes per project',
+        message: `Must be at least ${Number(updatedRound.maxVotesPerProjectPerVoter)} (maximum votes per project)`,
       };
     } else {
       votesPerVoterValidationState = { type: 'valid' };
@@ -71,6 +79,15 @@
     } else if (updatedRound.maxVotesPerProjectPerVoter < 1) {
       maxVotesPerProjectValidationState = { type: 'invalid', message: 'Must be at least 1' };
     } else if (
+      updatedRound.minVotesPerProjectPerVoter &&
+      Number(updatedRound.maxVotesPerProjectPerVoter) <
+        Number(updatedRound.minVotesPerProjectPerVoter)
+    ) {
+      maxVotesPerProjectValidationState = {
+        type: 'invalid',
+        message: 'Must be equal or higher than min votes per project',
+      };
+    } else if (
       updatedRound.maxVotesPerVoter &&
       Number(updatedRound.maxVotesPerProjectPerVoter) > Number(updatedRound.maxVotesPerVoter)
     ) {
@@ -80,6 +97,34 @@
       };
     } else {
       maxVotesPerProjectValidationState = { type: 'valid' };
+    }
+  }
+
+  let minVotesPerProjectValidationState: TextInputValidationState = { type: 'unvalidated' };
+  $: {
+    if (!updatedRound.minVotesPerProjectPerVoter) {
+      minVotesPerProjectValidationState = { type: 'unvalidated' };
+    } else if (updatedRound.minVotesPerProjectPerVoter < 1) {
+      minVotesPerProjectValidationState = { type: 'invalid', message: 'Must be at least 1' };
+    } else if (
+      updatedRound.maxVotesPerProjectPerVoter &&
+      Number(updatedRound.minVotesPerProjectPerVoter) >
+        Number(updatedRound.maxVotesPerProjectPerVoter)
+    ) {
+      minVotesPerProjectValidationState = {
+        type: 'invalid',
+        message: 'Must be equal or lower than max votes per project',
+      };
+    } else if (
+      updatedRound.maxVotesPerVoter &&
+      Number(updatedRound.minVotesPerProjectPerVoter) > Number(updatedRound.maxVotesPerVoter)
+    ) {
+      minVotesPerProjectValidationState = {
+        type: 'invalid',
+        message: 'Must be equal or lower than votes per voter',
+      };
+    } else {
+      minVotesPerProjectValidationState = { type: 'valid' };
     }
   }
 
@@ -107,28 +152,55 @@
   $: valid = Boolean(
     votesPerVoterValidationState.type !== 'invalid' &&
       maxVotesPerProjectValidationState.type !== 'invalid' &&
+      minVotesPerProjectValidationState.type !== 'invalid' &&
       voterGuidelinesLinkValidationState.type !== 'invalid',
   );
 
   $: changesMade =
     updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
     updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
+    updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
     updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
     !areStringArraysEqual(
       updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
       data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
     );
 
+  function normalizeOptionalNumberInput(value: unknown): number | null {
+    if (value === '' || value === null || value === undefined) {
+      return null;
+    }
+
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return parsed;
+  }
+
   async function saveHandler() {
+    const maxVotesPerVoter = normalizeOptionalNumberInput(updatedRound.maxVotesPerVoter);
+    const maxVotesPerProject = normalizeOptionalNumberInput(
+      updatedRound.maxVotesPerProjectPerVoter,
+    );
+    const minVotesPerProject = normalizeOptionalNumberInput(
+      updatedRound.minVotesPerProjectPerVoter,
+    );
+
     await updateRound(undefined, data.round.id, {
-      maxVotesPerVoter: updatedRound.maxVotesPerVoter
-        ? Number(updatedRound.maxVotesPerVoter)
-        : undefined,
-      maxVotesPerProjectPerVoter: updatedRound.maxVotesPerProjectPerVoter
-        ? Number(updatedRound.maxVotesPerProjectPerVoter)
-        : undefined,
+      maxVotesPerVoter,
+      maxVotesPerProjectPerVoter: maxVotesPerProject ?? null,
+      minVotesPerProjectPerVoter: minVotesPerProject ?? null,
       voterGuidelinesLink: updatedRound.voterGuidelinesLink,
     });
+
+    updatedRound = {
+      ...updatedRound,
+      maxVotesPerVoter,
+      maxVotesPerProjectPerVoter: maxVotesPerProject,
+      minVotesPerProjectPerVoter: minVotesPerProject,
+    };
 
     if (canUpdateVoters) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
@@ -136,11 +208,11 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round} invalid={!valid} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm invalid={!valid} saveEnabled={changesMade} {saveHandler}>
   {#if !isDraft}
     <div style:align-self="flex-start">
       <AnnotationBox>
-        You can no longer change the votes per voter or maximum votes per project for an ongoing,
+        You can no longer change the votes per voter or per-project vote limits for an ongoing,
         published round.
       </AnnotationBox>
     </div>
@@ -160,7 +232,20 @@
   </FormField>
 
   <FormField
-    title="Maximum votes per project*"
+    title="Minimum votes per project"
+    description="The minimum amount of votes that a badgeholder must allocate to any project they include on their ballot."
+    disabled={!isDraft}
+  >
+    <TextInput
+      placeholder="10"
+      validationState={minVotesPerProjectValidationState}
+      bind:value={updatedRound.minVotesPerProjectPerVoter}
+      variant={{ type: 'number', min: 1 }}
+    />
+  </FormField>
+
+  <FormField
+    title="Maximum votes per project"
     description="The maximum amount of votes any given badgeholder may allocate to a single project."
     disabled={!isDraft}
   >

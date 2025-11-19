@@ -18,6 +18,7 @@ import type {
 } from './queries/__generated__/gql.generated';
 import network from '$lib/stores/wallet/network';
 import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
+import FEATURED_DRIP_LISTS_CONFIG from '../../../(pages)/app/(app)/drip-lists/components/featured-drip-lists-config';
 
 const ENABLE_INVALIDATE_LOGS = true;
 
@@ -40,6 +41,18 @@ async function invalidateAccountCache(accountId: string, client: RedisClientType
   }
 }
 
+async function invalidateExplorePageCache(client: RedisClientType) {
+  log('INVALIDATE EXPLORE PAGE CACHE');
+
+  if (!client) return;
+
+  const pattern = `${network.name}-explore-page:*`;
+
+  for await (const key of client.scanIterator({ MATCH: pattern })) {
+    await client.del(key);
+  }
+}
+
 async function invalidateProjectCache(projectAccountId: string, client: RedisClientType) {
   log('INVALIDATE PROJECT CACHE', { projectAccountId });
 
@@ -56,7 +69,9 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
       projectAccountId,
       ...chainData.support.map((support) => support.account.accountId),
       ...(isClaimed(chainData)
-        ? chainData.splits.dependencies.map((dependency) => dependency.account.accountId)
+        ? chainData.splits.dependencies
+            .filter((dependency) => 'account' in dependency)
+            .map((dependency) => dependency.account.accountId)
         : []),
       ...(isClaimed(chainData)
         ? chainData.splits.maintainers.map((maintainer) => maintainer.account.accountId)
@@ -90,7 +105,9 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
       nftDriverAccountId,
       dripList.owner.accountId,
       ...dripList.support.map((support) => support.account.accountId),
-      ...dripList.splits.map((split) => split.account.accountId),
+      ...dripList.splits
+        .filter((split) => 'account' in split)
+        .map((split) => split.account.accountId),
     ];
 
     return Promise.all(
@@ -112,7 +129,9 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
       nftDriverAccountId,
       ecosystemMainAccount.owner.accountId,
       ...ecosystemMainAccount.support.map((support) => support.account.accountId),
-      ...ecosystemMainAccount.splits.map((split) => split.account.accountId),
+      ...ecosystemMainAccount.splits
+        .filter((split) => 'account' in split)
+        .map((split) => split.account.accountId),
     ];
 
     return Promise.all(
@@ -160,6 +179,19 @@ export const POST = async ({ request }) => {
       }
     }),
   );
+
+  // Check if any of the invalidated account IDs are featured on the explore page
+  const allFeaturedDripListIds = (
+    Object.values(FEATURED_DRIP_LISTS_CONFIG) as Array<{ featuredDripListIds?: string[] }>
+  ).flatMap((config) => config.featuredDripListIds ?? []);
+
+  const shouldInvalidateExplorePage = validAccountIds.some((accountId) =>
+    allFeaturedDripListIds.includes(accountId),
+  );
+
+  if (shouldInvalidateExplorePage) {
+    await invalidateExplorePageCache(redis);
+  }
 
   return new Response('OK');
 };

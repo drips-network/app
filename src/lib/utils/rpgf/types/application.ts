@@ -168,93 +168,79 @@ export const createApplicationFormDtoSchema = z.object({
 });
 export type CreateApplicationFormDto = z.infer<typeof createApplicationFormDtoSchema>;
 
-export type ApplicationUrlAnswer = {
-  type: 'url';
-  fieldId: string;
-  field: ApplicationUrlField;
-  url: string;
-};
 export const applicationUrlAnswerSchema = z.object({
   type: z.literal('url'),
   fieldId: z.string().min(1).max(255),
   field: applicationUrlFieldDtoSchema,
-  url: z.string().max(2000).url(),
+  url: z.string().max(2000).url().nullable(),
 });
+export type ApplicationUrlAnswer = z.infer<typeof applicationUrlAnswerSchema>;
+
 export const applicationUrlAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
-  value: z.string().max(2000).url(),
+  value: z.string().max(2000).url().nullable(),
 });
 export type ApplicationUrlAnswerDto = z.infer<typeof applicationUrlAnswerDtoSchema>;
 
-export type ApplicationTextAnswer = {
-  type: 'text';
-  fieldId: string;
-  field: ApplicationTextField | ApplicationTextAreaField;
-  text: string;
-};
 export const applicationTextAnswerSchema = z.object({
   type: z.union([z.literal('text'), z.literal('textarea')]),
   fieldId: z.string().min(1).max(255),
   field: z.union([applicationTextFieldDtoSchema, applicationTextAreaFieldDtoSchema]),
-  text: z.string().max(10000),
+  text: z.string().max(10000).nullable(),
 });
+export type ApplicationTextAnswer = z.infer<typeof applicationTextAnswerSchema>;
+
 export const applicationTextAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
-  value: z.string().max(10000),
+  value: z.string().max(10000).nullable(),
 });
 export type ApplicationTextAnswerDto = z.infer<typeof applicationTextAnswerDtoSchema>;
 
-export type ApplicationEmailAnswer = {
-  type: 'email';
-  fieldId: string;
-  field: ApplicationEmailField;
-  email: string;
-};
 export const applicationEmailAnswerSchema = z.object({
   type: z.literal('email'),
   fieldId: z.string().min(1).max(255),
   field: applicationEmailFieldDtoSchema,
-  email: z.string().max(255).email(),
+  email: z.string().max(255).email().nullable(),
 });
+export type ApplicationEmailAnswer = z.infer<typeof applicationEmailAnswerSchema>;
+
 export const applicationEmailAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
-  value: z.string().max(255).email(),
+  value: z.string().max(255).email().nullable(),
 });
 export type ApplicationEmailAnswerDto = z.infer<typeof applicationEmailAnswerDtoSchema>;
 
-export type ApplicationListAnswer = {
-  type: 'list';
-  fieldId: string;
-  field: ApplicationListField;
-  entries: Record<string, string | number>[];
-};
 export const applicationListAnswerSchema = z.object({
   type: z.literal('list'),
   fieldId: z.string().min(1).max(255),
   field: applicationListFieldDtoSchema,
-  entries: z.array(z.record(z.union([z.string().max(1000), z.number()]))).max(100),
+  entries: z
+    .array(z.record(z.union([z.string().max(1000), z.number()])))
+    .max(100)
+    .nullable(),
 });
+export type ApplicationListAnswer = z.infer<typeof applicationListAnswerSchema>;
+
 export const applicationListAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
-  value: z.array(z.record(z.union([z.string().max(1000), z.number()]))).max(100),
+  value: z
+    .array(z.record(z.union([z.string().max(1000), z.number()])))
+    .max(100)
+    .nullable(),
 });
 export type ApplicationListAnswerDto = z.infer<typeof applicationListAnswerDtoSchema>;
 
-export type ApplicationSelectAnswer = {
-  type: 'select';
-  fieldId: string;
-  field: ApplicationSelectField;
-  selected: string[];
-};
 export const applicationSelectAnswerSchema = z.object({
   type: z.literal('select'),
   fieldId: z.string().min(1).max(255),
   field: applicationSelectFieldDtoSchema,
-  selected: z.array(z.string().min(1).max(255)).max(100),
+  selected: z.array(z.string().min(1).max(255)).max(100).nullable(),
 });
+export type ApplicationSelectAnswer = z.infer<typeof applicationSelectAnswerSchema>;
+
 export const applicationSelectAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
-  value: z.array(z.string().min(1).max(255)).max(100),
+  value: z.array(z.string().min(1).max(255)).max(100).nullable(),
 });
 export type ApplicationSelectAnswerDto = z.infer<typeof applicationSelectAnswerDtoSchema>;
 
@@ -288,6 +274,10 @@ export const createApplicationDtoSchema = z.object({
   projectName: z.string().min(1).max(255),
   dripsAccountId: z.string().min(1).max(255),
   attestationUID: z.string().min(1).max(255).optional(),
+  deferredAttestationTxHash: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{64}$/)
+    .optional(),
   categoryId: z.string().min(1).max(255),
   answers: applicationAnswerDtoSchema,
 });
@@ -366,6 +356,13 @@ export const applicationSchema = z.object({
   projectName: z.string().min(1).max(255),
   dripsProjectDataSnapshot: projectChainDataSchema,
   latestVersion: applicationVersionSchema,
+  customDatasetValues: z.array(
+    z.object({
+      datasetId: z.string(),
+      datasetName: z.string(),
+      values: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]).nullable()),
+    }),
+  ),
 });
 export type Application = z.infer<typeof applicationSchema>;
 
@@ -390,6 +387,7 @@ export type UpdateApplicationDto = {
   projectName: string;
   dripsAccountId: string;
   attestationUID?: string;
+  deferredAttestationTxHash?: string;
   categoryId: string;
   answers: ApplicationAnswerDto;
 };

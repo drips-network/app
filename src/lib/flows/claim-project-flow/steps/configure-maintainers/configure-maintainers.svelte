@@ -49,6 +49,7 @@
         allowDripLists: false,
         addItem: createAddItemFunction(context, 'maintainerSplits'),
         clearItems: createClearItemsFunction(context, 'maintainerSplits'),
+        blockedAccountIds: dependencyKeys,
       }),
     );
   }

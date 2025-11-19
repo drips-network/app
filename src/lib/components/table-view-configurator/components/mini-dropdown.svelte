@@ -1,8 +1,18 @@
-<script lang="ts" generics="TOptions extends { [value: string]: string | null }">
+<script lang="ts" context="module">
+  import type { ComponentType } from 'svelte';
+
+  export type TDropdownOption = {
+    icon?: ComponentType;
+    label: string;
+  };
+
+  export type TDropdownOptions = { [value: string]: TDropdownOption };
+</script>
+
+<script lang="ts" generics="TOptions extends TDropdownOptions">
   import { fly } from 'svelte/transition';
 
   import Check from '$lib/components/icons/Check.svelte';
-  import type { ComponentType } from 'svelte';
   import MiniButton from './mini-button.svelte';
 
   export let icon: ComponentType;
@@ -20,11 +30,15 @@
 
   export let disabled = false;
 
+  export let onOptionClick:
+    | ((key: keyof TOptions, selectFn: () => void, isSelected: boolean) => void)
+    | undefined = undefined;
+
   function handleClick() {
     open = !open;
   }
 
-  function handleOptionClick(key: keyof TOptions) {
+  function selectFn(key: keyof TOptions) {
     if (allowNull && key === value) {
       value = null;
     } else {
@@ -34,8 +48,28 @@
     open = false;
   }
 
+  function handleOptionClick(key: keyof TOptions) {
+    if (onOptionClick) {
+      onOptionClick(key, () => selectFn(key), value === key);
+      return;
+    }
+
+    selectFn(key);
+  }
+
   let dropdownElem: HTMLUListElement | undefined = undefined;
   let toggleButtonElem: HTMLButtonElement | undefined = undefined;
+  let dropdownPosition = { top: 0, right: 0 };
+
+  function updateDropdownPosition() {
+    if (toggleButtonElem && typeof window !== 'undefined') {
+      const rect = toggleButtonElem.getBoundingClientRect();
+      dropdownPosition = {
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      };
+    }
+  }
 
   function handleWindowClick(event: MouseEvent) {
     if (
@@ -48,10 +82,18 @@
     }
   }
 
+  function handleWindowResize() {
+    open = false;
+  }
+
+  $: if (open && toggleButtonElem) {
+    updateDropdownPosition();
+  }
+
   const ariaSlug = `mini-dropdown-${Math.random().toString(36).substring(2, 15)}`;
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} on:resize={handleWindowResize} />
 
 <div class="mini-dropdown" class:open class:highlight={highlightIfSet && value}>
   <button
@@ -76,12 +118,13 @@
     <ul
       transition:fly={{ y: 4, duration: 200 }}
       class="dropdown"
+      style="top: {dropdownPosition.top}px; right: {dropdownPosition.right}px;"
       role="listbox"
       id="select-dropdown-{ariaSlug}"
       aria-labelledby="select-button-{ariaSlug}"
       bind:this={dropdownElem}
     >
-      {#each Object.entries(options).filter((v) => !!v[1]) as [key, label]}
+      {#each Object.entries(options) as [key, item]}
         <li
           role="option"
           aria-selected={value === key}
@@ -93,11 +136,17 @@
             }
           }}
         >
+          {#if item.icon}
+            <svelte:component this={item.icon} style="fill: var(--color-foreground)" />
+          {/if}
+
           <button>
-            {label}
+            {item.label}
           </button>
 
-          <div class="checkmark" style:opacity={value === key ? '1' : '0'}><Check /></div>
+          <div class="checkmark" style:opacity={value === key ? '1' : '0'}>
+            <Check style="fill: var(--color-foreground)" />
+          </div>
         </li>
       {/each}
     </ul>
@@ -115,9 +164,7 @@
   }
 
   .dropdown {
-    position: absolute;
-    top: 2.5rem;
-    right: 0;
+    position: fixed;
     background: var(--color-background);
     box-shadow: var(--elevation-medium);
     border-radius: 1rem 0 1rem 1rem;

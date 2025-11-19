@@ -12,6 +12,7 @@
     EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT,
+    EDIT_PROJECT_SPLITS_FLOW_LINKED_IDENTITY_RECEIVER_FRAGMENT,
   } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
   export const PROJECT_PROFILE_FRAGMENT = gql`
@@ -24,6 +25,7 @@
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT}
+    ${EDIT_PROJECT_SPLITS_FLOW_LINKED_IDENTITY_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
     ${SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT}
@@ -38,6 +40,9 @@
         accountId
       }
       repoMetadata {
+        url
+        repoName
+        ownerName
         description
         forksCount
         stargazersCount
@@ -82,6 +87,9 @@
               }
               ... on SubListReceiver {
                 ...EditProjectSplitsFlowSubListReceiver
+              }
+              ... on LinkedIdentityReceiver {
+                ...EditProjectSplitsFlowLinkedIdentityReceiver
               }
             }
             maintainers {
@@ -574,6 +582,7 @@
                 unclaimedTokensExpandable={false}
                 unclaimedTokensExpanded={chainData.withdrawableBalances.length > 0}
                 showClaimButton={repoExists}
+                showProjectBadge={false}
                 on:claimButtonClick={() =>
                   goto(buildUrl('/app/claim-project', { projectToAdd: project.source.url }))}
               />

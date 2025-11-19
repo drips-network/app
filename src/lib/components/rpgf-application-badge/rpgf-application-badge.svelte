@@ -10,14 +10,12 @@
   export let hideState = false;
   export let inline = false;
   export let size: ComponentProps<ProjectAvatar>['size'] = 'small';
-  export let excludeFromViewTransition = false;
+  export let short: boolean = false;
 
   $: projectSnapshot = application.dripsProjectDataSnapshot;
 
-  $: viewTransitionName = `rpgf-application-avatar-${application.id}`;
-
   const stateMap: Record<ListingApplication['state'], string> = {
-    pending: 'Pending review',
+    pending: short ? 'Pending' : 'Pending review',
     approved: 'Approved',
     rejected: 'Rejected',
   };
@@ -31,11 +29,7 @@
 
 <div class="rpgf-application-badge" style:display={inline ? 'inline-flex' : 'flex'}>
   {#if !hideAvatar}
-    <div
-      class="avatar"
-      style:view-transition-name={excludeFromViewTransition ? undefined : viewTransitionName}
-      style:view-transition-class={excludeFromViewTransition ? undefined : 'element-handover'}
-    >
+    <div class="avatar">
       <ProjectAvatar
         {size}
         project={{

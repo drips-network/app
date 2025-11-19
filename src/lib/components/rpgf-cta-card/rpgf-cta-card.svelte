@@ -82,8 +82,8 @@
         </p>
         <Button
           href={hasExistingBallot
-            ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot`
-            : `/app/rpgf/rounds/${round.urlSlug}/applications`}
+            ? `/app/rpgf/rounds/${round.urlSlug}/applications/ballot?filter=approved`
+            : `/app/rpgf/rounds/${round.urlSlug}/applications?filter=approved`}
           icon={Ledger}
           variant="primary"
           size="large"
@@ -102,6 +102,9 @@
           The badgeholders of this round are now voting on the applications. After votes are
           tallied, the results will be announced.
         </p>
+        <AnnotationBox type="info"
+          >Are you a badgeholder? Make sure you're signed in with the correct wallet.</AnnotationBox
+        >
       {/if}
     {:else if !round.resultsPublished}
       <h2 class="pixelated">Pending results</h2>

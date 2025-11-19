@@ -10,7 +10,8 @@
   marked.use({
     renderer: {
       link({ href, text }) {
-        const sameDomain = browser && href.startsWith(window.location.origin);
+        const sameDomain =
+          browser && new URL(href, window.location.href).origin === window.location.origin;
         const url = sameDomain ? href : buildExternalUrl(href);
 
         return `<a href="${url}" target="_blank" rel="noreferrer">${text}</a>`;

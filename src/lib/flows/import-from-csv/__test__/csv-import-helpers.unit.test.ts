@@ -92,4 +92,37 @@ describe('csv-import-helpers', () => {
       })();
     });
   });
+
+  describe('addItem with duplicate accountIds', () => {
+    it('overwrites items when the same accountId is added multiple times', () => {
+      const context = writable({
+        dripList: {
+          items: {} as Record<string, ListEditorItem>,
+          weights: {} as Record<string, number>,
+        },
+      });
+
+      const addItem = createAddItemFunction(context, 'dripList');
+
+      // Add an item
+      const accountId = '0x1234' as AccountId;
+      const item1: ListEditorItem = {
+        type: 'address',
+        address: '0x1234',
+      };
+      addItem(accountId, item1, 50);
+
+      // Add the same accountId with different weight
+      const item2: ListEditorItem = {
+        type: 'address',
+        address: '0x1234',
+      };
+      addItem(accountId, item2, 30);
+
+      // The second call overwrites the first (object key behavior)
+      const state = get(context);
+      expect(Object.keys(state.dripList.items).length).toBe(1);
+      expect(state.dripList.weights[accountId]).toBe(300000); // Math.round(30 * 10000)
+    });
+  });
 });

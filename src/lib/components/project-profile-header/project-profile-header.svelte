@@ -52,13 +52,7 @@
 
 <div class="flex flex-col gap-4 items-start sm:flex-row sm:justify-between relative">
   <div class="max-w-full flex-1 min-w-0 flex flex-col gap-2 sm:flex-row sm:gap-8 sm:items-center">
-    <div
-      class="avatar"
-      style:width="fit-content"
-      style:view-transition-name="project-avatar-{project.source.ownerName}-{project.source
-        .repoName}"
-      style:view-transition-class="element-handover"
-    >
+    <div class="avatar" style:width="fit-content">
       <ProjectAvatar {pendingAvatar} project={projectChainData} size="huge" />
     </div>
     <div class="flex-1 min-w-0 flex flex-col gap-1">

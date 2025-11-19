@@ -12,7 +12,7 @@
   import Ethereum from '$lib/components/icons/Ethereum.svelte';
   import Github from '$lib/components/icons/Github.svelte';
   import type { ComponentType } from 'svelte';
-  import Copyable from '../copyable/copyable.svelte';
+  import Tooltip from '../tooltip/tooltip.svelte';
   import formatAddress from '$lib/utils/format-address';
   import buildExternalUrl from '$lib/utils/build-external-url';
 
@@ -69,6 +69,11 @@
       href={buildExternalUrl(getURLFromENSRecordValue(value))}>{formatValue(value)}</a
     >
   {:else if network === 'ethereum'}
-    <div class="typo-text tabular-nums"><Copyable {value}>{formatAddress(value)}</Copyable></div>
+    <Tooltip text={value} copyable>
+      <div class="typo-text tabular-nums">{formatAddress(value)}</div>
+      <svelte:fragment slot="tooltip-content">
+        {value}
+      </svelte:fragment>
+    </Tooltip>
   {/if}
 </div>

@@ -8,11 +8,11 @@
   import { getCoreRowModel } from '@tanstack/svelte-table';
   import Markdown from '../markdown/markdown.svelte';
   import ExpandableText from '../expandable-text/expandable-text.svelte';
-  import AnswerField from './components/answer-field.svelte';
   import Toggle from '../toggle/toggle.svelte';
   import storedWritable from '@efstajas/svelte-stored-writable';
   import z from 'zod';
   import { browser } from '$app/environment';
+  import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
   export let canSeePrivateFields: boolean;
 
@@ -41,64 +41,84 @@
       </AnnotationBox>
     {/if}
 
-    <AnswerField title="Category">
+    <TitleAndValue title="Category">
       {applicationVersion.category.name}
-    </AnswerField>
+    </TitleAndValue>
 
     {#each applicationVersion.answers as answer}
-      <AnswerField
+      <TitleAndValue
         title={answer.field.label}
         isPrivate={answer.field.private}
         hidden={$privateFieldsHidden && answer.field.private}
       >
         {#if answer.type === 'text'}
           <ExpandableText>
-            <Markdown content={answer.text} />
+            {#if answer.text === null}
+              <span class="no-answer">No answer provided</span>
+            {:else}
+              <Markdown content={answer.text} />
+            {/if}
           </ExpandableText>
         {:else if answer.type === 'email'}
-          <p>{answer.email}</p>
+          {#if answer.email === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <p>{answer.email}</p>
+          {/if}
         {:else if answer.type === 'url'}
-          <a
-            style:width="fit-content"
-            class="typo-link"
-            href={buildExternalUrl(answer.url)}
-            target="_blank"
-            rel="noopener noreferrer">{answer.url}</a
-          >
+          {#if answer.url === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <a
+              style:width="fit-content"
+              class="typo-link"
+              href={buildExternalUrl(answer.url)}
+              target="_blank"
+              rel="noopener noreferrer">{answer.url}</a
+            >
+          {/if}
         {:else if answer.type === 'select'}
-          {#each answer.selected as selected}
-            <p>
-              {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
-            </p>
-          {/each}
+          {#if answer.selected === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            {#each answer.selected as selected}
+              <p>
+                {answer.field.options.find((o) => o.value === selected)?.label ?? 'Unknown option'}
+              </p>
+            {/each}
+          {/if}
         {:else if answer.type === 'list'}
-          <Table
-            options={{
-              columns: answer.field.entryFields.map((ef) => ({
-                header: ef.label,
-                accessorKey: ef.label,
-                cell: (v) => (ef.type === 'url' ? LinkCell : v),
-                enableSorting: false,
-              })),
-              // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
-              data: answer.entries.map((row) => {
-                return Object.fromEntries(
-                  Object.entries(row).map(([label, value]) => {
-                    const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
+          {#if answer.entries === null}
+            <span class="no-answer">No answer provided</span>
+          {:else}
+            <Table
+              options={{
+                columns: answer.field.entryFields.map((ef) => ({
+                  header: ef.label,
+                  accessorKey: ef.label,
+                  cell: (v) => (ef.type === 'url' ? LinkCell : v),
+                  enableSorting: false,
+                })),
+                // This maps the rows so that url fields are displayed as a link... Sorry for the 🍝
+                data: answer.entries.map((row) => {
+                  return Object.fromEntries(
+                    Object.entries(row).map(([label, value]) => {
+                      const fieldDef = answer.field.entryFields.find((ef) => ef.label === label);
 
-                    if (fieldDef?.type === 'url' && typeof value === 'string') {
-                      return [label, { href: buildExternalUrl(value) }];
-                    } else {
-                      return [label, value];
-                    }
-                  }),
-                );
-              }),
-              getCoreRowModel: getCoreRowModel(),
-            }}
-          />
+                      if (fieldDef?.type === 'url' && typeof value === 'string') {
+                        return [label, { href: buildExternalUrl(value) }];
+                      } else {
+                        return [label, value];
+                      }
+                    }),
+                  );
+                }),
+                getCoreRowModel: getCoreRowModel(),
+              }}
+            />
+          {/if}
         {/if}
-      </AnswerField>
+      </TitleAndValue>
     {/each}
   </div>
 </RpgfApplicationDetailsCard>
@@ -114,5 +134,9 @@
   p {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .no-answer {
+    color: var(--color-foreground-level-5);
   }
 </style>

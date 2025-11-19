@@ -226,7 +226,7 @@ test.describe('rounds', () => {
     await connectedSession2.page.waitForURL(`**/applications/${applicationId}`);
 
     await expect(
-      connectedSession2.page.getByText('Visibility Test Application').first(),
+      connectedSession2.page.getByText('Visibility Test Application').nth(1),
     ).toBeVisible();
 
     // check private field name Test Testerson is not visible
@@ -304,7 +304,8 @@ test.describe('rounds', () => {
       await page.getByRole('link', { name: 'View all' }).first().click();
 
       // download the csv
-      await page.getByRole('button', { name: 'Download CSV' }).click();
+      await page.getByRole('button', { name: 'Open Download dropdown' }).click();
+      await page.getByRole('button', { name: 'CSV' }).click();
       const download = await page.waitForEvent('download');
 
       const fileName = workerUniqueString(testInfo, 'export-user2') + '.csv';

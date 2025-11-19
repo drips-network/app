@@ -136,6 +136,7 @@
       const wronglyCasedProject = (
         await query<ProjectQuery, ProjectQueryVariables>(projectQuery, {
           url: gitUrl,
+          chains: [network.gqlName],
         })
       ).projectByUrl?.chainData;
 

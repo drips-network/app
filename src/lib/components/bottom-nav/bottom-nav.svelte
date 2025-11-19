@@ -111,6 +111,10 @@
     view-transition-name: bottom-nav;
   }
 
+  :root::view-transition-group(bottom-nav) {
+    z-index: 10;
+  }
+
   .items {
     display: flex;
     align-items: center;

@@ -20,6 +20,7 @@
   export let onAction: (() => void) | undefined = undefined;
 
   export let safeAppMode = false;
+  export let safeDescription: string | (() => string) | undefined = undefined;
 
   function handleConfirm() {
     if (action === 'continue') {
@@ -40,7 +41,10 @@
       <Emoji size="huge" emoji="⏳" />
       <StepHeader
         headline="Continue in your Safe"
-        description="Please execute the proposed transaction(s) in your Safe. Once executed, come back to see the result."
+        description={typeof safeDescription === 'function'
+          ? safeDescription()
+          : (safeDescription ??
+            'Please execute the proposed transaction(s) in your Safe. Once executed, come back to see the result.')}
       />
     {:else}
       <ConfettiOnClick alsoOnMount>

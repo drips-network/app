@@ -6,7 +6,9 @@
   export let size: 'normal' | 'big' = 'normal';
 </script>
 
-<label class="toggle {size}">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<label class="toggle {size}" on:click|stopPropagation>
   <input tabindex="0" type="checkbox" bind:checked />
   <SelectedDot type="check" bind:selected={checked} />
   {#if label}<span class="typo-text-bold">{label}</span>{/if}

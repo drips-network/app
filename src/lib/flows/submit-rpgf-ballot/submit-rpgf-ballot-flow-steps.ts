@@ -5,18 +5,14 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import type { Round } from '$lib/utils/rpgf/types/round';
 import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
 
-export default (
-  ballot: Writable<InProgressBallot> & { clear: () => void },
-  round: Round,
-  previouslyCastBallot: boolean,
-) => ({
+export default (ballot: Writable<InProgressBallot> & { clear: () => void }, round: Round) => ({
   steps: [
     makeStep({
       component: Confirm,
       props: {
         ballot,
         roundId: round.id,
-        previouslyCastBallot,
+        round,
       },
     }),
     makeStep({

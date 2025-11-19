@@ -18,6 +18,7 @@
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
+  import ClaimYourProjectCard from './claim-your-project-card.svelte';
   import ProjectsGrid from './projects-grid.svelte';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
@@ -169,6 +170,8 @@
       </div>
     </Section>
   {/if}
+
+  <ClaimYourProjectCard />
 
   {#if featuredDripLists?.length > 0}
     <Section

@@ -31,7 +31,13 @@ import {
   type ListingApplication,
   type UpdateApplicationDto,
 } from './types/application';
-import { wrappedBallotSchema, type Ballot, type WrappedBallot } from './types/ballot';
+import {
+  ballotSchema,
+  wrappedBallotSchema,
+  type Ballot,
+  type SubmitBallotDto,
+  type WrappedBallot,
+} from './types/ballot';
 import { userSchema, type RpgfUser } from './types/user';
 import { auditLogSchema, type AuditLog } from './types/auditLog';
 import {
@@ -39,6 +45,8 @@ import {
   type CreateKycRequestForApplicationDto,
   type KycRequest,
 } from './types/kyc';
+import { customDatasetSchema, type CustomDataset } from './types/customDataset';
+import { signBallot } from './sign-ballot';
 
 const rpgfApiUrl = getOptionalEnvVar(
   'PUBLIC_DRIPS_RPGF_URL',
@@ -57,6 +65,10 @@ export async function rpgfServerCall(
   body: unknown = null,
   headers: Record<string, string> = {},
   f = fetch,
+  contentType:
+    | 'application/json'
+    | 'text/csv'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' = 'application/json',
 ) {
   if (!rpgfApiUrl || !rpgfInternalApiUrl) {
     throw new Error('Required environment variables are not set');
@@ -68,10 +80,14 @@ export async function rpgfServerCall(
     method,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
       ...headers,
+      'Content-Type': contentType,
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    body: body
+      ? contentType === 'application/json'
+        ? JSON.stringify(body)
+        : (body as BodyInit)
+      : null,
   });
 
   return res;
@@ -83,6 +99,11 @@ export async function authenticatedRpgfServerCall(
   body: unknown = null,
   f = fetch,
   attemptRefresh: boolean = true,
+  disableErrorHandling = false,
+  contentType:
+    | 'application/json'
+    | 'text/csv'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' = 'application/json',
 ) {
   const accessToken = get(walletStore).connected ? get(rpgfAccessJwtStore) : null;
 
@@ -94,6 +115,7 @@ export async function authenticatedRpgfServerCall(
       Authorization: accessToken ? `Bearer ${accessToken}` : '',
     },
     f,
+    contentType,
   );
 
   if (res.status === 401 && accessToken && attemptRefresh) {
@@ -105,20 +127,28 @@ export async function authenticatedRpgfServerCall(
     }
   }
 
-  if (res.status === 401) {
-    // User needs to re-authenticate
-    throw error(401);
+  if (res.status === 400 || res.status === 401) {
+    const errorBody = await res.text();
+
+    let message;
+    if (errorBody) {
+      message = errorBody;
+    } else if (res.status === 400) {
+      message = 'Bad Request';
+    } else {
+      message = 'Unauthorized';
+    }
+
+    throw error(res.status, message);
+  }
+
+  if (disableErrorHandling) {
+    return res;
   }
 
   if (res.status === 500) {
     // Server error, throw a generic error
     throw error(500, 'Unexpected server error occurred.');
-  }
-
-  if (res.status === 400) {
-    const errorBody = await res.json().catch(() => null);
-    const message = errorBody?.error || 'Bad Request';
-    throw error(400, message);
   }
 
   return res;
@@ -145,12 +175,9 @@ export async function createRound(f = fetch, draft: CreateRoundDto): Promise<Rou
 
 export async function updateRound(f = fetch, id: string, draft: PatchRoundDto): Promise<Round> {
   // strip empty fields
-  const strippedDraft: PatchRoundDto = Object.fromEntries(
-    Object.entries(draft).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
-  );
-
-  // ...except customAvatarCid, which can be null
-  strippedDraft.customAvatarCid = draft.customAvatarCid ?? null;
+  const strippedDraft = Object.fromEntries(
+    Object.entries(draft).filter(([_, value]) => value !== undefined && value !== ''),
+  ) as PatchRoundDto;
 
   const res = await authenticatedRpgfServerCall(`/rounds/${id}`, 'PATCH', strippedDraft, f);
 
@@ -247,9 +274,13 @@ export async function getApplications(
   return listingApplicationSchema.array().parse(await res.json());
 }
 
-export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<string> {
+export async function getApplicationsCsv(
+  f = fetch,
+  roundSlug: string,
+  onlyApproved = false,
+): Promise<string> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/applications?format=csv`,
+    `/rounds/${roundSlug}/applications?format=csv${onlyApproved ? '&state=approved' : ''}`,
     'GET',
     undefined,
     f,
@@ -260,6 +291,25 @@ export async function getApplicationsCsv(f = fetch, roundSlug: string): Promise<
   }
 
   return await res.text();
+}
+
+export async function getApplicationsXlsx(
+  f = fetch,
+  roundSlug: string,
+  onlyApproved = false,
+): Promise<Blob> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/applications?format=xlsx${onlyApproved ? '&state=approved' : ''}`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  if (!res.ok) {
+    throw new Error(`${res.status} - Failed to fetch applications XLSX: ${res.statusText}`);
+  }
+
+  return await res.blob();
 }
 
 export async function getApplication(
@@ -292,21 +342,6 @@ export async function getApplicationHistory(
   return applicationVersionSchema.array().parse(await res.json());
 }
 
-export async function patchRound(f = fetch, roundId: string, patchRoundDto: PatchRoundDto) {
-  // strip empty fields
-  const strippedRound = Object.fromEntries(
-    Object.entries(patchRoundDto).filter((v) => v[1] !== null && v[1] !== undefined && v[1] !== ''),
-  );
-
-  //...except customAvatarCid, which can be null
-  strippedRound.customAvatarCid = patchRoundDto.customAvatarCid ?? null;
-
-  const res = await authenticatedRpgfServerCall(`/rounds/${roundId}`, 'PATCH', strippedRound, f);
-
-  const parsed = roundSchema.parse(await res.json());
-  return parsed;
-}
-
 export async function submitApplicationReview(
   f = fetch,
   roundId: string,
@@ -320,12 +355,16 @@ export async function castBallot(
   roundSlug: string,
   ballot: Ballot,
 ): Promise<WrappedBallot> {
+  const { signature, chainId } = await signBallot(ballot);
+
   const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots`,
     'PUT',
     {
       ballot,
-    },
+      signature,
+      chainId,
+    } satisfies SubmitBallotDto,
     f,
   );
 
@@ -333,22 +372,79 @@ export async function castBallot(
   return parsed;
 }
 
-export async function patchBallot(
+type SpreadsheetFormat = 'csv' | 'xlsx';
+type SpreadsheetBody = string | ArrayBuffer;
+
+const SPREADSHEET_CONTENT_TYPE: Record<
+  SpreadsheetFormat,
+  Parameters<typeof authenticatedRpgfServerCall>[6]
+> = {
+  csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+};
+
+export async function parseBallotSpreadsheet(
   f = fetch,
-  roundId: string,
-  updatedBallot: Ballot,
-): Promise<WrappedBallot> {
+  roundSlug: string,
+  data: SpreadsheetBody,
+  format: SpreadsheetFormat,
+): Promise<Ballot> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundId}/ballots/own`,
-    'PATCH',
-    {
-      ballot: updatedBallot,
-    },
+    `/rounds/${roundSlug}/ballots/parse-spreadsheet?format=${format}`,
+    'POST',
+    data,
     f,
+    true,
+    false,
+    SPREADSHEET_CONTENT_TYPE[format],
+  );
+
+  return z.object({ ballot: ballotSchema }).parse(await res.json()).ballot;
+}
+
+async function submitSpreadsheetBallot(
+  f = fetch,
+  roundSlug: string,
+  data: SpreadsheetBody,
+  format: SpreadsheetFormat,
+): Promise<WrappedBallot> {
+  const ballot = await parseBallotSpreadsheet(f, roundSlug, data, format);
+  const { signature, chainId } = await signBallot(ballot);
+
+  const query = new URLSearchParams({
+    format,
+    signature,
+    chainId: chainId.toString(),
+  });
+
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundSlug}/ballots/spreadsheet?${query.toString()}`,
+    'POST',
+    data,
+    f,
+    true,
+    false,
+    SPREADSHEET_CONTENT_TYPE[format],
   );
 
   const parsed = wrappedBallotSchema.parse(await res.json());
   return parsed;
+}
+
+export async function castBallotAsCsv(
+  f = fetch,
+  roundSlug: string,
+  data: string,
+): Promise<WrappedBallot> {
+  return submitSpreadsheetBallot(f, roundSlug, data, 'csv');
+}
+
+export async function castBallotAsXlsx(
+  f = fetch,
+  roundSlug: string,
+  data: ArrayBuffer,
+): Promise<WrappedBallot> {
+  return submitSpreadsheetBallot(f, roundSlug, data, 'xlsx');
 }
 
 export async function getOwnBallot(f = fetch, roundSlug: string): Promise<WrappedBallot | null> {
@@ -744,4 +840,90 @@ export async function linkExistingKycRequestToApplication(
   );
 
   return;
+}
+
+export async function getCustomDatasetsForRound(
+  f = fetch,
+  roundId: string,
+): Promise<CustomDataset[]> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return customDatasetSchema.array().parse(await res.json());
+}
+
+export async function createCustomDataset(
+  f = fetch,
+  roundId: string,
+  name: string,
+): Promise<CustomDataset> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets`,
+    'PUT',
+    { name, isPublic: false },
+    f,
+  );
+
+  return customDatasetSchema.parse(await res.json());
+}
+
+export async function updateCustomDataset(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+  name: string,
+  isPublic: boolean,
+): Promise<CustomDataset> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}`,
+    'PATCH',
+    { name, isPublic },
+    f,
+  );
+
+  return customDatasetSchema.parse(await res.json());
+}
+
+export async function deleteCustomDataset(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+): Promise<void> {
+  await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}`,
+    'DELETE',
+    undefined,
+    f,
+  );
+
+  return;
+}
+
+export async function uploadCustomDatasetCsv(
+  f = fetch,
+  roundId: string,
+  datasetId: string,
+  csvData: string,
+): Promise<CustomDataset | { error: string }> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/custom-datasets/${datasetId}/upload`,
+    'POST',
+    csvData,
+    f,
+    true,
+    true,
+    'text/csv',
+  );
+
+  return customDatasetSchema
+    .or(
+      z.object({
+        error: z.string(),
+      }),
+    )
+    .parse(await res.json());
 }

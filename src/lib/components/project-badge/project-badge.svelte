@@ -53,6 +53,7 @@
   /** display project as if it's unclaimed, even if it is claimed */
   export let forceUnclaimed = false;
   export let hideAvatar = false;
+  export let hideName = false;
   export let linkToNewTab = false;
   export let linkTo: 'external-url' | 'project-page' | 'nothing' = 'project-page';
   export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
@@ -107,9 +108,11 @@
           <div><ProjectAvatar {size} project={chainData} /></div>
         </div>
       {/if}
-      <div class="name flex-1 min-w-0 truncate">
-        <ProjectName tiny={smallText} project={processedProject} />
-      </div>
+      {#if !hideName}
+        <div class="name flex-1 min-w-0 truncate">
+          <ProjectName tiny={smallText} project={processedProject} />
+        </div>
+      {/if}
       {#if !project?.isVisible}
         <WarningIcon
           style="height: 1.25rem; width: 1.25rem; fill: var(--color-foreground-level-4); display:inline"

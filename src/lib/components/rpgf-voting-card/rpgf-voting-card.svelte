@@ -13,14 +13,21 @@
   import submitRpgfBallotFlowSteps from '$lib/flows/submit-rpgf-ballot/submit-rpgf-ballot-flow-steps';
   import buildExternalUrl from '$lib/utils/build-external-url';
   import type { Round } from '$lib/utils/rpgf/types/round';
-  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { InProgressBallot, WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import unreachable from '$lib/utils/unreachable';
+  import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
+  import File from '../icons/File.svelte';
+  import rpgfSpreadsheetVoteFlowSteps from '$lib/flows/rpgf-spreadsheet-vote-flow/rpgf-spreadsheet-vote-flow-steps';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import { goto, invalidate } from '$app/navigation';
+  import type { BallotValidationErrorsStore } from '$lib/utils/rpgf/ballot-validation-context';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
   export let round: Round;
-  export let previouslyCastBallot: boolean;
+  export let previouslyCastBallot: WrappedBallot | null;
+  export let ballotValidationErrors: BallotValidationErrorsStore;
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
   $: voterGuidelinesSeen = round.voterGuidelinesLink
@@ -46,11 +53,57 @@
     .filter((vote) => vote !== null)
     .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0);
   $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
+  $: hasValidationErrors = $ballotValidationErrors.size > 0;
 
   async function handleSubmitBallot() {
-    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round, previouslyCastBallot));
+    if (hasValidationErrors) {
+      return;
+    }
+
+    modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
+  }
+
+  $: localStoredBallotIsDifferentFromRemote =
+    previouslyCastBallot === null
+      ? ballotHasEntries
+      : Object.keys($ballot).length !== Object.keys(previouslyCastBallot.ballot).length ||
+        Object.entries($ballot).some(
+          ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
+        );
+
+  let clearingLocalBallot = false;
+  async function clearLocalBallotHandler() {
+    await doWithConfirmationModal(
+      previouslyCastBallot
+        ? 'Are you sure you want to clear your changes and revert to your previously submitted ballot?'
+        : 'Are you sure you want to clear your changes?',
+      async () => {
+        clearingLocalBallot = true;
+
+        ballot.clear();
+        ballotValidationErrors.set(new Set());
+        await invalidate('rpgf:round:ownBallot');
+        await goto(`/app/rpgf/rounds/${round.urlSlug}`);
+
+        clearingLocalBallot = false;
+      },
+    );
+  }
+
+  let shiftKeyPressed = false;
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = true;
+    }
+  }
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Shift') {
+      shiftKeyPressed = false;
+    }
   }
 </script>
+
+<svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
 
 <div class="voting-card">
   <h5>Voting</h5>
@@ -63,6 +116,18 @@
         <Button
           variant="primary"
           on:click={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
+        >
+      </svelte:fragment>
+    </AnnotationBox>
+  {/if}
+
+  {#if localStoredBallotIsDifferentFromRemote}
+    <AnnotationBox type="warning">
+      Changes to your ballot have not yet been submitted.
+
+      <svelte:fragment slot="actions">
+        <Button on:click={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
+          >Clear changes</Button
         >
       </svelte:fragment>
     </AnnotationBox>
@@ -108,10 +173,10 @@
         {/if}
       </div>
 
-      <Divider />
+      <Divider sideMargin={-1} />
     {/if}
 
-    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications">
+    <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications?filter=approved">
       <div class="step-headline" class:active={voteStep === 'build-ballot'}>
         <h6 class="typo-text-bold">
           {#if voteStep === 'assign-votes'}
@@ -131,6 +196,7 @@
           <p class="typo-text-small">
             Use this step to decide on which projects you believe are worthy of funding.
           </p>
+          <p class="typo-text-small">Alternatively, you can vote by uploading a spreadsheet.</p>
         </div>
 
         <div class="actions">
@@ -143,11 +209,22 @@
             href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
             >Continue to assign votes</Button
           >
+
+          <OrDivider />
+
+          <Button
+            icon={File}
+            href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+            on:click={(e) => {
+              e.preventDefault();
+              modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+            }}>Vote using spreadsheet</Button
+          >
         </div>
       {/if}
     </a>
 
-    <Divider />
+    <Divider sideMargin={-1} />
 
     <a class="step" href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot">
       <div class="step-headline" class:active={voteStep === 'assign-votes'}>
@@ -159,6 +236,19 @@
         <div class="description">
           <p class="typo-text-small">Assign votes to the selected applications.</p>
           <p class="typo-text-small">Once you're done, cast your ballot below.</p>
+          {#if round.minVotesPerProjectPerVoter !== null || round.maxVotesPerProjectPerVoter !== null}
+            <p class="typo-text-small">
+              {#if round.minVotesPerProjectPerVoter !== null}
+                Each project you include must receive at least
+                <span class="typo-text-small-bold">{round.minVotesPerProjectPerVoter}</span> votes.
+              {/if}
+              {#if round.maxVotesPerProjectPerVoter !== null}
+                {#if round.minVotesPerProjectPerVoter !== null}{' '}{/if}
+                No project may receive more than
+                <span class="typo-text-small-bold">{round.maxVotesPerProjectPerVoter}</span> votes.
+              {/if}
+            </p>
+          {/if}
         </div>
 
         <div class="actions">
@@ -168,11 +258,21 @@
           <div class="assignment-progress-bar">
             <div class="progress-bar" style:width="{percentageOfVotesAssigned * 100}%"></div>
           </div>
-          <div style:margin-top="1rem" style:display="flex" style:flex-direction="column">
+          <div
+            style:margin-top="1rem"
+            style:display="flex"
+            style:flex-direction="column"
+            style:gap="0.5rem"
+          >
             <Button
               size="large"
               icon={Proposals}
-              disabled={!ballotHasEntries || amountOfVotesAssigned === 0}
+              disabled={!ballotHasEntries ||
+                amountOfVotesAssigned === 0 ||
+                hasValidationErrors ||
+                (Boolean(previouslyCastBallot) &&
+                  !shiftKeyPressed &&
+                  !localStoredBallotIsDifferentFromRemote)}
               on:click={(e) => {
                 e.preventDefault();
                 handleSubmitBallot();
@@ -185,6 +285,28 @@
                 Submit your ballot
               {/if}
             </Button>
+
+            {#if hasValidationErrors}
+              <p class="typo-text-small error-hint">
+                Fix validation errors in your ballot before submitting.
+              </p>
+            {/if}
+
+            <OrDivider />
+
+            <Button
+              icon={File}
+              href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
+              on:click={(e) => {
+                e.preventDefault();
+                modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
+              }}
+              >{#if previouslyCastBallot}
+                Update using spreadsheet
+              {:else}
+                Vote using spreadsheet
+              {/if}</Button
+            >
           </div>
         </div>
       {/if}
@@ -200,8 +322,6 @@
     display: flex;
     gap: 1rem;
     flex-direction: column;
-    view-transition-name: rpgf-applications-voting-card;
-    view-transition-class: element-handover;
   }
 
   .steps {
@@ -268,5 +388,10 @@
     height: 100%;
     background-color: var(--color-primary);
     transition: width 0.3s;
+  }
+
+  .error-hint {
+    color: var(--color-negative);
+    text-align: center;
   }
 </style>

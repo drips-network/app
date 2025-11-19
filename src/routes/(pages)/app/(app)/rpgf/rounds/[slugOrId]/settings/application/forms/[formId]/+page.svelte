@@ -19,7 +19,7 @@
   }
 </script>
 
-<RpgfSettingsForm round={data.round} {saveHandler}>
+<RpgfSettingsForm {saveHandler}>
   <div class="form-header">
     <Button
       icon={ArrowLeft}

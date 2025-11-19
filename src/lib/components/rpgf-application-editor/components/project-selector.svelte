@@ -1,10 +1,7 @@
 <script lang="ts">
-  import Plus from '$lib/components/icons/Plus.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
-  import ClaimProjectStepper from '$lib/flows/claim-project-flow/claim-project-stepper.svelte';
-  import modal from '$lib/stores/modal';
   import type { RpgfApplicationEditorProjectFragment } from '../__generated__/gql.generated';
 
   export let projects: RpgfApplicationEditorProjectFragment[];
@@ -31,21 +28,12 @@
         ];
       }),
     ),
-    'claim-project': {
-      type: 'action',
-      label: 'Claim new project',
-      image: {
-        component: Plus,
-        props: {},
-      },
-      handler: () =>
-        modal.show(ClaimProjectStepper, undefined, {
-          skipWalletConnect: true,
-          linkToProjectPageOnSuccess: false,
-          skipNetworkSelection: true,
-        }),
-    },
   };
 </script>
 
-<ListSelect bind:selected items={projectItems} searchable={false} />
+<ListSelect
+  bind:selected
+  items={projectItems}
+  searchable={false}
+  emptyStateText="You have no claimed projects yet"
+/>

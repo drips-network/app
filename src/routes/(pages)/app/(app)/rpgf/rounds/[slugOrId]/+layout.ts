@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, params, url, depends }) => {
   depends('rpgf:round');
+  depends('rpgf:round:ownBallot');
 
   const { slugOrId } = params;
 

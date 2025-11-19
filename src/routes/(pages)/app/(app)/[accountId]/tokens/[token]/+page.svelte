@@ -22,7 +22,6 @@
 
 <script lang="ts">
   import tokens from '$lib/stores/tokens';
-  import { page } from '$app/stores';
   import Token from '$lib/components/token/token.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -51,28 +50,26 @@
 
   export let data;
 
-  $: urlParamToken = $page.params.token?.toLowerCase();
-
   $: tokenBalances = data.balances.find(
-    (balance) => balance.tokenAddress.toLowerCase() === urlParamToken?.toLowerCase(),
-  ) ?? { tokenAddress: urlParamToken, incoming: [], outgoing: [] };
+    (balance) => balance.tokenAddress.toLowerCase() === data.tokenAddress?.toLowerCase(),
+  ) ?? { tokenAddress: data.tokenAddress, incoming: [], outgoing: [] };
 
   $: currentOutgoingAmountReadable = streamCurrentAmountsStore(
     tokenBalances.outgoing,
-    urlParamToken,
+    data.tokenAddress,
   );
   $: currentIncomingAmountReadable = streamCurrentAmountsStore(
     tokenBalances.incoming,
-    urlParamToken,
+    data.tokenAddress,
   );
 
   $: token = $tokens?.find(
     (token) =>
-      token.info.address.toLowerCase() === urlParamToken ||
-      token.info.symbol.toLowerCase() === urlParamToken,
+      token.info.address.toLowerCase() === data.tokenAddress ||
+      token.info.symbol.toLowerCase() === data.tokenAddress,
   );
 
-  $: tokenAddress = token?.info.address.toLowerCase() ?? urlParamToken;
+  $: tokenAddress = token?.info.address.toLowerCase() ?? data.tokenAddress;
 
   $: accountId = $wallet.dripsAccountId;
 
@@ -81,13 +78,13 @@
   }
 
   function openWithdrawModal() {
-    modal.show(Stepper, undefined, getWithdrawSteps(tokenAddress));
+    modal.show(Stepper, undefined, getWithdrawSteps(data.tokenAddress));
   }
 
   let error: 'connected-to-wrong-user' | 'unknown-token' | undefined;
 
   async function checkUrlAccountId() {
-    const decodedUrlAccountId = await decodeAccountId($page.params.accountId);
+    const decodedUrlAccountId = await decodeAccountId(data.accountId);
 
     const connectedToRightUser = checkIsUser(decodedUrlAccountId.dripsAccountId);
     if (!connectedToRightUser) return (error = 'connected-to-wrong-user');

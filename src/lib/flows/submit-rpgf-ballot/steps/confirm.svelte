@@ -1,56 +1,36 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import Check from '$lib/components/icons/Check.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
-  import { castBallot, patchBallot } from '$lib/utils/rpgf/rpgf';
-  import type { Ballot, InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import { castBallot } from '$lib/utils/rpgf/rpgf';
+  import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import { prepareBallotForSubmission } from '$lib/utils/rpgf/validate-ballot';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
 
   export let ballot: Writable<InProgressBallot> & {
     clear: () => void;
   };
-  export let previouslyCastBallot: boolean;
   export let roundId: string;
+  export let round: Round;
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
-
-  function assertValidBallot(
-    inProgressBallot: InProgressBallot,
-  ): asserts inProgressBallot is Ballot {
-    // check that there is at least one entry in the ballot, and no null values
-    if (
-      Object.keys(inProgressBallot).length === 0 ||
-      Object.values(inProgressBallot).includes(null)
-    ) {
-      throw new Error('Invalid ballot: must have at least one entry and no null values');
-    }
-  }
-
   function handleConfirm() {
     dispatch('await', {
       promise: async () => {
-        const strippedBallot = Object.fromEntries(
-          Object.entries($ballot).filter(
-            (v) => v[1] !== null && v[1] !== undefined && v[1] !== 0 && v[1] !== '',
-          ),
-        ) as Ballot;
+        const sanitizedBallot = prepareBallotForSubmission($ballot, round);
 
-        assertValidBallot(strippedBallot);
-
-        if (previouslyCastBallot) {
-          await patchBallot(undefined, roundId, strippedBallot);
-        } else {
-          await castBallot(undefined, roundId, strippedBallot);
-        }
+        await castBallot(undefined, roundId, sanitizedBallot);
 
         ballot.clear();
         await invalidate('rpgf:round');
       },
-      message: 'Casting your ballot...',
+      message: 'Waiting for you to confirm the ballot in your wallet...',
     });
   }
 </script>
@@ -61,8 +41,13 @@
     description="Are you sure you want to cast your ballot now? After casting, you can view and make changes until voting for the round closes."
     emoji="🗳️"
   />
+
+  <AnnotationBox>
+    When you confirm, a wallet signature request will be triggered. Please review your ballot
+    details and confirm.
+  </AnnotationBox>
   <svelte:fragment slot="actions">
     <Button on:click={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-    <Button icon={Check} on:click={handleConfirm} variant="primary">Yes, cast my ballot</Button>
+    <Button icon={Wallet} on:click={handleConfirm} variant="primary">Yes, cast my ballot</Button>
   </svelte:fragment>
 </StepLayout>
