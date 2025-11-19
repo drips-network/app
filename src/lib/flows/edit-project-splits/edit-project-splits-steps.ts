@@ -73,7 +73,7 @@ export const EDIT_PROJECT_SPLITS_FLOW_ORCID_RECEIVER_FRAGMENT = gql`
   ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT}
   fragment EditProjectSplitsFlowOrcidReceiver on LinkedIdentityReceiver {
     ...SplitReceiversToListEditorConfigOrcidReceiver
-  }
+}
 `;
 
 type SplitReceiver =

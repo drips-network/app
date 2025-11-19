@@ -222,6 +222,8 @@
             {linkToNewTab}
             project={split.project}
           />
+          project={split.project}
+          />
         </PrimaryColorThemer>
       {:else if split.__typename === 'LinkedIdentityReceiver'}
         <OrcidBadge {chainOverride} orcid={split.linkedIdentity} />
