@@ -1,71 +1,21 @@
 <script context="module">
-  export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
-    ${DRIP_LIST_BADGE_FRAGMENT}
-    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
-    fragment SelectDripListStepLists on DripList {
-      ...DripListBadge
-      ...EditDripListFlowDripList
-      splits {
-        ... on AddressReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on ProjectReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on DripListReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on EcosystemMainAccountReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on SubListReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on LinkedIdentityReceiver {
-          account {
-            accountId
-          }
-        }
-      }
-    }
-  `;
+  import {
+    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
+    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
+    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
+  } from '../../fragments';
 
-  export const SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListProjectToAdd on Project {
-      account {
-        accountId
-      }
-      source {
-        url
-      }
-    }
-  `;
-
-  export const SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListDripListToAdd on DripList {
-      account {
-        accountId
-      }
-    }
-  `;
+  export {
+    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
+    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
+    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
+  };
 </script>
 
 <script lang="ts">
   import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
-  import DripListBadge, {
-    DRIP_LIST_BADGE_FRAGMENT,
-  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -74,7 +24,6 @@
   import modal from '$lib/stores/modal';
   import buildUrl from '$lib/utils/build-url';
   import unreachable from '$lib/utils/unreachable';
-  import { gql } from 'graphql-request';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -83,8 +32,7 @@
     SelectDripListDripListToAddFragment,
     SelectDripListProjectToAddFragment,
     SelectDripListStepListsFragment,
-  } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '../../edit-members/edit-drip-list-steps';
+  } from '../../__generated__/gql.generated';
   import type { Items, Weights } from '$lib/components/list-editor/types';
   import {
     mapSplitReceiversToEditorConfig,

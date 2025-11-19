@@ -5,7 +5,7 @@ import {
   repoDriverSplitReceiverSchema,
 } from './v2';
 
-const dripListSplitReceiverSchema = z.object({
+export const dripListSplitReceiverSchema = z.object({
   type: z.literal('dripList'),
   weight: z.number(),
   accountId: z.string(),

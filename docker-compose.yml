@@ -28,45 +28,53 @@ services:
       - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
+      - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
     volumes:
-    - .:/app
-    - /app/node_modules/
+      - .:/app
+      - /app/node_modules/
     ports:
-    - 5173:5173
+      - 5173:5173
     depends_on:
-    - redis
-    - graphql-api
-    - fake-pinata
+      - redis
+      - graphql-api
+      - fake-pinata
 
   redis:
     image: redis:latest
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 1s
       timeout: 30s
       retries: 5
     ports:
-    - 6379:6379
+      - 6379:6379
 
-  event-processor:
-    image: 'j537/event-processor:${EVENT_PROCESSOR_TAG-main}-localtestnet'
+  dripfeed:
+    image: 'j537/dripfeed:${DRIPFEED_TAG-main}-localtestnet'
     pull_policy: always
-    entrypoint: bash -c "npm run db:run-migrations && npm run start"
+    entrypoint: bash -c "npm run db:migrate && npm run start"
     environment:
-      - IPFS_GATEWAY_URL=http://fake-pinata:3000
-      - SHOULD_PROCESS_PAST_EVENTS=${EVENT_PROCESSOR_SHOULD_PROCESS_PAST_EVENTS}
-      - PRIMARY_RPC_URL=http://testnet:8545
+      - DATABASE_URL=postgresql://user:admin@postgres:5432/dripsdb
+      - DB_SCHEMA=localtestnet
       - NETWORK=localtestnet
-      - POLLING_INTERVAL=${EVENT_PROCESSOR_POLLING_INTERVAL}
-      - CHUNK_SIZE=${EVENT_PROCESSOR_CHUNK_SIZE}
+      - RPC_URL=http://testnet:8545
       - CONFIRMATIONS=0
-      - SHOULD_START_MONITORING_UI=true
-      - REDIS_CONNECTION_STRING=redis://redis:6379
-      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
-      - LOG_LEVEL=debug
-      - MONITORING_UI_PORT=3001
+      - FETCH_BATCH_SIZE=5000
+      - INSERT_CHUNK_SIZE=1000
+      - PROCESS_BATCH_SIZE=100
+      - POLL_DELAY=2000
+      - MAX_CONSECUTIVE_ERRORS=10
+      - RPC_CONCURRENCY=10
+      - AUTO_HANDLE_REORGS=false
+      - LOG_LEVEL=DEBUG
+      - LOG_PRETTY=true
+      - IPFS_GATEWAY_URL=http://fake-pinata:3000
       - CACHE_INVALIDATION_ENDPOINT=http://app:5173/api/cache/invalidate-account-ids
+      - HEALTH_PORT=3000
+      - NODE_ENV=development
+      - OTEL_DEBUG=false
+      - OTEL_SERVICE_NAME=dripfeed-dev
     ports:
       - 3001:3001
     depends_on:
@@ -91,8 +99,8 @@ services:
       - GITHUB_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
       - REDIS_URL=redis://redis:6379
       - ORCID_API_ENDPOINT=${ORCID_API_ENDPOINT-https://pub.sandbox.orcid.org/v3.0}
-      - ORCID_CLIENT_ID=${ORCID_CLIENT_ID-dummy}
-      - ORCID_CLIENT_SECRET=${ORCID_CLIENT_SECRET-dummy}
+      - ORCID_CLIENT_ID=${ORCID_CLIENT_ID-APP-DUMMYCREDENTIALS}
+      - ORCID_CLIENT_SECRET=${ORCID_CLIENT_SECRET-00000000-0000-0000-0000-000000000000}
       - ORCID_TOKEN_ENDPOINT=${ORCID_TOKEN_ENDPOINT-https://sandbox.orcid.org/oauth/token}
     ports:
       - '8080:8080'
@@ -102,13 +110,13 @@ services:
       fake-pinata:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 1s
       timeout: 30s
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-sha-0b554e8}-${ARCH}'
+    image: 'j537/contracts:${CONTRACTS_TAG-igor-orcid}-${ARCH}'
     pull_policy: always
     ports:
       - '8545:8545'
@@ -117,7 +125,7 @@ services:
     image: 'j537/fake-pinata:main'
     pull_policy: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
       interval: 1s
       timeout: 30s
       retries: 5
@@ -157,7 +165,7 @@ services:
     ports:
       - 54320:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "dripsdb" ]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -174,7 +182,7 @@ services:
     ports:
       - 54321:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "dripsdb" ]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -191,7 +199,7 @@ services:
     ports:
       - 54322:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "dripsdb" ]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -236,7 +244,7 @@ services:
     ports:
       - 7700:7700
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:7700/health" ]
       interval: 1s
       timeout: 60s
       retries: 10
@@ -268,7 +276,7 @@ services:
     ports:
       - 54323:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "dripsdb"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "dripsdb" ]
       interval: 30s
       timeout: 60s
       retries: 5

@@ -3,6 +3,7 @@
   import type {
     ListEditorDripListFragment,
     ListEditorProjectFragment,
+    ListEditorOrcidFragment,
   } from '../__generated__/gql.generated';
   import Button from '$lib/components/button/button.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -17,11 +18,13 @@
   import { AddItemError } from '../errors';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import { isAddress } from 'ethers';
+  import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
     addProject: { accountId: string; project: ListEditorProjectFragment };
     addDripList: { accountId: string; dripList: ListEditorDripListFragment };
+    addOrcid: { accountId: string; orcid: ListEditorOrcidFragment };
     errorDismissed: void;
   }>();
 
@@ -32,6 +35,7 @@
   export let allowDripLists: boolean;
   export let allowProjects: boolean;
   export let allowAddresses: boolean;
+  export let allowOrcids: boolean;
 
   export let weightsMode: boolean;
 
@@ -51,7 +55,8 @@
   $: validInput =
     (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
     (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
-    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`));
+    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)) ||
+    (allowOrcids && isValidOrcidId(inputValue));
 
   function createInvalidMessage(type: string, value: string): string {
     switch (type) {
@@ -66,6 +71,8 @@
         return "Couldn't find that Git project. Is it private?";
       case 'drip-list':
         return "This isn't a recognized Drip List";
+      case 'orcid':
+        return "This isn't a valid ORCID iD";
       default:
         return "This isn't valid";
     }
@@ -93,6 +100,8 @@
     if (project && !project.isVisible) {
       throw new AddItemError('Project is hidden and cannot be split to', 'warning');
     }
+
+    // TODO: orcid private?
   }
 
   function dispatchUpdate(recipientResult: RecipientResult) {
@@ -118,6 +127,13 @@
         dripList: recipientResult.dripList,
       });
     }
+
+    if (recipientResult?.orcid) {
+      dispatch('addOrcid', {
+        accountId: recipientResult.accountId,
+        orcid: recipientResult.orcid,
+      });
+    }
   }
 
   function displayError(error: NonNullable<(typeof errors)[0]>) {
@@ -140,6 +156,7 @@
         allowProjects && ('GitHub URL' as const),
         allowAddresses && ('ETH address' as const),
         allowDripLists && ('Drip List URL' as const),
+        allowOrcids && ('ORCID iD' as const),
       ],
       (v) => (v ? v : undefined),
     );
