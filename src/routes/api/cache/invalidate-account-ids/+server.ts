@@ -69,7 +69,9 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
       projectAccountId,
       ...chainData.support.map((support) => support.account.accountId),
       ...(isClaimed(chainData)
-        ? chainData.splits.dependencies.map((dependency) => dependency.account.accountId)
+        ? chainData.splits.dependencies
+            .filter((dependency) => 'account' in dependency)
+            .map((dependency) => dependency.account.accountId)
         : []),
       ...(isClaimed(chainData)
         ? chainData.splits.maintainers.map((maintainer) => maintainer.account.accountId)
@@ -103,7 +105,9 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
       nftDriverAccountId,
       dripList.owner.accountId,
       ...dripList.support.map((support) => support.account.accountId),
-      ...dripList.splits.map((split) => split.account.accountId),
+      ...dripList.splits
+        .filter((split) => 'account' in split)
+        .map((split) => split.account.accountId),
     ];
 
     return Promise.all(
