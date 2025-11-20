@@ -57,7 +57,7 @@
       time.
     </SolutionLineItem>
     <SolutionLineItem icon={TokenStreams}>
-      At the end of each cycle rewards are distributed to maintainers on-chain.
+      At the end of each cycle funds are distributed to contributors on-chain.
     </SolutionLineItem>
   </svelte:fragment>
 </SolutionCard>
