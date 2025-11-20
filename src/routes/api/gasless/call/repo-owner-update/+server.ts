@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { ethers, toUtf8Bytes } from 'ethers';
 import unreachable from '$lib/utils/unreachable';
 import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
 import assert from '$lib/utils/assert';
@@ -17,7 +16,7 @@ import { Octokit } from '@octokit/rest';
 import GitHub from '$lib/utils/github/GitHub';
 import { redis } from '../../../redis';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
-import { JsonRpcProvider } from 'ethers';
+import { buildRequestOwnerUpdateTx } from '../build-txs';
 
 const GELATO_API_KEY = getOptionalEnvVar(
   'GELATO_API_KEY',
@@ -40,19 +39,6 @@ const payloadSchema = z.object({
   projectName: z.string(),
   chainId: z.number(),
 });
-
-const REPO_DRIVER_ABI = `[
-  {
-    "inputs": [
-      { "internalType": "enum Forge", "name": "forge", "type": "uint8" },
-      { "internalType": "bytes", "name": "name", "type": "bytes" }
-    ],
-    "name": "requestUpdateOwner",
-    "outputs": [{ "internalType": "uint256", "name": "accountId", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]`;
 
 const projectUnclaimedQuery = gql`
   query isProjectUnclaimed($projectUrl: String!, $chains: [SupportedChain!]!) {
@@ -152,13 +138,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     }
   }
 
-  const provider = new JsonRpcProvider(network.rpcUrl);
-  const contract = new ethers.Contract(network.contracts.REPO_DRIVER, REPO_DRIVER_ABI, provider);
-
-  const tx = await contract.requestUpdateOwner.populateTransaction(
-    forge,
-    ethers.hexlify(toUtf8Bytes(projectName)),
-  );
+  const tx = await buildRequestOwnerUpdateTx(forge, projectName);
 
   const relayRequest: SponsoredCallRequest = {
     chainId: BigInt(chainId),

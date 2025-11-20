@@ -13,6 +13,7 @@
   export let applications: ListingApplication[];
   export let round: Round;
   export let signedIn: boolean;
+  export let hideState = false;
 
   export let reviewMode = false;
   export let decisions: Record<string, 'approve' | 'reject' | null> = {};
@@ -60,6 +61,7 @@
       {signedIn}
       {displayVisibilityNote}
       bind:decisions
+      {hideState}
     />
   </PaddedHorizontalScroll>
 {:else}
@@ -75,6 +77,7 @@
     bind:decisions
     ellipsis={true}
     {displayVisibilityNote}
+    {hideState}
   />
 {/if}
 

@@ -46,6 +46,13 @@
       ...IdentityCardEcosystem
     }
   `;
+
+  export const DRIP_VISUAL_ORCID_FRAGMENT = gql`
+    ${IDENTITY_CARD_ORCID_FRAGMENT}
+    fragment DripVisualOrcid on OrcidLinkedIdentity {
+      ...IdentityCardOrcid
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -60,6 +67,7 @@
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
     IDENTITY_CARD_ECOSYSTEM_FRAGMENT,
     IDENTITY_CARD_PROJECT_FRAGMENT,
+    IDENTITY_CARD_ORCID_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
@@ -72,6 +80,7 @@
     DripVisualProjectFragment,
     DripVisualUserFragment,
     DripVisualEcosystemFragment,
+    DripVisualOrcidFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
@@ -84,6 +93,7 @@
     | DripVisualDripListFragment
     | DripVisualUserFragment
     | DripVisualEcosystemFragment
+    | DripVisualOrcidFragment
     | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
   export let disableLinks = false;
@@ -176,6 +186,8 @@
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
     {:else if to && to.__typename === 'EcosystemMainAccount'}
       <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
+    {:else if to && to.__typename === 'OrcidLinkedIdentity'}
+      <IdentityCard disableLink={disableLinks} orcid={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

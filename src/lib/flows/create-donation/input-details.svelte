@@ -4,6 +4,8 @@
     DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
+    DRIP_VISUAL_ORCID_FRAGMENT,
+    DRIP_VISUAL_USER_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   export const CREATE_DONATION_DETAILS_STEP_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
@@ -40,6 +42,26 @@
       }
     }
   `;
+
+  export const CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT = gql`
+    ${DRIP_VISUAL_ORCID_FRAGMENT}
+    fragment CreateDonationDetailsStepOrcid on OrcidLinkedIdentity {
+      ...DripVisualOrcid
+      account {
+        accountId
+      }
+    }
+  `;
+
+  export const CREATE_DONATION_DETAILS_STEP_USER_FRAGMENT = gql`
+    ${DRIP_VISUAL_USER_FRAGMENT}
+    fragment CreateDonationDetailsStepUser on User {
+      ...DripVisualUser
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -60,6 +82,7 @@
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
     CreateDonationDetailsStepEcosystemFragment,
+    CreateDonationDetailsStepOrcidFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -83,7 +106,8 @@
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 
   let selectedTokenAllowance: bigint | undefined;
 
@@ -103,6 +127,12 @@
       case 'EcosystemMainAccount':
         receiverTypeLabel = 'Ecosystem';
         break;
+      case 'OrcidLinkedIdentity':
+        receiverTypeLabel = 'ORCID';
+        break;
+      case 'AddressDriverAccount':
+        receiverTypeLabel = 'Address';
+        break;
     }
   }
 
@@ -115,6 +145,7 @@
         break;
       case 'Project':
       case 'EcosystemMainAccount':
+      case 'OrcidLinkedIdentity':
         recipientAccountId = receiver.account.accountId;
         break;
     }
@@ -176,16 +207,29 @@
         <WhatsNextCard>
           <svelte:fragment slot="title">After your donation...</svelte:fragment>
           <svelte:fragment slot="items">
-            <WhatsNextItem icon={TransactionsIcon}>
-              Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
-              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-            </WhatsNextItem>
-            <WhatsNextItem icon={CalendarIcon}>
-              The next date that accumulated funds will be distributed is <span
-                class="typo-text-bold"
-                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-              >.
-            </WhatsNextItem>
+            {#if receiver.__typename === 'OrcidLinkedIdentity'}
+              <WhatsNextItem icon={CalendarIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed to its owner on
+                <span class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {:else}
+              <WhatsNextItem icon={TransactionsIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
+                <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+              </WhatsNextItem>
+              <WhatsNextItem icon={CalendarIcon}>
+                The next date that accumulated funds will be distributed is <span
+                  class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {/if}
           </svelte:fragment>
         </WhatsNextCard>
       </WhatsNextSection>

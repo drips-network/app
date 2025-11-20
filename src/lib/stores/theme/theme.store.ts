@@ -3,6 +3,12 @@ import storedWritable from '@efstajas/svelte-stored-writable';
 import { derived, get, writable } from 'svelte/store';
 import { z } from 'zod';
 
+export type Theme = 'light' | 'dark' | 'h4x0r';
+export type PrimaryColor = z.infer<typeof storedPrimaryColorSchema>;
+
+/** Binary light / dark value for cases where we have alternate light / dark raster images */
+export type ImageTheme = 'light' | 'dark';
+
 const META_THEME_COLOR = {
   blue: '#5555ff',
   pink: '#ff55ff',
@@ -30,8 +36,15 @@ const storedPrimaryColorSchema = z.union([
   z.literal('red'),
 ]);
 
-export type Theme = 'light' | 'dark' | 'h4x0r';
-export type PrimaryColor = z.infer<typeof storedPrimaryColorSchema>;
+const imageThemeMap = {
+  light: 'light',
+  dark: 'dark',
+  h4x0r: 'dark',
+} as const;
+
+export function getImageTheme(theme: Theme): ImageTheme {
+  return imageThemeMap[theme];
+}
 
 export default (() => {
   const darkModeQuery = browser && window.matchMedia('(prefers-color-scheme: dark)');
