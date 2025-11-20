@@ -200,11 +200,9 @@
 
   // Fixed item height for VirtualList
   const ITEM_HEIGHT = 48;
-  const SEARCH_BAR_HEIGHT = 48;
 
   // Measure parent container height
   let containerElem = $state<HTMLDivElement>();
-  let containerHeight = $state(0);
 
   let filteredItems = $derived(
     Object.fromEntries(
@@ -249,17 +247,9 @@
       return true;
     }),
   );
-  run(() => {
-    if (containerElem) {
-      containerHeight = containerElem.clientHeight;
-    }
-  });
+
   // Calculate height: subtract search bar height if searchable, use parent height if available
-  let virtualListHeight = $derived(
-    containerHeight > 0
-      ? containerHeight - (searchable ? SEARCH_BAR_HEIGHT : 0)
-      : Math.min(itemsArray.length * ITEM_HEIGHT, 1000),
-  );
+  let virtualListHeight = $derived(Math.min(itemsArray.length * ITEM_HEIGHT, 1000));
 </script>
 
 <svelte:window onkeydown={handleArrowKeys} />
@@ -296,7 +286,6 @@
     {#if hasAnyItems && itemsArray.length > 0}
       <VirtualList
         height={virtualListHeight}
-        width="100%"
         itemCount={itemsArray.length}
         itemSize={ITEM_HEIGHT}
         {scrollToIndex}
