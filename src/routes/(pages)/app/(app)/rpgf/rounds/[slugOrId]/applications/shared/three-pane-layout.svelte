@@ -17,7 +17,6 @@
   import type { ApplicationReviewDto } from '$lib/utils/rpgf/types/application.js';
   import type { InProgressBallot, WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import type { Round } from '$lib/utils/rpgf/types/round';
-  import unreachable from '$lib/utils/unreachable.js';
   import { onMount, setContext } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
   import {
@@ -128,12 +127,7 @@
 
         {#if resultsMode}
           <div class="sidebar-card">
-            <RpgfResultsCard
-              resultsCalculated={round.resultsCalculated}
-              resultsPublished={round.resultsPublished}
-              roundId={round.id}
-              roundName={round.name ?? unreachable()}
-            />
+            <RpgfResultsCard {round} />
           </div>
         {/if}
       </div>
