@@ -25,6 +25,7 @@
   export let projects: ProjectsSectionProjectFragment[];
   export let withClaimProjectButton = false;
   export let showVisibilityToggle = false;
+  export let label = 'Your projects';
 
   let error = false;
 
@@ -46,7 +47,7 @@
   bind:collapsable
   header={{
     icon: Box,
-    label: 'Your projects',
+    label,
     actions: withClaimProjectButton
       ? [
           {

@@ -93,6 +93,7 @@
     <div class="article-content gap-16">
       <Developer accountId={data.profileData.account.accountId} />
       <YourProjectsSection
+        label={isSelf ? 'Your projects' : 'Projects'}
         collapsable
         collapsed={mapFilterUndefined([profileChainData], (v) => (v === null ? undefined : v))
           .length === 0}
@@ -102,6 +103,7 @@
         withClaimProjectButton={true}
       />
       <YourDripListsSection
+        label={isSelf ? 'Your Drip Lists' : 'Drip Lists'}
         collapsable
         collapsed={[
           ...data.profileData.votingRounds,

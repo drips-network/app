@@ -19,7 +19,7 @@ import SuccessStep from '$lib/components/success-step/success-step.svelte';
 import WalletSlot from '$lib/components/slots/wallet-slot.svelte';
 import { gql } from 'graphql-request';
 import type { ClaimProjectFlowProjectFragment } from './__generated__/gql.generated';
-import type { Items, ListEditorConfig, Weights } from '$lib/components/list-editor/types';
+import type { ListEditorConfig } from '$lib/components/list-editor/types';
 import ChooseNetwork from './steps/choose-network/choose-network.svelte';
 import type { FundingJson } from '$lib/utils/github/GitHub';
 import type { TemplateHighlight } from './steps/add-ethereum-address/drips-json-template';

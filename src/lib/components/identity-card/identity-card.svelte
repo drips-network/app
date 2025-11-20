@@ -43,7 +43,7 @@
       }
       orcid
     }
-  `
+  `;
 </script>
 
 <script lang="ts">
@@ -56,7 +56,7 @@
     IdentityCardDripListFragment,
     IdentityCardProjectFragment,
     IdentityCardEcosystemFragment,
-    IdentityCardOrcidFragment
+    IdentityCardOrcidFragment,
   } from './__generated__/gql.generated';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -95,9 +95,9 @@
         break;
       case !!ecosystem:
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
-        break
+        break;
       case !!orcid:
-        link = buildOrcidUrl(orcid.orcid)
+        link = buildOrcidUrl(orcid.orcid);
     }
   }
 </script>
