@@ -447,6 +447,35 @@ export async function castBallotAsXlsx(
   return submitSpreadsheetBallot(f, roundSlug, data, 'xlsx');
 }
 
+async function importResultsSpreadsheet(
+  f = fetch,
+  roundId: string,
+  data: SpreadsheetBody,
+  format: SpreadsheetFormat,
+): Promise<void> {
+  await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/results/import?format=${format}`,
+    'POST',
+    data,
+    f,
+    true,
+    false,
+    SPREADSHEET_CONTENT_TYPE[format],
+  );
+}
+
+export async function importResultsAsCsv(f = fetch, roundId: string, data: string): Promise<void> {
+  return importResultsSpreadsheet(f, roundId, data, 'csv');
+}
+
+export async function importResultsAsXlsx(
+  f = fetch,
+  roundId: string,
+  data: ArrayBuffer,
+): Promise<void> {
+  return importResultsSpreadsheet(f, roundId, data, 'xlsx');
+}
+
 export async function getOwnBallot(f = fetch, roundSlug: string): Promise<WrappedBallot | null> {
   const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots/own`,
