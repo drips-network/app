@@ -75,11 +75,7 @@
     }
   }
 
-  let invalid = $derived(
-    Boolean(
-      urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
-    ),
-  );
+  let invalid = $derived(Boolean(urlSlugValidationState.type === 'invalid'));
 
   let activeAvatarTab: 'tab1' | 'tab2' = $derived(updatedRound.customAvatarCid ? 'tab2' : 'tab1');
 

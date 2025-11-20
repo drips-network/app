@@ -38,7 +38,6 @@
 
 <style>
   .sections {
-    margin-top: 4rem;
     display: flex;
     flex-direction: column;
     gap: 4rem;

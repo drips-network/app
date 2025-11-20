@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { Round } from '$lib/utils/rpgf/types/round';
   import EmojiOrIpfsAvatar from '../emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
@@ -23,31 +21,24 @@
     PendingResults,
     Results,
   }
-  let enrichedState = $state<EnrichedState>();
-
-  run(() => {
+  let enrichedState = $derived.by<EnrichedState>(() => {
     if (!round.state) {
-      enrichedState = EnrichedState.Draft;
+      return EnrichedState.Draft;
     } else if (round.resultsPublished) {
-      enrichedState = EnrichedState.Results;
+      return EnrichedState.Results;
     } else {
       switch (round.state) {
         case 'intake':
-          enrichedState = EnrichedState.Intake;
-          break;
+          return EnrichedState.Intake;
         case 'voting':
-          enrichedState = EnrichedState.Voting;
-          break;
+          return EnrichedState.Voting;
         case 'pending-intake':
-          enrichedState = EnrichedState.PendingIntake;
-          break;
+          return EnrichedState.PendingIntake;
         case 'pending-voting':
-          enrichedState = EnrichedState.PendingVoting;
-          break;
+          return EnrichedState.PendingVoting;
         case 'pending-results':
         case 'results':
-          enrichedState = EnrichedState.PendingResults;
-          break;
+          return EnrichedState.PendingResults;
       }
     }
   });
@@ -62,7 +53,7 @@
     [EnrichedState.Results]: 'Results available',
   };
 
-  let stateLabel = $derived(enrichedState ? stateLabels[enrichedState] : undefined);
+  let stateLabel = $derived(stateLabels[enrichedState]);
 </script>
 
 <PrimaryColorThemer colorHex={round.color}>
