@@ -24,16 +24,33 @@
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
 
-  export let round: Round;
-  export let ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
-  export let voteMode: boolean;
-  export let reviewMode: boolean;
-  export let resultsMode: boolean;
-  export let existingBallot: WrappedBallot | null;
-  export let pageIsEmpty = false;
-  export let hideAppsPane = false;
+  interface Props {
+    round: Round;
+    ballot: Writable<InProgressBallot> & {
+      clear: () => void;
+    };
+    voteMode: boolean;
+    reviewMode: boolean;
+    resultsMode: boolean;
+    existingBallot: WrappedBallot | null;
+    pageIsEmpty?: boolean;
+    hideAppsPane?: boolean;
+    apps?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    round,
+    ballot,
+    voteMode,
+    reviewMode,
+    resultsMode,
+    existingBallot,
+    pageIsEmpty = false,
+    hideAppsPane = false,
+    apps,
+    children,
+  }: Props = $props();
 
   const ballotValidationErrors: BallotValidationErrorsStore = writable(new Set());
   setContext(ballotValidationContextKey, ballotValidationErrors);
@@ -46,9 +63,9 @@
     };
   });
 
-  $: approveCount = Object.values($decisionsStore).filter((v) => v === 'approve').length;
-  $: rejectCount = Object.values($decisionsStore).filter((v) => v === 'reject').length;
-  $: hasDecisions = approveCount + rejectCount > 0;
+  let approveCount = $derived(Object.values($decisionsStore).filter((v) => v === 'approve').length);
+  let rejectCount = $derived(Object.values($decisionsStore).filter((v) => v === 'reject').length);
+  let hasDecisions = $derived(approveCount + rejectCount > 0);
 
   async function handleSubmitReviewDecisions() {
     const mappedToDto: ApplicationReviewDto = mapFilterUndefined(
@@ -71,7 +88,7 @@
     await invalidate('rpgf:round:applications');
   }
 
-  $: ballotStore = ballot;
+  let ballotStore = $derived(ballot);
 </script>
 
 <div
@@ -107,7 +124,7 @@
             <Button
               disabled={!hasDecisions}
               variant="primary"
-              on:click={() =>
+              onclick={() =>
                 doWithConfirmationModal(
                   "Are you sure you want to submit these decisions? You can't undo them later.",
                   async () => await doWithErrorModal(handleSubmitReviewDecisions),
@@ -134,17 +151,17 @@
     </div>
   {/if}
 
-  {#if $$slots.apps}
+  {#if apps}
     <div class="apps">
       <div class="apps-inner">
-        <slot name="apps" />
+        {@render apps?.()}
       </div>
     </div>
   {/if}
 
   <div class="page">
     <div style:visibility="hidden" style:position="absolute" style:top="-84px"></div>
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

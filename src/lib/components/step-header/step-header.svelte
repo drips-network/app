@@ -1,17 +1,24 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     emoji?: string | undefined;
     headline?: string | undefined;
     description?: string | undefined;
+    emojiSlot?: Snippet;
   }
 
-  let { emoji = undefined, headline = undefined, description = undefined }: Props = $props();
+  let {
+    emojiSlot,
+    emoji = undefined,
+    headline = undefined,
+    description = undefined,
+  }: Props = $props();
 </script>
 
 <div class="step-header">
-  <slot name="emoji" />
+  {@render emojiSlot?.()}
   {#if emoji}<Emoji {emoji} size="huge" />{/if}
   {#if headline}<h1>{headline}</h1>{/if}
   {#if description}<p>{description}</p>{/if}

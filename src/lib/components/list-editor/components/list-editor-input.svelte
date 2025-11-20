@@ -260,7 +260,7 @@
     disabled={loading || !validInput || maxItemsReached}
     variant={validInput ? 'primary' : undefined}
     {loading}
-    on:click={() => handleSubmit(inputValue)}>Add</Button
+    onclick={() => handleSubmit(inputValue)}>Add</Button
   >
 </div>
 

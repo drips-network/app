@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const REVIEW_STEP_UNCLAIMED_ORCID_FRAGMENT = gql`
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
     fragment ReviewStepUnclaimedOrcid on OrcidLinkedIdentity {
@@ -39,15 +39,18 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let canEditWalletConnection = true;
+  interface Props {
+    context: Writable<State>;
+    canEditWalletConnection?: boolean;
+  }
 
-  $: orcidProfile = $context.claimableMetadata ?? unreachable();
-  $: orcidAccount = $context.claimableAccount ?? unreachable();
+  let { context, canEditWalletConnection = true }: Props = $props();
+
+  let orcidProfile = $derived($context.claimableMetadata ?? unreachable());
+  let orcidAccount = $derived($context.claimableAccount ?? unreachable());
 
   // For previewing what the ORCID will look like after claiming
-  let fakeClaimedOrcid: OrcidProfileHeaderFragment;
-  $: fakeClaimedOrcid = {
+  let fakeClaimedOrcid: OrcidProfileHeaderFragment = $derived({
     __typename: 'OrcidLinkedIdentity',
     orcid: orcidAccount.orcid,
     chain: network.gqlName,
@@ -58,7 +61,7 @@
     orcidMetadata: orcidAccount.orcidMetadata,
     areSplitsValid: false,
     isClaimed: false,
-  };
+  });
 
   async function submit() {
     dispatch('goForward');
@@ -67,10 +70,12 @@
   let withdrawableBalances: MergeWithdrawableBalancesFragment[] =
     $context.claimableAccount?.withdrawableBalances ?? [];
 
-  $: hasCollectableAmount =
-    withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0;
-  $: hasSplittableAmount =
-    withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length > 0;
+  let hasCollectableAmount = $derived(
+    withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length > 0,
+  );
+  let hasSplittableAmount = $derived(
+    withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length > 0,
+  );
 </script>
 
 <StandaloneFlowStepLayout
@@ -83,13 +88,13 @@
     </div>
   </FormField>
   <FormField type="div" title="Owned by">
-    <svelte:fragment slot="action">
+    {#snippet action()}
       {#if canEditWalletConnection}
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+        <Button variant="ghost" onclick={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
           >Edit</Button
         >
       {/if}
-    </svelte:fragment>
+    {/snippet}
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
@@ -101,8 +106,10 @@
   <WhatsNextSection>
     {#if hasCollectableAmount || hasSplittableAmount}
       <WhatsNextCard>
-        <svelte:fragment slot="title">On transaction confirmation...</svelte:fragment>
-        <svelte:fragment slot="items">
+        {#snippet title()}
+          On transaction confirmation...
+        {/snippet}
+        {#snippet items()}
           {#if hasCollectableAmount && hasSplittableAmount}
             <WhatsNextItem icon={Download}
               >Some of your claimable funds will be <span class="typo-text-bold"
@@ -127,12 +134,14 @@
               >.</WhatsNextItem
             >
           {/if}
-        </svelte:fragment>
+        {/snippet}
       </WhatsNextCard>
     {/if}
     <WhatsNextCard>
-      <svelte:fragment slot="title">After transaction confirmation...</svelte:fragment>
-      <svelte:fragment slot="items">
+      {#snippet title()}
+        After transaction confirmation...
+      {/snippet}
+      {#snippet items()}
         <WhatsNextItem icon={EyeOpenIcon}
           >Anyone can support or split to your ORCID on Drips.</WhatsNextItem
         >
@@ -140,13 +149,13 @@
           >You can <span class="typo-text-bold">collect your tokens</span> from your
           <span class="typo-text-bold">Drips dashboard</span>.</WhatsNextItem
         >
-      </svelte:fragment>
+      {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm in wallet</Button>
-  </svelte:fragment>
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button icon={WalletIcon} variant="primary" onclick={submit}>Confirm in wallet</Button>
+  {/snippet}
 </StandaloneFlowStepLayout>

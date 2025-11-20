@@ -22,26 +22,30 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Wave</svelte:fragment>
-  <svelte:fragment slot="headline"
-    >Reward open-source contributions fairly and transparently</svelte:fragment
-  >
-  <svelte:fragment slot="description">
+  {#snippet usecase_badge()}
+    Wave
+  {/snippet}
+  {#snippet headline()}
+    Reward open-source contributions fairly and transparently
+  {/snippet}
+  {#snippet description()}
     Waves turn open-source sprints into on-chain funding cycles. Ecosystems launch recurring Waves
     to reward measurable impact — all tracked from issue to fund distribution.
-  </svelte:fragment>
+  {/snippet}
 </SolutionHeader>
 
 <SolutionCard illustrationScale="1.1">
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <ThemedRasterImage
       srcLight="/assets/solutions/wave/what-it-enables/light.png"
       srcDark="/assets/solutions/wave/what-it-enables/dark.png"
       alt="Wave solution illustration"
     />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">What It Enables</svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet headline()}
+    What It Enables
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Wave}>
       Launch monthly “Waves” with a USD-denominated reward pool tied to approved repositories.
     </SolutionLineItem>
@@ -59,24 +63,28 @@
     <SolutionLineItem icon={TokenStreams}>
       At the end of each cycle funds are distributed to contributors on-chain.
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionInterstitial>
-  <svelte:fragment slot="headline">Want fair, on-chain rewards for your community?</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet headline()}
+    Want fair, on-chain rewards for your community?
+  {/snippet}
+  {#snippet description()}
     Our team can walk you through how Drips fits into your workflow, help you design repeatable
     funding cycles, and show you how to reward meaningful work with full on-chain accountability.
-  </svelte:fragment>
+  {/snippet}
 </SolutionInterstitial>
 
 <SolutionCard reverse illustrationScale="1.1">
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsWavesWhoItsFor />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Who It's For</svelte:fragment>
+  {/snippet}
+  {#snippet headline()}
+    Who It's For
+  {/snippet}
 
-  <svelte:fragment slot="line-items">
+  {#snippet line_items()}
     <SolutionLineItem icon={Ecosystem}>
       Ecosystems: Drive developer activity, launch recurring funding cycles, manage applicants and
       distributions in a unified flow.
@@ -85,17 +93,19 @@
       Maintainers: Attract high-quality contributors, grow the community, set issue priorities, sync
       repos, and track contribution transparently.
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionCard illustrationScale="1.1">
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsWavesWhyItMatters />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Why It Matters</svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Why It Matters
+  {/snippet}
+  {#snippet description()}
     Drips Wave captures the entire funding lifecycle. From proposal to contribution, verification,
     and fund allocation. Built on the Drips protocol, it’s engineered for open ecosystems committed
     to fair, transparent rewarding of public goods.
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>

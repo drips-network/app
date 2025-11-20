@@ -181,7 +181,7 @@
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  let activeTab = $state<string>();
+  let activeTab = $state<'tab1' | 'tab2'>('tab1');
 
   let incomingStreamsTotalStreamed = $state<{ tokenAddress: string; amount: bigint }[]>();
   function updateIncomingStreamsTotalStreamed() {
@@ -230,11 +230,11 @@
   let clampTitleClass = $derived(!clampTitle ? '' : isMinimal ? 'line-clamp-2' : 'line-clamp-1');
   run(() => {
     if (dripList && votingRound) {
-      activeTab = 'tab-1';
+      activeTab = 'tab1';
     } else if (dripList) {
-      activeTab = 'tab-1';
+      activeTab = 'tab1';
     } else if (votingRound) {
-      activeTab = 'tab-2';
+      activeTab = 'tab2';
     }
   });
   let isOwnVotingRound = $derived(votingRound?.publisherAddress === $walletStore?.address);
@@ -348,7 +348,7 @@
 
         <TransitionedHeight transitionHeightChanges>
           <div class="tabs">
-            <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
+            <div class="list tab tab-1" class:active-tab={activeTab === 'tab1'}>
               {#if dripList}
                 <div class="flex flex-col gap-1.5">
                   <div class="totals">
@@ -405,7 +405,7 @@
 
             <div
               class="list tab tab-2"
-              class:active-tab={activeTab === 'tab-2'}
+              class:active-tab={activeTab === 'tab2'}
               class:-mt-6={!votingRound?.result}
             >
               {#if votingRound}

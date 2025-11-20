@@ -9,7 +9,7 @@ export default () => ({
   steps: [
     makeStep({
       component: ChooseIdentity,
-      props: undefined,
+      props: {},
     }),
   ],
 });

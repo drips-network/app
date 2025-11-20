@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -7,7 +9,7 @@
   import { fade } from 'svelte/transition';
   import SplitsListComponent from '../../splits.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
-  import { tick, type SvelteComponent, onMount } from 'svelte';
+  import { tick, onMount, type Component } from 'svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
@@ -23,34 +25,45 @@
   import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
   import OrcidBadge from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 
-  export let split: SplitsComponentSplitsReceiver | SplitGroup;
-  export let disableLink = true;
-  export let linkToNewTab = false;
-  export let isNested = false;
-  export let draft = false;
+  let element: HTMLDivElement | undefined = $state();
 
-  /** Set to false to hide the chevron next to split groups. */
-  export let groupsExpandable = true;
+  interface Props {
+    split: SplitsComponentSplitsReceiver | SplitGroup;
+    disableLink?: boolean;
+    linkToNewTab?: boolean;
+    isNested?: boolean;
+    draft?: boolean;
+    /** Set to false to hide the chevron next to split groups. */
+    groupsExpandable?: boolean;
+    /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
+    isLast?: boolean;
+    /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
+    isFirst?: boolean;
+    disableTooltip?: boolean;
+    /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
+    chainOverride?: SupportedChain | undefined;
+    groupExpanded?: boolean;
+  }
 
-  /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
-  export let isLast = false;
-  /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
-  export let isFirst = false;
+  let {
+    split,
+    disableLink = true,
+    linkToNewTab = false,
+    isNested = false,
+    draft = false,
+    groupsExpandable = true,
+    isLast = false,
+    isFirst = false,
+    disableTooltip = false,
+    chainOverride = undefined,
+    groupExpanded = $bindable(false),
+  }: Props = $props();
 
-  export let disableTooltip = false;
+  let primaryColor = $derived(
+    element ? getComputedStyle(element).getPropertyValue('--color-primary') : undefined,
+  );
 
-  /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
-  export let chainOverride: SupportedChain | undefined = undefined;
-
-  let element: HTMLDivElement;
-
-  export let groupExpanded = false;
-
-  $: primaryColor = element
-    ? getComputedStyle(element).getPropertyValue('--color-primary')
-    : undefined;
-
-  $: percentageTextColor = primaryColor ? getContrastColor(primaryColor) : 'white';
+  let percentageTextColor = $derived(primaryColor ? getContrastColor(primaryColor) : 'white');
 
   function calcGroupWeight(group: SplitGroup): number {
     return group.list.reduce(
@@ -71,7 +84,7 @@
 
   interface ComponentAndProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: typeof SvelteComponent<any>;
+    component: Component<any>;
     props: Record<string, unknown>;
   }
 
@@ -119,11 +132,11 @@
   }
 
   const GROUP_EXPAND_DURATION = 300;
-  let groupElem: HTMLDivElement | undefined;
+  let groupElem: HTMLDivElement | undefined = $state();
   let groupHeight = tweened(48, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
-  let groupHeightAnimating = false;
+  let groupHeightAnimating = $state(false);
 
-  let groupPileElem: HTMLDivElement | undefined;
+  let groupPileElem: HTMLDivElement | undefined = $state();
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
   async function alignGroupName() {
@@ -133,7 +146,9 @@
 
   // Align group name on mount, when splits change, and on a mutation of groupPileElem
   onMount(alignGroupName);
-  $: split && alignGroupName();
+  run(() => {
+    split && alignGroupName();
+  });
 
   async function toggleGroup() {
     if (!groupElem) return;
@@ -231,7 +246,7 @@
           bind:this={groupElem}
           style:height={groupHeightAnimating ? `${$groupHeight}px` : 'auto'}
         >
-          <button class="name" on:click={toggleGroup}>
+          <button class="name" onclick={toggleGroup}>
             <div class="pile" bind:this={groupPileElem}>
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>

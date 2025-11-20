@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
@@ -16,24 +18,34 @@
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
 
-  export let round: Round;
-  export let application: ListingApplication;
-  export let hideState = false;
+  interface Props {
+    round: Round;
+    application: ListingApplication;
+    hideState?: boolean;
+    reviewMode: boolean;
+    decision?: ComponentProps<typeof ApplicationDecisionButtons>['decision'];
+    voteStep?: 'build-ballot' | 'assign-votes' | null;
+    ballotStore: Writable<InProgressBallot>;
+    ellipsis?: boolean;
+  }
 
-  export let reviewMode: boolean;
-  export let decision: ComponentProps<ApplicationDecisionButtons>['decision'] = null;
-
-  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
-  export let ballotStore: Writable<InProgressBallot>;
-
-  export let ellipsis: boolean = false;
+  let {
+    round,
+    application,
+    hideState = false,
+    reviewMode,
+    decision = $bindable(null),
+    voteStep = null,
+    ballotStore,
+    ellipsis = false,
+  }: Props = $props();
 
   /** If true, only the application name and icon are clickable, otherwise entire row.
    * Needed for voting mode bc otherwise the input becomes really buggy
    */
-  $: smallLink = voteStep === 'assign-votes';
+  let smallLink = $derived(voteStep === 'assign-votes');
 
-  let picked = $ballotStore[application.id] !== undefined;
+  let picked = $state($ballotStore[application.id] !== undefined);
 
   function updateBallot(picked: boolean) {
     if (voteStep !== 'build-ballot') return;
@@ -51,11 +63,14 @@
       });
     }
   }
-  $: updateBallot(picked);
+  run(() => {
+    updateBallot(picked);
+  });
 
-  let voteAmountInput: string | undefined =
-    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]);
-  let voteAmountInputValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let voteAmountInput: string | undefined = $state(
+    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]),
+  );
+  let voteAmountInputValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
 
   const ballotValidationErrors = getContext<BallotValidationErrorsStore | undefined>(
     ballotValidationContextKey,
@@ -82,14 +97,15 @@
     updateValidationErrors(state);
   }
 
-  $: votePlaceholder =
+  let votePlaceholder = $derived(
     round.minVotesPerProjectPerVoter !== null && round.maxVotesPerProjectPerVoter !== null
       ? `${round.minVotesPerProjectPerVoter}-${round.maxVotesPerProjectPerVoter}`
       : round.minVotesPerProjectPerVoter !== null
         ? `${round.minVotesPerProjectPerVoter}+`
         : round.maxVotesPerProjectPerVoter !== null
           ? `0-${round.maxVotesPerProjectPerVoter}`
-          : undefined;
+          : undefined,
+  );
 
   function updateVoteAmount(voteAmountInput: string | undefined) {
     if (voteStep !== 'assign-votes') {
@@ -151,17 +167,21 @@
       };
     }
   }
-  $: updateVoteAmount(voteAmountInput);
+  run(() => {
+    updateVoteAmount(voteAmountInput);
+  });
 
   onDestroy(() => {
     updateValidationErrors({ type: 'unvalidated' });
   });
 
-  $: active = $page.url.href.includes(`/applications/${application.id}`);
+  let active = $derived($page.url.href.includes(`/applications/${application.id}`));
 
-  $: link = `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
-    voteStep === 'assign-votes' ? '?backToBallot' : ''
-  }${$page.url.search}`;
+  let link = $derived(
+    `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
+      voteStep === 'assign-votes' ? '?backToBallot' : ''
+    }${$page.url.search}`,
+  );
 </script>
 
 <svelte:element
@@ -187,7 +207,7 @@
   {#if voteStep === 'assign-votes' && application.state === 'approved'}
     <div class="vote-count-input">
       <TextInput
-        on:click={(e) => e.preventDefault()}
+        onclick={(e) => e.preventDefault()}
         validationState={voteAmountInputValidationState}
         bind:value={voteAmountInput}
         variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}

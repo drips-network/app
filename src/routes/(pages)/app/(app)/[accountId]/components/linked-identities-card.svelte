@@ -52,7 +52,7 @@
   {/if}
   {#if canLinkIdentity}
     <div class="actions">
-      <Button icon={Link} variant="muted" on:click={launchLinkIdentityFlow}>Link identity</Button>
+      <Button icon={Link} variant="muted" onclick={launchLinkIdentityFlow}>Link identity</Button>
     </div>
   {/if}
 </div>

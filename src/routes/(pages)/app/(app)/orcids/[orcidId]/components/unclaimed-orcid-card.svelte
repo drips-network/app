@@ -78,7 +78,7 @@
               {#if unclaimedTokensExpandable}
                 <button
                   class="expand-chevron"
-                  on:click={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
+                  onclick={() => (unclaimedTokensExpanded = !unclaimedTokensExpanded)}
                   style:transform="rotate({unclaimedTokensExpanded ? 180 : 0}deg)"
                 >
                   <ChevronDown style="fill: var(--color-foreground); width: 2rem; height: 2rem;" />
@@ -100,7 +100,7 @@
 
       {#if hasClaimableFunds && showClaimButton}
         <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-end">
-          <Button icon={Wallet} variant="normal" on:click={() => dispatch('claimButtonClick')}
+          <Button icon={Wallet} variant="normal" onclick={() => dispatch('claimButtonClick')}
             >Claim funds</Button
           >
         </div>

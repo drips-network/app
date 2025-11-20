@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
@@ -65,6 +65,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -100,26 +102,31 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<CreateDonationFlowState>;
+  interface Props {
+    context: Writable<CreateDonationFlowState>;
+    receiver:
+      | CreateDonationDetailsStepAddressDriverAccountFragment
+      | CreateDonationDetailsStepNftDriverAccountFragment
+      | CreateDonationDetailsStepProjectFragment
+      | CreateDonationDetailsStepEcosystemFragment
+      | CreateDonationDetailsStepOrcidFragment;
+  }
 
-  export let receiver:
-    | CreateDonationDetailsStepAddressDriverAccountFragment
-    | CreateDonationDetailsStepNftDriverAccountFragment
-    | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment
-    | CreateDonationDetailsStepOrcidFragment;
+  let { context, receiver }: Props = $props();
 
-  let selectedTokenAllowance: bigint | undefined;
+  let selectedTokenAllowance: bigint | undefined = $state();
 
-  let formValid: boolean;
+  let formValid = $state(false);
 
-  let amount: bigint | undefined;
+  let amount: bigint | undefined = $state();
 
-  $: selectedTokenAddress = $context.selectedTokenAddress?.[0];
-  $: selectedToken = selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null;
+  let selectedTokenAddress = $derived($context.selectedTokenAddress?.[0]);
+  let selectedToken = $derived(
+    selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null,
+  );
 
-  let receiverTypeLabel = 'Drip List';
-  $: {
+  let receiverTypeLabel = $state('Drip List');
+  run(() => {
     switch (receiver.__typename) {
       case 'Project':
         receiverTypeLabel = 'Drips project';
@@ -134,7 +141,7 @@
         receiverTypeLabel = 'Address';
         break;
     }
-  }
+  });
 
   function submit() {
     let recipientAccountId: string;
@@ -194,19 +201,23 @@
     <TransitionedHeight collapsed={!formValid} negativeMarginWhileCollapsed="-1rem">
       <WhatsNextSection>
         <WhatsNextCard>
-          <svelte:fragment slot="title">On transaction confirmation...</svelte:fragment>
-          <svelte:fragment slot="items">
+          {#snippet title()}
+            On transaction confirmation...
+          {/snippet}
+          {#snippet items()}
             <WhatsNextItem icon={TransactionsIcon}
-              >{formatTokenAmount(amount, selectedToken.info.decimals, 1n, false)}
+              >{amount ? formatTokenAmount(amount, selectedToken.info.decimals, 1n, false) : ''}
               {selectedToken?.info.symbol} will be
               <span class="typo-text-bold">immediately sent from your wallet</span>
               to this {receiverTypeLabel}.</WhatsNextItem
             >
-          </svelte:fragment>
+          {/snippet}
         </WhatsNextCard>
         <WhatsNextCard>
-          <svelte:fragment slot="title">After your donation...</svelte:fragment>
-          <svelte:fragment slot="items">
+          {#snippet title()}
+            After your donation...
+          {/snippet}
+          {#snippet items()}
             {#if receiver.__typename === 'OrcidLinkedIdentity'}
               <WhatsNextItem icon={CalendarIcon}>
                 Funds sent to {receiverTypeLabel}s on {network.label} are distributed to its owner on
@@ -230,16 +241,16 @@
                 >.
               </WhatsNextItem>
             {/if}
-          </svelte:fragment>
+          {/snippet}
         </WhatsNextCard>
       </WhatsNextSection>
     </TransitionedHeight>
   {/if}
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" icon={WalletIcon} on:click={submit} disabled={!formValid}
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" icon={WalletIcon} onclick={submit} disabled={!formValid}
       >Confirm in your wallet</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>

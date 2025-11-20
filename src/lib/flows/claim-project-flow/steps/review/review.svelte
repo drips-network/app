@@ -116,7 +116,6 @@
           makeStep({
             component: ProjectCustomizerStep,
             props: {
-              originalProject: project,
               newProjectData: newProjectDataWritable,
             },
           }),

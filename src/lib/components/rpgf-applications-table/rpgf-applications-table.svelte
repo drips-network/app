@@ -41,7 +41,7 @@
     <MagnifyingGlass />
     <input bind:value={searchQuery} placeholder="Search applications" type="text" />
     {#if searchQuery}
-      <button on:click={() => (searchQuery = '')} aria-label="Clear search">
+      <button onclick={() => (searchQuery = '')} aria-label="Clear search">
         <Cross />
       </button>
     {/if}

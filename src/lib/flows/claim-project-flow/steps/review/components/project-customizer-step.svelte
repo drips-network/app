@@ -12,7 +12,6 @@
 
   interface Props {
     context: Writable<State>;
-    originalProject: ProjectCustomizerFragment;
     newProjectData: Writable<
       ReturnType<
         typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
@@ -20,7 +19,7 @@
     >;
   }
 
-  let { context, originalProject, newProjectData }: Props = $props();
+  let { context, newProjectData }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -44,7 +43,7 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer {originalProject} {newProjectData} />
+  <ProjectCustomizer {newProjectData} />
   <div class="flex justify-end">
     <Button icon={CheckCircle} onclick={handleConfirm}>Confirm</Button>
   </div>
