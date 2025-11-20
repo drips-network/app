@@ -77,10 +77,6 @@
     >Everything you need for accountable, scalable Pro-PGF</svelte:fragment
   >
 
-  <svelte:fragment slot="description">
-    As a fully decentralized on-chain protocol, Drips can be composed with any other contract.
-  </svelte:fragment>
-
   <svelte:fragment slot="line-items">
     <SolutionLineItem icon={ArrowClockwiseHeart}>
       Run clearly scoped funding batches with defined themes and budgets
