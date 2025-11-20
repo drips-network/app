@@ -10,6 +10,7 @@ import { redis } from '../../../../../../../../api/redis';
 import cached from '$lib/utils/cache/remote/cached';
 import queryCacheKey from '$lib/utils/cache/remote/query-cache-key';
 import { executeRepoDriverReadMethod } from '$lib/utils/sdk/repo-driver/repo-driver';
+import { executeRepoSubAccountDriverReadMethod } from '$lib/utils/sdk/repo-sub-account-driver/repo-sub-account-driver';
 import { hexlify, toUtf8Bytes } from 'ethers';
 import { Forge, type OxString } from '$lib/utils/sdk/sdk-types';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
@@ -33,8 +34,21 @@ async function fetchDripsProject(repoUrl: string) {
     args: [Forge.gitHub, hexlify(toUtf8Bytes(`${owner}/${repo}`)) as OxString],
   });
 
-  const cacheKey = queryCacheKey(getProjectsQuery, [repoUrl], `project-page:${accountId}`);
+  let subAccountId = 0n;
+  if (network.contracts.SUB_ACCOUNT_REPO_DRIVER) {
+    subAccountId = await executeRepoSubAccountDriverReadMethod({
+      functionName: 'calcAccountId',
+      args: [accountId],
+    });
+  }
 
+  // Projects may be referenced with their repo sub account id or their "main" repo account id,
+  // so we add both to their cache key to ensure we remove the cache with the invalidate-account-ids endpoint.
+  const cacheKey = queryCacheKey(
+    getProjectsQuery,
+    [repoUrl],
+    `project-page:${accountId}:${subAccountId}`,
+  );
   return await cached(redis, cacheKey, 172800, () =>
     query<ProjectByUrlQuery, ProjectByUrlQueryVariables>(
       getProjectsQuery,

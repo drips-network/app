@@ -6,9 +6,12 @@ import type {
   ListEditorProjectFragment,
   ListEditorEcosystemFragment,
   ListEditorSubListFragment,
+  ListEditorOrcidFragment,
 } from './__generated__/gql.generated';
 import type { Component } from 'svelte';
 import { ECOSYSTEM_BADGE_FRAGMENT } from '../ecosystem-badge/ecosystem-badge.svelte';
+import { ORCID_BADGE_FRAGMENT } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
+import type { AccountId } from '$lib/utils/common-types';
 
 export const LIST_EDITOR_PROJECT_FRAGMENT = gql`
   ${PROJECT_BADGE_FRAGMENT}
@@ -39,6 +42,13 @@ export const LIST_EDITOR_SUB_LIST_FRAGMENT = gql`
     account {
       accountId
     }
+  }
+`;
+
+export const LIST_EDITOR_ORCID_FRAGMENT = gql`
+  ${ORCID_BADGE_FRAGMENT}
+  fragment ListEditorOrcid on OrcidLinkedIdentity {
+    ...OrcidBadge
   }
 `;
 
@@ -75,14 +85,18 @@ type SubListItem = BaseItem & {
   subList: ListEditorSubListFragment;
 };
 
+type OrcidItem = BaseItem & {
+  type: 'orcid';
+  orcid: ListEditorOrcidFragment;
+};
+
 export type ListEditorItem =
   | ProjectItem
   | DripListItem
   | EthAddressItem
   | EcosystemItem
-  | SubListItem;
-
-export type AccountId = string;
+  | SubListItem
+  | OrcidItem;
 
 export type Items = Record<AccountId, ListEditorItem>;
 export type Weights = Record<AccountId, number>;
@@ -93,13 +107,19 @@ export type RecipientResult = {
   accountId: string;
   dripList?: ListEditorDripListFragment;
   project?: ListEditorProjectFragment;
+  orcid?: ListEditorOrcidFragment;
   address?: string;
 } | null;
 
 export type RecipientClassification = {
-  type: 'project' | 'address' | 'drip-list';
+  type: 'project' | 'address' | 'drip-list' | 'orcid';
   value: string;
   resolvedAddress?: string | undefined;
   validate: () => Promise<boolean | string | undefined>;
   fetch: () => Promise<RecipientResult>;
 } | null;
+
+export interface ListEditorConfig {
+  items: Items;
+  weights: Weights;
+}

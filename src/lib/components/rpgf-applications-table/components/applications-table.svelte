@@ -6,33 +6,19 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
-  interface Props {
-    includesResults: boolean;
-    applications: ListingApplication[];
-    filteredApplications: ListingApplication[];
-    ellipsis?: boolean;
-    signedIn: boolean;
-    displayVisibilityNote?: boolean;
-    voteStep?: 'build-ballot' | 'assign-votes' | null;
-    ballotStore: Writable<InProgressBallot>;
-    reviewMode?: boolean;
-    round: Round;
-    decisions?: Record<string, 'approve' | 'reject' | null>;
-  }
+  export let includesResults: boolean;
+  export let applications: ListingApplication[];
+  export let filteredApplications: ListingApplication[];
+  export let ellipsis: boolean = false;
+  export let signedIn: boolean;
+  export let displayVisibilityNote = false;
+  export let hideState = false;
 
-  let {
-    includesResults,
-    applications,
-    filteredApplications,
-    ellipsis = false,
-    signedIn,
-    displayVisibilityNote = false,
-    voteStep = null,
-    ballotStore,
-    reviewMode = false,
-    round,
-    decisions = $bindable({}),
-  }: Props = $props();
+  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
+  export let ballotStore: Writable<InProgressBallot>;
+  export let reviewMode = false;
+  export let round: Round;
+  export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 </script>
 
 <div class="wrapper">
@@ -52,6 +38,7 @@
           {reviewMode}
           {round}
           {application}
+          {hideState}
           bind:decision={decisions[application.id]}
         />
       {/each}

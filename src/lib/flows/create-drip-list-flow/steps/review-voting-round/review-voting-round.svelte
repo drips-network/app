@@ -94,6 +94,11 @@
                       type: 'subList',
                       accountId: v.subList.account.accountId,
                     };
+                  case 'orcid':
+                    return {
+                      type: 'orcid',
+                      accountId: v.orcid.orcid,
+                    };
                 }
               })
             : undefined,

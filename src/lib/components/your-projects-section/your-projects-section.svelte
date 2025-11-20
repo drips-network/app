@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   export const PROJECTS_SECTION_PROJECT_FRAGMENT = gql`
     ${PROJECT_CARD_FRAGMENT}
     fragment ProjectsSectionProject on Project {
@@ -22,34 +22,24 @@
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
+  export let projects: ProjectsSectionProjectFragment[];
+  export let withClaimProjectButton = false;
+  export let showVisibilityToggle = false;
+  export let label = 'Your projects';
+
   let error = false;
 
-  interface Props {
-    projects: ProjectsSectionProjectFragment[];
-    withClaimProjectButton?: boolean;
-    showVisibilityToggle?: boolean;
-    collapsed?: boolean;
-    collapsable?: boolean;
-  }
+  export let collapsed = false;
+  export let collapsable = false;
 
-  let {
-    projects,
-    withClaimProjectButton = false,
-    showVisibilityToggle = false,
-    collapsed = $bindable(false),
-    collapsable = $bindable(false),
-  }: Props = $props();
+  let showHidden: boolean = false;
+  $: hiddenProjectsCount = projects.filter((p) => !p.isVisible).length ?? 0;
 
-  let showHidden: boolean = $state(false);
-  let hiddenProjectsCount = $derived(projects.filter((p) => !p.isVisible).length ?? 0);
+  $: visibleProjects = projects.filter((p) => p.isVisible);
 
-  let visibleProjects = $derived(projects.filter((p) => p.isVisible));
+  $: hiddenProjects = showHidden ? projects.filter((p) => !p.isVisible) : [];
 
-  let hiddenProjects = $derived(showHidden ? projects.filter((p) => !p.isVisible) : []);
-
-  let isOwner = $derived(
-    $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId),
-  );
+  $: isOwner = $walletStore.connected && checkIsUser(projects[0]?.chainData[0]?.owner?.accountId);
 </script>
 
 <Section
@@ -57,7 +47,7 @@
   bind:collapsable
   header={{
     icon: Box,
-    label: 'Your projects',
+    label,
     actions: withClaimProjectButton
       ? [
           {
@@ -71,7 +61,7 @@
   skeleton={{
     horizontalScroll: false,
     loaded: true,
-    empty: showVisibilityToggle ? projects?.length === 0 : visibleProjects?.length === 0,
+    empty: showVisibilityToggle ? projects.length === 0 : visibleProjects.length === 0,
     error,
     emptyStateEmoji: '🫙',
     emptyStateHeadline: 'No claimed projects',

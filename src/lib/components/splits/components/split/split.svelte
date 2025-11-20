@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
@@ -9,7 +7,7 @@
   import { fade } from 'svelte/transition';
   import SplitsListComponent from '../../splits.svelte';
   import Pile from '$lib/components/pile/pile.svelte';
-  import { tick, onMount, type Component, type ComponentProps } from 'svelte';
+  import { tick, type SvelteComponent, onMount } from 'svelte';
   import ProjectAvatar from '$lib/components/project-avatar/project-avatar.svelte';
   import { tweened } from 'svelte/motion';
   import { sineInOut } from 'svelte/easing';
@@ -22,46 +20,37 @@
   import unreachable from '$lib/utils/unreachable';
   import type { SplitGroup, Splits, SplitsComponentSplitsReceiver } from '../../types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import OrcidAvatar from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
+  import OrcidBadge from '../../../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 
-  let element: HTMLDivElement | undefined = $state();
+  export let split: SplitsComponentSplitsReceiver | SplitGroup;
+  export let disableLink = true;
+  export let linkToNewTab = false;
+  export let isNested = false;
+  export let draft = false;
 
-  interface Props {
-    split: SplitsComponentSplitsReceiver | SplitGroup;
-    disableLink?: boolean;
-    linkToNewTab?: boolean;
-    isNested?: boolean;
-    draft?: boolean;
-    /** Set to false to hide the chevron next to split groups. */
-    groupsExpandable?: boolean;
-    /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
-    isLast?: boolean;
-    /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
-    isFirst?: boolean;
-    disableTooltip?: boolean;
-    /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
-    chainOverride?: SupportedChain | undefined;
-    groupExpanded?: boolean;
-  }
+  /** Set to false to hide the chevron next to split groups. */
+  export let groupsExpandable = true;
 
-  let {
-    split,
-    disableLink = true,
-    linkToNewTab = false,
-    isNested = false,
-    draft = false,
-    groupsExpandable = true,
-    isLast = false,
-    isFirst = false,
-    disableTooltip = false,
-    chainOverride = undefined,
-    groupExpanded = $bindable(false),
-  }: Props = $props();
+  /** Set to true if it's the last split in a list. Disables the lefthand line down to the next split. */
+  export let isLast = false;
+  /** Set to true if it's the first split in a list. Enables the little gradient line at the top from the source. */
+  export let isFirst = false;
 
-  let primaryColor = $derived(
-    element ? getComputedStyle(element).getPropertyValue('--color-primary') : undefined,
-  );
+  export let disableTooltip = false;
 
-  let percentageTextColor = $derived(primaryColor ? getContrastColor(primaryColor) : 'white');
+  /** If we explicitly want to display projects from a chain other than that configured for this deployment, this prop allows for that */
+  export let chainOverride: SupportedChain | undefined = undefined;
+
+  let element: HTMLDivElement;
+
+  export let groupExpanded = false;
+
+  $: primaryColor = element
+    ? getComputedStyle(element).getPropertyValue('--color-primary')
+    : undefined;
+
+  $: percentageTextColor = primaryColor ? getContrastColor(primaryColor) : 'white';
 
   function calcGroupWeight(group: SplitGroup): number {
     return group.list.reduce(
@@ -82,9 +71,8 @@
 
   interface ComponentAndProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: Component<any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    props: ComponentProps<Component<any>>;
+    component: typeof SvelteComponent<any>;
+    props: Record<string, unknown>;
   }
 
   function getPileComponents(list: Splits): ComponentAndProps[] {
@@ -101,7 +89,7 @@
               size: 'medium',
               disableLink: true,
             },
-          };
+          } as ComponentAndProps;
         case 'DripListReceiver':
           return {
             component: DripListBadge,
@@ -111,7 +99,7 @@
               showName: false,
               isLinked: !disableLink,
             },
-          };
+          } as ComponentAndProps;
         case 'ProjectReceiver':
           return {
             component: ProjectAvatar,
@@ -120,17 +108,22 @@
               project: filterCurrentChainData(s.project.chainData, undefined, chainOverride),
               outline: true,
             },
-          };
+          } as ComponentAndProps;
+        case 'LinkedIdentityReceiver':
+          return {
+            component: OrcidAvatar,
+            props: { size: 'small' },
+          } as ComponentAndProps;
       }
     });
   }
 
   const GROUP_EXPAND_DURATION = 300;
-  let groupElem: HTMLDivElement | undefined = $state();
+  let groupElem: HTMLDivElement | undefined;
   let groupHeight = tweened(48, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
-  let groupHeightAnimating = $state(false);
+  let groupHeightAnimating = false;
 
-  let groupPileElem: HTMLDivElement | undefined = $state();
+  let groupPileElem: HTMLDivElement | undefined;
   let groupNameOffset = tweened(0, { duration: GROUP_EXPAND_DURATION, easing: sineInOut });
 
   async function alignGroupName() {
@@ -140,9 +133,7 @@
 
   // Align group name on mount, when splits change, and on a mutation of groupPileElem
   onMount(alignGroupName);
-  run(() => {
-    split && alignGroupName();
-  });
+  $: split && alignGroupName();
 
   async function toggleGroup() {
     if (!groupElem) return;
@@ -232,13 +223,15 @@
             project={split.project}
           />
         </PrimaryColorThemer>
+      {:else if split.__typename === 'LinkedIdentityReceiver'}
+        <OrcidBadge {chainOverride} orcid={split.linkedIdentity} />
       {:else if split.__typename === 'SplitGroup'}
         <div
           class="group"
           bind:this={groupElem}
           style:height={groupHeightAnimating ? `${$groupHeight}px` : 'auto'}
         >
-          <button class="name" onclick={toggleGroup}>
+          <button class="name" on:click={toggleGroup}>
             <div class="pile" bind:this={groupPileElem}>
               <Pile transitionedOut={groupExpanded} components={getPileComponents(split.list)} />
             </div>

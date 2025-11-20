@@ -43,6 +43,3 @@
     >
   {/snippet}
 </StandaloneFlowStepLayout>
-
-<style>
-</style>

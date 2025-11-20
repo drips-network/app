@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   export const IDENTITY_CARD_DRIP_LIST_FRAGMENT = gql`
     fragment IdentityCardDripList on DripList {
       account {
@@ -35,11 +35,18 @@
       name
     }
   `;
+
+  export const IDENTITY_CARD_ORCID_FRAGMENT = gql`
+    fragment IdentityCardOrcid on OrcidLinkedIdentity {
+      account {
+        accountId
+      }
+      orcid
+    }
+  `;
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { fade } from 'svelte/transition';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
@@ -49,6 +56,7 @@
     IdentityCardDripListFragment,
     IdentityCardProjectFragment,
     IdentityCardEcosystemFragment,
+    IdentityCardOrcidFragment,
   } from './__generated__/gql.generated';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -58,32 +66,23 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import OrcidIcon from '$lib/components/icons/Orcid.svelte';
 
-  interface Props {
-    // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
-    address?: string | undefined;
-    dripList?: IdentityCardDripListFragment | undefined;
-    project?: IdentityCardProjectFragment | undefined;
-    ecosystem?: IdentityCardEcosystemFragment | undefined;
-    loading?: boolean;
-    title?: string | undefined;
-    disableLink?: boolean;
-  }
+  // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
+  export let address: string | undefined = undefined;
+  export let dripList: IdentityCardDripListFragment | undefined = undefined;
+  export let project: IdentityCardProjectFragment | undefined = undefined;
+  export let ecosystem: IdentityCardEcosystemFragment | undefined = undefined;
+  export let orcid: IdentityCardOrcidFragment | undefined = undefined;
+  export let loading = false;
+  export let title: string | undefined = undefined;
+  export let disableLink = false;
 
-  let {
-    address = undefined,
-    dripList = undefined,
-    project = undefined,
-    ecosystem = undefined,
-    loading = false,
-    title = undefined,
-    disableLink = false,
-  }: Props = $props();
+  let avatarImgElem: HTMLImageElement | undefined;
 
-  let avatarImgElem: HTMLImageElement | undefined = $state();
-
-  let link: string | undefined = $state();
-  run(() => {
+  let link: string | undefined;
+  $: {
     switch (true) {
       case disableLink:
         link = undefined;
@@ -97,8 +96,10 @@
       case !!ecosystem:
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
         break;
+      case !!orcid:
+        link = buildOrcidUrl(orcid.orcid);
     }
-  });
+  }
 </script>
 
 <svelte:element
@@ -165,6 +166,16 @@
           />
         {/if}{project.source.repoName}</span
       >
+    </div>
+  {:else if orcid}
+    <div class="content-container" in:fade>
+      <div class="icon">
+        <OrcidIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
+      </div>
+
+      <div>
+        <span class="typo-header-3 ellipsis">{orcid.orcid}</span>
+      </div>
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>

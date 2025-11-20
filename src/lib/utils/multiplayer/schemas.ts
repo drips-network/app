@@ -53,6 +53,11 @@ export const subListSchema = z.object({
   accountId: z.string(),
 });
 
+export const orcidSchema = z.object({
+  type: z.literal('orcid'),
+  accountId: z.string(),
+});
+
 export const pendingVoteSchema = z.object({
   collaboratorAddress: z.string(),
   latestVote: z.null(),

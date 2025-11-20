@@ -15,6 +15,7 @@
   import RpgfApplicationSubmissionDetailsCard from '$lib/components/rpgf-application-submission-details-card/rpgf-application-submission-details-card.svelte';
   import RpgfApplicationSplitsCard from '$lib/components/rpgf-application-splits-card/rpgf-application-splits-card.svelte';
   import RpgfApplicationCustomDatasets from '$lib/components/rpgf-application-custom-datasets/rpgf-application-custom-datasets.svelte';
+  import RpgfApplicationAllocationCard from '$lib/components/rpgf-application-allocation-card/rpgf-application-allocation-card.svelte';
 
   let { data } = $props();
   let round = $derived(data.round);
@@ -98,6 +99,11 @@
       isRoundAdmin={round.isAdmin}
     />
   {/if}
+
+  <RpgfApplicationAllocationCard
+    allocation={application.allocation}
+    resultsPublished={round.resultsPublished}
+  />
 
   <RpgfApplicationFormAnswersCard
     {canSeePrivateFields}

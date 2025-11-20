@@ -10,63 +10,49 @@
   import type { Writable } from 'svelte/store';
   import type { State } from '$lib/flows/create-drip-list-flow/create-drip-list-flow';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
-  import type { AccountId, ListEditorItem } from '$lib/components/list-editor/types';
+  import type { ListEditorItem } from '$lib/components/list-editor/types';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
   import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
   import { DEFAULT_CSV_HEADERS, DEFAULT_MAX_ENTRIES } from './import-from-csv-steps';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   const MAX_DECIMALS = 4;
 
-  interface Props {
-    context: Writable<State>;
-    headline: string;
-    description: string;
-    allowProjects?: boolean;
-    allowAddresses?: boolean;
-    allowDripLists?: boolean;
-    // csvHeaders[0] should always be an address
-    csvHeaders?: Array<string>;
-    csvMaxEntries?: number;
-    exampleTableHeaders?: Array<string> | undefined;
-    exampleTableData?: Array<Array<unknown>> | undefined;
-    exampleTableCaption?: string | undefined;
-    addItem?: (key: AccountId, item: ListEditorItem, weight: number | undefined) => undefined;
-    clearItems?: () => undefined;
-    onItemsError?: (errors: Array<AddItemSuberror>) => AddItemError;
-    blockedAccountIds?: string[];
-  }
+  export let context: Writable<State>;
+  export let headline: string;
+  export let description: string;
+  export let allowProjects: boolean = true;
+  export let allowAddresses: boolean = true;
+  export let allowDripLists: boolean = true;
+  export let allowOrcids: boolean = true;
+  // csvHeaders[0] should always be an address
+  export let csvHeaders: Array<string> = DEFAULT_CSV_HEADERS;
+  export let csvMaxEntries: number = DEFAULT_MAX_ENTRIES;
+  export let exampleTableHeaders: Array<string> | undefined = csvHeaders;
+  export let exampleTableData: Array<Array<unknown>> | undefined = undefined;
+  export let exampleTableCaption: string | undefined = undefined;
+  export let addItem: (
+    key: AccountId,
+    item: ListEditorItem,
+    weight: number | undefined,
+  ) => undefined = () => undefined;
+  export let clearItems: () => undefined = () => undefined;
+  export let onItemsError: (errors: Array<AddItemSuberror>) => AddItemError = (errors) => {
+    return new AddItemError(
+      'Some of your imported recipients were invalid',
+      'error',
+      'They won’t be included in your splits.',
+      errors,
+    );
+  };
+  export let blockedAccountIds: string[] = [];
 
-  let {
-    context,
-    headline,
-    description,
-    allowProjects = true,
-    allowAddresses = true,
-    allowDripLists = true,
-    csvHeaders = DEFAULT_CSV_HEADERS,
-    csvMaxEntries = DEFAULT_MAX_ENTRIES,
-    exampleTableHeaders = csvHeaders,
-    exampleTableData = undefined,
-    exampleTableCaption = undefined,
-    addItem = () => undefined,
-    clearItems = () => undefined,
-    onItemsError = (errors) => {
-      return new AddItemError(
-        'Some of your imported recipients were invalid',
-        'error',
-        'They won’t be included in your splits.',
-        errors,
-      );
-    },
-    blockedAccountIds = [],
-  }: Props = $props();
-
-  let uploadForm: HTMLFormElement | undefined = $state(undefined);
+  let uploadForm: HTMLFormElement | undefined = undefined;
   let parsedFile: Array<Array<string>> = [];
-  let loading: boolean = $state(false);
+  let loading: boolean = false;
   let errors: Array<AddItemSuberror> = [];
 
   const customErrors: Array<string> = ['too-many-entries', 'wrong-filetype'] as const;
@@ -89,9 +75,7 @@
     return parsedFile.length > csvMaxEntries ? 'too-many-entries' : false;
   }
 
-  async function submit(e: Event) {
-    e.preventDefault();
-
+  async function submit() {
     try {
       loading = true;
 
@@ -107,6 +91,7 @@
           allowProjects,
           allowAddresses,
           allowDripLists,
+          allowOrcids,
         });
 
         // assume header, skip it
@@ -116,7 +101,7 @@
 
         // can't classify this input as something we recognize
         if (!classification) {
-          const error = new AddItemSuberror(createInvalidMessage('unknown'), recipient, index + 1);
+          const error = new AddItemSuberror("This isn't valid", recipient, index + 1);
           errors.push(error);
           continue;
         }
@@ -214,7 +199,7 @@
     data={exampleTableData ? exampleTableData : undefined}
     caption={exampleTableCaption}
   />
-  <form id="upload-form" bind:this={uploadForm} onsubmit={submit}>
+  <form id="upload-form" bind:this={uploadForm} on:submit|preventDefault={submit}>
     <DropZone
       validateCustom={validateFile}
       filetypes={['text/csv']}
@@ -222,26 +207,25 @@
       {loading}
       on:input={handleDropZoneInput}
     >
-      {#snippet loadingSlot()}
+      <svelte:fragment slot="loading">
         <Spinner />
         <p class="typo-text">We’re parsing your CSV and building your list…</p>
-      {/snippet}
-      {#snippet errorSlot({ error, defaultContent })}
+      </svelte:fragment>
+      <svelte:fragment slot="error" let:error let:defaultContent>
         {#if error && customErrors.includes(error)}
           <p class="typo-text-bold">{customErrorMessages[error]}</p>
         {:else}
           {@html defaultContent}
         {/if}
-      {/snippet}
+      </svelte:fragment>
     </DropZone>
   </form>
-
-  {#snippet left_actions()}
-    <Button disabled={loading} variant="ghost" icon={ArrowLeft} onclick={() => dispatch('conclude')}
-      >Back</Button
+  <svelte:fragment slot="left-actions">
+    <Button
+      disabled={loading}
+      variant="ghost"
+      icon={ArrowLeft}
+      on:click={() => dispatch('conclude')}>Back</Button
     >
-  {/snippet}
+  </svelte:fragment>
 </StepLayout>
-
-<style>
-</style>

@@ -13,32 +13,30 @@
   import DripList from '../icons/DripList.svelte';
   import Stepper from '../stepper/stepper.svelte';
   import OrDivider from './components/or-divider.svelte';
+  import File from '../icons/File.svelte';
+  import rpgfUploadResultsFlowSteps from '$lib/flows/rpgf-upload-results-flow/rpgf-upload-results-flow-steps';
+  import type { Round } from '$lib/utils/rpgf/types/round';
+  import unreachable from '$lib/utils/unreachable';
 
-  interface Props {
-    roundId: string;
-    roundName: string;
-    resultsCalculated: boolean;
-    resultsPublished: boolean;
-  }
+  export let round: Round;
 
-  let { roundId, roundName, resultsCalculated, resultsPublished }: Props = $props();
+  let calcMethod = 'avg';
 
-  let calcMethod = $state('avg');
+  let forceRecalculate = false;
 
-  let loading = $state(false);
+  let loading = false;
   async function handleCalculateResults() {
     await doWithErrorModal(
       async () => {
         if (loading) return;
         loading = true;
 
-        await recalculateResults(undefined, roundId, calcMethod as 'avg' | 'median' | 'sum');
+        await recalculateResults(undefined, round.id, calcMethod as 'avg' | 'median' | 'sum');
 
         await invalidateAll();
 
         loading = false;
-
-        step = 'publish';
+        forceRecalculate = false;
       },
       () => {
         loading = false;
@@ -55,12 +53,10 @@
             if (loading) return;
             loading = true;
 
-            await publishResults(undefined, roundId);
+            await publishResults(undefined, round.id);
             await invalidateAll();
 
             loading = false;
-
-            step = 'published';
           },
           () => {
             loading = false;
@@ -70,10 +66,10 @@
     );
   }
 
-  let step: 'calculate' | 'publish' | 'published' | 'linked' | undefined = $state();
-  if (resultsPublished) {
+  let step: 'calculate' | 'publish' | 'published' | 'linked';
+  $: if (round.resultsPublished) {
     step = 'published';
-  } else if (resultsCalculated) {
+  } else if (round.resultsCalculated && !forceRecalculate) {
     step = 'publish';
   } else {
     step = 'calculate';
@@ -105,8 +101,17 @@
       bind:value={calcMethod}
     />
 
-    <Button onclick={handleCalculateResults} {loading} size="large" variant="primary">
+    <Button on:click={handleCalculateResults} {loading} size="large" variant="primary">
       Calculate results
+    </Button>
+
+    <OrDivider />
+
+    <Button
+      icon={File}
+      on:click={() => modal.show(Stepper, undefined, rpgfUploadResultsFlowSteps(round))}
+    >
+      Manually upload results
     </Button>
   {:else if step === 'publish'}
     <h2 class="pixelated">Publish results</h2>
@@ -120,13 +125,13 @@
       Filter the view by allocation amount or download a CSV of the results for review on the left.
     </AnnotationBox>
 
-    <Button onclick={handlePublishResults} {loading} size="large" variant="primary">
+    <Button on:click={handlePublishResults} {loading} size="large" variant="primary">
       Publish results
     </Button>
 
     <OrDivider />
 
-    <Button icon={ArrowLeft} onclick={() => (step = 'calculate')} variant="ghost"
+    <Button icon={ArrowLeft} on:click={() => (forceRecalculate = true)} variant="ghost"
       >Recalculate results</Button
     >
   {:else if step === 'published'}
@@ -138,8 +143,12 @@
     </p>
 
     <Button
-      onclick={() =>
-        modal.show(Stepper, undefined, createRpgfRoundDripListFlow(roundId, roundName))}
+      on:click={() =>
+        modal.show(
+          Stepper,
+          undefined,
+          createRpgfRoundDripListFlow(round.id, round.name ?? unreachable()),
+        )}
       icon={DripList}
       size="large"
       variant="primary">Prepare Drip List</Button
@@ -148,7 +157,8 @@
     <OrDivider />
 
     <Button
-      onclick={() => modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(roundId, []))}
+      on:click={() =>
+        modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(round.id, []))}
       >Manually link Drip Lists</Button
     >
   {/if}

@@ -2,42 +2,34 @@
   import Button from '../button/button.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
 
-  interface Props {
-    reverse?: boolean;
-    illustrationPadding?: string | undefined;
-    button?:
-      | {
-          text: string;
-          href: string;
-        }
-      | undefined;
-    illustration?: import('svelte').Snippet;
-    headline?: import('svelte').Snippet;
-    description?: import('svelte').Snippet;
-    line_items?: import('svelte').Snippet;
-  }
+  export let reverse = false;
+  export let illustrationPadding: string | undefined = undefined;
+  export let illustrationScale: string | undefined = undefined;
 
-  let {
-    reverse = false,
-    illustrationPadding = undefined,
-    button = undefined,
-    illustration,
-    headline,
-    description,
-    line_items,
-  }: Props = $props();
+  export let button:
+    | {
+        text: string;
+        href: string;
+      }
+    | undefined = undefined;
 </script>
 
 <div class="solution-card" class:reverse>
-  <div style:padding={illustrationPadding} class="illustration">
-    {@render illustration?.()}
+  <div
+    style:padding={illustrationPadding}
+    class="illustration"
+    style:--illustration-scale={illustrationScale}
+  >
+    <slot name="illustration"></slot>
   </div>
   <div class="content">
     <div class="inner">
-      <h2>{@render headline?.()}</h2>
-      <p>{@render description?.()}</p>
+      <h2><slot name="headline"></slot></h2>
+      {#if $$slots.description}
+        <p><slot name="description"></slot></p>
+      {/if}
       <div class="line-items">
-        {@render line_items?.()}
+        <slot name="line-items"></slot>
       </div>
       {#if button}
         <div>
@@ -56,6 +48,7 @@
     margin-top: 2rem;
     border: 1px solid var(--color-foreground-level-2);
     border-radius: 2rem 0 2rem 2rem;
+    gap: 1rem;
   }
 
   .solution-card.reverse {
@@ -75,6 +68,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transform: scale(var(--illustration-scale, 1));
   }
 
   .content {
@@ -118,6 +112,7 @@
       margin: 0 auto;
       margin-top: -3rem;
       margin-bottom: 1rem;
+      transform: none;
     }
   }
 </style>

@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   export const DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
     fragment DripVisualAddressDriverAccount on AddressDriverAccount {
       driver
@@ -46,11 +46,16 @@
       ...IdentityCardEcosystem
     }
   `;
+
+  export const DRIP_VISUAL_ORCID_FRAGMENT = gql`
+    ${IDENTITY_CARD_ORCID_FRAGMENT}
+    fragment DripVisualOrcid on OrcidLinkedIdentity {
+      ...IdentityCardOrcid
+    }
+  `;
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import amtDeltaUnitStore, {
     FRIENDLY_NAMES,
     MULTIPLIERS,
@@ -62,6 +67,7 @@
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
     IDENTITY_CARD_ECOSYSTEM_FRAGMENT,
     IDENTITY_CARD_PROJECT_FRAGMENT,
+    IDENTITY_CARD_ORCID_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
   import { gql } from 'graphql-request';
   import query from '$lib/graphql/dripsQL';
@@ -74,47 +80,38 @@
     DripVisualProjectFragment,
     DripVisualUserFragment,
     DripVisualEcosystemFragment,
+    DripVisualOrcidFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
   import network from '$lib/stores/wallet/network';
 
-  interface Props {
-    from?: DripVisualAddressDriverAccountFragment | undefined;
-    to?:
-      | DripVisualNftDriverAccountFragment
-      | DripVisualAddressDriverAccountFragment
-      | DripVisualProjectFragment
-      | DripVisualDripListFragment
-      | DripVisualUserFragment
-      | DripVisualEcosystemFragment
-      | undefined;
-    visual?: 'stream' | 'donation';
-    disableLinks?: boolean;
-    amountPerSecond?: bigint | undefined;
-    halted?: boolean;
-    tokenInfo?: { decimals: number; symbol: string } | undefined;
-  }
+  export let from: DripVisualAddressDriverAccountFragment | undefined = undefined;
+  export let to:
+    | DripVisualNftDriverAccountFragment
+    | DripVisualAddressDriverAccountFragment
+    | DripVisualProjectFragment
+    | DripVisualDripListFragment
+    | DripVisualUserFragment
+    | DripVisualEcosystemFragment
+    | DripVisualOrcidFragment
+    | undefined = undefined;
+  export let visual: 'stream' | 'donation' = 'stream';
+  export let disableLinks = false;
+  export let amountPerSecond: bigint | undefined = undefined;
+  export let halted = false;
 
-  let {
-    from = undefined,
-    to = undefined,
-    visual = 'stream',
-    disableLinks = false,
-    amountPerSecond = undefined,
-    halted = false,
-    tokenInfo = undefined,
-  }: Props = $props();
+  export let tokenInfo: { decimals: number; symbol: string } | undefined = undefined;
 
   let animationSpeed = tweened(0, {
     duration: 500,
   });
 
-  run(() => {
+  $: {
     animationSpeed.set(to && amountPerSecond && !halted ? 1 : 0);
-  });
+  }
 
-  let windowWidth = $state((browser && window.innerWidth) || 0);
-  let verticalAnimation = $derived(windowWidth <= 768);
+  let windowWidth = (browser && window.innerWidth) || 0;
+  $: verticalAnimation = windowWidth <= 768;
 
   function getAmtPerSec() {
     const multiplier = MULTIPLIERS[$amtDeltaUnitStore];
@@ -189,6 +186,8 @@
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
     {:else if to && to.__typename === 'EcosystemMainAccount'}
       <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
+    {:else if to && to.__typename === 'OrcidLinkedIdentity'}
+      <IdentityCard disableLink={disableLinks} orcid={to} title="To" />
     {:else}
       <IdentityCard disableLink={disableLinks} address={undefined} title="To" />
     {/if}

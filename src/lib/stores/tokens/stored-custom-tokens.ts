@@ -1,6 +1,7 @@
+import type { TokenInfo } from '@uniswap/token-lists/src/types';
 import { isAddress } from 'ethers';
 import { z } from 'zod';
-import type { CustomTokenInfoWrapper, TokenInfo } from './tokens.store';
+import type { CustomTokenInfoWrapper } from './tokens.store';
 import assert from '$lib/utils/assert';
 
 export function createCustomToken(customToken: TokenInfo) {

@@ -1,68 +1,41 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import type { Component } from 'svelte';
+  import type { ComponentType } from 'svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  interface Props {
-    variant?: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    icon?: Component<any> | undefined;
-    disabled?: boolean;
-    ariaLabel?: string | undefined;
-    size?: 'small' | 'normal' | 'large';
-    loading?: boolean;
-    dataTestId?: string | undefined;
-    href?: string | undefined;
-    target?: string | undefined;
-    rel?: string | undefined;
-    type?: 'submit' | 'reset' | 'button';
-    form?: string | undefined;
-    justify?: 'left' | 'right' | 'center';
-    circular?: boolean;
-    children?: import('svelte').Snippet;
-    onclick?: ((event: MouseEvent) => void) | undefined;
-    onmouseenter?: ((event: MouseEvent) => void) | undefined;
-    onmouseleave?: ((event: MouseEvent) => void) | undefined;
-    onfocus?: ((event: FocusEvent) => void) | undefined;
-    onblur?: ((event: FocusEvent) => void) | undefined;
-  }
+  export let variant:
+    | 'normal'
+    | 'primary'
+    | 'destructive'
+    | 'destructive-outline'
+    | 'ghost'
+    | 'muted' = 'normal';
+  export let icon: ComponentType | undefined = undefined;
+  export let disabled = false;
+  export let ariaLabel: string | undefined = undefined;
+  export let size: 'small' | 'normal' | 'large' = 'normal';
+  export let loading = false;
+  export let dataTestId: string | undefined = undefined;
+  export let href: string | undefined = undefined;
+  export let target: string | undefined = undefined;
+  export let rel: string | undefined = undefined;
+  export let type: 'submit' | 'reset' | 'button' = 'button';
+  export let form: string | undefined = undefined;
+  export let justify: 'left' | 'right' | 'center' = 'center';
+  export let circular: boolean = false;
 
-  let {
-    variant = 'normal',
-    icon = undefined,
-    disabled = false,
-    ariaLabel = undefined,
-    size = 'normal',
-    loading = false,
-    dataTestId = undefined,
-    href = undefined,
-    target = undefined,
-    rel = undefined,
-    type = 'button',
-    form = undefined,
-    justify = 'center',
-    circular = false,
-    children,
-    onclick = undefined,
-    onmouseenter = undefined,
-    onmouseleave = undefined,
-    onfocus = undefined,
-    onblur = undefined,
-  }: Props = $props();
+  //** in case props must be passed as object */
+  export let onClick: (() => void) | undefined = undefined;
 
-  let isDisabled = $derived(disabled || loading);
+  $: isDisabled = disabled || loading;
 
-  let el: HTMLButtonElement | HTMLAnchorElement | undefined = $state();
+  let el: HTMLButtonElement | HTMLAnchorElement;
 
-  let primaryColor = $derived(
-    el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined,
-  );
+  $: primaryColor = el ? getComputedStyle(el).getPropertyValue('--color-primary') : undefined;
 
-  let textColor = $state('var(--color-foreground)');
-  run(() => {
+  let textColor = 'var(--color-foreground)';
+  $: {
     if (variant === 'destructive-outline') {
       textColor = 'var(--color-negative-level-6)';
     } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
@@ -70,7 +43,7 @@
     } else {
       textColor = 'var(--color-foreground)';
     }
-  });
+  }
 </script>
 
 <svelte:element
@@ -87,31 +60,31 @@
   class:circular
   disabled={isDisabled}
   aria-disabled={isDisabled}
-  {onclick}
+  on:click
+  on:click={onClick}
   data-testid={dataTestId}
-  {onmouseenter}
-  {onmouseleave}
-  {onfocus}
-  {onblur}
+  on:mouseenter|stopPropagation
+  on:mouseleave|stopPropagation
+  on:focus
   role={href ? 'link' : 'button'}
   style:--color-foreground={variant === 'destructive-outline' ? 'var(--color-negative)' : null}
   type={href ? null : type}
 >
   <div
-    class:with-icon-text={Boolean(icon) && Boolean(children)}
-    class:with-text={Boolean(children) && !icon}
+    class:with-icon-text={Boolean(icon) && Boolean($$slots.default)}
+    class:with-text={Boolean($$slots.default) && !icon}
     class="inner typo-text {variant}"
     style:color={textColor}
   >
     {#if icon}
-      {@const SvelteComponent = icon}
-      <SvelteComponent
+      <svelte:component
+        this={icon}
         style={variant === 'destructive' || variant === 'primary'
           ? `fill: ${textColor}; transition: fill 0.3s;`
           : 'fill: var(--color-foreground); transition: fill 0.3s;'}
       />
     {/if}
-    {@render children?.()}
+    <slot />
     {#if loading}
       <div out:fade={{ duration: 300 }} class="loading">
         <Spinner />
@@ -185,6 +158,10 @@
   }
 
   .button .inner:not(.ghost) {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
+  }
+
+  .button .inner.muted {
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 

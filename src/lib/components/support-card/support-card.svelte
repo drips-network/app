@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   export const SUPPORT_CARD_DRIP_LIST_FRAGMENT = gql`
     ${CREATE_DONATION_FLOW_DRIP_LIST_FRAGMENT}
     ${DRIP_LIST_BADGE_FRAGMENT}
@@ -48,11 +48,32 @@
       }
     }
   `;
+
+  export const SUPPORT_CARD_ORCID_FRAGEMENT = gql`
+    fragment SupportCardOrcid on OrcidLinkedIdentity {
+      orcid
+      account {
+        accountId
+        driver
+      }
+      owner {
+        accountId
+      }
+    }
+  `;
+
+  export const SUPPORT_CARD_USER_FRAGEMENT = gql`
+    fragment SupportCardUser on User {
+      account {
+        accountId
+        address
+        driver
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import Heart from '$lib/components/icons/Heart.svelte';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -78,6 +99,8 @@
     SupportCardDripListFragment,
     SupportCardProjectFragment,
     SupportCardEcosystemFragment,
+    SupportCardOrcidFragment,
+    SupportCardUserFragment,
   } from './__generated__/gql.generated';
   import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
   import createDonationFlowSteps, {
@@ -91,29 +114,25 @@
   import awaitStoreValue from '$lib/utils/await-store-value';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import network from '$lib/stores/wallet/network';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import OrcidAvatar from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-avatar.svelte';
 
-  interface Props {
-    project?: SupportCardProjectFragment | undefined;
-    dripList?: SupportCardDripListFragment | undefined;
-    ecosystem?: SupportCardEcosystemFragment | undefined;
-    draftListMode?: boolean;
-    disabled?: boolean;
+  export let project: SupportCardProjectFragment | undefined = undefined;
+  export let dripList: SupportCardDripListFragment | undefined = undefined;
+  export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
+  export let orcid: SupportCardOrcidFragment | undefined = undefined;
+  export let user: SupportCardUserFragment | undefined = undefined;
+
+  export let draftListMode = false;
+
+  export let disabled = false;
+  $: {
+    if (!project && !dripList && !ecosystem && !orcid && !user) disabled = true;
   }
 
-  let {
-    project = undefined,
-    dripList = undefined,
-    ecosystem = undefined,
-    draftListMode = false,
-    disabled = $bindable(false),
-  }: Props = $props();
-  run(() => {
-    if (!project && !dripList && !ecosystem) disabled = true;
-  });
+  let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user' = 'dripList';
 
-  let type: 'dripList' | 'project' | 'ecosystem' = $state('dripList');
-
-  run(() => {
+  $: {
     switch (true) {
       case !!project:
         type = 'project';
@@ -121,15 +140,21 @@
       case !!ecosystem:
         type = 'ecosystem';
         break;
+      case !!orcid:
+        type = 'orcid';
+        break;
+      case !!user:
+        type = 'user';
+        break;
       default:
         type = 'dripList';
     }
-  });
+  }
 
-  let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = $state(undefined);
+  let ownDripLists: OwnDripListsQuery['dripLists'] | null | undefined = undefined;
 
-  let supportUrl: string | undefined = $state();
-  run(() => {
+  let supportUrl: string;
+  $: {
     switch (true) {
       case !!project:
         supportUrl = project.source.url;
@@ -140,12 +165,18 @@
       case !!ecosystem:
         supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
+      case !!orcid:
+        supportUrl = `${BASE_URL}${buildOrcidUrl(orcid.orcid)}`;
+        break;
+      case !!user:
+        supportUrl = `${BASE_URL}/app/${user?.account.address}`;
+        break;
       default:
         supportUrl = '/';
     }
-  });
+  }
 
-  let updating = $state(true);
+  let updating = true;
   async function updateState() {
     updating = true;
 
@@ -191,10 +222,10 @@
 
     updating = false;
   }
-  run(() => {
+  $: {
     $walletStore.connected;
     updateState();
-  });
+  }
 
   function onClickNewStream() {
     let donationFlowStepsInput: Parameters<typeof createStreamFlowSteps>[1];
@@ -218,7 +249,7 @@
   }
 
   async function onClickAddToDripList() {
-    if ((!project && !dripList) || !supportUrl) return;
+    if (!project && !dripList) return;
 
     if (!ownDripLists) {
       goto(buildUrl('/app/funder-onboarding', { urlToAdd: supportUrl }));
@@ -240,6 +271,12 @@
       case !!ecosystem:
         donationFlowStepsInput = ecosystem;
         break;
+      case !!orcid:
+        donationFlowStepsInput = orcid;
+        break;
+      case !!user:
+        donationFlowStepsInput = user.account;
+        break;
       default:
         unreachable();
     }
@@ -247,7 +284,7 @@
     return modal.show(Stepper, undefined, createDonationFlowSteps(donationFlowStepsInput));
   }
 
-  let supportMenuOpen = $state(false);
+  let supportMenuOpen = false;
   async function onClickConnectWallet() {
     await walletStore.connect();
     supportMenuOpen = true;
@@ -269,6 +306,10 @@
       {#if project}
         <div>
           <ProjectAvatar project={filterCurrentChainData(project.chainData)} size="large" />
+        </div>
+      {:else if orcid}
+        <div>
+          <OrcidAvatar size="large" outline />
         </div>
       {/if}
     </div>

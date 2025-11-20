@@ -16,12 +16,17 @@ import type {
   DripListOtDsQueryVariables,
   EcosystemOtDsQuery,
   EcosystemOtDsQueryVariables,
+  OrcidOtDsQuery,
+  OrcidOtDsQueryVariables,
+  AddressOtDsQuery,
+  AddressOtDsQueryVariables,
 } from './__generated__/gql.generated';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
+  CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 import { buildOneTimeDonationTxs } from './build-one-time-donation-txs';
 
@@ -88,6 +93,40 @@ const ecosystemSupportQuery = gql`
   }
 `;
 
+const orcidSupportQuery = gql`
+  query OrcidOTDs($orcid: String!, $chain: SupportedChain!) {
+    orcidLinkedIdentityByOrcid(orcid: $orcid, chain: $chain) {
+      chain
+      support {
+        ... on OneTimeDonationSupport {
+          account {
+            accountId
+          }
+          date
+        }
+      }
+    }
+  }
+`;
+
+const addressSupportQuery = gql`
+  query AddressOTDs($address: String!, $chains: [SupportedChain!]!) {
+    userByAddress(address: $address, chains: $chains) {
+      chainData {
+        chain
+        support {
+          ... on OneTimeDonationSupport {
+            account {
+              accountId
+            }
+            date
+          }
+        }
+      }
+    }
+  }
+`;
+
 function checkDonation(
   ownAccountId: string,
   supportAccountId: string,
@@ -104,7 +143,8 @@ export default function (
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment,
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment,
   tokenAddress: string,
   amountToGive: bigint,
   tokenAllowance: bigint,
@@ -172,7 +212,7 @@ export default function (
               );
               break;
             }
-            case 'EcosystemMainAccount':
+            case 'EcosystemMainAccount': {
               await expect(
                 () =>
                   query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
@@ -197,6 +237,33 @@ export default function (
                 1000,
               );
               break;
+            }
+            case 'OrcidLinkedIdentity': {
+              await expect(
+                () =>
+                  query<OrcidOtDsQuery, OrcidOtDsQueryVariables>(orcidSupportQuery, {
+                    orcid: recipient.orcid,
+                    chain: network.gqlName,
+                  }),
+                (res) => {
+                  const orcidData = res.orcidLinkedIdentityByOrcid;
+                  if (!orcidData) return false;
+
+                  return orcidData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            }
             case 'NftDriverAccount': {
               await expect(
                 () =>
@@ -209,6 +276,32 @@ export default function (
                   if (!dripListData) return true;
 
                   return dripListData.support.some((support) => {
+                    if (support.__typename !== 'OneTimeDonationSupport') return false;
+                    return checkDonation(
+                      ownAccountId,
+                      support.account.accountId,
+                      support.date,
+                      blockTimestamp,
+                    );
+                  });
+                },
+                30000,
+                1000,
+              );
+              break;
+            }
+            case 'AddressDriverAccount': {
+              await expect(
+                () =>
+                  query<AddressOtDsQuery, AddressOtDsQueryVariables>(addressSupportQuery, {
+                    address: recipient.address,
+                    chains: [network.gqlName],
+                  }),
+                (res) => {
+                  const userData = res.userByAddress;
+                  if (!userData) return true;
+
+                  return filterCurrentChainData(userData.chainData).support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,

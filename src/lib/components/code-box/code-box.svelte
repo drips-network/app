@@ -7,53 +7,41 @@
   import sanitize from 'sanitize-html';
   import insertTextAtIndices from '$lib/utils/insert-text-at-indicies';
 
-  interface Props {
-    path?: string;
-    code: string;
-    repoUrl?: string | undefined;
-    defaultBranch?: string;
-    highlight?: [number | null, number | null];
-    editing?: boolean;
-    height?: string | undefined;
-    width?: string | undefined;
-  }
+  export let path: string = 'Code';
+  export let code: string;
+  export let repoUrl: string | undefined = undefined;
+  export let defaultBranch = 'main';
+  export let highlight: [number | null, number | null] = [null, null];
+  export let editing: boolean = false;
+  export let height: string | undefined = undefined;
+  export let width: string | undefined = undefined;
+  /* *
+   * Whether to wrap long lines of code. When true, text will wrap
+   * onto multiple lines instead of overflowing.
+   * */
+  export let wrap: boolean = false;
 
-  let {
-    path = 'Code',
-    code,
-    repoUrl = undefined,
-    defaultBranch = 'main',
-    highlight = [null, null],
-    editing = false,
-    height = undefined,
-    width = undefined,
-  }: Props = $props();
+  let headerElem: HTMLElement | undefined;
 
-  let headerElem: HTMLElement | undefined = $state();
+  $: primaryColor = headerElem
+    ? getComputedStyle(headerElem).getPropertyValue('--color-primary')
+    : undefined;
 
-  let primaryColor = $derived(
-    headerElem ? getComputedStyle(headerElem).getPropertyValue('--color-primary') : undefined,
-  );
+  $: textColor = primaryColor ? getContrastColor(primaryColor) : undefined;
 
-  let textColor = $derived(primaryColor ? getContrastColor(primaryColor) : undefined);
+  $: sanitizedCode = sanitize(code, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+  $: displayCode = highlight.some((v) => v === null)
+    ? sanitizedCode
+    : insertTextAtIndices(sanitizedCode, {
+        [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
+        [highlight[1] as number]: '</mark>',
+      });
+  $: ctaText = editing ? 'Edit on GitHub' : 'Add to your repo';
 
-  let sanitizedCode = $derived(
-    sanitize(code, {
-      allowedTags: [],
-      allowedAttributes: {},
-    }),
-  );
-  let displayCode = $derived(
-    highlight.some((v) => v === null)
-      ? sanitizedCode
-      : insertTextAtIndices(sanitizedCode, {
-          [highlight[0] as number]: '<mark class="typo-text-diff-additive">',
-          [highlight[1] as number]: '</mark>',
-        }),
-  );
-  let ctaText = $derived(editing ? 'Edit on GitHub' : 'Add to your repo');
-
-  let copySuccess = $state(false);
+  let copySuccess = false;
 
   async function copyClipboard(text: string) {
     await navigator.clipboard.writeText(text);
@@ -62,11 +50,9 @@
   }
 
   // TODO: add support for Gitlab.
-  let gitHubProposalUrl = $derived(
-    editing
-      ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json`
-      : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`,
-  );
+  $: gitHubProposalUrl = editing
+    ? `${repoUrl}/edit/${defaultBranch}/FUNDING.json`
+    : `${repoUrl}/new/${defaultBranch}?filename=FUNDING.json&value=${encodeURIComponent(code)}`;
 </script>
 
 <section
@@ -78,7 +64,7 @@
   <header class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">
-      <button onclick={() => copyClipboard(code)}>
+      <button on:click={() => copyClipboard(code)}>
         {#if copySuccess}
           <CheckIcon style="fill: {textColor}" />
         {:else}
@@ -88,7 +74,7 @@
     </div>
   </header>
   <div class="code-wrapper">
-    <code class="typo-text-mono">
+    <code class="typo-text-mono" class:wrap>
       {@html displayCode}
     </code>
   </div>
@@ -124,6 +110,11 @@
   code {
     white-space: pre;
     color: var(--color-foreground-level-6);
+  }
+
+  code.wrap {
+    white-space: pre-wrap;
+    word-break: break-all;
   }
 
   .actions {

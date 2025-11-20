@@ -13,6 +13,7 @@
   import HackathonUsecase from './usecase-illustrations/hackathon-usecase.svelte';
   import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
   import Box from '$lib/components/icons/Box.svelte';
+  import Trophy from '$lib/components/icons/Trophy.svelte';
 
   const usecaseCards: UsecaseIllustrationConfig[] = [
     {
@@ -77,6 +78,14 @@
         x: '-25px',
         y: '-10px',
       },
+    },
+    {
+      headline: 'Launch Wave programs',
+      href: '/solutions/wave',
+      description: 'Run recurring Waves that convert merged pull requests into on-chain rewards.',
+      icon: Trophy,
+      sparkles: [],
+      illustration: StreamUsecase,
     },
     {
       headline: 'Start a hackathon',

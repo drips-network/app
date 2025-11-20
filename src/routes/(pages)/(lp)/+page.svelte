@@ -25,7 +25,7 @@
       <LpHeroBigGraph />
     </div>
     <div class="text">
-      <h1>The easiest way to fund open-source in your ecosystem.</h1>
+      <h1>The superapp for funding developers within your ecosystem.</h1>
 
       <p style:color="var(--color-foreground-level-5)">Have a funding experiment to talk about?</p>
       <Button variant="primary" href={INBOUND_LEAD_FORM_URL} target="_blank" rel="noreferrer"

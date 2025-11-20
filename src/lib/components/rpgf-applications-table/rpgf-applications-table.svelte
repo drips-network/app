@@ -8,43 +8,32 @@
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import ApplicationsTable from './components/applications-table.svelte';
 
-  interface Props {
-    searchable?: boolean;
-    applications: ListingApplication[];
-    round: Round;
-    signedIn: boolean;
-    reviewMode?: boolean;
-    decisions?: Record<string, 'approve' | 'reject' | null>;
-    voteStep?: 'build-ballot' | 'assign-votes' | null;
-    ballotStore?: Writable<InProgressBallot>;
-    horizontalScroll?: boolean;
-    displayVisibilityNote?: boolean;
-  }
+  export let searchable = true;
 
-  let {
-    searchable = true,
-    applications,
-    round,
-    signedIn,
-    reviewMode = false,
-    decisions = $bindable({}),
-    voteStep = null,
-    ballotStore = writable({}),
-    horizontalScroll = false,
-    displayVisibilityNote = false,
-  }: Props = $props();
+  export let applications: ListingApplication[];
+  export let round: Round;
+  export let signedIn: boolean;
+  export let hideState = false;
 
-  let searchQuery = $state('');
+  export let reviewMode = false;
+  export let decisions: Record<string, 'approve' | 'reject' | null> = {};
 
-  let filteredApplications = $derived(
-    applications.filter((application) => {
-      return (
-        !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }),
-  );
+  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
+  export let ballotStore: Writable<InProgressBallot> = writable({});
 
-  let includesResults = $derived(applications.some((a) => a.allocation !== null));
+  export let horizontalScroll = false;
+
+  export let displayVisibilityNote = false;
+
+  let searchQuery = '';
+
+  $: filteredApplications = applications.filter((application) => {
+    return (
+      !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
+  $: includesResults = applications.some((a) => a.allocation !== null);
 </script>
 
 {#if searchable}
@@ -52,7 +41,7 @@
     <MagnifyingGlass />
     <input bind:value={searchQuery} placeholder="Search applications" type="text" />
     {#if searchQuery}
-      <button onclick={() => (searchQuery = '')} aria-label="Clear search">
+      <button on:click={() => (searchQuery = '')} aria-label="Clear search">
         <Cross />
       </button>
     {/if}
@@ -72,6 +61,7 @@
       {signedIn}
       {displayVisibilityNote}
       bind:decisions
+      {hideState}
     />
   </PaddedHorizontalScroll>
 {:else}
@@ -87,6 +77,7 @@
     bind:decisions
     ellipsis={true}
     {displayVisibilityNote}
+    {hideState}
   />
 {/if}
 

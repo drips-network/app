@@ -19,6 +19,7 @@
     nft: 'NFT Driver',
     address: 'Address Driver',
     repo: 'Repo Driver',
+    repoSubAccountDriver: 'Repo Sub-Account Driver',
     immutableSplits: 'Immutable Splits Driver',
   } as const;
 
@@ -26,6 +27,7 @@
     nft: Coin,
     address: Wallet,
     repo: Box,
+    repoSubAccountDriver: Box,
     immutableSplits: Splits,
   } as const;
 

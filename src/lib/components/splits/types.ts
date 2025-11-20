@@ -7,6 +7,7 @@ import type {
   SplitsComponentProjectReceiverFragment,
   SplitsComponentEcosystemReceiverFragment,
   SplitsComponentSubListReceiverFragment,
+  SplitsComponentOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 import { DRIP_LIST_BADGE_FRAGMENT } from '../drip-list-badge/drip-list-badge.svelte';
 
@@ -98,6 +99,27 @@ export const SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT = gql`
   }
 `;
 
+export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
+  fragment SplitsComponentOrcidReceiver on LinkedIdentityReceiver {
+    weight
+    linkedIdentity {
+      ... on OrcidLinkedIdentity {
+        chain
+        isClaimed
+        areSplitsValid
+        account {
+          accountId
+        }
+        orcid
+        orcidMetadata {
+          givenName
+          familyName
+        }
+      }
+    }
+  }
+`;
+
 export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
   ${PROJECT_AVATAR_FRAGMENT}
   ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
@@ -105,6 +127,7 @@ export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
   ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
   ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
   ${SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT}
+  ${SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT}
   fragment SplitsComponentProjectSplits on ProjectData {
     ... on ClaimedProjectData {
       splits {
@@ -124,6 +147,9 @@ export const SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT = gql`
           ... on SubListReceiver {
             ...SplitsComponentSubListReceiver
           }
+          ... on LinkedIdentityReceiver {
+            ...SplitsComponentOrcidReceiver
+          }
         }
         maintainers {
           ... on AddressReceiver {
@@ -140,7 +166,8 @@ export type SplitsComponentSplitsReceiver =
   | SplitsComponentDripListReceiverFragment
   | SplitsComponentProjectReceiverFragment
   | SplitsComponentEcosystemReceiverFragment
-  | SplitsComponentSubListReceiverFragment;
+  | SplitsComponentSubListReceiverFragment
+  | SplitsComponentOrcidReceiverFragment;
 
 export type Splits = (SplitGroup | SplitsComponentSplitsReceiver)[];
 

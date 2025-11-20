@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import type {
     ListEditorDripListFragment,
     ListEditorProjectFragment,
+    ListEditorOrcidFragment,
   } from '../__generated__/gql.generated';
   import Button from '$lib/components/button/button.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -19,40 +18,33 @@
   import { AddItemError } from '../errors';
   import { classifyRecipient } from '$lib/components/list-editor/classifiers';
   import { isAddress } from 'ethers';
+  import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
   const dispatch = createEventDispatcher<{
     addAddress: { accountId: string; address: string };
     addProject: { accountId: string; project: ListEditorProjectFragment };
     addDripList: { accountId: string; dripList: ListEditorDripListFragment };
+    addOrcid: { accountId: string; orcid: ListEditorOrcidFragment };
     errorDismissed: void;
   }>();
 
-  interface Props {
-    maxItemsReached: boolean;
-    existingKeys: string[];
-    blockedAccountIds: string[];
-    allowDripLists: boolean;
-    allowProjects: boolean;
-    allowAddresses: boolean;
-    weightsMode: boolean;
-    addOnMount: string | undefined;
-    errors?: Array<AddItemError>;
-  }
+  export let maxItemsReached: boolean;
+  export let existingKeys: string[];
+  export let blockedAccountIds: string[];
 
-  let {
-    maxItemsReached,
-    existingKeys,
-    blockedAccountIds,
-    allowDripLists,
-    allowProjects,
-    allowAddresses,
-    weightsMode,
-    addOnMount,
-    errors = $bindable([]),
-  }: Props = $props();
+  export let allowDripLists: boolean;
+  export let allowProjects: boolean;
+  export let allowAddresses: boolean;
+  export let allowOrcids: boolean;
+
+  export let weightsMode: boolean;
+
+  export let addOnMount: string | undefined;
+
+  export let errors: Array<AddItemError> = [];
 
   let inputElem: HTMLInputElement;
-  let inputValue = $state(addOnMount ?? '');
+  let inputValue = addOnMount ?? '';
 
   onMount(() => {
     if (addOnMount) {
@@ -60,11 +52,11 @@
     }
   });
 
-  let validInput = $derived(
+  $: validInput =
     (allowProjects && (isSupportedGitUrl(inputValue) || isDripsProjectUrl(inputValue))) ||
-      (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
-      (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)),
-  );
+    (allowAddresses && (inputValue.endsWith('.eth') || isAddress(inputValue))) ||
+    (allowDripLists && inputValue.includes(`${BASE_URL}/app/drip-lists/`)) ||
+    (allowOrcids && isValidOrcidId(inputValue));
 
   function createInvalidMessage(type: string, value: string): string {
     switch (type) {
@@ -79,6 +71,8 @@
         return "Couldn't find that Git project. Is it private?";
       case 'drip-list':
         return "This isn't a recognized Drip List";
+      case 'orcid':
+        return "This isn't a valid ORCID iD";
       default:
         return "This isn't valid";
     }
@@ -106,6 +100,8 @@
     if (project && !project.isVisible) {
       throw new AddItemError('Project is hidden and cannot be split to', 'warning');
     }
+
+    // TODO: orcid private?
   }
 
   function dispatchUpdate(recipientResult: RecipientResult) {
@@ -131,6 +127,13 @@
         dripList: recipientResult.dripList,
       });
     }
+
+    if (recipientResult?.orcid) {
+      dispatch('addOrcid', {
+        accountId: recipientResult.accountId,
+        orcid: recipientResult.orcid,
+      });
+    }
   }
 
   function displayError(error: NonNullable<(typeof errors)[0]>) {
@@ -141,18 +144,19 @@
     errors = [];
   }
 
-  run(() => {
+  $: {
     inputValue;
     if (inputValue !== '') clearError();
-  });
+  }
 
-  let inputPlaceholder = $state<string>();
-  run(() => {
+  let inputPlaceholder: string;
+  $: {
     const allowed = mapFilterUndefined(
       [
         allowProjects && ('GitHub URL' as const),
         allowAddresses && ('ETH address' as const),
         allowDripLists && ('Drip List URL' as const),
+        allowOrcids && ('ORCID iD' as const),
       ],
       (v) => (v ? v : undefined),
     );
@@ -166,9 +170,9 @@
         .filter((_, i, a) => i !== a.length - 1)
         .join(', ')}, or ${allowed.pop()}`;
     }
-  });
+  }
 
-  let loading = $state(false);
+  let loading = false;
 
   function handleKeydown(e: KeyboardEvent) {
     if (validInput && e.key === 'Enter') {
@@ -243,8 +247,8 @@
   <input
     data-testid="list-editor-input"
     bind:this={inputElem}
-    onkeydown={handleKeydown}
-    onpaste={handlePaste}
+    on:keydown={handleKeydown}
+    on:paste={handlePaste}
     disabled={loading}
     bind:value={inputValue}
     type="text"
@@ -256,7 +260,7 @@
     disabled={loading || !validInput || maxItemsReached}
     variant={validInput ? 'primary' : undefined}
     {loading}
-    onclick={() => handleSubmit(inputValue)}>Add</Button
+    on:click={() => handleSubmit(inputValue)}>Add</Button
   >
 </div>
 

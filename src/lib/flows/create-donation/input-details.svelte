@@ -1,9 +1,11 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   import {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
+    DRIP_VISUAL_ORCID_FRAGMENT,
+    DRIP_VISUAL_USER_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   export const CREATE_DONATION_DETAILS_STEP_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
@@ -40,11 +42,29 @@
       }
     }
   `;
+
+  export const CREATE_DONATION_DETAILS_STEP_ORCID_FRAGMENT = gql`
+    ${DRIP_VISUAL_ORCID_FRAGMENT}
+    fragment CreateDonationDetailsStepOrcid on OrcidLinkedIdentity {
+      ...DripVisualOrcid
+      account {
+        accountId
+      }
+    }
+  `;
+
+  export const CREATE_DONATION_DETAILS_STEP_USER_FRAGMENT = gql`
+    ${DRIP_VISUAL_USER_FRAGMENT}
+    fragment CreateDonationDetailsStepUser on User {
+      ...DripVisualUser
+      account {
+        accountId
+      }
+    }
+  `;
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import StepHeader from '$lib/components/step-header/step-header.svelte';
   import StepLayout from '$lib/components/step-layout/step-layout.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -62,6 +82,7 @@
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
     CreateDonationDetailsStepEcosystemFragment,
+    CreateDonationDetailsStepOrcidFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
   import { Driver } from '$lib/graphql/__generated__/base-types';
@@ -79,30 +100,26 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  interface Props {
-    context: Writable<CreateDonationFlowState>;
-    receiver:
-      | CreateDonationDetailsStepAddressDriverAccountFragment
-      | CreateDonationDetailsStepNftDriverAccountFragment
-      | CreateDonationDetailsStepProjectFragment
-      | CreateDonationDetailsStepEcosystemFragment;
-  }
+  export let context: Writable<CreateDonationFlowState>;
 
-  let { context, receiver }: Props = $props();
+  export let receiver:
+    | CreateDonationDetailsStepAddressDriverAccountFragment
+    | CreateDonationDetailsStepNftDriverAccountFragment
+    | CreateDonationDetailsStepProjectFragment
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 
-  let selectedTokenAllowance: bigint | undefined = $state();
+  let selectedTokenAllowance: bigint | undefined;
 
-  let formValid = $state(false);
+  let formValid: boolean;
 
-  let amount: bigint | undefined = $state();
+  let amount: bigint | undefined;
 
-  let selectedTokenAddress = $derived($context.selectedTokenAddress?.[0]);
-  let selectedToken = $derived(
-    selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null,
-  );
+  $: selectedTokenAddress = $context.selectedTokenAddress?.[0];
+  $: selectedToken = selectedTokenAddress ? tokensStore.getByAddress(selectedTokenAddress) : null;
 
-  let receiverTypeLabel = $state('Drip List');
-  run(() => {
+  let receiverTypeLabel = 'Drip List';
+  $: {
     switch (receiver.__typename) {
       case 'Project':
         receiverTypeLabel = 'Drips project';
@@ -110,8 +127,14 @@
       case 'EcosystemMainAccount':
         receiverTypeLabel = 'Ecosystem';
         break;
+      case 'OrcidLinkedIdentity':
+        receiverTypeLabel = 'ORCID';
+        break;
+      case 'AddressDriverAccount':
+        receiverTypeLabel = 'Address';
+        break;
     }
-  });
+  }
 
   function submit() {
     let recipientAccountId: string;
@@ -122,6 +145,7 @@
         break;
       case 'Project':
       case 'EcosystemMainAccount':
+      case 'OrcidLinkedIdentity':
         recipientAccountId = receiver.account.accountId;
         break;
     }
@@ -170,45 +194,52 @@
     <TransitionedHeight collapsed={!formValid} negativeMarginWhileCollapsed="-1rem">
       <WhatsNextSection>
         <WhatsNextCard>
-          {#snippet title()}
-            On transaction confirmation...
-          {/snippet}
-          {#snippet items()}
-            {#if amount}
-              <WhatsNextItem icon={TransactionsIcon}
-                >{formatTokenAmount(amount, selectedToken.info.decimals, 1n, false)}
-                {selectedToken?.info.symbol} will be
-                <span class="typo-text-bold">immediately sent from your wallet</span>
-                to this {receiverTypeLabel}.</WhatsNextItem
-              >
-            {/if}
-          {/snippet}
+          <svelte:fragment slot="title">On transaction confirmation...</svelte:fragment>
+          <svelte:fragment slot="items">
+            <WhatsNextItem icon={TransactionsIcon}
+              >{formatTokenAmount(amount, selectedToken.info.decimals, 1n, false)}
+              {selectedToken?.info.symbol} will be
+              <span class="typo-text-bold">immediately sent from your wallet</span>
+              to this {receiverTypeLabel}.</WhatsNextItem
+            >
+          </svelte:fragment>
         </WhatsNextCard>
         <WhatsNextCard>
-          {#snippet title()}
-            After your donation...
-          {/snippet}
-          {#snippet items()}
-            <WhatsNextItem icon={TransactionsIcon}>
-              Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
-              <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
-            </WhatsNextItem>
-            <WhatsNextItem icon={CalendarIcon}>
-              The next date that accumulated funds will be distributed is <span
-                class="typo-text-bold"
-                >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
-              >.
-            </WhatsNextItem>
-          {/snippet}
+          <svelte:fragment slot="title">After your donation...</svelte:fragment>
+          <svelte:fragment slot="items">
+            {#if receiver.__typename === 'OrcidLinkedIdentity'}
+              <WhatsNextItem icon={CalendarIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed to its owner on
+                <span class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {:else}
+              <WhatsNextItem icon={TransactionsIcon}>
+                Funds sent to {receiverTypeLabel}s on {network.label} are distributed among its recipients
+                <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
+              </WhatsNextItem>
+              <WhatsNextItem icon={CalendarIcon}>
+                The next date that accumulated funds will be distributed is <span
+                  class="typo-text-bold"
+                  >{nextSettlementDate === 'daily'
+                    ? 'today'
+                    : formatDate(nextSettlementDate())}</span
+                >.
+              </WhatsNextItem>
+            {/if}
+          </svelte:fragment>
         </WhatsNextCard>
       </WhatsNextSection>
     </TransitionedHeight>
   {/if}
 
-  {#snippet actions()}
-    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" icon={WalletIcon} onclick={submit} disabled={!formValid}
+  <svelte:fragment slot="actions">
+    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" icon={WalletIcon} on:click={submit} disabled={!formValid}
       >Confirm in your wallet</Button
     >
-  {/snippet}
+  </svelte:fragment>
 </StepLayout>

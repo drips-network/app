@@ -11,12 +11,14 @@ import type {
   SdkProjectReceiver,
   SdkAddressReceiver,
   SdkDripListReceiver,
+  SdkOrcidReceiver,
 } from '@drips-network/sdk';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepEcosystemFragment,
+  CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 
 const WAITING_WALLET_ICON = {
@@ -44,7 +46,8 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment,
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment,
 ): SdkReceiver {
   switch (receiver.__typename) {
     case 'AddressDriverAccount':
@@ -71,6 +74,12 @@ function transformReceiverToSdkReceiver(
         accountId: BigInt(receiver.account.accountId),
       } as SdkEcosystemMainAccountReceiver;
 
+    case 'OrcidLinkedIdentity':
+      return {
+        type: 'orcid',
+        orcidId: receiver.orcid,
+      } as SdkOrcidReceiver;
+
     default:
       throw new Error(`Unsupported receiver type: ${(receiver as any).__typename}`); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
@@ -85,7 +94,8 @@ export interface OneTimeDonationContext {
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment;
+    | CreateDonationDetailsStepEcosystemFragment
+    | CreateDonationDetailsStepOrcidFragment;
 }
 
 export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
@@ -103,7 +113,7 @@ export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
     amount: String(amountInputValue),
     erc20: tokenAddress as Address,
     tokenDecimals: token.info.decimals,
-    receiver: sdkReceiver,
+    receiver: sdkReceiver as SdkReceiver,
   });
 
   const txs = [

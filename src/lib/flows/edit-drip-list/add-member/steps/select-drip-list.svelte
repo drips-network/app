@@ -1,65 +1,21 @@
-<script module>
-  export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
-    ${DRIP_LIST_BADGE_FRAGMENT}
-    ${EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT}
-    fragment SelectDripListStepLists on DripList {
-      ...DripListBadge
-      ...EditDripListFlowDripList
-      splits {
-        ... on AddressReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on ProjectReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on DripListReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on EcosystemMainAccountReceiver {
-          account {
-            accountId
-          }
-        }
-        ... on SubListReceiver {
-          account {
-            accountId
-          }
-        }
-      }
-    }
-  `;
+<script context="module">
+  import {
+    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
+    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
+    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
+  } from '../../fragments';
 
-  export const SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListProjectToAdd on Project {
-      account {
-        accountId
-      }
-      source {
-        url
-      }
-    }
-  `;
-
-  export const SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT = gql`
-    fragment SelectDripListDripListToAdd on DripList {
-      account {
-        accountId
-      }
-    }
-  `;
+  export {
+    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
+    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
+    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
+  };
 </script>
 
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
-  import DripListBadge, {
-    DRIP_LIST_BADGE_FRAGMENT,
-  } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -68,7 +24,6 @@
   import modal from '$lib/stores/modal';
   import buildUrl from '$lib/utils/build-url';
   import unreachable from '$lib/utils/unreachable';
-  import { gql } from 'graphql-request';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -77,33 +32,37 @@
     SelectDripListDripListToAddFragment,
     SelectDripListProjectToAddFragment,
     SelectDripListStepListsFragment,
-  } from './__generated__/gql.generated';
-  import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '../../edit-members/edit-drip-list-steps';
+  } from '../../__generated__/gql.generated';
+  import type { Items, Weights } from '$lib/components/list-editor/types';
   import {
     mapSplitReceiversToEditorConfig,
     type SplitReceiver,
   } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
-  import type { ContextType } from '../add-drip-list-member-steps';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  interface Props {
-    dripLists: SelectDripListStepListsFragment[];
-    context: Writable<ContextType>;
-    projectOrDripListToAdd:
-      | SelectDripListDripListToAddFragment
-      | SelectDripListProjectToAddFragment;
-  }
+  export let dripLists: SelectDripListStepListsFragment[];
 
-  let { dripLists, context, projectOrDripListToAdd }: Props = $props();
+  export let state: Writable<{
+    listEditorConfig: {
+      items: Items;
+      weights: Weights;
+    };
+    name: string;
+    description: string | undefined;
+    dripListAccountId: string | undefined;
+  }>;
 
-  let urlToAdd = $derived(
+  export let projectOrDripListToAdd:
+    | SelectDripListDripListToAddFragment
+    | SelectDripListProjectToAddFragment;
+
+  $: urlToAdd =
     'source' in projectOrDripListToAdd
       ? projectOrDripListToAdd.source.url
-      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`,
-  );
+      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`;
 
-  let selected: string[] = $state([]);
+  let selected: string[] = [];
 
   function isAlreadyInList(listSplits: SelectDripListStepListsFragment['splits']) {
     const accountIdToAdd = projectOrDripListToAdd.account.accountId;
@@ -115,20 +74,18 @@
     const selectedDripList =
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
-    $context = {
+    $state = {
       listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits as SplitReceiver[]),
       name: selectedDripList.name,
       description: selectedDripList.description || undefined,
       dripListAccountId: selectedDripList.account.accountId,
-      isVisible: selectedDripList.isVisible,
     };
 
     dispatch('goForward');
   }
 
-  let subjectName = $derived(
-    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project',
-  );
+  $: subjectName =
+    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
 </script>
 
 <StepLayout>
@@ -169,19 +126,23 @@
         )}
       />
     </div>
-    <Button icon={Plus} href={buildUrl('/app/funder-onboarding', { urlToAdd })} onclick={modal.hide}
-      >Create new Drip List</Button
+    <Button
+      icon={Plus}
+      on:click={() => {
+        modal.hide();
+        goto(buildUrl('/app/funder-onboarding', { urlToAdd }));
+      }}>Create new Drip List</Button
     >
   </FormField>
-  {#snippet actions()}
-    <Button onclick={modal.hide} variant="ghost">Cancel</Button>
+  <svelte:fragment slot="actions">
+    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
     <Button
-      onclick={submit}
+      on:click={submit}
       disabled={selected[0] === undefined}
       icon={DripListIcon}
       variant="primary">Add</Button
     >
-  {/snippet}
+  </svelte:fragment>
 </StepLayout>
 
 <style>

@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   export type AnnouncementBannerConfig = {
     title: string;
     link: string;
@@ -18,35 +18,30 @@
   import Hamburger from '../icons/Hamburger.svelte';
   import DripsLogo from '../header/drips-logo.svelte';
 
-  let scrolledDown = $derived($scrollStore.pos > 10);
+  $: scrolledDown = $scrollStore.pos > 10;
 
-  interface Props {
-    announcementBanner?: AnnouncementBannerConfig | undefined;
-  }
-
-  let { announcementBanner = undefined }: Props = $props();
+  export let announcementBanner: AnnouncementBannerConfig | undefined = undefined;
 
   let wrapper: Element;
 
-  let firstRender = $state(true);
+  let firstRender = true;
   onMount(() => {
     firstRender = false;
   });
 
-  let dismissableKey = $derived(`announcementBanner-${announcementBanner?.title}`);
+  $: dismissableKey = `announcementBanner-${announcementBanner?.title}`;
 
   function dismissAnnouncement() {
     dismissablesStore.dismiss(dismissableKey);
   }
-  let announcementBannerVisible = $derived(
+  $: announcementBannerVisible =
     announcementBanner &&
-      !$dismissablesStore.includes(dismissableKey) &&
-      !firstRender &&
-      !scrolledDown,
-  );
+    !$dismissablesStore.includes(dismissableKey) &&
+    !firstRender &&
+    !scrolledDown;
 
-  let openMenu: string | 'all' | null = $state(null);
-  let menuXOffset: number | null = $state(null);
+  let openMenu: string | 'all' | null = null;
+  let menuXOffset: number | null = null;
 
   type MenuLink = { title: string; type: 'link'; href: string };
   type MenuDropdown = {
@@ -61,10 +56,12 @@
       title: 'Solutions',
       type: 'dropdown',
       entries: [
+        { title: 'Contribution bounties', href: '/solutions/wave' },
+        { title: 'RetroPGF voting & distribution', href: '/solutions/retro-pgf' },
+        { title: 'Proactive grants', href: '/solutions/pro-pgf' },
         { title: 'Dependency Funding', href: '/solutions/dependency-funding' },
-        { title: 'RetroPGF Voting & Distribution', href: '/solutions/retro-pgf' },
-        { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Ecosystem funding', href: '/solutions/ecosystem-funding' },
+        { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Hackathons', href: '/solutions/hackathons' },
       ],
     },
@@ -108,30 +105,30 @@
     }
   }
 
-  let allMenusSorted = $derived([
+  $: allMenusSorted = [
     ...menus.filter((menu) => menu.type === 'link'),
     ...menus.filter((menu) => menu.type === 'dropdown'),
-  ]);
+  ];
 </script>
 
 {#if openMenu}
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div transition:fade={{ duration: 100 }} class="bg" onclick={() => (openMenu = null)}></div>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div transition:fade={{ duration: 100 }} class="bg" on:click={() => (openMenu = null)}></div>
 {/if}
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <header
-  onmouseleave={() => (openMenu = null)}
+  on:mouseleave={() => (openMenu = null)}
   bind:this={wrapper}
   class:raised={scrolledDown || openMenu}
   class:has-announcement-banner={announcementBannerVisible}
-  onkeydown={() => (openMenu = null)}
-  onfocus={() => (openMenu = null)}
+  on:keydown={() => (openMenu = null)}
+  on:focus={() => (openMenu = null)}
 >
   <div class="top">
     <div class="left">
-      <button class="hamburger" onclick={handleHamburgerClick} aria-label="Toggle menu">
+      <button class="hamburger" on:click={handleHamburgerClick} aria-label="Toggle menu">
         {#if openMenu === 'all'}
           <div out:fly={{ duration: 300, y: -4 }} in:fly={{ duration: 300, y: 4 }}><Cross /></div>
         {:else}
@@ -144,8 +141,8 @@
         aria-label="Go to homepage"
         class="logo"
         href="/"
-        onmouseenter={() => (openMenu = null)}
-        onfocus={() => (openMenu = null)}
+        on:mouseenter={() => (openMenu = null)}
+        on:focus={() => (openMenu = null)}
       >
         <DripsLogo />
       </a>
@@ -174,7 +171,8 @@
       </nav>
     </div>
     <div data-sveltekit-preload-code="eager" data-sveltekit-reload>
-      <Button variant="primary" href="/app" onmouseenter={() => (openMenu = null)}>Open app</Button>
+      <Button variant="primary" href="/app" on:mouseenter={() => (openMenu = null)}>Open app</Button
+      >
     </div>
   </div>
   {#if openMenu}
@@ -237,9 +235,7 @@
           style:text-decoration="underline"
           style:white-space="nowrap">Learn more</a
         >
-        <button aria-label="Dismiss announcement" onclick={dismissAnnouncement}>
-          <Cross style="fill: white;" />
-        </button>
+        <Cross on:click={dismissAnnouncement} style="fill: white; cursor: pointer;" />
       </div>
     </div>
   {/if}
