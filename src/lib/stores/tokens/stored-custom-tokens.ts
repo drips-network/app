@@ -1,4 +1,4 @@
-import type { TokenInfo } from '@uniswap/token-lists';
+import type { TokenInfo } from '@uniswap/token-lists/src/types';
 import { isAddress } from 'ethers';
 import { z } from 'zod';
 import type { CustomTokenInfoWrapper } from './tokens.store';

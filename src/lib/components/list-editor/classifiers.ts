@@ -5,12 +5,14 @@ import {
   reformatUrl,
   validateAddress,
   validateDripList,
+  validateOrcid,
   validateProject,
 } from './validators';
-import { getAddress, getDripList, getProject } from './hydrators';
+import { getAddress, getDripList, getProject, getOrcid } from './hydrators';
 import { buildRepositoryURL, isDripsProjectUrl } from '../../utils/build-repo-url';
 import type { RecipientClassification } from './types';
 import { isAddress } from 'ethers';
+import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
 
 export const classifyRecipient = (
   input: string,
@@ -18,10 +20,12 @@ export const classifyRecipient = (
     allowProjects = true,
     allowAddresses = true,
     allowDripLists = true,
+    allowOrcids = true,
   }: {
     allowProjects?: boolean;
     allowAddresses?: boolean;
     allowDripLists?: boolean;
+    allowOrcids?: boolean;
   } = {},
 ): RecipientClassification => {
   if (allowProjects && isSupportedGitUrl(input)) {
@@ -86,6 +90,19 @@ export const classifyRecipient = (
       },
       fetch() {
         return getProject(this.value);
+      },
+    };
+  }
+
+  if (allowOrcids && isValidOrcidId(input)) {
+    return {
+      type: 'orcid',
+      value: input,
+      validate() {
+        return validateOrcid(this.value);
+      },
+      fetch() {
+        return getOrcid(this.value);
       },
     };
   }

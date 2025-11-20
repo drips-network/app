@@ -132,7 +132,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
   // Cache the result
   cacheImageBuffer(cacheKey, imageBuffer);
 
-  return new Response(imageBuffer, {
+  return new Response(imageBuffer as BodyInit, {
     status: 200,
     headers: new Headers({ 'Content-Type': 'image/png' }),
   });

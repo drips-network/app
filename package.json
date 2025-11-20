@@ -10,7 +10,7 @@
     "dev:docker:sprinkle": "./docker/sprinkle.sh",
     "preview": "vite preview",
     "test:unit": "PUBLIC_NETWORK=1 PUBLIC_JUNCTION_URL=http://dummy.org PUBLIC_INTERNAL_JUNCTION_URL=http://dummy.org vitest run unit",
-    "test:e2e": "NODE_OPTIONS='--no-experimental-strip-types' ./docker/start-e2e.sh --start-playwright-ui ",
+    "test:e2e": "NODE_OPTIONS='--no-experimental-strip-types' ./docker/start-e2e.sh --start-playwright-ui",
     "test:e2e:headless": "NODE_OPTIONS='--no-experimental-strip-types' ./docker/start-e2e.sh --prod-build",
     "coverage": "vitest run --coverage",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -81,7 +81,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
-    "@drips-network/sdk": "^0.1.0-alpha.11",
+    "@drips-network/sdk": "0.1.0-alpha.15",
     "@efstajas/svelte-stored-writable": "^0.3.0",
     "@efstajas/versioned-parser": "^0.1.4",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
