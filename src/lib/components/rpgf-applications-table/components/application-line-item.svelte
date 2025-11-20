@@ -34,7 +34,7 @@
     application,
     hideState = false,
     reviewMode,
-    decision = $bindable(null),
+    decision = $bindable(),
     voteStep = null,
     ballotStore,
     ellipsis = false,
