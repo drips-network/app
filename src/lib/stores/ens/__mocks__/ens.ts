@@ -5,7 +5,7 @@ const MockProvider = vi.fn().mockImplementation(() => ({
   })),
 }));
 
-export const provider = new MockProvider();
+export const provider = MockProvider();
 
 export function getMainnetProvider() {
   return provider;

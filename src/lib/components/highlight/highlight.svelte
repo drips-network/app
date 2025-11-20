@@ -44,7 +44,7 @@
       }
     | undefined = $state();
   function updateHighlightPos() {
-    if (!highlightBB) return;
+    if (!highlightBB || !window) return;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;

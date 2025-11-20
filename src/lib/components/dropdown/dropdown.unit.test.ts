@@ -6,6 +6,12 @@ vi.mock('$app/environment', () => ({
   browser: true,
 }));
 
+const mockAnimations = () => {
+  Element.prototype.animate = vi
+    .fn()
+    .mockImplementation(() => ({ finished: Promise.resolve(), cancel: () => {} }));
+};
+
 const TEST_PROPS = {
   value: 'first',
   options: [
@@ -25,6 +31,10 @@ const TEST_PROPS = {
 };
 
 describe('dropdown.svelte', () => {
+  beforeAll(() => {
+    mockAnimations();
+  });
+
   it('renders the selected item', () => {
     render(Dropdown, {
       props: TEST_PROPS,

@@ -9,7 +9,7 @@ if (process.env.FARO_UPLOAD_SOURCE_MAPS_KEY) {
   console.log('👀 - FARO_UPLOAD_SOURCE_MAPS_KEY is not set, skipping source map upload');
 }
 
-const config = defineConfig({
+const config = defineConfig(({ mode }) => ({
   plugins: [
     sveltekit(),
     process.env.FARO_UPLOAD_SOURCE_MAPS_KEY
@@ -22,7 +22,6 @@ const config = defineConfig({
           gzipContents: true,
         })
       : undefined,
-    // visualizer(),
   ],
   test: {
     // Jest like globals
@@ -31,15 +30,14 @@ const config = defineConfig({
     include: ['src/**/*.{test,spec}.ts'],
     exclude: ['src/e2e-tests/.tmp/**'],
     setupFiles: ['./setup-test.js'],
-    // deps: {
-    //   inline: [
-    //     '@ethersproject/signing-key',
-    //     '@ethersproject/basex',
-    //     '@depay/solana-web3.js',
-    //     'cupertino-pane',
-    //   ],
-    // },
     testTimeout: 7000,
+  },
+  resolve: {
+    conditions: mode === 'unit-test' ? ['browser'] : undefined,
+    alias: {
+      // Required for octokit.
+      'node-fetch': 'isomorphic-fetch',
+    },
   },
   build: {
     target: 'es2020',
@@ -53,16 +51,10 @@ const config = defineConfig({
   preview: {
     host: '0.0.0.0',
   },
-  resolve: {
-    alias: {
-      // Required for octokit.
-      'node-fetch': 'isomorphic-fetch',
-    },
-  },
   server: {
     // required for local env
     allowedHosts: ['app'],
   },
-});
+}));
 
 export default config;
