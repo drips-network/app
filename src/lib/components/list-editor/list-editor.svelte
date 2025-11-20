@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AccountId, Items, ListEditorItem, Weights } from './types';
+  import type { Items, ListEditorItem, Weights } from './types';
   import ListEditorInput from './components/list-editor-input.svelte';
   import ListEditorItemComponent from './components/list-editor-item.svelte';
   import ListEditorPie from './components/list-editor-pie.svelte';
@@ -7,11 +7,14 @@
   import type {
     ListEditorDripListFragment,
     ListEditorProjectFragment,
+    ListEditorOrcidFragment,
   } from './__generated__/gql.generated';
   import { onMount, tick } from 'svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
   import type { AddItemError } from './errors';
   import { WEIGHT_FACTOR } from './types';
+  import type { AccountId } from '$lib/utils/common-types';
+  import network from '$lib/stores/wallet/network';
 
   const MAX_WEIGHT = 1000000;
 
@@ -30,6 +33,7 @@
   export let allowDripLists = true;
   export let allowProjects = true;
   export let allowAddresses = true;
+  export let allowOrcids = network.orcids;
 
   export let allowEmptyPercentages = false;
 
@@ -134,6 +138,15 @@
     }
   }
 
+  function handleAddOrcid(accountId: AccountId, orcid: ListEditorOrcidFragment) {
+    if (allowOrcids) {
+      addItem(accountId, {
+        type: 'orcid',
+        orcid,
+      });
+    }
+  }
+
   function handlePercentageEdit(key: AccountId, value: number) {
     percentagesManuallyChanged = true;
 
@@ -185,7 +198,7 @@
 
 <div class="list-editor" class:with-outline={outline}>
   <div class="inner">
-    {#if isEditable && (allowAddresses || allowProjects || allowDripLists)}
+    {#if isEditable && (allowAddresses || allowProjects || allowDripLists || allowOrcids)}
       <ListEditorInput
         existingKeys={Object.keys(items)}
         errors={inputErrors}
@@ -194,11 +207,13 @@
         {allowAddresses}
         {allowProjects}
         {allowDripLists}
+        {allowOrcids}
         {blockedAccountIds}
         maxItemsReached={Object.keys(items).length >= maxItems}
         on:addAddress={(e) => handleAddAddress(e.detail.accountId, e.detail.address)}
         on:addProject={(e) => handleAddProject(e.detail.accountId, e.detail.project)}
         on:addDripList={(e) => handleAddDripList(e.detail.accountId, e.detail.dripList)}
+        on:addOrcid={(e) => handleAddOrcid(e.detail.accountId, e.detail.orcid)}
         on:errorDismissed
       />
     {/if}

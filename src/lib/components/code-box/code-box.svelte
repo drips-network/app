@@ -15,6 +15,11 @@
   export let editing: boolean = false;
   export let height: string | undefined = undefined;
   export let width: string | undefined = undefined;
+  /* *
+   * Whether to wrap long lines of code. When true, text will wrap
+   * onto multiple lines instead of overflowing.
+   * */
+  export let wrap: boolean = false;
 
   let headerElem: HTMLElement | undefined;
 
@@ -69,7 +74,7 @@
     </div>
   </header>
   <div class="code-wrapper">
-    <code class="typo-text-mono">
+    <code class="typo-text-mono" class:wrap>
       {@html displayCode}
     </code>
   </div>
@@ -105,6 +110,11 @@
   code {
     white-space: pre;
     color: var(--color-foreground-level-6);
+  }
+
+  code.wrap {
+    white-space: pre-wrap;
+    word-break: break-all;
   }
 
   .actions {

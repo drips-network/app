@@ -35,6 +35,15 @@
       name
     }
   `;
+
+  export const IDENTITY_CARD_ORCID_FRAGMENT = gql`
+    fragment IdentityCardOrcid on OrcidLinkedIdentity {
+      account {
+        accountId
+      }
+      orcid
+    }
+  `;
 </script>
 
 <script lang="ts">
@@ -47,6 +56,7 @@
     IdentityCardDripListFragment,
     IdentityCardProjectFragment,
     IdentityCardEcosystemFragment,
+    IdentityCardOrcidFragment,
   } from './__generated__/gql.generated';
   import ProjectAvatar, {
     PROJECT_AVATAR_FRAGMENT,
@@ -56,12 +66,15 @@
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
+  import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
+  import OrcidIcon from '$lib/components/icons/Orcid.svelte';
 
   // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
   export let project: IdentityCardProjectFragment | undefined = undefined;
   export let ecosystem: IdentityCardEcosystemFragment | undefined = undefined;
+  export let orcid: IdentityCardOrcidFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
   export let disableLink = false;
@@ -83,6 +96,8 @@
       case !!ecosystem:
         link = `/app/ecosystems/${ecosystem.account.accountId}`;
         break;
+      case !!orcid:
+        link = buildOrcidUrl(orcid.orcid);
     }
   }
 </script>
@@ -151,6 +166,16 @@
           />
         {/if}{project.source.repoName}</span
       >
+    </div>
+  {:else if orcid}
+    <div class="content-container" in:fade>
+      <div class="icon">
+        <OrcidIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
+      </div>
+
+      <div>
+        <span class="typo-header-3 ellipsis">{orcid.orcid}</span>
+      </div>
     </div>
   {:else if loading}
     <div class="spinner"><Spinner /></div>

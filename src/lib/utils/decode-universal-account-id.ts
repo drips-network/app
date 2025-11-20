@@ -21,6 +21,11 @@ interface NFTDriverResult {
   dripsAccountId: string;
 }
 
+interface RepoSubAccountDriverResult {
+  driver: 'repoSubAccountDriver';
+  dripsAccountId: string;
+}
+
 /**
  * "universalAccountIdentifier" is either an .ens name, an ETH address, or a Drips User ID (any supported driver).
  * This utility takes such an identifier (which e.g. may be navigated to via drips.network/<universalAcccountIdentifier>),
@@ -29,7 +34,7 @@ interface NFTDriverResult {
  */
 export default async function (
   universalAcccountIdentifier: string,
-): Promise<AddressDriverResult | RepoDriverResult | NFTDriverResult> {
+): Promise<AddressDriverResult | RepoDriverResult | NFTDriverResult | RepoSubAccountDriverResult> {
   if (isAddress(universalAcccountIdentifier)) {
     const address = universalAcccountIdentifier;
     const dripsAccountId = (

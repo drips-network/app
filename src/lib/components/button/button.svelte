@@ -4,8 +4,13 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' =
-    'normal';
+  export let variant:
+    | 'normal'
+    | 'primary'
+    | 'destructive'
+    | 'destructive-outline'
+    | 'ghost'
+    | 'muted' = 'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
@@ -153,6 +158,10 @@
   }
 
   .button .inner:not(.ghost) {
+    box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
+  }
+
+  .button .inner.muted {
     box-shadow: 0px 0px 0px 1px var(--color-foreground-level-3);
   }
 

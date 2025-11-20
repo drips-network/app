@@ -11,11 +11,11 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import ArrowDown from '$lib/components/icons/ArrowDown.svelte';
-  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import {
     createAddItemFunction,
     createClearItemsFunction,
   } from '$lib/flows/import-from-csv/csv-import-helpers';
+  import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
