@@ -4,8 +4,13 @@
   import Spinner from '../spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
 
-  export let variant: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' | 'muted' =
-    'normal';
+  export let variant:
+    | 'normal'
+    | 'primary'
+    | 'destructive'
+    | 'destructive-outline'
+    | 'ghost'
+    | 'muted' = 'normal';
   export let icon: ComponentType | undefined = undefined;
   export let disabled = false;
   export let ariaLabel: string | undefined = undefined;
