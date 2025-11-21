@@ -11,7 +11,7 @@ export const load = async ({ url, parent }) => {
     const isSafe = isSafePath(decoded);
 
     if (isSafe) redirect(301, decoded);
-  } else {
+  } else if (user) {
     redirect(301, '/wave');
   }
 

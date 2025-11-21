@@ -20,6 +20,7 @@ declare namespace App {
 
   interface Locals {
     newWaveAccessToken?: string;
+    waveRefreshToken?: string;
   }
 
   // interface PageError {}
