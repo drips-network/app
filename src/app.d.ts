@@ -18,6 +18,10 @@ declare namespace App {
     preservePathOnNetworkChange?: boolean;
   }
 
+  interface Locals {
+    newWaveAccessToken?: string;
+  }
+
   // interface PageError {}
   // interface Platform {}
 }
