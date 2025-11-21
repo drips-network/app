@@ -1,21 +1,33 @@
 <script lang="ts">
+  import { run, stopPropagation, createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { createEventDispatcher } from 'svelte';
 
-  export let percentage = 0;
-  export let disabled = false;
-  export let editable = true;
-  export let emptyIsError = true;
+  interface Props {
+    percentage?: number;
+    disabled?: boolean;
+    editable?: boolean;
+    emptyIsError?: boolean;
+  }
 
-  let error = false;
-  let empty = false;
-  let inputWidth = 'auto';
+  let {
+    percentage = $bindable(0),
+    disabled = false,
+    editable = true,
+    emptyIsError = true,
+  }: Props = $props();
 
-  let percentageValue: string | number = (Math.round(percentage * 100) / 100).toString();
+  let error = $state(false);
+  let empty = $state(false);
+  let inputWidth = $state('auto');
 
-  let prevPercentage: number = percentage;
-  let prevPercentageValue = Number(percentageValue);
+  let percentageValue: string | number = $state((Math.round(percentage * 100) / 100).toString());
 
-  $: {
+  let prevPercentage: number = $state(percentage);
+  let prevPercentageValue = $state(percentage);
+
+  run(() => {
     const percentageChanged = prevPercentage !== percentage;
     const percentageValueChanged = Number(prevPercentageValue) !== Number(percentageValue);
 
@@ -53,9 +65,9 @@
 
     prevPercentage = percentage;
     prevPercentageValue = Number(percentageValue);
-  }
+  });
 
-  let focus = false;
+  let focus = $state(false);
 
   let inputElem: HTMLInputElement;
 
@@ -84,7 +96,7 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="percentage-editor typo-text tabular-nums cursor-text"
   class:focus
@@ -93,19 +105,19 @@
   class:empty
   class:disabled
   class:editable
-  on:click|stopPropagation={focusInput}
-  on:keypress|stopPropagation
+  onclick={stopPropagation(focusInput)}
+  onkeypress={stopPropagation(bubble('keypress'))}
 >
   <input
     bind:this={inputElem}
     class="typo-text tabular-nums"
     tabindex={disabled ? -1 : 0}
-    on:focus={() => {
+    onfocus={() => {
       focus = true;
       inputElem.select();
     }}
-    on:blur={handleBlur}
-    on:keydown={handleKeydown}
+    onblur={handleBlur}
+    onkeydown={handleKeydown}
     step="0.01"
     style:width={inputWidth}
     bind:value={percentageValue}

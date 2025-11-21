@@ -7,8 +7,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let onAdd: (field: ApplicationFieldDto) => void;
+  interface Props {
+    context: Writable<State>;
+    onAdd: (field: ApplicationFieldDto) => void;
+  }
+
+  let { context, onAdd }: Props = $props();
 
   const DEFAULT_FIELD_SETTINGS: Record<ApplicationFieldDto['type'], ApplicationFieldDto> = {
     markdown: {
@@ -125,7 +129,7 @@
 
 <div class="add-field-modal">
   {#each Object.entries(FIELD_TYPES) as [type, { friendlyName, description }]}
-    <button class="option" on:click={() => handleAdd(type)}>
+    <button class="option" onclick={() => handleAdd(type)}>
       <span class="name typo-text-bold">{friendlyName}</span>
       <span class="description typo-text" style:color="var(--color-foreground-level-6)"
         >{description}</span

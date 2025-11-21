@@ -21,18 +21,26 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.dependencySplits.items,
-    $context.dependencySplits.weights,
-    $context.highLevelPercentages['dependencies'],
+  let { context }: Props = $props();
+
+  let dependencyRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.dependencySplits.items,
+      $context.dependencySplits.weights,
+      $context.highLevelPercentages['dependencies'],
+    ),
   );
 
-  $: maintainerRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.maintainerSplits.items,
-    $context.maintainerSplits.weights,
-    $context.highLevelPercentages['maintainers'],
+  let maintainerRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.maintainerSplits.items,
+      $context.maintainerSplits.weights,
+      $context.highLevelPercentages['maintainers'],
+    ),
   );
 
   function submit() {
@@ -107,12 +115,13 @@
       </div>
     </div>
   </FormField>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm changes</Button>
-  </svelte:fragment>
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button icon={WalletIcon} variant="primary" onclick={submit}>Confirm changes</Button>
+  {/snippet}
 </StepLayout>
 
 <style>

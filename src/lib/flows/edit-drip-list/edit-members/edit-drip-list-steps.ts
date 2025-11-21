@@ -10,7 +10,7 @@ import {
 import type { EditDripListFlowDripListFragment } from '../__generated__/gql.generated';
 
 export default (dripList: EditDripListFlowDripListFragment) => {
-  const state = writable({
+  const context = writable({
     listEditorConfig: mapSplitReceiversToEditorConfig(dripList.splits as SplitReceiver[]),
     name: dripList.name,
     description: dripList.description || undefined,
@@ -19,13 +19,11 @@ export default (dripList: EditDripListFlowDripListFragment) => {
   });
 
   return {
-    context: undefined,
+    context: () => context,
     steps: [
       makeStep({
         component: EditDripListStep,
-        props: {
-          state,
-        },
+        props: {},
       }),
       makeStep({
         component: SuccessStep,

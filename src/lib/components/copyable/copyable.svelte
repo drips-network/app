@@ -3,12 +3,17 @@
   import SuccessIcon from '$lib/components/icons/CheckCircle.svelte';
   import { fly } from 'svelte/transition';
 
-  export let value: string;
-  export let alwaysVisible = false;
-  export let disabled = false;
+  interface Props {
+    value: string;
+    alwaysVisible?: boolean;
+    disabled?: boolean;
+    children?: import('svelte').Snippet;
+  }
 
-  let success = false;
-  let visible = false;
+  let { value, alwaysVisible = false, disabled = false, children }: Props = $props();
+
+  let success = $state(false);
+  let visible = $state(false);
 
   async function copyClipboard(text: string) {
     await navigator.clipboard.writeText(text);
@@ -17,21 +22,21 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="copyable"
-  on:click={(e) => {
+  onclick={(e) => {
     if (disabled) return;
     copyClipboard(value);
     e.stopPropagation();
   }}
-  on:keydown={() => (visible = true)}
-  on:mouseenter={() => (visible = true)}
-  on:mouseleave={() => (visible = false)}
+  onkeydown={() => (visible = true)}
+  onmouseenter={() => (visible = true)}
+  onmouseleave={() => (visible = false)}
 >
   <!-- needs a .min-w-0 wrapper so slotted content that truncates can still truncate ("...") -->
   <div class="min-w-0">
-    <slot />
+    {@render children?.()}
   </div>
   <div
     class="copy-icon"

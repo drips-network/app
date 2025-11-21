@@ -2,7 +2,11 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import type { AuditLogActor } from '$lib/utils/rpgf/types/auditLog';
 
-  export let actor: AuditLogActor;
+  interface Props {
+    actor: AuditLogActor;
+  }
+
+  let { actor }: Props = $props();
 </script>
 
 {#if actor.type === 'user'}

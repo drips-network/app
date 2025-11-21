@@ -21,59 +21,60 @@
   import editRpgfCustomDatasetFlow from '$lib/flows/edit-rpgf-custom-dataset/edit-rpgf-custom-dataset-flow';
   import uploadRpgfCustomDatasetCsvFlow from '$lib/flows/upload-rpgf-custom-dataset-csv/upload-rpgf-custom-dataset-csv-flow';
 
-  export let data;
+  let { data } = $props();
 
   interface CustomDatasetTableRow {
     name: string;
-    visibilityIcon: ComponentProps<VisibilityIcon>;
+    visibilityIcon: ComponentProps<typeof VisibilityIcon>;
     rowCount: string;
-    editButton: ComponentProps<Button>;
-    uploadButton: ComponentProps<Button>;
-    deleteButton: ComponentProps<Button>;
+    editButton: ComponentProps<typeof Button>;
+    uploadButton: ComponentProps<typeof Button>;
+    deleteButton: ComponentProps<typeof Button>;
   }
 
-  let customDatasetTableData: CustomDatasetTableRow[];
-  $: customDatasetTableData = data.customDatasets.map((cds) => ({
-    name: cds.name,
-    visibilityIcon: {
-      visible: cds.isPublic,
-    },
-    rowCount: cds.rowCount.toString(),
-    editButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Pen,
-      ariaLabel: 'Edit dataset',
-      // If round is published, mandate at least one category
-      onClick: () =>
-        modal.show(Stepper, undefined, editRpgfCustomDatasetFlow(cds, data.customDatasets)),
-    },
-    uploadButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Sharrow,
-      ariaLabel: 'Upload dataset CSV',
-      // If round is published, mandate at least one category
-      onClick: () => modal.show(Stepper, undefined, uploadRpgfCustomDatasetCsvFlow(cds)),
-    },
-    deleteButton: {
-      variant: 'ghost',
-      circular: true,
-      icon: Trash,
-      ariaLabel: 'Delete dataset',
-      // If round is published, mandate at least one category
-      onClick: () => {
-        doWithConfirmationModal(
-          'Are you sure you want to delete this custom dataset? This action cannot be undone.',
-          () =>
-            doWithErrorModal(async () => {
-              await deleteCustomDataset(undefined, data.round.id, cds.id);
-              await invalidate('rpgf:round:applications:custom-datasets');
-            }),
-        );
+  let customDatasetTableData: CustomDatasetTableRow[] = $derived(
+    data.customDatasets.map((cds) => ({
+      name: cds.name,
+      visibilityIcon: {
+        visible: cds.isPublic,
       },
-    },
-  }));
+      rowCount: cds.rowCount.toString(),
+      editButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Pen,
+        ariaLabel: 'Edit dataset',
+        // If round is published, mandate at least one category
+        onclick: () =>
+          modal.show(Stepper, undefined, editRpgfCustomDatasetFlow(cds, data.customDatasets)),
+      },
+      uploadButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Sharrow,
+        ariaLabel: 'Upload dataset CSV',
+        // If round is published, mandate at least one category
+        onclick: () => modal.show(Stepper, undefined, uploadRpgfCustomDatasetCsvFlow(cds)),
+      },
+      deleteButton: {
+        variant: 'ghost',
+        circular: true,
+        icon: Trash,
+        ariaLabel: 'Delete dataset',
+        // If round is published, mandate at least one category
+        onclick: () => {
+          doWithConfirmationModal(
+            'Are you sure you want to delete this custom dataset? This action cannot be undone.',
+            () =>
+              doWithErrorModal(async () => {
+                await deleteCustomDataset(undefined, data.round.id, cds.id);
+                await invalidate('rpgf:round:applications:custom-datasets');
+              }),
+          );
+        },
+      },
+    })),
+  );
 
   const customDatasetTableColumns: ColumnDef<CustomDatasetTableRow>[] = [
     {
@@ -139,7 +140,7 @@
 
     <Button
       icon={Plus}
-      on:click={() =>
+      onclick={() =>
         modal.show(
           Stepper,
           undefined,

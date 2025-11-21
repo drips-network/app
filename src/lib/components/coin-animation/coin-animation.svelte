@@ -4,11 +4,23 @@
   import { quintIn, quintOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
 
-  export let sparkles = true;
-  export let enable = true;
-  export let animateOnMount = false;
-  export let playSound = false;
-  export let animateOnHover = true;
+  interface Props {
+    sparkles?: boolean;
+    enable?: boolean;
+    animateOnMount?: boolean;
+    playSound?: boolean;
+    animateOnHover?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let {
+    sparkles = true,
+    enable = true,
+    animateOnMount = false,
+    playSound = false,
+    animateOnHover = true,
+    children,
+  }: Props = $props();
 
   const coinSound = browser ? new Audio('/assets/coin-sound.mp3') : undefined;
   if (coinSound) coinSound.volume = 0.1;
@@ -17,12 +29,12 @@
     if (enable && animateOnMount) animate(false);
   });
 
-  let containerElem: HTMLDivElement;
+  let containerElem = $state<HTMLDivElement>();
   let tokenRotationDeg = tweened(0);
   let sparkle1Scale = tweened(0);
   let sparkle2Scale = tweened(0);
 
-  $: sparkleFontSize = containerElem?.offsetWidth / 6;
+  let sparkleFontSize = $derived(containerElem ? containerElem?.offsetWidth / 6 : undefined);
 
   async function animate(click: boolean) {
     if (!enable) return;
@@ -44,16 +56,16 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="coin-animation"
   bind:this={containerElem}
-  on:mouseenter={() => animate(false)}
-  on:click={() => animate(true)}
-  on:keydown={() => animate(true)}
+  onmouseenter={() => animate(false)}
+  onclick={() => animate(true)}
+  onkeydown={() => animate(true)}
 >
   <div class="content" style={`transform: rotate3d(0, 1, 0, ${$tokenRotationDeg}deg)`}>
-    <slot />
+    {@render children?.()}
   </div>
   {#if sparkles}
     <div

@@ -8,21 +8,30 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import { fade } from 'svelte/transition';
 
-  export let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user';
+  interface Props {
+    type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user';
+    transitions?: boolean;
+    onClickConnectWallet?: (() => void) | undefined;
+    onClickNewStream?: (() => void) | undefined;
+    onClickAddToDripList?: (() => void) | undefined;
+    onClickNewDonation?: (() => void) | undefined;
+    supportMenuOpen?: boolean;
+  }
 
-  export let transitions = true;
-
-  export let onClickConnectWallet: (() => void) | undefined = undefined;
-  export let onClickNewStream: (() => void) | undefined = undefined;
-  export let onClickAddToDripList: (() => void) | undefined = undefined;
-  export let onClickNewDonation: (() => void) | undefined = undefined;
-
-  export let supportMenuOpen = false;
+  let {
+    type,
+    transitions = true,
+    onClickConnectWallet = undefined,
+    onClickNewStream = undefined,
+    onClickAddToDripList = undefined,
+    onClickNewDonation = undefined,
+    supportMenuOpen = $bindable(false),
+  }: Props = $props();
 </script>
 
 {#if !$walletStore.connected}
   <div class="button-container">
-    <Button on:click={onClickConnectWallet} size="large" icon={Wallet} variant="primary"
+    <Button onclick={onClickConnectWallet} size="large" icon={Wallet} variant="primary"
       >Connect your wallet</Button
     >
   </div>
@@ -30,7 +39,7 @@
   <div out:fade={transitions ? { duration: 300 } : { duration: 0 }} class="button-container">
     <Button
       variant="primary"
-      on:click={() => {
+      onclick={() => {
         supportMenuOpen = true;
       }}
       icon={Heart}
@@ -43,14 +52,13 @@
     class="button-container"
   >
     {#if type === 'dripList' || type === 'ecosystem'}
-      <Button on:click={onClickNewStream} size="large" icon={TokenStreams}
+      <Button onclick={onClickNewStream} size="large" icon={TokenStreams}
         >Continuous donation</Button
       >
     {/if}
-    <Button size="large" icon={Droplet} on:click={onClickNewDonation}>One-time donation</Button>
+    <Button size="large" icon={Droplet} onclick={onClickNewDonation}>One-time donation</Button>
     {#if type !== 'ecosystem'}
-      <Button on:click={onClickAddToDripList} size="large" icon={DripList}
-        >Add to a Drip List</Button
+      <Button onclick={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button
       >
     {/if}
   </div>

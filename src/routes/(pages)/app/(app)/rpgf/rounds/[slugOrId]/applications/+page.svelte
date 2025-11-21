@@ -7,13 +7,13 @@
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
   import highlightStore from '$lib/stores/highlight/highlight.store';
 
-  export let data;
-  $: round = data.round;
-  $: ballotStore = data.ballot;
+  let { data } = $props();
+  let round = $derived(data.round);
+  let ballotStore = $derived(data.ballot);
 
-  $: imageBaseUrl = `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`;
+  let imageBaseUrl = $derived(`/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`);
 
-  let tableConfiguratorEl: HTMLDivElement | undefined;
+  let tableConfiguratorEl: HTMLDivElement | undefined = $state();
 
   onMount(() => {
     if (!tableConfiguratorEl) return;
@@ -45,14 +45,14 @@
 />
 
 <ThreePaneLayout {...data} pageIsEmpty>
-  <svelte:fragment slot="apps">
+  {#snippet apps()}
     <ApplicationsPane
       bind:tableConfiguratorEl
       {...data}
       {ballotStore}
       loggedIn={data.rpgfUserData !== null}
     />
-  </svelte:fragment>
+  {/snippet}
 
   <div class="empty">
     <EmptyState emoji="👀" headline="" text="Select an application on the left to view details" />

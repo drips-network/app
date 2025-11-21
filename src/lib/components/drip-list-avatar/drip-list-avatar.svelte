@@ -2,11 +2,15 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
 
   type Size = 'tiny' | 'small' | 'medium' | 'large' | 'huge';
-  export let size: Size = 'small';
-  export let outline = false;
 
-  /** Makes the drip list icon grey instead of primary. */
-  export let disabled = false;
+  interface Props {
+    size?: Size;
+    outline?: boolean;
+    /** Makes the drip list icon grey instead of primary. */
+    disabled?: boolean;
+  }
+
+  let { size = 'small', outline = false, disabled = false }: Props = $props();
 
   const CONTAINER_SIZES: Record<Size, string> = {
     tiny: '1.5rem',
@@ -15,7 +19,7 @@
     large: '4rem',
     huge: '8rem',
   };
-  $: containerSize = CONTAINER_SIZES[size];
+  let containerSize = $derived(CONTAINER_SIZES[size]);
 </script>
 
 <div

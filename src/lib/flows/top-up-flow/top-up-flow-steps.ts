@@ -38,11 +38,11 @@ export default function getTopUpFlowSteps(tokenAddress?: string) {
       tokenAddress
         ? makeStep({
             component: FetchAllowanceAndBalanceStep,
-            props: undefined,
+            props: {},
           })
         : makeStep({
             component: SelectTokenStep,
-            props: undefined,
+            props: {},
           }),
       makeStep({
         component: EnterAmountStep,

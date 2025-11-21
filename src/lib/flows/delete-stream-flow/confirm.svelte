@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT = gql`
     fragment DeleteStreamConfirmStep on Stream {
       id
@@ -25,7 +25,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let stream: DeleteStreamConfirmStepFragment;
+  interface Props {
+    stream: DeleteStreamConfirmStepFragment;
+  }
+
+  let { stream }: Props = $props();
 
   function startDeleting() {
     dispatch(
@@ -78,8 +82,8 @@
     headline="Delete stream"
     description="Are you sure that you want to delete this stream? It will immediately stop streaming, and be irreversibly erased."
   />
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button on:click={startDeleting} variant="destructive">Delete stream</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button onclick={startDeleting} variant="destructive">Delete stream</Button>
+  {/snippet}
 </StepLayout>

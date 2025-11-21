@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import type { Items, Weights } from '$lib/components/list-editor/types';
 
   export interface DripListConfig {
@@ -10,6 +10,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
@@ -19,32 +21,47 @@
   import CustodialWarning from '../annotation-box/custodial-warning.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
 
-  export let name: string;
-  export let description: string | undefined;
-  export let items: Items;
-  export let weights: Weights;
+  let recipientErrors: AddItemError[] = $state([]);
 
-  export let urlToAdd: string | undefined = undefined;
+  let listValid = $state(false);
 
-  export let isVisible: boolean;
+  interface Props {
+    name: string;
+    description: string | undefined;
+    items: Items;
+    weights: Weights;
+    urlToAdd?: string | undefined;
+    isVisible: boolean;
+    isValid?: boolean;
+    list_editor_action?: import('svelte').Snippet;
+  }
 
-  let recipientErrors: AddItemError[] = [];
+  let {
+    name = $bindable(),
+    description = $bindable(),
+    items = $bindable(),
+    weights = $bindable(),
+    urlToAdd = undefined,
+    isVisible = $bindable(),
+    isValid = $bindable(false),
+    list_editor_action,
+  }: Props = $props();
 
-  let listValid = false;
-  $: titleValid = name.length > 0;
-  $: descriptionValid = textAreaValidationState.type === 'valid';
+  let textAreaValidationState: TextInputValidationState = $derived(
+    !description
+      ? { type: 'valid' }
+      : description.length >= 1000
+        ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
+        : /<[^>]+>/gi.test(description)
+          ? { type: 'invalid', message: 'HTML currently not allowed.' }
+          : { type: 'valid' },
+  );
+  let titleValid = $derived(name.length > 0);
 
-  export let isValid = false;
-  $: isValid = listValid && titleValid && descriptionValid;
-
-  let textAreaValidationState: TextInputValidationState;
-  $: textAreaValidationState = !description
-    ? { type: 'valid' }
-    : description.length >= 1000
-      ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
-      : /<[^>]+>/gi.test(description)
-        ? { type: 'invalid', message: 'HTML currently not allowed.' }
-        : { type: 'valid' };
+  let descriptionValid = $derived(textAreaValidationState.type === 'valid');
+  run(() => {
+    isValid = listValid && titleValid && descriptionValid;
+  });
 </script>
 
 <section class="flex flex-col gap-8">
@@ -66,9 +83,9 @@
       on:errorDismissed={() => (recipientErrors = [])}
       addOnMount={urlToAdd}
     />
-    <svelte:fragment slot="action">
-      <slot name="list-editor-action" />
-    </svelte:fragment>
+    {#snippet action()}
+      {@render list_editor_action?.()}
+    {/snippet}
   </FormField>
 
   <FormField type="div" title="Visibility">

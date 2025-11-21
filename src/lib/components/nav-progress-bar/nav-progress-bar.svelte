@@ -256,7 +256,7 @@
     style={barStyle}
   >
     {#if running}
-      <div class="svelte-progress-bar-leader" style={leaderColorStyle} />
+      <div class="svelte-progress-bar-leader" style={leaderColorStyle}></div>
     {/if}
   </output>
 {/if}

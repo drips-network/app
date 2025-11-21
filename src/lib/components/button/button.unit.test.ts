@@ -31,9 +31,11 @@ describe('button.svelte', async () => {
   it('fires click handler on click', async () => {
     const handleClick = vi.fn();
 
-    const { component } = render(Button);
-
-    component.$on('click', handleClick);
+    render(Button, {
+      props: {
+        onclick: handleClick,
+      },
+    });
 
     const button = screen.getByRole('button');
     await userEvent.click(button);

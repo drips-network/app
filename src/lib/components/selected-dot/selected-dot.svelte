@@ -1,15 +1,19 @@
 <script lang="ts">
   import CheckIcon from '$lib/components/icons/CheckSmall.svelte';
   import { scale } from 'svelte/transition';
-  export let selected: boolean;
-  export let type: 'radio' | 'check' = 'radio';
-  export let focussed = false;
+  interface Props {
+    selected: boolean;
+    type?: 'radio' | 'check';
+    focussed?: boolean;
+  }
+
+  let { selected = $bindable(false), type = 'radio', focussed = false }: Props = $props();
 </script>
 
 {#if type === 'radio'}
   <div class="selected-dot" class:focussed>
-    <div class="inner" class:selected />
-    <div class="outer" class:selected />
+    <div class="inner" class:selected></div>
+    <div class="outer" class:selected></div>
   </div>
 {:else}
   <div class="selected-dot check" class:focussed>
@@ -20,7 +24,7 @@
         </div>
       {/if}
     </div>
-    <div class="outer check" class:selected />
+    <div class="outer check" class:selected></div>
   </div>
 {/if}
 

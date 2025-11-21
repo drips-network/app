@@ -64,7 +64,7 @@
   <header class="header typo-text-small-mono" bind:this={headerElem} style:color={textColor}>
     {path}
     <div class="actions">
-      <button on:click={() => copyClipboard(code)}>
+      <button onclick={() => copyClipboard(code)}>
         {#if copySuccess}
           <CheckIcon style="fill: {textColor}" />
         {:else}

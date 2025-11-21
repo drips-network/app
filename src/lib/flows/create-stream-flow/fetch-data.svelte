@@ -17,7 +17,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<CreateStreamFlowState>;
+  interface Props {
+    context: Writable<CreateStreamFlowState>;
+  }
+
+  let { context }: Props = $props();
 
   onMount(() => {
     dispatch('await', {

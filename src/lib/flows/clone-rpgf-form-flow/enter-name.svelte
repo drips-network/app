@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { goto, invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -14,13 +16,17 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let roundId: string;
-  export let form: ApplicationForm;
+  interface Props {
+    roundId: string;
+    form: ApplicationForm;
+  }
 
-  let nameValue = '';
+  let { roundId, form }: Props = $props();
 
-  let nameValidationState: TextInputValidationState;
-  $: {
+  let nameValue = $state('');
+
+  let nameValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
+  run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
     } else if (nameValue.length > 255) {
@@ -28,7 +34,7 @@
     } else {
       nameValidationState = { type: 'valid' };
     }
-  }
+  });
 
   function handleCreate() {
     dispatch('await', {
@@ -60,13 +66,13 @@
     later.</AnnotationBox
   >
 
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button
       variant="primary"
       disabled={nameValidationState.type !== 'valid'}
       type="submit"
       icon={CheckCircle}
-      on:click={handleCreate}>Copy form</Button
+      onclick={handleCreate}>Copy form</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

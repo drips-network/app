@@ -1,25 +1,39 @@
 <script lang="ts" generics="T">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import { createEventDispatcher } from 'svelte';
 
   type Option<V extends keyof T> = { title: string; value: V }[];
 
-  export let options: Option<keyof T>;
-  export let active: keyof T;
-  export let disabled: boolean = false;
+  interface Props {
+    options: Option<keyof T>;
+    active: keyof T;
+    disabled?: boolean;
+    containerRole?: string;
+    itemRole?: string;
+    ariaLabel?: string | undefined;
+    onTabChange?: (tab: keyof T) => void;
+  }
 
-  export let containerRole = 'radiogroup';
-  export let itemRole = 'radio';
-  export let ariaLabel: string | undefined = undefined;
+  let {
+    options,
+    active = $bindable(),
+    disabled = false,
+    containerRole = 'radiogroup',
+    itemRole = 'radio',
+    ariaLabel = undefined,
+    onTabChange = undefined,
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{ select: keyof T }>();
 
-  let optionElems: Partial<{ [key in keyof T]: HTMLDivElement }> = {};
+  let optionElems: Partial<{ [key in keyof T]: HTMLDivElement }> = $state({});
 
-  let selectorWidth: number;
-  let selectorOffset: number;
+  let selectorWidth = $state<number>();
+  let selectorOffset = $state<number>();
 
-  let transition = false;
+  let transition = $state(false);
 
   function updateSelector(shouldTransition = false) {
     transition = shouldTransition;
@@ -28,13 +42,20 @@
     selectorWidth = optionElems[active]?.offsetWidth ?? 0;
   }
 
-  $: active && updateSelector(true);
+  run(() => {
+    active && updateSelector(true);
+  });
 
-  let containerElem: HTMLDivElement | undefined;
+  let containerElem: HTMLDivElement | undefined = $state();
   let containerResizeObserver = browser ? new ResizeObserver(() => updateSelector()) : undefined;
-  $: containerElem && containerResizeObserver?.observe(containerElem);
+  run(() => {
+    containerElem && containerResizeObserver?.observe(containerElem);
+  });
 
-  $: dispatch('select', active);
+  run(() => {
+    onTabChange && onTabChange(active);
+    dispatch('select', active);
+  });
 
   function handleKeydown(e: KeyboardEvent, option: keyof T) {
     const selectKeys = ['Enter', ' '];
@@ -49,7 +70,7 @@
 <div class="segmented-control" class:disabled bind:this={containerElem}>
   <div class="options" role={containerRole} aria-label={ariaLabel}>
     {#each options as option}
-      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
         role={itemRole}
         aria-checked={active === option.value}
@@ -57,12 +78,12 @@
         bind:this={optionElems[option.value]}
         class:selected={active === option.value}
         tabindex="0"
-        on:click={() => (active = option.value)}
-        on:keydown={(e) => handleKeydown(e, option.value)}
+        onclick={() => (active = option.value)}
+        onkeydown={(e) => handleKeydown(e, option.value)}
         id={String(option.value)}
       >
         <label for={String(option.value)}>{option.title}</label>
-        <div class="background" />
+        <div class="background"></div>
       </div>
     {/each}
   </div>
@@ -72,7 +93,7 @@
     class:at-beginning={options.findIndex((o) => o.value === active) === 0}
     class:at-end={options.findIndex((o) => o.value === active) === options.length - 1}
     style="transform: translateX({selectorOffset}px); width: {selectorWidth}px;"
-  />
+  ></div>
 </div>
 
 <style>

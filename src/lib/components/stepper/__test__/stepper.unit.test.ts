@@ -13,6 +13,12 @@ vi.mock('$app/environment', () => ({
   building: false,
 }));
 
+const mockAnimations = () => {
+  Element.prototype.animate = vi
+    .fn()
+    .mockImplementation(() => ({ finished: Promise.resolve(), cancel: () => {} }));
+};
+
 class ResizeObserver {
   observe() {
     return undefined;
@@ -28,6 +34,10 @@ class ResizeObserver {
 describe('stepper.svelte', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window.ResizeObserver as any) = ResizeObserver;
+
+  beforeAll(() => {
+    mockAnimations();
+  });
 
   it('renders a step', () => {
     render(Stepper, {
@@ -93,13 +103,7 @@ describe('stepper.svelte', () => {
 
     await wait(300);
 
-    /*
-    For some reason, previous steps that have been transitioned out
-    stay in the DOM with the svelte testing library.
-    In reality, the previous steps are removed from the DOM, but
-    we need to expect Step 2 to be rendered twice here.
-    */
-    expect(screen.getAllByText('Step 2').length).toBe(2);
+    expect(screen.getAllByText('Step 2').length).toBe(1);
   });
 
   /*
@@ -116,7 +120,7 @@ describe('stepper.svelte', () => {
         steps: [
           makeStep({
             component: TriggerAwaitEvent,
-            props: undefined,
+            props: {},
           }),
           makeStep({
             component: OnlyText,

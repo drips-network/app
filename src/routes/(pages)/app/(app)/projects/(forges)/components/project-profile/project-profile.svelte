@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import { PROJECT_PROFILE_HEADER_FRAGMENT } from '$lib/components/project-profile-header/project-profile-header.svelte';
   import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/types';
@@ -105,6 +105,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import SupportCard from '$lib/components/support-card/support-card.svelte';
@@ -165,22 +167,27 @@
   import { page } from '$app/stores';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
-  export let project: ProjectProfileFragment;
-  export let description: string | undefined;
-
   interface RepoInfo {
     url: string;
     repoName: string;
     ownerName: string;
   }
 
-  export let newRepo: RepoInfo | undefined;
-  export let correctCasingRepo: RepoInfo | undefined;
-  export let repoExists: boolean;
+  interface Props {
+    project: ProjectProfileFragment;
+    description: string | undefined;
+    newRepo: RepoInfo | undefined;
+    correctCasingRepo: RepoInfo | undefined;
+    repoExists: boolean;
+  }
 
-  $: ownAccountId = $walletStore.dripsAccountId;
-  $: chainData = filterCurrentChainData(project.chainData);
-  $: isOwnProject = ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined);
+  let { project, description, newRepo, correctCasingRepo, repoExists }: Props = $props();
+
+  let ownAccountId = $derived($walletStore.dripsAccountId);
+  let chainData = $derived(filterCurrentChainData(project.chainData));
+  let isOwnProject = $derived(
+    ownAccountId === (isClaimed(chainData) ? chainData.owner.accountId : undefined),
+  );
 
   type ExtractFragment<T, Condition> = T extends Condition ? T : never;
 
@@ -230,10 +237,11 @@
     });
   }
 
-  $: mobileView =
-    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet';
+  let mobileView = $derived(
+    $breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet',
+  );
 
-  let collectHintTriggered = false;
+  let collectHintTriggered = $state(false);
 
   function triggerCollectHint() {
     collectHintTriggered = true;
@@ -251,7 +259,7 @@
 
   const walletInitialized = walletStore.initialized;
 
-  $: {
+  run(() => {
     if (browser && !collectHintTriggered && $walletInitialized) {
       let url = new URL(window.location.href);
 
@@ -265,17 +273,19 @@
         }
       }
     }
-  }
+  });
 
-  $: canonicalRepoInfo = newRepo ?? correctCasingRepo ?? project.source;
+  let canonicalRepoInfo = $derived(newRepo ?? correctCasingRepo ?? project.source);
 
-  let splitsSectionSkeleton: SectionSkeleton | undefined;
-  let supportersSectionSkeleton: SectionSkeleton | undefined;
+  let splitsSectionSkeleton: SectionSkeleton | undefined = $state();
+  let supportersSectionSkeleton: SectionSkeleton | undefined = $state();
 
-  $: imageBaseUrl = `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`;
+  let imageBaseUrl = $derived(
+    `/api/share-images/project/${encodeURIComponent(project.source.url)}.png`,
+  );
 
-  $: origin = browser ? window.location.origin : '';
-  $: supportButtonStepConfig = {
+  let origin = $derived(browser ? window.location.origin : '');
+  let supportButtonStepConfig = $derived({
     projectSourceUrl: project.source.url,
     supportButtonData: {
       dependencies: isClaimed(chainData) ? chainData.splits.dependencies.length.toString() : '0',
@@ -283,7 +293,7 @@
       projectUrl: `${origin}${buildProjectUrl(Forge.GitHub, project.source.ownerName, project.source.repoName, false)}`,
       projectData: chainData as SupportButtonData['projectData'],
     },
-  };
+  });
 
   function handleEmbedButtonConfigureClick() {
     // don't focus the first selectable element
@@ -328,14 +338,14 @@
     <div class="notice">
       <AnnotationBox>
         The GitHub repo for this project has been renamed to {newRepo.ownerName}/{newRepo.repoName}.
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           <Button
             icon={ArrowRight}
             variant="primary"
             href={buildProjectUrl(Forge.GitHub, newRepo.ownerName, newRepo.repoName, false)}
             >Go to the new project</Button
           >
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -344,7 +354,7 @@
       <AnnotationBox>
         This project resolves to a GitHub repo with different casing ({correctCasingRepo.ownerName}/{correctCasingRepo.repoName}).
         Any new splits to this misnamed project will automatically be routed to the correct project.
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           <Button
             size="small"
             icon={EyeOpen}
@@ -356,7 +366,7 @@
               false,
             )}>View correct project</Button
           >
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -371,7 +381,7 @@
           > in claimable funds. Project owners can collect by claiming their project.{:else}This
           project is unclaimed on {network.label}, but can still receive funds that the owner can
           collect later.{/if}
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           <div class="flex gap-3">
             <ShareButton
               url={browser ? window.location.href : ''}
@@ -382,10 +392,10 @@
               size="small"
               icon={Registered}
               variant="primary"
-              on:click={() => launchClaimProject(project.source.url)}>Claim project</Button
+              onclick={() => launchClaimProject(project.source.url)}>Claim project</Button
             >
           </div>
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -413,20 +423,20 @@
           target="_blank"
           href="https://docs.drips.network/advanced/drip-list-and-project-visibility">Learn more</a
         >.
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           {#if isOwnProject}
             <div class="flex gap-3">
               <Button
                 size="small"
                 icon={Registered}
                 variant="primary"
-                on:click={() => {
+                onclick={() => {
                   modal.show(Stepper, undefined, editProjectMetadataSteps(project));
                 }}>Unhide it</Button
               >
             </div>
           {/if}
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -470,7 +480,7 @@
             <a
               class="stat btn-theme-outlined"
               href="#support"
-              on:click={() => supportersSectionSkeleton?.highlightSection()}
+              onclick={() => supportersSectionSkeleton?.highlightSection()}
             >
               <KeyValuePair key="Supporters">
                 <Pile maxItems={4} components={getSupportersPile(chainData.support)} />
@@ -482,7 +492,7 @@
             <a
               class="stat btn-theme-outlined"
               href="#splits"
-              on:click={() => splitsSectionSkeleton?.highlightSection()}
+              onclick={() => splitsSectionSkeleton?.highlightSection()}
             >
               <KeyValuePair key="Splits with">
                 <Pile
@@ -499,11 +509,11 @@
         {#if isOwnProject}
           <AnnotationBox type="info">
             Embed a support button on your website.
-            <svelte:fragment slot="actions">
-              <Button variant="primary" icon={Settings} on:click={handleEmbedButtonConfigureClick}
+            {#snippet actions()}
+              <Button variant="primary" icon={Settings} onclick={handleEmbedButtonConfigureClick}
                 >Configure</Button
               >
-            </svelte:fragment>
+            {/snippet}
           </AnnotationBox>
         {/if}
       {/if}

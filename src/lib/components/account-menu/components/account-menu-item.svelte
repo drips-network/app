@@ -1,26 +1,42 @@
 <script lang="ts">
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let disabled = false;
-  export let icon: ComponentType | undefined = undefined;
-  export let href: string | undefined = undefined;
+  interface Props {
+    disabled?: boolean;
+    icon?: Component | undefined;
+    href?: string | undefined;
+    left?: import('svelte').Snippet;
+    title?: import('svelte').Snippet;
+    right?: import('svelte').Snippet;
+    onclick?: (e: MouseEvent) => void;
+  }
+
+  let {
+    disabled = false,
+    icon: Icon = undefined,
+    href = undefined,
+    left,
+    title,
+    right,
+    onclick,
+  }: Props = $props();
 </script>
 
-<a {href} on:click class:disabled class:clickable={href} class="account-menu-item-wrapper">
-  {#if !icon}
-    <slot name="left" />
+<a {href} {onclick} class:disabled class:clickable={href} class="account-menu-item-wrapper">
+  {#if !Icon}
+    {@render left?.()}
   {:else}
     <div class="icon-wrapper">
-      {#if icon}<svelte:component this={icon} style="fill: var(--color-background)" />{/if}
+      {#if Icon}<Icon style="fill: var(--color-background)" />{/if}
     </div>
   {/if}
   <div class="description typo-text">
-    <slot name="title" />
+    {@render title?.()}
   </div>
-  <slot name="right">
+  {#if right}{@render right()}{:else}
     <ChevronRight />
-  </slot>
+  {/if}
 </a>
 
 <style>

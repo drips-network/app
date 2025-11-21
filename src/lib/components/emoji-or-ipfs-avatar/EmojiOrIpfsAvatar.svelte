@@ -1,19 +1,28 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import twemoji from '$lib/utils/twemoji';
-  import { onMount, type ComponentType } from 'svelte';
+  import { onMount, type Component } from 'svelte';
   import Question from '../icons/Question.svelte';
   import Spinner from '../spinner/spinner.svelte';
 
-  export let emoji: string | undefined = undefined;
-  export let ipfsCid: string | undefined = undefined;
-
-  /** If set, displays placeholder intead of real avatar. */
-  export let placeholderIcon: ComponentType | undefined = undefined;
-
   type Size = 'micro' | 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'huge';
-  export let size: Size = 'small';
+  interface Props {
+    emoji?: string | undefined;
+    ipfsCid?: string | undefined;
+    /** If set, displays placeholder intead of real avatar. */
+    placeholderIcon?: Component | undefined;
+    size?: Size;
+  }
 
-  $: outline = Boolean(ipfsCid || emoji);
+  let {
+    emoji = undefined,
+    ipfsCid = undefined,
+    placeholderIcon = undefined,
+    size = 'small',
+  }: Props = $props();
+
+  let outline = $derived(Boolean(ipfsCid || emoji));
 
   const CONTAINER_SIZES: Record<Size, string> = {
     micro: '0.8rem',
@@ -24,7 +33,7 @@
     xlarge: '6.5rem',
     huge: '8rem',
   };
-  $: containerSize = CONTAINER_SIZES[size];
+  let containerSize = $derived(CONTAINER_SIZES[size]);
 
   const IMAGE_SIZES = {
     micro: 32,
@@ -35,19 +44,19 @@
     xlarge: 192,
     huge: 256,
   };
-  $: imageSize = IMAGE_SIZES[size];
+  let imageSize = $derived(IMAGE_SIZES[size]);
 
-  $: emojiElem = emoji ? twemoji(emoji) : undefined;
+  let emojiElem = $derived(emoji ? twemoji(emoji) : undefined);
 
-  let customImageEl: HTMLImageElement | undefined = undefined;
-  let customImageLoading = false;
-  let prevAvatarCid: string | undefined = undefined;
-  $: {
+  let customImageEl: HTMLImageElement | undefined = $state(undefined);
+  let customImageLoading = $state(false);
+  let prevAvatarCid: string | undefined = $state(undefined);
+  run(() => {
     if (ipfsCid && ipfsCid !== prevAvatarCid) {
       customImageLoading = true;
       prevAvatarCid = ipfsCid;
     }
-  }
+  });
 
   onMount(async () => {
     if (customImageEl && customImageEl.complete) {
@@ -69,7 +78,7 @@
   {#if ipfsCid}
     <img
       bind:this={customImageEl}
-      on:load={() => (customImageLoading = false)}
+      onload={() => (customImageLoading = false)}
       src="/api/custom-avatars/{ipfsCid}?size={imageSize}"
       alt="project avatar"
       style:height="100%"
@@ -79,10 +88,8 @@
       {@html emojiElem}
     </div>
   {:else if placeholderIcon}
-    <svelte:component
-      this={placeholderIcon}
-      style="width: min(80%, 3rem); height: min(80%, 3rem)"
-    />
+    {@const SvelteComponent = placeholderIcon}
+    <SvelteComponent style="width: min(80%, 3rem); height: min(80%, 3rem)" />
   {:else}
     <Question style="width: min(80%, 3rem); height: min(80%, 3rem)" />
   {/if}

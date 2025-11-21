@@ -23,7 +23,7 @@ export default (applicationId: string) => {
       }),
       makeStep({
         component: Success,
-        props: undefined,
+        props: {},
       }),
     ],
   };

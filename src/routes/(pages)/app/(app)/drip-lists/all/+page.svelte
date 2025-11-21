@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const DRIP_LISTS_LISTINGS_ITEM_FRAGMENT = gql`
@@ -82,13 +82,17 @@
   import onClickGoto from '$lib/utils/on-click-goto';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   interface TableRow {
-    badge: ComponentProps<DripListBadge> & { dripList: DripListBadgeFragment };
-    owner: ComponentProps<IdentityBadge>;
-    recipientsPile: ComponentProps<Pile>;
-    supportersPile: ComponentProps<Pile>;
+    badge: ComponentProps<typeof DripListBadge> & { dripList: DripListBadgeFragment };
+    owner: ComponentProps<typeof IdentityBadge>;
+    recipientsPile: ComponentProps<typeof Pile>;
+    supportersPile: ComponentProps<typeof Pile>;
   }
 
   const tableData: TableRow[] = data.content.dripLists
@@ -171,10 +175,10 @@
     },
   ];
 
-  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
-    const { dripList } = tableData[event.detail.rowIndex].badge;
+  function onRowClick(event: RowClickEventPayload) {
+    const { dripList } = tableData[event.rowIndex].badge;
 
-    onClickGoto('/app/drip-lists/' + dripList.account.accountId, event.detail.event);
+    onClickGoto('/app/drip-lists/' + dripList.account.accountId, event.event);
   }
 </script>
 
@@ -204,7 +208,7 @@
         getCoreRowModel: getCoreRowModel(),
       }}
       isRowClickable={true}
-      on:rowClick={onRowClick}
+      {onRowClick}
     />
   </Section>
 </article>

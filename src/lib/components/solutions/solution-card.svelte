@@ -1,17 +1,34 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (line-items to line_items) making the component unusable -->
 <script lang="ts">
   import Button from '../button/button.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
 
-  export let reverse = false;
-  export let illustrationPadding: string | undefined = undefined;
-  export let illustrationScale: string | undefined = undefined;
+  interface Props {
+    reverse?: boolean;
+    illustrationPadding?: string | undefined;
+    illustrationScale?: string | undefined;
+    button?:
+      | {
+          text: string;
+          href: string;
+        }
+      | undefined;
+    illustration?: import('svelte').Snippet;
+    headline?: import('svelte').Snippet;
+    description?: import('svelte').Snippet;
+    line_items?: import('svelte').Snippet;
+  }
 
-  export let button:
-    | {
-        text: string;
-        href: string;
-      }
-    | undefined = undefined;
+  let {
+    reverse = false,
+    illustrationPadding = undefined,
+    illustrationScale = undefined,
+    button = undefined,
+    illustration,
+    headline,
+    description,
+    line_items,
+  }: Props = $props();
 </script>
 
 <div class="solution-card" class:reverse>
@@ -20,16 +37,16 @@
     class="illustration"
     style:--illustration-scale={illustrationScale}
   >
-    <slot name="illustration"></slot>
+    {@render illustration?.()}
   </div>
   <div class="content">
     <div class="inner">
-      <h2><slot name="headline"></slot></h2>
-      {#if $$slots.description}
-        <p><slot name="description"></slot></p>
+      <h2>{@render headline?.()}</h2>
+      {#if description}
+        <p>{@render description?.()}</p>
       {/if}
       <div class="line-items">
-        <slot name="line-items"></slot>
+        {@render line_items?.()}
       </div>
       {#if button}
         <div>

@@ -1,16 +1,21 @@
 <script lang="ts">
-  export let forceLoading = false;
-  export let fiatEstimateCents: number | 'pending' | 'unsupported' | undefined = 'pending';
-  export let compact = false;
+  interface Props {
+    forceLoading?: boolean;
+    fiatEstimateCents?: number | 'pending' | 'unsupported' | undefined;
+    compact?: boolean;
+  }
 
-  $: formattedFiatEstimate =
+  let { forceLoading = false, fiatEstimateCents = 'pending', compact = false }: Props = $props();
+
+  let formattedFiatEstimate = $derived(
     typeof fiatEstimateCents === 'number'
       ? fiatEstimateCents.toLocaleString('en-US', {
           style: 'currency',
           currency: 'USD',
           ...(compact && { notation: 'compact', compactDisplay: 'short' }),
         })
-      : undefined;
+      : undefined,
+  );
 </script>
 
 <div class="tabular-nums">

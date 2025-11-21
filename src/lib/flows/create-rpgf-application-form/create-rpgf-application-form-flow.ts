@@ -1,5 +1,5 @@
-import { makeStep } from "$lib/components/stepper/types";
-import EnterFormDetails from "./enter-form-details.svelte";
+import { makeStep } from '$lib/components/stepper/types';
+import EnterFormDetails from './enter-form-details.svelte';
 
 export default (roundId: string) => {
   return {
@@ -8,8 +8,8 @@ export default (roundId: string) => {
         component: EnterFormDetails,
         props: {
           roundId,
-        }
-      })
-    ]
-  }
-}
+        },
+      }),
+    ],
+  };
+};

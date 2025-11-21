@@ -150,7 +150,7 @@ test('create collaborative drip list', async ({ page, connectedSession }) => {
   await page.getByRole('button', { name: 'Got it' }).click();
   await page.getByRole('button', { name: 'Share with collaborators' }).click();
   await page.getByRole('button', { name: 'Copy link' }).click();
-  await page.getByRole('button').filter({ hasText: /^$/ }).click();
+  await page.getByLabel('Close modal').click();
 
   await page.getByRole('button', { name: 'Publish Drip List' }).nth(1).click({ timeout: 120_000 });
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();

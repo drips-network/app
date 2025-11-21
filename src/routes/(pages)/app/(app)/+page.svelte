@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import DefaultExplorePage from './components/default-explore-page.svelte';
   import DistributionExplorePage from './components/distribution-explore-page.svelte';
 
@@ -11,13 +11,20 @@
 <script lang="ts">
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
 
-  $: component = EXPLORE_PAGE_VARIANT_COMPONENTS[data.variant] as ComponentType;
+  let { data }: Props = $props();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let component = $derived<Component<any>>(EXPLORE_PAGE_VARIANT_COMPONENTS[data.variant]);
+
+  const SvelteComponent = $derived(component);
 </script>
 
 <HeadMeta title="Explore" />
 
-<svelte:component this={component} {...data.data} />
+<SvelteComponent {...data.data} />

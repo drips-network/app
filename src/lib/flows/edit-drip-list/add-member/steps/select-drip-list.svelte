@@ -1,17 +1,3 @@
-<script context="module">
-  import {
-    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
-    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
-    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
-  } from '../../fragments';
-
-  export {
-    SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT,
-    SELECT_DRIP_LIST_PROJECT_TO_ADD_FRAGMENT,
-    SELECT_DRIP_LIST_DRIP_LIST_TO_ADD_FRAGMENT,
-  };
-</script>
-
 <script lang="ts">
   import { goto } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
@@ -41,28 +27,31 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let dripLists: SelectDripListStepListsFragment[];
+  interface Props {
+    dripLists: SelectDripListStepListsFragment[];
+    context: Writable<{
+      listEditorConfig: {
+        items: Items;
+        weights: Weights;
+      };
+      name: string;
+      description: string | undefined;
+      dripListAccountId: string | undefined;
+    }>;
+    projectOrDripListToAdd:
+      | SelectDripListDripListToAddFragment
+      | SelectDripListProjectToAddFragment;
+  }
 
-  export let state: Writable<{
-    listEditorConfig: {
-      items: Items;
-      weights: Weights;
-    };
-    name: string;
-    description: string | undefined;
-    dripListAccountId: string | undefined;
-  }>;
+  let { dripLists, context, projectOrDripListToAdd }: Props = $props();
 
-  export let projectOrDripListToAdd:
-    | SelectDripListDripListToAddFragment
-    | SelectDripListProjectToAddFragment;
-
-  $: urlToAdd =
+  let urlToAdd = $derived(
     'source' in projectOrDripListToAdd
       ? projectOrDripListToAdd.source.url
-      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`;
+      : `https://drips.network/app/drip-lists/${projectOrDripListToAdd.account.accountId}`,
+  );
 
-  let selected: string[] = [];
+  let selected: string[] = $state([]);
 
   function isAlreadyInList(listSplits: SelectDripListStepListsFragment['splits']) {
     const accountIdToAdd = projectOrDripListToAdd.account.accountId;
@@ -74,7 +63,7 @@
     const selectedDripList =
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
-    $state = {
+    $context = {
       listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits as SplitReceiver[]),
       name: selectedDripList.name,
       description: selectedDripList.description || undefined,
@@ -84,8 +73,9 @@
     dispatch('goForward');
   }
 
-  $: subjectName =
-    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project';
+  let subjectName = $derived(
+    'name' in projectOrDripListToAdd ? `"${projectOrDripListToAdd.name}"` : 'this project',
+  );
 </script>
 
 <StepLayout>
@@ -128,21 +118,21 @@
     </div>
     <Button
       icon={Plus}
-      on:click={() => {
+      onclick={() => {
         modal.hide();
         goto(buildUrl('/app/funder-onboarding', { urlToAdd }));
       }}>Create new Drip List</Button
     >
   </FormField>
-  <svelte:fragment slot="actions">
-    <Button on:click={modal.hide} variant="ghost">Cancel</Button>
+  {#snippet actions()}
+    <Button onclick={modal.hide} variant="ghost">Cancel</Button>
     <Button
-      on:click={submit}
+      onclick={submit}
       disabled={selected[0] === undefined}
       icon={DripListIcon}
       variant="primary">Add</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>

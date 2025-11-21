@@ -10,7 +10,7 @@ import type { CurrentAmountsUserBalanceTimelineItemFragment } from '$lib/utils/_
 export interface CreateStreamFlowState {
   streamNameValue: string | undefined;
   recipientInputValue: string | undefined;
-  selectedTokenAddress: string[] | undefined;
+  selectedTokenAddress: string[];
   amountValue: string | undefined;
   selectedMultiplier: string;
   streamStartDateValue: string | undefined;
@@ -42,7 +42,7 @@ export default (
   writable<CreateStreamFlowState>({
     streamNameValue: undefined,
     recipientInputValue: undefined,
-    selectedTokenAddress: selectedTokenAddress ? [selectedTokenAddress] : undefined,
+    selectedTokenAddress: selectedTokenAddress ? [selectedTokenAddress] : [],
     amountValue: undefined,
     selectedMultiplier: '1',
     setStartAndEndDate: false,

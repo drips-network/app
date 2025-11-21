@@ -112,7 +112,7 @@
     },
   ].reverse();
 
-  let hoveringOverIndex = -1;
+  let hoveringOverIndex = $state(-1);
 </script>
 
 <div class="usecases">
@@ -121,19 +121,21 @@
       <UsecaseCard
         href={config.href}
         tonedDown={hoveringOverIndex !== -1 && hoveringOverIndex !== index}
-        on:mouseenter={() => (hoveringOverIndex = index)}
-        on:mouseleave={() => (hoveringOverIndex = -1)}
+        onMouseEnter={() => (hoveringOverIndex = index)}
+        onMouseLeave={() => (hoveringOverIndex = -1)}
         padHeight
         icon={config.icon}
       >
-        <svelte:fragment slot="headline">{config.headline}</svelte:fragment>
-        <svelte:fragment slot="description">
+        {#snippet headline()}
+          {config.headline}
+        {/snippet}
+        {#snippet description()}
           {config.description}
-        </svelte:fragment>
+        {/snippet}
 
-        <svelte:fragment slot="illustration" let:active>
+        {#snippet illustration({ active })}
           <UsecaseIllustration {active} {config} />
-        </svelte:fragment>
+        {/snippet}
       </UsecaseCard>
     </div>
   {/each}

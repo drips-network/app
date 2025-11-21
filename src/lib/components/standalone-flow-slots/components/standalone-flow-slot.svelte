@@ -1,20 +1,30 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
-  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import { createEventDispatcher, type Component } from 'svelte';
 
   const dispatch = createEventDispatcher<{ edit: { stepIndex: number } }>();
 
   interface ComponentAndProps {
-    component: ComponentType;
+    component: Component;
     props: Record<string, unknown>;
   }
 
-  export let leftComponent: ComponentAndProps | undefined = undefined;
-  export let rightComponent: ComponentAndProps | undefined = undefined;
-  export let icon: ComponentType | undefined = undefined;
-  export let title: string | undefined = undefined;
-  export let editStepIndex: number | undefined = undefined;
+  interface Props {
+    leftComponent?: ComponentAndProps | undefined;
+    rightComponent?: ComponentAndProps | undefined;
+    icon?: Component | undefined;
+    title?: string | undefined;
+    editStepIndex?: number | undefined;
+  }
+
+  let {
+    leftComponent = undefined,
+    rightComponent = undefined,
+    icon = undefined,
+    title = undefined,
+    editStepIndex = undefined,
+  }: Props = $props();
 </script>
 
 <li
@@ -22,29 +32,30 @@
 >
   <div class="flex items-center gap-2 min-w-0">
     {#if icon}
+      {@const SvelteComponent = icon}
       <div
         role="img"
         aria-label="Icon"
         class="h-8 w-8 bg-primary-level-1 flex items-center justify-center rounded-full"
       >
-        <svelte:component this={icon} style="fill: var(--color-primary);" />
+        <SvelteComponent style="fill: var(--color-primary);" />
       </div>
     {/if}
     {#if title}
       <div class="flex-1 min-w-0 truncate">{title}</div>
     {/if}
     {#if leftComponent}
-      <svelte:component this={leftComponent.component} {...leftComponent.props} />
+      <leftComponent.component {...leftComponent.props} />
     {/if}
   </div>
   <div class="flex items-center gap-2">
     {#if rightComponent}
-      <svelte:component this={rightComponent.component} {...rightComponent.props} />
+      <rightComponent.component {...rightComponent.props} />
     {/if}
     {#if editStepIndex !== undefined}<Button
         variant="ghost"
         icon={Pen}
-        on:click={() =>
+        onclick={() =>
           editStepIndex !== undefined && dispatch('edit', { stepIndex: editStepIndex })}
         >Edit</Button
       >{/if}

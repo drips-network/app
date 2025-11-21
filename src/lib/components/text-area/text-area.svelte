@@ -1,36 +1,58 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import { onMount } from 'svelte';
 
-  export let resizable = false;
+  interface Props {
+    resizable?: boolean;
+    caption?: string | undefined;
+    textareaStyle?: string | undefined;
+    value?: string | undefined | null;
+    placeholder?: string | undefined;
+    validationState?: TextInputValidationState;
+    onchange?: (event: Event) => void;
+    onclick?: (event: Event) => void;
+    oninput?: (event: Event) => void;
+    onblur?: (event: Event) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
+  }
 
-  export let caption: string | undefined = undefined;
-  export let textareaStyle: string | undefined = undefined;
+  let {
+    resizable = false,
+    caption = undefined,
+    textareaStyle = undefined,
+    value = $bindable(),
+    placeholder = undefined,
+    validationState = {
+      type: 'unvalidated',
+    },
+    onchange = undefined,
+    onclick = undefined,
+    oninput = undefined,
+    onblur = undefined,
+    onkeydown = undefined,
+  }: Props = $props();
 
-  export let value: string | undefined | null = undefined;
-  export let placeholder: string | undefined = undefined;
-
-  export let validationState: TextInputValidationState = {
-    type: 'unvalidated',
-  };
-
-  let textareaElement: HTMLTextAreaElement | undefined = undefined;
+  let textareaElement: HTMLTextAreaElement | undefined = $state(undefined);
 
   // We either auto-grow the text area, or allow the user to resize it. These
   // options are mutually exclusive because a user resized textarea would
   // automatically shrink upon text input otherwise.
-  $: if (textareaElement && !resizable) {
-    // React to changes to the textarea content.
-    value;
+  run(() => {
+    if (textareaElement && !resizable) {
+      // React to changes to the textarea content.
+      value;
 
-    // Reset height to 0px on every value change so that the textarea
-    // immediately shrinks when all text is deleted.
-    textareaElement.style.height = `0px`;
+      // Reset height to 0px on every value change so that the textarea
+      // immediately shrinks when all text is deleted.
+      textareaElement.style.height = `0px`;
 
-    textareaElement.style.height = `${textareaElement.scrollHeight}px`;
-  }
+      textareaElement.style.height = `${textareaElement.scrollHeight}px`;
+    }
+  });
 
   onMount(() => {
     if (textareaElement && resizable && value?.length) {
@@ -48,13 +70,12 @@
     class="typo-text"
     class:resizable
     {placeholder}
-    on:change
-    on:click
-    on:input
-    on:blur
-    on:keydown
-    on:keypress
-  />
+    {onchange}
+    {onclick}
+    {oninput}
+    {onblur}
+    {onkeydown}
+  ></textarea>
 
   {#if caption && validationState.type !== 'invalid'}
     <p class="caption typo-text-small">

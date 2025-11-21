@@ -7,8 +7,12 @@
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
 
-  export let tokenName: string;
-  export let tokenAddress: string;
+  interface Props {
+    tokenName: string;
+    tokenAddress: string;
+  }
+
+  let { tokenName, tokenAddress }: Props = $props();
 
   function deleteToken() {
     tokens.removeCustomToken(tokenAddress, $wallet.network.chainId);
@@ -24,10 +28,10 @@
       headline="Are you sure?"
       description={`"${tokenName}" will be removed from your custom tokens. Any streams streaming this token will show up as "Unknown token".`}
     />
-    <svelte:fragment slot="actions">
-      <Button on:click={() => modal.hide()} variant="ghost">Cancel</Button>
-      <Button variant="destructive" on:click={deleteToken}>Delete token</Button>
-    </svelte:fragment>
+    {#snippet actions()}
+      <Button onclick={() => modal.hide()} variant="ghost">Cancel</Button>
+      <Button variant="destructive" onclick={deleteToken}>Delete token</Button>
+    {/snippet}
   </StepLayout>
 </div>
 

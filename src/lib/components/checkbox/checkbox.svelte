@@ -1,15 +1,25 @@
 <script lang="ts">
   import SelectedDot from '../selected-dot/selected-dot.svelte';
 
-  export let checked: boolean;
-  export let label: string | undefined = undefined;
-  export let size: 'normal' | 'big' = 'normal';
+  interface Props {
+    checked: boolean;
+    label?: string | undefined;
+    size?: 'normal' | 'big';
+    onclick?: ((e: MouseEvent) => void) | undefined;
+    oninput?: ((event: Event) => void) | undefined;
+  }
+
+  let {
+    checked = $bindable(),
+    label = undefined,
+    size = 'normal',
+    onclick = undefined,
+    oninput = undefined,
+  }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<label class="toggle {size}" on:click|stopPropagation>
-  <input tabindex="0" type="checkbox" bind:checked />
+<label class="toggle {size}">
+  <input tabindex="0" type="checkbox" bind:checked {oninput} {onclick} />
   <SelectedDot type="check" bind:selected={checked} />
   {#if label}<span class="typo-text-bold">{label}</span>{/if}
 </label>

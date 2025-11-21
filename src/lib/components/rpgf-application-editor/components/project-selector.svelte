@@ -4,11 +4,14 @@
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import type { RpgfApplicationEditorProjectFragment } from '../__generated__/gql.generated';
 
-  export let projects: RpgfApplicationEditorProjectFragment[];
-  export let selected: string[] = [];
+  interface Props {
+    projects: RpgfApplicationEditorProjectFragment[];
+    selected?: string[];
+  }
 
-  let projectItems: Items;
-  $: projectItems = {
+  let { projects, selected = $bindable([]) }: Props = $props();
+
+  let projectItems: Items = $derived({
     ...Object.fromEntries(
       projects.map((project) => {
         return [
@@ -28,7 +31,7 @@
         ];
       }),
     ),
-  };
+  });
 </script>
 
 <ListSelect

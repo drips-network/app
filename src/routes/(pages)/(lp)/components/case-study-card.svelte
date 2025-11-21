@@ -9,18 +9,31 @@
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
 
-  export let blogPost:
-    | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
-        slug: string;
-      })
-    | undefined;
-  export let orgName: string;
-  export let logoSrc: string;
-  export let logoAlt: string;
-  export let description: string;
-  export let dripList: DripListCardFragment | undefined;
-  export let maxSplitRows: number | undefined = undefined;
-  export let chainOverride: SupportedChain | undefined = undefined;
+  interface Props {
+    blogPost:
+      | (Pick<z.infer<typeof metadataSchema>, 'title' | 'coverImage' | 'coverImageAlt'> & {
+          slug: string;
+        })
+      | undefined;
+    orgName: string;
+    logoSrc: string;
+    logoAlt: string;
+    description: string;
+    dripList: DripListCardFragment | undefined;
+    maxSplitRows?: number | undefined;
+    chainOverride?: SupportedChain | undefined;
+  }
+
+  let {
+    blogPost,
+    orgName,
+    logoSrc,
+    logoAlt,
+    description,
+    dripList,
+    maxSplitRows = undefined,
+    chainOverride = undefined,
+  }: Props = $props();
 
   onMount(fiatEstimates.start);
 </script>

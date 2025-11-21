@@ -6,7 +6,11 @@
   import sanitize from 'sanitize-html';
   import { BASE_URL } from '$lib/utils/base-url';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   let imageUrl = `/api/share-images/blog-post/og/${encodeURIComponent(data.meta.slug)}.png`;
 
@@ -49,7 +53,7 @@
 <article>
   <PostCard shareButton {imageUrl} {...data.meta} first={true} link={false} />
   <div class="content">
-    <svelte:component this={data.PostContent} />
+    <data.PostContent />
   </div>
 </article>
 

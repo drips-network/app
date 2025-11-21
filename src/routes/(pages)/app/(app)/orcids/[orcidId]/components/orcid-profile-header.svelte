@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ORCID_PROFILE_HEADER_FRAGMENT = gql`
     ${ORCID_BADGE_FRAGMENT}
     fragment OrcidProfileHeader on OrcidLinkedIdentity {
@@ -30,9 +30,13 @@
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
-  export let orcid: Orcid;
-  export let orcidAccount: OrcidProfileHeaderFragment;
-  export let shareButton: ComponentProps<ShareButton> | undefined = undefined;
+  interface Props {
+    orcid: Orcid;
+    orcidAccount: OrcidProfileHeaderFragment;
+    shareButton?: ComponentProps<typeof ShareButton> | undefined;
+  }
+
+  let { orcid, orcidAccount, shareButton = undefined }: Props = $props();
 
   const orcidName = getOrcidDisplayName(orcidAccount);
 </script>

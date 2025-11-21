@@ -1,12 +1,17 @@
 <script lang="ts">
-  export let key: string;
-  export let size: 'medium' | 'large' = 'large';
-  export let highlight = false;
+  interface Props {
+    key: string;
+    size?: 'medium' | 'large';
+    highlight?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let { key, size = 'large', highlight = false, children }: Props = $props();
 </script>
 
 <div class="key-value-pair typo-text size-{size}" class:highlight>
   <h5 class="key">{key}</h5>
-  <div class="value"><slot /></div>
+  <div class="value">{@render children?.()}</div>
 </div>
 
 <style>

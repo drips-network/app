@@ -1,10 +1,14 @@
 <script lang="ts">
   import IconWrapper from './IconWrapper.svelte';
 
-  export let style: string | undefined = undefined;
+  interface Props {
+    style?: string | undefined;
+  }
+
+  let { style = undefined }: Props = $props();
 </script>
 
-<IconWrapper on:click {style}>
+<IconWrapper {style}>
   <path
     d="M19.75 16C19.75 16.5523 19.3023 17 18.75 17C18.1977 17 17.75 16.5523 17.75 16C17.75 15.4477 18.1977 15 18.75 15C19.3023 15 19.75 15.4477 19.75 16Z"
   />

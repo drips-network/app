@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const SET_NEW_METADATA_STEP_FRAGMENT = gql`
     ${PROJECT_CUSTOMIZER_FRAGMENT}
     fragment SetNewMetadataStep on Project {
@@ -52,14 +52,19 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let project: SetNewMetadataStepFragment;
-  $: projectChainData = filterCurrentChainData(project.chainData, 'claimed');
+  interface Props {
+    project: SetNewMetadataStepFragment;
+  }
 
-  $: projectDataWritable = writable(
-    structuredClone({ ...projectChainData, isProjectVisible: project.isVisible }),
+  let { project }: Props = $props();
+
+  let projectChainData = $derived(filterCurrentChainData(project.chainData, 'claimed'));
+
+  let projectDataWritable = $derived(
+    writable(structuredClone({ ...projectChainData, isProjectVisible: project.isVisible })),
   );
 
-  let valid = false;
+  let valid = $state(false);
 
   function submit() {
     const metadataManager = new RepoDriverMetadataManager();
@@ -124,10 +129,10 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer bind:valid originalProject={project} newProjectData={projectDataWritable} />
-  <svelte:fragment slot="actions">
-    <Button on:click={submit} disabled={!valid} variant="primary" icon={Wallet}
+  <ProjectCustomizer bind:valid newProjectData={projectDataWritable} />
+  {#snippet actions()}
+    <Button onclick={submit} disabled={!valid} variant="primary" icon={Wallet}
       >Confirm changes</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>

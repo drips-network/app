@@ -3,15 +3,18 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import type { BottomNavItems } from './types';
 
-  export let items: BottomNavItems;
+  interface Props {
+    items: BottomNavItems;
+  }
+
+  let { items }: Props = $props();
 </script>
 
 <div class="mobile-nav-overflow">
   {#each items as item}
     {@const active = $page.url.pathname === item.href}
-    <a class="item" href={item.href} class:active on:click={() => cupertinoPaneStore.closeSheet()}>
-      <svelte:component
-        this={item.icon}
+    <a class="item" href={item.href} class:active onclick={() => cupertinoPaneStore.closeSheet()}>
+      <item.icon
         style="fill: {active ? 'var(--color-primary-level-6)' : 'var(--color-foreground)'}"
       />
 

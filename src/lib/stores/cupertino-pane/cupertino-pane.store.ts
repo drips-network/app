@@ -1,17 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as CupertinoPane from 'cupertino-pane';
 
-import type { ComponentType } from 'svelte';
+import type { Component, ComponentProps } from 'svelte';
 import { get, writable } from 'svelte/store';
 
 import scroll from '$lib/stores/scroll';
 
-interface CupertinoSheetStore {
-  component?: ComponentType;
-  props?: { [key: string]: unknown };
+interface CupertinoSheetStore<T extends Component> {
+  component?: T;
+  props?: ComponentProps<T>;
 }
 
 export default (() => {
-  const store = writable<CupertinoSheetStore>({});
+  const store = writable<CupertinoSheetStore<Component>>({});
   const pane = writable<CupertinoPane.CupertinoPane>();
 
   function attach() {
@@ -33,7 +35,7 @@ export default (() => {
     get(pane).destroy();
   }
 
-  function openSheet(component: ComponentType, props?: Record<string, unknown>): void {
+  function openSheet<CT extends Component<any>>(component: CT, props?: ComponentProps<CT>): void {
     const p = get(pane);
 
     if (!p) {

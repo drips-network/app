@@ -10,7 +10,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
 </script>
 
 <StandaloneFlowStepLayout
@@ -33,7 +37,7 @@
     Open KYC provider form
   </Button>
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')}>Close</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')}>Close</Button>
+  {/snippet}
 </StandaloneFlowStepLayout>

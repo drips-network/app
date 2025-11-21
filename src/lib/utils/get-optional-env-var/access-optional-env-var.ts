@@ -20,8 +20,8 @@ export default function accessOptionalEnvVar(
 
   const needProdEnvVars = !(dev || building);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const surpressMissingVarErrors =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (publicEnv as any).PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS === 'true';
 
   if (needProdEnvVars && requiredInProd && !surpressMissingVarErrors && varMissing) {

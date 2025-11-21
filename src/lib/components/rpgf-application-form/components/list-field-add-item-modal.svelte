@@ -5,34 +5,40 @@
   import modal from '$lib/stores/modal';
   import type { ApplicationListField } from '$lib/utils/rpgf/types/application';
 
-  export let formFields: ApplicationListField['entryFields'];
-  export let addToValuesFn: (item: Record<string, string | number>) => void;
+  interface Props {
+    formFields: ApplicationListField['entryFields'];
+    addToValuesFn: (item: Record<string, string | number>) => void;
+  }
 
-  let values: Record<string, string | number> = {};
+  let { formFields, addToValuesFn }: Props = $props();
+
+  let values: Record<string, string | number> = $state({});
 
   function handleAddItem() {
     addToValuesFn(values);
     modal.hide();
   }
 
-  $: filledOut = formFields.every((field) => {
-    const value = values[field.label];
-    const type = field.type;
+  let filledOut = $derived(
+    formFields.every((field) => {
+      const value = values[field.label];
+      const type = field.type;
 
-    if (type === 'number') {
-      return value !== undefined && value.toString().trim() !== '' && !isNaN(Number(value));
-    }
+      if (type === 'number') {
+        return value !== undefined && value.toString().trim() !== '' && !isNaN(Number(value));
+      }
 
-    if (type === 'url') {
-      return (
-        value !== undefined &&
-        value.toString().trim() !== '' &&
-        /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value.toString().trim())
-      );
-    }
+      if (type === 'url') {
+        return (
+          value !== undefined &&
+          value.toString().trim() !== '' &&
+          /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value.toString().trim())
+        );
+      }
 
-    return value !== undefined && value.toString().trim() !== '';
-  });
+      return value !== undefined && value.toString().trim() !== '';
+    }),
+  );
 </script>
 
 <div class="modal">
@@ -44,7 +50,7 @@
       />
     </FormField>
   {/each}
-  <Button disabled={!filledOut} variant="primary" on:click={handleAddItem}>Add Item</Button>
+  <Button disabled={!filledOut} variant="primary" onclick={handleAddItem}>Add Item</Button>
 </div>
 
 <style>

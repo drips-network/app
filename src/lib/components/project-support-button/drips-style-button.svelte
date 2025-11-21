@@ -11,11 +11,15 @@
   } from './project-support-button';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
 
-  export let options: SupportButtonOptions;
-  export let data: SupportButtonData;
+  interface Props {
+    options: SupportButtonOptions;
+    data: SupportButtonData;
+  }
 
-  $: dripFill = getDripFill(options);
-  $: dependenciesStatement = getDependenciesStatement(data?.dependencies);
+  let { options, data }: Props = $props();
+
+  let dripFill = $derived(getDripFill(options));
+  let dependenciesStatement = $derived(getDependenciesStatement(data?.dependencies));
 </script>
 
 <a

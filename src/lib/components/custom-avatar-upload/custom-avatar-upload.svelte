@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import CheckIcon from '$lib/components/icons/CheckCircle.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
@@ -11,17 +13,17 @@
   }>();
 
   let filetypes = ['image/png', 'image/jpeg'];
-  let error: 'upload-failed' | undefined;
-  let uploading = false;
-  let uploadSuccess = false;
+  let error: 'upload-failed' | undefined = $state();
+  let uploading = $state(false);
+  let uploadSuccess = $state(false);
 
-  $: {
+  run(() => {
     if (uploadSuccess) {
       setTimeout(() => {
         uploadSuccess = false;
       }, 2000);
     }
-  }
+  });
 
   async function uploadFile(file: File) {
     uploading = true;
@@ -62,11 +64,11 @@
   {error}
   on:input={(event) => handleDropZoneInput({ file: event.detail.file })}
 >
-  <svelte:fragment slot="loading">
+  {#snippet loadingSlot()}
     <Spinner />
     <p class="typo-text">Uploading…</p>
-  </svelte:fragment>
-  <svelte:fragment slot="error" let:error let:defaultContent>
+  {/snippet}
+  {#snippet errorSlot({ error, defaultContent })}
     {#if error === 'wrong-filetype'}
       <p class="typo-text-bold">File must be a JPG or PNG</p>
     {:else if error == 'upload-failed'}
@@ -74,11 +76,11 @@
     {:else}
       {@html defaultContent}
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="success">
+  {/snippet}
+  {#snippet successSlot()}
     <CheckIcon style="height: 2rem; width: 2rem; fill: var(--color-positive-level-6)" />
     <p class="typo-text">Upload successful</p>
-  </svelte:fragment>
+  {/snippet}
 </DropZone>
 
 <style>

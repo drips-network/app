@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const STREAM_STATE_BADGE_STREAM_FRAGMENT = gql`
@@ -23,10 +23,13 @@
   import type { StreamStateBadgeStreamFragment } from './__generated__/gql.generated';
   import { streamCurrentAmountsStore } from '$lib/utils/current-amounts';
 
-  export let stream: StreamStateBadgeStreamFragment;
+  interface Props {
+    stream: StreamStateBadgeStreamFragment;
+    hideActive?: boolean;
+    size?: 'small' | 'normal' | 'large';
+  }
 
-  export let hideActive = false;
-  export let size: 'small' | 'normal' | 'large' = 'normal';
+  let { stream, hideActive = false, size = 'normal' }: Props = $props();
 
   const streamReadable = streamCurrentAmountsStore(
     stream.timeline,
@@ -34,7 +37,7 @@
   );
 
   // listen to updates of the stream's current realtime state and update the state
-  $: state = $streamReadable && streamState(stream);
+  let state = $derived($streamReadable && streamState(stream));
 
   const colorMap = {
     paused: 'caution',
@@ -43,9 +46,9 @@
     scheduled: 'caution',
     'out-of-funds': 'negative',
   } as const;
-  $: color = state ? colorMap[state] : undefined;
+  let color = $derived(state ? colorMap[state] : undefined);
 
-  $: stateLabel = state ? STREAM_STATE_LABELS[state] : undefined;
+  let stateLabel = $derived(state ? STREAM_STATE_LABELS[state] : undefined);
 </script>
 
 {#if state && !(state === 'active' && hideActive)}

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
   import OrcidTooltip, { ORCID_TOOLTIP_FRAGMENT } from './orcid-tooltip.svelte';
 
@@ -32,32 +32,47 @@
   import CopyIcon from '$lib/components/icons/Copy.svelte';
   import { fade } from 'svelte/transition';
 
-  export let orcid: OrcidBadgeFragment;
+  interface Props {
+    orcid: OrcidBadgeFragment;
+    tooltip?: boolean;
+    /** display orcid as if it's unclaimed, even if it is claimed */
+    forceUnclaimed?: boolean;
+    hideAvatar?: boolean;
+    hideType?: boolean;
+    linkToNewTab?: boolean;
+    linkTo?: 'external-url' | 'orcid-page' | 'nothing';
+    size?: 'tiny' | 'small' | 'medium' | 'large' | 'huge';
+    smallText?: boolean;
+    chainOverride?: SupportedChain | undefined;
+    outlined?: boolean;
+    copyable?: boolean;
+  }
 
-  export let tooltip = true;
-  /** display orcid as if it's unclaimed, even if it is claimed */
-  export let forceUnclaimed = false;
-  export let hideAvatar = false;
-  export let hideType = true;
-  export let linkToNewTab = false;
-  export let linkTo: 'external-url' | 'orcid-page' | 'nothing' = 'orcid-page';
-  export let size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' = 'small';
-  export let smallText = false;
-  export let chainOverride: SupportedChain | undefined = undefined;
-  export let outlined: boolean = false;
-  export let copyable: boolean = false;
+  let {
+    orcid,
+    tooltip = true,
+    forceUnclaimed = false,
+    hideAvatar = false,
+    hideType = true,
+    linkToNewTab = false,
+    linkTo = 'orcid-page',
+    size = 'small',
+    smallText = false,
+    chainOverride = undefined,
+    outlined = false,
+    copyable = false,
+  }: Props = $props();
 
-  let copySuccess = false;
+  let copySuccess = $state(false);
 
-  let unclaimedOrcid: OrcidBadgeFragment;
-  $: unclaimedOrcid = {
+  let unclaimedOrcid: OrcidBadgeFragment = $derived({
     ...orcid,
     chain: chainOverride ?? network.gqlName,
     isClaimed: false,
     areSplitsValid: false,
-  } as OrcidBadgeFragment;
+  } as OrcidBadgeFragment);
 
-  $: processedOrcid = forceUnclaimed ? unclaimedOrcid : orcid;
+  let processedOrcid = $derived(forceUnclaimed ? unclaimedOrcid : orcid);
 
   async function copyClipboard(event: MouseEvent) {
     event.preventDefault();
@@ -92,7 +107,7 @@
       </div>
       {#if copyable}
         <div class="copy">
-          <button on:click={copyClipboard}>
+          <button onclick={copyClipboard}>
             {#if copySuccess}
               <span transition:fade={{ duration: 200 }}>
                 <CheckIcon style="fill: var(--color-foreground)" />
@@ -106,9 +121,9 @@
         </div>
       {/if}
     </svelte:element>
-    <svelte:fragment slot="tooltip-content">
+    {#snippet tooltip_content()}
       <OrcidTooltip orcid={processedOrcid} />
-    </svelte:fragment>
+    {/snippet}
   </Tooltip>
 </PrimaryColorThemer>
 

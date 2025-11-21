@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Ens from './svgs/partner-logos/ens.svelte';
   import EthereumFoundation from './svgs/partner-logos/ethereum-foundation.svelte';
   import FilecoinFoundation from './svgs/partner-logos/filecoin-foundation.svelte';
@@ -7,7 +7,11 @@
   import Radworks from './svgs/partner-logos/radworks.svelte';
   import Scroll from './svgs/partner-logos/scroll.svelte';
 
-  export let headline = 'Trusted by';
+  interface Props {
+    headline?: string;
+  }
+
+  let { headline = 'Trusted by' }: Props = $props();
 </script>
 
 <div class="trusted-by">

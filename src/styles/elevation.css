@@ -1,7 +1,8 @@
 :root {
   --elevation-low: 0px 0px 0px 1px var(--color-foreground-level-3);
 
-  --elevation-medium: 0px 0px 0px 1px var(--color-foreground), 0 4px 0px 1px var(--color-foreground);
+  --elevation-medium:
+    0px 0px 0px 1px var(--color-foreground), 0 4px 0px 1px var(--color-foreground);
 
   --elevation-high: 0px 0px 0px 1px var(--color-foreground), 0 8px 0px 1px var(--color-foreground);
 }

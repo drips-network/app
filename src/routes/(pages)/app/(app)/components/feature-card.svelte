@@ -1,10 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  export let imageUrl: string;
+  interface Props {
+    imageUrl: string;
+    children?: import('svelte').Snippet;
+    actions?: import('svelte').Snippet;
+  }
+
+  let { imageUrl, children, actions }: Props = $props();
 
   let imageEl: HTMLImageElement;
-  let imageLoaded = false;
+  let imageLoaded = $state(false);
 
   onMount(() => {
     if (imageEl?.complete) {
@@ -18,17 +24,17 @@
     bind:this={imageEl}
     class:loaded={imageLoaded}
     src={imageUrl}
-    on:load={() => {
+    onload={() => {
       imageLoaded = true;
     }}
     alt=""
   />
 
   <div class="content">
-    <slot />
+    {@render children?.()}
 
     <div class="actions">
-      <slot name="actions" />
+      {@render actions?.()}
     </div>
   </div>
 </div>

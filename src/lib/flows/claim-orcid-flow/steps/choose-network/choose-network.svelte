@@ -17,7 +17,7 @@
     ? Object.values(NETWORK_CONFIG)
     : Object.values(NETWORK_CONFIG).filter((n) => !n.isTestnet);
 
-  let selectedNetworkId = network.chainId;
+  let selectedNetworkId = $state(network.chainId);
 
   // Disable the warning on navigate away, because the user hasn't yet entered any info and might want to
   // switch to a different network deployment.
@@ -42,7 +42,7 @@
             value={network.chainId}
           />
           <label for="network-{network.chainId}">
-            <svelte:component this={network.icon} />
+            <network.icon />
             <div>{network.label}</div>
           </label>
         </div>
@@ -53,28 +53,28 @@
       <div transition:slide={{ duration: 300 }} class="switch-network-prompt">
         <AnnotationBox>
           To claim on {selectedNetwork.label}, switch your current network.
-          <svelte:fragment slot="actions">
+          {#snippet actions()}
             <Button
               variant="primary"
               target="_self"
               href={getChainDeploymentUrl(selectedNetwork.chainId)}
               >Switch to {selectedNetwork.label}</Button
             >
-          </svelte:fragment>
+          {/snippet}
         </AnnotationBox>
       </div>
     {/if}
   </div>
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button
       variant="primary"
       icon={ArrowRight}
       disabled={selectedNetworkId !== network.chainId}
-      on:click={() => dispatch('goForward')}
+      onclick={() => dispatch('goForward')}
     >
       Continue
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

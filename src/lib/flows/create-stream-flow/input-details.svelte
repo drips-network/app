@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const CREATE_STREAM_FLOW_DETAILS_NFT_DRIVER_ACCOUNT_FRAGMENT = gql`
     ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
     fragment CreateStreamFlowDetailsNftDriverAccount on NftDriverAccount {
@@ -93,52 +93,58 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<CreateStreamFlowState>;
+  interface Props {
+    context: Writable<CreateStreamFlowState>;
+  }
 
-  $: nameInputHidden =
+  let { context }: Props = $props();
+
+  let nameInputHidden = $derived(
     $context.receiver?.__typename === 'NftDriverAccount' ||
-    $context.receiver?.__typename === 'EcosystemMainAccount';
+      $context.receiver?.__typename === 'EcosystemMainAccount',
+  );
 
   // Recipient Address
 
-  let recipientInputValidationState: TextInputValidationState = { type: 'unvalidated' };
+  let recipientInputValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
   function onRecipientInputValidationChange(event: CustomEvent) {
     recipientInputValidationState = event.detail ?? { type: 'unvalidated' };
   }
 
   // Token dropdown
 
-  let tokenList: Items;
-  $: tokenList = Object.fromEntries(
-    mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
-      const token = tokens.getByAddress(b.tokenAddress);
-      if (!token) return undefined;
+  let tokenList: Items = $derived(
+    Object.fromEntries(
+      mapFilterUndefined($context.userOutgoingTokenBalances, (b) => {
+        const token = tokens.getByAddress(b.tokenAddress);
+        if (!token) return undefined;
 
-      return [
-        token.info.address.toLowerCase(),
-        {
-          type: 'selectable',
-          label: token.info.name,
-          searchString: [token.info.name, token.info.symbol],
-          text: {
-            component: RealtimeAmount,
-            props: {
-              tokenAddress: token.info.address,
-              timeline: b.outgoing,
-              showDelta: false,
+        return [
+          token.info.address.toLowerCase(),
+          {
+            type: 'selectable',
+            label: token.info.name,
+            searchString: [token.info.name, token.info.symbol],
+            text: {
+              component: RealtimeAmount,
+              props: {
+                tokenAddress: token.info.address,
+                timeline: b.outgoing,
+                showDelta: false,
+              },
+            },
+            image: {
+              component: Token,
+              props: {
+                show: 'none',
+                address: token.info.address,
+                size: 'small',
+              },
             },
           },
-          image: {
-            component: Token,
-            props: {
-              show: 'none',
-              address: token.info.address,
-              size: 'small',
-            },
-          },
-        },
-      ];
-    }),
+        ];
+      }),
+    ),
   );
 
   onMount(() => {
@@ -148,69 +154,84 @@
     if (firstToken) $context.selectedTokenAddress = [firstToken];
   });
 
-  $: selectedToken =
+  let selectedToken = $derived(
     $context.selectedTokenAddress?.length === 1
       ? tokens.getByAddress($context.selectedTokenAddress[0])
-      : undefined;
+      : undefined,
+  );
 
   // Amount input
 
-  $: amountValueParsed =
+  let amountValueParsed = $derived(
     $context.amountValue && selectedToken
       ? parseTokenAmount(
           $context.amountValue,
           selectedToken?.info.decimals + contractConstants.AMT_PER_SEC_EXTRA_DECIMALS,
         )
-      : undefined;
+      : undefined,
+  );
 
   // Amount per second
 
-  $: amountPerSecond =
+  let amountPerSecond = $derived(
     amountValueParsed && $context.selectedMultiplier && selectedToken
       ? amountValueParsed / BigInt($context.selectedMultiplier)
-      : undefined;
+      : undefined,
+  );
 
-  $: amountValidationState = validateAmtPerSecInput(amountPerSecond);
+  let amountValidationState = $derived(validateAmtPerSecInput(amountPerSecond));
 
   // Stream start date
-  $: streamStartDate = parseDate($context.streamStartDateValue).date;
-  $: streamStartDateValidationState = parseDate($context.streamStartDateValue).validationState;
+  let streamStartDate = $derived(parseDate($context.streamStartDateValue).date);
+  let streamStartDateValidationState = $derived(
+    parseDate($context.streamStartDateValue).validationState,
+  );
 
   // Stream start time
-  $: streamStartTime = parseTime($context.streamStartTimeValue).time;
-  $: streamStartTimeValidationState = parseTime($context.streamStartTimeValue).validationState;
+  let streamStartTime = $derived(parseTime($context.streamStartTimeValue).time);
+  let streamStartTimeValidationState = $derived(
+    parseTime($context.streamStartTimeValue).validationState,
+  );
 
   // Stream end date
-  $: streamEndDate = parseDate($context.streamEndDateValue).date;
-  $: streamEndDateValidationState = parseDate($context.streamEndDateValue).validationState;
+  let streamEndDate = $derived(parseDate($context.streamEndDateValue).date);
+  let streamEndDateValidationState = $derived(
+    parseDate($context.streamEndDateValue).validationState,
+  );
 
   // Stream end time
-  $: streamEndTime = parseTime($context.streamEndTimeValue).time;
-  $: streamEndTimeValidationState = parseTime($context.streamEndTimeValue).validationState;
+  let streamEndTime = $derived(parseTime($context.streamEndTimeValue).time);
+  let streamEndTimeValidationState = $derived(
+    parseTime($context.streamEndTimeValue).validationState,
+  );
 
-  $: combinedStartDate =
+  let combinedStartDate = $derived(
     streamStartDate &&
-    streamStartTime &&
-    combineDateAndTime(streamStartDate ?? unreachable(), streamStartTime ?? unreachable());
+      streamStartTime &&
+      combineDateAndTime(streamStartDate ?? unreachable(), streamStartTime ?? unreachable()),
+  );
 
-  $: combinedEndDate =
+  let combinedEndDate = $derived(
     streamEndDate &&
-    streamEndTime &&
-    combineDateAndTime(streamEndDate ?? unreachable(), streamEndTime ?? unreachable());
+      streamEndTime &&
+      combineDateAndTime(streamEndDate ?? unreachable(), streamEndTime ?? unreachable()),
+  );
 
-  $: timeRangeValid =
+  let timeRangeValid = $derived(
     !$context.setStartAndEndDate ||
-    (combinedStartDate &&
-      combinedEndDate &&
-      combinedStartDate.getTime() > new Date().getTime() &&
-      combinedStartDate?.getTime() < combinedEndDate?.getTime());
+      (combinedStartDate &&
+        combinedEndDate &&
+        combinedStartDate.getTime() > new Date().getTime() &&
+        combinedStartDate?.getTime() < combinedEndDate?.getTime()),
+  );
 
-  $: formValid =
+  let formValid = $derived(
     streamEndDateValidationState.type !== 'invalid' &&
-    ($context.receiver || recipientInputValidationState.type === 'valid') &&
-    amountValidationState?.type === 'valid' &&
-    (nameInputHidden || $context.streamNameValue) &&
-    timeRangeValid;
+      ($context.receiver || recipientInputValidationState.type === 'valid') &&
+      amountValidationState?.type === 'valid' &&
+      (nameInputHidden || $context.streamNameValue) &&
+      timeRangeValid,
+  );
 
   function submit() {
     dispatch(
@@ -427,8 +448,10 @@
     <WhatsNextSection>
       {@const nextSettlementDate = network.settlement.nextSettlementDate}
       <WhatsNextCard>
-        <svelte:fragment slot="title">When your continuous donation begins...</svelte:fragment>
-        <svelte:fragment slot="items">
+        {#snippet title()}
+          When your continuous donation begins...
+        {/snippet}
+        {#snippet items()}
           <WhatsNextItem icon={TransactionsIcon}>
             Funds sent to {$context.receiver?.__typename === 'EcosystemMainAccount'
               ? 'Ecosystems'
@@ -440,15 +463,15 @@
               >{nextSettlementDate === 'daily' ? 'today' : formatDate(nextSettlementDate())}</span
             >.
           </WhatsNextItem>
-        </svelte:fragment>
+        {/snippet}
       </WhatsNextCard>
     </WhatsNextSection>
   {/if}
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" on:click={submit} disabled={!formValid}>Create stream</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" onclick={submit} disabled={!formValid}>Create stream</Button>
+  {/snippet}
 </StepLayout>
 
 <style>

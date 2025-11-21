@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run, preventDefault } from 'svelte/legacy';
+
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
@@ -19,14 +21,18 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let unavailableSlugs: string[];
-  export let onAdd: (field: ApplicationFieldDto) => void;
+  interface Props {
+    context: Writable<State>;
+    unavailableSlugs: string[];
+    onAdd: (field: ApplicationFieldDto) => void;
+  }
 
-  $: fieldSettings = $context.field ?? unreachable();
+  let { context, unavailableSlugs, onAdd }: Props = $props();
 
-  let valid: boolean;
-  $: {
+  let fieldSettings = $state($context.field ?? unreachable());
+
+  let valid = $state(false);
+  $effect(() => {
     const normalizedFieldSettings = {
       ...fieldSettings,
       slug: 'slug' in fieldSettings ? fieldSettings.slug.toLowerCase().trim() : '',
@@ -40,15 +46,16 @@
       unavailableSlugs.includes(normalizedFieldSettings.slug);
 
     valid = parseResult.success && !slugUnavailable;
-  }
+  });
 
-  let listSelectAddItemInput = '';
-  $: listSelectAddItemInputValid =
+  let listSelectAddItemInput = $state('');
+  let listSelectAddItemInputValid = $derived(
     listSelectAddItemInput.trim() !== '' &&
-    fieldSettings.type === 'select' &&
-    !fieldSettings.options?.some(
-      (option) => option.value.toLowerCase() === listSelectAddItemInput.trim().toLowerCase(),
-    );
+      fieldSettings.type === 'select' &&
+      !fieldSettings.options?.some(
+        (option) => option.value.toLowerCase() === listSelectAddItemInput.trim().toLowerCase(),
+      ),
+  );
 
   function handleAddSelectOption() {
     if (fieldSettings.type !== 'select') return;
@@ -63,23 +70,23 @@
     listSelectAddItemInput = '';
   }
 
-  let listAddRowNameInput = '';
-  let listAddRowDataType: 'text' | 'number' | 'url' = 'text';
+  let listAddRowNameInput = $state('');
+  let listAddRowDataType: 'text' | 'number' | 'url' = $state('text');
 
-  let maxItemsInput = '';
-  $: {
+  let maxItemsInput = $state('');
+  run(() => {
     if ('maxItems' in fieldSettings && maxItemsInput) {
       fieldSettings.maxItems = Number(maxItemsInput);
     }
-  }
+  });
 </script>
 
 <div class="field-settings-modal">
   <form
-    on:submit|preventDefault={() => {
+    onsubmit={preventDefault(() => {
       onAdd(fieldSettings);
       dispatch('conclude');
-    }}
+    })}
   >
     {#if 'content' in fieldSettings}
       <FormField title="Markdown content*">
@@ -115,7 +122,7 @@
           <Button
             disabled={!listSelectAddItemInputValid}
             size="large"
-            on:click={handleAddSelectOption}
+            onclick={handleAddSelectOption}
             icon={CheckCircle}
             variant="primary">Add</Button
           >
@@ -125,7 +132,7 @@
             <div class="list-option">
               <span class="typo-text">{option.label}</span>
               <Button
-                on:click={() => {
+                onclick={() => {
                   fieldSettings.options = fieldSettings.options.filter((_, i) => i !== index);
                 }}
                 icon={Trash}
@@ -165,7 +172,7 @@
           </div>
           <Button
             size="large"
-            on:click={() => {
+            onclick={() => {
               if (listAddRowNameInput.trim() === '') return;
 
               fieldSettings.entryFields = [
@@ -186,7 +193,7 @@
             <div class="list-option">
               <span class="typo-text">{entryField.label} ({entryField.type})</span>
               <Button
-                on:click={() => {
+                onclick={() => {
                   fieldSettings.entryFields = fieldSettings.entryFields.filter(
                     (_, i) => i !== index,
                   );

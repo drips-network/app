@@ -7,9 +7,9 @@
 </script>
 
 Step 2
-<Button on:click={() => dispatch('goBackward')}>Back</Button>
+<Button onclick={() => dispatch('goBackward')}>Back</Button>
 <Button
-  on:click={() =>
+  onclick={() =>
     dispatch('await', {
       message: 'Waiting for 2 seconds...',
       promise: () => new Promise((resolve) => setTimeout(resolve, 2000)),
@@ -17,7 +17,7 @@ Step 2
 >
 
 <Button
-  on:click={() =>
+  onclick={() =>
     dispatch('await', {
       message: 'Throwing an error in 2 seconds...',
       promise: () => new Promise((_, reject) => setTimeout(reject, 2000)),

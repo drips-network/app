@@ -23,8 +23,12 @@
   import PrimaryColorThemer from '$lib/components/primary-color-themer/primary-color-themer.svelte';
   import isClaimed from '$lib/utils/project/is-claimed';
 
-  export let supportButtonData: SupportButtonData;
-  export let projectSourceUrl: string;
+  interface Props {
+    supportButtonData: SupportButtonData;
+    projectSourceUrl: string;
+  }
+
+  let { supportButtonData, projectSourceUrl }: Props = $props();
 
   const headline = 'Configure your embed code';
   const description = 'Choose how you want your support button to be displayed.';
@@ -54,12 +58,12 @@
   const texts = createOptions(SupportButtonText);
   const stats = createOptions(SupportButtonStat);
 
-  const selection: SupportButtonOptions = {
+  const selection: SupportButtonOptions = $state({
     background: SupportButtonBackground.default,
     style: SupportButtonStyle.default,
     text: SupportButtonText.default,
     stat: SupportButtonStat.default,
-  };
+  });
 
   function makeOnSelect<K extends keyof SupportButtonOptions>(prop: K) {
     return function <T extends CustomEvent>(event: T) {
@@ -93,8 +97,8 @@
     fetch(pngUrl);
   }
 
-  $: backgroundDisabled = selection.style === SupportButtonStyle.github;
-  $: embedCode = generateEmbedCode(selection, projectSourceUrl, supportButtonData);
+  let backgroundDisabled = $derived(selection.style === SupportButtonStyle.github);
+  let embedCode = $derived(generateEmbedCode(selection, projectSourceUrl, supportButtonData));
 </script>
 
 <PrimaryColorThemer colorHex={projectColor}>
@@ -150,22 +154,22 @@
       </div>
     </div>
 
-    <svelte:fragment slot="left-actions">
-      <Button on:click={onClickCancel}>Never mind</Button>
-    </svelte:fragment>
+    {#snippet left_actions()}
+      <Button onclick={onClickCancel}>Never mind</Button>
+    {/snippet}
 
-    <svelte:fragment slot="actions">
+    {#snippet actions()}
       <CopyLinkButton url={embedCode} variant="primary" on:linkCopied={cacheInitialState}>
         Copy embed code
-        <svelte:fragment slot="idle">
+        {#snippet idle()}
           <CopyIcon style="fill: currentColor" />
-        </svelte:fragment>
+        {/snippet}
         <!-- hover is the same as idle in this case -->
-        <svelte:fragment slot="success">
+        {#snippet success()}
           <CheckCircleIcon style="fill: currentColor" />
-        </svelte:fragment>
+        {/snippet}
       </CopyLinkButton>
-    </svelte:fragment>
+    {/snippet}
   </StepLayout>
 </PrimaryColorThemer>
 

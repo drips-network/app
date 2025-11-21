@@ -2,9 +2,13 @@
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import Token from '../token/token.svelte';
 
-  export let emoji: string;
-  export let tokenAddress: string;
-  export let animateTokenOnMount = false;
+  interface Props {
+    emoji: string;
+    tokenAddress: string;
+    animateTokenOnMount?: boolean;
+  }
+
+  let { emoji, tokenAddress, animateTokenOnMount = false }: Props = $props();
 </script>
 
 <div class="illustration">

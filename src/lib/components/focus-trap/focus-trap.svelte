@@ -2,6 +2,8 @@
   Adjusted from `svelte-headlessui`: https://github.com/rgossiaux/svelte-headlessui/blob/master/src/lib/components/focus-trap/FocusTrap.svelte
 -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { focusIn, Focus, FocusResult } from './methods/focus';
   import { onMount, onDestroy, tick } from 'svelte';
 
@@ -25,9 +27,13 @@
     Tab = 'Tab',
   }
 
-  export let containers: Set<HTMLElement>;
-  export let enabled = true;
-  export let options: { initialFocus?: HTMLElement | null } = {};
+  interface Props {
+    containers: Set<HTMLElement>;
+    enabled?: boolean;
+    options?: { initialFocus?: HTMLElement | null };
+  }
+
+  let { containers, enabled = true, options = {} }: Props = $props();
 
   let restoreElement: HTMLElement | null =
     typeof window !== 'undefined' ? (document.activeElement as HTMLElement) : null;
@@ -89,7 +95,9 @@
   // Handle initial focus
   onMount(handleFocus);
 
-  $: enabled && containers ? handleFocus() : restore();
+  run(() => {
+    enabled && containers ? handleFocus() : restore();
+  });
 
   // When this component is being destroyed, focusElement is called
   // before handleWindowFocus is removed, so in the svelte port we add this
@@ -152,4 +160,4 @@
   }
 </script>
 
-<svelte:window on:keydown={handleWindowKeyDown} on:focus|capture={handleWindowFocus} />
+<svelte:window onkeydown={handleWindowKeyDown} onfocuscapture={handleWindowFocus} />

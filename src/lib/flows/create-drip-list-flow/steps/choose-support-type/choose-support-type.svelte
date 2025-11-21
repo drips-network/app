@@ -17,9 +17,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: formValid = $context.selectedSupportOption !== undefined;
+  let { context }: Props = $props();
+
+  let formValid = $derived($context.selectedSupportOption !== undefined);
 
   function submit() {
     switch ($context.selectedSupportOption) {
@@ -83,13 +87,14 @@
       ],
     }}
   />
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button on:click={supportLater}>Support later</Button>
-    <Button disabled={!formValid} icon={ArrowRight} variant="primary" on:click={submit}
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button onclick={supportLater}>Support later</Button>
+    <Button disabled={!formValid} icon={ArrowRight} variant="primary" onclick={submit}
       >Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

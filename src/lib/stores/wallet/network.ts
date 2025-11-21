@@ -9,9 +9,9 @@ import { SupportedChain } from '$lib/graphql/__generated__/base-types';
 import assert from '$lib/utils/assert';
 import { BASE_URL } from '$lib/utils/base-url';
 import { nextMainnetSettlementDate } from '$lib/utils/settlement-date';
-import type { ComponentType } from 'svelte';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { browser } from '$app/environment';
+import type { Component } from 'svelte';
 
 export const SUPPORTED_CHAIN_IDS = [
   1, 80002, 11155420, 11155111, 31337, 84532, 314, 1088, 10,
@@ -31,7 +31,7 @@ export type Network = {
   token: string;
   id: string;
   rpcUrl: string;
-  icon: ComponentType;
+  icon: Component;
   color: string;
   isTestnet: boolean;
   subdomain: string;

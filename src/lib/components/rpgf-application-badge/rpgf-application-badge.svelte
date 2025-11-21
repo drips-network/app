@@ -4,15 +4,27 @@
   import ProjectAvatar from '../project-avatar/project-avatar.svelte';
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
 
-  export let application: ListingApplication;
-  export let hideName = false;
-  export let hideAvatar = false;
-  export let hideState = false;
-  export let inline = false;
-  export let size: ComponentProps<ProjectAvatar>['size'] = 'small';
-  export let short: boolean = false;
+  interface Props {
+    application: ListingApplication;
+    hideName?: boolean;
+    hideAvatar?: boolean;
+    hideState?: boolean;
+    inline?: boolean;
+    size?: ComponentProps<typeof ProjectAvatar>['size'];
+    short?: boolean;
+  }
 
-  $: projectSnapshot = application.dripsProjectDataSnapshot;
+  let {
+    application,
+    hideName = false,
+    hideAvatar = false,
+    hideState = false,
+    inline = false,
+    size = 'small',
+    short = false,
+  }: Props = $props();
+
+  let projectSnapshot = $derived(application.dripsProjectDataSnapshot);
 
   const stateMap: Record<ListingApplication['state'], string> = {
     pending: short ? 'Pending' : 'Pending review',

@@ -4,15 +4,31 @@
   import Markdown from '../markdown/markdown.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
 
-  export let title: string | undefined = undefined;
-  export let description: string | undefined = undefined;
-  export let descriptionMd: string | undefined = undefined;
-  export let disabled = false;
-  export let privateNoticeText: string | undefined = undefined;
-  export let type: 'label' | 'div' = 'label';
+  interface Props {
+    title?: string | undefined;
+    description?: string | undefined;
+    descriptionMd?: string | undefined;
+    disabled?: boolean;
+    privateNoticeText?: string | undefined;
+    type?: 'label' | 'div';
+    validationState?: { type: 'valid' } | { type: 'invalid'; message: string } | undefined;
+    children?: import('svelte').Snippet;
+    action?: import('svelte').Snippet;
+    private_notice?: import('svelte').Snippet;
+  }
 
-  export let validationState: { type: 'valid' } | { type: 'invalid'; message: string } | undefined =
-    undefined;
+  let {
+    title = undefined,
+    description = undefined,
+    descriptionMd = undefined,
+    disabled = false,
+    privateNoticeText = undefined,
+    type = 'label',
+    validationState = undefined,
+    children,
+    action,
+    private_notice,
+  }: Props = $props();
 </script>
 
 <svelte:element this={type} class="wrapper typo-text-bold" class:disabled>
@@ -24,14 +40,14 @@
           style:visibility="hidden"
           style:position="absolute"
           style:top="-230px"
-        />
+        ></div>
         <AnnotationBox type="error">
           {validationState.message}
         </AnnotationBox>
       </div>
     {/if}
   {/if}
-  <div class="content"><slot /></div>
+  <div class="content">{@render children?.()}</div>
   {#if description || descriptionMd}
     <div class="description" style:color="var(--color-foreground-level-6)">
       {#if description}<p style:color="var(--color-foreground-level-6)">{description}</p>{/if}
@@ -44,7 +60,7 @@
     <div class="title">
       {title}
       <span class="slot">
-        <slot name="action" />
+        {@render action?.()}
       </span>
       {#if privateNoticeText}
         <Tooltip>
@@ -55,13 +71,13 @@
             style:background-color="var(--color-foreground-level-1)"
           >
             <span class="slot">
-              <slot name="private-notice" />
+              {@render private_notice?.()}
             </span>
             <Lock />
           </div>
-          <svelte:fragment slot="tooltip-content">
+          {#snippet tooltip_content()}
             {privateNoticeText}
-          </svelte:fragment>
+          {/snippet}
         </Tooltip>
       {/if}
     </div>

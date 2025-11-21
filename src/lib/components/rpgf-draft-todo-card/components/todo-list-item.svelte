@@ -1,20 +1,25 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  export let icon: ComponentType;
-  export let done: boolean;
-  export let optional = false;
-  export let title: string;
-  export let error: boolean = false;
+  interface Props {
+    icon: Component;
+    done: boolean;
+    optional?: boolean;
+    title: string;
+    error?: boolean;
+    href: string;
+  }
 
-  export let href: string;
+  let { icon, done, optional = false, title, error = false, href }: Props = $props();
 
-  let iconFillColor: string;
-  $: {
+  let iconFillColor: string | undefined = $state();
+  run(() => {
     if (error) {
       iconFillColor = 'var(--color-caution)';
     } else if (done) {
@@ -24,7 +29,7 @@
     } else {
       iconFillColor = 'var(--color-foreground)';
     }
-  }
+  });
 
   function iconTransition(direction: 'in' | 'out') {
     return {
@@ -32,11 +37,13 @@
       duration: 300,
     };
   }
+
+  const SvelteComponent = $derived(icon);
 </script>
 
 <li>
   <a {href} class="todo-list-item" class:done class:error class:optional>
-    <svelte:component this={icon} style="fill: {iconFillColor}" />
+    <SvelteComponent style="fill: {iconFillColor}" />
     <h2 class="typo-text-bold">{title}</h2>
     <div class="icon">
       {#if error}

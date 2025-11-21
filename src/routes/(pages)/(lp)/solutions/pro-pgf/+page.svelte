@@ -21,31 +21,34 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Pro-PGF</svelte:fragment>
-  <svelte:fragment slot="headline"
-    >Proactive, community-led public goods funding on-chain</svelte:fragment
-  >
-  <svelte:fragment slot="description">
+  {#snippet usecase_badge()}
+    Pro-PGF
+  {/snippet}
+  {#snippet headline()}
+    Proactive, community-led public goods funding on-chain
+  {/snippet}
+  {#snippet description()}
     Pro-PGF gives ecosystems a structured, transparent way to fund essential public goods. It
     supports new initiatives and ongoing projects that keep your ecosystem healthy and growing.
-  </svelte:fragment>
+  {/snippet}
 </SolutionHeader>
 
 <SolutionCard illustrationScale="1.1">
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <ThemedRasterImage
       srcLight="/assets/solutions/pro-pgf/streamline/light.png"
       srcDark="/assets/solutions/pro-pgf/streamline/dark.png"
       alt="Wave solution illustration"
     />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Streamline how your ecosystem funds public goods</svelte:fragment
-  >
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Streamline how your ecosystem funds public goods
+  {/snippet}
+  {#snippet description()}
     Run curated funding rounds that combine expert review with community oversight all tracked and
     executed on-chain.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Ledger}>
       Proactively fund new and existing projects aligned with ecosystem priorities
     </SolutionLineItem>
@@ -58,26 +61,28 @@
     <SolutionLineItem icon={ArrowClockwiseHeart}>
       Complement retroactive funding with a forward-looking Pro-PGF program
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionInterstitial>
-  <svelte:fragment slot="headline">Want fair, on-chain rewards for your community?</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet headline()}
+    Want fair, on-chain rewards for your community?
+  {/snippet}
+  {#snippet description()}
     Our team can walk you through how Drips fits into your workflow, help you design repeatable
     funding cycles, and show you how to reward meaningful work with full on-chain accountability.
-  </svelte:fragment>
+  {/snippet}
 </SolutionInterstitial>
 
 <SolutionCard reverse illustrationScale="1.1">
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsPropgfEverythingYouNeed />
-  </svelte:fragment>
-  <svelte:fragment slot="headline"
-    >Everything you need for accountable, scalable Pro-PGF</svelte:fragment
-  >
+  {/snippet}
+  {#snippet headline()}
+    Everything you need for accountable, scalable Pro-PGF
+  {/snippet}
 
-  <svelte:fragment slot="line-items">
+  {#snippet line_items()}
     <SolutionLineItem icon={ArrowClockwiseHeart}>
       Run clearly scoped funding batches with defined themes and budgets
     </SolutionLineItem>
@@ -90,5 +95,5 @@
     <SolutionLineItem icon={Wave}>
       Build a continuous Pro-PGF pipeline that funds high-impact work from idea to execution
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>

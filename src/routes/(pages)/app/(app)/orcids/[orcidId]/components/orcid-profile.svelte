@@ -27,17 +27,21 @@
   import launchClaimOrcid from '$lib/utils/launch-claim-orcid';
   import getOrcidDisplayName from '$lib/utils/orcids/display-name';
 
-  // for bio
-  export let orcid: Orcid;
-  // for everything else
-  export let orcidAccount: OrcidProfileFragment;
+  interface Props {
+    // for bio
+    orcid: Orcid;
+    // for everything else
+    orcidAccount: OrcidProfileFragment;
+  }
 
-  let supportersSectionSkeleton: SectionSkeleton | undefined;
+  let { orcid, orcidAccount }: Props = $props();
+
+  let supportersSectionSkeleton: SectionSkeleton | undefined = $state();
   const orcidDisplayName = getOrcidDisplayName(orcidAccount);
 
-  $: imageBaseUrl = `/api/share-images/orcids/${encodeURIComponent(orcid.id)}.png`;
-  $: withdrawableBalances = orcidAccount.withdrawableBalances ?? [];
-  $: support = orcidAccount.support ?? [];
+  let imageBaseUrl = $derived(`/api/share-images/orcids/${encodeURIComponent(orcid.id)}.png`);
+  let withdrawableBalances = $derived(orcidAccount.withdrawableBalances ?? []);
+  let support = $derived(orcidAccount.support ?? []);
 
   function claimOrcid() {
     launchClaimOrcid(orcidAccount.orcid);
@@ -66,17 +70,17 @@
           > in claimable funds. The owner can collect by claiming their ORCID iD.{:else}This ORCID
           iD is unclaimed on {network.label}, but can still receive funds that the owner can collect
           later.{/if}
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           <div class="flex gap-3">
             <CopyLinkButton
               url={buildOrcidUrl(orcidAccount.orcid, { absolute: true })}
               variant="ghost"
             />
-            <Button size="small" icon={Registered} variant="primary" on:click={claimOrcid}
+            <Button size="small" icon={Registered} variant="primary" onclick={claimOrcid}
               >Claim ORCID iD</Button
             >
           </div>
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}
@@ -111,7 +115,7 @@
         {#if [support].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
-            <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
+            <a href="#support" onclick={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
                 <Pile maxItems={4} components={getSupportersPile(support)} />
               </KeyValuePair>

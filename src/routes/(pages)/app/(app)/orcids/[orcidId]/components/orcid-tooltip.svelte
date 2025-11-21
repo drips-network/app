@@ -35,7 +35,7 @@
     style:background-color={orcid.isClaimed
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
-  />
+  ></div>
   <div class="header">
     <OrcidAvatar size="large" outline />
     <a class="name typo-header-4" href={buildOrcidUrl(orcid.orcid)}><OrcidName {orcid} /></a>

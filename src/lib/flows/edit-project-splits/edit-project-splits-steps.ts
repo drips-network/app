@@ -146,19 +146,19 @@ export default (projectAccountId: string, projectSourceUrl: string, splits: Spli
   steps: [
     makeStep({
       component: SetNewDependencyMaintainerSplit,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: EditMaintainerList,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: EditDependencyList,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: Review,
-      props: undefined,
+      props: {},
     }),
     makeStep({
       component: SuccessStep,

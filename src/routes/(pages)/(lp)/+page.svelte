@@ -14,7 +14,7 @@
   import { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
-  export let data;
+  let { data } = $props();
 </script>
 
 <HeadMeta title="Drips | Fund Open Source In Your Ecosystem" />

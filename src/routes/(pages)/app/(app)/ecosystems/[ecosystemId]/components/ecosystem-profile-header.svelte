@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const PROJECT_PROFILE_HEADER_FRAGMENT = gql`
     ${ECOSYSTEM_BADGE_FRAGMENT}
     ${ECOSYSTEM_AVATAR_FRAGMENT}
@@ -26,8 +26,12 @@
   import { gql } from 'graphql-request';
   import type { EcosystemProfileHeaderFragment } from './__generated__/gql.generated';
 
-  export let ecosystem: Ecosystem;
-  export let ecosystemChainData: EcosystemProfileHeaderFragment | undefined;
+  interface Props {
+    ecosystem: Ecosystem;
+    ecosystemChainData: EcosystemProfileHeaderFragment | undefined;
+  }
+
+  let { ecosystem, ecosystemChainData }: Props = $props();
 </script>
 
 <div

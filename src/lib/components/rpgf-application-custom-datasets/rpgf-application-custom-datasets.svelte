@@ -3,7 +3,11 @@
   import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
   import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
-  export let application: Application;
+  interface Props {
+    application: Application;
+  }
+
+  let { application }: Props = $props();
 </script>
 
 {#each application.customDatasetValues as dataset}

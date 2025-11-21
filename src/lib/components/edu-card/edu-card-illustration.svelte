@@ -1,6 +1,14 @@
-<div class="edu-card-illustration-bg" />
+<script lang="ts">
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
+</script>
+
+<div class="edu-card-illustration-bg"></div>
 <div class="edu-card-illustration-wrapper">
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>

@@ -9,7 +9,11 @@
   import Splits from '$lib/components/icons/Splits.svelte';
   import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
 
-  export let accountId: string | undefined = undefined;
+  interface Props {
+    accountId?: string | undefined;
+  }
+
+  let { accountId = undefined }: Props = $props();
 
   const DRIVER_FRIENDLY_NAMES = {
     nft: 'NFT Driver',
@@ -27,7 +31,7 @@
     immutableSplits: Splits,
   } as const;
 
-  $: driver = accountId && extractDriverNameFromAccountId(accountId);
+  let driver = $derived(accountId && extractDriverNameFromAccountId(accountId));
 </script>
 
 {#if $developerModeStore}
@@ -52,10 +56,11 @@
       {/if}
 
       {#if driver}
+        {@const SvelteComponent = DRIVER_ICONS[driver]}
         <div class="key-value">
           <h5 class="key">Driver</h5>
           <div class="value">
-            <svelte:component this={DRIVER_ICONS[driver]} />
+            <SvelteComponent />
             {DRIVER_FRIENDLY_NAMES[driver]}
           </div>
         </div>

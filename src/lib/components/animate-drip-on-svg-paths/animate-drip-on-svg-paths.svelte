@@ -9,9 +9,14 @@
     scale: number | undefined;
   }
 
-  export let svgElemAttrs: Record<string, string>;
+  interface Props {
+    svgElemAttrs: Record<string, string>;
+    children?: import('svelte').Snippet;
+  }
 
-  let currentDrips: Drip[] = [];
+  let { svgElemAttrs, children }: Props = $props();
+
+  let currentDrips: Drip[] = $state([]);
 
   let start: number | undefined = undefined;
 
@@ -122,7 +127,7 @@
 
 <div bind:this={contentEl} class="content">
   <svg {...svgElemAttrs}>
-    <slot />
+    {@render children?.()}
     {#each currentDrips as { x, y, scale }}
       <circle r={(scale ?? 0) * radius} cx={x} cy={y} fill="var(--color-primary)" class="circle" />
     {/each}

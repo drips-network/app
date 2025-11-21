@@ -123,7 +123,7 @@
             <h6 class="typo-text-bold">Got a new idea?</h6>
             <p>You can create as many Drip Lists as you like.</p>
             <div class="mt-2">
-              <Button icon={Plus} on:click={launchCreateDripList}>Create a new Drip List</Button>
+              <Button icon={Plus} onclick={launchCreateDripList}>Create a new Drip List</Button>
             </div>
           </div>
         </div>

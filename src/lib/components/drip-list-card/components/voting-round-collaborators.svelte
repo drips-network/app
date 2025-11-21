@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { Collaborator, Vote, VotingRound } from '$lib/utils/multiplayer/schemas';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -7,14 +9,18 @@
   import * as multiplayer from '$lib/utils/multiplayer';
   import VoteButton from './vote-button.svelte';
 
-  export let votingRound: VotingRound;
+  interface Props {
+    votingRound: VotingRound;
+    noButtons?: boolean;
+  }
 
-  export let noButtons = false;
+  let { votingRound, noButtons = false }: Props = $props();
 
-  $: isOwnVotingRound =
-    votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase();
+  let isOwnVotingRound = $derived(
+    votingRound.publisherAddress.toLowerCase() === $walletStore.address?.toLowerCase(),
+  );
 
-  let revealedVotes: Vote[] | undefined = undefined;
+  let revealedVotes: Vote[] | undefined = $state(undefined);
 
   async function handleRevealVotes() {
     if (!$walletStore.connected) return;
@@ -38,17 +44,17 @@
     ];
   }
 
-  let collaborator: Collaborator | undefined = undefined;
+  let collaborator: Collaborator | undefined = $state(undefined);
 
   async function updateCollaborator(votingRoundId: string, address: string) {
     collaborator = undefined;
     collaborator = await multiplayer.getCollaborator(votingRoundId, address);
   }
-  $: {
+  run(() => {
     if ($walletStore.connected) {
       updateCollaborator(votingRound.id, $walletStore.address);
     }
-  }
+  });
 
   function sortVotes(connectedAddress: string | undefined, votes: Vote[]) {
     if (!connectedAddress) return votes;
@@ -136,7 +142,7 @@
         </p>
         {#if isOwnVotingRound}
           <div style:margin-top="0.25rem">
-            <Button on:click={handleRevealVotes}>Reveal collaborators</Button>
+            <Button onclick={handleRevealVotes}>Reveal collaborators</Button>
           </div>
         {/if}
       </div>

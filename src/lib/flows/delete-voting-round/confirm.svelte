@@ -13,7 +13,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let votingRoundId: string;
+  interface Props {
+    votingRoundId: string;
+  }
+
+  let { votingRoundId }: Props = $props();
 
   function submit() {
     dispatch('await', {
@@ -50,8 +54,8 @@
     headline="Delete voting round"
     description="Are you sure that you want to delete this voting round? You can't undo this."
   />
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button on:click={() => submit()} variant="destructive" icon={Wallet}>Confirm in wallet</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button onclick={() => submit()} variant="destructive" icon={Wallet}>Confirm in wallet</Button>
+  {/snippet}
 </StepLayout>

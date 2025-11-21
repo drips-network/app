@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const RPGF_APPLICATION_SUBMISSION_DETAILS_CARD_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     fragment RpgfApplicationSubmissionDetailsCardProject on Project {
@@ -19,9 +19,13 @@
   import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
   import type { RpgfApplicationSubmissionDetailsCardProjectFragment } from './__generated__/gql.generated';
 
-  export let applicationVersion: ApplicationVersion;
-  export let submitterWalletAddress: string;
-  export let project: RpgfApplicationSubmissionDetailsCardProjectFragment;
+  interface Props {
+    applicationVersion: ApplicationVersion;
+    submitterWalletAddress: string;
+    project: RpgfApplicationSubmissionDetailsCardProjectFragment;
+  }
+
+  let { applicationVersion, submitterWalletAddress, project }: Props = $props();
 </script>
 
 <RpgfApplicationDetailsCard title="Details" key="details">

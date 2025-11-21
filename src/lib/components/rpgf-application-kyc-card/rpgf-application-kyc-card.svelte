@@ -15,14 +15,25 @@
   import OrDivider from '../rpgf-results-card/components/or-divider.svelte';
   import Stepper from '../stepper/stepper.svelte';
 
-  export let kycRequest: KycRequest | null;
-  export let roundKycConfig: KycConfig;
-  export let applicationId: string;
-  export let roundId: string;
-  export let isOwnApplication: boolean;
-  export let isRoundAdmin: boolean;
+  interface Props {
+    kycRequest: KycRequest | null;
+    roundKycConfig: KycConfig;
+    applicationId: string;
+    roundId: string;
+    isOwnApplication: boolean;
+    isRoundAdmin: boolean;
+  }
 
-  let refreshing = false;
+  let {
+    kycRequest,
+    roundKycConfig,
+    applicationId,
+    roundId,
+    isOwnApplication,
+    isRoundAdmin,
+  }: Props = $props();
+
+  let refreshing = $state(false);
   async function handleRefreshKyc() {
     if (refreshing) return;
 
@@ -63,17 +74,17 @@
 </script>
 
 <RpgfApplicationDetailsCard title="Identity verification" key="kyc">
-  <svelte:fragment slot="right">
+  {#snippet right()}
     <Button
       variant="ghost"
       ariaLabel="Refresh"
       icon={Refresh}
       loading={refreshing}
-      on:click={handleRefreshKyc}
+      onclick={handleRefreshKyc}
     >
       Refresh status
     </Button>
-  </svelte:fragment>
+  {/snippet}
 
   {#if !isOwnApplication && isRoundAdmin}
     <div class="fields">
@@ -143,7 +154,7 @@
         <Button
           size="large"
           variant="primary"
-          on:click={() => modal.show(Stepper, undefined, createRpgfKycRequestFlow(applicationId))}
+          onclick={() => modal.show(Stepper, undefined, createRpgfKycRequestFlow(applicationId))}
           icon={ArrowRight}
         >
           Begin verification
@@ -153,7 +164,7 @@
 
         <Button
           size="large"
-          on:click={() =>
+          onclick={() =>
             modal.show(Stepper, undefined, linkKycRequestToApplicationFlow(applicationId, roundId))}
         >
           Link existing KYC process

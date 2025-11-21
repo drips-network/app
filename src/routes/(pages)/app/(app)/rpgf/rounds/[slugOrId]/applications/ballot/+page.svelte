@@ -6,12 +6,14 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined.js';
   import ThreePaneLayout from '../shared/three-pane-layout.svelte';
 
-  export let data;
-  $: ballotStore = data.ballot;
+  let { data } = $props();
+  let ballotStore = $derived(data.ballot);
 
-  $: selectedApplications = mapFilterUndefined(Object.keys($ballotStore), (id) => {
-    return data.allApplications.find((app) => app.id === id);
-  });
+  let selectedApplications = $derived(
+    mapFilterUndefined(Object.keys($ballotStore), (id) => {
+      return data.allApplications.find((app) => app.id === id);
+    }),
+  );
 </script>
 
 <HeadMeta title="Your ballot" />

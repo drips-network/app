@@ -1,7 +1,7 @@
 import { makeStep } from '$lib/components/stepper/types';
 import type configureProjectSupportButtonSteps from '../configure-project-support-button/configure-project-support-button-steps';
 import ShareUrl from './steps/share-url.svelte';
-import { type ComponentType } from 'svelte';
+import { type Component } from 'svelte';
 
 type ShareUrlProps = {
   url: string;
@@ -13,7 +13,7 @@ type ShareUrlProps = {
 
 export type ShareOption = {
   name: string;
-  icon: ComponentType;
+  icon: Component;
   href?: string;
   onClick?: (this: ShareOption) => undefined;
 };

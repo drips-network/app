@@ -1,17 +1,18 @@
 import { derived, get, writable } from 'svelte/store';
-import type { ComponentType, SvelteComponent } from 'svelte';
+import type { Component, ComponentProps } from 'svelte';
 import scroll from '../scroll';
 import { browser } from '$app/environment';
 
 type OnHide = () => void;
 
-type ModalLayout = {
-  modalComponent: ComponentType;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ModalLayout<T extends Component<any>> = {
+  modalComponent: T;
   onHide: OnHide;
-  modalComponentProps: { [key: string]: unknown };
+  modalComponentProps: ComponentProps<T>;
 };
 
-const overlayStore = writable<ModalLayout | null>(null);
+const overlayStore = writable<ModalLayout<Component> | null>(null);
 
 const hideable = writable<boolean>(true);
 const focusTrapped = writable<boolean>(true);
@@ -93,22 +94,17 @@ warnOnNavigate.subscribe((value) => {
   }
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Constructor<T> = new (...args: any[]) => T;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Props<T> = T extends SvelteComponent<infer P, any, any> ? P : never;
-export type PropsOrUndefined<T> = Props<T> extends Record<string, never> ? undefined : Props<T>;
-
 /**
  * Display a modal with the given component.
  * @param modalComponent The component to display in the modal.
  * @param onHide An optional function that gets triggered when the modal is closed.
  * @param modalComponentProps Props for the modal component.
  */
-export const show = <T extends SvelteComponent>(
-  modalComponent: Constructor<T>,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const show = <T extends Component<any>>(
+  modalComponent: T,
   onHide: OnHide = doNothing,
-  modalComponentProps: Props<T>,
+  modalComponentProps: ComponentProps<T>,
   warnOnNavigate = true,
 ): void => {
   scroll.lock();

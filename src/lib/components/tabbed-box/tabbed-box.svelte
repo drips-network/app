@@ -1,37 +1,51 @@
 <script lang="ts">
   import SegmentedControl from '../segmented-control/segmented-control.svelte';
 
-  export let tabs = {
-    1: 'Emoji',
-    2: 'Custom image',
-  };
+  interface Props {
+    tabs?: Record<1 | 2, string>;
+    ariaLabel: string;
+    border?: boolean;
+    activeTab?: 'tab1' | 'tab2';
+    tab1?: import('svelte').Snippet;
+    tab2?: import('svelte').Snippet;
+    onTabChange?: (tab: 'tab1' | 'tab2') => void;
+  }
 
-  export let ariaLabel: string;
-  export let border = false;
-
-  export let activeTab = 'tab-1';
+  let {
+    tabs = {
+      1: 'Emoji',
+      2: 'Custom image',
+    },
+    ariaLabel,
+    border = false,
+    activeTab = $bindable('tab1'),
+    tab1,
+    tab2,
+    onTabChange = undefined,
+  }: Props = $props();
 </script>
 
 <div class="tabbed-box whitespace-nowrap relative" class:with-border={border}>
   <div class="tabs">
     <SegmentedControl
+      {onTabChange}
       bind:active={activeTab}
       itemRole="tab"
       containerRole="tablist"
       {ariaLabel}
       options={[
-        { title: tabs[1], value: 'tab-1' },
-        { title: tabs[2], value: 'tab-2' },
+        { title: tabs[1], value: 'tab1' },
+        { title: tabs[2], value: 'tab2' },
       ]}
     />
   </div>
-  {#if activeTab === 'tab-1'}
+  {#if activeTab === 'tab1'}
     <div role="tabpanel">
-      <slot name="tab-1" />
+      {@render tab1?.()}
     </div>
-  {:else if activeTab === 'tab-2'}
+  {:else if activeTab === 'tab2'}
     <div role="tabpanel">
-      <slot name="tab-2" />
+      {@render tab2?.()}
     </div>
   {/if}
 </div>

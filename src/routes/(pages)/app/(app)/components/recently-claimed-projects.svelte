@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DEFAULT_EXPLORE_PAGE_FEATURED_PROJECT_FRAGMENT = gql`
     ${PROJECT_CARD_FRAGMENT}
     fragment DefaultExplorePageFeaturedProject on Project {
@@ -27,13 +27,19 @@
   import { gql } from 'graphql-request';
   import ProjectsGrid from './projects-grid.svelte';
 
-  export let projects: DefaultExplorePageFeaturedProjectFragment[];
+  interface Props {
+    projects: DefaultExplorePageFeaturedProjectFragment[];
+  }
 
-  $: projectsWithoutJasonTests = projects.filter(
-    (p) => !p.source.repoName.includes('drips-test-repo'),
+  let { projects }: Props = $props();
+
+  let projectsWithoutJasonTests = $derived(
+    projects.filter((p) => !p.source.repoName.includes('drips-test-repo')),
   );
 
-  $: recentlyClaimedProjects = projectsWithoutJasonTests.filter((p) => p.isVisible).slice(0, 4);
+  let recentlyClaimedProjects = $derived(
+    projectsWithoutJasonTests.filter((p) => p.isVisible).slice(0, 4),
+  );
 </script>
 
 {#if recentlyClaimedProjects.length > 0}

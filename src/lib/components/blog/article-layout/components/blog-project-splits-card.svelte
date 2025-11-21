@@ -17,12 +17,16 @@
   import isClaimed from '$lib/utils/project/is-claimed';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
 
-  export let projectId: string;
+  interface Props {
+    projectId: string;
+  }
 
-  let project: NonNullable<BlogProjectQuery['projectById']> | undefined = undefined;
+  let { projectId }: Props = $props();
+
+  let project: NonNullable<BlogProjectQuery['projectById']> | undefined = $state(undefined);
   let projectChainData:
     | NonNullable<BlogProjectQuery['projectById']>['chainData'][number]
-    | undefined = undefined;
+    | undefined = $state(undefined);
 
   onMount(async () => {
     await fiatEstimates.start();

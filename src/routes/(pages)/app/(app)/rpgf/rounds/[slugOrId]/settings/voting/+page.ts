@@ -7,5 +7,5 @@ export const load = async ({ parent, fetch }) => {
 
   return {
     roundVoters,
-  }
+  };
 };

@@ -13,11 +13,15 @@
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
 
-  export let ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
-  export let roundId: string;
-  export let round: Round;
+  interface Props {
+    ballot: Writable<InProgressBallot> & {
+      clear: () => void;
+    };
+    roundId: string;
+    round: Round;
+  }
+
+  let { ballot, roundId, round }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
   function handleConfirm() {
@@ -46,8 +50,8 @@
     When you confirm, a wallet signature request will be triggered. Please review your ballot
     details and confirm.
   </AnnotationBox>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-    <Button icon={Wallet} on:click={handleConfirm} variant="primary">Yes, cast my ballot</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
+    <Button icon={Wallet} onclick={handleConfirm} variant="primary">Yes, cast my ballot</Button>
+  {/snippet}
 </StepLayout>

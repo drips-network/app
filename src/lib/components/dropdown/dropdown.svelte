@@ -12,24 +12,35 @@
     iconUrl?: string;
   }
 
-  export let disabled = false;
-  export let value: string | undefined;
-  export let toggleValue = false;
-  export let noBorder = false;
-  export let options: Option[];
-  export let dropdownWidth: { pixels: number; align: 'left' | 'right' } | undefined = undefined;
-  export let toggle: { label: string } | undefined = undefined;
+  interface Props {
+    disabled?: boolean;
+    value: string | undefined;
+    toggleValue?: boolean;
+    noBorder?: boolean;
+    options: Option[];
+    dropdownWidth?: { pixels: number; align: 'left' | 'right' } | undefined;
+    toggle?: { label: string } | undefined;
+  }
 
-  $: selectedOptionIndex = options.findIndex((o) => o.value === value);
-  let selectedOption: Option | undefined;
-  $: selectedOption = options[selectedOptionIndex];
+  let {
+    disabled = false,
+    value = $bindable(),
+    toggleValue = $bindable(false),
+    noBorder = false,
+    options,
+    dropdownWidth = undefined,
+    toggle = undefined,
+  }: Props = $props();
+
+  let selectedOptionIndex = $derived(options.findIndex((o) => o.value === value));
+  let selectedOption: Option | undefined = $derived(options[selectedOptionIndex]);
 
   let wrapperElem: HTMLDivElement;
   let dropdownElem: HTMLDivElement;
-  let optionsElem: HTMLDivElement;
+  let optionsElem = $state<HTMLDivElement | undefined>(undefined);
   let optionElems: HTMLDivElement[] = [];
 
-  let expanded = false;
+  let expanded = $state(false);
 
   async function setExpanded(val: boolean) {
     modal.setFocusTrapped(!val);
@@ -63,6 +74,8 @@
   }
 
   async function handleWindowKeydown(e: KeyboardEvent) {
+    if (!optionsElem) return;
+
     if (e.key === 'Escape' && expanded) {
       e.preventDefault();
       setExpanded(false);
@@ -85,7 +98,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleWindowKeydown} on:click={handleWindowClick} />
+<svelte:window onkeydown={handleWindowKeydown} onclick={handleWindowClick} />
 
 <div class="wrapper typo-text" bind:this={wrapperElem}>
   <div
@@ -97,8 +110,8 @@
     class:disabled
     tabindex={disabled ? -1 : 0}
     bind:this={dropdownElem}
-    on:keydown={disabled ? undefined : handleDropdownKeydown}
-    on:click={disabled ? undefined : handleWrapperClick}
+    onkeydown={disabled ? undefined : handleDropdownKeydown}
+    onclick={disabled ? undefined : handleWrapperClick}
     data-testid="dropdown"
   >
     {#if selectedOption}
@@ -149,8 +162,8 @@
           aria-selected={selectedOptionIndex === index}
           tabindex="0"
           data-testid="option-{option.value}"
-          on:click={() => select(option)}
-          on:keydown={handleOptionKeydown}
+          onclick={() => select(option)}
+          onkeydown={handleOptionKeydown}
           bind:this={optionElems[index]}
         >
           {#if option.iconUrl}<img src={option.iconUrl} alt="{option.title} icon" />{/if}

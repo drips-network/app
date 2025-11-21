@@ -10,11 +10,11 @@
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import type { ComponentProps } from 'svelte';
 
-  export let data;
+  let { data } = $props();
 
   interface HistoryEntryRow {
     timestamp: string;
-    applicationBadge: ComponentProps<RpgfApplicationBadge>;
+    applicationBadge: ComponentProps<typeof RpgfApplicationBadge>;
   }
 
   const historyTableColumns: ColumnDef<HistoryEntryRow>[] = [
@@ -34,23 +34,25 @@
     },
   ];
 
-  $: historyTableData = data.history.map((version) => ({
-    timestamp: formatDate(version.createdAt),
-    applicationBadge: {
-      application: {
-        id: data.application.id,
-        projectName: version.projectName,
-        dripsProjectDataSnapshot: version.dripsProjectDataSnapshot,
-        allocation: null,
+  let historyTableData = $derived(
+    data.history.map((version) => ({
+      timestamp: formatDate(version.createdAt),
+      applicationBadge: {
+        application: {
+          id: data.application.id,
+          projectName: version.projectName,
+          dripsProjectDataSnapshot: version.dripsProjectDataSnapshot,
+          allocation: null,
+        },
+        hideState: true,
+        excludeFromViewTransition: true,
+        size: 'small' as ComponentProps<typeof RpgfApplicationBadge>['size'],
       },
-      hideState: true,
-      excludeFromViewTransition: true,
-      size: 'small' as ComponentProps<RpgfApplicationBadge>['size'],
-    },
-  }));
+    })),
+  );
 
-  function handleRowClick(e: CustomEvent<RowClickEventPayload>) {
-    const version = data.history[e.detail.rowIndex];
+  function handleRowClick({ rowIndex }: RowClickEventPayload) {
+    const version = data.history[rowIndex];
 
     goto(
       `/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}/history/${version.id}${$page.url.search}`,
@@ -72,6 +74,6 @@
       getCoreRowModel: getCoreRowModel(),
     }}
     isRowClickable={true}
-    on:rowClick={handleRowClick}
+    onRowClick={handleRowClick}
   />
 </PaddedHorizontalScroll>

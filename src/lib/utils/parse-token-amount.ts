@@ -6,9 +6,9 @@ import { parseUnits } from 'ethers';
  * @returns The bigint value of the parsed input at the given decimal precision, or undefined
  * if parsing failed.
  */
-export default function (input: string, decimals: number): bigint | undefined {
+export default function (input: string | number, decimals: number): bigint | undefined {
   try {
-    return parseUnits(input, decimals);
+    return parseUnits(String(input), decimals);
   } catch {
     return undefined;
   }

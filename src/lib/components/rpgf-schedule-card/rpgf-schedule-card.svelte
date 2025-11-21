@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onMount } from 'svelte';
   import ScheduleItem from './components/schedule-item.svelte';
   import { tweened } from 'svelte/motion';
@@ -7,48 +9,15 @@
   import { browser } from '$app/environment';
   import PulsatingCircle from '../pulsating-circle/pulsating-circle.svelte';
 
-  export let round: Round;
-
-  $: schedule =
-    (round.applicationPeriodStart &&
-      round.applicationPeriodEnd &&
-      round.votingPeriodStart &&
-      round.votingPeriodEnd &&
-      round.resultsPeriodStart && {
-        applicationPeriodStart: new Date(round.applicationPeriodStart),
-        applicationPeriodEnd: new Date(round.applicationPeriodEnd),
-        votingPeriodStart: new Date(round.votingPeriodStart),
-        votingPeriodEnd: new Date(round.votingPeriodEnd),
-        resultsPeriodStart: new Date(round.resultsPeriodStart),
-      }) ||
-    null;
-
-  $: timeline = schedule
-    ? [
-        { date: schedule.applicationPeriodStart, title: 'Registration' },
-        { date: schedule.applicationPeriodEnd, title: 'Review' },
-        { date: schedule.votingPeriodStart, title: 'Voting' },
-        { date: schedule.votingPeriodEnd, title: 'Tallying' },
-        { date: schedule.resultsPeriodStart, title: 'Distribution' },
-      ]
-    : null;
-
-  let activeItemIndex: number;
-  $: {
-    if (!timeline) {
-      activeItemIndex = -1;
-    } else {
-      const nextItem = timeline.findIndex((item) => new Date(item.date) > now);
-      if (nextItem === -1) {
-        activeItemIndex = timeline.length - 1;
-      } else {
-        activeItemIndex = nextItem - 1;
-      }
-    }
+  interface Props {
+    round: Round;
   }
 
-  let updatedOnce = false;
-  let now = new Date();
+  let { round }: Props = $props();
+  let activeItemIndex: number | undefined = $state();
+
+  let updatedOnce = $state(false);
+  let now = $state(new Date());
   let updateInterval: NodeJS.Timeout;
   onMount(() => {
     updatedOnce = false;
@@ -62,15 +31,19 @@
     };
   });
 
-  let timeItems: HTMLTimeElement[] = [];
-  let timelineElem: HTMLDivElement;
-  let timelineCircle: HTMLDivElement;
+  let timeItems: HTMLTimeElement[] = $state([]);
+  let timelineElem: HTMLDivElement | undefined = $state();
+  let timelineCircle: HTMLDivElement | undefined = $state();
   let timelineCircleOffsetY = tweened(0, {
     duration: 1500,
     easing: expoOut,
   });
 
   function updateTimeline() {
+    if (!timelineElem || activeItemIndex === undefined) {
+      return;
+    }
+
     updatedOnce = true;
 
     const activeItem = timeItems[activeItemIndex];
@@ -83,10 +56,47 @@
     const offsetY = activeItemTop - timelineTop + 4;
     timelineCircleOffsetY.set(offsetY);
   }
-  $: {
+  let schedule = $derived(
+    (round.applicationPeriodStart &&
+      round.applicationPeriodEnd &&
+      round.votingPeriodStart &&
+      round.votingPeriodEnd &&
+      round.resultsPeriodStart && {
+        applicationPeriodStart: new Date(round.applicationPeriodStart),
+        applicationPeriodEnd: new Date(round.applicationPeriodEnd),
+        votingPeriodStart: new Date(round.votingPeriodStart),
+        votingPeriodEnd: new Date(round.votingPeriodEnd),
+        resultsPeriodStart: new Date(round.resultsPeriodStart),
+      }) ||
+      null,
+  );
+  let timeline = $derived(
+    schedule
+      ? [
+          { date: schedule.applicationPeriodStart, title: 'Registration' },
+          { date: schedule.applicationPeriodEnd, title: 'Review' },
+          { date: schedule.votingPeriodStart, title: 'Voting' },
+          { date: schedule.votingPeriodEnd, title: 'Tallying' },
+          { date: schedule.resultsPeriodStart, title: 'Distribution' },
+        ]
+      : null,
+  );
+  run(() => {
+    if (!timeline) {
+      activeItemIndex = -1;
+    } else {
+      const nextItem = timeline.findIndex((item) => new Date(item.date) > now);
+      if (nextItem === -1) {
+        activeItemIndex = timeline.length - 1;
+      } else {
+        activeItemIndex = nextItem - 1;
+      }
+    }
+  });
+  run(() => {
     now;
     updateTimeline();
-  }
+  });
 </script>
 
 {#if timeline && schedule && browser}
@@ -103,7 +113,7 @@
       </div>
     </div>
     <div class="items">
-      {#if now < schedule.applicationPeriodStart}<div class="spacer" />{/if}
+      {#if now < schedule.applicationPeriodStart}<div class="spacer"></div>{/if}
       {#each timeline as { title, date }, i}
         <ScheduleItem
           bind:elem={timeItems[i]}
@@ -111,7 +121,7 @@
           {date}
           isActive={i === activeItemIndex}
           expanded={i === activeItemIndex}
-          isDone={i < activeItemIndex}
+          isDone={activeItemIndex === undefined ? false : i < activeItemIndex}
           until={timeline[i + 1]?.date}
           onExpandChange={() => updateTimeline()}
           fuzzy={title === 'Distribution'}
@@ -132,7 +142,7 @@
         </ScheduleItem>
       {/each}
       <div class="timeline" bind:this={timelineElem}>
-        <div class="line" />
+        <div class="line"></div>
         <div class="circle-wrapper" style:transform="translateY({$timelineCircleOffsetY}px)">
           <PulsatingCircle visible={updatedOnce} bind:element={timelineCircle} />
         </div>

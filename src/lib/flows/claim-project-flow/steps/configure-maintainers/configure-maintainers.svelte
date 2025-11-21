@@ -22,11 +22,15 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let formValid: boolean;
+  let { context }: Props = $props();
 
-  $: dependencyKeys = Object.keys($context.dependencySplits.items);
+  let formValid = $state<boolean>(false);
+
+  let dependencyKeys = $derived(Object.keys($context.dependencySplits.items));
 
   function handleImportCSV() {
     dispatch(
@@ -88,16 +92,17 @@
       allowDripLists={false}
       blockedAccountIds={dependencyKeys}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {#snippet action()}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={goForward}
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={goForward}
       >Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

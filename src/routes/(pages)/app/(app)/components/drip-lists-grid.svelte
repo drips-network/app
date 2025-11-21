@@ -2,8 +2,12 @@
   import DripListCard from '$lib/components/drip-list-card/drip-list-card.svelte';
   import type { ComponentProps } from 'svelte';
 
-  export let dripLists: ComponentProps<DripListCard>['data']['dripList'][];
-  export let cardVariant: ComponentProps<DripListCard>['variant'] = 'partial';
+  interface Props {
+    dripLists: ComponentProps<typeof DripListCard>['data']['dripList'][];
+    cardVariant?: ComponentProps<typeof DripListCard>['variant'];
+  }
+
+  let { dripLists, cardVariant = 'partial' }: Props = $props();
 </script>
 
 <div class="drip-list-cards-grid" class:minimal-grid={cardVariant === 'minimal'}>

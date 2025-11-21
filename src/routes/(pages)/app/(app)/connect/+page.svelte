@@ -1,17 +1,23 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import type { PageData } from './$types';
   import DisconnectedState from '$lib/components/section-skeleton/disconnected-state.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 
   const { backTo, requireRpgfSignIn } = data;
 
-  let emptyStateText: string;
-  let headline: string | undefined = undefined;
-  let emoji: string | undefined = undefined;
-  $: {
+  let emptyStateText: string | undefined = $state();
+  let headline: string | undefined = $state(undefined);
+  let emoji: string | undefined = $state(undefined);
+  run(() => {
     switch (true) {
       case requireRpgfSignIn && $walletStore.connected:
         emoji = '🔐';
@@ -38,7 +44,7 @@
         headline = 'No wallet connected';
         emptyStateText = 'Connect a wallet to continue.';
     }
-  }
+  });
 </script>
 
 <HeadMeta title="Drips" />

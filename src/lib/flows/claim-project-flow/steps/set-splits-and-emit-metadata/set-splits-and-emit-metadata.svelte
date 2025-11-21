@@ -41,8 +41,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  $: projectSource = $context.project?.source ?? unreachable();
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
+  let projectSource = $derived($context.project?.source ?? unreachable());
 
   async function checkProjectInExpectedStateForClaiming() {
     const checkProjectVerificationStatusQuery = gql`

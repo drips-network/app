@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -17,13 +19,16 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let customDataset: CustomDataset;
+  interface Props {
+    customDataset: CustomDataset;
+  }
 
-  let valid = false;
-  $: valid = csvData.length > 0;
+  let { customDataset }: Props = $props();
 
-  let csvData: string = '';
-  let loadedFile: File | null = null;
+  let valid = $state(false);
+
+  let csvData: string = $state('');
+  let loadedFile: File | null = $state(null);
 
   let uploading = false;
 
@@ -65,6 +70,9 @@
 
     reader.readAsText(e.detail.file);
   }
+  run(() => {
+    valid = csvData.length > 0;
+  });
 </script>
 
 <StandaloneFlowStepLayout
@@ -81,7 +89,7 @@
     </FormField>
 
     <FormField title="CSV example" type="div">
-      <svelte:fragment slot="action">
+      {#snippet action()}
         <a
           class="typo-text typo-link"
           href="https://docs.drips.network/rpgf/advanced/custom-datasets"
@@ -90,7 +98,7 @@
         >
           Full documentation
         </a>
-      </svelte:fragment>
+      {/snippet}
 
       <PaddedHorizontalScroll>
         <CsvExample
@@ -121,7 +129,7 @@
             circular
             icon={CrossCircle}
             ariaLabel="Remove loaded file"
-            on:click={() => {
+            onclick={() => {
               loadedFile = null;
               csvData = '';
             }}
@@ -137,14 +145,14 @@
     </AnnotationBox>
   {/if}
 
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button
       variant="primary"
       disabled={valid === false}
       type="submit"
       icon={Sharrow}
       loading={uploading}
-      on:click={handleUpload}>Upload data</Button
+      onclick={handleUpload}>Upload data</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

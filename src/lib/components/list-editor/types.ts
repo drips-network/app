@@ -8,7 +8,7 @@ import type {
   ListEditorSubListFragment,
   ListEditorOrcidFragment,
 } from './__generated__/gql.generated';
-import type { ComponentType } from 'svelte';
+import type { Component } from 'svelte';
 import { ECOSYSTEM_BADGE_FRAGMENT } from '../ecosystem-badge/ecosystem-badge.svelte';
 import { ORCID_BADGE_FRAGMENT } from '../../../routes/(pages)/app/(app)/orcids/[orcidId]/components/orcid-badge.svelte';
 import type { AccountId } from '$lib/utils/common-types';
@@ -54,7 +54,8 @@ export const LIST_EDITOR_ORCID_FRAGMENT = gql`
 
 type BaseItem = {
   rightComponent?: {
-    component: ComponentType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: Component<any>;
     props: Record<string, unknown>;
   };
 };

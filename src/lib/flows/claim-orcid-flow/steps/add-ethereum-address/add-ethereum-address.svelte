@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ADD_ETHEREUM_ADDRESS_STEP_ORCID_FRAGMENT = gql`
     fragment AddEthereumAddressStepOrcid on OrcidLinkedIdentity {
       orcid
@@ -26,19 +26,31 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: network = $walletStore.network.name
-    ? $walletStore.network.name === 'homestead'
-      ? 'ethereum'
-      : $walletStore.network.name
-    : unreachable();
-  $: link = `http://0.0.0.0/?${getNetworkLinkName()}=${$walletStore.address}&orcid=${$context.claimableId}`;
-  $: editing = !!$context.claimableProof;
-  $: description = editing
-    ? `To verify you are the owner of this ORCID iD, please add or edit the funding URL to the Websites & social links section of your ORCID profile.`
-    : `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`;
-  $: checkboxLabel = editing ? 'I added or edited the URL.' : 'I added this to my ORCID profile';
+  let { context }: Props = $props();
+
+  let network = $derived(
+    $walletStore.network.name
+      ? $walletStore.network.name === 'homestead'
+        ? 'ethereum'
+        : $walletStore.network.name
+      : unreachable(),
+  );
+  let link = $derived(
+    `http://0.0.0.0/?${getNetworkLinkName()}=${$walletStore.address}&orcid=${$context.claimableId}`,
+  );
+  let editing = $derived(!!$context.claimableProof);
+  let description = $derived(
+    editing
+      ? `To verify you are the owner of this ORCID iD, please add or edit the funding URL to the Websites & social links section of your ORCID profile.`
+      : `To verify you are the owner of this ORCID iD, please add the funding URL to the Websites & social links section of your ORCID profile.`,
+  );
+  let checkboxLabel = $derived(
+    editing ? 'I added or edited the URL.' : 'I added this to my ORCID profile',
+  );
 
   onMount(() => {
     $context.linkedToClaimable = false;
@@ -99,8 +111,8 @@
     });
   }
 
-  let checked = false;
-  $: formValid = $walletStore.connected && checked;
+  let checked = $state(false);
+  let formValid = $derived($walletStore.connected && checked);
 </script>
 
 <StandaloneFlowStepLayout headline="Verify ownership" {description}>
@@ -109,12 +121,12 @@
   <p>Then add the link</p>
   <CodeBox path="Link" code={link} wrap />
   <Checkbox bind:checked label={checkboxLabel} />
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" on:click={verify}
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button disabled={!formValid} icon={VerifiedIcon} variant="primary" onclick={verify}
       >Verify now</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

@@ -59,8 +59,7 @@
   {:else}
     <h4>Congratulations!</h4>
     <p>Youʼve successfully claimed your ORCID.</p>
-    <Button variant="primary" icon={ArrowBoxUpRight} on:click={viewOrcid}>View ORCID profile</Button
-    >
+    <Button variant="primary" icon={ArrowBoxUpRight} onclick={viewOrcid}>View ORCID profile</Button>
   {/if}
 </div>
 

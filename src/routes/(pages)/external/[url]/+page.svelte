@@ -6,8 +6,12 @@
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
   import type { PageData } from './$types';
 
-  export let data: PageData;
-  $: url = data.url;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
+  let url = $derived(data.url);
 </script>
 
 <HeadMeta title="External Link" />

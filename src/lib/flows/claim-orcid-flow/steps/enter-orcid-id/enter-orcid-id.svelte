@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
   export const ENTER_GIT_URL_STEP_ORCID_FRAGMENT = gql`
     ${UNCLAIMED_ORCID_CARD_FRAGMENT}
@@ -46,14 +46,18 @@
   import isValidOrcidId from '$lib/utils/orcids/is-valid-orcid-id';
   import isClaimed from '$lib/utils/orcids/is-claimed';
 
-  export let context: Writable<State>;
-  export let orcidId: string | undefined = undefined;
+  interface Props {
+    context: Writable<State>;
+    orcidId?: string | undefined;
+  }
+
+  let { context, orcidId = undefined }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  let validationState: TextInputValidationState = { type: 'unvalidated' };
+  let validationState = $state<TextInputValidationState>({ type: 'unvalidated' });
 
-  $: formValid = validationState.type === 'valid';
+  let formValid = $derived(validationState.type === 'valid');
 
   const { searchParams } = $page.url;
   const orcidToAdd = orcidId ?? searchParams.get('orcidId') ?? undefined;
@@ -157,10 +161,11 @@
     }
   }
 
-  $: inputSubmittable =
+  let inputSubmittable = $derived(
     isValidOrcidId($context.claimableId) &&
-    validationState.type !== 'valid' &&
-    validationState.type !== 'pending';
+      validationState.type !== 'valid' &&
+      validationState.type !== 'pending',
+  );
 
   async function onPaste() {
     // need to wait some time for value to be available ¯\_(ツ)_/¯
@@ -193,9 +198,9 @@
     disabled={validationState.type === 'valid' || validationState.type === 'pending'}
     {validationState}
     showClearButton={$context.claimableId.length > 0 && validationState.type !== 'pending'}
-    on:clear={clearOrcid}
-    on:keydown={(e) => e.key === 'Enter' && submitInput()}
-    on:paste={onPaste}
+    onclear={clearOrcid}
+    onkeydown={(e) => e.key === 'Enter' && submitInput()}
+    onpaste={onPaste}
   />
   {#if $context.claimableAccount && validationState.type === 'valid'}
     <UnclaimedOrcidCard
@@ -203,19 +208,19 @@
       claimableTokensKey="Claimable tokens"
     />
   {/if}
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if formValid}
-      <Button icon={ArrowRightIcon} variant="primary" on:click={goForward}>Continue</Button>
+      <Button icon={ArrowRightIcon} variant="primary" onclick={goForward}>Continue</Button>
     {:else}
       <Button
         disabled={!inputSubmittable}
         icon={MagnifyingGlass}
         variant="primary"
-        on:click={() => submitInput()}>Search</Button
+        onclick={() => submitInput()}>Search</Button
       >
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
 </StandaloneFlowStepLayout>

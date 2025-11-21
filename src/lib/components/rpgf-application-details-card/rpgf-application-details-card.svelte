@@ -7,8 +7,14 @@
   import { fly } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
 
-  export let key: string;
-  export let title: string;
+  interface Props {
+    key: string;
+    title: string;
+    right?: import('svelte').Snippet;
+    children?: import('svelte').Snippet;
+  }
+
+  let { key, title, right, children }: Props = $props();
 
   const isOpen = storedWritable(
     `rpgf-application-details-card-${key}-open`,
@@ -17,7 +23,7 @@
     !browser,
   );
 
-  $: hasRightComponent = $$slots.right;
+  let hasRightComponent = $derived(right);
 </script>
 
 <div class="rpgf-application-details-card">
@@ -27,14 +33,14 @@
         class="expand-button"
         aria-label="Expand section"
         class:expanded={$isOpen}
-        on:click={() => ($isOpen = !$isOpen)}
+        onclick={() => ($isOpen = !$isOpen)}
       >
         <ChevronDown style="fill: var(--color-foreground); height: 1.5rem; width: 1.5rem;" />
       </button>
 
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <h5 style:cursor="pointer" on:click={() => ($isOpen = !$isOpen)}>{title}</h5>
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <h5 style:cursor="pointer" onclick={() => ($isOpen = !$isOpen)}>{title}</h5>
     </div>
 
     {#if $isOpen && hasRightComponent}
@@ -43,14 +49,14 @@
         out:fly={{ y: -10, duration: 300, easing: cubicInOut }}
         class="right"
       >
-        <slot name="right" />
+        {@render right?.()}
       </div>
     {/if}
   </div>
 
   <TransitionedHeight negativeMarginWhileCollapsed="-1rem" collapsed={!$isOpen}>
     <div class="content">
-      <slot />
+      {@render children?.()}
     </div>
   </TransitionedHeight>
 </div>

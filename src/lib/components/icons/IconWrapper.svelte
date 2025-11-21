@@ -3,10 +3,7 @@
   export let boxDimension: number = 24;
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <svg
-  on:click
-  on:keydown
   width={boxDimension}
   height={boxDimension}
   style={`flex-shrink: 0; fill: var(--color-foreground-level-5); ${style ? style : ''}`}

@@ -19,24 +19,31 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Hackathons</svelte:fragment>
-  <svelte:fragment slot="headline">Simplify voting & reward payouts</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet usecase_badge()}
+    Hackathons
+  {/snippet}
+  {#snippet headline()}
+    Simplify voting & reward payouts
+  {/snippet}
+  {#snippet description()}
     Hackathon voting, choosing winners, and distributing prizes can quickly turn into a tangle of
     spreadsheets, DMs, and manual transactions. With Drips, you can simplify all of that and spend
     less time on the logistics.
-  </svelte:fragment>
+  {/snippet}
 </SolutionHeader>
 
 <SolutionCard>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsHackathonVoting />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Run votes and payouts in one seamless flow</svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Run votes and payouts in one seamless flow
+  {/snippet}
+  {#snippet description()}
     Vote on winners, distribute prizes automatically, and keep everything transparent and on-chain.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+
+  {#snippet line_items()}
     <SolutionLineItem icon={Proposals}>
       Let participants or judges vote on the best projects
     </SolutionLineItem>
@@ -46,29 +53,31 @@
     <SolutionLineItem icon={Transactions}>
       Automatically distribute funds to all winners in a single transaction
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionInterstitial>
-  <svelte:fragment slot="headline">Get started with your own hackathon</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet headline()}
+    Get started with your own hackathon
+  {/snippet}
+  {#snippet description()}
     Drips is already helping communities and ecosystems run lighter, faster funding rounds without
     the usual hassle. Whether you’re hosting a small weekend sprint or a global event, it’s a simple
     way to reward contributions with less admin.
-  </svelte:fragment>
+  {/snippet}
 </SolutionInterstitial>
 
 <SolutionCard reverse>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsHackathonLeaderboard />
-  </svelte:fragment>
-  <svelte:fragment slot="headline"
-    >Everything you need to get your hackathon started</svelte:fragment
-  >
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Everything you need to get your hackathon started
+  {/snippet}
+  {#snippet description()}
     Automate prize distribution, scale funding easily, and keep every payout transparent.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Proposals}>
       Run a distributed off-chain vote with any number of Ethereum addresses
     </SolutionLineItem>
@@ -78,5 +87,5 @@
     <SolutionLineItem icon={GnosisSafe}>
       Fund hackathon winners using any ERC-20 from an EOA or Safe Multisig
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>

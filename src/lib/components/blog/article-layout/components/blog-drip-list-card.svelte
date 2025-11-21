@@ -15,9 +15,13 @@
   import { fade } from 'svelte/transition';
   import network from '$lib/stores/wallet/network';
 
-  export let dripListId: string;
+  interface Props {
+    dripListId: string;
+  }
 
-  let dripList: BlogDripListQuery['dripList'] | undefined = undefined;
+  let { dripListId }: Props = $props();
+
+  let dripList: BlogDripListQuery['dripList'] | undefined = $state(undefined);
 
   onMount(async () => {
     await fiatEstimates.start();

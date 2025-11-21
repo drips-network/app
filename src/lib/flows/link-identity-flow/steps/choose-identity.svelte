@@ -33,16 +33,16 @@
 
 <StepLayout>
   <StepHeader {headline} {description}>
-    <svelte:fragment slot="emoji">
+    {#snippet emojiSlot()}
       <div class="large-illustration">
         <div class="large-illustration-inner">
           <MultiChain></MultiChain>
         </div>
       </div>
-    </svelte:fragment>
+    {/snippet}
   </StepHeader>
   {#if network.orcids}
-    <Button variant="muted" size="large" on:click={launchSpecificIdentityFlow}>
+    <Button variant="muted" size="large" onclick={launchSpecificIdentityFlow}>
       <Orcid style="fill: var(--color-foreground); width: 2rem;" />ORCID</Button
     >
   {:else}

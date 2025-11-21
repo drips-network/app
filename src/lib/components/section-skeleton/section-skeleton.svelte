@@ -9,15 +9,7 @@
   import type { ComponentProps } from 'svelte';
   import Button from '../button/button.svelte';
 
-  export let loaded = false;
-  export let empty = false;
-  export let disconnected = false;
-  export let error = false;
-  export let placeholderOutline = true;
-  export let horizontalScroll = true;
-  export let overflowAction: (ComponentProps<Button> & { label: string }) | undefined = undefined;
-
-  let highlit = false;
+  let highlit = $state(false);
 
   export const highlightSection = () => {
     highlit = true;
@@ -26,19 +18,45 @@
     }, 500);
   };
 
-  export let collapsed = false;
+  interface Props {
+    loaded?: boolean;
+    empty?: boolean;
+    disconnected?: boolean;
+    error?: boolean;
+    placeholderOutline?: boolean;
+    horizontalScroll?: boolean;
+    overflowAction?: (ComponentProps<typeof Button> & { label: string }) | undefined;
+    collapsed?: boolean;
+    emptyStateEmoji?: string;
+    emptyStateHeadline?: string | undefined;
+    emptyStateText?: string | undefined;
+    disconnectedStateEmoji?: string | undefined;
+    disconnectedStateHeadline?: string | undefined;
+    disconnectedStateText?: string | undefined;
+    children?: import('svelte').Snippet;
+  }
 
-  export let emptyStateEmoji = '👻';
-  export let emptyStateHeadline: string | undefined = 'Nothing to see here';
-  export let emptyStateText: string | undefined = undefined;
+  let {
+    loaded = false,
+    empty = false,
+    disconnected = false,
+    error = false,
+    placeholderOutline = true,
+    horizontalScroll = true,
+    overflowAction = undefined,
+    collapsed = $bindable(false),
+    emptyStateEmoji = '👻',
+    emptyStateHeadline = 'Nothing to see here',
+    emptyStateText = undefined,
+    disconnectedStateEmoji = '🫙',
+    disconnectedStateHeadline = 'You are disconnected',
+    disconnectedStateText = undefined,
+    children,
+  }: Props = $props();
 
-  export let disconnectedStateEmoji: string | undefined = '🫙';
-  export let disconnectedStateHeadline: string | undefined = 'You are disconnected';
-  export let disconnectedStateText: string | undefined = undefined;
+  let placeholderContainerElem: HTMLDivElement | undefined = $state();
 
-  let placeholderContainerElem: HTMLDivElement;
-
-  let contentTransitonedIn = loaded;
+  let contentTransitonedIn = $state(loaded);
 </script>
 
 <div class="section-skeleton">
@@ -94,16 +112,16 @@
           class="content-container"
           style:margin-top={placeholderContainerElem ? '-16rem' : undefined}
           in:fade={{ duration: 250 }}
-          on:transitionend={() => {
+          ontransitionend={() => {
             contentTransitonedIn = true;
           }}
         >
           {#if horizontalScroll}
             <PaddedHorizontalScroll>
-              <slot />
+              {@render children?.()}
             </PaddedHorizontalScroll>
           {:else}
-            <slot />
+            {@render children?.()}
           {/if}
         </div>
 
@@ -122,7 +140,7 @@
       in:scale={{ duration: 300, start: 0.9 }}
       out:scale={{ duration: 300, start: 1.05 }}
       class="highlight-overlay"
-    />
+    ></div>
   {/if}
 </div>
 

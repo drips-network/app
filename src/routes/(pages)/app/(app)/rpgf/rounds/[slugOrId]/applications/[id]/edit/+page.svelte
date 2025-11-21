@@ -12,8 +12,8 @@
   import type { ComponentProps } from 'svelte';
   import assert from '$lib/utils/assert';
 
-  export let data;
-  $: round = data.round;
+  let { data } = $props();
+  let round = $derived(data.round);
 
   function mapAnswersToDto(
     answers: typeof data.application.latestVersion.answers,
@@ -37,8 +37,8 @@
     }) as any as CreateApplicationDto['answers'];
   }
 
-  let readyToSubmit = false;
-  let formValue: ComponentProps<RpgfApplicationEditor>['value'];
+  let readyToSubmit = $state(false);
+  let formValue: ComponentProps<typeof RpgfApplicationEditor>['value'] = $state();
 
   function handleSubmit() {
     if (!formValue) return;
@@ -106,7 +106,7 @@
   <Button
     icon={Wallet}
     disabled={!readyToSubmit}
-    on:click={handleSubmit}
+    onclick={handleSubmit}
     variant="primary"
     size="large"
   >

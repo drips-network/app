@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+  import { createEventDispatcher, onMount, type Component } from 'svelte';
   import type {
     BeforeFunc,
     ExternalTransaction,
@@ -39,7 +39,11 @@
   const dispatchResult = createEventDispatcher<{ result: Result }>();
   const dispatchStartOver = createEventDispatcher<{ startOver: void }>();
 
-  export let transactPayload: SomeTransactPayload;
+  interface Props {
+    transactPayload: SomeTransactPayload;
+  }
+
+  let { transactPayload }: Props = $props();
 
   type TransactionWrapperWithGasLimit = TransactionWrapper & { gasLimit: number | undefined };
 
@@ -71,26 +75,26 @@
         status: 'awaitingPrevious' | 'pending' | 'failed' | 'confirmed';
       };
 
-  let isRetrying = false;
-  let failedTxIndex = -1;
-  let headline: string = '';
-  let isExecutionCompleted = false;
+  let isRetrying = $state(false);
+  let failedTxIndex = $state(-1);
+  let headline: string = $state('');
+  let isExecutionCompleted = $state(false);
 
   let resolvedPayload: TransactPayload<BeforeFunc | null | undefined> | undefined;
 
-  let description: string | undefined;
+  let description: string | undefined = $state();
   let duringAfterMsg: string | undefined;
-  let duringBeforeMsg: string | undefined;
+  let duringBeforeMsg: string | undefined = $state();
   let icon:
     | {
-        component: ComponentType;
+        component: Component;
         props?: Record<string, unknown>;
       }
-    | undefined;
+    | undefined = $state();
 
-  let isErrorDetailsVisible = false;
-  let error: Error | undefined;
-  let transactionsTimeline: TransactionTimelineItem[] = [];
+  let isErrorDetailsVisible = $state(false);
+  let error: Error | undefined = $state();
+  let transactionsTimeline: TransactionTimelineItem[] = $state([]);
 
   onMount(executeTransactions);
 
@@ -205,8 +209,9 @@
     isExecutionCompleted = true;
   }
 
-  $: gaslessRelayAvailable =
-    networkConfig.gaslessTransactions && networkConfig.gelatoRelayAvailable;
+  let gaslessRelayAvailable = $derived(
+    networkConfig.gaslessTransactions && networkConfig.gelatoRelayAvailable,
+  );
 
   async function handleEoaTransactions(
     network: { chainId: number; name: string },
@@ -720,7 +725,7 @@
     <!-- Header -->
     {#if icon}
       <div class="icon">
-        <svelte:component this={icon.component} class="icon" {...icon.props} />
+        <icon.component class="icon" {...icon.props} />
       </div>
     {/if}
     <StepHeader {headline} {description} />
@@ -775,7 +780,7 @@
                       <Button
                         variant="primary"
                         disabled={isRetrying}
-                        on:click={async () => await retryFailedTransaction()}>Try again</Button
+                        onclick={async () => await retryFailedTransaction()}>Try again</Button
                       >
                     </div>
                   {/if}
@@ -818,7 +823,7 @@
                       {/if}
                       <button
                         style="margin-left: 0.5rem;"
-                        on:click={() => toggleErrorDetails(index)}
+                        onclick={() => toggleErrorDetails(index)}
                       >
                         <span class="button" style="text-decoration: underline;">
                           {isErrorDetailsVisible ? 'Hide' : 'Show'} error
@@ -870,26 +875,27 @@
     </div>
     <!-- </TransitionedHeight> -->
   </div>
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button
       icon={ArrowLeft}
       variant="ghost"
       disabled={!!failedTxIndex}
-      on:click={() => dispatchStartOver('startOver')}
+      onclick={() => dispatchStartOver('startOver')}
     >
       Back
     </Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
+  {/snippet}
+  {#snippet actions()}
     <Button
       icon={ArrowRight}
       variant="primary"
       disabled={!isExecutionCompleted}
-      on:click={() => dispatchResult('result', { success: true })}
+      onclick={() => dispatchResult('result', { success: true })}
     >
       Continue
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>

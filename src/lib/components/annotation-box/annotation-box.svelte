@@ -1,11 +1,24 @@
 <script lang="ts">
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import type { ComponentType } from 'svelte';
-  export let type: 'warning' | 'info' | 'error' = 'warning';
-  export let size: 'normal' | 'small' = 'normal';
-  export let overlay: boolean = false;
-  export let icon: ComponentType | undefined = undefined;
+  import type { Component } from 'svelte';
+  interface Props {
+    type?: 'warning' | 'info' | 'error';
+    size?: 'normal' | 'small';
+    overlay?: boolean;
+    icon?: Component | undefined;
+    children?: import('svelte').Snippet;
+    actions?: import('svelte').Snippet;
+  }
+
+  let {
+    type = 'warning',
+    size = 'normal',
+    overlay = false,
+    icon = undefined,
+    children,
+    actions,
+  }: Props = $props();
 </script>
 
 <div
@@ -15,7 +28,8 @@
   <div class="flex gap-2 items-start">
     <div class="icon-container">
       {#if icon}
-        <svelte:component this={icon} style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
+        {@const SvelteComponent = icon}
+        <SvelteComponent style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
       {:else if type === 'warning'}
         <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
       {:else if type === 'info'}
@@ -25,12 +39,12 @@
       {/if}
     </div>
     <div class="flex-1 pt-px">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
-  {#if $$slots.actions}
+  {#if actions}
     <div class="flex-1 gap-1 flex justify-end">
-      <slot name="actions" />
+      {@render actions?.()}
     </div>
   {/if}
 </div>

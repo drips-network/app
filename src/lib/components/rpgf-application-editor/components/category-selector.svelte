@@ -3,21 +3,26 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import type { ApplicationCategory } from '$lib/utils/rpgf/types/application';
 
-  export let categories: ApplicationCategory[];
-  export let selected: string[] = [];
+  interface Props {
+    categories: ApplicationCategory[];
+    selected?: string[];
+  }
 
-  let categoryItems: Items;
-  $: categoryItems = Object.fromEntries(
-    categories.map((category) => {
-      return [
-        category.id,
-        {
-          type: 'selectable',
-          label: category.name,
-          searchString: [category.name, category.description || ''],
-        },
-      ];
-    }),
+  let { categories, selected = $bindable([]) }: Props = $props();
+
+  let categoryItems: Items = $derived(
+    Object.fromEntries(
+      categories.map((category) => {
+        return [
+          category.id,
+          {
+            type: 'selectable',
+            label: category.name,
+            searchString: [category.name, category.description || ''],
+          },
+        ];
+      }),
+    ),
   );
 </script>
 

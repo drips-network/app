@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   import { STREAM_STATE_BADGE_STREAM_FRAGMENT } from '$lib/components/stream-state-badge/stream-state-badge.svelte';
   import { gql } from 'graphql-request';
 
@@ -27,7 +27,11 @@
   import StreamStateBadge from '$lib/components/stream-state-badge/stream-state-badge.svelte';
   import type { NameAndBadgeCellStreamFragment } from './__generated__/gql.generated';
 
-  export let stream: NameAndBadgeCellStreamFragment;
+  interface Props {
+    stream: NameAndBadgeCellStreamFragment;
+  }
+
+  let { stream }: Props = $props();
 </script>
 
 <div class="name-and-badge">

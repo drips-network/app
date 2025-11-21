@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import wallet from '$lib/stores/wallet/wallet.store';
   import UserIcon from '$lib/components/icons/User.svelte';
   import Button from '../button/button.svelte';
@@ -12,43 +14,45 @@
   import LegalLinks from '../legal-links/legal-links.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
 
-  $: $navigating && cupertinoPaneStore.closeSheet();
+  run(() => {
+    $navigating && cupertinoPaneStore.closeSheet();
+  });
 
-  $: safeAppMode = Boolean($wallet.safe);
+  let safeAppMode = $derived(Boolean($wallet.safe));
 </script>
 
 <div class="account-menu">
   {#if $wallet.address}
     <AccountMenuItem>
-      <svelte:fragment slot="left"
-        ><IdentityBadge
+      {#snippet left()}
+        <IdentityBadge
           size="big"
           disableLink
           address={$wallet.address}
           showIdentity={false}
           disableSelection
           disableTooltip
-        /></svelte:fragment
-      >
-      <svelte:fragment slot="title"
-        ><IdentityBadge
+        />
+      {/snippet}
+      {#snippet title()}
+        <IdentityBadge
           disableSelection
           disableLink
           address={$wallet.address}
           showAvatar={false}
           disableTooltip
-        /></svelte:fragment
-      >
-      <svelte:fragment slot="right">
+        />
+      {/snippet}
+      {#snippet right()}
         <Button
           disabled={safeAppMode}
           variant="ghost"
-          on:click={() => {
+          onclick={() => {
             cupertinoPaneStore.closeSheet();
             wallet.disconnect();
           }}>Disconnect</Button
-        ></svelte:fragment
-      >
+        >
+      {/snippet}
     </AccountMenuItem>
     {#if safeAppMode}
       <div class="connected-to-safe">
@@ -72,10 +76,14 @@
         icon={UserIcon}
         href={`/app/${$ens[$wallet.address]?.name ?? $wallet.address}`}
       >
-        <svelte:fragment slot="title">Profile</svelte:fragment>
+        {#snippet title()}
+          Profile
+        {/snippet}
       </AccountMenuItem>
       <AccountMenuItem icon={Settings} href="/app/settings">
-        <svelte:fragment slot="title">Settings</svelte:fragment>
+        {#snippet title()}
+          Settings
+        {/snippet}
       </AccountMenuItem>
     </div>
     <Divider sideMargin={0.5} />
