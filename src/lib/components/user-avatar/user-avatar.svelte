@@ -27,7 +27,9 @@
       onerror={() => (error = true)}
     />
   {/if}
-  <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
+  {#if placeholderSrc}
+    <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
+  {/if}
 </div>
 
 <style>

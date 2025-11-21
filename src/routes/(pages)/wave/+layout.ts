@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { getAccessJwt, getUserData, setAccessJwt } from '$lib/utils/wave/auth.js';
+import { getUserData, setAccessJwt } from '$lib/utils/wave/auth.js';
 
 export const load = async ({ depends, data }) => {
   depends('wave:user');
@@ -7,10 +7,12 @@ export const load = async ({ depends, data }) => {
   let accessToken: string | null;
 
   if (browser) {
-    if (data.newWaveAccessToken) setAccessJwt(data.newWaveAccessToken);
+    // set the new login. if there is none, it means the user is logged out (e.g. expired refresh token)
 
-    accessToken = getAccessJwt();
+    setAccessJwt(data.newWaveAccessToken);
+    accessToken = data.newWaveAccessToken;
   } else {
+    // on server, just read from locals
     accessToken = data.newWaveAccessToken ?? null;
   }
 
@@ -20,5 +22,3 @@ export const load = async ({ depends, data }) => {
     user: userData,
   };
 };
-
-export const ssr = true;

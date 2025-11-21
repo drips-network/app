@@ -1,12 +1,7 @@
 <script lang="ts">
-  import Button from '$lib/components/button/button.svelte';
-  import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+  import LogInButton from '$lib/components/wave/log-in-button/log-in-button.svelte';
 
-  const WAVE_API_URL = getOptionalEnvVar(
-    'PUBLIC_WAVE_API_URL',
-    true,
-    'Wave functionality will not work.',
-  );
+  let { data } = $props();
 </script>
 
-<Button href="{WAVE_API_URL}/api/auth/oauth/github/login">Log in with GitHub</Button>
+<LogInButton backTo={data.backTo || '/wave'} />

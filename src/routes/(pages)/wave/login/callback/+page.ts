@@ -1,5 +1,6 @@
 import { redeemGitHubOAuthCode, setAccessJwt } from '$lib/utils/wave/auth.js';
 import { error, redirect } from '@sveltejs/kit';
+import isSafePath from '$lib/utils/safe-path';
 
 export const load = async ({ url }) => {
   // extract gh oauth code and state from url
@@ -18,6 +19,15 @@ export const load = async ({ url }) => {
   }
 
   setAccessJwt(accessToken);
+
+  const backTo = url.searchParams.get('backTo');
+  const decoded = decodeURIComponent(backTo || '');
+
+  if (backTo) {
+    const isSafe = isSafePath(decoded);
+
+    if (isSafe) return redirect(302, decoded);
+  }
 
   return redirect(302, '/wave');
 };

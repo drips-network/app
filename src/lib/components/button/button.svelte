@@ -19,6 +19,8 @@
     form?: string | undefined;
     justify?: 'left' | 'right' | 'center';
     circular?: boolean;
+    reloadOnLinkClick?: boolean;
+    noPreload?: boolean;
     onclick?: ((event: MouseEvent) => void) | undefined;
     onmouseenter?: (event: MouseEvent) => void;
     onmouseleave?: (event: MouseEvent) => void;
@@ -42,6 +44,8 @@
     form = undefined,
     justify = 'center',
     circular = false,
+    reloadOnLinkClick = false,
+    noPreload = false,
     onclick = undefined,
     onmouseenter = undefined,
     onmouseleave = undefined,
@@ -84,6 +88,9 @@
   class:circular
   disabled={isDisabled}
   aria-disabled={isDisabled}
+  data-sveltekit-reload={reloadOnLinkClick}
+  data-sveltekit-preload-data={noPreload ? 'false' : undefined}
+  data-sveltekit-preload-code={noPreload ? 'false' : undefined}
   {onclick}
   {onmouseenter}
   {onmouseleave}

@@ -2,28 +2,36 @@ import { browser } from '$app/environment';
 import z from 'zod';
 import { call } from './call';
 import { jwtDecode } from 'jwt-decode';
+import type { WaveUser } from './types/user';
 
 const accessClaimJwtSchema = z.object({
   iss: z.literal('drips-wave'),
-  sub: z.string().uuid(),
+  sub: z.uuid(),
   iat: z.number().int(),
   exp: z.number().int(),
   isSuperAdmin: z.boolean(),
   name: z.string(),
-  email: z.string().email(),
-  picture: z.string().url().optional(),
+  email: z.email(),
+  picture: z.string().url(),
 });
 
-export type WaveUserData = z.infer<typeof accessClaimJwtSchema>;
-
-export function getUserData(jwt: string | null): WaveUserData | null {
+export function getUserData(jwt: string | null): WaveUser | null {
   if (!jwt) {
     return null;
   }
 
   const content = accessClaimJwtSchema.parse(jwtDecode(jwt));
 
-  return content;
+  const now = Math.floor(Date.now() / 1000);
+  if (content.exp < now) {
+    return null;
+  }
+
+  return {
+    id: content.sub,
+    gitHubUsername: content.name,
+    gitHubAvatarUrl: content.picture,
+  };
 }
 
 export function setAccessJwt(token: string | null) {
@@ -79,4 +87,13 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
   setAccessJwt(data.accessToken);
 
   return data.accessToken;
+}
+
+export async function logOut() {
+  await call('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  setAccessJwt(null);
 }
