@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
@@ -40,12 +38,7 @@
     ellipsis = false,
   }: Props = $props();
 
-  /** If true, only the application name and icon are clickable, otherwise entire row.
-   * Needed for voting mode bc otherwise the input becomes really buggy
-   */
-  let smallLink = $derived(voteStep === 'assign-votes');
-
-  let picked = $state($ballotStore[application.id] !== undefined);
+  let picked = $state();
 
   function updateBallot(picked: boolean) {
     if (voteStep !== 'build-ballot') return;
@@ -63,9 +56,13 @@
       });
     }
   }
-  run(() => {
-    updateBallot(picked);
-  });
+
+  function handleCheckboxInput(event: Event) {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+
+    updateBallot(target.checked);
+  }
 
   let voteAmountInput: string | undefined = $state(
     $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]),
@@ -167,7 +164,7 @@
       };
     }
   }
-  run(() => {
+  $effect(() => {
     updateVoteAmount(voteAmountInput);
   });
 
@@ -184,44 +181,46 @@
   );
 </script>
 
-<svelte:element
-  this={smallLink ? 'div' : 'a'}
-  href={link}
+<div
   class="application-line-item"
   class:active
-  class:small-link={smallLink}
   data-testid="application-line-item-{application.id}"
 >
-  <svelte:element this={smallLink ? 'a' : 'div'} href={link} class:ellipsis>
+  <a href={link} class:ellipsis>
     <RpgfApplicationBadge {hideState} short {application} />
-  </svelte:element>
+  </a>
 
-  {#if reviewMode && application.state === 'pending'}
-    <ApplicationDecisionButtons applicationId={application.id} bind:decision />
-  {/if}
+  <div class="interactions">
+    {#if reviewMode && application.state === 'pending'}
+      <ApplicationDecisionButtons applicationId={application.id} bind:decision />
+    {/if}
 
-  {#if voteStep === 'build-ballot' && application.state === 'approved'}
-    <Checkbox bind:checked={picked} />
-  {/if}
-
-  {#if voteStep === 'assign-votes' && application.state === 'approved'}
-    <div class="vote-count-input">
-      <TextInput
-        onclick={(e) => e.preventDefault()}
-        validationState={voteAmountInputValidationState}
-        bind:value={voteAmountInput}
-        variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
-        placeholder={votePlaceholder ?? '0+'}
+    {#if voteStep === 'build-ballot' && application.state === 'approved'}
+      <Checkbox
+        checked={$ballotStore[application.id] !== undefined}
+        oninput={handleCheckboxInput}
       />
-    </div>
-  {/if}
+    {/if}
 
-  {#if application.allocation !== null}
-    <span class="typo-text-small-bold">
-      {application.allocation}
-    </span>
-  {/if}
-</svelte:element>
+    {#if voteStep === 'assign-votes' && application.state === 'approved'}
+      <div class="vote-count-input">
+        <TextInput
+          onclick={(e) => e.preventDefault()}
+          validationState={voteAmountInputValidationState}
+          bind:value={voteAmountInput}
+          variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
+          placeholder={votePlaceholder ?? '0+'}
+        />
+      </div>
+    {/if}
+
+    {#if application.allocation !== null}
+      <span class="typo-text-small-bold">
+        {application.allocation}
+      </span>
+    {/if}
+  </div>
+</div>
 
 <style>
   .application-line-item {
@@ -229,8 +228,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 0.5rem;
     border-bottom: 1px solid var(--color-foreground-level-3);
+    transition: background-color 0.2s ease;
+  }
+
+  a {
+    padding: 0.5rem;
+    flex-grow: 1;
+  }
+
+  .interactions {
+    padding: 0.5rem;
   }
 
   .application-line-item.active {

@@ -102,7 +102,7 @@
         forceUnclaimed
         smallText
         tooltip={false}
-        linkTo="project-page"
+        linkTo="nothing"
         linkToNewTab
         size="tiny"
         {project}

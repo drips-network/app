@@ -1,6 +1,5 @@
 <script lang="ts">
   import { writable, type Writable } from 'svelte/store';
-  import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import MagnifyingGlass from '../icons/MagnifyingGlass.svelte';
   import Cross from '../icons/Cross.svelte';
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
@@ -8,32 +7,43 @@
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import ApplicationsTable from './components/applications-table.svelte';
 
-  export let searchable = true;
+  interface Props {
+    searchable?: boolean;
+    applications: ListingApplication[];
+    round: Round;
+    signedIn: boolean;
+    hideState?: boolean;
+    reviewMode?: boolean;
+    decisions?: Record<string, 'approve' | 'reject' | null>;
+    voteStep?: 'build-ballot' | 'assign-votes' | null;
+    ballotStore?: Writable<InProgressBallot>;
+    displayVisibilityNote?: boolean;
+  }
 
-  export let applications: ListingApplication[];
-  export let round: Round;
-  export let signedIn: boolean;
-  export let hideState = false;
+  let {
+    searchable = true,
+    applications,
+    round,
+    signedIn,
+    hideState = false,
+    reviewMode = false,
+    decisions = $bindable({}),
+    voteStep = null,
+    ballotStore = writable({}),
+    displayVisibilityNote = false,
+  }: Props = $props();
 
-  export let reviewMode = false;
-  export let decisions: Record<string, 'approve' | 'reject' | null> = {};
+  let searchQuery = $state('');
 
-  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
-  export let ballotStore: Writable<InProgressBallot> = writable({});
+  let filteredApplications = $derived(
+    applications.filter((application) => {
+      return (
+        !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }),
+  );
 
-  export let horizontalScroll = false;
-
-  export let displayVisibilityNote = false;
-
-  let searchQuery = '';
-
-  $: filteredApplications = applications.filter((application) => {
-    return (
-      !searchQuery || application.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
-
-  $: includesResults = applications.some((a) => a.allocation !== null);
+  let includesResults = $derived(applications.some((a) => a.allocation !== null));
 </script>
 
 {#if searchable}
@@ -48,38 +58,20 @@
   </div>
 {/if}
 
-{#if horizontalScroll}
-  <PaddedHorizontalScroll>
-    <ApplicationsTable
-      {includesResults}
-      {applications}
-      {filteredApplications}
-      {voteStep}
-      {ballotStore}
-      {reviewMode}
-      {round}
-      {signedIn}
-      {displayVisibilityNote}
-      bind:decisions
-      {hideState}
-    />
-  </PaddedHorizontalScroll>
-{:else}
-  <ApplicationsTable
-    {includesResults}
-    {applications}
-    {filteredApplications}
-    {voteStep}
-    {ballotStore}
-    {reviewMode}
-    {round}
-    {signedIn}
-    bind:decisions
-    ellipsis={true}
-    {displayVisibilityNote}
-    {hideState}
-  />
-{/if}
+<ApplicationsTable
+  {includesResults}
+  {applications}
+  {filteredApplications}
+  {voteStep}
+  {ballotStore}
+  {reviewMode}
+  {round}
+  {signedIn}
+  bind:decisions
+  ellipsis={true}
+  {displayVisibilityNote}
+  {hideState}
+/>
 
 <style>
   .search-bar {
