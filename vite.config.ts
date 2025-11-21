@@ -2,6 +2,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 import faroUploader from '@grafana/faro-rollup-plugin';
+import devtoolsJson from 'vite-plugin-devtools-json';
 
 if (process.env.FARO_UPLOAD_SOURCE_MAPS_KEY) {
   console.log('👀 - FARO_UPLOAD_SOURCE_MAPS_KEY is set, enabling source map upload');
@@ -11,6 +12,7 @@ if (process.env.FARO_UPLOAD_SOURCE_MAPS_KEY) {
 
 const config = defineConfig(({ mode }) => ({
   plugins: [
+    devtoolsJson(),
     sveltekit(),
     process.env.FARO_UPLOAD_SOURCE_MAPS_KEY
       ? faroUploader({
