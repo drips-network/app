@@ -33,6 +33,10 @@
     );
   });
 
+  $: hasNonApproved = applications.some((a) => a.state !== 'approved');
+
+  $: shouldHideState = hideState || (!hasNonApproved && !reviewMode);
+
   $: includesResults = applications.some((a) => a.allocation !== null);
 </script>
 
@@ -61,7 +65,7 @@
       {signedIn}
       {displayVisibilityNote}
       bind:decisions
-      {hideState}
+      hideState={shouldHideState}
     />
   </PaddedHorizontalScroll>
 {:else}
@@ -77,7 +81,7 @@
     bind:decisions
     ellipsis={true}
     {displayVisibilityNote}
-    {hideState}
+    hideState={shouldHideState}
   />
 {/if}
 

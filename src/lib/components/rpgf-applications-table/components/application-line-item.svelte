@@ -2,7 +2,6 @@
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
-  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import type { Writable } from 'svelte/store';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -15,6 +14,7 @@
     ballotValidationContextKey,
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
+  import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
 
   export let round: Round;
   export let application: ListingApplication;
@@ -181,7 +181,7 @@
   {/if}
 
   {#if voteStep === 'build-ballot' && application.state === 'approved'}
-    <Checkbox bind:checked={picked} />
+    <CheckboxSimple bind:checked={picked} />
   {/if}
 
   {#if voteStep === 'assign-votes' && application.state === 'approved'}
