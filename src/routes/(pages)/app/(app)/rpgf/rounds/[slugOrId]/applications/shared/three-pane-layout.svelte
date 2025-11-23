@@ -169,6 +169,8 @@
   .apps {
     grid-area: apps;
     min-width: 0;
+    view-transition-name: rpgf-applications-apps-card;
+    view-transition-class: element-handover;
   }
 
   .apps-inner {
@@ -181,8 +183,6 @@
     border: 1px solid var(--color-foreground-level-3);
     padding: 1rem;
     border-radius: 1rem 0 1rem 1rem;
-    view-transition-name: rpgf-applications-apps-card;
-    view-transition-class: element-handover;
     overflow: scroll;
   }
 
