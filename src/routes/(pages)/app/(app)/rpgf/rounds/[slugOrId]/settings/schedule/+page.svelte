@@ -6,12 +6,10 @@
   import { updateRound } from '$lib/utils/rpgf/rpgf.js';
 
   export let data;
-
+  $: round = data.round;
   $: published = data.round.published;
 
   let updatedRound = { ...data.round };
-
-  let now = new Date();
 
   $: changesMade =
     updatedRound.applicationPeriodStart?.getTime() !==
@@ -30,16 +28,15 @@
       resultsPeriodStart: updatedRound.resultsPeriodStart,
     });
   }
+
+  const now = new Date();
 </script>
 
 <RpgfSettingsForm saveEnabled={changesMade} {saveHandler}>
   <div style:width="100%">
     {#if published}
       <div style:margin-bottom="1rem">
-        <AnnotationBox>
-          The schedule of an ongoing, published round can no longer be changed. Contact the Drips
-          team if necessary.
-        </AnnotationBox>
+        <AnnotationBox>Schedule timestamps in the past can no longer be changed.</AnnotationBox>
       </div>
     {/if}
 
@@ -52,11 +49,13 @@
   <FormField
     title="Application intake start*"
     description="From this date onwards, anyone can submit applications."
-    disabled={published}
+    disabled={published && round.applicationPeriodStart
+      ? round.applicationPeriodStart < now
+      : false}
   >
     <DateInput
       bind:value={updatedRound.applicationPeriodStart}
-      min={!published ? now : undefined}
+      min={published ? undefined : now}
       timePrecision="minute"
     />
   </FormField>
@@ -64,11 +63,11 @@
   <FormField
     title="Application intake end*"
     description="Applications are no longer accepted. Admins can review pending applications until voting starts."
-    disabled={published}
+    disabled={published && round.applicationPeriodEnd ? round.applicationPeriodEnd < now : false}
   >
     <DateInput
       bind:value={updatedRound.applicationPeriodEnd}
-      min={!published ? now : undefined}
+      min={published ? undefined : now}
       timePrecision="minute"
     />
   </FormField>
@@ -76,11 +75,11 @@
   <FormField
     title="Voting start*"
     description="Badgeholders may now submit votes. Any applications still pending are automatically rejected."
-    disabled={published}
+    disabled={published && round.votingPeriodStart ? round.votingPeriodStart < now : false}
   >
     <DateInput
       bind:value={updatedRound.votingPeriodStart}
-      min={!published ? now : undefined}
+      min={published ? undefined : now}
       timePrecision="minute"
     />
   </FormField>
@@ -88,7 +87,7 @@
   <FormField
     title="Voting end*"
     description="The round no longer accepts ballot submissions. Admins can review the vote results, make final results public, and prepare the distribution."
-    disabled={published}
+    disabled={published && round.votingPeriodEnd ? round.votingPeriodEnd < now : false}
   >
     <DateInput bind:value={updatedRound.votingPeriodEnd} min={now} timePrecision="minute" />
   </FormField>
@@ -96,11 +95,11 @@
   <FormField
     title="Distribution start*"
     description="In this phase, admins are expected to pay out rewards based on the round results using Drip Lists."
-    disabled={published}
+    disabled={published && round.resultsPeriodStart ? round.resultsPeriodStart < now : false}
   >
     <DateInput
       bind:value={updatedRound.resultsPeriodStart}
-      min={!published ? now : undefined}
+      min={published ? undefined : now}
       timePrecision="minute"
     />
   </FormField>
