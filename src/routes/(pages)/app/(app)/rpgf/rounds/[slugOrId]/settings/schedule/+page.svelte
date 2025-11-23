@@ -19,13 +19,38 @@
     updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
     updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime();
 
+  function isDifferent(date1: Date | null, date2: Date | null) {
+    if (date1 === null && date2 === null) return false;
+    if (date1 === null || date2 === null) return true;
+    return date1.getTime() !== date2.getTime();
+  }
+
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {
-      applicationPeriodStart: updatedRound.applicationPeriodStart,
-      applicationPeriodEnd: updatedRound.applicationPeriodEnd,
-      votingPeriodStart: updatedRound.votingPeriodStart,
-      votingPeriodEnd: updatedRound.votingPeriodEnd,
-      resultsPeriodStart: updatedRound.resultsPeriodStart,
+      applicationPeriodStart: isDifferent(
+        updatedRound.applicationPeriodStart,
+        data.round.applicationPeriodStart,
+      )
+        ? updatedRound.applicationPeriodStart
+        : undefined,
+      applicationPeriodEnd: isDifferent(
+        updatedRound.applicationPeriodEnd,
+        data.round.applicationPeriodEnd,
+      )
+        ? updatedRound.applicationPeriodEnd
+        : undefined,
+      votingPeriodStart: isDifferent(updatedRound.votingPeriodStart, data.round.votingPeriodStart)
+        ? updatedRound.votingPeriodStart
+        : undefined,
+      votingPeriodEnd: isDifferent(updatedRound.votingPeriodEnd, data.round.votingPeriodEnd)
+        ? updatedRound.votingPeriodEnd
+        : undefined,
+      resultsPeriodStart: isDifferent(
+        updatedRound.resultsPeriodStart,
+        data.round.resultsPeriodStart,
+      )
+        ? updatedRound.resultsPeriodStart
+        : undefined,
     });
   }
 
