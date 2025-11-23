@@ -16,6 +16,9 @@
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
   import TransactStep from './components/transact-step.svelte';
+  import animationsStore from '$lib/stores/animations/animations.store';
+
+  const { isEnabled: animationsEnabled } = animationsStore;
 
   const dispatch = createEventDispatcher<{ stepChange: void }>();
 
@@ -24,9 +27,7 @@
   const resolvedContext = context?.();
   export let minHeightPx = 0;
 
-  export let noTransitions = browser
-    ? window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true
-    : false;
+  export let noTransitions = browser ? $animationsEnabled === false : false;
 
   let stepElement: HTMLDivElement;
 
