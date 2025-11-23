@@ -8,13 +8,8 @@
   import { get } from 'svelte/store';
   import scroll from '$lib/stores/scroll';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
-  import { browser } from '$app/environment';
 
   const { isEnabled } = animationsStore;
-
-  $: if (browser) {
-    document.documentElement.classList.toggle('no-animations', !$isEnabled);
-  }
 
   onMount(() => {
     scroll.attach();

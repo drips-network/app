@@ -140,10 +140,3 @@ h3,
     animation: none;
   }
 }
-
-html.no-animations *,
-html.no-animations *::before,
-html.no-animations *::after {
-  transition: none !important;
-  animation: none !important;
-}
