@@ -1,9 +1,11 @@
 <script lang="ts">
   import { browser } from '$app/environment';
+  import animationsStore from '$lib/stores/animations/animations.store';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
   import { onMount } from 'svelte';
   import { cubicInOut } from 'svelte/easing';
   import { tweened, type Tweened } from 'svelte/motion';
+  import { get } from 'svelte/store';
 
   // ___________
   // PROPS
@@ -68,7 +70,8 @@
 
     const collapsedChanged = previouslyCollapsed !== collapsed;
 
-    const shouldTransition = transitionHeightChanges || collapsedChanged;
+    const shouldTransition =
+      get(animationsStore.isEnabled) && (transitionHeightChanges || collapsedChanged);
 
     if (collapsed && !collapsedChanged) return;
 

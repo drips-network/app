@@ -16,8 +16,11 @@
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import network from '$lib/stores/wallet/network';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
+  import animationsStore from '$lib/stores/animations/animations.store';
 
   const { primaryColor } = themeStore;
+
+  const { selectedSetting: animationsSetting } = animationsStore;
 
   // Tick control
   const { slowMode } = tickStore;
@@ -90,6 +93,31 @@
           {
             title: 'Pink',
             value: 'pink',
+          },
+        ]}
+      />
+    </Setting>
+    <Setting
+      title="Animations"
+      subtitle="Enable smooth transitios and animations across the app. Auto follows the system setting."
+    >
+      <SegmentedControl
+        active={$animationsSetting}
+        on:select={(value) => {
+          animationsSetting.set(value.detail);
+        }}
+        options={[
+          {
+            title: 'Auto',
+            value: 'auto',
+          },
+          {
+            title: 'On',
+            value: 'on',
+          },
+          {
+            title: 'Off',
+            value: 'off',
           },
         ]}
       />
