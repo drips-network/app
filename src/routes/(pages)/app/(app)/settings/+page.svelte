@@ -99,7 +99,7 @@
     </Setting>
     <Setting
       title="Animations"
-      subtitle="Enable smooth transitios and animations across the app. Auto follows the system setting."
+      subtitle="Enable smooth transitions and animations across the app. Auto follows the system setting."
     >
       <SegmentedControl
         active={$animationsSetting}
