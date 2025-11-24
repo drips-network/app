@@ -155,15 +155,19 @@
       voterGuidelinesLinkValidationState.type !== 'invalid',
   );
 
+  function haveVotersChanged(): boolean {
+    return !areStringArraysEqual(
+      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
+      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
+    );
+  }
+
   $: changesMade =
     updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
     updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
     updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
     updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
-    !areStringArraysEqual(
-      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
-    );
+    haveVotersChanged();
 
   function normalizeOptionalNumberInput(value: unknown): number | null {
     if (value === '' || value === null || value === undefined) {
@@ -203,11 +207,7 @@
 
     // Always try to update voters when changes are made
     // The backend will validate and reject if trying to delete voters who have submitted ballots
-    const votersChanged = !areStringArraysEqual(
-      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
-    );
-    if (votersChanged) {
+    if (haveVotersChanged()) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
     }
   }
