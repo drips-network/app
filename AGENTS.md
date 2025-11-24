@@ -22,6 +22,7 @@ Head to Settings within the app and enable "Developer mode" to display helpful "
 Drips uses an on-chain oracle service to validate ownership of repositories by looking up a `FUNDING.json` file on the repo's default branch. On the local development testnet, a fake oracle that can be used to fake the contents of this file is available.
 
 To claim a project during local dev mode:
+
 - If you haven't already, enable "Developer mode" in the app settings.
 - Navigate to the project page of a repo you want to claim by pasting its GitHub URL into the app's search bar
 - Copy the project's Account ID.

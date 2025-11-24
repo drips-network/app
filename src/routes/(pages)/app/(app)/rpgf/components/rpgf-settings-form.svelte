@@ -11,6 +11,8 @@
   export let saveEnabled = true;
   export let invalid = false;
 
+  export let onSaveError: ((error: unknown) => void) | undefined = undefined;
+
   let saving = false;
   let success = false;
 
@@ -38,8 +40,9 @@
     resetSuccess();
 
     if (saveHandler) {
-      await doWithErrorModal(saveHandler, () => {
+      await doWithErrorModal(saveHandler, (e) => {
         saving = false;
+        onSaveError?.(e);
       });
     }
 
