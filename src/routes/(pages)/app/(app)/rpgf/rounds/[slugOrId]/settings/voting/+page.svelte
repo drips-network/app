@@ -11,6 +11,7 @@
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
   import { areStringArraysEqual } from '$lib/utils/compare-string-array';
   import { setRoundVoters, updateRound } from '$lib/utils/rpgf/rpgf';
+  import { invalidate } from '$app/navigation';
 
   export let data;
 
@@ -21,18 +22,22 @@
 
   $: isDraft = !data.round.published;
 
+  function getVoterItemsFromAddresses(addresses: string[]): Items {
+    return Object.fromEntries(
+      addresses.map((address) => {
+        return [
+          address,
+          {
+            type: 'address',
+            address,
+          },
+        ];
+      }),
+    );
+  }
+
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let voterItems: Items = Object.fromEntries(
-    data.roundVoters.map((u) => {
-      return [
-        getAddress(u.walletAddress),
-        {
-          type: 'address',
-          address: getAddress(u.walletAddress),
-        },
-      ];
-    }) ?? [],
-  );
+  let voterItems: Items = getVoterItemsFromAddresses(updatedVoterAddresses);
 
   $: updatedVoterAddresses = mapFilterUndefined(
     Object.values(voterItems).map((item) => {
@@ -155,10 +160,10 @@
       voterGuidelinesLinkValidationState.type !== 'invalid',
   );
 
-  function haveVotersChanged(): boolean {
+  function haveVotersChanged(updated: string[], current: typeof data.roundVoters): boolean {
     return !areStringArraysEqual(
-      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
+      updated.map((a) => a.toLowerCase()).sort(),
+      current.map((u) => u.walletAddress.toLowerCase()).sort(),
     );
   }
 
@@ -167,7 +172,7 @@
     updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
     updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
     updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
-    haveVotersChanged();
+    haveVotersChanged(updatedVoterAddresses, data.roundVoters);
 
   function normalizeOptionalNumberInput(value: unknown): number | null {
     if (value === '' || value === null || value === undefined) {
@@ -207,13 +212,25 @@
 
     // Always try to update voters when changes are made
     // The backend will validate and reject if trying to delete voters who have submitted ballots
-    if (haveVotersChanged()) {
+    if (haveVotersChanged(updatedVoterAddresses, data.roundVoters)) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
     }
   }
+
+  async function saveErrorHandler() {
+    await invalidate('rpgf:round-voters');
+
+    updatedVoterAddresses = [...data.roundVoters.map((u) => getAddress(u.walletAddress))];
+    voterItems = getVoterItemsFromAddresses(updatedVoterAddresses);
+  }
 </script>
 
-<RpgfSettingsForm invalid={!valid} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm
+  invalid={!valid}
+  saveEnabled={changesMade}
+  {saveHandler}
+  onSaveError={saveErrorHandler}
+>
   {#if !isDraft}
     <div style:align-self="flex-start">
       <AnnotationBox>
