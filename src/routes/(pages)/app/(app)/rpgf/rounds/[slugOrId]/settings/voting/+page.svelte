@@ -135,9 +135,7 @@
 
   // Voters can be updated during voting period, but the backend will restrict
   // deleting voters who have already submitted ballots
-  $: canUpdateVoters = data.round.state
-    ? data.round.state !== 'pending-results' && data.round.state !== 'results'
-    : true;
+  $: canUpdateVoters = data.round.state ? data.round.state !== 'results' : true;
 
   let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
   $: {
@@ -296,11 +294,11 @@
     description="These addresses will be able to vote in the round."
     disabled={!canUpdateVoters}
   >
-    {#if data.round.state === 'voting'}
+    {#if data.round.state === 'voting' || data.round.state === 'pending-results'}
       <div style:margin-bottom="1rem">
         <AnnotationBox>
-          During the voting period, you can add new badgeholders but can only remove those who have
-          not yet submitted a ballot.
+          You can add new badgeholders but can only remove those who have not yet submitted a
+          ballot.
         </AnnotationBox>
       </div>
     {/if}

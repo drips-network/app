@@ -1,8 +1,10 @@
 import buildUrl from '$lib/utils/build-url';
-import { getBallots } from '$lib/utils/rpgf/rpgf.js';
+import { getBallots, getRoundVoters } from '$lib/utils/rpgf/rpgf.js';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ parent, url, fetch }) => {
+export const load = async ({ parent, url, fetch, depends }) => {
+  depends('rpgf:round:ballots');
+
   const { rpgfUserData, round } = await parent();
 
   if (!rpgfUserData) {
@@ -10,8 +12,9 @@ export const load = async ({ parent, url, fetch }) => {
   }
 
   const ballots = await getBallots(fetch, round.id);
+  const voters = await getRoundVoters(fetch, round.id);
 
-  return { ballots };
+  return { ballots, voters };
 };
 
 export const ssr = false;
