@@ -294,7 +294,7 @@
     description="These addresses will be able to vote in the round."
     disabled={!canUpdateVoters}
   >
-    {#if data.round.state === 'voting'}
+    {#if data.round.state === 'voting' || data.round.state === 'pending-results'}
       <div style:margin-bottom="1rem">
         <AnnotationBox>
           You can add new badgeholders but can only remove those who have not yet submitted a
