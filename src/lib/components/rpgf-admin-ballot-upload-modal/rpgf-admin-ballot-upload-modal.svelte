@@ -21,6 +21,7 @@
   import type { WrappedBallot } from '$lib/utils/rpgf/types/ballot';
   import AlreadyVotedBadge from './components/already-voted-badge.svelte';
   import Wallet from '../icons/Wallet.svelte';
+  import buildExternalUrl from '$lib/utils/build-external-url';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -48,6 +49,7 @@
             showAvatar: true,
             showIdentity: true,
             disableLink: true,
+            disableTooltip: true,
           },
         },
         text: existingBallots.some((ballot) => ballot.user.id === voter.id)
@@ -63,6 +65,11 @@
   let fileData: ArrayBuffer | null = null;
   let filetype: 'csv' | 'xlsx' | null = null;
   let submitting = false;
+
+  $: hasVoteLimits =
+    round.minVotesPerProjectPerVoter !== null ||
+    round.maxVotesPerProjectPerVoter !== null ||
+    round.maxVotesPerVoter !== null;
 
   function resetFile() {
     loadedFile = null;
@@ -185,6 +192,42 @@
       title="Ballot spreadsheet"
       description="Upload a CSV or XLSX ballot template completed by the selected badgeholder."
     >
+      <div style:margin-bottom="1rem">
+        <AnnotationBox type="info">
+          <p class="typo-text-small">
+            Ensure the sheet includes at least the <span class="typo-text-small-bold">ID</span> and
+            <span class="typo-text-small-bold">Allocation</span> columns, with allocations entered as
+            whole numbers.
+          </p>
+          {#if hasVoteLimits}
+            <p class="typo-text-small">As per the round's configuration:</p>
+            <ul class="requirements typo-text-small">
+              {#if round.minVotesPerProjectPerVoter !== null}
+                <li>
+                  Minimum of {round.minVotesPerProjectPerVoter} votes per selected application.
+                </li>
+              {/if}
+              {#if round.maxVotesPerProjectPerVoter !== null}
+                <li>Maximum of {round.maxVotesPerProjectPerVoter} votes per application.</li>
+              {/if}
+              {#if round.maxVotesPerVoter !== null}
+                <li>Total allocation may not exceed {round.maxVotesPerVoter} votes.</li>
+              {/if}
+            </ul>
+          {/if}
+          {#if round.voterGuidelinesLink}
+            <p class="typo-text-small">
+              See the round's
+              <a
+                class="typo-link"
+                href={buildExternalUrl(round.voterGuidelinesLink)}
+                target="_blank"
+                rel="noopener noreferrer">voter guidelines</a
+              > for more details.
+            </p>
+          {/if}
+        </AnnotationBox>
+      </div>
       {#if loadedFile && filetype && fileData}
         <div class="file-preview">
           <div class="file-info">
@@ -254,5 +297,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .requirements {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+  }
+
+  .requirements li {
+    margin: 0.125rem 0;
+    list-style: disc;
   }
 </style>
