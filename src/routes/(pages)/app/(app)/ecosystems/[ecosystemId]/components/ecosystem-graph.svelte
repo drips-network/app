@@ -47,7 +47,7 @@
   let lastH: number = h;
 
   // for expanding and collapsing, refresh instance to get most up to date view
-  $: w, h, detectCollapseAndDeselectNode(), refreshGraphDebounced();
+  $: (w, h, detectCollapseAndDeselectNode(), refreshGraphDebounced());
 
   interface State {
     isDragging?: boolean;
@@ -125,7 +125,7 @@
     programaticZoom = false;
   }
 
-  $: zoom, sigmaInstance && setZoom(sigmaInstance, zoom);
+  $: (zoom, sigmaInstance && setZoom(sigmaInstance, zoom));
 
   function setSelectedNode(node?: string) {
     if (node && state.selectedNode !== node) {

@@ -14,7 +14,7 @@
   import Link from '../icons/Link.svelte';
 
   export let round: Round;
-  export let amountOfVoters: number
+  export let amountOfVoters: number;
 
   $: nameAndDescriptionDone = Boolean(round.name && round.urlSlug);
   $: scheduleDone = Boolean(
