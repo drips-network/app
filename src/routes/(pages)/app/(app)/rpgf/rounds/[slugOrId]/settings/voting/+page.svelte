@@ -128,11 +128,10 @@
     }
   }
 
-  // Voters can not be updated after voting has started
+  // Voters can be updated during voting period, but the backend will restrict
+  // deleting voters who have already submitted ballots
   $: canUpdateVoters = data.round.state
-    ? data.round.state !== 'pending-results' &&
-      data.round.state !== 'results' &&
-      data.round.state !== 'voting'
+    ? data.round.state !== 'pending-results' && data.round.state !== 'results'
     : true;
 
   let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
@@ -202,7 +201,13 @@
       minVotesPerProjectPerVoter: minVotesPerProject,
     };
 
-    if (canUpdateVoters) {
+    // Always try to update voters when changes are made
+    // The backend will validate and reject if trying to delete voters who have submitted ballots
+    const votersChanged = !areStringArraysEqual(
+      updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
+      data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
+    );
+    if (votersChanged) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
     }
   }
@@ -274,6 +279,14 @@
     description="These addresses will be able to vote in the round."
     disabled={!canUpdateVoters}
   >
+    {#if data.round.state === 'voting'}
+      <div style:margin-bottom="1rem">
+        <AnnotationBox>
+          During the voting period, you can add new badgeholders but can only remove those who have
+          not yet submitted a ballot.
+        </AnnotationBox>
+      </div>
+    {/if}
     <ListEditor
       bind:items={voterItems}
       allowDripLists={false}

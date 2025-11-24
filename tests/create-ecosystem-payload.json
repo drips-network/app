@@ -8,7 +8,8 @@
     "emoji": "💧"
   },
   "color": "#9BD226",
-  "metadata": [{
+  "metadata": [
+    {
       "icon": "Recipients",
       "title": "MIT Licensed",
       "text": "327",
@@ -16,35 +17,39 @@
         "href": "https://maps.app.goo.gl/cQFc5uDp1g1NQh488",
         "label": "Castro Monte Mozinho"
       }
-  }, {
-    "icon": "Wallet",
-    "title": "Source",
-    "text": "Based on data from",
-    "link": {
+    },
+    {
+      "icon": "Wallet",
+      "title": "Source",
+      "text": "Based on data from",
+      "link": {
         "href": "https://www.opensource.observer/",
         "label": "Open Source Observer"
-    }
-  }, {
-    "icon": "Download",
-    "title": "Culinary Relations",
-    "link": {
+      }
+    },
+    {
+      "icon": "Download",
+      "title": "Culinary Relations",
+      "link": {
         "href": "https://maps.app.goo.gl/5PmHWtBCAjguoatB7",
         "label": "Casa Da Viuva"
+      }
+    },
+    {
+      "icon": "Coin",
+      "title": "Fun Fact",
+      "text": "Portugal is very nice",
+      "link": {
+        "href": "https://drips.network",
+        "label": "Drips"
+      }
     }
-  }, {
-    "icon": "Coin",
-    "title": "Fun Fact",
-    "text": "Portugal is very nice",
-    "link": {
-      "href": "https://drips.network",
-      "label": "Drips"
-    }
-  }],
+  ],
   "graph": {
     "nodes": [
-			{
-					"projectName": "root"
-			},
+      {
+        "projectName": "root"
+      },
       {
         "projectName": "GitoxideLabs/gitoxide"
       },

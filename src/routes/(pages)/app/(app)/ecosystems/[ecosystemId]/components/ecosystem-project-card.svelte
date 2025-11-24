@@ -36,7 +36,7 @@
   let error: boolean = false;
 
   $: projectChainData = project ? filterCurrentChainData(project.chainData) : undefined;
-  $: loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject();
+  $: (loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject());
   $: dependenciesCount =
     projectChainData && isClaimed(projectChainData)
       ? projectChainData.splits.dependencies.length
