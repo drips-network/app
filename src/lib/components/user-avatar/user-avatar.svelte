@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
-    src?: string | undefined;
-    placeholderSrc?: string | undefined;
+    src?: string | null;
+    placeholderSrc?: string | undefined | null;
     size?: number;
     imgElem?: HTMLImageElement | undefined;
   }

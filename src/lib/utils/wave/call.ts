@@ -64,7 +64,7 @@ export async function authenticatedCall(
     await getRefreshedAuthToken();
 
     // retry the original request with the new token
-    return authenticatedCall(path, options, false);
+    return authenticatedCall(f, path, options, false);
   }
 
   return res;
