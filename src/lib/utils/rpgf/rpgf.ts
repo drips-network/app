@@ -501,7 +501,8 @@ export async function getOwnBallot(f = fetch, roundSlug: string): Promise<Wrappe
 
 export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedBallot[]> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots`,
+    // TODO(rpgf) pagination
+    `/rounds/${roundSlug}/ballots?limit=1000`,
     'GET',
     undefined,
     f,
