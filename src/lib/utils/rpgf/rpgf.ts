@@ -514,7 +514,7 @@ export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedB
 
 export async function getBallotsCsv(f = fetch, roundSlug: string): Promise<string> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots?format=csv`,
+    `/rounds/${roundSlug}/ballots?format=csv&limit=1000`,
     'GET',
     undefined,
     f,
