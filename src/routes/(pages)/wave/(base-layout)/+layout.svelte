@@ -23,7 +23,20 @@
 </div>
 
 <style>
+  .header-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+  }
+
   .layout-container {
+    margin-top: 4rem;
     padding: 1rem;
+    min-height: calc(100vh - 4rem);
+    display: flex;
+    height: fit-content;
+    flex-direction: column;
   }
 </style>

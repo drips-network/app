@@ -53,7 +53,7 @@
   */
   let fitContent = $state(!collapsed);
 
-  let containerHeight: Tweened<number> | undefined = $state();
+  let containerHeight: Tweened<number> | undefined = $state(collapsed ? tweened(0) : undefined);
   onMount(() => {
     if (collapsed) {
       containerHeight = tweened(0);

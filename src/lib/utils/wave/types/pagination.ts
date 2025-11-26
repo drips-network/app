@@ -8,6 +8,7 @@ export const paginationSchema = z.object({
   hasNextPage: z.boolean(),
   hasPreviousPage: z.boolean(),
 });
+export type Pagination = z.infer<typeof paginationSchema>;
 
 export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
   z.object({

@@ -50,10 +50,8 @@
 
 <style>
   .main {
-    min-height: 100vh;
     min-width: 100vw;
     background-color: var(--color-background);
     color: var(--color-foreground);
-    transition: background-color 0.5s;
   }
 </style>

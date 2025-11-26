@@ -1,6 +1,7 @@
 import z from 'zod';
 import { waveUserDtoSchema } from './user';
 import { filterSchema } from './filter';
+import { repoDtoSchema } from './repo';
 
 export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
   waveId: z.uuid(),
@@ -33,17 +34,7 @@ export const issueDetailsDtoSchema = z.object({
   gitHubCreatedAt: z.coerce.date(),
   gitHubUpdatedAt: z.coerce.date(),
   gitHubClosedAt: z.coerce.date().nullable(),
-  repo: z.object({
-    id: z.uuid(),
-    gitHubRepoName: z.string(),
-    gitHubRepoFullName: z.string(),
-    gitHubRepoUrl: z.string(),
-    org: z.object({
-      id: z.uuid(),
-      gitHubOrgLogin: z.string(),
-      gitHubOrgName: z.string().nullable(),
-    }),
-  }),
+  repo: repoDtoSchema,
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   waveId: z.uuid().nullable(),

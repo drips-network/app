@@ -17,3 +17,7 @@ export async function getIssues(f = fetch, pagination?: PaginationInput, filters
     ),
   );
 }
+
+export async function getIssue(f = fetch, issueId: string) {
+  return parseRes(issueDetailsDtoSchema, await authenticatedCall(f, `/api/issues/${issueId}`));
+}

@@ -13,7 +13,7 @@
 </script>
 
 <header>
-  <h1 class="typo-header-3">Drips Wave</h1>
+  <a class="typo-header-3" href="/wave">Drips Wave</a>
 
   {#if user}
     <Flyout>
@@ -32,10 +32,19 @@
 
 <style>
   header {
-    height: 4rem;
+    height: 5rem;
+    margin-bottom: -1rem;
     display: flex;
     align-items: center;
     padding: 0 1rem;
+    padding-bottom: 1rem;
     justify-content: space-between;
+    background: linear-gradient(
+      180deg,
+      var(--color-background) 0%,
+      var(--color-background) 80%,
+      transparent 100%
+    );
+    view-transition-name: header;
   }
 </style>
