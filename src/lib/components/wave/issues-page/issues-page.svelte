@@ -5,24 +5,27 @@
   import SortMostToLeast from '$lib/components/icons/SortMostToLeast.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import IssuesList from '$lib/components/wave/issues-page/components/issues-list/issues-list.svelte';
-  import type { Snippet } from 'svelte';
+  import type { ComponentProps, Snippet } from 'svelte';
   import { getIssues } from '$lib/utils/wave/issues';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import FilterConfig from './components/filter-config/filter-config.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import Spinner from '$lib/components/spinner/spinner.svelte';
+  import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
 
   let {
     issues,
     children,
     onapplyfilters,
     appliedFilters,
+    breadcrumbs,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
     appliedFilters: IssueFilters;
     onapplyfilters?: (filters: IssueFilters) => void | Promise<void>;
+    breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -60,11 +63,15 @@
 
 <div class="wrapper">
   <div class="issues">
+    <div class="breadcrumbs-wrapper">
+      <Breadcrumbs crumbs={breadcrumbs} />
+    </div>
+
     <div class="issue-list-configuration">
       <Button icon={MagnifyingGlass}>Search</Button>
 
       <div>
-        <Button icon={Filter} onclick={handleFilterClick}>Filter</Button>
+        <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>Filter</Button>
         <Button icon={SortMostToLeast}>Sort</Button>
       </div>
     </div>
@@ -95,16 +102,16 @@
     </Card>
   </div>
 
-  <div class="content">
-    <Card style="padding: 0;">
-      <div class="content-inner">
-        {@render children()}
-      </div>
-    </Card>
+  <div class="content" style:padding-top="3.5rem">
+    {@render children()}
   </div>
 </div>
 
 <style>
+  .breadcrumbs-wrapper {
+    margin-bottom: 1rem;
+  }
+
   .wrapper {
     flex: 1;
     display: grid;
@@ -115,6 +122,7 @@
   }
 
   .issues {
+    flex: 1;
     display: flex;
     flex-direction: column;
     height: calc(100vh - 6rem);
@@ -132,11 +140,6 @@
 
   .content {
     position: relative;
-  }
-
-  .content-inner {
-    height: 100%;
-    padding: 1rem;
   }
 
   .filter-config {

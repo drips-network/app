@@ -11,11 +11,13 @@ export default async function performLogin(url: URL) {
   }
 
   // exchange for wave login
-  const accessToken = await redeemGitHubOAuthCode(code, state);
+  const { accessToken, newUser } = await redeemGitHubOAuthCode(code, state);
 
   if (!accessToken) {
     throw error(401, 'Failed to exchange GitHub OAuth code for access token');
   }
 
   setAccessJwt(accessToken);
+
+  return { accessToken, newUser };
 }

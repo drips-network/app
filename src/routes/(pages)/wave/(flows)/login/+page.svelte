@@ -4,4 +4,7 @@
   let { data } = $props();
 </script>
 
-<LogInButton backTo={data.backTo || '/wave'} />
+<h1>Sign in to Drips Wave</h1>
+<p>To start using Drips Wave, please sign in with your GitHub account.</p>
+
+<LogInButton primary wordy backTo={data.backTo || '/wave'} />

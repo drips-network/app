@@ -1,5 +1,16 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
+  import { logOut } from '$lib/utils/wave/auth';
+
+  let loggingOut = $state(false);
+
+  async function handleLogOut() {
+    loggingOut = true;
+    await logOut();
+    await invalidateAll();
+    loggingOut = false;
+  }
 </script>
 
-<Button href="/wave/logout" reloadOnLinkClick noPreload>Log out</Button>
+<Button onclick={handleLogOut} loading={loggingOut}>Log out</Button>

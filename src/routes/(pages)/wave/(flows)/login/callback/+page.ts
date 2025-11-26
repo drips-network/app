@@ -4,7 +4,7 @@ import performLogin from './perform-login.js';
 import z from 'zod';
 
 export const load = async ({ url }) => {
-  await performLogin(url);
+  const { newUser } = await performLogin(url);
 
   // state param is a base 64 encoded JSON string
   const decodedState = url.searchParams.get('state')
@@ -22,7 +22,13 @@ export const load = async ({ url }) => {
     throw error(400, 'Invalid state parameter');
   }
 
-  return redirect(302, `/wave/login?backTo=${parsedState.data.backTo || ''}`);
+  const { backTo } = parsedState.data;
+
+  if (newUser) {
+    return redirect(302, `/wave/welcome?backTo=${backTo || ''}`);
+  }
+
+  return redirect(302, `/wave/login?backTo=${backTo || ''}`);
 };
 
 export const ssr = false;

@@ -32,8 +32,7 @@
 
 <style>
   header {
-    height: 5rem;
-    margin-bottom: -1rem;
+    height: 4.5rem;
     display: flex;
     align-items: center;
     padding: 0 1rem;

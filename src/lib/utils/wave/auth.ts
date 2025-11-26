@@ -81,12 +81,13 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
   const data = z
     .object({
       accessToken: z.string(),
+      newUser: z.boolean(),
     })
     .parse(res);
 
   setAccessJwt(data.accessToken);
 
-  return data.accessToken;
+  return data;
 }
 
 export async function logOut() {

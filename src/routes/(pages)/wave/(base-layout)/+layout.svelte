@@ -33,7 +33,7 @@
 
   .layout-container {
     margin-top: 4rem;
-    padding: 1rem;
+    padding: 0 1rem 1rem 1rem;
     min-height: calc(100vh - 4rem);
     display: flex;
     height: fit-content;

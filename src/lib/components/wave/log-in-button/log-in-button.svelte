@@ -4,7 +4,11 @@
   import Github from '$lib/components/icons/Github.svelte';
   import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
-  let { backTo = page.url.pathname + page.url.search }: { backTo?: string } = $props();
+  let {
+    backTo = page.url.pathname + page.url.search,
+    wordy = false,
+    primary = false,
+  }: { backTo?: string; wordy?: boolean; primary?: boolean } = $props();
 
   const WAVE_API_URL = getOptionalEnvVar(
     'PUBLIC_WAVE_API_URL',
@@ -15,7 +19,8 @@
 
 <Button
   icon={Github}
+  variant={primary ? 'primary' : undefined}
   href="{WAVE_API_URL}/api/auth/oauth/github/login{backTo
     ? `?backTo=${encodeURIComponent(backTo)}`
-    : ''}">Log in</Button
+    : ''}">{wordy ? 'Log in with GitHub' : 'Log in'}</Button
 >

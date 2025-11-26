@@ -21,6 +21,7 @@
     circular?: boolean;
     reloadOnLinkClick?: boolean;
     noPreload?: boolean;
+    highlit?: boolean;
     onclick?: ((event: MouseEvent) => void) | undefined;
     onmouseenter?: (event: MouseEvent) => void;
     onmouseleave?: (event: MouseEvent) => void;
@@ -46,6 +47,7 @@
     circular = false,
     reloadOnLinkClick = false,
     noPreload = false,
+    highlit = false,
     onclick = undefined,
     onmouseenter = undefined,
     onmouseleave = undefined,
@@ -86,6 +88,7 @@
   class:disabled={isDisabled}
   class:loading
   class:circular
+  class:highlit
   disabled={isDisabled}
   aria-disabled={isDisabled}
   data-sveltekit-reload={reloadOnLinkClick}
@@ -133,6 +136,10 @@
     margin: -4px 0;
     transition: opacity 0.3s;
     flex-shrink: 0;
+  }
+
+  .button:not(:hover).highlit .inner {
+    background-color: var(--color-primary-level-1);
   }
 
   .button.size-large {

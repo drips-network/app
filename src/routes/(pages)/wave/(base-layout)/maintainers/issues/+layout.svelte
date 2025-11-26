@@ -14,13 +14,12 @@
   } = $props();
 
   async function handleApplyFilters(filters: IssueFilters) {
-    if (Object.values(filters).length === 0) {
-      await goto('?filters=', { replaceState: true });
-      return;
-    }
-
-    const encodedFilters = btoa(JSON.stringify(filters));
-    await goto(`?filters=${encodedFilters}`, { replaceState: true });
+    const encodedFilters = Object.values(filters).length === 0 ? '' : btoa(JSON.stringify(filters));
+    await goto(`?filters=${encodedFilters}`, {
+      replaceState: true,
+      noScroll: true,
+      keepFocus: true,
+    });
   }
 </script>
 
@@ -28,6 +27,7 @@
   issues={data.issues}
   appliedFilters={data.appliedFilters}
   onapplyfilters={handleApplyFilters}
+  breadcrumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Issues' }]}
 >
   {@render children()}
 </IssuesPage>

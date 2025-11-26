@@ -1,7 +1,10 @@
 import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
+import { inferBadges } from './issues-list-item.svelte';
 
 const ISSUE_ITEM_HEIGHT_SINGLE_LINE = 80; // in px
 const ISSUE_ITEM_HEIGHT_DOUBLE_LINE = 105; // in px
+
+const BADGES_ROW_HEIGHT = 24 + 8; // in px (24px for badges height + 8px gap)
 
 export function determineAmountOfLines(issue: IssueDetailsDto): 1 | 2 {
   if (issue.title.length > 50) {
@@ -14,9 +17,13 @@ export function determineAmountOfLines(issue: IssueDetailsDto): 1 | 2 {
 export function determineIssuesListItemHeight(issue: IssueDetailsDto): number {
   const amountOfLines = determineAmountOfLines(issue);
 
-  if (amountOfLines === 1) {
-    return ISSUE_ITEM_HEIGHT_SINGLE_LINE;
-  } else {
-    return ISSUE_ITEM_HEIGHT_DOUBLE_LINE;
+  let base = amountOfLines === 1 ? ISSUE_ITEM_HEIGHT_SINGLE_LINE : ISSUE_ITEM_HEIGHT_DOUBLE_LINE;
+
+  const hasBadges = inferBadges(issue).length > 0;
+
+  if (hasBadges) {
+    base += BADGES_ROW_HEIGHT;
   }
+
+  return base;
 }
