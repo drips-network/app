@@ -68,7 +68,7 @@
     "rehype-img-size": "^1.0.1",
     "rehype-slug": "^6.0.0",
     "rollup-plugin-visualizer": "^6.0.3",
-    "svelte": "^5.0.0",
+    "svelte": "^5.45.2",
     "svelte-check": "^4.0.0",
     "svelte-tiny-virtual-list": "v4.0.0-rc.2",
     "svelte2tsx": "^0.7.45",
