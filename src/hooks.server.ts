@@ -18,7 +18,7 @@ export const handle = async ({ event, resolve }) => {
   // this allows the initial page render to be SSR even for logged-in-only views.
 
   if (event.url.pathname.startsWith('/wave') && WAVE_API_URL) {
-    const refreshToken = event.cookies.get('wave_refresh_token');
+    const refreshToken = event.cookies.get('wave_refresh_token', {});
 
     if (refreshToken) {
       event.locals.waveRefreshToken = refreshToken;
@@ -46,12 +46,11 @@ export const handle = async ({ event, resolve }) => {
           const { name, value, ...options } = setCookieParser.parseString(str);
 
           if (name === 'wave_refresh_token') {
+            // set the same cookie that was sent by the Wave API, same options as well
             event.cookies.set('wave_refresh_token', value, {
-              path: '/',
-              httpOnly: true,
-              secure: event.url.protocol === 'https:', // false on localhost usually
-              sameSite: 'lax',
-              maxAge: options.maxAge,
+              ...options,
+              sameSite: options.sameSite as 'lax' | 'strict' | 'none',
+              path: options.path || '/',
             });
           }
         }
