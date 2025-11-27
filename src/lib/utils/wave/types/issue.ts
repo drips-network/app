@@ -2,6 +2,7 @@ import z from 'zod';
 import { waveUserDtoSchema } from './user';
 import { filterSchema } from './filter';
 import { repoDtoSchema } from './repo';
+import { complexitySchema } from './wave';
 
 export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
   waveId: z.uuid(),
@@ -39,6 +40,7 @@ export const issueDetailsDtoSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   waveId: z.uuid().nullable(),
+  complexity: complexitySchema.nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
 });

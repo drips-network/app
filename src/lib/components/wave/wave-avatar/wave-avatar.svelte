@@ -8,7 +8,7 @@
     size,
   }: {
     wave: WaveDto;
-    size: ComponentProps<typeof UserAvatar>['size'];
+    size?: ComponentProps<typeof UserAvatar>['size'];
   } = $props();
 </script>
 

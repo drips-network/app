@@ -4,13 +4,21 @@
   interface Props {
     checked: boolean;
     label?: string | undefined;
+    disabled?: boolean;
     size?: 'normal' | 'big';
     onclick?: ((e: MouseEvent) => void) | undefined;
-    oninput?: ((event: Event) => void) | undefined;
+    oninput?:
+      | ((
+          event: Event & {
+            currentTarget: EventTarget & HTMLInputElement;
+          },
+        ) => void)
+      | undefined;
   }
 
   let {
     checked = $bindable(),
+    disabled = false,
     label = undefined,
     size = 'normal',
     onclick = undefined,
@@ -18,8 +26,8 @@
   }: Props = $props();
 </script>
 
-<label class="toggle {size}">
-  <input tabindex="0" type="checkbox" bind:checked {oninput} {onclick} />
+<label class="toggle {size}" class:disabled>
+  <input {disabled} tabindex="0" type="checkbox" bind:checked {oninput} {onclick} />
   <SelectedDot type="check" bind:selected={checked} />
   {#if label}<span class="typo-text-bold">{label}</span>{/if}
 </label>
@@ -29,6 +37,12 @@
     display: flex;
     gap: 0.5rem;
     cursor: pointer;
+  }
+
+  .toggle.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
   }
 
   input {

@@ -1,5 +1,6 @@
 import { getIssues } from '$lib/utils/wave/issues';
 import { issueFilters } from '$lib/utils/wave/types/issue.js';
+import { getOwnWaveRepos, getWaves } from '$lib/utils/wave/waves.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, url, depends }) => {
@@ -18,17 +19,25 @@ export const load = async ({ fetch, url, depends }) => {
 
   const filters = filtersParamParseResult.data || {};
 
-  const issues = await getIssues(
-    fetch,
-    { limit: 10 },
-    {
-      ...filters,
-      mine: true,
-    },
-  );
+  const [issues, waveRepos, waves] = await Promise.all([
+    getIssues(
+      fetch,
+      { limit: 10 },
+      {
+        ...filters,
+        mine: true,
+      },
+    ),
+    // todo(wave): pagination
+    getOwnWaveRepos(fetch, { limit: 100 }),
+    // todo(wave): Only fetch waves included in the issues list
+    getWaves(fetch, { limit: 100 }),
+  ]);
 
   return {
     issues,
     appliedFilters: filters,
+    waveRepos,
+    waves,
   };
 };

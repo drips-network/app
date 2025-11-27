@@ -110,3 +110,32 @@ export const waveRepoWithDetailsDtoSchema = z.object({
   reviewedBy: waveUserDtoSchema.nullable(),
 });
 export type WaveRepoWithDetailsDto = z.infer<typeof waveRepoWithDetailsDtoSchema>;
+
+export const complexitySchema = z.enum(['small', 'medium', 'large']);
+export type Complexity = z.infer<typeof complexitySchema>;
+
+export const waveIssueWithDetailsDtoSchema = z.object({
+  id: z.uuid(),
+  addedAt: z.coerce.date(),
+  removedAt: z.coerce.date().nullable(),
+  complexity: complexitySchema.nullable(),
+  issue: z.object({
+    id: z.uuid(),
+    gitHubIssueNumber: z.number(),
+    title: z.string(),
+    body: z.string().nullable(),
+    state: z.string(),
+    gitHubAuthorLogin: z.string().nullable(),
+    gitHubCreatedAt: z.coerce.date(),
+    gitHubUpdatedAt: z.coerce.date(),
+    gitHubClosedAt: z.coerce.date().nullable(),
+    repo: z.object({
+      id: z.uuid(),
+      gitHubRepoName: z.string(),
+      gitHubRepoFullName: z.string(),
+      gitHubRepoUrl: z.string(),
+    }),
+  }),
+  addedBy: waveUserDtoSchema.nullable(),
+  removedBy: waveUserDtoSchema.nullable(),
+});

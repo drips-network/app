@@ -10,9 +10,15 @@
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import FilterConfig from './components/filter-config/filter-config.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
-  import type { IssueFilters } from '$lib/utils/wave/types/issue';
+  import { type IssueDetailsDto, type IssueFilters } from '$lib/utils/wave/types/issue';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
+  import Plus from '$lib/components/icons/Plus.svelte';
+  import { fade } from 'svelte/transition';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave/add-issues-to-wave-flow';
+  import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
 
   let {
     issues,
@@ -20,12 +26,22 @@
     onapplyfilters,
     appliedFilters,
     breadcrumbs,
+    allowAddToWave = false,
+    ownWaveRepos = [],
+    waves,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
     appliedFilters: IssueFilters;
     onapplyfilters?: (filters: IssueFilters) => void | Promise<void>;
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
+    allowAddToWave?: boolean;
+
+    /** For determining what Waves, if any, issues may be added to */
+    ownWaveRepos: WaveRepoWithDetailsDto[];
+
+    /** For displaying wave data in list items */
+    waves: WaveDto[];
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -59,6 +75,14 @@
 
     applyingFilters = false;
   }
+
+  let selectedIssues = $state<IssueDetailsDto[]>([]);
+
+  let listInstance = $state<IssuesList | undefined>(undefined);
+
+  function handleClear() {
+    listInstance?.clearSelection();
+  }
 </script>
 
 <div class="wrapper">
@@ -67,14 +91,35 @@
       <Breadcrumbs crumbs={breadcrumbs} />
     </div>
 
-    <div class="issue-list-configuration">
-      <Button icon={MagnifyingGlass}>Search</Button>
-
-      <div>
-        <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>Filter</Button>
-        <Button icon={SortMostToLeast}>Sort</Button>
+    {#if selectedIssues.length > 0}
+      <div class="batch-actions" in:fade={{ duration: 150 }}>
+        <span class="tnum"
+          >{selectedIssues.length} issue{selectedIssues.length === 1 ? '' : 's'}</span
+        >
+        <div class="buttons">
+          <button style="text-decoration: underline" onclick={handleClear}>Clear</button>
+          <Button
+            variant="primary"
+            icon={Plus}
+            onclick={() =>
+              modal.show(
+                Stepper,
+                undefined,
+                addIssuesToWaveFlow(ownWaveRepos, selectedIssues, waves, handleClear),
+              )}>Add to Wave</Button
+          >
+        </div>
       </div>
-    </div>
+    {:else}
+      <div class="issue-list-configuration">
+        <Button icon={MagnifyingGlass}>Search</Button>
+
+        <div>
+          <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>Filter</Button>
+          <Button icon={SortMostToLeast}>Sort</Button>
+        </div>
+      </div>
+    {/if}
 
     <TransitionedHeight collapsed={!filtersOpen}>
       <div class="filter-config">
@@ -95,8 +140,12 @@
         </div>
       {:else}
         <IssuesList
+          {waves}
+          bind:this={listInstance}
+          multiselectMode={allowAddToWave}
           issuesWithPagination={issues}
           getMoreIssues={(currentPagination) => getMoreIssues(currentPagination, appliedFilters)}
+          onselectchange={(selected) => (selectedIssues = selected)}
         />
       {/if}
     </Card>
@@ -136,9 +185,31 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    transition: opacity 0.3s;
+    height: 2.25rem;
+  }
+
+  .batch-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    height: 2.25rem;
+
+    padding: 0 0 0 1rem;
+    border-radius: 1.25rem 0 1.25rem 1.25rem;
+    background-color: var(--color-primary-level-1);
+    color: var(--color-primary-level-6);
+  }
+
+  .batch-actions .buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   .content {
+    min-width: 0;
     position: relative;
   }
 

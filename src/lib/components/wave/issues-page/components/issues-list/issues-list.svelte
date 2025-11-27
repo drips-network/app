@@ -5,15 +5,32 @@
   import { determineIssuesListItemHeight } from './components/determine-issues-list-item-height';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import Spinner from '$lib/components/spinner/spinner.svelte';
+  import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
+  import { SvelteSet } from 'svelte/reactivity';
+  import type { WaveDto } from '$lib/utils/wave/types/wave';
+  import { onMount } from 'svelte';
+  import {
+    registerIssueUpdateListener,
+    unregisterIssueUpdateListener,
+  } from '../../issue-update-coordinator';
 
   let {
     issuesWithPagination,
     getMoreIssues,
+    waves,
+    multiselectMode = false,
+    onselectchange,
   }: {
     issuesWithPagination: Awaited<ReturnType<typeof getIssues>>;
     getMoreIssues: (
       pagination: Pagination,
     ) => Promise<Awaited<ReturnType<typeof getIssues>> | null>;
+
+    /** For displaying wave data in list items */
+    waves: WaveDto[];
+
+    multiselectMode?: boolean;
+    onselectchange?: (selectedIssues: IssueDetailsDto[]) => void;
   } = $props();
 
   let issues = $state(issuesWithPagination.data);
@@ -88,7 +105,88 @@
       observer?.disconnect();
     };
   });
+
+  let shiftKeyHeld = $state<boolean>(false);
+  let lastClickedIndex = $state<number | null>(null);
+  let selectedIndices = $state<Set<number>>(new SvelteSet<number>());
+
+  function handleItemSelect(index: number, selected: boolean) {
+    if (selected) {
+      selectedIndices.add(index);
+    } else {
+      selectedIndices.delete(index);
+    }
+
+    if (shiftKeyHeld && lastClickedIndex !== null) {
+      const start = Math.min(lastClickedIndex, index);
+      const end = Math.max(lastClickedIndex, index);
+
+      for (let i = start; i <= end; i++) {
+        if (selected) {
+          const issueStatus = issues[i].state;
+          if (issueStatus !== 'open') continue;
+
+          selectedIndices.add(i);
+        } else {
+          selectedIndices.delete(i);
+        }
+      }
+    }
+
+    lastClickedIndex = index;
+  }
+
+  $effect(() => {
+    if (onselectchange) {
+      const selectedIssues = Array.from(selectedIndices).map((index) => issues[index]);
+      onselectchange(selectedIssues);
+    }
+  });
+
+  export function clearSelection() {
+    selectedIndices = new SvelteSet();
+  }
+
+  function getWaveById(waveId: string | null): WaveDto | null {
+    if (!waveId) return null;
+
+    return waves.find((wave) => wave.id === waveId) || null;
+  }
+
+  /** Surgically update an issue. Awkward but necessary considering the endless scrolling */
+  function patchIssue(updatedIssue: IssueDetailsDto) {
+    const index = issues.findIndex((issue) => issue.id === updatedIssue.id);
+
+    if (index === -1) return;
+
+    issues[index] = updatedIssue;
+  }
+
+  onMount(() => {
+    const issueUpdatedListener = (updatedIssue: IssueDetailsDto) => {
+      patchIssue(updatedIssue);
+    };
+
+    registerIssueUpdateListener(issueUpdatedListener);
+
+    return () => {
+      unregisterIssueUpdateListener(issueUpdatedListener);
+    };
+  });
 </script>
+
+<svelte:window
+  on:keydown={(e) => {
+    if (e.key === 'Shift') {
+      shiftKeyHeld = true;
+    }
+  }}
+  on:keyup={(e) => {
+    if (e.key === 'Shift') {
+      shiftKeyHeld = false;
+    }
+  }}
+/>
 
 <div class="wrapper">
   <div class="height-observer" bind:this={heightObserverEl} use:measureHeight></div>
@@ -102,7 +200,13 @@
     {#snippet item({ style, index })}
       {@const issue = issues[index]}
       <div {style}>
-        <IssuesListItem {issue} />
+        <IssuesListItem
+          {issue}
+          selectable={multiselectMode}
+          selected={selectedIndices.has(index)}
+          onselect={(selected) => handleItemSelect(index, selected)}
+          partOfWave={getWaveById(issue.waveId)}
+        />
       </div>
     {/snippet}
 
@@ -123,6 +227,7 @@
     height: 100%;
     flex: 1;
     position: relative;
+    user-select: none;
   }
 
   .height-observer {

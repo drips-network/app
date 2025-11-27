@@ -1,8 +1,8 @@
 import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import { inferBadges } from './issues-list-item.svelte';
 
-const ISSUE_ITEM_HEIGHT_SINGLE_LINE = 88; // in px
-const ISSUE_ITEM_HEIGHT_DOUBLE_LINE = 115; // in px
+const ISSUE_ITEM_HEIGHT_SINGLE_LINE = 85; // in px
+const ISSUE_ITEM_HEIGHT_DOUBLE_LINE = 110; // in px
 
 const BADGES_ROW_HEIGHT = 24 + 8; // in px (24px for badges height + 8px gap)
 
