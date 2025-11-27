@@ -63,7 +63,7 @@
   </h3>
 
   <div class="details">
-    <RepoBadge repo={issue.repo} />
+    <RepoBadge size="small" repo={issue.repo} />
   </div>
 </a>
 

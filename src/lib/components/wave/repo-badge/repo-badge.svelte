@@ -7,7 +7,7 @@
 </script>
 
 <div class="repo-badge">
-  <EmojiOrIpfsAvatar placeholderIcon={GithubIcon} />
+  <EmojiOrIpfsAvatar size={size === 'small' ? 'tiny' : undefined} placeholderIcon={GithubIcon} />
   <span class={size === 'small' ? 'typo-text-small' : 'typo-text'}>{repo.gitHubRepoFullName}</span>
 </div>
 
