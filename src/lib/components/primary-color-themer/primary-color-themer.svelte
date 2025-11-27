@@ -25,7 +25,14 @@
   }>();
 
   run(() => {
-    if (colorHex && SUPPORTED_COLORS.includes(colorHex)) {
+    if (!colorHex) {
+      colorVars = {
+        primary: 'inherit',
+        'primary-level-1': 'inherit',
+        'primary-level-2': 'inherit',
+        'primary-level-6': 'inherit',
+      };
+    } else if (colorHex && SUPPORTED_COLORS.includes(colorHex)) {
       const rgb = hexToRgb(colorHex);
       const level6Adjustment = isLightTheme ? 30 : -30;
 
