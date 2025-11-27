@@ -1,4 +1,4 @@
-import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
+import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
@@ -8,7 +8,7 @@ PuppeteerManager.launch({
 });
 
 const WAVE_API_URL = getOptionalEnvVar(
-  'INTERNAL_WAVE_API_URL',
+  'PUBLIC_INTERNAL_WAVE_API_URL',
   true,
   'Wave functionality will not work.',
 );
