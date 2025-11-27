@@ -8,7 +8,9 @@
 
 <div class="repo-badge">
   <EmojiOrIpfsAvatar size={size === 'small' ? 'tiny' : undefined} placeholderIcon={GithubIcon} />
-  <span class={size === 'small' ? 'typo-text-small' : 'typo-text'}>{repo.gitHubRepoFullName}</span>
+  <span class="{size === 'small' ? 'typo-text-small' : 'typo-text'} line-clamp-1"
+    >{repo.gitHubRepoFullName}</span
+  >
 </div>
 
 <style>

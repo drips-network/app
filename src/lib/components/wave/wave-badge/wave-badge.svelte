@@ -13,7 +13,7 @@
 
 <div class="wave-badge">
   <WaveAvatar {wave} />
-  <span class={size === 'small' ? 'typo-text-small' : 'typo-text'}>{wave.name}</span>
+  <span class="line-clamp-1 {size === 'small' ? 'typo-text-small' : 'typo-text'}">{wave.name}</span>
 </div>
 
 <style>
