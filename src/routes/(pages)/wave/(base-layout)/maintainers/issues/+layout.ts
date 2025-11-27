@@ -18,7 +18,14 @@ export const load = async ({ fetch, url, depends }) => {
 
   const filters = filtersParamParseResult.data || {};
 
-  const issues = await getIssues(fetch, { limit: 10 }, filters);
+  const issues = await getIssues(
+    fetch,
+    { limit: 10 },
+    {
+      ...filters,
+      mine: true,
+    },
+  );
 
   return {
     issues,

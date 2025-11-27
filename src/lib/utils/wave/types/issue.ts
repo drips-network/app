@@ -16,6 +16,7 @@ export const issueFilters = filterSchema(
     state: z.enum(['open', 'closed']).optional(),
     sortBy: z.enum(['createdAt', 'updatedAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
+    mine: z.boolean().optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;
