@@ -1,10 +1,14 @@
-import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
+import {
+  parseFile,
+  deduplicateEntriesAndSumWeights,
+} from '$lib/flows/import-from-csv/parse-upload';
 import splits from './data/splits.csv?raw';
 import splitsHeader from './data/splits-header.csv?raw';
 import splitsHeaderExtra from './data/splits-header-extra.csv?raw';
 import splitsHeaderCase from './data/splits-header-case.csv?raw';
 import splitsHeaderSpace from './data/splits-header-space.csv?raw';
 import collaboratorsHeaderMixed from './data/collaborators-header-mixed.csv?raw';
+import splitsDuplicateAddress from './data/splits-duplicate-address.csv?raw';
 
 vi.mock('$app/environment', () => ({
   browser: true,
@@ -60,6 +64,52 @@ describe('parse upload', () => {
     it('should parse a valid splits file and remove trim white space', async () => {
       const parsedFile = await parseFile(splitsHeaderSpaceFile, csvHeaders);
       expect(parsedFile[0][0]).toBe('https://github.com/user/project/');
+    });
+  });
+
+  describe('deduplicateEntriesAndSumWeights', () => {
+    let splitsDuplicateAddressFile: File;
+
+    beforeAll(() => {
+      splitsDuplicateAddressFile = new File(
+        [new Blob([splitsDuplicateAddress], { type: 'text/csv' })],
+        'name',
+      );
+    });
+
+    it('should sum weights for duplicate recipients', async () => {
+      const parsedFile = await parseFile(splitsDuplicateAddressFile, [
+        'ethereum_address',
+        'impact_percentage',
+      ]);
+
+      // Should have 5 entries (duplicates included)
+      expect(parsedFile).toHaveLength(5);
+
+      const deduplicatedFile = deduplicateEntriesAndSumWeights(parsedFile);
+
+      // Should have 4 unique entries (5 rows - 1 duplicate)
+      expect(deduplicatedFile).toHaveLength(4);
+
+      // Find the merged entry
+      const mergedEntry = deduplicatedFile.find(
+        (row) => row[0] === '0x9D8dC28E9d9C4C5a387A858182edF9ab8B90F565',
+      );
+
+      expect(mergedEntry).toBeDefined();
+      // 10.66 + 0.72 = 11.38
+      expect(mergedEntry![1]).toBe('11.38');
+    });
+    it('should handle mixed undefined and defined weights', () => {
+      const entries = [
+        ['recipient1', '10'],
+        ['recipient1'], // undefined
+      ];
+
+      const result = deduplicateEntriesAndSumWeights(entries);
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(['recipient1', '10']);
     });
   });
 

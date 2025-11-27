@@ -16,7 +16,10 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
   import { createInvalidMessage } from '$lib/components/list-editor/validators';
-  import { parseFile } from '$lib/flows/import-from-csv/parse-upload';
+  import {
+    parseFile,
+    deduplicateEntriesAndSumWeights,
+  } from '$lib/flows/import-from-csv/parse-upload';
   import { DEFAULT_CSV_HEADERS, DEFAULT_MAX_ENTRIES } from './import-from-csv-steps';
   import type { AccountId } from '$lib/utils/common-types';
 
@@ -90,7 +93,8 @@
 
   async function validateFile(file: File): Promise<string | false> {
     // sets global data used later in submit()
-    parsedFile = await parseFile(file, csvHeaders);
+    const rawParsedFile = await parseFile(file, csvHeaders);
+    parsedFile = deduplicateEntriesAndSumWeights(rawParsedFile);
     return parsedFile.length > csvMaxEntries ? 'too-many-entries' : false;
   }
 
