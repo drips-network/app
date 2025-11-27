@@ -47,7 +47,9 @@
               </div>
               <Button
                 icon={ArrowBoxUpRight}
-                href="https://github.com/settings/installations/{org.org.gitHubInstallationId}"
+                href={org.org.accountType === 'User'
+                  ? `https://github.com/settings/installations/${org.org.gitHubInstallationId}`
+                  : `https://github.com/organizations/${org.org.gitHubOrgLogin}/settings/installations/${org.org.gitHubInstallationId}`}
                 size="small">Edit settings</Button
               >
             </div>
