@@ -32,7 +32,16 @@
 
   const pluralS = issues.length > 1 ? 's' : '';
 
-  let eligibleIssues = $derived(issues.filter((issue) => !issue.waveId && issue.state === 'open'));
+  let eligibleIssues = $derived(
+    issues
+      .filter((issue) => !issue.waveId && issue.state === 'open')
+      .filter((issue) => {
+        const matchingWaveRepo = waveRepos.find(
+          (waveRepo) => waveRepo.repo.id === issue.repo.id && waveRepo.status === 'approved',
+        );
+        return Boolean(matchingWaveRepo);
+      }),
+  );
   let hasIneligibleIssues = $derived(eligibleIssues.length < issues.length);
 
   async function handleSubmit() {
