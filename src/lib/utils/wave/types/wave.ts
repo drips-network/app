@@ -94,6 +94,7 @@ export type RejectWaveRepoDto = z.infer<typeof rejectWaveRepoDtoSchema>;
 
 export const waveRepoWithDetailsDtoSchema = z.object({
   id: z.uuid(),
+  waveId: z.uuid(),
   status: waveRepoStatusSchema,
   appliedAt: z.coerce.date(),
   reviewedAt: z.coerce.date().nullable(),

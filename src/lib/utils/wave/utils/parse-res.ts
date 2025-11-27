@@ -26,8 +26,13 @@ export default async function parseRes<ZT extends ZodType>(
       return null;
     }
 
-    return Promise.reject(new Error(`Request failed with status ${res.status}: ${res.statusText}`));
+    return Promise.reject(
+      new Error(
+        `Request failed with status ${res.status}: ${res.statusText} : ${await res.text()}`,
+      ),
+    );
   }
 
-  return schema.parse(await res.json());
+  const json = await res.json();
+  return schema.parse(json);
 }

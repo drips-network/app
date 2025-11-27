@@ -15,6 +15,7 @@ export const orgDtoSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
+export type Org = z.infer<typeof orgDtoSchema>;
 
 export const orgFiltersSchema = filterSchema(
   z.object({

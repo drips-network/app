@@ -10,7 +10,10 @@ export const load = async ({ parent, fetch, depends }) => {
     throw redirect(302, '/wave/login?backTo=/wave/maintainer-onboarding/review-repos');
   }
 
-  const [userOrgs, ownRepos] = await Promise.all([getOrgs(fetch), getOwnRepos(fetch)]);
+  const [userOrgs, ownRepos] = await Promise.all([
+    getOrgs(fetch, { limit: 100 }),
+    getOwnRepos(fetch, { limit: 100 }),
+  ]);
 
   if (!userOrgs || userOrgs.data.length === 0) {
     throw redirect(302, '/wave/maintainer-onboarding/install-app');

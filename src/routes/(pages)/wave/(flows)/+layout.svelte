@@ -1,5 +1,6 @@
 <script lang="ts">
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
+  import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
 
   interface Props {
     children?: import('svelte').Snippet;
@@ -8,8 +9,10 @@
   let { children }: Props = $props();
 </script>
 
+<ModalLayout />
+
 <div class="flow-base-layout">
-  <a href="/" class="logo">
+  <a href="/wave" class="logo">
     <!-- todo logo -->
     Drips Wave
   </a>
@@ -32,6 +35,7 @@
     gap: 2rem;
     min-height: 100vh;
     padding: 1rem 0.5rem;
+    max-width: 100vw;
   }
 
   .content {

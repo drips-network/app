@@ -1,5 +1,9 @@
 <script lang="ts">
+  import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
+  import ConfettiOnClick from '$lib/components/confetti-on-click/confetti-on-click.svelte';
+  import Emoji from '$lib/components/emoji/emoji.svelte';
   import type { Component } from 'svelte';
+  import Confetti from 'svelte-confetti';
 
   interface Props {
     headline?: string | undefined;
@@ -8,12 +12,14 @@
     children?: import('svelte').Snippet;
     leftActions?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
+    confetti?: boolean;
   }
 
   let {
     headline = undefined,
     description = undefined,
     icon = undefined,
+    confetti = false,
     children,
     leftActions,
     actions,
@@ -22,6 +28,27 @@
 
 <div class="step-layout">
   <div class="top">
+    {#if confetti}
+      <ConfettiOnClick alsoOnMount>
+        {#snippet label()}
+          <CoinAnimation animateOnMount>
+            <div class="circle">
+              <Emoji size="huge" emoji="🎉" />
+            </div>
+          </CoinAnimation>
+        {/snippet}
+
+        <Confetti
+          x={[-1, 1]}
+          y={[-0.25, 1]}
+          colorArray={[
+            'var(--color-primary)',
+            'var(--color-primary-level-2)',
+            'var(--color-primary-level-6)',
+          ]}
+        />
+      </ConfettiOnClick>
+    {/if}
     {#if icon}
       {@const SvelteComponent = icon}
       <div class="icon">
@@ -59,6 +86,7 @@
     height: 100%;
     min-height: 8rem;
     width: 100%;
+    flex: 1;
   }
 
   .top {
