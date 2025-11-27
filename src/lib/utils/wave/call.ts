@@ -14,7 +14,7 @@ const INTERNAL_WAVE_API_URL = getOptionalEnvVarPublic(
   'Wave functionality will not work.',
 );
 
-const WAVE_API_URL = browser ? INTERNAL_WAVE_API_URL : PUBLIC_WAVE_API_URL;
+const WAVE_API_URL = browser ? PUBLIC_WAVE_API_URL : INTERNAL_WAVE_API_URL;
 
 export async function call(path: string, options: RequestInit = {}) {
   if (!WAVE_API_URL) {
