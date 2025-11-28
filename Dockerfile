@@ -84,6 +84,8 @@ ARG PUBLIC_WAVE_API_URL
 ARG PUBLIC_INTERNAL_WAVE_API_URL
 ARG PUBLIC_WAVE_GITHUB_APP_NAME
 
+ARG PUBLIC_INTERCOM_APP_ID
+
 RUN apt-get update \
  && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
