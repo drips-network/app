@@ -5,7 +5,7 @@
   import SortMostToLeast from '$lib/components/icons/SortMostToLeast.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import IssuesList from '$lib/components/wave/issues-page/components/issues-list/issues-list.svelte';
-  import type { ComponentProps, Snippet } from 'svelte';
+  import { onMount, type ComponentProps, type Snippet } from 'svelte';
   import { getIssues } from '$lib/utils/wave/issues';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import FilterConfig from './components/filter-config/filter-config.svelte';
@@ -19,6 +19,10 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave/add-issues-to-wave-flow';
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
+  import {
+    registerIssueUpdateListener,
+    unregisterIssueUpdateListener,
+  } from './issue-update-coordinator';
 
   let {
     issues,
@@ -28,6 +32,7 @@
     breadcrumbs,
     allowAddToWave = false,
     ownWaveRepos = [],
+    pathPrefix,
     waves,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
@@ -37,8 +42,10 @@
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
     allowAddToWave?: boolean;
 
+    pathPrefix: string;
+
     /** For determining what Waves, if any, issues may be added to */
-    ownWaveRepos: WaveRepoWithDetailsDto[];
+    ownWaveRepos?: WaveRepoWithDetailsDto[];
 
     /** For displaying wave data in list items */
     waves: WaveDto[];
@@ -83,6 +90,18 @@
   function handleClear() {
     listInstance?.clearSelection();
   }
+
+  onMount(() => {
+    const issueUpdatedHandler = () => {
+      handleClear();
+    };
+
+    registerIssueUpdateListener(issueUpdatedHandler);
+
+    return () => {
+      unregisterIssueUpdateListener(issueUpdatedHandler);
+    };
+  });
 </script>
 
 <div class="wrapper">
@@ -138,8 +157,13 @@
         <div class="spinner">
           <Spinner />
         </div>
+      {:else if issues.pagination.total === 0}
+        <div style="padding: 2rem; text-align: center; color: var(--color-foreground-level-5);">
+          No issues found matching the selected filters.
+        </div>
       {:else}
         <IssuesList
+          {pathPrefix}
           {waves}
           bind:this={listInstance}
           multiselectMode={allowAddToWave}

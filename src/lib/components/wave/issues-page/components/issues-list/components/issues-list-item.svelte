@@ -10,6 +10,14 @@
       });
     }
 
+    if (issue.points) {
+      badges.push({
+        text: `${issue.points} Points`,
+        color: 'var(--color-primary-level-7)',
+        backgroundColor: 'var(--color-primary-level-2)',
+      });
+    }
+
     return badges;
   }
 </script>
@@ -32,18 +40,20 @@
     selected = false,
     onselect,
     partOfWave,
+    pathPrefix,
   }: {
     issue: IssueDetailsDto;
     selectable?: boolean;
     selected?: boolean;
     onselect?: (selected: boolean) => void;
     partOfWave?: WaveDto | null;
+    pathPrefix: string;
   } = $props();
 
   let numberOfLines = determineAmountOfLines(issue);
-  let itemHeight = determineIssuesListItemHeight(issue);
+  let itemHeight = $derived(determineIssuesListItemHeight(issue));
 
-  let active = $derived(page.url.pathname === `/wave/maintainers/issues/${issue.id}`);
+  let active = $derived(page.url.pathname.includes(issue.id));
 
   let badges = $derived.by(() => inferBadges(issue));
 </script>
@@ -57,7 +67,7 @@
 <svelte:element
   this={selectable ? 'div' : 'a'}
   class="issue-list-item"
-  href="/wave/maintainers/issues/{issue.id}?{page.url.searchParams}"
+  href="{pathPrefix}{issue.id}?{page.url.searchParams}"
   style:height={itemHeight + 'px'}
   class:active
 >
@@ -94,7 +104,7 @@
     <div class="repo-and-wave">
       <RepoBadge size="small" repo={issue.repo} />
       {#if partOfWave}
-        <WaveBadge size="small" wave={partOfWave} />
+        <WaveBadge hideName size="small" wave={partOfWave} />
       {/if}
     </div>
   </svelte:element>
@@ -122,6 +132,7 @@
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    justify-content: space-between;
   }
 
   .state-badge {

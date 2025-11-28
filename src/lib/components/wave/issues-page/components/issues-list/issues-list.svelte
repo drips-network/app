@@ -19,12 +19,15 @@
     getMoreIssues,
     waves,
     multiselectMode = false,
+    pathPrefix,
     onselectchange,
   }: {
     issuesWithPagination: Awaited<ReturnType<typeof getIssues>>;
     getMoreIssues: (
       pagination: Pagination,
     ) => Promise<Awaited<ReturnType<typeof getIssues>> | null>;
+
+    pathPrefix: string;
 
     /** For displaying wave data in list items */
     waves: WaveDto[];
@@ -153,18 +156,30 @@
     return waves.find((wave) => wave.id === waveId) || null;
   }
 
+  let virtualListInstance: VirtualList;
+
   /** Surgically update an issue. Awkward but necessary considering the endless scrolling */
-  function patchIssue(updatedIssue: IssueDetailsDto) {
-    const index = issues.findIndex((issue) => issue.id === updatedIssue.id);
+  function patchIssues(updatedIssues: IssueDetailsDto[]) {
+    let lowestUpdatedIndex = 0;
 
-    if (index === -1) return;
+    for (const updatedIssue of updatedIssues) {
+      const index = issues.findIndex((issue) => issue.id === updatedIssue.id);
 
-    issues[index] = updatedIssue;
+      if (index === -1) continue;
+
+      issues[index] = updatedIssue;
+
+      if (index < lowestUpdatedIndex) {
+        lowestUpdatedIndex = index;
+      }
+    }
+
+    virtualListInstance?.recomputeSizes(lowestUpdatedIndex);
   }
 
   onMount(() => {
-    const issueUpdatedListener = (updatedIssue: IssueDetailsDto) => {
-      patchIssue(updatedIssue);
+    const issueUpdatedListener = (updatedIssues: IssueDetailsDto[]) => {
+      patchIssues(updatedIssues);
     };
 
     registerIssueUpdateListener(issueUpdatedListener);
@@ -191,6 +206,7 @@
 <div class="wrapper">
   <div class="height-observer" bind:this={heightObserverEl} use:measureHeight></div>
   <VirtualList
+    bind:this={virtualListInstance}
     height={heightObserverHeight}
     itemCount={issues.length}
     itemSize={itemHeights}
@@ -206,6 +222,7 @@
           selected={selectedIndices.has(index)}
           onselect={(selected) => handleItemSelect(index, selected)}
           partOfWave={getWaveById(issue.waveId)}
+          {pathPrefix}
         />
       </div>
     {/snippet}

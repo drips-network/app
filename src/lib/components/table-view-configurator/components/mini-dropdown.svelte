@@ -15,7 +15,7 @@
   import { fly } from 'svelte/transition';
 
   import Check from '$lib/components/icons/Check.svelte';
-  import MiniButton from './mini-button.svelte';
+  import MiniButton from '$lib/components/mini-button/mini-button.svelte';
 
   interface Props {
     icon: Component;

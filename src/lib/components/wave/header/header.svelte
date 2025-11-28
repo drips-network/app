@@ -1,33 +1,40 @@
 <script lang="ts">
   import Flyout from '$lib/components/flyout/flyout.svelte';
-  import type { WaveUser } from '$lib/utils/wave/types/user';
+  import SupportButton from '$lib/components/intercom/support-button.svelte';
+  import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import LogInButton from '../log-in-button/log-in-button.svelte';
   import LogOutButton from '../log-out-button/log-out-button.svelte';
 
   let {
     user,
+    noBackground = false,
   }: {
-    user: WaveUser | null;
+    user: WaveLoggedInUser | null;
+    noBackground?: boolean;
   } = $props();
 </script>
 
-<header>
+<header class:noBackground>
   <a class="typo-header-3" href="/wave">Drips Wave</a>
 
-  {#if user}
-    <Flyout>
-      {#snippet trigger()}
-        <GithubUserBadge {user} />
-      {/snippet}
+  <div class="right">
+    <SupportButton {user} />
 
-      {#snippet content()}
-        <LogOutButton />
-      {/snippet}
-    </Flyout>
-  {:else}
-    <LogInButton />
-  {/if}
+    {#if user}
+      <Flyout>
+        {#snippet trigger()}
+          <GithubUserBadge {user} />
+        {/snippet}
+
+        {#snippet content()}
+          <LogOutButton />
+        {/snippet}
+      </Flyout>
+    {:else}
+      <LogInButton />
+    {/if}
+  </div>
 </header>
 
 <style>
@@ -45,5 +52,15 @@
       transparent 100%
     );
     view-transition-name: header;
+  }
+
+  header.noBackground {
+    background: transparent;
+  }
+
+  header .right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 </style>

@@ -22,6 +22,7 @@
     reloadOnLinkClick?: boolean;
     noPreload?: boolean;
     highlit?: boolean;
+    id?: string | undefined;
     onclick?: ((event: MouseEvent) => void) | undefined;
     onmouseenter?: (event: MouseEvent) => void;
     onmouseleave?: (event: MouseEvent) => void;
@@ -48,6 +49,7 @@
     reloadOnLinkClick = false,
     noPreload = false,
     highlit = false,
+    id = undefined,
     onclick = undefined,
     onmouseenter = undefined,
     onmouseleave = undefined,
@@ -78,6 +80,7 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
+  {id}
   bind:this={el}
   aria-label={ariaLabel}
   {href}

@@ -2,9 +2,11 @@
   import { invalidate } from '$app/navigation';
   import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import Ledger from '$lib/components/icons/Ledger.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
+  import Section from '$lib/components/section/section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
@@ -12,28 +14,40 @@
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
+  import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
   import { beComplexityToFriendlyLabel, removeIssueFromWave } from '$lib/utils/wave/waves';
   import WaveBadge from '../wave-badge/wave-badge.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
-  import { notifyIssueUpdated } from './issue-update-coordinator';
+  import { notifyIssuesUpdated } from './issue-update-coordinator';
 
   interface Props {
     issue: IssueDetailsDto;
     allowAddingOrRemovingWave?: boolean;
 
     /** User's wave repos - used to determine which waves the issue may be added to */
-    waveRepos: WaveRepoWithDetailsDto[];
+    waveRepos?: WaveRepoWithDetailsDto[];
 
     /** Wave the issue is part of, if any */
     partOfWave: WaveDto | null;
 
     /** For listing available waves to add the issue to */
     waves: WaveDto[];
+
+    /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
+    issueApplicationsPromise: ReturnType<typeof getIssueApplications> | null;
   }
 
-  let { issue, allowAddingOrRemovingWave, waveRepos, partOfWave, waves }: Props = $props();
+  let {
+    issue,
+    allowAddingOrRemovingWave,
+    waveRepos = [],
+    partOfWave,
+    waves,
+    issueApplicationsPromise,
+  }: Props = $props();
 
   let matchingWaveRepos = $derived(
     waveRepos.filter(
@@ -41,7 +55,7 @@
     ),
   );
 
-  let canBeAddedToAWave = $derived(matchingWaveRepos.length > 0);
+  let canBeAddedToAWave = $derived(matchingWaveRepos.length > 0 && issue.state === 'open');
 
   async function handleRemoveFromWave() {
     if (!partOfWave) {
@@ -56,11 +70,16 @@
 
     await invalidate('wave:issues');
 
-    notifyIssueUpdated({
-      ...issue,
-      waveId: null,
-    });
+    const newIssue = await getIssue(undefined, issue.id);
+    notifyIssuesUpdated([newIssue]);
   }
+
+  let applications = $state<IssueApplicationWithDetailsDto[] | null>(null);
+  $effect(() => {
+    issueApplicationsPromise?.then((apps) => {
+      applications = apps.data;
+    });
+  });
 </script>
 
 <div
@@ -90,6 +109,24 @@
           <p style:color="var(--color-foreground-level-4)">No description provided.</p>
         {/if}
       </div>
+
+      {#if issueApplicationsPromise}
+        <Section
+          header={{
+            label: 'Applications',
+            icon: Ledger,
+            infoTooltip:
+              'Contributors can start applying to work on this issue during active Wave Cycles.',
+          }}
+          skeleton={{
+            loaded: applications !== null,
+            empty: applications?.length === 0,
+            emptyStateEmoji: '🫙',
+            emptyStateHeadline: 'No applications yet',
+            emptyStateText: 'No one has applied to work on this issue in the Wave yet.',
+          }}
+        ></Section>
+      {/if}
     </div>
   </Card>
 
@@ -97,8 +134,7 @@
     <Card style="height: fit-content; padding: 0;">
       <SidebarButton
         icon={ArrowBoxUpRight}
-        onclick={() =>
-          modal.show(Stepper, undefined, addIssuesToWaveFlow(waveRepos, [issue], waves))}
+        href={`https://github.com/${issue.repo.gitHubRepoFullName}/issues/${issue.gitHubIssueNumber}`}
       >
         View on GitHub
       </SidebarButton>
@@ -133,12 +169,16 @@
         {/if}
       </div>
 
-      {#if issue.complexity}
+      {#if issue.complexity || issue.waveId}
         <div class="sidebar-section">
           <div class="content">
             <h5>Complexity</h5>
 
-            <p>{beComplexityToFriendlyLabel(issue.complexity)}</p>
+            {#if issue.complexity}
+              <p>{beComplexityToFriendlyLabel(issue.complexity)}</p>
+            {:else}
+              <p style:color="var(--color-foreground-level-5)">Not set</p>
+            {/if}
           </div>
         </div>
       {/if}

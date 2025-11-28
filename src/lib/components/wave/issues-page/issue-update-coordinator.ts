@@ -4,18 +4,20 @@
 
 import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
 
-let listeners: Array<(updatedIssue: IssueDetailsDto) => void> = [];
+let listeners: Array<(updatedIssues: IssueDetailsDto[]) => void> = [];
 
-export function registerIssueUpdateListener(listener: (updatedIssue: IssueDetailsDto) => void) {
+export function registerIssueUpdateListener(listener: (updatedIssues: IssueDetailsDto[]) => void) {
   listeners.push(listener);
 }
 
-export function unregisterIssueUpdateListener(listener: (updatedIssue: IssueDetailsDto) => void) {
+export function unregisterIssueUpdateListener(
+  listener: (updatedIssues: IssueDetailsDto[]) => void,
+) {
   listeners = listeners.filter((l) => l !== listener);
 }
 
-export function notifyIssueUpdated(updatedIssue: IssueDetailsDto) {
+export function notifyIssuesUpdated(updatedIssues: IssueDetailsDto[]) {
   for (const listener of listeners) {
-    listener(updatedIssue);
+    listener(updatedIssues);
   }
 }

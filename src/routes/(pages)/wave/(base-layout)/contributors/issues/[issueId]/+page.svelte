@@ -10,8 +10,6 @@
 <SingleIssuePage
   waves={data.waves.data}
   issue={data.issue}
-  waveRepos={data.waveRepos.data}
-  allowAddingOrRemovingWave
   issueApplicationsPromise={data.applicationsPromise}
   {partOfWave}
 />

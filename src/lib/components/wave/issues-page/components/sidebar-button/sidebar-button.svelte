@@ -3,16 +3,22 @@
 
   interface Props {
     icon: Component<{ style: string }>;
-    onclick: () => void;
+    onclick?: () => void;
     children: Snippet;
+    href?: string;
     variant?: 'normal' | 'primary';
     disabled?: boolean;
   }
 
-  let { icon: Icon, onclick, children, variant = 'normal', disabled }: Props = $props();
+  let { icon: Icon, onclick, children, href, variant = 'normal', disabled }: Props = $props();
 </script>
 
-<button
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<svelte:element
+  this={href ? 'a' : 'button'}
+  {href}
+  target="_blank"
+  rel="noopener noreferrer"
   class="sidebar-button {variant}"
   class:disabled
   {onclick}
@@ -21,7 +27,7 @@
 >
   <Icon style="fill: var(--color-foreground)" />
   {@render children()}
-</button>
+</svelte:element>
 
 <style>
   .sidebar-button {

@@ -18,6 +18,8 @@ export const issueFilters = filterSchema(
     sortBy: z.enum(['createdAt', 'updatedAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
     mine: z.boolean().optional(),
+    isInWave: z.boolean().optional(),
+    eligibleForWave: z.boolean().optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;
@@ -41,6 +43,7 @@ export const issueDetailsDtoSchema = z.object({
   updatedAt: z.coerce.date(),
   waveId: z.uuid().nullable(),
   complexity: complexitySchema.nullable(),
+  points: z.number().int().nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
 });

@@ -16,6 +16,10 @@ declare namespace App {
      * If false, the app will redirect to the explore page.
      */
     preservePathOnNetworkChange?: boolean;
+
+    /** If true, the /wave route header will have a transparent background
+     * and pass through clicks. */
+    waveHeaderBackground?: false;
   }
 
   interface Locals {

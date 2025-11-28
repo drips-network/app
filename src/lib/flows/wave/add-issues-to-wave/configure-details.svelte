@@ -13,8 +13,9 @@
   import type { Items } from '$lib/components/list-select/list-select.types';
   import { addIssueToWave } from '$lib/utils/wave/waves';
   import { invalidate } from '$app/navigation';
-  import { notifyIssueUpdated } from '$lib/components/wave/issues-page/issue-update-coordinator';
+  import { notifyIssuesUpdated } from '$lib/components/wave/issues-page/issue-update-coordinator';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import { getIssue } from '$lib/utils/wave/issues';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -63,19 +64,12 @@
           throw new Error('Some issues could not be added to the Wave. Please try again.');
         }
 
+        const updatedIssues = await Promise.all(
+          eligibleIssues.map((issue) => getIssue(undefined, issue.id)),
+        );
+
+        notifyIssuesUpdated(updatedIssues);
         await invalidate('wave:issues');
-
-        for (const result of results) {
-          if (result.status === 'fulfilled') {
-            const issueData = issues.find((i) => i.id === result.value.issue.id);
-            if (!issueData) continue;
-
-            notifyIssueUpdated({
-              ...issueData,
-              waveId: selectedWaveId,
-            });
-          }
-        }
 
         onsuccess?.();
       },

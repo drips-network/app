@@ -3,6 +3,7 @@
   import type { PageProps } from './$types';
   import Header from '$lib/components/wave/header/header.svelte';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
+  import { page } from '$app/state';
 
   let {
     data,
@@ -15,7 +16,7 @@
 <ModalLayout />
 
 <div class="header-container">
-  <Header user={data.user} />
+  <Header user={data.user} noBackground={page.data.waveHeaderBackground === false} />
 </div>
 
 <div class="layout-container">
@@ -28,7 +29,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 10;
+    z-index: 5;
   }
 
   .layout-container {

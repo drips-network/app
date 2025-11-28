@@ -24,14 +24,12 @@
 </script>
 
 <IssuesPage
-  ownWaveRepos={data.waveRepos.data}
   waves={data.waves.data}
   issues={data.issues}
+  pathPrefix="/wave/contributors/issues/"
   appliedFilters={data.appliedFilters}
   onapplyfilters={handleApplyFilters}
-  allowAddToWave
-  pathPrefix="/wave/maintainers/issues/"
-  breadcrumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Issues' }]}
+  breadcrumbs={[{ label: 'Contributor Dashboard' }, { label: 'Issues' }]}
 >
   {@render children()}
 </IssuesPage>

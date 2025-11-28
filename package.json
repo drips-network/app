@@ -91,6 +91,7 @@
     "@gelatonetwork/relay-sdk": "^5.5.6",
     "@grafana/faro-web-sdk": "^1.18.1",
     "@grafana/faro-web-tracing": "^1.18.1",
+    "@intercom/messenger-js-sdk": "^0.0.18",
     "@octokit/rest": "^21.0.2",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.58.1",

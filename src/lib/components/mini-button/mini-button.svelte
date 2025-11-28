@@ -9,14 +9,15 @@
     highlight?: boolean;
     label: string;
     open?: boolean;
+    id?: string | undefined;
   }
 
-  let { icon, highlight = false, label, open = false }: Props = $props();
+  let { icon, highlight = false, label, open = false, id = undefined }: Props = $props();
 
   const SvelteComponent = $derived(icon);
 </script>
 
-<button class:highlight class:open onclick={bubble('click')} aria-label={label}>
+<button class:highlight class:open onclick={bubble('click')} aria-label={label} {id}>
   <SvelteComponent style="fill: var(--color-foreground)" />
 </button>
 
@@ -29,6 +30,7 @@
     align-items: center;
     background: var(--color-foreground-level-1);
     border-radius: 1rem;
+    transition: background 0.3s;
   }
 
   button:hover,

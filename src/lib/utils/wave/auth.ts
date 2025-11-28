@@ -1,8 +1,9 @@
 import { browser } from '$app/environment';
 import z from 'zod';
-import { call } from './call';
+import { authenticatedCall, call } from './call';
 import { jwtDecode } from 'jwt-decode';
 import type { WaveUser } from './types/user';
+import parseRes from './utils/parse-res';
 
 const accessClaimJwtSchema = z.object({
   iss: z.literal('drips-wave'),
@@ -12,15 +13,32 @@ const accessClaimJwtSchema = z.object({
   isSuperAdmin: z.boolean(),
   name: z.string(),
   email: z.email(),
-  picture: z.string().url(),
+  picture: z.url(),
+  signUpDate: z.coerce.date(),
 });
 
-export function getUserData(jwt: string | null): WaveUser | null {
+export type WaveLoggedInUser = WaveUser & {
+  name: string;
+  email: string;
+  avatarUrl: string;
+  isSuperAdmin: boolean;
+  signUpDate: Date;
+};
+
+export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   if (!jwt) {
     return null;
   }
 
-  const content = accessClaimJwtSchema.parse(jwtDecode(jwt));
+  const parsed = accessClaimJwtSchema.safeParse(jwtDecode(jwt));
+
+  // maybe we added a new claim, in this case the user needs to refresh the token
+  // usually does not require a re-login as the refresh token is still valid
+  if (!parsed.success) {
+    return null;
+  }
+
+  const { data: content } = parsed;
 
   const now = Math.floor(Date.now() / 1000);
   if (content.exp < now) {
@@ -30,7 +48,12 @@ export function getUserData(jwt: string | null): WaveUser | null {
   return {
     id: content.sub,
     gitHubUsername: content.name,
+    name: content.name,
     gitHubAvatarUrl: content.picture,
+    email: content.email,
+    isSuperAdmin: content.isSuperAdmin,
+    avatarUrl: content.picture,
+    signUpDate: content.signUpDate,
   };
 }
 
@@ -97,4 +120,13 @@ export async function logOut() {
   });
 
   setAccessJwt(null);
+}
+
+export async function getIntercomJwt() {
+  return parseRes(
+    z.object({
+      token: z.string(),
+    }),
+    await authenticatedCall(undefined, '/api/user/intercom-identity'),
+  );
 }
