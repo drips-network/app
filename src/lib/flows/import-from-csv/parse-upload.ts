@@ -77,3 +77,53 @@ export async function parseFile(file: File, csvHeaders: string[]): Promise<strin
 
   return result;
 }
+
+/**
+ * Deduplicates entries by summing weights for duplicate recipients.
+ *
+ * @param entries The parsed CSV entries.
+ * @returns Deduplicated entries with summed weights.
+ */
+export function deduplicateEntriesAndSumWeights(entries: string[][]): string[][] {
+  const entriesMap = new Map<string, number | undefined>();
+
+  for (const row of entries) {
+    const recipient = row[0];
+    // If recipient is missing, just skip or keep?
+    // The original logic in upload.svelte skips empty recipients: if (!recipient.trim()) continue;
+    // We can preserve that behavior by just keeping them in the map (keys might be empty string).
+    // But Map keys must be unique.
+    // If we have multiple empty lines, they merge?
+    // upload.svelte filters them out anyway.
+
+    const rawSplit = row[1];
+    const weight = typeof rawSplit === 'undefined' ? undefined : parseFloat(rawSplit);
+
+    if (entriesMap.has(recipient)) {
+      const currentWeight = entriesMap.get(recipient);
+
+      let newWeight: number | undefined = undefined;
+
+      // If either has a weight, we treat undefined as 0 and sum
+      if (currentWeight !== undefined || weight !== undefined) {
+        const w1 = currentWeight ?? 0;
+        const w2 = weight ?? 0;
+        // Check for NaN. If any is NaN, the sum is NaN.
+        // If we have "abc" (NaN) and "10", sum is NaN.
+        // If we have "10" and "20", sum is 30.
+        newWeight = w1 + w2;
+      }
+
+      entriesMap.set(recipient, newWeight);
+    } else {
+      entriesMap.set(recipient, weight);
+    }
+  }
+
+  return Array.from(entriesMap.entries()).map(([recipient, weight]) => {
+    if (weight === undefined) {
+      return [recipient];
+    }
+    return [recipient, weight.toString()];
+  });
+}
