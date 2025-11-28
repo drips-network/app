@@ -39,5 +39,6 @@ export const load = async ({ fetch, url, depends }) => {
     issues,
     appliedFilters: filters,
     waves,
+    waveHeaderBackground: false,
   };
 };
