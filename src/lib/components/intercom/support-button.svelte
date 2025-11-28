@@ -5,6 +5,7 @@
   import MiniButton from '../mini-button/mini-button.svelte';
   import { scale } from 'svelte/transition';
   import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+  import type { InitType } from '@intercom/messenger-js-sdk/dist/types';
 
   const INTERCOM_APP_ID = getOptionalEnvVar(
     'PUBLIC_INTERCOM_APP_ID',
@@ -19,6 +20,29 @@
 
   let { user }: Props = $props();
 
+  function initIntercom(jwt: string | null) {
+    if (!INTERCOM_APP_ID) {
+      return;
+    }
+
+    const intercomSettings: InitType = {
+      app_id: INTERCOM_APP_ID,
+      region: 'eu',
+      hide_default_launcher: true,
+      custom_launcher_selector: '#intercom-support-button',
+    };
+
+    if (jwt) {
+      intercomSettings.intercom_user_jwt = jwt;
+    }
+
+    Intercom(intercomSettings);
+
+    onUnreadCountChange((newUnreadCount: number) => {
+      unreadCount = newUnreadCount;
+    });
+  }
+
   $effect(() => {
     if (!INTERCOM_APP_ID) {
       return;
@@ -26,33 +50,14 @@
 
     if (user) {
       getIntercomJwt().then((res) => {
-        Intercom({
-          app_id: INTERCOM_APP_ID,
-          region: 'eu',
-          hide_default_launcher: true,
-          custom_launcher_selector: '#intercom-support-button',
-          intercom_user_jwt: res.token,
-        });
+        initIntercom(res.token);
       });
     } else {
-      Intercom({
-        app_id: INTERCOM_APP_ID,
-        region: 'eu',
-        hide_default_launcher: true,
-        custom_launcher_selector: '#intercom-support-button',
-      });
+      initIntercom(null);
     }
   });
 
   let unreadCount = $state(0);
-
-  $effect(() => {
-    if (INTERCOM_APP_ID) {
-      onUnreadCountChange((newUnreadCount: number) => {
-        unreadCount = newUnreadCount;
-      });
-    }
-  });
 </script>
 
 {#if INTERCOM_APP_ID}
