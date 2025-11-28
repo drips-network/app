@@ -5,6 +5,7 @@
   import MiniButton from '../mini-button/mini-button.svelte';
   import { scale } from 'svelte/transition';
   import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+  import { browser } from '$app/environment';
 
   const INTERCOM_APP_ID = getOptionalEnvVar(
     'PUBLIC_INTERCOM_APP_ID',
@@ -46,9 +47,11 @@
 
   let unreadCount = $state(0);
 
-  onUnreadCountChange((newUnreadCount: number) => {
-    unreadCount = newUnreadCount;
-  });
+  if (browser && INTERCOM_APP_ID) {
+    onUnreadCountChange((newUnreadCount: number) => {
+      unreadCount = newUnreadCount;
+    });
+  }
 </script>
 
 {#if INTERCOM_APP_ID}
