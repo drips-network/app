@@ -4,6 +4,13 @@
   import QuestionCircle from '../icons/QuestionCircle.svelte';
   import MiniButton from '../mini-button/mini-button.svelte';
   import { scale } from 'svelte/transition';
+  import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+
+  const INTERCOM_APP_ID = getOptionalEnvVar(
+    'PUBLIC_INTERCOM_APP_ID',
+    true,
+    'Intercom widget will not appear',
+  );
 
   interface Props {
     /** In the future this will be a unified Drips account object */
@@ -13,10 +20,14 @@
   let { user }: Props = $props();
 
   $effect(() => {
+    if (!INTERCOM_APP_ID) {
+      return;
+    }
+
     if (user) {
       getIntercomJwt().then((res) => {
         Intercom({
-          app_id: 'soo7r6c6',
+          app_id: INTERCOM_APP_ID,
           region: 'eu',
           hide_default_launcher: true,
           custom_launcher_selector: '#intercom-support-button',
@@ -25,7 +36,7 @@
       });
     } else {
       Intercom({
-        app_id: 'soo7r6c6',
+        app_id: INTERCOM_APP_ID,
         region: 'eu',
         hide_default_launcher: true,
         custom_launcher_selector: '#intercom-support-button',
@@ -40,18 +51,20 @@
   });
 </script>
 
-<div class="support-button">
-  <MiniButton id="intercom-support-button" label="Get support" icon={QuestionCircle} />
-  {#if unreadCount > 0}
-    <div
-      transition:scale={{ duration: 300 }}
-      class="unread-badge tnum"
-      class:hidden={unreadCount === 0}
-    >
-      {unreadCount}
-    </div>
-  {/if}
-</div>
+{#if INTERCOM_APP_ID}
+  <div class="support-button">
+    <MiniButton id="intercom-support-button" label="Get support" icon={QuestionCircle} />
+    {#if unreadCount > 0}
+      <div
+        transition:scale={{ duration: 300 }}
+        class="unread-badge tnum"
+        class:hidden={unreadCount === 0}
+      >
+        {unreadCount}
+      </div>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .support-button {
