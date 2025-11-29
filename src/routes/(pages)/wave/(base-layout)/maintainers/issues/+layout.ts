@@ -22,15 +22,11 @@ export const load = async ({ fetch, url, depends }) => {
   // Maintainers can only see issues that are part of an approved Wave repo
   filters.eligibleForWave = true;
 
+  // Maintainers can only see issues from their own repos here
+  filters.mine = true;
+
   const [issues, waveRepos, waves] = await Promise.all([
-    getIssues(
-      fetch,
-      { limit: 10 },
-      {
-        ...filters,
-        mine: true,
-      },
-    ),
+    getIssues(fetch, { limit: 10 }, filters),
     // todo(wave): pagination
     getOwnWaveRepos(fetch, { limit: 100 }),
     // todo(wave): Only fetch waves included in the issues list

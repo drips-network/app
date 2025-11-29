@@ -23,14 +23,7 @@ export const load = async ({ fetch, url, depends }) => {
   filters.isInWave = true;
 
   const [issues, waves] = await Promise.all([
-    getIssues(
-      fetch,
-      { limit: 10 },
-      {
-        ...filters,
-        mine: true,
-      },
-    ),
+    getIssues(fetch, { limit: 10 }, filters),
     // todo(wave): Only fetch waves included in the issues list
     getWaves(fetch, { limit: 100 }),
   ]);
