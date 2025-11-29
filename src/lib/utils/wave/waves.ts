@@ -1,14 +1,18 @@
 import { authenticatedCall } from './call';
+import { toFilterParams } from './types/filter';
 import {
   paginatedResponseSchema,
   toPaginationParams,
   type PaginationInput,
 } from './types/pagination';
 import {
+  waveCycleDtoSchema,
+  waveCycleFiltersSchema,
   waveDtoSchema,
   waveIssueWithDetailsDtoSchema,
   waveRepoWithDetailsDtoSchema,
   type Complexity,
+  type WaveCycleFilters,
 } from './types/wave';
 import parseRes from './utils/parse-res';
 
@@ -73,4 +77,14 @@ export async function removeIssueFromWave(f = fetch, waveId: string, issueId: st
   return await authenticatedCall(f, `/api/waves/${waveId}/issues/${issueId}`, {
     method: 'DELETE',
   });
+}
+
+export async function getWaveCycles(f = fetch, waveId: string, filters: WaveCycleFilters = {}) {
+  return parseRes(
+    paginatedResponseSchema(waveCycleDtoSchema),
+    await authenticatedCall(
+      f,
+      `/api/waves/${waveId}/cycles?${toFilterParams(waveCycleFiltersSchema, filters)}`,
+    ),
+  );
 }

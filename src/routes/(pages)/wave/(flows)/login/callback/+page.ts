@@ -24,7 +24,9 @@ export const load = async ({ url }) => {
 
   const { backTo } = parsedState.data;
 
-  if (newUser) {
+  const skipWelcome = url.searchParams.get('skip_welcome') === 'true';
+
+  if (newUser && !skipWelcome) {
     return redirect(302, `/wave/welcome?backTo=${backTo || ''}`);
   }
 

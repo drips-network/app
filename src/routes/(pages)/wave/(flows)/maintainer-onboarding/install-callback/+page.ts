@@ -6,14 +6,14 @@ export const load = async ({ parent, fetch, url, depends }) => {
 
   const { user } = await parent();
 
-  if (!user) {
-    throw redirect(302, '/wave/login/install-app');
-  }
-
   const installationId = url.searchParams.get('installation_id');
 
   if (!installationId) {
     throw redirect(302, '/wave/maintainer-onboarding/install-app');
+  }
+
+  if (!user) {
+    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}`);
   }
 
   const userOrgs = await getOrgs(fetch, { limit: 1 }, { gitHubInstallationId: installationId });

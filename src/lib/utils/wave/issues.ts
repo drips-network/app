@@ -1,7 +1,11 @@
 import { authenticatedCall } from './call';
 import { toFilterParams } from './types/filter';
 import { issueDetailsDtoSchema, issueFilters, type IssueFilters } from './types/issue';
-import { issueApplicationWithDetailsDtoSchema } from './types/issue-application';
+import {
+  issueApplicationFiltersSchema,
+  issueApplicationWithDetailsDtoSchema,
+  type IssueApplicationFilters,
+} from './types/issue-application';
 import {
   paginatedResponseSchema,
   toPaginationParams,
@@ -28,12 +32,30 @@ export async function getIssueApplications(
   waveId: string,
   issueId: string,
   pagination?: PaginationInput,
+  filters?: IssueApplicationFilters,
 ) {
   return parseRes(
     paginatedResponseSchema(issueApplicationWithDetailsDtoSchema),
     await authenticatedCall(
       f,
-      `/api/waves/${waveId}/issues/${issueId}/applications?${toPaginationParams(pagination)}`,
+      `/api/waves/${waveId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}`,
     ),
+  );
+}
+
+export async function applyToWorkOnIssue(
+  f = fetch,
+  waveId: string,
+  issueId: string,
+  applicationText: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(f, `/api/waves/${waveId}/issues/${issueId}/applications`, {
+      method: 'POST',
+      body: JSON.stringify({
+        applicationText,
+      }),
+    }),
   );
 }

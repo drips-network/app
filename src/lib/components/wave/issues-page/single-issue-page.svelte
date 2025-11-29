@@ -20,6 +20,7 @@
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
   import { beComplexityToFriendlyLabel, removeIssueFromWave } from '$lib/utils/wave/waves';
   import WaveBadge from '../wave-badge/wave-badge.svelte';
+  import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
 
@@ -80,6 +81,12 @@
       applications = apps.data;
     });
   });
+
+  let canApplyToIssue = $derived(
+    partOfWave !== null &&
+      // Don't allow applying to own issue
+      !allowAddingOrRemovingWave,
+  );
 </script>
 
 <div
@@ -115,6 +122,15 @@
           header={{
             label: 'Applications',
             icon: Ledger,
+            actions: [
+              {
+                label: 'Apply to work on this issue',
+                icon: Ledger,
+                variant: 'primary',
+                disabled: !canApplyToIssue,
+                href: `/wave/${partOfWave?.id}/issues/${issue.id}/apply`,
+              },
+            ],
             infoTooltip:
               'Contributors can start applying to work on this issue during active Wave Cycles.',
           }}
@@ -125,7 +141,13 @@
             emptyStateHeadline: 'No applications yet',
             emptyStateText: 'No one has applied to work on this issue in the Wave yet.',
           }}
-        ></Section>
+        >
+          <div class="applications-grid">
+            {#each applications as application}
+              <IssueApplicationCard {application} />
+            {/each}
+          </div>
+        </Section>
       {/if}
     </div>
   </Card>
@@ -263,5 +285,11 @@
     align-items: flex-start;
     margin-bottom: 1rem;
     gap: 1rem;
+  }
+
+  .applications-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   }
 </style>

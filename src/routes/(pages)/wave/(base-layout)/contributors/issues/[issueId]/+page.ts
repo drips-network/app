@@ -15,7 +15,7 @@ export const load = async ({ fetch, parent, params }) => {
 
   // todo(wave): what if more than 100 applications?
   const applicationsPromise = issue.waveId
-    ? getIssueApplications(fetch, issue.waveId, issue.id, { limit: 100 })
+    ? getIssueApplications(fetch, issue.waveId, issue.id, { limit: 100 }, { cycleId: 'current' })
     : null;
 
   return {

@@ -2,10 +2,11 @@
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import type { WaveUser } from '$lib/utils/wave/types/user';
 
-  let { user }: { user: WaveUser } = $props();
+  let { user, link = true }: { user: WaveUser; link?: boolean } = $props();
 </script>
 
-<a
+<svelte:element
+  this={link ? 'a' : 'div'}
   class="github-user-badge"
   href="https://github.com/{user.gitHubUsername}"
   target="_blank"
@@ -13,7 +14,7 @@
 >
   <UserAvatar src={user.gitHubAvatarUrl} />
   <span class="typo-text">{user.gitHubUsername}</span>
-</a>
+</svelte:element>
 
 <style>
   .github-user-badge {

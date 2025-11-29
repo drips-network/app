@@ -139,3 +139,28 @@ export const waveIssueWithDetailsDtoSchema = z.object({
   addedBy: waveUserDtoSchema.nullable(),
   removedBy: waveUserDtoSchema.nullable(),
 });
+
+// ===========================
+// Wave Cycle Types
+// ===========================
+
+export const waveCycleStatusSchema = z.enum(['upcoming', 'active', 'ended']);
+
+export const waveCycleFiltersSchema = filterSchema(
+  z.object({
+    status: waveCycleStatusSchema.optional(),
+  }),
+);
+export type WaveCycleFilters = z.infer<typeof waveCycleFiltersSchema>;
+
+export const waveCycleDtoSchema = z.object({
+  id: z.uuid(),
+  waveId: z.uuid(),
+  cycleNumber: z.number().int(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  budgetUSD: z.string(),
+  status: waveCycleStatusSchema,
+  createdAt: z.coerce.date(),
+});
+export type WaveCycleDto = z.infer<typeof waveCycleDtoSchema>;
