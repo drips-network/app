@@ -8,12 +8,21 @@
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { applyToWorkOnIssue } from '$lib/utils/wave/issues';
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
+  import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
+  import type { Snapshot } from './$types.js';
 
   let { data } = $props();
 
   let applicationText = $state('');
 
-  let valid = $derived(applicationText.trim().length > 0);
+  let valid = $derived(applicationText.trim().length >= 10 && applicationText.length <= 2000);
+
+  let beenFocussed = $state(false);
+
+  let tooShort = $derived(
+    beenFocussed && applicationText.trim().length > 0 && applicationText.trim().length < 10,
+  );
+  let tooLong = $derived(applicationText.length > 2000);
 
   let waveHasActiveCycle = $derived(data.cycles.pagination.total > 0);
 
@@ -30,15 +39,24 @@
       submitting = false;
     }
   }
+
+  export const snapshot: Snapshot<string> = {
+    capture: () => applicationText,
+    restore: (value) => (applicationText = value),
+  };
 </script>
 
-<!-- TODO(wave): Display preview of the issue -->
 <!-- TODO(wave): Show wave & cycle info -->
 <!-- TODO(wave): Intro for what Wave is -->
 <FlowStepWrapper
   headline="Apply to issue"
-  description="Submit your application to work on this issue in the current Wave Cycle."
+  description="Submit your application to work on this issue in the ${data.wave
+    .name} Wave's current cycle."
 >
+  <FormField title="Issue*" type="div">
+    <IssuePreviewCard issue={data.issue} />
+  </FormField>
+
   {#if data.alreadyApplied}
     <AnnotationBox>
       You already applied to this issue in the current Wave Cycle. First withdraw your previous
@@ -49,12 +67,29 @@
       title="Application Text*"
       description="Explain why you'd like to work on this issue and list any relevant experience."
       type="div"
+      validationState={valid
+        ? { type: 'valid' }
+        : beenFocussed
+          ? {
+              type: 'invalid',
+              message: tooShort
+                ? 'Application must be at least 10 characters.'
+                : tooLong
+                  ? 'Application must not exceed 2000 characters.'
+                  : 'This field is required.',
+            }
+          : { type: 'valid' }}
     >
-      <!-- TODO(wave): Max length validation -->
       <TextArea
         bind:value={applicationText}
         placeholder="I would like to work on this issue because..."
+        onblur={() => (beenFocussed = true)}
       />
+      <div class="char-count">
+        Markdown supported · <span class:too-long={tooLong} class="tnum"
+          >{applicationText.length} / 2.000</span
+        >
+      </div>
     </FormField>
   {:else}
     <!-- TODO(wave): nicer styling, info about upcoming cycle -->
@@ -80,3 +115,16 @@
     {/if}
   {/snippet}
 </FlowStepWrapper>
+
+<style>
+  .char-count {
+    font-size: 0.875rem;
+    color: var(--color-foreground-level-6);
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .char-count .too-long {
+    color: var(--color-negative);
+  }
+</style>

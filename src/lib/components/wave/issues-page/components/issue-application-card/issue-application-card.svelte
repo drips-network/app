@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Markdown from '$lib/components/markdown/markdown.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
@@ -15,7 +16,7 @@
     <GithubUserBadge link={false} user={application.applicant} />
     <!-- TODO(wave): Applicant metrics -->
     <p class="line-clamp-3">
-      {application.applicationText}
+      <Markdown content={application.applicationText} />
     </p>
   </div>
 </Card>
