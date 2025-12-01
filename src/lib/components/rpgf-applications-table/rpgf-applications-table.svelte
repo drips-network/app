@@ -43,6 +43,10 @@
     }),
   );
 
+  let hasNonApproved = $derived(applications.some((a) => a.state !== 'approved'));
+
+  let shouldHideState = $derived(hideState || (!hasNonApproved && !reviewMode));
+
   let includesResults = $derived(applications.some((a) => a.allocation !== null));
 </script>
 
@@ -67,10 +71,9 @@
   {reviewMode}
   {round}
   {signedIn}
-  bind:decisions
-  ellipsis={true}
   {displayVisibilityNote}
-  {hideState}
+  bind:decisions
+  hideState={shouldHideState}
 />
 
 <style>

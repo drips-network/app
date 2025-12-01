@@ -2,8 +2,10 @@
   import '../../styles/app.css';
 
   import '$lib/stores/theme/theme.store';
+  import animationsStore from '$lib/stores/animations/animations.store';
 
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import scroll from '$lib/stores/scroll';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   interface Props {
@@ -11,6 +13,8 @@
   }
 
   let { children }: Props = $props();
+
+  const { isEnabled } = animationsStore;
 
   onMount(() => {
     scroll.attach();
@@ -32,6 +36,8 @@
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) return;
+
+    if (!get(isEnabled)) return;
 
     return new Promise((resolve) => {
       document.startViewTransition(async () => {

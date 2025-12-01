@@ -13,9 +13,16 @@
     saveEnabled?: boolean;
     invalid?: boolean;
     children?: import('svelte').Snippet;
+    onSaveError?: (error: unknown) => void;
   }
 
-  let { saveHandler = undefined, saveEnabled = true, invalid = false, children }: Props = $props();
+  let {
+    saveHandler = undefined,
+    saveEnabled = true,
+    invalid = false,
+    children,
+    onSaveError,
+  }: Props = $props();
 
   let saving = $state(false);
   let success = $state(false);
@@ -44,8 +51,9 @@
     resetSuccess();
 
     if (saveHandler) {
-      await doWithErrorModal(saveHandler, () => {
+      await doWithErrorModal(saveHandler, (e) => {
         saving = false;
+        onSaveError?.(e);
       });
     }
 

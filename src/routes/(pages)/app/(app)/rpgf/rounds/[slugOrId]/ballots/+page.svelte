@@ -10,8 +10,12 @@
   import downloadUrl from '$lib/utils/download-url.js';
   import formatDate from '$lib/utils/format-date.js';
   import { getBallotsCsv } from '$lib/utils/rpgf/rpgf.js';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import rpgfAdminBallotUploadFlowSteps from '$lib/flows/rpgf-admin-ballot-upload/rpgf-admin-ballot-upload-flow-steps';
   import { getCoreRowModel, type ColumnDef } from '@tanstack/svelte-table';
   import type { ComponentProps } from 'svelte';
+  import Sharrow from '$lib/components/icons/Sharrow.svelte';
 
   let { data } = $props();
 
@@ -58,12 +62,34 @@
     getCoreRowModel: getCoreRowModel(),
   });
 
+  let resultsPeriodStart = $derived<Date | null>(
+    data.round.resultsPeriodStart
+      ? data.round.resultsPeriodStart instanceof Date
+        ? data.round.resultsPeriodStart
+        : new Date(data.round.resultsPeriodStart)
+      : null,
+  );
+
+  let distributionPhaseStarted = $derived(
+    resultsPeriodStart ? resultsPeriodStart.getTime() <= Date.now() : false,
+  );
+
+  let canAdminUploadBallot = $derived(data.round.isAdmin && !distributionPhaseStarted);
+
   async function handleDownload() {
     const csvContent = await getBallotsCsv(undefined, data.round.id);
 
     downloadUrl(
       URL.createObjectURL(new Blob([csvContent], { type: 'text/csv' })),
       `ballots-${data.round.urlSlug}.csv`,
+    );
+  }
+
+  function openAdminUploadFlow() {
+    modal.show(
+      Stepper,
+      undefined,
+      rpgfAdminBallotUploadFlowSteps(data.round, data.voters ?? [], data.ballots ?? []),
     );
   }
 </script>
@@ -77,9 +103,16 @@
 
   <div class="header">
     <h1>Ballots</h1>
-    <Button icon={Download} variant="ghost" onclick={() => doWithErrorModal(handleDownload)}
-      >Download CSV</Button
-    >
+    <div class="actions">
+      {#if canAdminUploadBallot}
+        <Button icon={Sharrow} variant="ghost" onclick={openAdminUploadFlow}
+          >Manually upload ballot</Button
+        >
+      {/if}
+      <Button icon={Download} variant="primary" onclick={() => doWithErrorModal(handleDownload)}
+        >Download CSV</Button
+      >
+    </div>
   </div>
 
   <PaddedHorizontalScroll>
@@ -102,5 +135,11 @@
     border-bottom: 1px solid var(--color-border);
     flex-wrap: wrap;
     margin-bottom: 2rem;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>

@@ -2,7 +2,6 @@
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
-  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import type { Writable } from 'svelte/store';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -15,6 +14,7 @@
     ballotValidationContextKey,
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
+  import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
 
   interface Props {
     round: Round;
@@ -196,10 +196,19 @@
     {/if}
 
     {#if voteStep === 'build-ballot' && application.state === 'approved'}
-      <Checkbox
-        checked={$ballotStore[application.id] !== undefined}
-        oninput={handleCheckboxInput}
-      />
+      <CheckboxSimple oninput={handleCheckboxInput} />
+    {/if}
+
+    {#if voteStep === 'assign-votes' && application.state === 'approved'}
+      <div class="vote-count-input">
+        <TextInput
+          onclick={(e) => e.preventDefault()}
+          validationState={voteAmountInputValidationState}
+          bind:value={voteAmountInput}
+          variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
+          placeholder={votePlaceholder ?? '0+'}
+        />
+      </div>
     {/if}
 
     {#if voteStep === 'assign-votes' && application.state === 'approved'}
