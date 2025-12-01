@@ -7,7 +7,7 @@
   }
 
   let {
-    checked = $bindable(),
+    checked = false,
     label = undefined,
     size = 'normal',
     oninput = undefined,

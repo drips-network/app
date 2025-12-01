@@ -178,7 +178,12 @@
             >
           </div>
         {:else}
-          <Button variant="ghost" icon={ArrowBoxUpRight}>Review voter guidelines</Button>
+          <Button
+            variant="ghost"
+            href={buildExternalUrl(round.voterGuidelinesLink)}
+            target="_blank"
+            icon={ArrowBoxUpRight}>Review voter guidelines</Button
+          >
         {/if}
       </div>
 

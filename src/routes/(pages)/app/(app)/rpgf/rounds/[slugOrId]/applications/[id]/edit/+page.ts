@@ -2,7 +2,7 @@ import buildUrl from '$lib/utils/build-url';
 import { error, redirect } from '@sveltejs/kit';
 import fetchApplicationFormData from '../../shared/fetch-application-form-data';
 
-export const load = async ({ parent, url }) => {
+export const load = async ({ parent, url, fetch }) => {
   const { application, rpgfUserData, round } = await parent();
 
   if (round.state !== 'intake') {

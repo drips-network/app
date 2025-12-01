@@ -38,7 +38,7 @@
     ellipsis = false,
   }: Props = $props();
 
-  let picked = $state();
+  let picked = $derived($ballotStore[application.id] === undefined ? false : true);
 
   function updateBallot(picked: boolean) {
     if (voteStep !== 'build-ballot') return;
@@ -164,9 +164,6 @@
       };
     }
   }
-  $effect(() => {
-    updateVoteAmount(voteAmountInput);
-  });
 
   onDestroy(() => {
     updateValidationErrors({ type: 'unvalidated' });
@@ -196,17 +193,18 @@
     {/if}
 
     {#if voteStep === 'build-ballot' && application.state === 'approved'}
-      <CheckboxSimple oninput={handleCheckboxInput} />
+      <CheckboxSimple checked={picked} oninput={handleCheckboxInput} />
     {/if}
 
     {#if voteStep === 'assign-votes' && application.state === 'approved'}
       <div class="vote-count-input">
         <TextInput
+          bind:value={voteAmountInput}
           onclick={(e) => e.preventDefault()}
           validationState={voteAmountInputValidationState}
-          bind:value={voteAmountInput}
           variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
           placeholder={votePlaceholder ?? '0+'}
+          oninput={(e) => updateVoteAmount((e.target as HTMLInputElement).value)}
         />
       </div>
     {/if}

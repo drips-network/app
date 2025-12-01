@@ -33,7 +33,7 @@
     validationState?: TextInputValidationState;
     onchange?: (e: Event) => void;
     onclick?: (e: Event) => void;
-    oninput?: (e: Event) => void;
+    oninput?: (e: Event, v: string) => void;
     onfocus?: (e: FocusEvent) => void;
     onkeydown?: (e: KeyboardEvent) => void;
     onkeypress?: (e: KeyboardEvent) => void;
@@ -110,6 +110,11 @@
   }
 
   let rightContainerWidth: number | undefined = $state();
+
+  function handleInput(e: Event) {
+    const target = e.target as HTMLInputElement;
+    oninput?.(e, target.value);
+  }
 </script>
 
 <div {style} class="wrapper typo-text">
@@ -136,7 +141,7 @@
     bind:this={inputElement}
     {onchange}
     {onclick}
-    {oninput}
+    oninput={handleInput}
     {onfocus}
     {onkeydown}
     {onmousedown}

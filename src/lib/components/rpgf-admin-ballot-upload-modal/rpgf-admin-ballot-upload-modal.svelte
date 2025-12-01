@@ -22,6 +22,7 @@
   import AlreadyVotedBadge from './components/already-voted-badge.svelte';
   import Wallet from '../icons/Wallet.svelte';
   import buildExternalUrl from '$lib/utils/build-external-url';
+  import walletStore from '$lib/stores/wallet/wallet.store';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -61,6 +62,8 @@
             ? { component: AlreadyVotedBadge, props: {} }
             : undefined,
           searchString: [voter.walletAddress],
+          // cannot upload for self
+          disabled: voter.walletAddress.toLowerCase() === $walletStore.address?.toLowerCase(),
         } satisfies Items[string];
 
         return acc;
@@ -146,7 +149,7 @@
 
             resetFile();
             selected = [];
-            await invalidate('rpgf:round:ballots');
+            await invalidate('rpgf:round');
           });
         } finally {
           submitting = false;
