@@ -211,18 +211,6 @@
       </div>
     {/if}
 
-    {#if voteStep === 'assign-votes' && application.state === 'approved'}
-      <div class="vote-count-input">
-        <TextInput
-          onclick={(e) => e.preventDefault()}
-          validationState={voteAmountInputValidationState}
-          bind:value={voteAmountInput}
-          variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
-          placeholder={votePlaceholder ?? '0+'}
-        />
-      </div>
-    {/if}
-
     {#if application.allocation !== null}
       <span class="typo-text-small-bold">
         {application.allocation}
