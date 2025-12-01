@@ -73,7 +73,6 @@
     // Amount input
     amountInputValue: string;
     amount?: bigint | undefined;
-    topUpMax: boolean;
     selectedTokenBalance?: bigint | undefined;
     selectedTokenAllowance?: bigint | undefined;
     formValid: boolean;
@@ -83,7 +82,6 @@
     selectedTokenAddress = $bindable([]),
     amountInputValue = $bindable(),
     amount = $bindable(),
-    topUpMax = $bindable(),
     selectedTokenBalance = $bindable(),
     selectedTokenAllowance = $bindable(),
     formValid = $bindable(),
@@ -114,7 +112,6 @@
     tokenBalance={selectedTokenBalance}
     bind:inputValue={amountInputValue}
     bind:amount
-    bind:topUpMax
     bind:validationState={amountValidationState}
     loading={loadingToken}
   />

@@ -244,6 +244,7 @@
             title={{
               component: IdentityBadge,
               props: {
+                disableLink: true,
                 disableTooltip: true,
                 tag:
                   stream.sender.account.accountId === $walletStore.dripsAccountId

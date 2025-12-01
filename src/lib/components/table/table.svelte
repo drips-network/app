@@ -11,6 +11,7 @@
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
+  import { browser } from '$app/environment';
 
   interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,89 +56,92 @@
 
 <svelte:window onkeydown={handleKeyboard} />
 
-<table>
-  <thead>
-    {#each $table.getHeaderGroups() as headerGroup}
-      <tr>
-        {#each headerGroup.headers as header}
-          <th
-            onclick={header.column.getToggleSortingHandler()}
-            class:sortable={header.column.getCanSort()}
-            style={`width: ${header.column.getSize()}%`}
-          >
-            {#if !header.isPlaceholder}
-              <div>
-                <div class="header">
-                  {#if typeof header.column.columnDef.header === 'string'}
-                    <span class="typo-all-caps">{header.column.columnDef.header}</span>
-                  {/if}
-                  {#if typeof header.column.columnDef.meta === 'object'}
-                    {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
-                      <Tooltip>
-                        <InfoCircle style="height: 1rem;" />
-                        {#snippet tooltip_content()}
-                          {// eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          (header.column.columnDef.meta as any).tooltipMessage}
-                        {/snippet}
-                      </Tooltip>
+<!-- Tanstack table rendering is for some reason broken on SSR. TODO: get rid of this god forsaken dependency -->
+{#if browser}
+  <table>
+    <thead>
+      {#each $table.getHeaderGroups() as headerGroup}
+        <tr>
+          {#each headerGroup.headers as header}
+            <th
+              onclick={header.column.getToggleSortingHandler()}
+              class:sortable={header.column.getCanSort()}
+              style={`width: ${header.column.getSize()}%`}
+            >
+              {#if !header.isPlaceholder}
+                <div>
+                  <div class="header">
+                    {#if typeof header.column.columnDef.header === 'string'}
+                      <span class="typo-all-caps">{header.column.columnDef.header}</span>
                     {/if}
+                    {#if typeof header.column.columnDef.meta === 'object'}
+                      {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
+                        <Tooltip>
+                          <InfoCircle style="height: 1rem;" />
+                          {#snippet tooltip_content()}
+                            {// eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (header.column.columnDef.meta as any).tooltipMessage}
+                          {/snippet}
+                        </Tooltip>
+                      {/if}
+                    {/if}
+                  </div>
+                  {#if header.column.getIsSorted() === 'asc'}
+                    <ChevronDown />
+                  {:else if header.column.getIsSorted() === 'desc'}
+                    <ChevronUp />
                   {/if}
                 </div>
-                {#if header.column.getIsSorted() === 'asc'}
-                  <ChevronDown />
-                {:else if header.column.getIsSorted() === 'desc'}
-                  <ChevronUp />
-                {/if}
+              {/if}
+            </th>
+          {/each}
+        </tr>
+      {/each}
+    </thead>
+    <tbody>
+      {#each $table.getRowModel().rows as row, index}
+        <tr
+          style:height="{rowHeight}px"
+          onclick={(e) => handleRowClick(index, e)}
+          onauxclick={(e) => handleRowClick(index, e)}
+          class:cursor-pointer={isRowClickable}
+          tabindex={isRowClickable ? 0 : -1}
+          bind:this={rowElems[index]}
+        >
+          {#each row.getVisibleCells() as cell}
+            {@const props = cell.getContext().getValue()}
+            {@const SvelteComponent = flexRender(cell.column.columnDef.cell, props)}
+            <td
+              class:typo-text-bold={cell.column.getIsSorted()}
+              class:sorted={cell.column.getIsSorted()}
+            >
+              <div>
+                <SvelteComponent {...typeof props === 'object' ? props : {}} />
               </div>
-            {/if}
-          </th>
-        {/each}
-      </tr>
-    {/each}
-  </thead>
-  <tbody>
-    {#each $table.getRowModel().rows as row, index}
-      <tr
-        style:height="{rowHeight}px"
-        onclick={(e) => handleRowClick(index, e)}
-        onauxclick={(e) => handleRowClick(index, e)}
-        class:cursor-pointer={isRowClickable}
-        tabindex={isRowClickable ? 0 : -1}
-        bind:this={rowElems[index]}
-      >
-        {#each row.getVisibleCells() as cell}
-          {@const props = cell.getContext().getValue()}
-          {@const SvelteComponent = flexRender(cell.column.columnDef.cell, props)}
-          <td
-            class:typo-text-bold={cell.column.getIsSorted()}
-            class:sorted={cell.column.getIsSorted()}
-          >
-            <div>
-              <SvelteComponent {...typeof props === 'object' ? props : {}} />
-            </div>
-          </td>
-        {/each}
-      </tr>
-    {/each}
-  </tbody>
-  <tfoot>
-    {#each $table.getFooterGroups() as footerGroup}
-      <tr>
-        {#each footerGroup.headers as header}
-          <th>
-            {#if !header.isPlaceholder}
-              {@const SvelteComponent_1 = flexRender(
-                header.column.columnDef.footer,
-                header.getContext(),
-              )}
-              <SvelteComponent_1 />
-            {/if}
-          </th>
-        {/each}
-      </tr>
-    {/each}
-  </tfoot>
-</table>
+            </td>
+          {/each}
+        </tr>
+      {/each}
+    </tbody>
+    <tfoot>
+      {#each $table.getFooterGroups() as footerGroup}
+        <tr>
+          {#each footerGroup.headers as header}
+            <th>
+              {#if !header.isPlaceholder}
+                {@const SvelteComponent_1 = flexRender(
+                  header.column.columnDef.footer,
+                  header.getContext(),
+                )}
+                <SvelteComponent_1 />
+              {/if}
+            </th>
+          {/each}
+        </tr>
+      {/each}
+    </tfoot>
+  </table>
+{/if}
 
 <style>
   table {
