@@ -25,51 +25,58 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let round: Round;
-  export let existingBallots: WrappedBallot[];
-  export let voters: RpgfUser[];
+  interface Props {
+    round: Round;
+    existingBallots: WrappedBallot[];
+    voters: RpgfUser[];
+  }
 
-  let selected: string[] = [];
-  $: selectedVoter = voters.find((voter) => voter.id === selected[0]) ?? null;
+  let { round, existingBallots, voters }: Props = $props();
 
-  $: voterItems = voters
-    .sort((a, b) => {
-      // those without existing ballot first
-      const aHasBallot = existingBallots.some((ballot) => ballot.user.id === a.id);
-      const bHasBallot = existingBallots.some((ballot) => ballot.user.id === b.id);
-      return aHasBallot === bHasBallot ? 0 : aHasBallot ? 1 : -1;
-    })
-    .reduce((acc, voter) => {
-      acc[voter.id] = {
-        type: 'selectable',
-        label: {
-          component: IdentityBadge,
-          props: {
-            address: voter.walletAddress,
-            showAvatar: true,
-            showIdentity: true,
-            disableLink: true,
-            disableTooltip: true,
+  let selected: string[] = $state([]);
+  let selectedVoter = $derived(voters.find((voter) => voter.id === selected[0]) ?? null);
+
+  let voterItems = $derived(
+    voters
+      .sort((a, b) => {
+        // those without existing ballot first
+        const aHasBallot = existingBallots.some((ballot) => ballot.user.id === a.id);
+        const bHasBallot = existingBallots.some((ballot) => ballot.user.id === b.id);
+        return aHasBallot === bHasBallot ? 0 : aHasBallot ? 1 : -1;
+      })
+      .reduce((acc, voter) => {
+        acc[voter.id] = {
+          type: 'selectable',
+          label: {
+            component: IdentityBadge,
+            props: {
+              address: voter.walletAddress,
+              showAvatar: true,
+              showIdentity: true,
+              disableLink: true,
+              disableTooltip: true,
+            },
           },
-        },
-        text: existingBallots.some((ballot) => ballot.user.id === voter.id)
-          ? { component: AlreadyVotedBadge, props: {} }
-          : undefined,
-        searchString: [voter.walletAddress],
-      } satisfies Items[string];
+          text: existingBallots.some((ballot) => ballot.user.id === voter.id)
+            ? { component: AlreadyVotedBadge, props: {} }
+            : undefined,
+          searchString: [voter.walletAddress],
+        } satisfies Items[string];
 
-      return acc;
-    }, {} as Items);
+        return acc;
+      }, {} as Items),
+  );
 
-  let loadedFile: File | null = null;
-  let fileData: ArrayBuffer | null = null;
-  let filetype: 'csv' | 'xlsx' | null = null;
-  let submitting = false;
+  let loadedFile: File | null = $state(null);
+  let fileData: ArrayBuffer | null = $state(null);
+  let filetype: 'csv' | 'xlsx' | null = $state(null);
+  let submitting = $state(false);
 
-  $: hasVoteLimits =
+  let hasVoteLimits = $derived(
     round.minVotesPerProjectPerVoter !== null ||
-    round.maxVotesPerProjectPerVoter !== null ||
-    round.maxVotesPerVoter !== null;
+      round.maxVotesPerProjectPerVoter !== null ||
+      round.maxVotesPerVoter !== null,
+  );
 
   function resetFile() {
     loadedFile = null;
@@ -245,7 +252,7 @@
             circular
             icon={CrossCircle}
             ariaLabel="Remove loaded file"
-            on:click={resetFile}
+            onclick={resetFile}
           />
         </div>
       {:else}
@@ -261,18 +268,18 @@
     </FormField>
   {/if}
 
-  <svelte:fragment slot="actions">
-    <Button variant="ghost" on:click={handleCancel}>Cancel</Button>
+  {#snippet actions()}
+    <Button variant="ghost" onclick={handleCancel}>Cancel</Button>
     <Button
       variant="primary"
       disabled={!selectedVoter || !fileData || submitting || voters.length === 0}
       loading={submitting}
-      on:click={handleSubmit}
+      onclick={handleSubmit}
       icon={Wallet}
     >
       Submit ballot
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>
