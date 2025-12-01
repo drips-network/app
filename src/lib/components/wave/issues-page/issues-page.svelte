@@ -35,6 +35,7 @@
     allowAddToWave = false,
     ownWaveRepos = [],
     pathPrefix,
+    showNewApplicationsBadge = false,
     waves,
     viewKey,
   }: {
@@ -55,6 +56,8 @@
 
     /** Unique name for the route the view is on to enable coherent view transitions */
     viewKey: string;
+
+    showNewApplicationsBadge?: boolean;
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -202,6 +205,7 @@
       {:else}
         <IssuesList
           {pathPrefix}
+          {showNewApplicationsBadge}
           {waves}
           bind:this={listInstance}
           multiselectMode={allowAddToWave}

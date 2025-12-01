@@ -33,6 +33,7 @@
   allowAddToWave
   pathPrefix="/wave/maintainers/issues/"
   breadcrumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Issues' }]}
+  showNewApplicationsBadge
 >
   {@render children()}
 </IssuesPage>

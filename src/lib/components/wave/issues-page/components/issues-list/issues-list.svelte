@@ -20,19 +20,20 @@
     waves,
     multiselectMode = false,
     pathPrefix,
+    showNewApplicationsBadge = false,
     onselectchange,
   }: {
     issuesWithPagination: Awaited<ReturnType<typeof getIssues>>;
     getMoreIssues: (
       pagination: Pagination,
     ) => Promise<Awaited<ReturnType<typeof getIssues>> | null>;
-
+    /** For building hrefs for issues links, e.g. '/wave/maintainers/issues' */
     pathPrefix: string;
-
     /** For displaying wave data in list items */
     waves: WaveDto[];
-
     multiselectMode?: boolean;
+    /** If true, issues with applications but no applicants receive a badge */
+    showNewApplicationsBadge?: boolean;
     onselectchange?: (selectedIssues: IssueDetailsDto[]) => void;
   } = $props();
 
@@ -60,7 +61,9 @@
     };
   }
 
-  let itemHeights = $derived(issues.map((issue) => determineIssuesListItemHeight(issue)));
+  let itemHeights = $derived(
+    issues.map((issue) => determineIssuesListItemHeight(issue, showNewApplicationsBadge)),
+  );
   let totalItemHeight = $derived(itemHeights.reduce((acc, height) => acc + height, 0));
 
   let infiniteLoadingTriggerEl = $state<HTMLDivElement>();
@@ -218,6 +221,7 @@
       <div {style}>
         <IssuesListItem
           {issue}
+          {showNewApplicationsBadge}
           selectable={multiselectMode}
           selected={selectedIndices.has(index)}
           onselect={(selected) => handleItemSelect(index, selected)}

@@ -1,14 +1,6 @@
 <script lang="ts" module>
-  export function inferBadges(issue: IssueDetailsDto) {
-    const badges = [];
-
-    if (issue.state === 'closed') {
-      badges.push({
-        text: 'Closed',
-        color: 'var(--color-foreground-level-6)',
-        backgroundColor: 'var(--color-foreground-level-2)',
-      });
-    }
+  export function inferBadges(issue: IssueDetailsDto, showNewApplicationsBadge: boolean) {
+    let badges = [];
 
     if (issue.points) {
       badges.push({
@@ -16,6 +8,26 @@
         color: 'var(--color-primary-level-7)',
         backgroundColor: 'var(--color-primary-level-2)',
       });
+    }
+
+    if (issue.pendingApplicationsCount && !issue.assignedApplicant && showNewApplicationsBadge) {
+      badges.push({
+        text: 'New applications',
+        color: 'var(--color-caution-level-6)',
+        backgroundColor: 'var(--color-caution-level-1)',
+        bold: true,
+      });
+    }
+
+    if (issue.state === 'closed') {
+      // Only show closed badge if closed
+      badges = [
+        {
+          text: 'Closed',
+          color: 'var(--color-foreground-level-6)',
+          backgroundColor: 'var(--color-foreground-level-2)',
+        },
+      ];
     }
 
     return badges;
@@ -41,6 +53,7 @@
     onselect,
     partOfWave,
     pathPrefix,
+    showNewApplicationsBadge = false,
   }: {
     issue: IssueDetailsDto;
     selectable?: boolean;
@@ -48,19 +61,22 @@
     onselect?: (selected: boolean) => void;
     partOfWave?: WaveDto | null;
     pathPrefix: string;
+    showNewApplicationsBadge?: boolean;
   } = $props();
 
   let numberOfLines = determineAmountOfLines(issue);
-  let itemHeight = $derived(determineIssuesListItemHeight(issue));
+  let itemHeight = $derived(determineIssuesListItemHeight(issue, showNewApplicationsBadge));
 
   let active = $derived(page.url.pathname.includes(issue.id));
 
-  let badges = $derived.by(() => inferBadges(issue));
+  let badges = $derived.by(() => inferBadges(issue, showNewApplicationsBadge));
 </script>
 
-{#snippet badge(text: string, color: string, backgroundColor: string)}
-  <span class="state-badge typo-text-small" style:color style:background-color={backgroundColor}
-    >{text}</span
+{#snippet badge(text: string, color: string, backgroundColor: string, bold?: boolean)}
+  <span
+    class="state-badge typo-text-small{bold ? '-bold' : ''}"
+    style:color
+    style:background-color={backgroundColor}>{text}</span
   >
 {/snippet}
 
@@ -90,8 +106,8 @@
   >
     {#if badges.length > 0}
       <div class="badges">
-        {#each badges as { text, color, backgroundColor }}
-          {@render badge(text, color, backgroundColor)}
+        {#each badges as { text, color, backgroundColor, bold }}
+          {@render badge(text, color, backgroundColor, bold)}
         {/each}
       </div>
     {/if}
@@ -153,5 +169,10 @@
 
   .issue-list-item:not(.active):hover {
     background-color: var(--color-foreground-level-1);
+  }
+
+  .badges {
+    display: flex;
+    gap: 0.25rem;
   }
 </style>
