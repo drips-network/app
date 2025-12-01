@@ -10,7 +10,10 @@
   }
 </script>
 
-<nav aria-label="Breadcrumbs">
+<nav
+  aria-label="Breadcrumbs"
+  style:view-transition-name="breadcrumbs-{crumbs.map((c) => c.label).join('-')}"
+>
   <ul class="breadcrumbs">
     {#each crumbs as crumb, index}
       <li class="breadcrumb">
@@ -41,8 +44,8 @@
     gap: 0.5rem;
     padding: 0;
     margin: 0;
-    view-transition-name: breadcrumbs;
     user-select: none;
+    view-transition-class: element-handover;
   }
 
   .breadcrumb {

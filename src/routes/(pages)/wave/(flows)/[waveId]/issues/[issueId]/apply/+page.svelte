@@ -50,7 +50,7 @@
 <!-- TODO(wave): Intro for what Wave is -->
 <FlowStepWrapper
   headline="Apply to issue"
-  description="Submit your application to work on this issue in the ${data.wave
+  description="Submit your application to work on this issue in the {data.wave
     .name} Wave's current cycle."
 >
   <FormField title="Issue*" type="div">

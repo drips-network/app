@@ -3,7 +3,8 @@ import modal from '$lib/stores/modal';
 
 export default async function doWithConfirmationModal<RT>(
   message: string,
-  fn: () => RT | Promise<RT>,
+  fnOrHref: (() => RT | Promise<RT>) | string,
+  onExit?: () => void,
 ): Promise<Awaited<RT> | null> {
   const promise: Promise<Awaited<RT> | null> = new Promise((resolve) => {
     modal.show(
@@ -14,9 +15,14 @@ export default async function doWithConfirmationModal<RT>(
       },
       {
         message,
-        onConfirm: async () => {
-          resolve(await fn());
-        },
+        onConfirm:
+          typeof fnOrHref === 'string'
+            ? undefined
+            : async () => {
+                resolve(await fnOrHref());
+              },
+        onExit,
+        href: typeof fnOrHref === 'string' ? fnOrHref : undefined,
       },
     );
   });

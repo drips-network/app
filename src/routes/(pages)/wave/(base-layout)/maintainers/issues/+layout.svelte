@@ -24,6 +24,7 @@
 </script>
 
 <IssuesPage
+  viewKey="maintainers"
   ownWaveRepos={data.waveRepos.data}
   waves={data.waves.data}
   issues={data.issues}

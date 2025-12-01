@@ -140,3 +140,7 @@ h3,
     animation: none;
   }
 }
+
+::view-transition {
+  pointer-events: none;
+}

@@ -24,6 +24,7 @@
 </script>
 
 <IssuesPage
+  viewKey="contributors"
   waves={data.waves.data}
   issues={data.issues}
   pathPrefix="/wave/contributors/issues/"

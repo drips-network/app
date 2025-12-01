@@ -6,10 +6,12 @@
 
   interface Props {
     message: string;
-    onConfirm: () => unknown | Promise<unknown>;
+    onConfirm?: () => unknown | Promise<unknown>;
+    onExit?: () => unknown | Promise<unknown>;
+    href?: string;
   }
 
-  let { message, onConfirm }: Props = $props();
+  let { message, onConfirm, href, onExit }: Props = $props();
 
   let working = $state(false);
 
@@ -20,7 +22,7 @@
   async function handleConfirm() {
     working = true;
 
-    await onConfirm();
+    await onConfirm?.();
 
     working = false;
     modal.setHideable(true);
@@ -40,9 +42,12 @@
       onclick={() => {
         modal.setHideable(true);
         modal.hide();
+        onExit?.();
       }}>No, cancel</Button
     >
-    <Button loading={working} variant="destructive" onclick={handleConfirm}>Yes, continue</Button>
+    <Button loading={working} variant="destructive" {href} onclick={handleConfirm}
+      >Yes, continue</Button
+    >
   </div>
 </div>
 

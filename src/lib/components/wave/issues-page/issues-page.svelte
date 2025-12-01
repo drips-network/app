@@ -23,6 +23,8 @@
     registerIssueUpdateListener,
     unregisterIssueUpdateListener,
   } from './issue-update-coordinator';
+  import { beforeNavigate } from '$app/navigation';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
 
   let {
     issues,
@@ -34,6 +36,7 @@
     ownWaveRepos = [],
     pathPrefix,
     waves,
+    viewKey,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -49,6 +52,9 @@
 
     /** For displaying wave data in list items */
     waves: WaveDto[];
+
+    /** Unique name for the route the view is on to enable coherent view transitions */
+    viewKey: string;
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -102,10 +108,42 @@
       unregisterIssueUpdateListener(issueUpdatedHandler);
     };
   });
+
+  let viewTransitionName = $state<null | string>(null);
+  let gotExitConfirmation = $state<boolean>(false);
+
+  beforeNavigate(async (navigation) => {
+    // if we are navigating within the same view (but maybe different issue), set the view transition name
+    if (navigation.to?.url.pathname.startsWith(`/wave/${viewKey}/issues`)) {
+      viewTransitionName = `issues-list-${viewKey}`;
+    } else {
+      viewTransitionName = null;
+    }
+
+    // prevent navigation (to ask for confirmation) if there are selected issues
+    if (selectedIssues.length > 0 && !navigation.to?.route.id) {
+      navigation.cancel();
+    } else if (selectedIssues.length > 0) {
+      if (gotExitConfirmation) {
+        // already got confirmation, allow navigation
+        return;
+      }
+
+      navigation.cancel();
+      gotExitConfirmation = true;
+      await doWithConfirmationModal(
+        'Navigating away will discard your current selection.',
+        `${navigation.to?.url.pathname}${navigation.to?.url.searchParams}`,
+        () => {
+          gotExitConfirmation = false;
+        },
+      );
+    }
+  });
 </script>
 
 <div class="wrapper">
-  <div class="issues">
+  <div class="issues" style:view-transition-name={viewTransitionName}>
     <div class="breadcrumbs-wrapper">
       <Breadcrumbs crumbs={breadcrumbs} />
     </div>
@@ -201,7 +239,6 @@
     height: calc(100vh - 6rem);
     position: sticky;
     top: 5rem;
-    view-transition-name: issues-list;
   }
 
   .issue-list-configuration {
