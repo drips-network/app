@@ -100,7 +100,6 @@
         projects={mapFilterUndefined(profileChainData.projects, (v) =>
           v === null ? undefined : v,
         )}
-        withClaimProjectButton={true}
       />
       <YourDripListsSection
         label={isSelf ? 'Your Drip Lists' : 'Drip Lists'}
@@ -113,7 +112,6 @@
         dripLists={mapFilterUndefined(profileChainData.dripLists, (v) =>
           v === null ? undefined : v,
         )}
-        withCreateButton={true}
       />
       <Supporters
         collapsable
