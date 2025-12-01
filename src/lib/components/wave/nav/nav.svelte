@@ -37,6 +37,9 @@
   let hovering = $state(false);
   let navEl: HTMLElement | undefined = $state();
 
+  // Track the timer ID so we can cancel it
+  let hoverTimeout: ReturnType<typeof setTimeout> | undefined;
+
   let shouldBeCollapsed = $derived(collapsed && !hovering);
   $effect(() => {
     isCurrentlyExpanded = !shouldBeCollapsed;
@@ -58,10 +61,6 @@
   afterNavigate(() => {
     // 1. Do NOT unlock immediately. The View Transition animation
     // is likely still running (standard duration is ~250-300ms).
-    // If we check too soon, the browser might think the mouse is "outside"
-    // the frozen snapshot.
-
-    // 2. Wait 500ms (safe buffer) for the transition to visually finish.
     setTimeout(() => {
       isNavigating = false;
 
@@ -73,12 +72,7 @@
   });
 
   function isActive(href: string) {
-    // return true if the given href is the longest match for the current page url
-    // as in: if we are on /wave/issue/123, and nav item A has href /wave and nav item B has href /wave/issue,
-    // nav item B should be active, not nav item A
-
     const currentPath = page.url.pathname;
-
     const flattenedItems: NavTarget[] = [];
     for (const item of [...items.top, ...(items.bottom || [])]) {
       if (item.type === 'target') {
@@ -89,7 +83,6 @@
     }
 
     let longestMatch = '';
-
     for (const item of flattenedItems) {
       if (item.href.length > longestMatch.length && currentPath.startsWith(item.href)) {
         longestMatch = item.href;
@@ -144,7 +137,7 @@
     bind:this={navTargetEls[item.href]}
   >
     <item.icon
-      style="fill: {isActive ? 'var(--color-primary)' : 'var(--color-foreground-level-6)'}"
+      style="fill: {isActive ? 'var(--color-primary-level-6)' : 'var(--color-foreground-level-6)'}"
     />
     {#if !shouldBeCollapsed}
       <span transition:fade={{ duration: 200 }}>{item.name}</span>
@@ -157,9 +150,15 @@
   style:width="{width.current}rem"
   onmouseenter={() => {
     isNavigating = false;
-    hovering = true;
+    // Delay the expansion by 100ms
+    hoverTimeout = setTimeout(() => {
+      hovering = true;
+    }, 100);
   }}
   onmouseleave={() => {
+    // If user leaves before 100ms, cancel the expansion
+    clearTimeout(hoverTimeout);
+
     if (isNavigating) return;
     hovering = false;
   }}
@@ -222,7 +221,7 @@
   }
 
   .nav-item.active {
-    color: var(--color-primary);
+    color: var(--color-primary-level-6);
   }
 
   .nav-item:not(.active):hover {
