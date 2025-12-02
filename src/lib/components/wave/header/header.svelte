@@ -1,6 +1,7 @@
 <script lang="ts">
   import Flyout from '$lib/components/flyout/flyout.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
+  import NotificationsButton from '$lib/components/notifications-button/notifications-button.svelte';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import LogInButton from '../log-in-button/log-in-button.svelte';
@@ -19,6 +20,10 @@
   <a class="typo-header-3" href="/wave">Drips Wave</a>
 
   <div class="right">
+    {#if user}
+      <NotificationsButton {user} />
+    {/if}
+
     <SupportButton {user} />
 
     {#if user}
