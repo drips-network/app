@@ -9,7 +9,9 @@ import type { UserStreamsQuery, UserStreamsQueryVariables } from './__generated_
 import network from '$lib/stores/wallet/network';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-export const load = async ({ fetch }) => {
+export const load = async ({ fetch, depends }) => {
+  depends('app:funds');
+
   const connectedAddress = getConnectedAddress();
 
   if (!connectedAddress) {

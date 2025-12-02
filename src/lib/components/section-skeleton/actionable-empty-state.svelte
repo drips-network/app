@@ -1,15 +1,25 @@
 <script lang="ts">
   import EmptyState from './empty-state.svelte';
 
-  export let emoji: string | undefined = undefined;
-  export let headline: string | undefined = undefined;
-  export let description: string | undefined = undefined;
+  interface Props {
+    emoji?: string | undefined;
+    headline?: string | undefined;
+    description?: string | undefined;
+    actions?: import('svelte').Snippet;
+  }
+
+  let {
+    emoji = undefined,
+    headline = undefined,
+    description = undefined,
+    actions,
+  }: Props = $props();
 </script>
 
 <div class="dynamic-empty-state">
   <EmptyState {emoji} {headline} text={description} />
   <div class="buttons">
-    <slot name="actions" />
+    {@render actions?.()}
   </div>
 </div>
 

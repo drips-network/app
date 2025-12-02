@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const DRIP_LISTS_PAGE_DRIP_LIST_FRAGMENT = gql`
     ${DRIP_LISTS_SECTION_DRIP_LIST_FRAGMENT}
     fragment DripListsPageDripList on DripList {
@@ -26,14 +26,18 @@
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import launchCreateDripList from '../../../../../lib/utils/launch-create-drip-list';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 </script>
 
 <HeadMeta title="Drip List" />
 
 <div class="page">
   <EduCard dismissableId="drip-lists-page-intro" negativeMarginWhileCollapsed="-4rem">
-    <svelte:fragment slot="text">
+    {#snippet text()}
       <h1 class="pixelated">What’s a Drip List?</h1>
       <p>
         A Drip List is a fundable list of anything on Drips. That includes projects, any Ethereum
@@ -45,18 +49,18 @@
           target="_blank">Learn more</a
         >
       </p>
-    </svelte:fragment>
-    <svelte:fragment slot="buttons">
-      <Button icon={Plus} variant="primary" on:click={launchCreateDripList}
+    {/snippet}
+    {#snippet buttons()}
+      <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
         >Create a Drip List</Button
       >
-    </svelte:fragment>
-    <svelte:fragment slot="illustration">
-      <div class="edu-card-illustration-bg" />
+    {/snippet}
+    {#snippet illustration()}
+      <div class="edu-card-illustration-bg"></div>
       <div class="edu-card-illustration-wrapper">
         <DripList />
       </div>
-    </svelte:fragment>
+    {/snippet}
   </EduCard>
 
   <YourDripListsSection

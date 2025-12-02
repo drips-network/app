@@ -13,18 +13,26 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import Link from '../icons/Link.svelte';
 
-  export let round: Round;
-  export let amountOfVoters: number;
+  interface Props {
+    round: Round;
+    amountOfVoters: number;
+  }
 
-  $: nameAndDescriptionDone = Boolean(round.name && round.urlSlug);
-  $: scheduleDone = Boolean(
-    round.applicationPeriodStart &&
-      round.applicationPeriodEnd &&
-      round.votingPeriodStart &&
-      round.votingPeriodEnd &&
-      round.resultsPeriodStart,
+  let { round, amountOfVoters }: Props = $props();
+
+  let nameAndDescriptionDone = $derived(Boolean(round.name && round.urlSlug));
+  let scheduleDone = $derived(
+    Boolean(
+      round.applicationPeriodStart &&
+        round.applicationPeriodEnd &&
+        round.votingPeriodStart &&
+        round.votingPeriodEnd &&
+        round.resultsPeriodStart,
+    ),
   );
-  $: votingConfigDone = Boolean(round.maxVotesPerProjectPerVoter && round.maxVotesPerVoter);
+  let votingConfigDone = $derived(
+    Boolean(round.maxVotesPerProjectPerVoter && round.maxVotesPerVoter),
+  );
 
   function handlePublish() {
     modal.show(Stepper, undefined, publishRpgfRoundFlowSteps(round.id));
@@ -92,7 +100,7 @@
     disabled={!round.validation?.readyToPublish}
     icon={Registered}
     size="large"
-    on:click={handlePublish}
+    onclick={handlePublish}
   >
     Publish round
   </Button>

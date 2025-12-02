@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Token from '$lib/components/token/token.svelte';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import unreachable from '$lib/utils/unreachable';
@@ -6,13 +8,18 @@
   import formatDate from '$lib/utils/format-date';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
 
-  export let streamRateValueParsed: bigint, topUpAmountValueParsed: bigint;
-  export let tokenAddress: string;
+  interface Props {
+    streamRateValueParsed: bigint;
+    topUpAmountValueParsed: bigint;
+    tokenAddress: string;
+  }
 
-  $: token = tokensStore.getByAddress(tokenAddress);
+  let { streamRateValueParsed, topUpAmountValueParsed, tokenAddress }: Props = $props();
 
-  let lastsUntil: string | undefined;
-  $: {
+  let token = $derived(tokensStore.getByAddress(tokenAddress));
+
+  let lastsUntil: string | undefined = $state();
+  run(() => {
     if (streamRateValueParsed !== undefined && topUpAmountValueParsed !== undefined) {
       const durationSeconds =
         (topUpAmountValueParsed /
@@ -25,7 +32,7 @@
       lastsUntil =
         topUpAmountValueParsed > 0 ? `≈ ${formatDate(timestamp, 'dayAndYear')}` : undefined;
     }
-  }
+  });
 </script>
 
 <h4>Continuous Support</h4>

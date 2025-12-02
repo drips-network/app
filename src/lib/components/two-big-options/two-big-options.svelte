@@ -1,23 +1,26 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import Option from './components/option.svelte';
 
   interface OptionConfig {
     emoji: string;
     title: string;
-    attributes: { icon: ComponentType; text: string }[];
+    attributes: { icon: Component; text: string }[];
   }
 
-  export let option1: OptionConfig;
-  export let option2: OptionConfig;
+  interface Props {
+    option1: OptionConfig;
+    option2: OptionConfig;
+    selected?: 1 | 2 | undefined;
+  }
 
-  export let selected: 1 | 2 | undefined = undefined;
+  let { option1, option2, selected = $bindable() }: Props = $props();
 </script>
 
 <div class="options" role="radiogroup">
-  <Option on:click={() => (selected = 1)} selected={selected === 1} {...option1} />
-  <div class="divider" />
-  <Option on:click={() => (selected = 2)} selected={selected === 2} {...option2} />
+  <Option onclick={() => (selected = 1)} selected={selected === 1} {...option1} />
+  <div class="divider"></div>
+  <Option onclick={() => (selected = 2)} selected={selected === 2} {...option2} />
 </div>
 
 <style>

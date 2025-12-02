@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
   import type { Items } from '$lib/components/list-editor/types';
@@ -13,14 +15,14 @@
   import { setRoundVoters, updateRound } from '$lib/utils/rpgf/rpgf';
   import { invalidate } from '$app/navigation';
 
-  export let data;
+  let { data } = $props();
 
-  let updatedRound: PatchRoundDto = { ...data.round };
-  let updatedVoterAddresses: string[] = [
+  let updatedRound: PatchRoundDto = $state({ ...data.round });
+  let updatedVoterAddresses: string[] = $state([
     ...data.roundVoters.map((u) => getAddress(u.walletAddress)),
-  ];
+  ]);
 
-  $: isDraft = !data.round.published;
+  let isDraft = $derived(!data.round.published);
 
   function getVoterItemsFromAddresses(addresses: string[]): Items {
     return Object.fromEntries(
@@ -37,21 +39,24 @@
   }
 
   // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let voterItems: Items = getVoterItemsFromAddresses(updatedVoterAddresses);
+  // svelte-ignore state_referenced_locally
+  let voterItems: Items = $state(getVoterItemsFromAddresses(updatedVoterAddresses));
 
-  $: updatedVoterAddresses = mapFilterUndefined(
-    Object.values(voterItems).map((item) => {
-      if (item.type === 'address') {
-        return getAddress(item.address);
-      } else {
-        return undefined;
-      }
-    }),
-    (v) => v,
-  );
+  run(() => {
+    updatedVoterAddresses = mapFilterUndefined(
+      Object.values(voterItems).map((item) => {
+        if (item.type === 'address') {
+          return getAddress(item.address);
+        } else {
+          return undefined;
+        }
+      }),
+      (v) => v,
+    );
+  });
 
-  let votesPerVoterValidationState: TextInputValidationState = { type: 'unvalidated' };
-  $: {
+  let votesPerVoterValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
+  run(() => {
     if (!updatedRound.maxVotesPerVoter) {
       votesPerVoterValidationState = { type: 'unvalidated' };
     } else if (updatedRound.maxVotesPerVoter < 1) {
@@ -75,10 +80,10 @@
     } else {
       votesPerVoterValidationState = { type: 'valid' };
     }
-  }
+  });
 
-  let maxVotesPerProjectValidationState: TextInputValidationState = { type: 'unvalidated' };
-  $: {
+  let maxVotesPerProjectValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
+  run(() => {
     if (!updatedRound.maxVotesPerProjectPerVoter) {
       maxVotesPerProjectValidationState = { type: 'unvalidated' };
     } else if (updatedRound.maxVotesPerProjectPerVoter < 1) {
@@ -103,10 +108,10 @@
     } else {
       maxVotesPerProjectValidationState = { type: 'valid' };
     }
-  }
+  });
 
-  let minVotesPerProjectValidationState: TextInputValidationState = { type: 'unvalidated' };
-  $: {
+  let minVotesPerProjectValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
+  run(() => {
     if (!updatedRound.minVotesPerProjectPerVoter) {
       minVotesPerProjectValidationState = { type: 'unvalidated' };
     } else if (updatedRound.minVotesPerProjectPerVoter < 1) {
@@ -131,14 +136,14 @@
     } else {
       minVotesPerProjectValidationState = { type: 'valid' };
     }
-  }
+  });
 
   // Voters can be updated during voting period, but the backend will restrict
   // deleting voters who have already submitted ballots
-  $: canUpdateVoters = data.round.state ? data.round.state !== 'results' : true;
+  let canUpdateVoters = $derived(data.round.state ? data.round.state !== 'results' : true);
 
-  let voterGuidelinesLinkValidationState: TextInputValidationState = { type: 'valid' };
-  $: {
+  let voterGuidelinesLinkValidationState = $state<TextInputValidationState>({ type: 'valid' });
+  run(() => {
     if (!updatedRound.voterGuidelinesLink) {
       voterGuidelinesLinkValidationState = { type: 'valid' };
     } else if (!/^https?:\/\//.test(updatedRound.voterGuidelinesLink)) {
@@ -149,28 +154,31 @@
     } else {
       voterGuidelinesLinkValidationState = { type: 'valid' };
     }
-  }
+  });
 
-  $: valid = Boolean(
-    votesPerVoterValidationState.type !== 'invalid' &&
-      maxVotesPerProjectValidationState.type !== 'invalid' &&
-      minVotesPerProjectValidationState.type !== 'invalid' &&
-      voterGuidelinesLinkValidationState.type !== 'invalid',
+  let valid = $derived(
+    Boolean(
+      votesPerVoterValidationState.type !== 'invalid' &&
+        maxVotesPerProjectValidationState.type !== 'invalid' &&
+        minVotesPerProjectValidationState.type !== 'invalid' &&
+        voterGuidelinesLinkValidationState.type !== 'invalid',
+    ),
   );
 
   function haveVotersChanged(updated: string[], current: typeof data.roundVoters): boolean {
     return !areStringArraysEqual(
-      updated.map((a) => a.toLowerCase()).sort(),
-      current.map((u) => u.walletAddress.toLowerCase()).sort(),
+      [...updated].map((a) => a.toLowerCase()).sort(),
+      [...current].map((u) => u.walletAddress.toLowerCase()).sort(),
     );
   }
 
-  $: changesMade =
+  let changesMade = $derived(
     updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
-    updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
-    updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
-    updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
-    haveVotersChanged(updatedVoterAddresses, data.roundVoters);
+      updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
+      updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
+      updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
+      haveVotersChanged(updatedVoterAddresses, data.roundVoters),
+  );
 
   function normalizeOptionalNumberInput(value: unknown): number | null {
     if (value === '' || value === null || value === undefined) {

@@ -183,9 +183,9 @@
     value={text}
     {placeholder}
     {disabled}
-    on:focus={() => (visible = true)}
-    on:mousedown={() => (visible = true)}
-    on:input={(e) => {
+    onfocus={() => (visible = true)}
+    onmousedown={() => (visible = true)}
+    oninput={(e) => {
       if (
         e instanceof InputEvent &&
         e.inputType === 'insertText' &&
@@ -215,7 +215,7 @@
       bind:this={pickerElement}
     >
       <DateTimePicker
-        on:focusout={onFocusOut}
+        onfocusout={onFocusOut}
         on:select={onSelect}
         bind:value={$store}
         {min}

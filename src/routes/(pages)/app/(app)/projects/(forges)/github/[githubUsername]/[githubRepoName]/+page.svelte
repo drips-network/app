@@ -2,7 +2,11 @@
   import type { PageData } from './$types';
   import ProjectProfile from '../../../components/project-profile/project-profile.svelte';
 
-  export let data: PageData;
+  interface Props {
+    data: PageData;
+  }
+
+  let { data }: Props = $props();
 </script>
 
 <ProjectProfile

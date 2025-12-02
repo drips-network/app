@@ -3,32 +3,41 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
-  import Toggle from '../toggle/toggle.svelte';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Token from '../token/token.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { formatUnits } from 'ethers';
+  import Button from '../button/button.svelte';
 
-  export let tokenAddress: string | undefined;
-  export let tokenBalance: bigint | undefined;
-  export let loading = false;
-  $: tokenInfo = tokenAddress ? tokens.getByAddress(tokenAddress) : undefined;
-
-  export let inputValue: string;
-
-  export let validationState: TextInputValidationState = {
-    type: 'unvalidated',
-  };
-
-  export let topUpMax = false;
-
-  $: if (topUpMax && tokenInfo) {
-    inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
+  interface Props {
+    tokenAddress: string | undefined;
+    tokenBalance: bigint | undefined;
+    loading?: boolean;
+    inputValue: string;
+    validationState?: TextInputValidationState;
+    amount?: bigint | undefined;
   }
 
-  export let amount: bigint | undefined = undefined;
-  $: {
+  let {
+    tokenAddress,
+    tokenBalance,
+    loading = false,
+    inputValue = $bindable(),
+    validationState = $bindable({
+      type: 'unvalidated',
+    }),
+    amount = $bindable(),
+  }: Props = $props();
+  let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
+
+  function setMax() {
+    if (tokenInfo) {
+      inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
+    }
+  }
+
+  $effect(() => {
     if (tokenBalance === undefined) {
       inputValue = '0';
     }
@@ -36,9 +45,7 @@
     if (tokenInfo?.info) {
       amount = inputValue ? parseTokenAmount(inputValue, tokenInfo.info.decimals) : undefined;
 
-      if (topUpMax && amount && amount > 0n) {
-        validationState = { type: 'valid' };
-      } else if (amount) {
+      if (amount) {
         if (tokenBalance && amount <= tokenBalance) {
           validationState = { type: 'valid' };
         } else {
@@ -57,7 +64,7 @@
     } else {
       validationState = { type: 'unvalidated' };
     }
-  }
+  });
 </script>
 
 <FormField title="Wallet balance">
@@ -91,9 +98,9 @@
     {validationState}
     variant={{ type: 'number', min: 0 }}
     suffix={tokenInfo?.info.symbol}
-    disabled={topUpMax || !tokenAddress}
+    disabled={!tokenAddress}
   />
-  <svelte:fragment slot="action">
-    <Toggle bind:checked={topUpMax} label="Max" />
-  </svelte:fragment>
+  {#snippet action()}
+    <Button size="small" variant="ghost" onclick={setMax}>Max</Button>
+  {/snippet}
 </FormField>

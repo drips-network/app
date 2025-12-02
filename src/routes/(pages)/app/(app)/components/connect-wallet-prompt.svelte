@@ -7,23 +7,23 @@
 </script>
 
 <EduCard>
-  <svelte:fragment slot="text">
+  {#snippet text()}
     <p>Connect your wallet to claim your open-source project, create a Drip List, and more.</p>
-  </svelte:fragment>
-  <svelte:fragment slot="buttons">
-    <Button icon={Wallet} variant="primary" on:click={() => walletStore.connect()}
+  {/snippet}
+  {#snippet buttons()}
+    <Button icon={Wallet} variant="primary" onclick={() => walletStore.connect()}
       >Connect wallet</Button
     >
     <Button href="https://docs.drips.network" target="_blank">Learn more</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="illustration">
-    <div class="edu-card-illustration-bg" />
+  {/snippet}
+  {#snippet illustration()}
+    <div class="edu-card-illustration-bg"></div>
     <div class="edu-card-illustration-wrapper">
       <div class="inner">
         <OneContract />
       </div>
     </div>
-  </svelte:fragment>
+  {/snippet}
 </EduCard>
 
 <style>

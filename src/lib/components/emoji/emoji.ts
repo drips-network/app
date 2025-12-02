@@ -1,4 +1,4 @@
-import type { ComponentType } from 'svelte';
+import type { Component } from 'svelte';
 
 import CheckIcon from '$lib/components/icons/✅.svelte';
 import WarningIcon from '$lib/components/icons/⚠️.svelte';
@@ -22,7 +22,7 @@ import FamilyIcon from '$lib/components/icons/👪.svelte';
 import PartyPopperIcon from '$lib/components/icons/🎉.svelte';
 import EyesIcon from '$lib/components/icons/👀.svelte';
 
-export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: ComponentType } = {
+export const CUSTOM_EMOJI_COMPONENTS: { [key: string]: Component<{ size: number }> } = {
   ['✅']: CheckIcon,
   ['⚠️']: WarningIcon,
   ['🌐']: GlobeIcon,

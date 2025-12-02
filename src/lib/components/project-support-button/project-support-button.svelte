@@ -7,8 +7,12 @@
   import DripsSupportButton from './drips-style-button.svelte';
   import GithubSupportButton from './github-style-button.svelte';
 
-  export let data: SupportButtonData;
-  export let options: SupportButtonOptions;
+  interface Props {
+    data: SupportButtonData;
+    options: SupportButtonOptions;
+  }
+
+  let { data, options }: Props = $props();
 </script>
 
 {#if options.style === SupportButtonStyle.github}

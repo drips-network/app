@@ -5,7 +5,11 @@
   import { browser } from '$app/environment';
   import buildExternalUrl from '$lib/utils/build-external-url';
 
-  export let content: string;
+  interface Props {
+    content: string;
+  }
+
+  let { content }: Props = $props();
 
   marked.use({
     renderer: {
@@ -66,7 +70,7 @@
     });
   }
 
-  $: rendered = reRender(content);
+  let rendered = $derived(reRender(content));
 </script>
 
 <div class="markdown">

@@ -1,14 +1,19 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let icon: ComponentType;
+  interface Props {
+    icon: Component;
+    children?: import('svelte').Snippet;
+  }
+
+  let { icon: Icon, children }: Props = $props();
 </script>
 
 <li class="ul-icon-li">
   <div class="icon">
-    <svelte:component this={icon} style="fill: var(--color-foreground)" />
+    <Icon style="fill: var(--color-foreground)" />
   </div>
-  <div class="content"><slot /></div>
+  <div class="content">{@render children?.()}</div>
 </li>
 
 <style>

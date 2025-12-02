@@ -16,34 +16,38 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<TopUpFlowState>;
-  export let backButton: boolean;
+  interface Props {
+    context: Writable<TopUpFlowState>;
+    backButton: boolean;
+  }
 
-  $: tokenAddress = $context.tokenAddress;
-  $: tokenInfo = tokenAddress ? (tokens.getByAddress(tokenAddress) ?? unreachable()) : undefined;
+  let { context, backButton }: Props = $props();
 
-  let amount: bigint | undefined = undefined;
+  let tokenAddress = $derived($context.tokenAddress);
+  let tokenInfo = $derived(
+    tokenAddress ? (tokens.getByAddress(tokenAddress) ?? unreachable()) : undefined,
+  );
 
-  let validationState: TextInputValidationState = {
+  let amount: bigint | undefined = $state(undefined);
+
+  let validationState: TextInputValidationState = $state({
     type: 'unvalidated',
-  };
+  });
 
   function submit() {
     if (!amount) return;
 
-    const { tokenBalance, tokenAllowance } = $context;
-
-    const amountToTopUp = $context.topUpMax ? tokenBalance : amount;
+    const { tokenAllowance } = $context;
 
     context.update((c) => ({
       ...c,
-      amountToTopUp,
+      amount,
     }));
 
     topUp(
       dispatch,
       tokenAddress ?? unreachable(),
-      amountToTopUp ?? unreachable(),
+      amount ?? unreachable(),
       tokenAllowance ?? unreachable(),
     );
   }
@@ -60,20 +64,18 @@
   <InputWalletAmount
     tokenAddress={$context.tokenAddress}
     tokenBalance={$context.tokenBalance}
-    bind:topUpMax={$context.topUpMax}
     bind:inputValue={$context.amountValue}
     bind:amount
     bind:validationState
   />
   <SafeAppDisclaimer disclaimerType="drips" />
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if backButton}
       <Button
-        on:click={() => {
+        onclick={() => {
           context.set({
             tokenAddress: undefined,
             amountValue: '',
-            topUpMax: false,
           });
           dispatch('goBackward');
         }}
@@ -83,9 +85,9 @@
       </Button>
     {/if}
     <span data-testid="confirm-amount-button">
-      <Button variant="primary" on:click={submit} disabled={validationState.type !== 'valid'}
+      <Button variant="primary" onclick={submit} disabled={validationState.type !== 'valid'}
         >Add {tokenInfo?.info.symbol ?? ''}</Button
       >
     </span>
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>

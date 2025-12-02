@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export interface AddressCellProps {
     address: string;
   }
@@ -8,16 +8,20 @@
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import formatAddress from '$lib/utils/format-address';
 
-  export let address: string;
+  interface Props {
+    address: string;
+  }
 
-  $: formatted = formatAddress(address);
+  let { address }: Props = $props();
+
+  let formatted = $derived(formatAddress(address));
 </script>
 
 <span class="typo-text tabular-nums">
   <Tooltip text={address} copyable>
     {formatted}
-    <svelte:fragment slot="tooltip-content">
+    {#snippet tooltip_content()}
       <span class="typo-text tabular-nums">{address}</span>
-    </svelte:fragment>
+    {/snippet}
   </Tooltip>
 </span>

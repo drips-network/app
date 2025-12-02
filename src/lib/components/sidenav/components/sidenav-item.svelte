@@ -1,13 +1,21 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import { createBubbler } from 'svelte/legacy';
 
-  export let label: string;
-  export let href: string;
-  export let active: boolean;
-  export let icon: ComponentType;
-  export let external = false;
+  const bubble = createBubbler();
+  import type { Component } from 'svelte';
 
-  export let backgroundOnActive = false;
+  interface Props {
+    label: string;
+    href: string;
+    active: boolean;
+    icon: Component<{ style: string }>;
+    external?: boolean;
+    backgroundOnActive?: boolean;
+  }
+
+  let { label, href, active, icon, external = false, backgroundOnActive = false }: Props = $props();
+
+  const IconComponent = $derived(icon);
 </script>
 
 <a
@@ -18,10 +26,9 @@
   class:background-on-active={backgroundOnActive}
   {href}
   target={external ? '_blank' : undefined}
-  on:click
+  onclick={bubble('click')}
 >
-  <svelte:component
-    this={icon}
+  <IconComponent
     style="fill: {active
       ? 'var(--color-primary-level-6)'
       : 'var(--color-foreground)'}; transition: fill 0.3s;"

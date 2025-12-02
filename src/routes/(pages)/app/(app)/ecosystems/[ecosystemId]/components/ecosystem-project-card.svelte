@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import DripList from '$lib/components/icons/DripList.svelte';
   import Pie from '$lib/components/icons/Pie.svelte';
   import User from '$lib/components/icons/User.svelte';
@@ -17,52 +19,31 @@
   import Trash from '$lib/components/icons/Trash.svelte';
   import type { ProjectProfileFragment } from '../../../projects/(forges)/components/project-profile/__generated__/gql.generated';
 
-  export let loadProjectData: {
-    forge: string;
-    repoOwner: string;
-    repoName: string;
-  };
-  export let projectMetadata:
-    | {
-        absoluteWeight: number;
-      }
-    | undefined = undefined;
+  interface Props {
+    loadProjectData: {
+      forge: string;
+      repoOwner: string;
+      repoName: string;
+    };
+    projectMetadata?:
+      | {
+          absoluteWeight: number;
+        }
+      | undefined;
+    project?: ProjectProfileFragment | undefined;
+    description?: string | undefined;
+  }
 
-  export let project: ProjectProfileFragment | undefined = undefined;
-  export let description: string | undefined = undefined;
+  let {
+    loadProjectData,
+    projectMetadata = undefined,
+    project = $bindable(),
+    description = $bindable(),
+  }: Props = $props();
 
-  let canonicalRepoInfo: CustomSource;
-  let loading: boolean = false;
-  let error: boolean = false;
-
-  $: projectChainData = project ? filterCurrentChainData(project.chainData) : undefined;
-  $: (loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject());
-  $: dependenciesCount =
-    projectChainData && isClaimed(projectChainData)
-      ? projectChainData.splits.dependencies.length
-      : 0;
-  $: dependenciesPercentage =
-    projectChainData && isClaimed(projectChainData)
-      ? formatPercent(
-          projectChainData.splits.dependencies.reduce((sum, dep) => sum + dep.weight, 0),
-        )
-      : '0%';
-  $: dependenciesStatement =
-    dependenciesCount > 1
-      ? `to ${dependenciesCount} dependencies`
-      : `to ${dependenciesCount} dependency`;
-  $: maintainersCount =
-    projectChainData && isClaimed(projectChainData)
-      ? projectChainData.splits.maintainers.length
-      : 0;
-  $: maintainersPercentage =
-    projectChainData && isClaimed(projectChainData)
-      ? formatPercent(projectChainData.splits.maintainers.reduce((sum, dep) => sum + dep.weight, 0))
-      : '0%';
-  $: maintainersStatement =
-    maintainersCount > 1
-      ? `to ${maintainersCount} maintainers`
-      : `to ${maintainersCount} maintainer`;
+  let canonicalRepoInfo: CustomSource | undefined = $state();
+  let loading: boolean = $state(false);
+  let error: boolean = $state(false);
 
   async function loadProject() {
     try {
@@ -87,6 +68,42 @@
   }
 
   onMount(loadProject);
+  let projectChainData = $derived(project ? filterCurrentChainData(project.chainData) : undefined);
+  run(() => {
+    (loadProjectData.forge, loadProjectData.repoName, loadProjectData.repoOwner, loadProject());
+  });
+  let dependenciesCount = $derived(
+    projectChainData && isClaimed(projectChainData)
+      ? projectChainData.splits.dependencies.length
+      : 0,
+  );
+  let dependenciesPercentage = $derived(
+    projectChainData && isClaimed(projectChainData)
+      ? formatPercent(
+          projectChainData.splits.dependencies.reduce((sum, dep) => sum + dep.weight, 0),
+        )
+      : '0%',
+  );
+  let dependenciesStatement = $derived(
+    dependenciesCount > 1
+      ? `to ${dependenciesCount} dependencies`
+      : `to ${dependenciesCount} dependency`,
+  );
+  let maintainersCount = $derived(
+    projectChainData && isClaimed(projectChainData)
+      ? projectChainData.splits.maintainers.length
+      : 0,
+  );
+  let maintainersPercentage = $derived(
+    projectChainData && isClaimed(projectChainData)
+      ? formatPercent(projectChainData.splits.maintainers.reduce((sum, dep) => sum + dep.weight, 0))
+      : '0%',
+  );
+  let maintainersStatement = $derived(
+    maintainersCount > 1
+      ? `to ${maintainersCount} maintainers`
+      : `to ${maintainersCount} maintainer`,
+  );
 </script>
 
 <PrimaryColorThemer
@@ -104,7 +121,7 @@
       <div class="details">
         <h2>
           <span class="pixelated">
-            {canonicalRepoInfo.repoName}
+            {canonicalRepoInfo?.repoName || ''}
           </span>
         </h2>
         <div>

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const initializing = writable(false);
 </script>
 
@@ -22,11 +22,16 @@
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Highlight from '$lib/components/highlight/highlight.svelte';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 
   let walletConnected = false;
-  let loaded = false;
+  let loaded = $state(false);
 
   async function initializeStores() {
     initializing.set(true);
@@ -123,10 +128,11 @@
 
 <div id="cupertino-pane">
   <div class="inner">
-    <div class="dragger" />
+    <div class="dragger"></div>
     {#if $cupertinoPaneStore.component}
+      {@const SvelteComponent = $cupertinoPaneStore.component}
       <div class="content">
-        <svelte:component this={$cupertinoPaneStore.component} {...$cupertinoPaneStore.props} />
+        <SvelteComponent {...$cupertinoPaneStore.props} />
       </div>
     {/if}
   </div>
@@ -135,12 +141,12 @@
 <ModalLayout />
 
 <div in:fade|global={{ duration: 300, delay: 300 }}>
-  {#if $page.data.blockWhileInitializing !== false && (!loaded || $initializing)}
+  {#if page.data.blockWhileInitializing !== false && (!loaded || $initializing)}
     <div out:fade={{ duration: 300 }} class="loading-spinner">
       <Spinner />
     </div>
   {/if}
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>

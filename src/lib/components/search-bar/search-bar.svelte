@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import SearchIcon from '$lib/components/icons/MagnifyingGlass.svelte';
   import CloseIcon from '$lib/components/icons/CrossSmall.svelte';
 
@@ -12,39 +14,43 @@
   import InfoCircle from '../icons/InfoCircle.svelte';
   import { browser } from '$app/environment';
 
-  let searchTerm: string | undefined;
+  let searchTerm: string | undefined = $state();
 
-  let searchElem: HTMLDivElement;
+  let searchElem = $state<HTMLDivElement>();
 
-  export let searchOpen = false;
+  interface Props {
+    searchOpen?: boolean;
+  }
+
+  let { searchOpen = $bindable(false) }: Props = $props();
 
   async function focusOnSearch() {
     await tick();
-    searchElem.focus();
+    searchElem?.focus();
   }
 
-  $: {
+  run(() => {
     if (searchOpen && browser) {
       scroll.lock();
       focusOnSearch();
     } else if (browser) {
       scroll.unlock();
     }
-  }
+  });
 
-  $: {
+  run(() => {
     if (!searchOpen) searchTerm = undefined;
-  }
+  });
 
   function closeSearch() {
     searchOpen = false;
   }
 
-  let loading = false;
-  let error = false;
+  let loading = $state(false);
+  let error = $state(false);
 
-  let results: Result[] = [];
-  let resultElems: HTMLElement[] = [];
+  let results: Result[] = $state([]);
+  let resultElems: HTMLElement[] = $state([]);
 
   let searchTimeout: ReturnType<typeof setTimeout>;
   let searchNumber = 0;
@@ -80,7 +86,9 @@
       }
     }, 300);
   }
-  $: handleSearchTermChange(searchTerm);
+  run(() => {
+    handleSearchTermChange(searchTerm);
+  });
 
   function handleKeyboard(e: KeyboardEvent) {
     if (e.metaKey && e.key === 'k') {
@@ -111,14 +119,14 @@
     if (nextElem) {
       (nextElem as HTMLElement)?.focus();
     } else if (selectedIndex === 0 && changeIndexBy === -1) {
-      searchElem.focus();
+      searchElem?.focus();
     }
 
     e.preventDefault();
   }
 </script>
 
-<svelte:window on:keydown={handleKeyboard} />
+<svelte:window onkeydown={handleKeyboard} />
 
 {#if searchOpen}
   <div
@@ -135,9 +143,13 @@
         bind:value={searchTerm}
         autocomplete="off"
       />
-      {#if searchOpen}<div transition:fly={{ duration: 300, y: 4 }}>
-          <CloseIcon style="cursor: pointer;" on:click={closeSearch} />
-        </div>{/if}
+      {#if searchOpen}
+        <div transition:fly={{ duration: 300, y: 4 }}>
+          <button aria-label="Close search" tabindex="0" onclick={closeSearch}>
+            <CloseIcon style="cursor: pointer;" />
+          </button>
+        </div>
+      {/if}
     </div>
     {#if searchOpen}
       <div
@@ -155,7 +167,7 @@
         class="results"
         data-testid="search-results"
       >
-        <Results bind:resultElems {results} {loading} {error} on:click={closeSearch} />
+        <Results bind:resultElems {results} {loading} {error} onclick={closeSearch} />
       </div>
     {/if}
   </div>

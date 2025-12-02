@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type {
@@ -8,20 +10,31 @@
   import type { ComponentProps } from 'svelte';
   import z from 'zod';
 
-  export let field: ApplicationUrlField;
-  export let answer: ApplicationUrlAnswerDto | undefined = undefined;
-  export let valid: boolean = false;
-  export let forceRevealError: boolean | undefined = undefined;
-
-  let value: string | undefined = answer?.value ?? undefined;
-  $: if (value) {
-    answer = {
-      fieldId: field.id,
-      value: value,
-    };
-  } else {
-    answer = undefined;
+  interface Props {
+    field: ApplicationUrlField;
+    answer?: ApplicationUrlAnswerDto | undefined;
+    valid?: boolean;
+    forceRevealError?: boolean | undefined;
   }
+
+  let {
+    field,
+    answer = $bindable(),
+    valid = $bindable(),
+    forceRevealError = undefined,
+  }: Props = $props();
+
+  let value: string | undefined = $state(answer?.value ?? undefined);
+  run(() => {
+    if (value) {
+      answer = {
+        fieldId: field.id,
+        value: value,
+      };
+    } else {
+      answer = undefined;
+    }
+  });
 
   function isValidUrl(url: string): boolean {
     // ensure valid URL, explicitly no spaces allowed
@@ -32,8 +45,8 @@
       .safeParse(url).success;
   }
 
-  $: hasValidUrl = value !== undefined && value.trim() !== '' && isValidUrl(value);
-  $: {
+  let hasValidUrl = $derived(value !== undefined && value.trim() !== '' && isValidUrl(value));
+  run(() => {
     if (field.required) {
       valid = hasValidUrl;
     } else if (value !== undefined && value.trim() !== '' && !isValidUrl(value)) {
@@ -41,19 +54,20 @@
     } else {
       valid = true;
     }
-  }
+  });
 
-  let beenFocussed = false;
-  let formFieldValidationState: ComponentProps<FormField>['validationState'];
-  $: formFieldValidationState = valid
-    ? { type: 'valid' }
-    : beenFocussed || forceRevealError
-      ? {
-          type: 'invalid',
-          message:
-            'This field is required and must be a full, valid URL without spaces, including https://.',
-        }
-      : { type: 'valid' };
+  let beenFocussed = $state(false);
+  let formFieldValidationState: ComponentProps<typeof FormField>['validationState'] = $derived(
+    valid
+      ? { type: 'valid' }
+      : beenFocussed || forceRevealError
+        ? {
+            type: 'invalid',
+            message:
+              'This field is required and must be a full, valid URL without spaces, including https://.',
+          }
+        : { type: 'valid' },
+  );
 </script>
 
 <FormField
@@ -64,5 +78,5 @@
     ? 'Data in this field is private and will only be shared with the admins of the round.'
     : undefined}
 >
-  <TextInput bind:value on:blur={() => (beenFocussed = true)} />
+  <TextInput bind:value onblur={() => (beenFocussed = true)} />
 </FormField>

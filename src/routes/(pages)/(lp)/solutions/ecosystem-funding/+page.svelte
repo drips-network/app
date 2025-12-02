@@ -17,27 +17,31 @@
 />
 
 <SolutionHeader>
-  <svelte:fragment slot="usecase-badge">Ecosystem funding</svelte:fragment>
-  <svelte:fragment slot="headline">Build a stronger ecosystem</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet usecase_badge()}
+    Ecosystem funding
+  {/snippet}
+  {#snippet headline()}
+    Build a stronger ecosystem
+  {/snippet}
+  {#snippet description()}
     Funding shouldn’t stop at the core team. Drips enables protocols and communities to distribute
     funding across their ecosystems - supporting the contributors, infrastructure providers, and
     maintainers that make your project possible.
-  </svelte:fragment>
+  {/snippet}
 </SolutionHeader>
 
 <SolutionCard>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsEcosystemsDistribution />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">
+  {/snippet}
+  {#snippet headline()}
     Reward contributors with continuous funding flows
-  </svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet description()}
     Set up programmable revenue-sharing, stream funds over time, and align incentives across your
     ecosystem.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Ecosystem}>
       Fund up to 40,000 recipients predictably and continuously
     </SolutionLineItem>
@@ -45,27 +49,31 @@
     <SolutionLineItem icon={TokenStreams}>
       Replace one-time grants with recurring funding
     </SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>
 
 <SolutionInterstitial>
-  <svelte:fragment slot="headline">Strengthen your ecosystem</svelte:fragment>
-  <svelte:fragment slot="description">
+  {#snippet headline()}
+    Strengthen your ecosystem
+  {/snippet}
+  {#snippet description()}
     Shared funding infrastructure keeps your ecosystem resilient, and keeps contributors motivated
     over the long term.
-  </svelte:fragment>
+  {/snippet}
 </SolutionInterstitial>
 
 <SolutionCard reverse>
-  <svelte:fragment slot="illustration">
+  {#snippet illustration()}
     <SolutionsEcosystemGraph />
-  </svelte:fragment>
-  <svelte:fragment slot="headline">Power continuous funding across your ecosystem</svelte:fragment>
-  <svelte:fragment slot="description">
+  {/snippet}
+  {#snippet headline()}
+    Power continuous funding across your ecosystem
+  {/snippet}
+  {#snippet description()}
     Stream in real-time, allocate resources dynamically, and keep every transaction transparent and
     on-chain.
-  </svelte:fragment>
-  <svelte:fragment slot="line-items">
+  {/snippet}
+  {#snippet line_items()}
     <SolutionLineItem icon={Ecosystem}>
       Distribute ecosystem-wide funding with programmable logic
     </SolutionLineItem>
@@ -73,5 +81,5 @@
       Recurring income for visible and behind-the-scenes contributors
     </SolutionLineItem>
     <SolutionLineItem icon={TokenStreams}>Avoid manual funding rounds</SolutionLineItem>
-  </svelte:fragment>
+  {/snippet}
 </SolutionCard>

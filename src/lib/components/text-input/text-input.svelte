@@ -1,47 +1,84 @@
 <!-- Adjusted from radicle-design-system's TextInput component -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import CheckCircleIcon from '$lib/components/icons/CheckCircle.svelte';
   import ExclamationCircleIcon from '$lib/components/icons/ExclamationCircle.svelte';
   import KeyHint from '$lib/components/key-hint/KeyHint.svelte';
   import Spinner from '$lib/components/spinner/spinner-radicle-system.svelte';
-  import { createEventDispatcher, type ComponentType, tick } from 'svelte';
+  import { tick, type Component } from 'svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
 
-  const dispatch = createEventDispatcher<{ clear: void }>();
+  interface Props {
+    variant?: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number };
+    spellcheck?: boolean;
+    autocapitalize?: boolean;
+    autocorrect?: boolean;
+    autocomplete?: boolean;
+    autofocus?: boolean;
+    disabled?: boolean;
+    readonly?: boolean;
+    showSuccessCheck?: boolean;
+    showClearButton?: boolean;
+    testId?: string | undefined;
+    icon?: Component | undefined;
+    inputStyle?: string | undefined;
+    style?: string | undefined;
+    value?: string | number | null | undefined;
+    placeholder?: string | undefined;
+    hint?: string | undefined;
+    suffix?: string | undefined;
+    inputElement?: HTMLInputElement | undefined;
+    validationState?: TextInputValidationState;
+    onchange?: (e: Event) => void;
+    onclick?: (e: Event) => void;
+    oninput?: (e: Event, v: string) => void;
+    onfocus?: (e: FocusEvent) => void;
+    onkeydown?: (e: KeyboardEvent) => void;
+    onkeypress?: (e: KeyboardEvent) => void;
+    onmousedown?: (e: MouseEvent) => void;
+    onpaste?: (e: ClipboardEvent) => void;
+    onclear?: () => void;
+    onblur?: (e: FocusEvent) => void;
+  }
 
-  export let variant: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number } = {
-    type: 'text',
-  };
-
-  export let spellcheck = false;
-  export let autocapitalize = true;
-  export let autocorrect = true;
-  export let autocomplete = true;
-  export let autofocus = false;
-  export let disabled = false;
-  export let readonly = false;
-  export let showSuccessCheck = false;
-  export let showClearButton = false;
-
-  export let testId: string | undefined = undefined;
-
-  export let icon: ComponentType | undefined = undefined;
-
-  export let inputStyle: string | undefined = undefined;
-  export let style: string | undefined = undefined;
-
-  export let value: string | number | null | undefined = undefined;
-  export let placeholder: string | undefined = undefined;
-
-  export let hint: string | undefined = undefined;
-  export let suffix: string | undefined = undefined;
-
-  export let inputElement: HTMLInputElement | undefined = undefined;
-
-  export let validationState: TextInputValidationState = {
-    type: 'unvalidated',
-  };
+  let {
+    variant = {
+      type: 'text',
+    },
+    spellcheck = false,
+    autocapitalize = true,
+    autocorrect = true,
+    autocomplete = true,
+    autofocus = false,
+    disabled = false,
+    readonly = false,
+    showSuccessCheck = false,
+    showClearButton = false,
+    testId = undefined,
+    icon = undefined,
+    inputStyle = undefined,
+    style = undefined,
+    value = $bindable(),
+    placeholder = undefined,
+    hint = undefined,
+    suffix = undefined,
+    inputElement = $bindable(),
+    validationState = {
+      type: 'unvalidated',
+    },
+    onchange,
+    onclick,
+    oninput,
+    onfocus,
+    onmousedown,
+    onkeydown,
+    onkeypress,
+    onpaste,
+    onclear,
+    onblur,
+  }: Props = $props();
 
   export const focus = (): void => {
     inputElement && inputElement.focus();
@@ -50,31 +87,41 @@
   // Canʼt use normal `autofocus` attribute on the `inputElement`: "Autofocus
   // processing was blocked because a document's URL has a fragment".
   // preventScroll is necessary for onboarding animations to work.
-  $: if (autofocus) {
-    inputElement && inputElement.focus({ preventScroll: true });
-  }
+  run(() => {
+    if (autofocus) {
+      inputElement && inputElement.focus({ preventScroll: true });
+    }
+  });
 
   // We do it this way to work around the svelte-check error: 'type' attribute
   // cannot be dynamic if input uses two-way binding (svelte).
-  $: if (inputElement) {
-    inputElement.type = variant.type;
-  }
+  run(() => {
+    if (inputElement) {
+      inputElement.type = variant.type;
+    }
+  });
 
   async function clear() {
     value = '';
-    dispatch('clear');
+    onclear?.();
     // wait a tick in case parent has some disabling logic (enter-git-url)
     await tick();
     return inputElement?.focus();
   }
 
-  let rightContainerWidth: number;
+  let rightContainerWidth: number | undefined = $state();
+
+  function handleInput(e: Event) {
+    const target = e.target as HTMLInputElement;
+    oninput?.(e, target.value);
+  }
 </script>
 
 <div {style} class="wrapper typo-text">
   {#if icon}
+    {@const SvelteComponent = icon}
     <div class="icon-container">
-      <svelte:component this={icon} />
+      <SvelteComponent />
     </div>
   {/if}
 
@@ -92,14 +139,15 @@
     {readonly}
     bind:value
     bind:this={inputElement}
-    on:change
-    on:click
-    on:input
-    on:focus
-    on:keydown
-    on:keypress
-    on:paste
-    on:blur
+    {onchange}
+    {onclick}
+    oninput={handleInput}
+    {onfocus}
+    {onkeydown}
+    {onmousedown}
+    {onkeypress}
+    {onpaste}
+    {onblur}
     autocomplete={autocomplete ? 'on' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}
@@ -114,7 +162,7 @@
     {/if}
 
     {#if showClearButton}
-      <button on:click={clear} on:keydown={clear} tabindex="-1">
+      <button onclick={clear} onkeydown={clear} tabindex="-1">
         <Cross />
       </button>
     {/if}

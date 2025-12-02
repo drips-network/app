@@ -1,16 +1,31 @@
 <script lang="ts">
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
 
-  export let headline: string | undefined = undefined;
-  export let description: string | undefined = undefined;
-  export let icon: ComponentType | undefined = undefined;
+  interface Props {
+    headline?: string | undefined;
+    description?: string | undefined;
+    icon?: Component | undefined;
+    children?: import('svelte').Snippet;
+    left_actions?: import('svelte').Snippet;
+    actions?: import('svelte').Snippet;
+  }
+
+  let {
+    headline = undefined,
+    description = undefined,
+    icon = undefined,
+    children,
+    left_actions,
+    actions,
+  }: Props = $props();
 </script>
 
 <div class="step-layout">
   <div class="top">
     {#if icon}
+      {@const SvelteComponent = icon}
       <div class="icon">
-        <svelte:component this={icon} />
+        <SvelteComponent />
       </div>
     {/if}
     {#if headline}
@@ -24,13 +39,13 @@
       </div>
     {/if}
   </div>
-  <slot />
+  {@render children?.()}
   <div class="actions">
     <div class="left">
-      <slot name="left-actions" />
+      {@render left_actions?.()}
     </div>
     <div class="right">
-      <slot name="actions" />
+      {@render actions?.()}
     </div>
   </div>
 </div>

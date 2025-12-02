@@ -2,12 +2,23 @@
   import Toggle from '../toggle/toggle.svelte';
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
 
-  export let toggled = false;
-  export let label: string | undefined = undefined;
-  export let removeFromTabIndexWhileCollapsed = true;
-  export let showToggle = true;
+  interface Props {
+    toggled?: boolean;
+    label?: string | undefined;
+    removeFromTabIndexWhileCollapsed?: boolean;
+    showToggle?: boolean;
+    children?: import('svelte').Snippet;
+  }
 
-  $: collapsed = !toggled;
+  let {
+    toggled = $bindable(false),
+    label = undefined,
+    removeFromTabIndexWhileCollapsed = true,
+    showToggle = true,
+    children,
+  }: Props = $props();
+
+  let collapsed = $derived(!toggled);
 </script>
 
 <div class="toggleable">
@@ -18,7 +29,7 @@
   {/if}
   <div class="content-inner" style:padding-top={showToggle ? '1rem' : ''}>
     <TransitionedHeight bind:collapsed {removeFromTabIndexWhileCollapsed}>
-      <slot />
+      {@render children?.()}
     </TransitionedHeight>
   </div>
 </div>

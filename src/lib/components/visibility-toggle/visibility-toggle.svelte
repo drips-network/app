@@ -1,9 +1,17 @@
 <script lang="ts">
   import Toggle from '$lib/components/toggle/toggle.svelte';
 
-  export let hiddenItemsCount: number;
-  export let showHidden: boolean = false;
-  export let message = 'Show hidden';
+  interface Props {
+    hiddenItemsCount: number;
+    showHidden?: boolean;
+    message?: string;
+  }
+
+  let {
+    hiddenItemsCount,
+    showHidden = $bindable(false),
+    message = 'Show hidden',
+  }: Props = $props();
 </script>
 
 {#if hiddenItemsCount}

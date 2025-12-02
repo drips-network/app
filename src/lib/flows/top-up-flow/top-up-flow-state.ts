@@ -6,12 +6,10 @@ export interface TopUpFlowState {
   tokenBalance?: bigint;
   amountValue: string;
   amountToTopUp?: bigint;
-  topUpMax: boolean;
 }
 
 export default (tokenAddress: string | undefined) =>
   writable<TopUpFlowState>({
     tokenAddress,
     amountValue: '',
-    topUpMax: false,
   });

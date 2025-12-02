@@ -1,10 +1,15 @@
-<script>
+<script lang="ts">
   import LpFooter from '../components/lp-footer.svelte';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 </script>
 
 <div class="wrapper">
   <div class="content">
-    <slot />
+    {@render children?.()}
     <div class="footer">
       <LpFooter />
     </div>

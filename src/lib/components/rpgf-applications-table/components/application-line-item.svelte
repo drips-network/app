@@ -16,24 +16,29 @@
   } from '$lib/utils/rpgf/ballot-validation-context';
   import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
 
-  export let round: Round;
-  export let application: ListingApplication;
-  export let hideState = false;
+  interface Props {
+    round: Round;
+    application: ListingApplication;
+    hideState?: boolean;
+    reviewMode: boolean;
+    decision?: ComponentProps<typeof ApplicationDecisionButtons>['decision'];
+    voteStep?: 'build-ballot' | 'assign-votes' | null;
+    ballotStore: Writable<InProgressBallot>;
+    ellipsis?: boolean;
+  }
 
-  export let reviewMode: boolean;
-  export let decision: ComponentProps<ApplicationDecisionButtons>['decision'] = null;
+  let {
+    round,
+    application,
+    hideState = false,
+    reviewMode,
+    decision = $bindable(),
+    voteStep = null,
+    ballotStore,
+    ellipsis = false,
+  }: Props = $props();
 
-  export let voteStep: 'build-ballot' | 'assign-votes' | null = null;
-  export let ballotStore: Writable<InProgressBallot>;
-
-  export let ellipsis: boolean = false;
-
-  /** If true, only the application name and icon are clickable, otherwise entire row.
-   * Needed for voting mode bc otherwise the input becomes really buggy
-   */
-  $: smallLink = voteStep === 'assign-votes';
-
-  let picked = $ballotStore[application.id] !== undefined;
+  let picked = $derived($ballotStore[application.id] === undefined ? false : true);
 
   function updateBallot(picked: boolean) {
     if (voteStep !== 'build-ballot') return;
@@ -51,11 +56,18 @@
       });
     }
   }
-  $: updateBallot(picked);
 
-  let voteAmountInput: string | undefined =
-    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]);
-  let voteAmountInputValidationState: TextInputValidationState = { type: 'unvalidated' };
+  function handleCheckboxInput(event: Event) {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+
+    updateBallot(target.checked);
+  }
+
+  let voteAmountInput: string | undefined = $state(
+    $ballotStore[application.id] == null ? undefined : String($ballotStore[application.id]),
+  );
+  let voteAmountInputValidationState: TextInputValidationState = $state({ type: 'unvalidated' });
 
   const ballotValidationErrors = getContext<BallotValidationErrorsStore | undefined>(
     ballotValidationContextKey,
@@ -82,14 +94,15 @@
     updateValidationErrors(state);
   }
 
-  $: votePlaceholder =
+  let votePlaceholder = $derived(
     round.minVotesPerProjectPerVoter !== null && round.maxVotesPerProjectPerVoter !== null
       ? `${round.minVotesPerProjectPerVoter}-${round.maxVotesPerProjectPerVoter}`
       : round.minVotesPerProjectPerVoter !== null
         ? `${round.minVotesPerProjectPerVoter}+`
         : round.maxVotesPerProjectPerVoter !== null
           ? `0-${round.maxVotesPerProjectPerVoter}`
-          : undefined;
+          : undefined,
+  );
 
   function updateVoteAmount(voteAmountInput: string | undefined) {
     if (voteStep !== 'assign-votes') {
@@ -151,57 +164,58 @@
       };
     }
   }
-  $: updateVoteAmount(voteAmountInput);
 
   onDestroy(() => {
     updateValidationErrors({ type: 'unvalidated' });
   });
 
-  $: active = $page.url.href.includes(`/applications/${application.id}`);
+  let active = $derived($page.url.href.includes(`/applications/${application.id}`));
 
-  $: link = `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
-    voteStep === 'assign-votes' ? '?backToBallot' : ''
-  }${$page.url.search}`;
+  let link = $derived(
+    `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
+      voteStep === 'assign-votes' ? '?backToBallot' : ''
+    }${$page.url.search}`,
+  );
 </script>
 
-<svelte:element
-  this={smallLink ? 'div' : 'a'}
-  href={link}
+<div
   class="application-line-item"
   class:active
-  class:small-link={smallLink}
   data-testid="application-line-item-{application.id}"
 >
-  <svelte:element this={smallLink ? 'a' : 'div'} href={link} class:ellipsis>
+  <a href={link} class:ellipsis>
     <RpgfApplicationBadge {hideState} short {application} />
-  </svelte:element>
+  </a>
 
-  {#if reviewMode && application.state === 'pending'}
-    <ApplicationDecisionButtons applicationId={application.id} bind:decision />
-  {/if}
+  <div class="interactions">
+    {#if reviewMode && application.state === 'pending'}
+      <ApplicationDecisionButtons applicationId={application.id} bind:decision />
+    {/if}
 
-  {#if voteStep === 'build-ballot' && application.state === 'approved'}
-    <CheckboxSimple bind:checked={picked} />
-  {/if}
+    {#if voteStep === 'build-ballot' && application.state === 'approved'}
+      <CheckboxSimple checked={picked} oninput={handleCheckboxInput} />
+    {/if}
 
-  {#if voteStep === 'assign-votes' && application.state === 'approved'}
-    <div class="vote-count-input">
-      <TextInput
-        on:click={(e) => e.preventDefault()}
-        validationState={voteAmountInputValidationState}
-        bind:value={voteAmountInput}
-        variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
-        placeholder={votePlaceholder ?? '0+'}
-      />
-    </div>
-  {/if}
+    {#if voteStep === 'assign-votes' && application.state === 'approved'}
+      <div class="vote-count-input">
+        <TextInput
+          bind:value={voteAmountInput}
+          onclick={(e) => e.preventDefault()}
+          validationState={voteAmountInputValidationState}
+          variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
+          placeholder={votePlaceholder ?? '0+'}
+          oninput={(e) => updateVoteAmount((e.target as HTMLInputElement).value)}
+        />
+      </div>
+    {/if}
 
-  {#if application.allocation !== null}
-    <span class="typo-text-small-bold">
-      {application.allocation}
-    </span>
-  {/if}
-</svelte:element>
+    {#if application.allocation !== null}
+      <span class="typo-text-small-bold">
+        {application.allocation}
+      </span>
+    {/if}
+  </div>
+</div>
 
 <style>
   .application-line-item {
@@ -209,8 +223,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 0.5rem;
     border-bottom: 1px solid var(--color-foreground-level-3);
+    transition: background-color 0.2s ease;
+  }
+
+  a {
+    padding: 0.5rem;
+    flex-grow: 1;
+  }
+
+  .interactions {
+    padding: 0.5rem;
   }
 
   .application-line-item.active {

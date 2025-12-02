@@ -3,7 +3,11 @@
   import modal from '$lib/stores/modal';
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
 
-  export let message: string;
+  interface Props {
+    message: string;
+  }
+
+  let { message }: Props = $props();
 </script>
 
 <div class="error-modal">
@@ -13,7 +17,7 @@
   <p class="codeblock typo-text-mono">
     {message}
   </p>
-  <Button on:click={modal.hide}>Got it</Button>
+  <Button onclick={modal.hide}>Got it</Button>
   <a class="typo-text-small" target="_blank" href="https://discord.gg/BakDKKDpHF"
     >Ask for help on Discord ↗</a
   >

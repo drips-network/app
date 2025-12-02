@@ -5,9 +5,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let text: string;
+  interface Props {
+    text: string;
+  }
+
+  let { text }: Props = $props();
 </script>
 
 {text}
-<Button on:click={() => dispatch('goForward')}>Continue</Button>
-<Button on:click={() => dispatch('goBackward')}>Back</Button>
+<Button onclick={() => dispatch('goForward')}>Continue</Button>
+<Button onclick={() => dispatch('goBackward')}>Back</Button>

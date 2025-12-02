@@ -22,9 +22,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let formValid: boolean;
+  let { context }: Props = $props();
+
+  let formValid = $state(false);
 
   function handleImportCSV() {
     dispatch(
@@ -58,7 +62,7 @@
     handleErrorDismissed();
   }
 
-  $: maintainerKeys = Object.keys($context.maintainerSplits.items);
+  let maintainerKeys = $derived(Object.keys($context.maintainerSplits.items));
 </script>
 
 <StepLayout>
@@ -80,19 +84,20 @@
         : maintainerKeys}
       maxItems={DEFAULT_MAX_ENTRIES - maintainerKeys.length}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {#snippet action()}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={goBackward}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={goBackward}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
     <Button
       disabled={!formValid}
       icon={ArrowRight}
       variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+      onclick={() => dispatch('goForward')}>Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>

@@ -14,8 +14,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let votingRound: VotingRound;
+  interface Props {
+    context: Writable<State>;
+    votingRound: VotingRound;
+  }
+
+  let { context, votingRound }: Props = $props();
 </script>
 
 <StepLayout>
@@ -49,7 +53,7 @@
     </FormField>
   {/if}
 
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Close</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Close</Button>
+  {/snippet}
 </StepLayout>

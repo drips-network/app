@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import { createEventDispatcher, onDestroy, onMount, tick } from 'svelte';
+  import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import type {
     AwaitPendingPayload,
     Steps,
@@ -12,7 +12,7 @@
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
   import AwaitErrorStep from './components/await-error-step.svelte';
-  import type { Writable } from 'svelte/store';
+  import type { derived, Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
   import TransactStep from './components/transact-step.svelte';
@@ -20,36 +20,46 @@
 
   const { isEnabled: animationsEnabled } = animationsStore;
 
+  interface Props {
+    steps: Steps;
+    context?: (() => Writable<unknown>) | undefined;
+    minHeightPx?: number;
+    noTransitions?: boolean;
+    currentStepIndex?: number;
+  }
+
+  let {
+    steps,
+    context = undefined,
+    minHeightPx = 0,
+    currentStepIndex = $bindable(0),
+    noTransitions = browser ? $animationsEnabled === false : false,
+  }: Props = $props();
+
   const dispatch = createEventDispatcher<{ stepChange: void }>();
 
-  export let steps: Steps;
-  export let context: (() => Writable<unknown>) | undefined = undefined;
   const resolvedContext = context?.();
-  export let minHeightPx = 0;
 
-  export let noTransitions = browser ? $animationsEnabled === false : false;
+  let stepElement = $state<HTMLDivElement>();
 
-  let stepElement: HTMLDivElement;
+  let internalSteps = $state(steps);
+  let resolvedSteps = $derived(internalSteps.map((someStep) => someStep((i) => i)));
+  let currentStep = $derived(resolvedSteps[currentStepIndex]);
 
-  let internalSteps = steps;
+  let prevStepIndex = $state(0);
 
-  let resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
-  $: resolvedSteps = internalSteps.map((someStep) => someStep((i) => i));
-
-  export let currentStepIndex = nextValidStepIndex(0, 'forward');
-  $: currentStep = resolvedSteps[currentStepIndex];
-
-  let prevStepIndex = 0;
-  let direction: 'forward' | 'backward' = 'forward';
-  $: {
+  let direction = $derived.by(() => {
     if (currentStepIndex > prevStepIndex) {
-      direction = 'forward';
+      return 'forward';
     } else if (currentStepIndex < prevStepIndex) {
-      direction = 'backward';
+      return 'backward';
+    } else {
+      return 'forward';
     }
-
+  });
+  $effect(() => {
     prevStepIndex = currentStepIndex;
-  }
+  });
 
   function nextValidStepIndex(startIndex: number, direction: 'forward' | 'backward') {
     let index = startIndex;
@@ -94,7 +104,9 @@
     currentStepIndex = nextValidStepIndex(currentStepIndex + by, direction);
 
     // Wait for the old step to be fully out of view and unmounted.
-    return new Promise<void>((resolve) => (transitionEndListener = resolve));
+    return new Promise<void>((resolve) => {
+      transitionEndListener = resolve;
+    });
   }
 
   let disableTransitions = false;
@@ -113,7 +125,7 @@
     return { x, duration: 300, easing: cubicInOut };
   }
 
-  let transitioning = false;
+  let transitioning = $state(false);
   let transitionEndListener: (() => void) | undefined = undefined;
 
   function setTransitioning(newVal: boolean) {
@@ -126,22 +138,20 @@
   let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
 
-  async function updateMutationObserver() {
+  $effect(() => {
     if (!resizeObserver) return;
-
-    await tick();
 
     resizeObserver.disconnect();
 
-    if (stepElement instanceof HTMLDivElement) {
+    if (stepElement) {
       observedElement = stepElement;
-      resizeObserver.observe(stepElement);
+      resizeObserver.observe(observedElement);
       updateContainerHeight();
     }
-  }
+  });
 
   let firstHeightUpdate = true;
-  async function updateContainerHeight() {
+  function updateContainerHeight() {
     if (!observedElement) return;
 
     const stepHeight = Math.max(observedElement.offsetHeight, minHeightPx);
@@ -158,8 +168,8 @@
     move(event.detail?.by ?? 1);
   }
 
-  let awaiting: AwaitPendingPayload | undefined;
-  let awaitError: Error | undefined;
+  let awaiting: AwaitPendingPayload | undefined = $state();
+  let awaitError: Error | undefined = $state();
 
   function handleAwait(event: CustomEvent<AwaitPendingPayload>) {
     if (transacting) {
@@ -185,7 +195,7 @@
     awaitError = undefined;
   }
 
-  let transacting: SomeTransactPayload | undefined;
+  let transacting: SomeTransactPayload | undefined = $state();
 
   function handleTransact(event: CustomEvent<SomeTransactPayload>) {
     if (awaiting) {
@@ -213,7 +223,7 @@
     move(0);
   }
 
-  let sidestepConfig: SidestepPayload | undefined = undefined;
+  let sidestepConfig = $state<SidestepPayload | undefined>(undefined);
   let originalSteps: Steps | undefined = undefined;
   let originalStepIndex: number | undefined = undefined;
 
@@ -228,23 +238,18 @@
     */
     internalSteps = [steps[currentStepIndex], ...event.detail.steps];
     currentStepIndex = 0;
+
     // move relies on resolvedSteps, so allow that computed property
     // to update
     await tick();
 
-    // Animate to the first side-step
-    await move(1);
-
     /*
-    Replace the step array with all side-steps only, while transitions are disabled.
+    Replace the step array with all side-steps only
     */
-    disableTransitions = true;
     internalSteps = [...event.detail.steps];
     currentStepIndex = 0;
 
     await tick();
-
-    disableTransitions = false;
   }
 
   async function handleConclusion() {
@@ -254,67 +259,47 @@
       // Temporarily add the sidestep-triggering step one index before the current side-step.
       internalSteps = [originalSteps[originalStepIndex], internalSteps[currentStepIndex]];
       currentStepIndex = 1;
+      direction = 'backward';
 
       await tick();
 
-      // Animate to the sidestep-triggering step.
-      await move(-1);
-
-      /* While transitions are disabled, restore the original state of the step array. */
-      disableTransitions = true;
+      /* Restore the original state of the step array. */
 
       internalSteps = originalSteps;
       currentStepIndex = originalStepIndex;
 
-      await tick();
-
       sidestepConfig = undefined;
       originalSteps = undefined;
       originalStepIndex = undefined;
-      disableTransitions = false;
+
+      await tick();
     } else {
       modal.hide();
     }
   }
-
-  $: {
-    currentStep;
-    awaitError;
-    awaiting;
-    transacting;
-    updateMutationObserver();
-  }
-
-  onMount(() => {
-    const windowResizeListener = () => updateContainerHeight();
-    window.addEventListener('resize', windowResizeListener);
-
-    return () => window.removeEventListener('resize', windowResizeListener);
-  });
 
   onDestroy(() => resizeObserver?.disconnect());
 </script>
 
 {#if currentStep?.staticHeaderComponent}
   <div class="static-header">
-    <svelte:component
-      this={currentStep.staticHeaderComponent.component}
-      {...currentStep.staticHeaderComponent.props}
-    />
+    <currentStep.staticHeaderComponent.component {...currentStep.staticHeaderComponent.props} />
   </div>
 {/if}
+
+<svelte:window onresize={updateContainerHeight} />
 
 <div
   class="wrapper w-full"
   style:height={`${$wrapperHeight}px`}
   style:overflow={transitioning ? 'hidden' : 'visible'}
 >
-  {#key `${awaiting}${transacting}${awaitError}${currentStepIndex}`}
+  {#key `${awaiting}${transacting}${awaitError?.name}${currentStepIndex}${sidestepConfig ? 'sidestep' : ''}`}
     <div
       in:fly={(() => getTransition('in'))()}
       out:fly={(() => getTransition('out'))()}
-      on:outrostart={() => setTransitioning(true)}
-      on:introend={() => setTransitioning(false)}
+      onoutrostart={() => setTransitioning(true)}
+      onintroend={() => setTransitioning(false)}
       class="step-wrapper"
     >
       <div class="step" bind:this={stepElement}>
@@ -329,8 +314,7 @@
             on:startOver={handleTransactStartOver}
           />
         {:else}
-          <svelte:component
-            this={currentStep.component}
+          <currentStep.component
             on:await={handleAwait}
             on:transact={handleTransact}
             on:goForward={handleGoForward}

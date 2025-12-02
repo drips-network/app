@@ -1,15 +1,20 @@
 <script lang="ts">
   import formatNumber from '$lib/utils/format-number';
 
-  export let key: string;
-  export let value: string | number | undefined = undefined;
-  export let explorerItems: {
-    base: string;
-    dripsContract: string;
-    icon: ConstructorOfATypedSvelteComponent;
-  }[] = [];
+  interface Props {
+    key: string;
+    value?: string | number | undefined;
+    explorerItems?: {
+      base: string;
+      dripsContract: string;
+      icon: ConstructorOfATypedSvelteComponent;
+    }[];
+    children?: import('svelte').Snippet;
+  }
 
-  $: formattedValue = typeof value === 'number' ? formatNumber(value) : value;
+  let { key, value = undefined, explorerItems = [], children }: Props = $props();
+
+  let formattedValue = $derived(typeof value === 'number' ? formatNumber(value) : value);
 </script>
 
 <div class="value-wrapper">
@@ -24,14 +29,14 @@
             rel="noreferrer"
             class="header"
           >
-            <svelte:component this={item.icon} />
+            <item.icon />
           </a>
         {/each}
       </div>
     {/if}
   </div>
   <span class="large-number pixelated"
-    >{#if value !== undefined}{formattedValue}{:else}<slot />{/if}</span
+    >{#if value !== undefined}{formattedValue}{:else}{@render children?.()}{/if}</span
   >
 </div>
 

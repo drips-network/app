@@ -24,7 +24,7 @@
   import type { ComponentProps } from 'svelte';
 
   interface TokenTableRow {
-    token: ComponentProps<Token>;
+    token: ComponentProps<typeof Token>;
     address: AddressCellProps;
     symbol: string;
     decimals: number;
@@ -67,8 +67,7 @@
     },
   ];
 
-  let tokenTableData: TokenTableRow[];
-  $: tokenTableData =
+  let tokenTableData: TokenTableRow[] = $derived(
     $tokens
       ?.filter((t) => t.source === 'custom')
       .map((t) => ({
@@ -92,15 +91,15 @@
             },
           ],
         },
-      })) ?? [];
+      })) ?? [],
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let options: TableOptions<any>;
-  $: options = {
+  let options: TableOptions<any> = $derived({
     data: tokenTableData,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-  };
+  });
 </script>
 
 <HeadMeta title="Custom tokens" />
@@ -111,7 +110,7 @@
       <h1>Custom tokens</h1>
       <Button
         icon={PlusIcon}
-        on:click={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps())}
+        onclick={() => modal.show(Stepper, undefined, addCustomTokenFlowSteps())}
         >Add custom token</Button
       >
     </div>

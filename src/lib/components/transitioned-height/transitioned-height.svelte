@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import setTabIndexRecursively from '$lib/utils/set-tab-index-recursive';
   import { onMount } from 'svelte';
@@ -8,26 +10,34 @@
   // ___________
   // PROPS
 
-  /** Force a height of 0, and optionally apply `negativeMarginWhileCollapsed`. */
-  export let collapsed = false;
+  interface Props {
+    /** Force a height of 0, and optionally apply `negativeMarginWhileCollapsed`. */
+    collapsed?: boolean;
+    /**
+     * If true, all content height changes are transitioned. If false, only collapsing and expanding
+     * the content is transitioned.
+     */
+    transitionHeightChanges?: boolean;
+    /**
+     * Force a negative margin while collapsed. This is useful when you use `transitionedHeight`
+     * in the context of some layout where there's further content below.
+     */
+    negativeMarginWhileCollapsed?: string | undefined;
+    /**
+     * If true, when `collapsed`, all content will be removed from the tab index, and restored
+     * when the section is expanded again.
+     */
+    removeFromTabIndexWhileCollapsed?: boolean;
+    children?: import('svelte').Snippet;
+  }
 
-  /**
-   * If true, all content height changes are transitioned. If false, only collapsing and expanding
-   * the content is transitioned.
-   */
-  export let transitionHeightChanges = false;
-
-  /**
-   * Force a negative margin while collapsed. This is useful when you use `transitionedHeight`
-   * in the context of some layout where there's further content below.
-   */
-  export let negativeMarginWhileCollapsed: string | undefined = undefined;
-
-  /**
-   * If true, when `collapsed`, all content will be removed from the tab index, and restored
-   * when the section is expanded again.
-   */
-  export let removeFromTabIndexWhileCollapsed = true;
+  let {
+    collapsed = $bindable(false),
+    transitionHeightChanges = false,
+    negativeMarginWhileCollapsed = undefined,
+    removeFromTabIndexWhileCollapsed = true,
+    children,
+  }: Props = $props();
 
   // ____________
   // VARS
@@ -41,9 +51,9 @@
     Further, if `transitionHeightChanges` is false, fitContent is set to true unless we're
     currently transitioning between collapsed and expanded states.
   */
-  let fitContent = !collapsed;
+  let fitContent = $state(!collapsed);
 
-  let containerHeight: Tweened<number> | undefined;
+  let containerHeight: Tweened<number> | undefined = $state();
   onMount(() => {
     if (collapsed) {
       containerHeight = tweened(0);
@@ -52,9 +62,9 @@
     }
   });
 
-  let animating = false;
+  let animating = $state(false);
 
-  let zeroHeight = collapsed;
+  let zeroHeight = $state(collapsed);
 
   // ____________
   // LOGIC
@@ -95,10 +105,10 @@
 
     previouslyCollapsed = collapsed;
   }
-  $: {
+  run(() => {
     collapsed;
     if (browser) updateHeight();
-  }
+  });
 
   let sizeObserver: ResizeObserver | undefined;
   onMount(() => {
@@ -108,7 +118,7 @@
     return () => sizeObserver?.disconnect();
   });
 
-  $: {
+  run(() => {
     if (contentContainerElem && removeFromTabIndexWhileCollapsed) {
       if (collapsed) {
         setTabIndexRecursively(contentContainerElem, '-1');
@@ -116,9 +126,9 @@
         setTabIndexRecursively(contentContainerElem, '0');
       }
     }
-  }
+  });
 
-  $: heightStyleString = fitContent ? 'fit-content' : `${$containerHeight}px`;
+  let heightStyleString = $derived(fitContent ? 'fit-content' : `${$containerHeight}px`);
 </script>
 
 <div
@@ -131,7 +141,7 @@
   style:height={heightStyleString}
 >
   <div class="inner" bind:this={contentContainerElem}>
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

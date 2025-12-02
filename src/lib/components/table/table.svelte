@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   export interface RowClickEventPayload {
     rowIndex: number;
     event: MouseEvent;
@@ -10,29 +10,26 @@
   import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import { createEventDispatcher } from 'svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
+  import { browser } from '$app/environment';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  export let options: TableOptions<any>;
-  export let rowHeight: number | undefined = undefined;
-  $: table = createSvelteTable(options);
+  interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: TableOptions<any>;
+    rowHeight?: number | undefined;
+    isRowClickable?: boolean;
+    onRowClick?: (payload: RowClickEventPayload) => void;
+  }
 
-  export let isRowClickable = false;
+  let { options, rowHeight = undefined, isRowClickable = false, onRowClick }: Props = $props();
 
-  type Events = {
-    rowClick: RowClickEventPayload;
-  };
-
-  const dispatch = createEventDispatcher<Events>();
-
-  function onRowClick(index: number, e: MouseEvent) {
+  function handleRowClick(index: number, e: MouseEvent) {
     if (isRowClickable) {
-      dispatch('rowClick', { rowIndex: index, event: e });
+      onRowClick?.({ rowIndex: index, event: e });
     }
   }
 
-  let rowElems: HTMLTableRowElement[] = [];
+  let rowElems: HTMLTableRowElement[] = $state([]);
 
   function handleKeyboard(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.code === 'Space') {
@@ -54,92 +51,97 @@
       );
     }
   }
+  let table = $derived(createSvelteTable(options));
 </script>
 
-<svelte:window on:keydown={handleKeyboard} />
+<svelte:window onkeydown={handleKeyboard} />
 
-<table>
-  <thead>
-    {#each $table.getHeaderGroups() as headerGroup}
-      <tr>
-        {#each headerGroup.headers as header}
-          <th
-            on:click={header.column.getToggleSortingHandler()}
-            class:sortable={header.column.getCanSort()}
-            style={`width: ${header.column.getSize()}%`}
-          >
-            {#if !header.isPlaceholder}
-              <div>
-                <div class="header">
-                  {#if typeof header.column.columnDef.header === 'string'}
-                    <span class="typo-all-caps">{header.column.columnDef.header}</span>
-                  {/if}
-                  {#if typeof header.column.columnDef.meta === 'object'}
-                    {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
-                      <Tooltip>
-                        <InfoCircle style="height: 1rem;" />
-                        <svelte:fragment slot="tooltip-content">
-                          {header.column.columnDef.meta['tooltipMessage']}
-                        </svelte:fragment>
-                      </Tooltip>
+<!-- Tanstack table rendering is for some reason broken on SSR. TODO: get rid of this god forsaken dependency -->
+{#if browser}
+  <table>
+    <thead>
+      {#each $table.getHeaderGroups() as headerGroup}
+        <tr>
+          {#each headerGroup.headers as header}
+            <th
+              onclick={header.column.getToggleSortingHandler()}
+              class:sortable={header.column.getCanSort()}
+              style={`width: ${header.column.getSize()}%`}
+            >
+              {#if !header.isPlaceholder}
+                <div>
+                  <div class="header">
+                    {#if typeof header.column.columnDef.header === 'string'}
+                      <span class="typo-all-caps">{header.column.columnDef.header}</span>
                     {/if}
+                    {#if typeof header.column.columnDef.meta === 'object'}
+                      {#if 'tooltipMessage' in header.column.columnDef.meta && typeof header.column.columnDef.meta['tooltipMessage'] === 'string'}
+                        <Tooltip>
+                          <InfoCircle style="height: 1rem;" />
+                          {#snippet tooltip_content()}
+                            {// eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (header.column.columnDef.meta as any).tooltipMessage}
+                          {/snippet}
+                        </Tooltip>
+                      {/if}
+                    {/if}
+                  </div>
+                  {#if header.column.getIsSorted() === 'asc'}
+                    <ChevronDown />
+                  {:else if header.column.getIsSorted() === 'desc'}
+                    <ChevronUp />
                   {/if}
                 </div>
-                {#if header.column.getIsSorted() === 'asc'}
-                  <ChevronDown />
-                {:else if header.column.getIsSorted() === 'desc'}
-                  <ChevronUp />
-                {/if}
+              {/if}
+            </th>
+          {/each}
+        </tr>
+      {/each}
+    </thead>
+    <tbody>
+      {#each $table.getRowModel().rows as row, index}
+        <tr
+          style:height="{rowHeight}px"
+          onclick={(e) => handleRowClick(index, e)}
+          onauxclick={(e) => handleRowClick(index, e)}
+          class:cursor-pointer={isRowClickable}
+          tabindex={isRowClickable ? 0 : -1}
+          bind:this={rowElems[index]}
+        >
+          {#each row.getVisibleCells() as cell}
+            {@const props = cell.getContext().getValue()}
+            {@const SvelteComponent = flexRender(cell.column.columnDef.cell, props)}
+            <td
+              class:typo-text-bold={cell.column.getIsSorted()}
+              class:sorted={cell.column.getIsSorted()}
+            >
+              <div>
+                <SvelteComponent {...typeof props === 'object' ? props : {}} />
               </div>
-            {/if}
-          </th>
-        {/each}
-      </tr>
-    {/each}
-  </thead>
-  <tbody>
-    {#each $table.getRowModel().rows as row, index}
-      <tr
-        style:height="{rowHeight}px"
-        on:click={(e) => onRowClick(index, e)}
-        on:auxclick={(e) => onRowClick(index, e)}
-        class:cursor-pointer={isRowClickable}
-        tabindex={isRowClickable ? 0 : -1}
-        bind:this={rowElems[index]}
-      >
-        {#each row.getVisibleCells() as cell}
-          {@const props = cell.getContext().getValue()}
-          <td
-            class:typo-text-bold={cell.column.getIsSorted()}
-            class:sorted={cell.column.getIsSorted()}
-          >
-            <div>
-              <svelte:component
-                this={flexRender(cell.column.columnDef.cell, props)}
-                {...typeof props === 'object' ? props : {}}
-              />
-            </div>
-          </td>
-        {/each}
-      </tr>
-    {/each}
-  </tbody>
-  <tfoot>
-    {#each $table.getFooterGroups() as footerGroup}
-      <tr>
-        {#each footerGroup.headers as header}
-          <th>
-            {#if !header.isPlaceholder}
-              <svelte:component
-                this={flexRender(header.column.columnDef.footer, header.getContext())}
-              />
-            {/if}
-          </th>
-        {/each}
-      </tr>
-    {/each}
-  </tfoot>
-</table>
+            </td>
+          {/each}
+        </tr>
+      {/each}
+    </tbody>
+    <tfoot>
+      {#each $table.getFooterGroups() as footerGroup}
+        <tr>
+          {#each footerGroup.headers as header}
+            <th>
+              {#if !header.isPlaceholder}
+                {@const SvelteComponent_1 = flexRender(
+                  header.column.columnDef.footer,
+                  header.getContext(),
+                )}
+                <SvelteComponent_1 />
+              {/if}
+            </th>
+          {/each}
+        </tr>
+      {/each}
+    </tfoot>
+  </table>
+{/if}
 
 <style>
   table {

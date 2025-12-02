@@ -7,18 +7,21 @@
   import type { Writable } from 'svelte/store';
   import type filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let originalProject: ProjectCustomizerFragment;
-  export let newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
+  interface Props {
+    newProjectData: Writable<
+      ReturnType<
+        typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+      > & { isProjectVisible: boolean }
+    >;
+  }
+
+  let { newProjectData }: Props = $props();
 </script>
 
 <div class="project-customizer-modal">
-  <ProjectCustomizer {originalProject} {newProjectData} />
+  <ProjectCustomizer {newProjectData} />
   <div class="actions">
-    <Button icon={CheckCircle} on:click={modal.hide}>Confirm</Button>
+    <Button icon={CheckCircle} onclick={modal.hide}>Confirm</Button>
   </div>
 </div>
 

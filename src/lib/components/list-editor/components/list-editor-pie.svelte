@@ -5,11 +5,15 @@
 
   const MAX_WEIGHT = 1000000;
 
-  export let hasEmptyInputs: boolean;
-  export let totalWeight: number;
+  interface Props {
+    hasEmptyInputs: boolean;
+    totalWeight: number;
+  }
 
-  $: valid = totalWeight === MAX_WEIGHT && !hasEmptyInputs;
-  $: error = hasEmptyInputs || totalWeight > MAX_WEIGHT;
+  let { hasEmptyInputs, totalWeight }: Props = $props();
+
+  let valid = $derived(totalWeight === MAX_WEIGHT && !hasEmptyInputs);
+  let error = $derived(hasEmptyInputs || totalWeight > MAX_WEIGHT);
 
   function formatWeight(weight: number) {
     const percentage = weight / 10000;

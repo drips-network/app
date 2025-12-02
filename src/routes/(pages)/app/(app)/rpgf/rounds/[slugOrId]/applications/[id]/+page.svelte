@@ -17,16 +17,16 @@
   import RpgfApplicationCustomDatasets from '$lib/components/rpgf-application-custom-datasets/rpgf-application-custom-datasets.svelte';
   import RpgfApplicationAllocationCard from '$lib/components/rpgf-application-allocation-card/rpgf-application-allocation-card.svelte';
 
-  export let data;
-  $: round = data.round;
-  $: application = data.application;
+  let { data } = $props();
+  let round = $derived(data.round);
+  let application = $derived(data.application);
 
-  $: isSubmitter = data.application.submitter.id === data.rpgfUserData?.userId;
-  $: canSeePrivateFields = round.isAdmin || isSubmitter;
+  let isSubmitter = $derived(data.application.submitter.id === data.rpgfUserData?.userId);
+  let canSeePrivateFields = $derived(round.isAdmin || isSubmitter);
 
-  $: latestVersion = application.latestVersion;
+  let latestVersion = $derived(application.latestVersion);
 
-  $: backToBallot = $page.url.searchParams.get('backToBallot') !== null;
+  let backToBallot = $derived($page.url.searchParams.get('backToBallot') !== null);
 </script>
 
 <HeadMeta title="{application.projectName} | {round.name}" />
@@ -45,9 +45,9 @@
       <AnnotationBox type="info">
         Sign in as the applicant or a round admin to see private fields, identity verification
         status, and more.
-        <svelte:fragment slot="actions">
+        {#snippet actions()}
           <RpgfSiweButton />
-        </svelte:fragment>
+        {/snippet}
       </AnnotationBox>
     </div>
   {/if}

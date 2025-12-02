@@ -1,16 +1,25 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  export let title = 'Drips';
-  export let image = '/assets/share/og-generic.png';
-  export let twitterImage = '/assets/share/twitter-summary.png';
-  export let description =
-    'Drips is the easiest way to fund Open Source in your ecosystem. Fund your dependencies with built-in dependency splitting, run RetroPGF rounds, and achieve any funding mechanism you can dream of.';
+  interface Props {
+    title?: string;
+    image?: string;
+    twitterImage?: string;
+    description?: string;
+    twitterCardType?: 'summary' | 'summary_large_image';
+  }
 
-  export let twitterCardType: 'summary' | 'summary_large_image' =
-    twitterImage === '/assets/share/twitter-summary.png' ? 'summary' : 'summary_large_image';
+  let {
+    title = 'Drips',
+    image = '/assets/share/og-generic.png',
+    twitterImage = '/assets/share/twitter-summary.png',
+    description = 'Drips is the easiest way to fund Open Source in your ecosystem. Fund your dependencies with built-in dependency splitting, run RetroPGF rounds, and achieve any funding mechanism you can dream of.',
+    twitterCardType = twitterImage === '/assets/share/twitter-summary.png'
+      ? 'summary'
+      : 'summary_large_image',
+  }: Props = $props();
 
-  $: fullTitle = `${title}${title?.startsWith('Drips') ? '' : ' | Drips'}`;
+  let fullTitle = $derived(`${title}${title?.startsWith('Drips') ? '' : ' | Drips'}`);
 </script>
 
 <svelte:head>

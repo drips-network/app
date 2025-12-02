@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { invalidate } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
@@ -6,15 +8,24 @@
   import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  export let saveHandler: (() => Promise<void>) | undefined = undefined;
+  interface Props {
+    saveHandler?: (() => Promise<void>) | undefined;
+    saveEnabled?: boolean;
+    invalid?: boolean;
+    children?: import('svelte').Snippet;
+    onSaveError?: (error: unknown) => void;
+  }
 
-  export let saveEnabled = true;
-  export let invalid = false;
+  let {
+    saveHandler = undefined,
+    saveEnabled = true,
+    invalid = false,
+    children,
+    onSaveError,
+  }: Props = $props();
 
-  export let onSaveError: ((error: unknown) => void) | undefined = undefined;
-
-  let saving = false;
-  let success = false;
+  let saving = $state(false);
+  let success = $state(false);
 
   let successTimeout: ReturnType<typeof setTimeout> | undefined;
   function resetSuccess() {
@@ -52,7 +63,7 @@
     saving = false;
   }
 
-  $: {
+  run(() => {
     // TODO(rpgf): Trigger confirmation dialog also when clicking a link on the page
     if (saveEnabled) {
       // Trigger browser confirmation dialog
@@ -60,7 +71,7 @@
     } else {
       window.onbeforeunload = null;
     }
-  }
+  });
 
   onDestroy(() => {
     window.onbeforeunload = null;
@@ -68,7 +79,7 @@
 </script>
 
 <div class="rpgf-settings-form">
-  <slot />
+  {@render children?.()}
 
   {#if saveHandler}
     <div class="actions">
@@ -84,7 +95,7 @@
       <Button
         variant="primary"
         loading={saving}
-        on:click={handleSave}
+        onclick={handleSave}
         disabled={!saveEnabled || invalid}>Save changes</Button
       >
     </div>

@@ -4,11 +4,14 @@
   import { onMount } from 'svelte';
   import Emoji from '../emoji/emoji.svelte';
 
-  export let message: string;
+  interface Props {
+    message: string;
+    onConfirm: () => unknown | Promise<unknown>;
+  }
 
-  export let onConfirm: () => unknown | Promise<unknown>;
+  let { message, onConfirm }: Props = $props();
 
-  let working = false;
+  let working = $state(false);
 
   onMount(() => {
     modal.setHideable(false);
@@ -34,12 +37,12 @@
     <Button
       disabled={working}
       variant="normal"
-      on:click={() => {
+      onclick={() => {
         modal.setHideable(true);
         modal.hide();
       }}>No, cancel</Button
     >
-    <Button loading={working} variant="destructive" on:click={handleConfirm}>Yes, continue</Button>
+    <Button loading={working} variant="destructive" onclick={handleConfirm}>Yes, continue</Button>
   </div>
 </div>
 

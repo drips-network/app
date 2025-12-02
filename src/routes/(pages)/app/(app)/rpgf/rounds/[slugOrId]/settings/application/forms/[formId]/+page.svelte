@@ -6,8 +6,8 @@
   import { updateApplicationForm } from '$lib/utils/rpgf/rpgf.js';
   import RpgfSettingsForm from '../../../../../../components/rpgf-settings-form.svelte';
 
-  export let data;
-  let updatedFields = [...data.form.fields];
+  let { data } = $props();
+  let updatedFields = $state([...data.form.fields]);
 
   async function saveHandler() {
     await updateApplicationForm(undefined, data.round.id, data.form.id, {

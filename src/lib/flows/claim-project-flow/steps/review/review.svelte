@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const REVIEW_STEP_UNCLAIMED_PROJECT_FRAGMENT = gql`
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     fragment ReviewStepUnclaimedProject on Project {
@@ -46,15 +46,18 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let canEditWalletConnection = true;
-  export let isModal = false;
+  interface Props {
+    context: Writable<State>;
+    canEditWalletConnection?: boolean;
+    isModal?: boolean;
+  }
 
-  $: project = $context.project ?? unreachable();
+  let { context, canEditWalletConnection = true, isModal = false }: Props = $props();
+
+  let project = $derived($context.project ?? unreachable());
 
   // For previewing what the project will look like after claiming
-  let fakeClaimedProject: ProjectProfileHeaderFragment;
-  $: fakeClaimedProject = {
+  let fakeClaimedProject: ProjectProfileHeaderFragment = $derived({
     __typename: 'Project',
     source: { ...project.source },
     isVisible: true,
@@ -79,18 +82,22 @@
               },
       },
     ],
-  };
+  });
 
-  $: dependencyRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.dependencySplits.items,
-    $context.dependencySplits.weights,
-    $context.highLevelPercentages['dependencies'],
+  let dependencyRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.dependencySplits.items,
+      $context.dependencySplits.weights,
+      $context.highLevelPercentages['dependencies'],
+    ),
   );
 
-  $: maintainerRepresentationalSplits = mapSplitsFromListEditorData(
-    $context.maintainerSplits.items,
-    $context.maintainerSplits.weights,
-    $context.highLevelPercentages['maintainers'],
+  let maintainerRepresentationalSplits = $derived(
+    mapSplitsFromListEditorData(
+      $context.maintainerSplits.items,
+      $context.maintainerSplits.weights,
+      $context.highLevelPercentages['maintainers'],
+    ),
   );
 
   async function submit() {
@@ -109,7 +116,6 @@
           makeStep({
             component: ProjectCustomizerStep,
             props: {
-              originalProject: project,
               newProjectData: newProjectDataWritable,
             },
           }),
@@ -127,19 +133,21 @@
               : { type: 'image', cid: avatar.cid };
           $context.projectColor = color;
         },
-        { originalProject: project, newProjectData: newProjectDataWritable },
+        { newProjectData: newProjectDataWritable },
       );
     }
   }
 
-  $: projectChainData = filterCurrentChainData(project.chainData, 'unclaimed');
+  let projectChainData = $derived(filterCurrentChainData(project.chainData, 'unclaimed'));
 
-  $: hasCollectableAmount =
+  let hasCollectableAmount = $derived(
     projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.collectableAmount) > 0n).length >
-    0;
-  $: hasSplittableAmount =
+      0,
+  );
+  let hasSplittableAmount = $derived(
     projectChainData.withdrawableBalances.filter((wb) => BigInt(wb.splittableAmount) > 0n).length >
-    0;
+      0,
+  );
 </script>
 
 <StandaloneFlowStepLayout
@@ -156,13 +164,13 @@
     </div>
   </FormField>
   <FormField type="div" title="Owned by">
-    <svelte:fragment slot="action">
+    {#snippet action()}
       {#if canEditWalletConnection}
-        <Button variant="ghost" on:click={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
+        <Button variant="ghost" onclick={() => dispatch('goForward', { by: -5 })} icon={PenIcon}
           >Edit</Button
         >
       {/if}
-    </svelte:fragment>
+    {/snippet}
     <AccountBox hideDisconnect />
   </FormField>
   <FormField type="div" title="Claimable funds">
@@ -173,11 +181,11 @@
   </FormField>
   <!-- TODO: Show the actual amounts that will be split on tx confirmation -->
   <FormField type="div" title="Split funds with">
-    <svelte:fragment slot="action">
-      <Button variant="ghost" on:click={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
+    {#snippet action()}
+      <Button variant="ghost" onclick={() => dispatch('goForward', { by: -3 })} icon={PenIcon}
         >Edit</Button
       >
-    </svelte:fragment>
+    {/snippet}
     <div class="card">
       <!-- TODO: Show the total amount that will be split on tx confirmation -->
       <div class="drip-icon">
@@ -205,8 +213,10 @@
   <WhatsNextSection>
     {#if hasCollectableAmount || hasSplittableAmount}
       <WhatsNextCard>
-        <svelte:fragment slot="title">On transaction confirmation...</svelte:fragment>
-        <svelte:fragment slot="items">
+        {#snippet title()}
+          On transaction confirmation...
+        {/snippet}
+        {#snippet items()}
           {#if hasCollectableAmount && hasSplittableAmount}
             <WhatsNextItem icon={Download}
               >Some of your claimable funds will be <span class="typo-text-bold"
@@ -231,12 +241,14 @@
               >.</WhatsNextItem
             >
           {/if}
-        </svelte:fragment>
+        {/snippet}
       </WhatsNextCard>
     {/if}
     <WhatsNextCard>
-      <svelte:fragment slot="title">After transaction confirmation...</svelte:fragment>
-      <svelte:fragment slot="items">
+      {#snippet title()}
+        After transaction confirmation...
+      {/snippet}
+      {#snippet items()}
         <WhatsNextItem icon={EyeOpenIcon}
           >Anyone can support or split to your project on Drips.</WhatsNextItem
         >
@@ -252,21 +264,22 @@
             },
           })}</WhatsNextItem
         >
-      </svelte:fragment>
+      {/snippet}
     </WhatsNextCard>
   </WhatsNextSection>
-  <svelte:fragment slot="left-actions">
+
+  {#snippet left_actions()}
     <Button
       icon={ArrowLeft}
-      on:click={() =>
+      onclick={() =>
         dispatch('goForward', {
           by: $context.highLevelPercentages['dependencies'] === 0 ? -2 : -1,
         })}>Back</Button
     >
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button icon={WalletIcon} variant="primary" on:click={submit}>Confirm in wallet</Button>
-  </svelte:fragment>
+  {/snippet}
+  {#snippet actions()}
+    <Button icon={WalletIcon} variant="primary" onclick={submit}>Confirm in wallet</Button>
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

@@ -4,9 +4,13 @@
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
   import PrimaryColorThemer from '../primary-color-themer/primary-color-themer.svelte';
 
-  export let round: Round;
+  interface Props {
+    round: Round;
+  }
 
-  $: url = `/app/rpgf/rounds/${round.urlSlug ?? round.id}`;
+  let { round }: Props = $props();
+
+  let url = $derived(`/app/rpgf/rounds/${round.urlSlug ?? round.id}`);
 
   enum EnrichedState {
     Draft,
@@ -17,34 +21,27 @@
     PendingResults,
     Results,
   }
-  let enrichedState: EnrichedState;
-
-  $: {
+  let enrichedState = $derived.by<EnrichedState>(() => {
     if (!round.state) {
-      enrichedState = EnrichedState.Draft;
+      return EnrichedState.Draft;
     } else if (round.resultsPublished) {
-      enrichedState = EnrichedState.Results;
+      return EnrichedState.Results;
     } else {
       switch (round.state) {
         case 'intake':
-          enrichedState = EnrichedState.Intake;
-          break;
+          return EnrichedState.Intake;
         case 'voting':
-          enrichedState = EnrichedState.Voting;
-          break;
+          return EnrichedState.Voting;
         case 'pending-intake':
-          enrichedState = EnrichedState.PendingIntake;
-          break;
+          return EnrichedState.PendingIntake;
         case 'pending-voting':
-          enrichedState = EnrichedState.PendingVoting;
-          break;
+          return EnrichedState.PendingVoting;
         case 'pending-results':
         case 'results':
-          enrichedState = EnrichedState.PendingResults;
-          break;
+          return EnrichedState.PendingResults;
       }
     }
-  }
+  });
 
   const stateLabels: Record<EnrichedState, string> = {
     [EnrichedState.Draft]: 'Draft',
@@ -56,7 +53,7 @@
     [EnrichedState.Results]: 'Results available',
   };
 
-  $: stateLabel = stateLabels[enrichedState];
+  let stateLabel = $derived(stateLabels[enrichedState]);
 </script>
 
 <PrimaryColorThemer colorHex={round.color}>

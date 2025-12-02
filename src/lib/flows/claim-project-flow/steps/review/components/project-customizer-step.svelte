@@ -10,14 +10,16 @@
   import type { State } from '../../../claim-project-flow';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+    newProjectData: Writable<
+      ReturnType<
+        typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
+      > & { isProjectVisible: boolean }
+    >;
+  }
 
-  export let originalProject: ProjectCustomizerFragment;
-  export let newProjectData: Writable<
-    ReturnType<
-      typeof filterCurrentChainData<ProjectCustomizerFragment['chainData'][number], 'claimed'>
-    > & { isProjectVisible: boolean }
-  >;
+  let { context, newProjectData }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -41,8 +43,8 @@
 </script>
 
 <StepLayout>
-  <ProjectCustomizer {originalProject} {newProjectData} />
+  <ProjectCustomizer {newProjectData} />
   <div class="flex justify-end">
-    <Button icon={CheckCircle} on:click={handleConfirm}>Confirm</Button>
+    <Button icon={CheckCircle} onclick={handleConfirm}>Confirm</Button>
   </div>
 </StepLayout>

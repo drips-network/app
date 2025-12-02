@@ -1,17 +1,21 @@
 <script lang="ts">
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import { slotsTemplate, state as createState, steps } from './create-drip-list-flow';
+  import { slotsTemplate, flowState, steps } from './create-drip-list-flow';
   import StandaloneFlowSlots from '$lib/components/standalone-flow-slots/standalone-flow-slots.svelte';
 
-  export let skipWalletConnect = false;
-  export let isModal = false;
-  export let displaySlots = false;
+  interface Props {
+    skipWalletConnect?: boolean;
+    isModal?: boolean;
+    displaySlots?: boolean;
+  }
 
-  let currentStepIndex = 0;
+  let { skipWalletConnect = false, isModal = false, displaySlots = false }: Props = $props();
 
-  const state = createState();
+  let currentStepIndex = $state(0);
 
-  $: slots = slotsTemplate($state, currentStepIndex);
+  const myState = flowState();
+
+  let slots = $derived(slotsTemplate($myState, currentStepIndex));
 
   function handleSlotEdit(e: CustomEvent<{ stepIndex: number }>) {
     currentStepIndex = e.detail.stepIndex;
@@ -25,7 +29,7 @@
 <Stepper
   bind:currentStepIndex
   on:stepChange={() => window.scrollTo({ top: 0 })}
-  context={() => state}
-  steps={steps(state, skipWalletConnect, isModal)}
+  context={() => myState}
+  steps={steps(myState, skipWalletConnect, isModal)}
   minHeightPx={128}
 />

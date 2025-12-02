@@ -102,7 +102,7 @@ export function slotsTemplate(state: State, stepIndex: number): Slots {
 export const steps = (claimableId: string | undefined = undefined, skipWalletConnect = false) => [
   makeStep({
     component: ChooseNetwork,
-    props: undefined,
+    props: {},
   }),
   makeStep({
     component: EnterOrcidId,
@@ -115,13 +115,13 @@ export const steps = (claimableId: string | undefined = undefined, skipWalletCon
     : [
         makeStep({
           component: ConnectWallet,
-          props: undefined,
+          props: {},
         }),
       ]),
   // aka verify ownership of ORCID profile
   makeStep({
     component: AddEthereumAddress,
-    props: undefined,
+    props: {},
   }),
   makeStep({
     component: Review,
@@ -131,10 +131,10 @@ export const steps = (claimableId: string | undefined = undefined, skipWalletCon
   }),
   makeStep({
     component: SetSplitsAndEmitMetadata,
-    props: undefined,
+    props: {},
   }),
   makeStep({
     component: Success,
-    props: undefined,
+    props: {},
   }),
 ];

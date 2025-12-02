@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import walletStore from '$lib/stores/wallet/wallet.store';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
@@ -12,12 +14,9 @@
   import type { OxString } from '$lib/utils/sdk/sdk-types';
   import { executeErc20ReadMethod } from '$lib/utils/sdk/erc20/erc20';
 
-  export let selectedTokenAddress: string[] = [];
-
   // Token list
 
-  let tokenList: Items;
-  $: tokenList = {
+  let tokenList: Items = $derived({
     ...Object.fromEntries(
       $tokensStore?.map((token) => [
         token.info.address,
@@ -37,22 +36,13 @@
         },
       ]) ?? [],
     ),
-  };
+  });
 
-  // Amount input
-
-  export let amountInputValue: string;
-  export let amount: bigint | undefined = undefined;
-  export let topUpMax: boolean;
-
-  let amountValidationState: TextInputValidationState = {
+  let amountValidationState: TextInputValidationState = $state({
     type: 'unvalidated',
-  };
+  });
 
-  export let selectedTokenBalance: bigint | undefined = undefined;
-  export let selectedTokenAllowance: bigint | undefined = undefined;
-
-  let loadingToken = false;
+  let loadingToken = $state(false);
 
   let prevTokenAddress: string | undefined;
   async function getSelectedTokenBalance() {
@@ -78,13 +68,32 @@
     prevTokenAddress = tokenAddress;
   }
 
-  $: {
-    selectedTokenAddress;
-    getSelectedTokenBalance();
+  interface Props {
+    selectedTokenAddress?: string[];
+    // Amount input
+    amountInputValue: string;
+    amount?: bigint | undefined;
+    selectedTokenBalance?: bigint | undefined;
+    selectedTokenAllowance?: bigint | undefined;
+    formValid: boolean;
   }
 
-  export let formValid: boolean;
-  $: formValid = amountValidationState.type === 'valid';
+  let {
+    selectedTokenAddress = $bindable([]),
+    amountInputValue = $bindable(),
+    amount = $bindable(),
+    selectedTokenBalance = $bindable(),
+    selectedTokenAllowance = $bindable(),
+    formValid = $bindable(),
+  }: Props = $props();
+
+  run(() => {
+    selectedTokenAddress;
+    getSelectedTokenBalance();
+  });
+  run(() => {
+    formValid = amountValidationState.type === 'valid';
+  });
 </script>
 
 <FormField title="Token*">
@@ -103,7 +112,6 @@
     tokenBalance={selectedTokenBalance}
     bind:inputValue={amountInputValue}
     bind:amount
-    bind:topUpMax
     bind:validationState={amountValidationState}
     loading={loadingToken}
   />

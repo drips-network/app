@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import fiatEstimates, { type Prices } from '$lib/utils/fiat-estimates/fiat-estimates';
   import { fade } from 'svelte/transition';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
@@ -16,32 +18,40 @@
 
   type Amounts = Amount[];
 
-  /** If undefined, component will display a loading state. */
-  export let amounts: Amounts | undefined;
-  $: tokenAddresses = amounts?.map((a) => a.tokenAddress);
-
-  export let supressUnknownAmountsWarning = false;
-
   const fiatEstimatesStarted = fiatEstimates.started;
-  $: {
-    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0 && !prices) {
-      fiatEstimates.track(tokenAddresses);
-    }
-  }
 
-  /**
+  let includesUnknownPrice = $state(false);
+
+  interface Props {
+    /** If undefined, component will display a loading state. */
+    amounts: Amounts | undefined;
+    supressUnknownAmountsWarning?: boolean;
+    /**
     Pass prices if they've been fetched externally already (e.g. in a load function).
     If undefined, it will call in and wait for prices from `fiatEstimates` store.
 
     If you do pass prices, make sure that there's a value for each token address included in `amounts`.
   */
-  export let prices: Prices | undefined = undefined;
-  $: priceStore = prices ? readable(prices) : fiatEstimates.price(tokenAddresses ?? []);
+    prices?: Prices | undefined;
+    fiatEstimateCents?: number | 'pending';
+    compact?: boolean;
+  }
 
-  export let fiatEstimateCents: number | 'pending' = 'pending';
-  let includesUnknownPrice = false;
-
-  $: {
+  let {
+    amounts,
+    supressUnknownAmountsWarning = false,
+    prices = undefined,
+    fiatEstimateCents = $bindable('pending'),
+    compact = false,
+  }: Props = $props();
+  let tokenAddresses = $derived(amounts?.map((a) => a.tokenAddress));
+  run(() => {
+    if ($fiatEstimatesStarted && tokenAddresses && tokenAddresses.length > 0 && !prices) {
+      fiatEstimates.track(tokenAddresses);
+    }
+  });
+  let priceStore = $derived(prices ? readable(prices) : fiatEstimates.price(tokenAddresses ?? []));
+  run(() => {
     if (amounts) {
       const result = aggregateFiatEstimate($priceStore, amounts);
 
@@ -52,9 +62,7 @@
       includesUnknownPrice = result.includesUnknownPrice;
       fiatEstimateCents = result.fiatEstimateCents;
     }
-  }
-
-  export let compact = false;
+  });
 </script>
 
 <div class="aggregate-fiat-estimate">
@@ -67,9 +75,9 @@
     <div class="warning" transition:fade={{ duration: 100 }}>
       <Tooltip>
         <WarningIcon />
-        <svelte:fragment slot="tooltip-content">
+        {#snippet tooltip_content()}
           This amount includes unknown tokens for which we couldnʼt determine a current USD value.
-        </svelte:fragment>
+        {/snippet}
       </Tooltip>
     </div>
   {/if}

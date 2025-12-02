@@ -1,34 +1,41 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import assert from '$lib/utils/assert';
 
   const MAX_SIZE = 16;
 
-  export let text: string;
+  interface Props {
+    text: string;
+  }
 
-  let containerElem: HTMLDivElement;
+  let { text }: Props = $props();
+
+  let containerElem: HTMLDivElement | undefined;
   let contentElem: HTMLSpanElement;
-  let fontSize: number = MAX_SIZE;
+  let fontSize: number = $state(MAX_SIZE);
   let contentWidth: number | undefined;
   let containerWidth: number | undefined;
 
   async function updateContentWidth() {
     await tick();
-    const contentBox = contentElem.getBoundingClientRect();
+
+    const contentBox = contentElem?.getBoundingClientRect();
     contentWidth = contentBox.width;
   }
 
-  let firstLetterOnly = false;
+  let firstLetterOnly = $state(false);
 
   async function fit() {
     fontSize = MAX_SIZE;
 
     await updateContentWidth();
 
-    const containerBox = containerElem.getBoundingClientRect();
-    containerWidth = containerBox.width;
+    const containerBox = containerElem?.getBoundingClientRect();
+    containerWidth = containerBox?.width;
 
-    assert(contentWidth);
+    if (!contentWidth || !containerWidth) {
+      return;
+    }
+
     while (contentWidth > containerWidth) {
       fontSize = fontSize - 1;
 

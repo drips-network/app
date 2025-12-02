@@ -12,36 +12,24 @@
   import TabbedBox from '$lib/components/tabbed-box/tabbed-box.svelte';
   import CustomAvatarUpload from '$lib/components/custom-avatar-upload/custom-avatar-upload.svelte';
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
+  import type { Round } from '$lib/utils/rpgf/types/round';
 
-  export let data;
-  $: isDraft = !data.round.published;
+  let { data } = $props();
+  let isDraft = $derived(!data.round.published);
 
-  let updatedRound = { ...data.round };
+  let updatedRound = $state<Round>({ ...data.round });
 
-  let urlSlugInputValue = updatedRound.urlSlug || '';
+  let urlSlugInputValue = $derived(updatedRound.urlSlug || '');
 
-  let urlSlugValidationState: TextInputValidationState = { type: 'valid' };
+  let showUrlSuccess = $state(false);
 
-  $: {
-    if (!urlSlugInputValue) {
-      updatedRound = {
-        ...updatedRound,
-        urlSlug: urlSlugInputValue,
-      };
-    }
-  }
-
-  $: {
-    urlSlugInputValue;
-
+  let urlSlugValidationState = $derived.by<TextInputValidationState>(() => {
     if (urlSlugInputValue === updatedRound.urlSlug) {
-      urlSlugValidationState = { type: 'valid' };
+      return { type: 'valid' };
     } else {
-      urlSlugValidationState = { type: 'unvalidated' };
+      return { type: 'unvalidated' };
     }
-
-    showUrlSuccess = false;
-  }
+  });
 
   async function validateSlug() {
     if (urlSlugInputValue === updatedRound.urlSlug) {
@@ -87,16 +75,14 @@
     }
   }
 
-  $: invalid = Boolean(
-    urlSlugValidationState.type === 'invalid' || urlSlugValidationState.type === 'unvalidated',
-  );
+  let invalid = $derived(Boolean(urlSlugValidationState.type === 'invalid'));
 
-  let showUrlSuccess = false;
+  let activeAvatarTab: 'tab1' | 'tab2' = $derived(updatedRound.customAvatarCid ? 'tab2' : 'tab1');
 
-  let activeAvatarTab: 'tab-1' | 'tab-2' = updatedRound.customAvatarCid ? 'tab-2' : 'tab-1';
+  function handleTabChange(tab: 'tab1' | 'tab2') {
+    activeAvatarTab = tab;
 
-  $: {
-    if (activeAvatarTab === 'tab-1') {
+    if (tab === 'tab1') {
       updatedRound = {
         ...updatedRound,
         customAvatarCid: null,
@@ -105,7 +91,7 @@
   }
 
   function handleAvatarUploaded(e: CustomEvent<{ ipfsCid: string }>) {
-    if (activeAvatarTab !== 'tab-2') {
+    if (activeAvatarTab !== 'tab2') {
       return;
     }
 
@@ -115,13 +101,14 @@
     };
   }
 
-  $: changesMade =
+  let changesMade = $derived(
     updatedRound.name !== data.round.name ||
-    updatedRound.emoji !== data.round.emoji ||
-    updatedRound.color !== data.round.color ||
-    updatedRound.urlSlug !== data.round.urlSlug ||
-    updatedRound.description !== data.round.description ||
-    updatedRound.customAvatarCid !== data.round.customAvatarCid;
+      updatedRound.emoji !== data.round.emoji ||
+      updatedRound.color !== data.round.color ||
+      updatedRound.urlSlug !== data.round.urlSlug ||
+      updatedRound.description !== data.round.description ||
+      updatedRound.customAvatarCid !== data.round.customAvatarCid,
+  );
 
   async function saveHandler() {
     await updateRound(undefined, data.round.id, {
@@ -145,13 +132,13 @@
   </FormField>
 
   <FormField title="Avatar*">
-    <TabbedBox bind:activeTab={activeAvatarTab} ariaLabel="Avatar settings" border={true}>
-      <svelte:fragment slot="tab-1">
+    <TabbedBox onTabChange={handleTabChange} ariaLabel="Avatar settings" border={true}>
+      {#snippet tab1()}
         <EmojiPicker bind:selectedEmoji={updatedRound.emoji} />
-      </svelte:fragment>
-      <svelte:fragment slot="tab-2">
+      {/snippet}
+      {#snippet tab2()}
         <CustomAvatarUpload on:uploaded={handleAvatarUploaded} />
-      </svelte:fragment>
+      {/snippet}
     </TabbedBox>
   </FormField>
 
@@ -164,7 +151,7 @@
       <span>{network.subdomain}/</span>
       <TextInput
         showSuccessCheck={showUrlSuccess}
-        on:blur={validateSlug}
+        onblur={validateSlug}
         validationState={urlSlugValidationState}
         bind:value={urlSlugInputValue}
         placeholder="my-rpgf-round"

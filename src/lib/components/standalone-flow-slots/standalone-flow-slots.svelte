@@ -1,13 +1,15 @@
-<script lang="ts" context="module">
-  import { tick, type ComponentType } from 'svelte';
+<script lang="ts" module>
+  import { tick, type Component } from 'svelte';
 
   interface ComponentAndProps {
-    component: ComponentType;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: Component<any>;
     props: Record<string, unknown>;
   }
 
   export interface Slot {
-    icon?: ComponentType | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon?: Component<any> | undefined;
     title?: string | undefined;
     leftComponent?: ComponentAndProps | undefined;
     rightComponent?: ComponentAndProps | undefined;
@@ -20,14 +22,20 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import StandaloneFlowSlot from './components/standalone-flow-slot.svelte';
   import { tweened } from 'svelte/motion';
   import { cubicInOut } from 'svelte/easing';
   import { fade } from 'svelte/transition';
 
-  export let slots: Slots;
+  interface Props {
+    slots: Slots;
+  }
 
-  let slotsElem: HTMLUListElement;
+  let { slots }: Props = $props();
+
+  let slotsElem = $state<HTMLUListElement>();
 
   let wrapperHeight = tweened(0, {
     duration: 300,
@@ -45,11 +53,11 @@
     wrapperHeight.set(slotsElem?.offsetHeight ?? 0);
   }
 
-  let prevSlots = slots;
-  $: {
+  let prevSlots = $state(slots);
+  run(() => {
     if (JSON.stringify(prevSlots) !== JSON.stringify(slots)) updateHeight();
     prevSlots = slots;
-  }
+  });
 </script>
 
 <div class="overflow-hidden" style:height="{$wrapperHeight}px">

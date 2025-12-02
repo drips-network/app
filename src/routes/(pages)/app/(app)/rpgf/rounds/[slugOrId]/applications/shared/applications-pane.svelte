@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -19,18 +19,33 @@
   import type { FilterParam, SortByParam } from '../+layout';
   import type { TDropdownOption } from '$lib/components/table-view-configurator/components/mini-dropdown.svelte';
 
-  export let round: Round;
-  export let ballotStore: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
-  export let sortByParam: SortByParam;
-  export let filterParam: FilterParam | null;
-  export let loggedIn: boolean;
-  export let categories: ApplicationCategory[];
-  export let voteMode: boolean;
-  export let reviewMode: boolean;
-  export let allApplications: ListingApplication[];
-  export let tableConfiguratorEl: HTMLDivElement | undefined = undefined;
+  interface Props {
+    round: Round;
+    ballotStore: Writable<InProgressBallot> & {
+      clear: () => void;
+    };
+    sortByParam: SortByParam;
+    filterParam: FilterParam | null;
+    loggedIn: boolean;
+    categories: ApplicationCategory[];
+    voteMode: boolean;
+    reviewMode: boolean;
+    allApplications: ListingApplication[];
+    tableConfiguratorEl?: HTMLDivElement | undefined;
+  }
+
+  let {
+    round,
+    ballotStore,
+    sortByParam,
+    filterParam,
+    loggedIn,
+    categories,
+    voteMode,
+    reviewMode,
+    allApplications,
+    tableConfiguratorEl = $bindable(),
+  }: Props = $props();
 
   async function handleDownload(format: 'csv' | 'xlsx') {
     const content: Blob | string =
@@ -49,19 +64,20 @@
     downloadUrl(URL.createObjectURL(new Blob([content], { type: fileType })), fileName);
   }
 
-  let selectedSortBy: SortByParam = sortByParam;
-  let selectedFilter: FilterParam | null = filterParam;
+  let selectedSortBy: SortByParam = $state(sortByParam);
+  let selectedFilter: FilterParam | null = $state(filterParam);
 
   async function handleTableOptsChange({
     sortBy,
     filterBy,
-    selectFn,
   }: {
     sortBy: string | null;
     filterBy: string | null;
-    selectFn: () => void;
   }) {
     let sortByToSet = sortBy ?? 'createdAt';
+
+    selectedSortBy = sortByToSet as SortByParam;
+    selectedFilter = filterBy as FilterParam | null;
 
     await goto(
       buildUrl($page.url.pathname, {
@@ -70,17 +86,9 @@
       }),
       { replaceState: true, noScroll: true },
     );
-
-    await invalidate('rpgf:round:listing-applications');
-
-    selectedSortBy = sortByToSet as SortByParam;
-    selectedFilter = filterBy as FilterParam | null;
-
-    selectFn();
   }
 
-  let filterOptions: Record<FilterParam, TDropdownOption>;
-  $: filterOptions = {
+  let filterOptions: Record<FilterParam, TDropdownOption> = $derived({
     ...(loggedIn ? { own: { label: 'My applications' } } : {}),
 
     pending: { label: 'Pending' },
@@ -88,7 +96,7 @@
     rejected: { label: 'Rejected' },
 
     ...Object.fromEntries(categories.map((cat) => [`cat-${cat.id}`, { label: cat.name }])),
-  } as Record<FilterParam, TDropdownOption>;
+  } as Record<FilterParam, TDropdownOption>);
 </script>
 
 <div>
@@ -100,9 +108,9 @@
     <AnnotationBox type="info">
       Sign in to RetroPGF on Drips to see your own applications, vote on applications, or view
       private data if you're an admin.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <RpgfSiweButton />
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   </div>
 {/if}
@@ -125,10 +133,8 @@
         onDownload={handleDownload}
         sortBy={selectedSortBy}
         filterBy={selectedFilter}
-        onFilterChange={(filterBy, selectFn) =>
-          handleTableOptsChange({ sortBy: selectedSortBy, filterBy, selectFn })}
-        onSortChange={(sortBy, selectFn) =>
-          handleTableOptsChange({ sortBy, filterBy: selectedFilter, selectFn })}
+        onFilterChange={(filterBy) => handleTableOptsChange({ sortBy: selectedSortBy, filterBy })}
+        onSortChange={(sortBy) => handleTableOptsChange({ sortBy, filterBy: selectedFilter })}
       />
     </div>
   </div>

@@ -1,10 +1,19 @@
 <script lang="ts">
-  export let checked: boolean;
-  export let label: string | undefined = undefined;
-  export let size: 'small' | 'normal' = 'normal';
-  export let disabled: boolean = false;
+  interface Props {
+    checked: boolean;
+    label?: string | undefined;
+    size?: 'small' | 'normal';
+    disabled?: boolean;
+  }
 
-  let focus = false;
+  let {
+    checked = $bindable(),
+    label = undefined,
+    size = 'normal',
+    disabled = false,
+  }: Props = $props();
+
+  let focus = $state(false);
 </script>
 
 <label class="toggle {size}" class:disabled>
@@ -17,12 +26,12 @@
     tabindex="0"
     type="checkbox"
     bind:checked
-    on:focus={() => (focus = true)}
-    on:blur={() => (focus = false)}
+    onfocus={() => (focus = true)}
+    onblur={() => (focus = false)}
     {disabled}
   />
   <div class="slider" class:checked class:focus data-testid="toggle-slider">
-    <div class="head" />
+    <div class="head"></div>
   </div>
 </label>
 

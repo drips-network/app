@@ -14,7 +14,7 @@
     <p>If you develop an open-source project, claim it on Drips to start collecting funds.</p>
   </div>
   <div class="actions">
-    <Button icon={Plus} on:click={() => launchClaimProject()} variant="primary"
+    <Button icon={Plus} onclick={() => launchClaimProject()} variant="primary"
       >Claim your project</Button
     >
   </div>

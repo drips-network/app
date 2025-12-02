@@ -14,38 +14,43 @@
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import unreachable from '$lib/utils/unreachable';
 
-  export let votingRound: VotingRound;
+  interface Props {
+    votingRound: VotingRound;
+  }
+
+  let { votingRound }: Props = $props();
 
   let votingRoundUrl = `${BASE_URL}/app/drip-lists/${votingRound.id}`;
 
-  $: isPublisher =
-    $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase();
+  let isPublisher = $derived(
+    $walletStore.address?.toLowerCase() === votingRound.publisherAddress.toLowerCase(),
+  );
 </script>
 
 {#if votingRound.status === 'Started'}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       This list is in voting.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <ShareButton
           shareLabel="Share with collaborators"
           buttonVariant="primary"
           url={votingRoundUrl}
           downloadableImageUrl="{votingRoundUrl}.png?target=og"
         />
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && !votingRound.result}
   <div class="wrapper">
     <AnnotationBox type="error" icon={Proposals}>
       Voting has ended but no collaborators voted.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         {#if isPublisher}
           <Button
             icon={Trash}
             variant="destructive"
-            on:click={() =>
+            onclick={() =>
               modal.show(
                 Stepper,
                 undefined,
@@ -53,16 +58,16 @@
               )}>Delete voting round</Button
           >
         {/if}
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if (votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion') && isPublisher}
   <div class="wrapper">
     <AnnotationBox type="info" icon={Proposals}>
       Voting has ended. You can now publish.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <Button
-          on:click={() =>
+          onclick={() =>
             modal.show(
               Stepper,
               undefined,
@@ -75,7 +80,7 @@
           variant="primary"
           icon={Wallet}>Publish Drip List</Button
         >
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   </div>
 {:else if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}

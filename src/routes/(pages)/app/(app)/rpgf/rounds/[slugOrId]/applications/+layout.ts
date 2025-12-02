@@ -7,7 +7,7 @@ import { z } from 'zod';
 export type SortByParam = 'name' | 'createdAt' | 'allocation';
 export type FilterParam = 'own' | 'approved' | 'rejected' | 'pending' | `cat-${string}`;
 
-export const load = async ({ parent, route, url, depends }) => {
+export const load = async ({ parent, route, url, depends, fetch }) => {
   depends('rpgf:round:listing-applications');
 
   const { round, existingBallot, rpgfUserData } = await parent();

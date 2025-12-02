@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT = gql`
     ${DRIP_LIST_BADGE_FRAGMENT}
     ${PROJECT_BADGE_FRAGMENT}
@@ -90,6 +90,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Heart from '$lib/components/icons/Heart.svelte';
   import type SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
@@ -121,19 +123,33 @@
   import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
 
-  export let supportItems: SupportersSectionSupportItemFragment[];
+  let emptyStateText: string | undefined = $state();
 
-  export let ownerAccountId: string | undefined = undefined;
+  interface Props {
+    supportItems: SupportersSectionSupportItemFragment[];
+    ownerAccountId?: string | undefined;
+    type: 'project' | 'dripList' | 'address' | 'ecosystem';
+    headline?: string;
+    emptyStateHeadline?: string;
+    collapsed?: boolean;
+    collapsable?: boolean;
+    infoTooltip?: string | undefined;
+    /** Bind to this to get the section skeleton instance of this section. */
+    sectionSkeleton?: SectionSkeleton | undefined;
+  }
 
-  export let type: 'project' | 'dripList' | 'address' | 'ecosystem';
-  export let headline = 'Support';
-  export let emptyStateHeadline = 'No supporters';
-
-  export let collapsed = false;
-  export let collapsable = false;
-
-  let emptyStateText: string;
-  $: {
+  let {
+    supportItems,
+    ownerAccountId = undefined,
+    type,
+    headline = 'Support',
+    emptyStateHeadline = 'No supporters',
+    collapsed = $bindable(false),
+    collapsable = $bindable(false),
+    infoTooltip = undefined,
+    sectionSkeleton = $bindable(),
+  }: Props = $props();
+  run(() => {
     switch (type) {
       case 'project':
         emptyStateText = `This project doesnʼt have any supporters yet.`;
@@ -148,12 +164,7 @@
         emptyStateText = `This ecosystem doesnʼt have any supporters yet.`;
         break;
     }
-  }
-
-  export let infoTooltip: string | undefined = undefined;
-
-  /** Bind to this to get the section skeleton instance of this section. */
-  export let sectionSkeleton: SectionSkeleton | undefined = undefined;
+  });
 </script>
 
 <section class="app-section">
@@ -193,10 +204,10 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={[item.amount]} />
-            </svelte:fragment>
-            <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               {@const amount = item.amount}
               {@const token = $tokensStore && tokensStore.getByAddress(amount.tokenAddress)}
               {#if token}
@@ -218,7 +229,7 @@
                 <!-- Placeholder for right height during SSR -->
                 <span>⠀</span>
               {/if}
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'StreamSupport'}
@@ -233,6 +244,7 @@
             title={{
               component: IdentityBadge,
               props: {
+                disableLink: true,
                 disableTooltip: true,
                 tag:
                   stream.sender.account.accountId === $walletStore.dripsAccountId
@@ -244,7 +256,7 @@
               },
             }}
           >
-            <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <RealtimeAmount
                 unknownTokenButton={false}
                 showFiatValue
@@ -252,8 +264,8 @@
                 timeline={stream.timeline}
                 tokenAddress={stream.config.amountPerSecond.tokenAddress}
               />
-            </svelte:fragment>
-            <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               {@const token =
                 $tokensStore &&
                 tokensStore.getByAddress(stream.config.amountPerSecond.tokenAddress)}
@@ -269,7 +281,7 @@
                 <!-- Placeholder for right height during SSR -->
                 <span>⠀</span>
               {/if}
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'DripListSupport'}
@@ -285,12 +297,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'ProjectSupport'}
@@ -309,12 +321,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
         {#if item.__typename === 'EcosystemSupport'}
@@ -330,12 +342,12 @@
             }}
             subtitle={formatDate(item.date)}
           >
-            <svelte:fragment slot="amount-value">
+            {#snippet amount_value()}
               <AggregateFiatEstimate amounts={item.totalSplit} />
-            </svelte:fragment>
-            <svelte:fragment slot="amount-sub">
+            {/snippet}
+            {#snippet amount_sub()}
               Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            </svelte:fragment>
+            {/snippet}
           </SupportItem>
         {/if}
       {/each}

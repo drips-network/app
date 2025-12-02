@@ -56,3 +56,7 @@ npm run test:e2e:headless
 ## Linting
 
 Before submitting changes, run `npx lint-staged --concurrent false` and `npm run check`. This will ensure there are no linting or compiler errors.
+
+## Adding a new blog post
+
+Blog posts are markdown files stored in `src/blog-posts/`. To add a new blog post, create a new markdown file in that directory. There needs to be specific frontmatter - please refer to existing blog posts for examples.

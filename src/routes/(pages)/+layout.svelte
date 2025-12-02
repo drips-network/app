@@ -8,6 +8,11 @@
   import { get } from 'svelte/store';
   import scroll from '$lib/stores/scroll';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 
   const { isEnabled } = animationsStore;
 
@@ -45,7 +50,7 @@
 
 <div class="main" data-uifont="inter">
   <main class="page">
-    <slot />
+    {@render children?.()}
   </main>
 </div>
 

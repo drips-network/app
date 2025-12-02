@@ -6,12 +6,23 @@
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
   import CodeBox from '../code-box/code-box.svelte';
 
-  export let amtPerSec: bigint | undefined = undefined;
-  export let tokenAddress: string | undefined = undefined;
-  export let tokenDecimals: number | undefined = undefined;
-  export let startDate: Date | undefined = undefined;
-  export let createdAt: Date | undefined = undefined;
-  export let rawTimeline: string | undefined = undefined;
+  interface Props {
+    amtPerSec?: bigint | undefined;
+    tokenAddress?: string | undefined;
+    tokenDecimals?: number | undefined;
+    startDate?: Date | undefined;
+    createdAt?: Date | undefined;
+    rawTimeline?: string | undefined;
+  }
+
+  let {
+    amtPerSec = undefined,
+    tokenAddress = undefined,
+    tokenDecimals = undefined,
+    startDate = undefined,
+    createdAt = undefined,
+    rawTimeline = undefined,
+  }: Props = $props();
 </script>
 
 {#if $developerModeStore}

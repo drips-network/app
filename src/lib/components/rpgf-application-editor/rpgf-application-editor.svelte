@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const RPGF_APPLICATION_EDITOR_PROJECT_FRAGMENT = gql`
     ${PROJECT_BADGE_FRAGMENT}
     fragment RpgfApplicationEditorProject on Project {
@@ -11,6 +11,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type {
     ApplicationAnswerDto,
     ApplicationCategory,
@@ -40,19 +42,45 @@
   import AnnotationBox from '../annotation-box/annotation-box.svelte';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
 
-  export let round: Round;
-  export let userId: string;
-  export let categories: ApplicationCategory[];
-  export let applicationForms: ApplicationForm[];
-  export let projects: RpgfApplicationEditorProjectFragment[];
+  interface Props {
+    round: Round;
+    userId: string;
+    categories: ApplicationCategory[];
+    applicationForms: ApplicationForm[];
+    projects: RpgfApplicationEditorProjectFragment[];
+    prefilledAnswers?: ApplicationAnswerDto;
+    preselectedCategoryId?: string | null;
+    prefilledProjectName?: string | null;
+    preselectedDripsAccountId?: string | null;
+    forceRevealErrors?: boolean;
+    noPersistance?: boolean;
+    readyToSubmit: boolean;
+    // Export full form data for binding
+    value?: {
+      categoryId: string;
+      categoryName: string;
+      fields: ApplicationForm['fields'];
+      dripsAccountId: string;
+      projectName: string;
+      answers: ApplicationAnswerDto;
+    } | null;
+  }
 
-  export let prefilledAnswers: ApplicationAnswerDto = [];
-  export let preselectedCategoryId: string | null = null;
-  export let prefilledProjectName: string | null = null;
-  export let preselectedDripsAccountId: string | null = null;
-
-  export let forceRevealErrors = false;
-  export let noPersistance = false;
+  let {
+    round,
+    userId,
+    categories,
+    applicationForms,
+    projects,
+    prefilledAnswers = [],
+    preselectedCategoryId = null,
+    prefilledProjectName = null,
+    preselectedDripsAccountId = null,
+    forceRevealErrors = false,
+    noPersistance = false,
+    readyToSubmit = $bindable(),
+    value = $bindable(),
+  }: Props = $props();
 
   const INITIAL_STATE = {
     dripsAccountId: [],
@@ -61,7 +89,7 @@
     answersByCategory: {},
   };
 
-  const state = !noPersistance
+  const applicationState = !noPersistance
     ? getLocallyStoredApplication(
         round.id,
         userId,
@@ -71,18 +99,18 @@
       )
     : {
         ...writable<ApplicationData>(INITIAL_STATE),
-        clear: () => state.set(INITIAL_STATE),
+        clear: () => applicationState.set(INITIAL_STATE),
       };
 
   // Apply prefilled values if any, considering that both categories and / or fields
   // may have been deleted / edited by admins
 
   if (preselectedDripsAccountId) {
-    $state.dripsAccountId = [preselectedDripsAccountId];
+    $applicationState.dripsAccountId = [preselectedDripsAccountId];
   }
   if (preselectedCategoryId) {
     if (categories.find((c) => c.id === preselectedCategoryId)) {
-      $state.categoryId = [preselectedCategoryId];
+      $applicationState.categoryId = [preselectedCategoryId];
     }
   }
   if (prefilledAnswers.length > 0) {
@@ -95,125 +123,119 @@
       if (formForCategory) {
         // Filter out any answers that don't correspond to existing fields
         const validFieldIds = new Set(formForCategory.fields.map((f) => f.id));
-        $state.answersByCategory[preselectedCategoryId] = prefilledAnswers.filter((a) =>
+        $applicationState.answersByCategory[preselectedCategoryId] = prefilledAnswers.filter((a) =>
           validFieldIds.has(a.fieldId),
         );
       }
     }
   }
   if (prefilledProjectName) {
-    $state.projectName = prefilledProjectName;
+    $applicationState.projectName = prefilledProjectName;
   }
 
   // Check if on mount anything has been restored from local storage
-  let formDataHasBeenRestored = false;
+  let formDataHasBeenRestored = $state(false);
   onMount(() => {
     if (noPersistance) return;
 
     if (
-      $state.dripsAccountId[0] ||
-      $state.projectName ||
-      $state.categoryId[0] ||
-      Object.keys($state.answersByCategory).length > 0
+      $applicationState.dripsAccountId[0] ||
+      $applicationState.projectName ||
+      $applicationState.categoryId[0] ||
+      Object.keys($applicationState.answersByCategory).length > 0
     ) {
       formDataHasBeenRestored = true;
     }
   });
 
-  // "Hack" to avoid update loops on state
-  $: stateCategoryId = $state.categoryId[0];
+  let selectedCategory: ApplicationCategory | null = $state(null);
 
-  let selectedCategory: ApplicationCategory | null = null;
-  $: {
-    selectedCategory = categories.find((category) => category.id === stateCategoryId) || null;
-  }
-
-  let formForSelectedCategory: ApplicationForm | null = applicationForms[0];
-  $: {
-    formForSelectedCategory = selectedCategory
-      ? applicationForms.find((form) => selectedCategory?.applicationForm.id === form.id) || null
-      : null;
-  }
+  let formForSelectedCategory: ApplicationForm | null = $state(applicationForms[0]);
 
   // Step logic
 
-  enum Step {
-    ProjectSelection = 1,
-    ApplicationName = 2,
-    CategorySelection = 3,
-    FormFilling = 4,
-  }
+  const STEP_SEQUENCE = {
+    ProjectSelection: 1,
+    ApplicationName: 2,
+    CategorySelection: 3,
+    FormFilling: 4,
+  };
+  type Step = (typeof STEP_SEQUENCE)[keyof typeof STEP_SEQUENCE];
 
-  let currentStep: Step = Step.ProjectSelection;
-  $: {
-    if ($state.dripsAccountId.length > 0) {
-      currentStep = Step.ApplicationName;
+  let currentStep = $state<Step>(STEP_SEQUENCE.ProjectSelection);
+
+  let formDataValid = $state(false);
+
+  let applicationNameValidationState = $derived(
+    applicationNameValidator($applicationState.projectName),
+  );
+
+  // "Hack" to avoid update loops on applicationState
+  let applicationStateCategoryId = $derived($applicationState.categoryId[0]);
+  run(() => {
+    selectedCategory =
+      categories.find((category) => category.id === applicationStateCategoryId) || null;
+  });
+  run(() => {
+    formForSelectedCategory = selectedCategory
+      ? applicationForms.find((form) => selectedCategory?.applicationForm.id === form.id) || null
+      : null;
+  });
+  run(() => {
+    if ($applicationState.dripsAccountId.length > 0) {
+      currentStep = STEP_SEQUENCE.ApplicationName;
 
       if (applicationNameValidationState.type === 'valid') {
-        currentStep = Step.CategorySelection;
-        if ($state.categoryId) {
-          currentStep = Step.FormFilling;
+        currentStep = STEP_SEQUENCE.CategorySelection;
+        if ($applicationState.categoryId) {
+          currentStep = STEP_SEQUENCE.FormFilling;
         }
       }
     } else {
-      currentStep = Step.ProjectSelection;
+      currentStep = STEP_SEQUENCE.ProjectSelection;
     }
-  }
+  });
 
-  // Validation
-
-  $: applicationNameValidationState = applicationNameValidator($state.projectName);
-  $: projectSelected = $state.dripsAccountId !== null;
-  $: applicationNameValid = applicationNameValidationState.type === 'valid';
-  $: categorySelected = $state.categoryId !== null;
-  let formDataValid = false;
-
-  export let readyToSubmit: boolean;
-  $: readyToSubmit = projectSelected && applicationNameValid && categorySelected && formDataValid;
-
-  // Export full form data for binding
-  export let value: {
-    categoryId: string;
-    categoryName: string;
-    fields: ApplicationForm['fields'];
-    dripsAccountId: string;
-    projectName: string;
-    answers: ApplicationAnswerDto;
-  } | null = null;
-  $: {
+  let projectSelected = $derived($applicationState.dripsAccountId !== null);
+  let applicationNameValid = $derived(applicationNameValidationState.type === 'valid');
+  let categorySelected = $derived($applicationState.categoryId !== null);
+  run(() => {
+    readyToSubmit = projectSelected && applicationNameValid && categorySelected && formDataValid;
+  });
+  run(() => {
     if (
-      $state.categoryId &&
-      $state.dripsAccountId &&
-      $state.projectName &&
+      $applicationState.categoryId &&
+      $applicationState.dripsAccountId &&
+      $applicationState.projectName &&
       selectedCategory &&
       formForSelectedCategory
     ) {
       value = {
-        categoryId: $state.categoryId[0],
-        dripsAccountId: $state.dripsAccountId[0],
+        categoryId: $applicationState.categoryId[0],
+        dripsAccountId: $applicationState.dripsAccountId[0],
         categoryName: selectedCategory.name,
         fields: formForSelectedCategory.fields,
-        projectName: $state.projectName,
-        answers: $state.answersByCategory[$state.categoryId[0]],
+        projectName: $applicationState.projectName,
+        answers: $applicationState.answersByCategory[$applicationState.categoryId[0]],
       };
     } else {
       value = null;
     }
-  }
+  });
 </script>
 
 {#if formDataHasBeenRestored}
   <div style:width="100%">
     <AnnotationBox type="info">
       We restored a previously saved application draft for you.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <Button
           variant="destructive"
-          on:click={() => {
+          onclick={() => {
             doWithConfirmationModal(
               'Are you sure you want to clear all fields? This action cannot be undone.',
               () => {
-                state.clear();
+                applicationState.clear();
                 formDataHasBeenRestored = false;
               },
             );
@@ -221,7 +243,7 @@
         >
           Clear all fields
         </Button>
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   </div>
 {/if}
@@ -232,21 +254,23 @@
   description="Select one of your claimed projects to apply to the round with."
 >
   <div class="list-select-wrapper min-height">
-    <ProjectSelector {projects} bind:selected={$state.dripsAccountId} />
+    <ProjectSelector {projects} bind:selected={$applicationState.dripsAccountId} />
   </div>
-  <div slot="action">
-    <Button
-      icon={Plus}
-      on:click={() =>
-        modal.show(ClaimProjectStepper, undefined, {
-          skipWalletConnect: true,
-          linkToProjectPageOnSuccess: false,
-          skipNetworkSelection: true,
-        })}
-    >
-      Claim new project
-    </Button>
-  </div>
+  {#snippet action()}
+    <div>
+      <Button
+        icon={Plus}
+        onclick={() =>
+          modal.show(ClaimProjectStepper, undefined, {
+            skipWalletConnect: true,
+            linkToProjectPageOnSuccess: false,
+            skipNetworkSelection: true,
+          })}
+      >
+        Claim new project
+      </Button>
+    </div>
+  {/snippet}
 </FormField>
 
 <DividerField />
@@ -255,12 +279,12 @@
   type="div"
   title="Project name*"
   description="Give your application a memorable name that describes it well."
-  disabled={currentStep < Step.ApplicationName}
+  disabled={currentStep < STEP_SEQUENCE.ApplicationName}
 >
   <TextInput
-    bind:value={$state.projectName}
+    bind:value={$applicationState.projectName}
     validationState={applicationNameValidationState}
-    disabled={currentStep < Step.ApplicationName}
+    disabled={currentStep < STEP_SEQUENCE.ApplicationName}
   />
 </FormField>
 
@@ -270,10 +294,10 @@
   type="div"
   title="Application category*"
   description="Select the category that best fits your project. Your selection will determine which questions you need to answer in the next step."
-  disabled={currentStep < Step.CategorySelection}
+  disabled={currentStep < STEP_SEQUENCE.CategorySelection}
 >
   <div class="list-select-wrapper">
-    <CategorySelector {categories} bind:selected={$state.categoryId} />
+    <CategorySelector {categories} bind:selected={$applicationState.categoryId} />
   </div>
 </FormField>
 
@@ -284,15 +308,15 @@
     type="div"
     title="Application form*"
     description="Fill out the application form. You can save your progress and come back later if you need more time."
-    disabled={currentStep < Step.FormFilling}
+    disabled={currentStep < STEP_SEQUENCE.FormFilling}
   >
     {#key selectedCategory.id + '-' + formForSelectedCategory.id}
       <RpgfApplicationForm
         {forceRevealErrors}
         bind:valid={formDataValid}
-        bind:answers={$state.answersByCategory[selectedCategory.id]}
+        bind:answers={$applicationState.answersByCategory[selectedCategory.id]}
         fields={formForSelectedCategory.fields}
-        disabled={currentStep < Step.FormFilling}
+        disabled={currentStep < STEP_SEQUENCE.FormFilling}
       />
     {/key}
   </FormField>

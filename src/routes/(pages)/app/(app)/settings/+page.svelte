@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import Setting from './components/setting.svelte';
@@ -24,8 +26,10 @@
 
   // Tick control
   const { slowMode } = tickStore;
-  $: slowModeEnabled = $slowMode;
-  $: tickStore.setSlowMode(slowModeEnabled);
+  let slowModeEnabled = $derived($slowMode);
+  run(() => {
+    tickStore.setSlowMode(slowModeEnabled);
+  });
 </script>
 
 <HeadMeta title="Settings" />
@@ -171,7 +175,7 @@
       title="Custom tokens"
       subtitle="Select which non-default tokens you want to use with Drips."
     >
-      <Button on:click={() => goto('/app/settings/custom-tokens')} icon={ListIcon}
+      <Button onclick={() => goto('/app/settings/custom-tokens')} icon={ListIcon}
         >Edit token list</Button
       >
     </Setting>
@@ -181,7 +185,7 @@
     >
       <Button
         disabled={$dismissablesStore.length === 0}
-        on:click={() => dismissablesStore.resetDismissables()}
+        onclick={() => dismissablesStore.resetDismissables()}
         icon={EyeOpen}>Reset hints</Button
       >
     </Setting>

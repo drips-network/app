@@ -4,7 +4,11 @@
   import formatDate from '$lib/utils/format-date';
   import type { VotingRound } from '$lib/utils/multiplayer/schemas';
 
-  export let votingRound: VotingRound;
+  interface Props {
+    votingRound: VotingRound;
+  }
+
+  let { votingRound }: Props = $props();
 </script>
 
 <FormField

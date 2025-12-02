@@ -4,28 +4,45 @@
   import type { z } from 'zod';
   import type { authorSchema } from '../../../../routes/api/blog/posts/schema';
 
-  export let title: string;
-  export let excerpt: string;
-  export let date: string;
-  export let slug: string;
-  export let coverImage: string;
-  export let coverImageAlt: string;
-  export let imageUrl: string | undefined = undefined;
-  export let author: z.infer<typeof authorSchema> | undefined = undefined;
+  interface Props {
+    title: string;
+    excerpt: string;
+    date: string;
+    slug: string;
+    coverImage: string;
+    coverImageAlt: string;
+    imageUrl?: string | undefined;
+    author?: z.infer<typeof authorSchema> | undefined;
+    compact?: boolean;
+    newTab?: boolean;
+    first?: boolean;
+    link?: boolean;
+    shareButton?: boolean;
+  }
 
-  export let compact = false;
-  export let newTab = false;
+  let {
+    title,
+    excerpt,
+    date,
+    slug,
+    coverImage,
+    coverImageAlt,
+    imageUrl = undefined,
+    author = undefined,
+    compact = false,
+    newTab = false,
+    first = false,
+    link = true,
+    shareButton = false,
+  }: Props = $props();
 
-  export let first = false;
-
-  export let link = true;
-  export let shareButton = false;
-
-  $: formattedDate = new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  let formattedDate = $derived(
+    new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+  );
 </script>
 
 <svelte:element

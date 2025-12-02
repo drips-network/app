@@ -6,7 +6,7 @@
   import Wallet from '../icons/Wallet.svelte';
   import { invalidateAll } from '$app/navigation';
 
-  let pending = false;
+  let pending = $state(false);
 
   const handleClick = async () => {
     pending = true;
@@ -36,6 +36,6 @@
   };
 </script>
 
-<Button loading={pending} variant="primary" icon={Wallet} on:click={handleClick}
+<Button loading={pending} variant="primary" icon={Wallet} onclick={handleClick}
   >{$walletStore.connected ? 'S' : 'Connect wallet & s'}ign in</Button
 >

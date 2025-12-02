@@ -1,5 +1,10 @@
-<script>
+<script lang="ts">
   import Star from '$lib/components/illustrations/star.svelte';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 </script>
 
 <div class="section-header">
@@ -7,7 +12,7 @@
     <Star />
   </div>
   <h1 class="content">
-    <slot />
+    {@render children?.()}
   </h1>
   <div class="illus">
     <Star />

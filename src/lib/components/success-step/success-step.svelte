@@ -13,14 +13,25 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let message: string | (() => string);
-  export let action: 'close' | 'hide-modal' | 'continue' | 'none' | 'link' = 'close';
-  export let href: string | (() => string) = '';
-  export let linkText = 'Continue';
-  export let onAction: (() => void) | undefined = undefined;
+  interface Props {
+    message: string | (() => string);
+    action?: 'close' | 'hide-modal' | 'continue' | 'none' | 'link';
+    href?: string | (() => string);
+    linkText?: string;
+    onAction?: (() => void) | undefined;
+    safeAppMode?: boolean;
+    safeDescription?: string | (() => string) | undefined;
+  }
 
-  export let safeAppMode = false;
-  export let safeDescription: string | (() => string) | undefined = undefined;
+  let {
+    message,
+    action = 'close',
+    href = '',
+    linkText = 'Continue',
+    onAction = undefined,
+    safeAppMode = false,
+    safeDescription = undefined,
+  }: Props = $props();
 
   function handleConfirm() {
     if (action === 'continue') {
@@ -48,13 +59,13 @@
       />
     {:else}
       <ConfettiOnClick alsoOnMount>
-        <svelte:fragment slot="label">
+        {#snippet label()}
           <CoinAnimation animateOnMount>
             <div class="circle">
               <Emoji size="huge" emoji="🎉" />
             </div>
           </CoinAnimation>
-        </svelte:fragment>
+        {/snippet}
 
         <Confetti
           x={[-1, 1]}
@@ -72,13 +83,13 @@
         description={typeof message === 'function' ? message() : message}
       />
     {/if}
-    <svelte:fragment slot="actions">
+    {#snippet actions()}
       {#if action === 'link'}
         <Button
           variant="primary"
           href={typeof href === 'function' ? href() : href}
           icon={ArrowRight}
-          on:click={() => {
+          onclick={() => {
             onAction?.();
             dispatch('conclude');
           }}
@@ -86,11 +97,11 @@
           {linkText}
         </Button>
       {:else if action !== 'none'}
-        <Button variant="primary" on:click={handleConfirm}
+        <Button variant="primary" onclick={handleConfirm}
           >{action === 'close' ? 'Got it' : 'Continue'}</Button
         >
       {/if}
-    </svelte:fragment>
+    {/snippet}
   </StepLayout>
 </div>
 

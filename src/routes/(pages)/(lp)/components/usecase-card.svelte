@@ -1,22 +1,50 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import BezierEasing from 'bezier-easing';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import isSafari from '$lib/utils/is-safari';
 
-  export let icon: ComponentType;
-  export let active = false;
-  export let tonedDown = false;
-  export let autoActive = true;
-  export let padHeight = false;
-  export let href: string;
+  interface Props {
+    icon: Component;
+    active?: boolean;
+    tonedDown?: boolean;
+    autoActive?: boolean;
+    padHeight?: boolean;
+    href: string;
+    headline?: import('svelte').Snippet;
+    description?: import('svelte').Snippet;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    illustration?: import('svelte').Snippet<[any]>;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
+  }
+
+  let {
+    icon,
+    active = $bindable(false),
+    tonedDown = false,
+    autoActive = true,
+    padHeight = false,
+    href,
+    headline,
+    description,
+    illustration,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+  }: Props = $props();
 
   function handleHover(hovering: boolean) {
     if (!autoActive) return;
 
     active = hovering;
+
+    if (hovering) {
+      onMouseEnter?.();
+    } else {
+      onMouseLeave?.();
+    }
   }
 
   const easing = BezierEasing(0.47, 0, 0.23, 2);
@@ -24,24 +52,23 @@
   // Super ugly but Safari just simply cannot handle blur effect transitions at all.
   // This is a dirty hack to mitigate that.
   const disableBlurs = isSafari();
+
+  const SvelteComponent = $derived(icon);
 </script>
 
 <div class="wrapper" class:pad-height={padHeight}>
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class:toned-down={tonedDown}
     class="usecase-card"
     class:pad-height={padHeight}
     class:active
-    on:mouseenter
-    on:mouseenter={() => handleHover(true)}
-    on:mouseleave
-    on:mouseleave={() => handleHover(false)}
+    onmouseenter={() => handleHover(true)}
+    onmouseleave={() => handleHover(false)}
     class:blurs={!disableBlurs}
   >
     <div class="icon">
-      <svelte:component
-        this={icon}
+      <SvelteComponent
         style="height: 2rem; width: 2rem; fill: {!tonedDown
           ? 'var(--color-primary)'
           : 'var(--color-primary-level-2)'}"
@@ -52,10 +79,10 @@
     </div>
     <div class="text">
       <h2 class="extra-bold">
-        <slot name="headline" />
+        {@render headline?.()}
       </h2>
       <p>
-        <slot name="description" />
+        {@render description?.()}
       </p>
       <div>
         {#if active}
@@ -66,7 +93,7 @@
       </div>
     </div>
     <div class="illustration">
-      <slot name="illustration" {active} />
+      {@render illustration?.({ active })}
     </div>
   </div>
 </div>

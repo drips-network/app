@@ -14,9 +14,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  $: formValid = $walletStore.connected;
+  let { context }: Props = $props();
+
+  let formValid = $derived($walletStore.connected);
 
   function verifyProject() {
     dispatch('await', {
@@ -35,12 +39,13 @@
   <FormField type="div" title="Project Owner Ethereum Address">
     <AccountBox />
   </FormField>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" on:click={verifyProject}
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button disabled={!formValid} icon={ArrowRightIcon} variant="primary" onclick={verifyProject}
       >Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

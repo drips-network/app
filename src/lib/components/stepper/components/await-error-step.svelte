@@ -5,7 +5,11 @@
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
 
-  export let message: string;
+  interface Props {
+    message: string;
+  }
+
+  let { message }: Props = $props();
 
   const dispatch = createEventDispatcher<{ retry: void }>();
 
@@ -19,7 +23,7 @@
   <p class="codeblock typo-text-mono">
     {message}
   </p>
-  <Button on:click={() => dispatch('retry')}>Back</Button>
+  <Button onclick={() => dispatch('retry')}>Back</Button>
   <a class="typo-text-small" target="_blank" href="https://discord.gg/BakDKKDpHF"
     >Ask for help on Discord ↗</a
   >

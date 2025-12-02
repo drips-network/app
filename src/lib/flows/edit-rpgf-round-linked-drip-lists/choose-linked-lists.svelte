@@ -15,17 +15,23 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let linkedDripLists: DripListItem['dripList'][];
-  export let roundId: string;
+  interface Props {
+    linkedDripLists: DripListItem['dripList'][];
+    roundId: string;
+  }
 
-  let items: Items = Object.fromEntries(
-    linkedDripLists.map((dripList) => [
-      dripList.account.accountId,
-      {
-        type: 'drip-list',
-        dripList,
-      },
-    ]),
+  let { linkedDripLists, roundId }: Props = $props();
+
+  let items: Items = $state(
+    Object.fromEntries(
+      linkedDripLists.map((dripList) => [
+        dripList.account.accountId,
+        {
+          type: 'drip-list',
+          dripList,
+        },
+      ]),
+    ),
   );
 
   function handleSubmit() {
@@ -57,9 +63,9 @@
     <ListEditor bind:items weightsMode={false} allowProjects={false} allowAddresses={false} />
   </FormField>
 
-  <svelte:fragment slot="actions">
-    <Button variant="primary" on:click={handleSubmit} icon={CheckCircle}>
+  {#snippet actions()}
+    <Button variant="primary" onclick={handleSubmit} icon={CheckCircle}>
       Update linked Drip Lists
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

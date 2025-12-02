@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let x = '0';
-  export let y = '0';
+  interface Props {
+    x?: string;
+    y?: string;
+  }
+
+  let { x = '0', y = '0' }: Props = $props();
 </script>
 
 <div class="sparkle" style:transform="translate({x}, {y})">

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { goto, invalidate } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
@@ -13,12 +15,16 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let roundId: string;
+  interface Props {
+    roundId: string;
+  }
 
-  let nameValue = '';
+  let { roundId }: Props = $props();
 
-  let nameValidationState: TextInputValidationState;
-  $: {
+  let nameValue = $state('');
+
+  let nameValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
+  run(() => {
     if (nameValue.length === 0) {
       nameValidationState = { type: 'unvalidated' };
     } else if (nameValue.length > 255) {
@@ -26,7 +32,7 @@
     } else {
       nameValidationState = { type: 'valid' };
     }
-  }
+  });
 
   function handleCreate() {
     dispatch('await', {
@@ -38,7 +44,6 @@
         });
 
         await invalidate('rpgf:round:applications:categories-and-forms');
-        dispatch('conclude');
         await goto(`/app/rpgf/rounds/${roundId}/settings/application/forms/${createdForm.id}`);
       },
     });
@@ -55,13 +60,13 @@
 
   <AnnotationBox type="info">You can add fields to the form after creating it.</AnnotationBox>
 
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button
       variant="primary"
       disabled={nameValidationState.type !== 'valid'}
       type="submit"
       icon={CheckCircle}
-      on:click={handleCreate}>Create form</Button
+      onclick={handleCreate}>Create form</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

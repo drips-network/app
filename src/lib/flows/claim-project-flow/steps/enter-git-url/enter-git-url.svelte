@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import { gql } from 'graphql-request';
 
@@ -54,15 +54,19 @@
   import modal from '$lib/stores/modal';
   import { loadFundingInfo } from './enter-git-url';
 
-  export let context: Writable<State>;
-  export let projectUrl: string | undefined = undefined;
-  export let showBackButton: boolean = true;
+  interface Props {
+    context: Writable<State>;
+    projectUrl?: string | undefined;
+    showBackButton?: boolean;
+  }
+
+  let { context, projectUrl = undefined, showBackButton = true }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  let validationState: TextInputValidationState = { type: 'unvalidated' };
+  let validationState = $state<TextInputValidationState>({ type: 'unvalidated' });
 
-  $: formValid = validationState.type === 'valid';
+  let formValid = $derived(validationState.type === 'valid');
 
   const { searchParams } = $page.url;
   const projectUrlToAdd = projectUrl ?? searchParams.get('projectToAdd') ?? undefined;
@@ -74,7 +78,7 @@
     }
   });
 
-  let claimingRenamedRepoOriginalName: string | undefined;
+  let claimingRenamedRepoOriginalName: string | undefined = $state();
 
   const projectQuery = gql`
     ${CLAIM_PROJECT_FLOW_PROJECT_FRAGMENT}
@@ -250,10 +254,11 @@
     }
   }
 
-  $: inputSubmittable =
+  let inputSubmittable = $derived(
     isSupportedGitUrl($context.gitUrl) &&
-    validationState.type !== 'valid' &&
-    validationState.type !== 'pending';
+      validationState.type !== 'valid' &&
+      validationState.type !== 'pending',
+  );
 
   async function onPaste() {
     // need to wait some time for value to be available ¯\_(ツ)_/¯
@@ -286,9 +291,9 @@
     disabled={validationState.type === 'valid' || validationState.type === 'pending'}
     {validationState}
     showClearButton={$context.gitUrl.length > 0 && validationState.type !== 'pending'}
-    on:clear={clearProject}
-    on:keydown={(e) => e.key === 'Enter' && submitInput()}
-    on:paste={onPaste}
+    onclear={clearProject}
+    onkeydown={(e) => e.key === 'Enter' && submitInput()}
+    onpaste={onPaste}
   />
   {#if $context.project && validationState.type === 'valid'}
     <UnclaimedProjectCard
@@ -307,21 +312,22 @@
       </AnnotationBox>
     {/if}
   {/if}
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if formValid}
-      <Button icon={ArrowRightIcon} variant="primary" on:click={goForward}>Continue</Button>
+      <Button icon={ArrowRightIcon} variant="primary" onclick={goForward}>Continue</Button>
     {:else}
       <Button
         disabled={!inputSubmittable}
         icon={MagnifyingGlass}
         variant="primary"
-        on:click={() => submitInput()}>Search</Button
+        onclick={() => submitInput()}>Search</Button
       >
     {/if}
-  </svelte:fragment>
-  <svelte:fragment slot="left-actions">
+  {/snippet}
+
+  {#snippet left_actions()}
     {#if showBackButton}
-      <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
+      <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
     {/if}
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

@@ -10,13 +10,17 @@
   import EcosystemDistributionDependencies from './ecosystem-distribution-dependencies.svelte';
   import formatNumber from '$lib/utils/format-number';
 
-  export let ecosystem: Ecosystem;
-  export let full: boolean = false;
+  interface Props {
+    ecosystem: Ecosystem;
+    full?: boolean;
+  }
+
+  let { ecosystem, full = false }: Props = $props();
 
   interface DistributionTableRow {
-    projectProps: ComponentProps<EcosystemDistributionProject>;
-    weightProps: ComponentProps<EcosystemDistributionWeight>;
-    dependenciesProps: ComponentProps<EcosystemDistributionDependencies>;
+    projectProps: ComponentProps<typeof EcosystemDistributionProject>;
+    weightProps: ComponentProps<typeof EcosystemDistributionWeight>;
+    dependenciesProps: ComponentProps<typeof EcosystemDistributionDependencies>;
   }
 
   const ROW_COUNT = full ? Infinity : 6;
@@ -71,8 +75,8 @@
     },
   ];
 
-  $: restCount = formatNumber(Math.max(ecosystem.graph.nodes.length - ROW_COUNT, 0));
-  $: hasEnoughForShadow = restCount !== '0';
+  let restCount = $derived(formatNumber(Math.max(ecosystem.graph.nodes.length - ROW_COUNT, 0)));
+  let hasEnoughForShadow = $derived(restCount !== '0');
 </script>
 
 <div class="ecosystem-distribution">

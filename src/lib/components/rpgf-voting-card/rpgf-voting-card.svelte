@@ -22,20 +22,24 @@
   import { goto, invalidate } from '$app/navigation';
   import type { BallotValidationErrorsStore } from '$lib/utils/rpgf/ballot-validation-context';
 
-  export let ballot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
-  export let round: Round;
-  export let previouslyCastBallot: WrappedBallot | null;
-  export let ballotValidationErrors: BallotValidationErrorsStore;
+  interface Props {
+    ballot: Writable<InProgressBallot> & {
+      clear: () => void;
+    };
+    round: Round;
+    previouslyCastBallot: WrappedBallot | null;
+    ballotValidationErrors: BallotValidationErrorsStore;
+  }
+
+  let { ballot, round, previouslyCastBallot, ballotValidationErrors }: Props = $props();
 
   const guidelinesDismissbleId = `rpgf-${round.urlSlug}-guidelines-seen`;
-  $: voterGuidelinesSeen = round.voterGuidelinesLink
-    ? $dismissablesStore.includes(guidelinesDismissbleId)
-    : true;
+  let voterGuidelinesSeen = $derived(
+    round.voterGuidelinesLink ? $dismissablesStore.includes(guidelinesDismissbleId) : true,
+  );
 
-  let voteStep: 'build-ballot' | 'assign-votes' | null = null;
-  $: {
+  let voteStep: 'build-ballot' | 'assign-votes' | null = $state(null);
+  $effect(() => {
     if (!voterGuidelinesSeen) {
       voteStep = null;
     } else if ($page.url.pathname.includes('/applications/ballot')) {
@@ -45,15 +49,19 @@
     } else {
       voteStep = null;
     }
-  }
+  });
 
-  $: ballotHasEntries = Object.keys($ballot).length > 0;
+  let ballotHasEntries = $derived(Object.keys($ballot).length > 0);
 
-  $: amountOfVotesAssigned = Object.values($ballot)
-    .filter((vote) => vote !== null)
-    .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0);
-  $: percentageOfVotesAssigned = amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable());
-  $: hasValidationErrors = $ballotValidationErrors.size > 0;
+  let amountOfVotesAssigned = $derived(
+    Object.values($ballot)
+      .filter((vote) => vote !== null)
+      .reduce<number>((acc, vote) => acc + Number(vote ?? 0), 0),
+  );
+  let percentageOfVotesAssigned = $derived(
+    amountOfVotesAssigned / (round.maxVotesPerVoter ?? unreachable()),
+  );
+  let hasValidationErrors = $derived($ballotValidationErrors.size > 0);
 
   async function handleSubmitBallot() {
     if (hasValidationErrors) {
@@ -63,15 +71,16 @@
     modal.show(Stepper, undefined, submitRpgfBallotFlowSteps(ballot, round));
   }
 
-  $: localStoredBallotIsDifferentFromRemote =
+  let localStoredBallotIsDifferentFromRemote = $derived(
     previouslyCastBallot === null
       ? ballotHasEntries
       : Object.keys($ballot).length !== Object.keys(previouslyCastBallot.ballot).length ||
-        Object.entries($ballot).some(
-          ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
-        );
+          Object.entries($ballot).some(
+            ([appId, votes]) => previouslyCastBallot.ballot[appId] !== votes,
+          ),
+  );
 
-  let clearingLocalBallot = false;
+  let clearingLocalBallot = $state(false);
   async function clearLocalBallotHandler() {
     await doWithConfirmationModal(
       previouslyCastBallot
@@ -90,7 +99,7 @@
     );
   }
 
-  let shiftKeyPressed = false;
+  let shiftKeyPressed = $state(false);
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Shift') {
       shiftKeyPressed = true;
@@ -103,7 +112,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
+<svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
 
 <div class="voting-card">
   <h5>Voting</h5>
@@ -112,12 +121,12 @@
     <AnnotationBox type="info">
       We're saving your progress locally on your browser. You can leave this page and come back
       later to continue voting.
-      <svelte:fragment slot="actions">
+      {#snippet actions()}
         <Button
           variant="primary"
-          on:click={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
+          onclick={() => dismissablesStore.dismiss('rpgf-we-save-ur-ballot')}>Sounds good</Button
         >
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   {/if}
 
@@ -125,11 +134,11 @@
     <AnnotationBox type="warning">
       Changes to your ballot have not yet been submitted.
 
-      <svelte:fragment slot="actions">
-        <Button on:click={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
+      {#snippet actions()}
+        <Button onclick={() => clearLocalBallotHandler()} loading={clearingLocalBallot}
           >Clear changes</Button
         >
-      </svelte:fragment>
+      {/snippet}
     </AnnotationBox>
   {/if}
 
@@ -164,12 +173,17 @@
             >
             <Button
               variant="normal"
-              on:click={() => dismissablesStore.dismiss(guidelinesDismissbleId)}
+              onclick={() => dismissablesStore.dismiss(guidelinesDismissbleId)}
               >Confirm & continue</Button
             >
           </div>
         {:else}
-          <Button variant="ghost" icon={ArrowBoxUpRight}>Review voter guidelines</Button>
+          <Button
+            variant="ghost"
+            href={buildExternalUrl(round.voterGuidelinesLink)}
+            target="_blank"
+            icon={ArrowBoxUpRight}>Review voter guidelines</Button
+          >
         {/if}
       </div>
 
@@ -215,7 +229,7 @@
           <Button
             icon={File}
             href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
-            on:click={(e) => {
+            onclick={(e) => {
               e.preventDefault();
               modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
             }}>Vote using spreadsheet</Button
@@ -273,7 +287,7 @@
                 (Boolean(previouslyCastBallot) &&
                   !shiftKeyPressed &&
                   !localStoredBallotIsDifferentFromRemote)}
-              on:click={(e) => {
+              onclick={(e) => {
                 e.preventDefault();
                 handleSubmitBallot();
               }}
@@ -297,7 +311,7 @@
             <Button
               icon={File}
               href="/app/rpgf/rounds/{round.urlSlug}/applications/ballot"
-              on:click={(e) => {
+              onclick={(e) => {
                 e.preventDefault();
                 modal.show(Stepper, undefined, rpgfSpreadsheetVoteFlowSteps(round, ballot));
               }}

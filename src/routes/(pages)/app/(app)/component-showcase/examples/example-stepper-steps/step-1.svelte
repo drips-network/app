@@ -3,7 +3,11 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
 
-  export let testProp: string;
+  interface Props {
+    testProp: string;
+  }
+
+  let { testProp }: Props = $props();
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -23,4 +27,4 @@
 
 <p>Test prop: {testProp}</p>
 
-<Button on:click={goForward}>Next</Button>
+<Button onclick={goForward}>Next</Button>

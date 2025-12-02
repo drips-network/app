@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT } from '$lib/utils/current-amounts';
   import { gql } from 'graphql-request';
 
@@ -17,6 +17,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import TokensIcon from '$lib/components/icons/Coin.svelte';
   import Table, { type RowClickEventPayload } from '$lib/components/table/table.svelte';
   import { getCoreRowModel, type ColumnDef, type TableOptions } from '@tanstack/svelte-table';
@@ -37,33 +39,43 @@
   import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
 
   interface TokenTableRow {
-    token: ComponentProps<Token>;
-    earnings: ComponentProps<RealtimeAmount>;
-    streaming: ComponentProps<RealtimeAmount>;
+    token: ComponentProps<typeof Token>;
+    earnings: ComponentProps<typeof RealtimeAmount>;
+    streaming: ComponentProps<typeof RealtimeAmount>;
   }
 
-  export let userBalances: UserBalancesFragment[];
+  interface Props {
+    userBalances: UserBalancesFragment[];
+    accountId: string | undefined;
+    disableActions?: boolean;
+    collapsed?: boolean;
+    collapsable?: boolean;
+  }
 
-  export let accountId: string | undefined;
-  export let disableActions = true;
+  let {
+    userBalances,
+    accountId,
+    disableActions = true,
+    collapsed = $bindable(false),
+    collapsable = $bindable(false),
+  }: Props = $props();
 
-  export let collapsed = false;
-  export let collapsable = false;
-
-  let tableData: TokenTableRow[] = [];
-  $: tableData = userBalances.map((balance) => ({
-    token: {
-      address: balance.tokenAddress,
-    },
-    earnings: {
-      tokenAddress: balance.tokenAddress,
-      timeline: balance.incoming,
-    },
-    streaming: {
-      tokenAddress: balance.tokenAddress,
-      timeline: balance.outgoing,
-    },
-  }));
+  let tableData: TokenTableRow[] = $state([]);
+  run(() => {
+    tableData = userBalances.map((balance) => ({
+      token: {
+        address: balance.tokenAddress,
+      },
+      earnings: {
+        tokenAddress: balance.tokenAddress,
+        timeline: balance.incoming,
+      },
+      streaming: {
+        tokenAddress: balance.tokenAddress,
+        timeline: balance.outgoing,
+      },
+    }));
+  });
 
   function buildTableColumns(isClickable = false): ColumnDef<TokenTableRow>[] {
     return [
@@ -103,20 +115,19 @@
       },
     ];
   }
-  $: isSelf = accountId === $wallet.dripsAccountId;
-  $: tableColumns = buildTableColumns(isSelf);
+  let isSelf = $derived(accountId === $wallet.dripsAccountId);
+  let tableColumns = $derived(buildTableColumns(isSelf));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let options: TableOptions<any>;
-  $: options = {
+  let options: TableOptions<any> = $derived({
     data: tableData,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-  };
+  });
 
-  function onRowClick(event: CustomEvent<RowClickEventPayload>) {
+  function onRowClick(event: RowClickEventPayload) {
     // go to token page by address
-    const tokenAddress = tableData[event.detail.rowIndex].token.address;
+    const tokenAddress = tableData[event.rowIndex].token.address;
     assert(accountId);
     const address = extractAddressFromAccountId(accountId);
     goto(`/app/${address ?? unreachable()}/tokens/${tokenAddress}`);
@@ -129,6 +140,9 @@
   header={{
     label: 'Balances',
     icon: TokensIcon,
+    infoTooltip: isSelf
+      ? 'When you receive or top up tokens, they appear here. Add funds to begin streaming to Drip Lists.'
+      : undefined,
     actions:
       disableActions || !isSelf
         ? []
@@ -150,5 +164,5 @@
     empty: tableData.length === 0,
   }}
 >
-  <Table {options} isRowClickable={isSelf} on:rowClick={onRowClick} />
+  <Table {options} isRowClickable={isSelf} {onRowClick} />
 </Section>

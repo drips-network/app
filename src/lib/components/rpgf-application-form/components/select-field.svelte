@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
@@ -7,40 +9,53 @@
     ApplicationSelectField,
   } from '$lib/utils/rpgf/types/application';
 
-  export let field: ApplicationSelectField;
-  export let answer: ApplicationSelectAnswerDto | undefined = undefined;
-  export let valid: boolean = false;
-  export let forceRevealError: boolean | undefined = undefined;
-  export let blockInteraction: boolean = false;
+  interface Props {
+    field: ApplicationSelectField;
+    answer?: ApplicationSelectAnswerDto | undefined;
+    valid?: boolean;
+    forceRevealError?: boolean | undefined;
+    blockInteraction?: boolean;
+  }
 
-  let items: Items;
-  $: items = Object.fromEntries(
-    field.options.map((option) => {
-      return [
-        option.value,
-        {
-          type: 'selectable',
-          label: option.label,
-        },
-      ];
-    }),
+  let {
+    field,
+    answer = $bindable(),
+    valid = $bindable(),
+    forceRevealError = undefined,
+    blockInteraction = false,
+  }: Props = $props();
+
+  let items: Items = $derived(
+    Object.fromEntries(
+      field.options.map((option) => {
+        return [
+          option.value,
+          {
+            type: 'selectable',
+            label: option.label,
+          },
+        ];
+      }),
+    ),
   );
 
   let beenFocussed = false;
 
-  let selected: string[] = answer ? [...(answer.value ?? [])] : [];
-  $: answer = {
-    fieldId: field.id,
-    value: selected,
-  };
+  let selected: string[] = $state(answer ? [...(answer.value ?? [])] : []);
+  run(() => {
+    answer = {
+      fieldId: field.id,
+      value: selected,
+    };
+  });
 
-  $: {
+  run(() => {
     if (field.required) {
       valid = answer !== undefined && (answer.value ?? []).length > 0;
     } else {
       valid = true;
     }
-  }
+  });
 </script>
 
 <FormField

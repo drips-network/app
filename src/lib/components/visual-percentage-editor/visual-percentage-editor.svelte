@@ -1,21 +1,23 @@
 <script lang="ts">
-  import { onMount, type ComponentType } from 'svelte';
+  import { run } from 'svelte/legacy';
+
+  import { onMount, type Component } from 'svelte';
   import Knob from './components/knob.svelte';
   import PercentageEditor from '../percentage-editor/percentage-editor.svelte';
 
   const MIN_ITEM_WIDTH_PX = 48;
 
-  export let items: { id: string; label: string; overflowIcon: ComponentType }[];
+  interface Props {
+    items: { id: string; label: string; overflowIcon: Component }[];
+    percentages: { [id: string]: number };
+  }
 
-  /** The last item provided always takes the remainder of all previous percentages. */
-  $: remainderItem = items[items.length - 1];
+  let { items, percentages = $bindable() }: Props = $props();
 
-  export let percentages: { [id: string]: number };
-
-  let blocksElem: HTMLDivElement;
+  let blocksElem: HTMLDivElement | undefined = $state();
   let blocksElemWidth: number;
 
-  let percentageElems: { [id: string]: number } | undefined = undefined;
+  let percentageElems: { [id: string]: number } | undefined = $state(undefined);
 
   function updatePercentageElemsBasedOnPercentages() {
     percentageElems = Object.fromEntries(
@@ -30,26 +32,21 @@
 
   onMount(() => {
     const resizeObserver = new ResizeObserver(() => {
+      if (!blocksElem) return;
       blocksElemWidth = blocksElem.offsetWidth - 16;
 
       updatePercentageElemsBasedOnPercentages();
     });
 
-    resizeObserver.observe(blocksElem);
+    if (blocksElem) resizeObserver.observe(blocksElem);
 
     return () => resizeObserver.disconnect();
   });
 
-  let blockDivs: { [id: string]: HTMLDivElement } = {};
-
-  $: overflownBlockDivs =
-    percentageElems &&
-    Object.fromEntries(
-      Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
-    );
+  let blockDivs: { [id: string]: HTMLDivElement } = $state({});
 
   let dragging = false;
-  let draggingIndex: number | undefined;
+  let draggingIndex: number | undefined = $state();
   let startDraggingAtXPos: number | undefined;
 
   function startDragging(itemIndex: number, e: MouseEvent) {
@@ -148,7 +145,7 @@
     document.removeEventListener('mouseup', stopDragging);
   }
 
-  let percentageInputValues: { [id: string]: number } = {};
+  let percentageInputValues: { [id: string]: number } = $state({});
 
   let prevPercentages: { [id: string]: number } = {};
   function updatePercentageInputs(percentages: { [id: string]: number }) {
@@ -156,8 +153,6 @@
 
     prevPercentages = { ...percentages };
   }
-
-  $: updatePercentageInputs(percentages);
 
   function handleConfirmPercentageInput(id: string) {
     const percentagesWithoutRemainder = Object.fromEntries(
@@ -189,6 +184,17 @@
 
     updatePercentageElemsBasedOnPercentages();
   }
+  /** The last item provided always takes the remainder of all previous percentages. */
+  let remainderItem = $derived(items[items.length - 1]);
+  let overflownBlockDivs = $derived(
+    percentageElems &&
+      Object.fromEntries(
+        Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
+      ),
+  );
+  run(() => {
+    updatePercentageInputs(percentages);
+  });
 </script>
 
 <div class="visual-percentage-editor">
@@ -204,9 +210,9 @@
               {items[index].label}
             </h4>
             {#if overflownBlockDivs && id in overflownBlockDivs}
+              {@const SvelteComponent = items[index].overflowIcon}
               <div class="overflown-icon">
-                <svelte:component
-                  this={items[index].overflowIcon}
+                <SvelteComponent
                   style="fill: {percentages[id] === 0
                     ? 'var(--color-foreground-level-5)'
                     : 'var(--color-foreground)'}"
@@ -215,8 +221,8 @@
             {/if}
           </div>
           {#if index !== Object.keys(percentageElems).length - 1}
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div class="knob" on:mousedown={(e) => startDragging(index, e)}>
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div class="knob" onmousedown={(e) => startDragging(index, e)}>
               <Knob dragging={draggingIndex === index} />
             </div>
             <div class="percentage-input">

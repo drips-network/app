@@ -14,6 +14,7 @@
 <div class="network-list">
   {#each networksToShow as { chainId, label, icon, color, isTestnet }}
     {@const colorRgb = hexToRgb(color)}
+    {@const SvelteComponent = icon}
     <a href={getChainDeploymentUrl(chainId)} class="network-item">
       <div
         class="network-icon"
@@ -21,7 +22,7 @@
         style:background="rgba({colorRgb?.r}, {colorRgb?.g}, {colorRgb?.b}, 0.2)"
       >
         <div style:position="relative">
-          <svelte:component this={icon} />
+          <SvelteComponent />
           {#if isTestnet}
             <div class="testnet-frame"><TestnetFrame /></div>
           {/if}

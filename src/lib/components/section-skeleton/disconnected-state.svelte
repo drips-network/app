@@ -5,20 +5,29 @@
   import Button from '../button/button.svelte';
   import RpgfSiweButton from '../rpgf-siwe-button/rpgf-siwe-button.svelte';
 
-  export let emoji: string = '🫙';
-  export let headline: string | undefined = 'You are disconnected';
-  export let text: string | undefined = 'Please connect your wallet to see this section.';
-  export let requireRpgfSignIn = false;
+  interface Props {
+    emoji?: string;
+    headline?: string | undefined;
+    text?: string | undefined;
+    requireRpgfSignIn?: boolean;
+  }
+
+  let {
+    emoji = '🫙',
+    headline = 'You are disconnected',
+    text = 'Please connect your wallet to see this section.',
+    requireRpgfSignIn = false,
+  }: Props = $props();
 </script>
 
 <ActionableEmptyState {emoji} {headline} description={text}>
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if requireRpgfSignIn && $wallet.signer}
       <RpgfSiweButton />
     {:else}
-      <Button icon={Wallet} variant="primary" on:click={() => wallet.connect()}>
+      <Button icon={Wallet} variant="primary" onclick={() => wallet.connect()}>
         Connect wallet
       </Button>
     {/if}
-  </svelte:fragment>
+  {/snippet}
 </ActionableEmptyState>

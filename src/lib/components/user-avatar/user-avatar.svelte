@@ -1,12 +1,20 @@
 <script lang="ts">
-  export let src: string | undefined = undefined;
-  export let placeholderSrc: string | undefined = undefined;
-  export let size = 24;
+  interface Props {
+    src?: string | undefined;
+    placeholderSrc?: string | undefined;
+    size?: number;
+    imgElem?: HTMLImageElement | undefined;
+  }
 
-  export let imgElem: HTMLImageElement | undefined = undefined;
+  let {
+    src = undefined,
+    placeholderSrc = undefined,
+    size = 24,
+    imgElem = $bindable(),
+  }: Props = $props();
 
-  let loaded = false;
-  let error = false;
+  let loaded = $state(false);
+  let error = $state(false);
 </script>
 
 <div class="avatar" style:height={size + 'px'} style:width={size + 'px'}>
@@ -15,8 +23,8 @@
       bind:this={imgElem}
       alt="user avatar"
       {src}
-      on:load={() => (loaded = true)}
-      on:error={() => (error = true)}
+      onload={() => (loaded = true)}
+      onerror={() => (error = true)}
     />
   {/if}
   <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />

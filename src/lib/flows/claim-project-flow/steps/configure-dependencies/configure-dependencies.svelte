@@ -22,9 +22,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let formValid: boolean;
+  let { context }: Props = $props();
+
+  let formValid: boolean = $state(false);
 
   onMount(async () => {
     if ($context.highLevelPercentages['dependencies'] === 0) {
@@ -32,7 +36,7 @@
     }
   });
 
-  $: maintainerKeys = Object.keys($context.maintainerSplits.items);
+  let maintainerKeys = $derived(Object.keys($context.maintainerSplits.items));
 
   function handleImportCSV() {
     dispatch(
@@ -97,19 +101,20 @@
       )}
       maxItems={DEFAULT_MAX_ENTRIES - maintainerKeys.length}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {#snippet action()}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeftIcon} on:click={goBackward}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeftIcon} onclick={goBackward}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
     <Button
       disabled={!formValid}
       icon={ArrowRightIcon}
       variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+      onclick={() => dispatch('goForward')}>Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

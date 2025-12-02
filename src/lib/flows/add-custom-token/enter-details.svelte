@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StepHeader from '$lib/components/step-header/step-header.svelte';
@@ -17,23 +19,28 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let tokenAddress = '';
-  let tokenAddressValidationState: TextInputValidationState = { type: 'unvalidated' };
+  interface Props {
+    tokenAddress?: string;
+  }
 
-  let tokenName: string | undefined = undefined;
-  let tokenSymbol: string | undefined = undefined;
-  let tokenDecimals: number | undefined = undefined;
-  let tokenLogoUrl: string | undefined = undefined;
+  let { tokenAddress = $bindable('') }: Props = $props();
+  let tokenAddressValidationState = $state<TextInputValidationState>({ type: 'unvalidated' });
 
-  $: urlValid = tokenLogoUrl ? validateUrl(tokenLogoUrl) : true;
+  let tokenName: string | undefined = $state(undefined);
+  let tokenSymbol: string | undefined = $state(undefined);
+  let tokenDecimals: number | undefined = $state(undefined);
+  let tokenLogoUrl: string | undefined = $state(undefined);
 
-  $: formValid =
+  let urlValid = $derived(tokenLogoUrl ? validateUrl(tokenLogoUrl) : true);
+
+  let formValid = $derived(
     tokenAddressValidationState.type === 'valid' &&
-    tokenName &&
-    tokenSymbol &&
-    tokenDecimals &&
-    tokenDecimals > 0 &&
-    urlValid;
+      tokenName &&
+      tokenSymbol &&
+      tokenDecimals &&
+      tokenDecimals > 0 &&
+      urlValid,
+  );
 
   async function updateTokenInfo() {
     tokenAddressValidationState = { type: 'pending' };
@@ -71,7 +78,7 @@
     }
   }
 
-  $: {
+  run(() => {
     if (!tokenAddress || tokenAddress === '') {
       tokenAddressValidationState = { type: 'unvalidated' };
     } else if (isAddress(tokenAddress) && tokens.getByAddress(tokenAddress) !== undefined) {
@@ -87,7 +94,7 @@
         message: 'Please enter a valid Ethereum address',
       };
     }
-  }
+  });
 
   function submit() {
     assert(tokenAddress && tokenName && tokenDecimals && tokenSymbol);
@@ -132,10 +139,10 @@
   <FormField title="Token logo URL">
     <TextInput placeholder="https://foo.com/token.png" bind:value={tokenLogoUrl} />
   </FormField>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
-    <Button variant="primary" disabled={!formValid} on:click={submit}>Add custom token</Button>
-  </svelte:fragment>
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+    <Button variant="primary" disabled={!formValid} onclick={submit}>Add custom token</Button>
+  {/snippet}
 </StepLayout>
 
 <style>

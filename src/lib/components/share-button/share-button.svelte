@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import ShareIcon from '$lib/components/icons/Sharrow.svelte';
   import Button from '../button/button.svelte';
   import { type ComponentProps } from 'svelte';
@@ -7,17 +9,27 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { browser } from '$app/environment';
 
-  export let text: string | undefined = undefined;
-  export let url: string;
-  export let disabled = false;
-  export let downloadableImageUrl: string = '';
-  export let shareModalText: string | undefined = undefined;
-  export let buttonVariant: ComponentProps<Button>['variant'] = 'ghost';
-  export let supportButtonOptions:
-    | Parameters<typeof shareSteps>[0]['supportButtonOptions']
-    | undefined = undefined;
+  interface Props {
+    text?: string | undefined;
+    url: string;
+    disabled?: boolean;
+    downloadableImageUrl?: string;
+    shareModalText?: string | undefined;
+    buttonVariant?: ComponentProps<typeof Button>['variant'];
+    supportButtonOptions?: Parameters<typeof shareSteps>[0]['supportButtonOptions'] | undefined;
+    shareLabel?: string;
+  }
 
-  export let shareLabel = 'Share';
+  let {
+    text = undefined,
+    url,
+    disabled = false,
+    downloadableImageUrl = '',
+    shareModalText = undefined,
+    buttonVariant = 'ghost',
+    supportButtonOptions = undefined,
+    shareLabel = 'Share',
+  }: Props = $props();
 
   async function preloadImage(url: string) {
     try {
@@ -31,7 +43,9 @@
     }
   }
 
-  $: browser && downloadableImageUrl && preloadImage(downloadableImageUrl);
+  run(() => {
+    browser && downloadableImageUrl && preloadImage(downloadableImageUrl);
+  });
 
   function handleClick() {
     modal.show(
@@ -48,7 +62,7 @@
   }
 </script>
 
-<Button {disabled} variant={buttonVariant} on:click={handleClick}>
+<Button {disabled} variant={buttonVariant} onclick={handleClick}>
   <div class="button-inner">
     <ShareIcon style="fill:currentColor" />
     {shareLabel}

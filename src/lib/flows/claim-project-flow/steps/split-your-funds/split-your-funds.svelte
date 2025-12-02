@@ -14,7 +14,11 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
+
+  let { context }: Props = $props();
 
   const formValid = true;
 </script>
@@ -42,17 +46,18 @@
     <InfoCircle style="fill: var(--color-foreground-level-6)" />
     <p class="typo-text-small">You’ll list your maintainers and dependencies in the next step.</p>
   </div>
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
+
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
     <Button
       disabled={!formValid}
       icon={ArrowRight}
       variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+      onclick={() => dispatch('goForward')}>Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>

@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   interface SuccessfulEvent {
     success: true;
   }
@@ -13,18 +13,27 @@
 
 <script lang="ts">
   import Spinner from '$lib/components/spinner/spinner.svelte';
-  import { createEventDispatcher, onMount, type ComponentType } from 'svelte';
+  import { createEventDispatcher, onMount, type Component } from 'svelte';
   import type { UpdateAwaitStepFn } from '../types';
   import { isHttpError } from '@sveltejs/kit';
 
   const dispatch = createEventDispatcher<{ result: Result }>();
 
-  export let message: string;
-  export let subtitle: string | undefined = undefined;
-  export let link: { url: string; label: string } | undefined = undefined;
-  export let icon: { component: ComponentType; props: Record<string, unknown> } | undefined =
-    undefined;
-  export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  interface Props {
+    message: string;
+    subtitle?: string | undefined;
+    link?: { url: string; label: string } | undefined;
+    icon?: { component: Component; props: Record<string, unknown> } | undefined;
+    promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
+  }
+
+  let {
+    message = $bindable(),
+    subtitle = $bindable(),
+    link = $bindable(),
+    icon = $bindable(),
+    promise,
+  }: Props = $props();
 
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;
@@ -72,7 +81,7 @@
 
 <div class="await-step">
   {#if icon}
-    <svelte:component this={icon.component} {...icon.props} />
+    <icon.component {...icon.props} />
   {:else}
     <Spinner />
   {/if}

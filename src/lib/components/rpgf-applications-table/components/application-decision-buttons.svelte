@@ -1,11 +1,18 @@
 <script lang="ts">
+  import { createBubbler, stopPropagation } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import ThumbsDown from '$lib/components/icons/ThumbsDown.svelte';
   import ThumbsUp from '$lib/components/icons/ThumbsUp.svelte';
 
-  export let applicationId: string;
-  export let decision: 'approve' | 'reject' | null = null;
+  interface Props {
+    applicationId: string;
+    decision?: 'approve' | 'reject' | null;
+  }
 
-  $: checkboxSlugPrefix = `application-decision-${applicationId}`;
+  let { applicationId, decision = $bindable() }: Props = $props();
+
+  let checkboxSlugPrefix = $derived(`application-decision-${applicationId}`);
 
   function handleDecisionClick(clickedDecision: 'approve' | 'reject') {
     if (decision === clickedDecision) {
@@ -16,20 +23,20 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   role="group"
   aria-label="Application decision"
   class="application-decision-buttons"
-  on:click|stopPropagation
+  onclick={stopPropagation(bubble('click'))}
 >
   <input
     type="checkbox"
     value="reject"
     checked={decision === 'reject'}
     id="{checkboxSlugPrefix}-reject"
-    on:click={() => handleDecisionClick('reject')}
+    onclick={() => handleDecisionClick('reject')}
   />
   <label
     class:rejected={decision === 'reject'}
@@ -44,7 +51,7 @@
     value="approve"
     checked={decision === 'approve'}
     id="{checkboxSlugPrefix}-approve"
-    on:click={() => handleDecisionClick('approve')}
+    onclick={() => handleDecisionClick('approve')}
   />
   <label
     class:approved={decision === 'approve'}

@@ -28,16 +28,29 @@
   import { invalidate } from '$app/navigation';
   import { clearLocallyStoredApplication } from '../../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
 
-  export let context: Writable<{ applicationId: string | null }>;
-  export let applicationData: CreateApplicationDto;
-  export let formFields: ApplicationFormFields;
-  export let roundId: string;
-  export let roundSlug: string;
-  export let roundName: string;
-  export let userId: string;
-  export let categoryName: string;
+  interface Props {
+    context: Writable<{ applicationId: string | null }>;
+    applicationData: CreateApplicationDto;
+    formFields: ApplicationFormFields;
+    roundId: string;
+    roundSlug: string;
+    roundName: string;
+    userId: string;
+    categoryName: string;
+    isUpdateForApplication: Application | null;
+  }
 
-  export let isUpdateForApplication: Application | null;
+  let {
+    context,
+    applicationData,
+    formFields,
+    roundId,
+    roundSlug,
+    roundName,
+    userId,
+    categoryName,
+    isUpdateForApplication,
+  }: Props = $props();
 
   type SubmissionExtras = {
     attestationUID?: string;
@@ -219,7 +232,9 @@
     });
   }
 
-  $: shouldAttest = network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled;
+  let shouldAttest = $derived(
+    network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled,
+  );
 
   function handleConfirm() {
     if (shouldAttest) {
@@ -268,16 +283,16 @@
       > for further information.
     </p>
   </div>
-  <svelte:fragment slot="actions">
-    <Button on:click={() => dispatch('conclude')} variant="ghost">Never mind</Button>
-    <Button icon={shouldAttest ? Wallet : CheckCircle} on:click={handleConfirm} variant="primary">
+  {#snippet actions()}
+    <Button onclick={() => dispatch('conclude')} variant="ghost">Never mind</Button>
+    <Button icon={shouldAttest ? Wallet : CheckCircle} onclick={handleConfirm} variant="primary">
       {#if shouldAttest}
         Confirm in wallet
       {:else}
         Submit application
       {/if}
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </StepLayout>
 
 <style>

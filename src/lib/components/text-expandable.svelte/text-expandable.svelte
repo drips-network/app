@@ -2,12 +2,17 @@
   import { browser } from '$app/environment';
   import { onDestroy, onMount } from 'svelte';
 
-  export let isExpandable = true;
-  export let numberOfLines = 2;
+  interface Props {
+    isExpandable?: boolean;
+    numberOfLines?: number;
+    children?: import('svelte').Snippet;
+  }
 
-  let element: HTMLElement | undefined = undefined;
-  let isClamped = false;
-  let expanded: boolean | undefined = undefined;
+  let { isExpandable = true, numberOfLines = 2, children }: Props = $props();
+
+  let element: HTMLElement | undefined = $state(undefined);
+  let isClamped = $state(false);
+  let expanded: boolean | undefined = $state(undefined);
 
   function setIsClamped() {
     isClamped = element ? element.scrollHeight > element.clientHeight : false;
@@ -33,19 +38,20 @@
     {!expanded ? `line-clamp-${numberOfLines}` : ''}
     "
 >
-  <slot />
+  {@render children?.()}
   {#if expanded === true}<button
       class="text-primary underline focus-visible:bg-primary-level-1 rounded hover:bg-primary-level-1 px-1 -ml-1"
-      on:click={() => {
+      onclick={() => {
         expanded = false;
       }}>less</button
     >{/if}
   {#if isClamped && isExpandable}
     <button
+      aria-label="Expand text"
       class="absolute overlay focus-visible:bg-primary-level-1 rounded"
-      on:click={() => {
+      onclick={() => {
         expanded = true;
       }}
-    />
+    ></button>
   {/if}
 </div>

@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let strokeWidth = 2;
+  interface Props {
+    strokeWidth?: number;
+  }
+
+  let { strokeWidth = 2 }: Props = $props();
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" fill="none" viewBox="0 0 500 500"

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const ECOSYSTEM_PROFILE_FRAGMENT = gql`
@@ -88,16 +88,22 @@
   import formatNumber from '$lib/utils/format-number';
   import Developer from '$lib/components/developer-section/developer.section.svelte';
 
-  export let ecosystem: Ecosystem;
-  export let ecosystemFragment: EcosystemProfileFragment | undefined;
+  interface Props {
+    ecosystem: Ecosystem;
+    ecosystemFragment: EcosystemProfileFragment | undefined;
+  }
 
-  $: ecosystemSupport = ecosystemFragment?.support || [];
-  let supportersSectionSkeleton: SectionSkeleton | undefined;
+  let { ecosystem, ecosystemFragment }: Props = $props();
+
+  let ecosystemSupport = $derived(ecosystemFragment?.support || []);
+  let supportersSectionSkeleton: SectionSkeleton | undefined = $state();
 
   const imageBaseUrl = `/api/share-images/ecosystem/${encodeURIComponent(ecosystem.id)}.png`;
 
   // all nodes except the root node
-  $: recipientsFormatted = formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0);
+  let recipientsFormatted = $derived(
+    formatNumber(ecosystem.graph ? ecosystem.graph.nodes.length - 1 : 0),
+  );
 </script>
 
 <HeadMeta
@@ -130,7 +136,7 @@
         {#if [ecosystemSupport].flat().length > 0}
           <div class="stat drip-bordered">
             <!-- ("Supporters" stat) -->
-            <a href="#support" on:click={() => supportersSectionSkeleton?.highlightSection()}>
+            <a href="#support" onclick={() => supportersSectionSkeleton?.highlightSection()}>
               <KeyValuePair key="Supporters">
                 <Pile maxItems={4} components={getSupportersPile(ecosystemSupport)} />
               </KeyValuePair>

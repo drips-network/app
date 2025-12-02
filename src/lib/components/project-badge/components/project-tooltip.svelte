@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
   import { PROJECT_AVATAR_FRAGMENT } from '$lib/components/project-avatar/project-avatar.svelte';
   import { PROJECT_NAME_FRAGMENT } from './project-name.svelte';
@@ -41,9 +41,13 @@
   import type { ProjectTooltipFragment } from './__generated__/gql.generated';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 
-  export let project: ProjectTooltipFragment;
+  interface Props {
+    project: ProjectTooltipFragment;
+  }
 
-  $: chainData = filterCurrentChainData(project.chainData);
+  let { project }: Props = $props();
+
+  let chainData = $derived(filterCurrentChainData(project.chainData));
 
   const SOURCE_TYPE_STRINGS: { [K in Forge]: string } = {
     GitHub: 'on GitHub',
@@ -57,7 +61,7 @@
     style:background-color={isClaimed(chainData)
       ? 'var(--color-primary-level-2)'
       : 'var(--color-foreground-level-1)'}
-  />
+  ></div>
   <div class="header">
     <ProjectAvatar project={chainData} size="large" />
     <a

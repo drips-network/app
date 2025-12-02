@@ -4,28 +4,41 @@
   import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import Button from '../button/button.svelte';
 
-  export let dismissableId: string | undefined = undefined;
-  export let negativeMarginWhileCollapsed: string | undefined = undefined;
+  interface Props {
+    dismissableId?: string | undefined;
+    negativeMarginWhileCollapsed?: string | undefined;
+    text?: import('svelte').Snippet;
+    buttons?: import('svelte').Snippet;
+    illustration?: import('svelte').Snippet;
+  }
+
+  let {
+    dismissableId = undefined,
+    negativeMarginWhileCollapsed = undefined,
+    text,
+    buttons,
+    illustration,
+  }: Props = $props();
 </script>
 
 <TransitionedHeight removeFromTabIndexWhileCollapsed={false} {negativeMarginWhileCollapsed}>
   {#if dismissableId ? !$dismissablesStore.includes(dismissableId) : true}
     <div out:fade={{ duration: 300 }} class="edu-card">
       <div class="text">
-        <slot name="text" />
+        {@render text?.()}
         <div class="buttons">
-          <slot name="buttons" />
+          {@render buttons?.()}
           {#if dismissableId}
             <Button
               variant="ghost"
-              on:click={() => dismissableId && dismissablesStore.dismiss(dismissableId)}
+              onclick={() => dismissableId && dismissablesStore.dismiss(dismissableId)}
               >Dismiss</Button
             >
           {/if}
         </div>
       </div>
       <div class="illustration">
-        <slot name="illustration" />
+        {@render illustration?.()}
       </div>
     </div>
   {/if}

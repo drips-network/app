@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const ECOSYSTEM_BADGE_FRAGMENT = gql`
     ${ECOSYSTEM_AVATAR_FRAGMENT}
     fragment EcosystemBadge on EcosystemMainAccount {
@@ -16,6 +16,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import ensStore from '$lib/stores/ens';
   import formatAddress from '$lib/utils/format-address';
   import { gql } from 'graphql-request';
@@ -24,22 +26,38 @@
     ECOSYSTEM_AVATAR_FRAGMENT,
   } from '../ecosystem-avatar/ecosystem-avatar.svelte';
 
-  export let ecosystem: EcosystemBadgeFragment | undefined;
+  interface Props {
+    ecosystem: EcosystemBadgeFragment | undefined;
+    showOwner?: boolean;
+    showName?: boolean;
+    isLinked?: boolean;
+    showAvatar?: boolean;
+    avatarSize?: 'tiny' | 'small';
+    disabled?: boolean;
+    outline?: boolean;
+    linkToNewTab?: boolean;
+  }
 
-  export let showOwner = true;
-  export let showName = true;
-  export let isLinked = true;
-  export let showAvatar = true;
-  export let avatarSize: 'tiny' | 'small' = 'small';
-  export let disabled = false;
-  export let outline = false;
-  export let linkToNewTab = false;
+  let {
+    ecosystem,
+    showOwner = true,
+    showName = true,
+    isLinked = true,
+    showAvatar = true,
+    avatarSize = 'small',
+    disabled = false,
+    outline = false,
+    linkToNewTab = false,
+  }: Props = $props();
 
   // lookup ens name if owner is provided
-  $: showOwner && ecosystem && ensStore.lookup(ecosystem.owner.address);
-  $: ens = showOwner && ecosystem ? $ensStore[ecosystem.owner.address] : {};
-  $: username =
-    ens?.name ?? (ecosystem && showOwner && formatAddress(ecosystem.owner.address)) ?? undefined;
+  run(() => {
+    showOwner && ecosystem && ensStore.lookup(ecosystem.owner.address);
+  });
+  let ens = $derived(showOwner && ecosystem ? $ensStore[ecosystem.owner.address] : {});
+  let username = $derived(
+    ens?.name ?? (ecosystem && showOwner && formatAddress(ecosystem.owner.address)) ?? undefined,
+  );
 </script>
 
 <svelte:element

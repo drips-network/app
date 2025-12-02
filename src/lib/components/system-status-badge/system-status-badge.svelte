@@ -1,12 +1,7 @@
-<a
-  class="system-status-badge"
-  href="https://status.drips.network/"
-  target="_blank"
-  rel="noreferrer"
->
-  <div class="status-circle" />
+<div class="system-status-badge">
+  <div class="status-circle"></div>
   <span class="typo-text-small">All good</span>
-</a>
+</div>
 
 <style>
   .system-status-badge {

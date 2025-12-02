@@ -76,7 +76,6 @@ export class Orcid {
     await this.page.getByRole('button', { name: 'Continue' }).click();
 
     // Step 3: Connect Wallet (might be skipped if already connected)
-    await this.page.getByRole('button', { name: 'Continue' }).click();
     await this.page.getByRole('button', { name: 'Connect wallet' }).click();
     await this.page.getByRole('button', { name: 'Continue' }).click();
 

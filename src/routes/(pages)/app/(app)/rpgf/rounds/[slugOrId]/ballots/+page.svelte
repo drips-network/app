@@ -17,21 +17,23 @@
   import type { ComponentProps } from 'svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
 
-  export let data;
+  let { data } = $props();
 
   interface BallotTableRow {
-    voter: ComponentProps<IdentityBadge>;
+    voter: ComponentProps<typeof IdentityBadge>;
     submittedAt: string;
     votesAssigned: string;
   }
 
-  $: tableData = data.ballots.map<BallotTableRow>((ballot) => ({
-    voter: {
-      address: ballot.user.walletAddress,
-    },
-    submittedAt: formatDate(ballot.createdAt),
-    votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
-  }));
+  let tableData = $derived(
+    data.ballots.map<BallotTableRow>((ballot) => ({
+      voter: {
+        address: ballot.user.walletAddress,
+      },
+      submittedAt: formatDate(ballot.createdAt),
+      votesAssigned: `${Object.values(ballot.ballot).reduce<number>((acc, v) => acc + v, 0)} / ${data.round.maxVotesPerVoter}`,
+    })),
+  );
 
   const tableColumns: ColumnDef<BallotTableRow>[] = [
     {
@@ -54,23 +56,25 @@
     },
   ];
 
-  $: tableOptions = {
+  let tableOptions = $derived({
     data: tableData,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-  };
+  });
 
-  $: resultsPeriodStart = data.round.resultsPeriodStart
-    ? data.round.resultsPeriodStart instanceof Date
-      ? data.round.resultsPeriodStart
-      : new Date(data.round.resultsPeriodStart)
-    : null;
+  let resultsPeriodStart = $derived<Date | null>(
+    data.round.resultsPeriodStart
+      ? data.round.resultsPeriodStart instanceof Date
+        ? data.round.resultsPeriodStart
+        : new Date(data.round.resultsPeriodStart)
+      : null,
+  );
 
-  $: distributionPhaseStarted = resultsPeriodStart
-    ? resultsPeriodStart.getTime() <= Date.now()
-    : false;
+  let distributionPhaseStarted = $derived(
+    resultsPeriodStart ? resultsPeriodStart.getTime() <= Date.now() : false,
+  );
 
-  $: canAdminUploadBallot = data.round.isAdmin && !distributionPhaseStarted;
+  let canAdminUploadBallot = $derived(data.round.isAdmin && !distributionPhaseStarted);
 
   async function handleDownload() {
     const csvContent = await getBallotsCsv(undefined, data.round.id);
@@ -101,11 +105,11 @@
     <h1>Ballots</h1>
     <div class="actions">
       {#if canAdminUploadBallot}
-        <Button icon={Sharrow} variant="ghost" on:click={openAdminUploadFlow}
+        <Button icon={Sharrow} variant="ghost" onclick={openAdminUploadFlow}
           >Manually upload ballot</Button
         >
       {/if}
-      <Button icon={Download} variant="primary" on:click={() => doWithErrorModal(handleDownload)}
+      <Button icon={Download} variant="primary" onclick={() => doWithErrorModal(handleDownload)}
         >Download CSV</Button
       >
     </div>

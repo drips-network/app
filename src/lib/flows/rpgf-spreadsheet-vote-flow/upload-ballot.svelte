@@ -26,13 +26,16 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let inProgressBallot: Writable<InProgressBallot> & {
-    clear: () => void;
-  };
+  interface Props {
+    inProgressBallot: Writable<InProgressBallot> & {
+      clear: () => void;
+    };
+    round: Round;
+  }
 
-  export let round: Round;
+  let { inProgressBallot, round }: Props = $props();
 
-  let downloading = false;
+  let downloading = $state(false);
 
   async function handleDownload(format: 'csv' | 'xlsx') {
     downloading = true;
@@ -55,9 +58,9 @@
     downloading = false;
   }
 
-  let loadedFile: File | null = null;
-  let fileData: ArrayBuffer | null = null;
-  let filetype: 'csv' | 'xlsx' | null = null;
+  let loadedFile: File | null = $state(null);
+  let fileData: ArrayBuffer | null = $state(null);
+  let filetype: 'csv' | 'xlsx' | null = $state(null);
 
   function handleFileInput(e: CustomEvent<{ file: File }>) {
     const reader = new FileReader();
@@ -134,11 +137,11 @@
         </p>
 
         <div class="actions">
-          <Button disabled={downloading} on:click={() => handleDownload('csv')} icon={FileCSV}>
+          <Button disabled={downloading} onclick={() => handleDownload('csv')} icon={FileCSV}>
             Download CSV
           </Button>
 
-          <Button disabled={downloading} on:click={() => handleDownload('xlsx')} icon={FileXLSX}>
+          <Button disabled={downloading} onclick={() => handleDownload('xlsx')} icon={FileXLSX}>
             Download XLSX
           </Button>
         </div>
@@ -238,7 +241,7 @@
               circular
               icon={CrossCircle}
               ariaLabel="Remove loaded file"
-              on:click={() => {
+              onclick={() => {
                 loadedFile = null;
                 fileData = null;
                 filetype = null;
@@ -256,7 +259,7 @@
         {/if}
 
         <div class="actions" style:margin-top="1rem">
-          <Button icon={Wallet} disabled={!fileData} variant="primary" on:click={handleSubmit}
+          <Button icon={Wallet} disabled={!fileData} variant="primary" onclick={handleSubmit}
             >Submit ballot</Button
           >
         </div>

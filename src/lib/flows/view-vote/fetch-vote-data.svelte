@@ -8,8 +8,12 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let vote: Vote;
+  interface Props {
+    context: Writable<State>;
+    vote: Vote;
+  }
+
+  let { context, vote }: Props = $props();
 
   onMount(async () => {
     dispatch('await', {

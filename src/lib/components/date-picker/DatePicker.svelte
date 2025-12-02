@@ -3,10 +3,41 @@
 	Credit to Kasper Henningsen & Contributors!
 -->
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import TimePicker from './TimePicker.svelte';
   import { getMonthLength, getCalendarDays, type CalendarDay } from './date-utils.js';
   import { getInnerLocale, type Locale } from './locale.js';
   import { createEventDispatcher } from 'svelte';
+
+  /** Default Date to use */
+  const defaultDate = new Date();
+
+  interface Props {
+    /** Date value. It's `null` if no date is selected */
+    value?: Date | null;
+    /** Show a time picker with the specified precision */
+    timePrecision?: 'minute' | 'second' | 'millisecond' | null;
+    /** The earliest year the user can select */
+    min?: Date;
+    /** The latest year the user can select */
+    max?: Date;
+    /** Locale object for internationalization */
+    locale?: Locale;
+    /** Wait with updating the date until a date is selected */
+    browseWithoutSelecting?: boolean;
+    onfocusout?: (e: FocusEvent) => void;
+  }
+
+  let {
+    value = $bindable(null),
+    timePrecision = null,
+    min = new Date(defaultDate.getFullYear() - 20, 0, 1),
+    max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999),
+    locale = {},
+    browseWithoutSelecting = false,
+    onfocusout = undefined,
+  }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     /** Fires when the user selects a new value by clicking on a date or by pressing enter */
@@ -16,9 +47,6 @@
   function cloneDate(d: Date) {
     return new Date(d.getTime());
   }
-
-  /** Date value. It's `null` if no date is selected */
-  export let value: Date | null = null;
 
   function setValue(d: Date) {
     if (d.getTime() !== value?.getTime()) {
@@ -37,20 +65,6 @@
 
   const todayDate = new Date();
 
-  /** Default Date to use */
-  const defaultDate = new Date();
-
-  /** Show a time picker with the specified precision */
-  export let timePrecision: 'minute' | 'second' | 'millisecond' | null = null;
-  /** The earliest year the user can select */
-  export let min = new Date(defaultDate.getFullYear() - 20, 0, 1);
-  /** The latest year the user can select */
-  export let max = new Date(defaultDate.getFullYear(), 11, 31, 23, 59, 59, 999);
-  $: if (value && value > max) {
-    setValue(max);
-  } else if (value && value < min) {
-    setValue(min);
-  }
   function clamp(d: Date, min: Date, max: Date) {
     if (d > max) {
       return cloneDate(max);
@@ -62,16 +76,14 @@
   }
 
   /** The date shown in the popup when none is selected */
-  let browseDate = value ? cloneDate(value) : cloneDate(clamp(defaultDate, min, max));
-  $: setBrowseDate(value);
+  let browseDate = $state(value ? cloneDate(value) : cloneDate(clamp(defaultDate, min, max)));
   function setBrowseDate(value: Date | null) {
     if (browseDate.getTime() !== value?.getTime()) {
       browseDate = value ? cloneDate(value) : browseDate;
     }
   }
 
-  let years = getYears(min, max);
-  $: years = getYears(min, max);
+  let years = $state(getYears(min, max));
   function getYears(min: Date, max: Date) {
     let years = [];
     for (let i = min.getFullYear(); i <= max.getFullYear(); i++) {
@@ -80,19 +92,11 @@
     return years;
   }
 
-  /** Locale object for internationalization */
-  export let locale: Locale = {};
-  $: iLocale = getInnerLocale(locale);
-  /** Wait with updating the date until a date is selected */
-  export let browseWithoutSelecting = false;
-
-  $: browseYear = browseDate.getFullYear();
   function setYear(newYear: number) {
     browseDate.setFullYear(newYear);
     browse(browseDate);
   }
 
-  $: browseMonth = browseDate.getMonth();
   function setMonth(newMonth: number) {
     let newYear = browseDate.getFullYear();
     if (newMonth === 12) {
@@ -117,8 +121,6 @@
       ),
     );
   }
-
-  $: calendarDays = getCalendarDays(browseDate, iLocale.weekStartsOn);
 
   function selectDay(calendarDay: CalendarDay) {
     if (dayIsInRange(calendarDay, min, max)) {
@@ -219,18 +221,36 @@
     }
     e.preventDefault();
   }
+  run(() => {
+    if (value && value > max) {
+      setValue(max);
+    } else if (value && value < min) {
+      setValue(min);
+    }
+  });
+  run(() => {
+    setBrowseDate(value);
+  });
+  run(() => {
+    years = getYears(min, max);
+  });
+  let iLocale = $derived(getInnerLocale(locale));
+  let browseYear = $derived(browseDate.getFullYear());
+  let browseMonth = $derived(browseDate.getMonth());
+  let calendarDays = $derived(getCalendarDays(browseDate, iLocale.weekStartsOn));
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="date-time-picker" on:focusout tabindex="0" on:keydown={keydown}>
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="date-time-picker" {onfocusout} tabindex="0" onkeydown={keydown}>
   <div class="tab-container" tabindex="-1">
     <div class="top">
       <button
         type="button"
         class="page-button"
         tabindex="-1"
-        on:click={() => setMonth(browseDate.getMonth() - 1)}
+        onclick={() => setMonth(browseDate.getMonth() - 1)}
+        aria-label="Previous month"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
           ><path
@@ -242,8 +262,8 @@
       <div class="dropdown month">
         <select
           value={browseMonth}
-          on:keydown={monthKeydown}
-          on:input={(e) => setMonth(parseInt(e.currentTarget.value))}
+          onkeydown={monthKeydown}
+          oninput={(e) => setMonth(parseInt(e.currentTarget.value))}
         >
           {#each iLocale.months as monthName, i}
             <option
@@ -272,8 +292,8 @@
       <div class="dropdown year">
         <select
           value={browseYear}
-          on:input={(e) => setYear(parseInt(e.currentTarget.value))}
-          on:keydown={yearKeydown}
+          oninput={(e) => setYear(parseInt(e.currentTarget.value))}
+          onkeydown={yearKeydown}
         >
           {#each years as v}
             <option value={v}>{v}</option>
@@ -293,7 +313,8 @@
         type="button"
         class="page-button"
         tabindex="-1"
-        on:click={() => setMonth(browseDate.getMonth() + 1)}
+        onclick={() => setMonth(browseDate.getMonth() + 1)}
+        aria-label="Next month"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
           ><path d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z" /></svg
@@ -314,10 +335,10 @@
     {#each Array(6) as _, weekIndex}
       <div class="week">
         {#each calendarDays.slice(weekIndex * 7, weekIndex * 7 + 7) as calendarDay}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <div
             class="cell"
-            on:click={() => selectDay(calendarDay)}
+            onclick={() => selectDay(calendarDay)}
             class:disabled={!dayIsInRange(calendarDay, min, max)}
             class:selected={value &&
               calendarDay.year === value.getFullYear() &&

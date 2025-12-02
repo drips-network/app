@@ -5,19 +5,22 @@
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
   import { updateRound } from '$lib/utils/rpgf/rpgf.js';
 
-  export let data;
-  $: round = data.round;
-  $: published = data.round.published;
+  let { data } = $props();
+  let round = $derived(data.round);
+  let published = $derived(data.round.published);
 
-  let updatedRound = { ...data.round };
+  let updatedRound = $state({ ...data.round });
 
-  $: changesMade =
+  let now = new Date();
+
+  let changesMade = $derived(
     updatedRound.applicationPeriodStart?.getTime() !==
       data.round.applicationPeriodStart?.getTime() ||
-    updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
-    updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
-    updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
-    updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime();
+      updatedRound.applicationPeriodEnd?.getTime() !== data.round.applicationPeriodEnd?.getTime() ||
+      updatedRound.votingPeriodStart?.getTime() !== data.round.votingPeriodStart?.getTime() ||
+      updatedRound.votingPeriodEnd?.getTime() !== data.round.votingPeriodEnd?.getTime() ||
+      updatedRound.resultsPeriodStart?.getTime() !== data.round.resultsPeriodStart?.getTime(),
+  );
 
   function isDifferent(date1: Date | null, date2: Date | null) {
     if (date1 === null && date2 === null) return false;
@@ -53,8 +56,6 @@
         : undefined,
     });
   }
-
-  const now = new Date();
 </script>
 
 <RpgfSettingsForm saveEnabled={changesMade} {saveHandler}>

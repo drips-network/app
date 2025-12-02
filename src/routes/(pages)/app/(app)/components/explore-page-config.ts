@@ -6,7 +6,7 @@ import type DistributionExplorePage from './distribution-explore-page.svelte';
 type ExplorePageVariantComponents = typeof EXPLORE_PAGE_VARIANT_COMPONENTS;
 export type ExplorePageVariant = keyof ExplorePageVariantComponents;
 
-type PageProps = ComponentProps<DistributionExplorePage>;
+type PageProps = ComponentProps<typeof DistributionExplorePage>;
 
 export type ExplorePageConfig = {
   variant: ExplorePageVariant;

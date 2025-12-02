@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -16,10 +18,12 @@
 
   // Update owner
 
-  let projectGitHubUrl = '';
+  let projectGitHubUrl = $state('');
 
   // must be a valid URL on host github.com and path /<owner>/<repo>
-  $: projectGitHubUrlValid = projectGitHubUrl.match(/^https:\/\/github\.com\/[^/]+\/[^/]+$/);
+  let projectGitHubUrlValid = $derived(
+    projectGitHubUrl.match(/^https:\/\/github\.com\/[^/]+\/[^/]+$/),
+  );
 
   let txInProgress = false;
   async function requestUpdateOwner(gitHubUrl: string) {
@@ -48,22 +52,22 @@
 
   // Stream config decoder
 
-  let streamConfigValue = '';
-  let tokenAddresssValue = '';
+  let streamConfigValue = $state('');
+  let tokenAddresssValue = $state('');
 
-  $: token = tokensStore.getByAddress(tokenAddresssValue);
+  let token = $derived(tokensStore.getByAddress(tokenAddresssValue));
 
   const decode = streamConfigFromUint256;
 
-  let decoded: ReturnType<typeof decode> | undefined;
+  let decoded: ReturnType<typeof decode> | undefined = $state();
 
-  $: {
+  run(() => {
     try {
       decoded = decode(toBigInt(streamConfigValue));
     } catch {
       decoded = undefined;
     }
-  }
+  });
 </script>
 
 <div class="utils">
@@ -95,7 +99,7 @@
     </FormField>
     <div>
       <Button
-        on:click={() => requestUpdateOwner(projectGitHubUrl)}
+        onclick={() => requestUpdateOwner(projectGitHubUrl)}
         disabled={!projectGitHubUrlValid || !$walletStore.connected}
         icon={Wallet}
         variant="primary">Request owner update</Button

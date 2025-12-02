@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
 
-  let description: string;
-  $: {
+  let description: string | undefined = $state();
+  run(() => {
     switch ($page.status) {
       case 404: {
         description = 'We werenʼt able to find that page.';
@@ -18,7 +20,7 @@
         description = 'Something went wrong.';
       }
     }
-  }
+  });
 </script>
 
 <LargeEmptyState

@@ -21,14 +21,19 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
+  interface Props {
+    context: Writable<State>;
+  }
 
-  let collaboratorsListValid = false;
-  let restrictedRecipientsListValid = false;
-  $: isValid =
+  let { context }: Props = $props();
+
+  let collaboratorsListValid = $state(false);
+  let restrictedRecipientsListValid = $state(false);
+  let isValid = $derived(
     collaboratorsListValid &&
-    $context.votingRoundConfig.votingEnds &&
-    (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid);
+      $context.votingRoundConfig.votingEnds &&
+      (!$context.votingRoundConfig.areRecipientsRestricted || restrictedRecipientsListValid),
+  );
 
   function handleImportCSV() {
     dispatch(
@@ -104,9 +109,9 @@
       weightsMode={false}
       maxItems={5000}
     />
-    <svelte:fragment slot="action">
-      <Button variant="ghost" icon={ArrowDown} on:click={handleImportCSV}>Import from CSV</Button>
-    </svelte:fragment>
+    {#snippet action()}
+      <Button variant="ghost" icon={ArrowDown} onclick={handleImportCSV}>Import from CSV</Button>
+    {/snippet}
   </FormField>
 
   <FormField
@@ -124,18 +129,18 @@
     title="Hide collaborators"
     description="If you hide collaborators, only you as the publisher may see the list of collaborators and their votes. At the end of the voting period, only the vote's results will be made public."
   >
-    <svelte:fragment slot="action">
+    {#snippet action()}
       <Toggle bind:checked={$context.votingRoundConfig.areVotesPrivate} />
-    </svelte:fragment>
+    {/snippet}
   </FormField>
 
   <FormField
     title="Restrict to specific recipients"
     description="By default, any collaborator can suggest any recipient. Enable this to configure a list of ETH addresses, GitHub repos, or other Drip Lists that can be voted for."
   >
-    <svelte:fragment slot="action">
+    {#snippet action()}
       <Toggle bind:checked={$context.votingRoundConfig.areRecipientsRestricted} />
-    </svelte:fragment>
+    {/snippet}
     {#if $context.votingRoundConfig.areRecipientsRestricted}
       <div transition:slide={{ duration: 300 }}>
         <ListEditor
@@ -150,15 +155,12 @@
     {/if}
   </FormField>
 
-  <svelte:fragment slot="left-actions">
-    <Button icon={ArrowLeft} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="actions">
-    <Button
-      disabled={!isValid}
-      icon={Check}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+  {#snippet left_actions()}
+    <Button icon={ArrowLeft} onclick={() => dispatch('goBackward')}>Back</Button>
+  {/snippet}
+  {#snippet actions()}
+    <Button disabled={!isValid} icon={Check} variant="primary" onclick={() => dispatch('goForward')}
+      >Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>

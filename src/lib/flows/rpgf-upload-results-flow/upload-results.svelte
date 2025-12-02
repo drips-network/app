@@ -22,9 +22,13 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let round: Round;
+  interface Props {
+    round: Round;
+  }
 
-  let downloading = false;
+  let { round }: Props = $props();
+
+  let downloading = $state(false);
 
   async function handleDownload(format: 'csv' | 'xlsx') {
     downloading = true;
@@ -47,9 +51,9 @@
     downloading = false;
   }
 
-  let loadedFile: File | null = null;
-  let fileData: ArrayBuffer | null = null;
-  let filetype: 'csv' | 'xlsx' | null = null;
+  let loadedFile: File | null = $state(null);
+  let fileData: ArrayBuffer | null = $state(null);
+  let filetype: 'csv' | 'xlsx' | null = $state(null);
 
   function handleFileInput(e: CustomEvent<{ file: File }>) {
     const reader = new FileReader();
@@ -125,11 +129,11 @@
         </p>
 
         <div class="actions">
-          <Button disabled={downloading} on:click={() => handleDownload('csv')} icon={FileCSV}>
+          <Button disabled={downloading} onclick={() => handleDownload('csv')} icon={FileCSV}>
             Download CSV
           </Button>
 
-          <Button disabled={downloading} on:click={() => handleDownload('xlsx')} icon={FileXLSX}>
+          <Button disabled={downloading} onclick={() => handleDownload('xlsx')} icon={FileXLSX}>
             Download XLSX
           </Button>
         </div>
@@ -184,7 +188,7 @@
               circular
               icon={CrossCircle}
               ariaLabel="Remove loaded file"
-              on:click={() => {
+              onclick={() => {
                 loadedFile = null;
                 fileData = null;
                 filetype = null;
@@ -202,7 +206,7 @@
         {/if}
 
         <div class="actions" style:margin-top="1rem">
-          <Button icon={Sharrow} disabled={!fileData} variant="primary" on:click={handleSubmit}
+          <Button icon={Sharrow} disabled={!fileData} variant="primary" onclick={handleSubmit}
             >Import results</Button
           >
         </div>

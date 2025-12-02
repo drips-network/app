@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { fade } from 'svelte/transition';
 
   import ensStore from '$lib/stores/ens';
@@ -6,30 +8,50 @@
   import formatAddress from '$lib/utils/format-address';
   import Tooltip from '../tooltip/tooltip.svelte';
 
-  export let address: string;
-  export let showIdentity = true;
-  export let showAvatar = true;
-  export let hideAvatarOnMobile = false;
-  export let disableLink = false;
-  export let disableSelection = false;
-  export let size: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic' = 'normal';
-  export let disableTooltip = false;
-  export let linkToNewTab = false;
-  export let showFullAddress = false;
-  export let muted = false;
+  interface Props {
+    address: string;
+    showIdentity?: boolean;
+    showAvatar?: boolean;
+    hideAvatarOnMobile?: boolean;
+    disableLink?: boolean;
+    disableSelection?: boolean;
+    size?: 'small' | 'normal' | 'medium' | 'big' | 'huge' | 'gigantic';
+    disableTooltip?: boolean;
+    linkToNewTab?: boolean;
+    showFullAddress?: boolean;
+    muted?: boolean;
+    avatarImgElem?: HTMLImageElement | undefined;
+    isReverse?: boolean;
+    tag?: string | undefined;
+  }
 
-  export let avatarImgElem: HTMLImageElement | undefined = undefined;
-  export let isReverse = false;
-  export let tag: string | undefined = undefined;
+  let {
+    address,
+    showIdentity = true,
+    showAvatar = true,
+    hideAvatarOnMobile = false,
+    disableLink = false,
+    disableSelection = false,
+    size = 'normal',
+    disableTooltip = false,
+    linkToNewTab = false,
+    showFullAddress = false,
+    muted = false,
+    avatarImgElem = $bindable(),
+    isReverse = false,
+    tag = undefined,
+  }: Props = $props();
 
-  $: ensStore.lookup(address);
-  $: ens = $ensStore[address];
+  run(() => {
+    ensStore.lookup(address);
+  });
+  let ens = $derived($ensStore[address]);
 
-  $: blockyUrl = `/api/blockies/${address}`;
+  let blockyUrl = $derived(`/api/blockies/${address}`);
 
-  $: link = disableLink ? undefined : `/app/${ens?.name ?? address}`;
+  let link = $derived(disableLink ? undefined : `/app/${ens?.name ?? address}`);
 
-  $: toDisplay = ens?.name ?? (showFullAddress ? address : formatAddress(address));
+  let toDisplay = $derived(ens?.name ?? (showFullAddress ? address : formatAddress(address)));
 
   const sizes = {
     small: 16,
@@ -39,7 +61,7 @@
     huge: 64,
     gigantic: 128,
   };
-  $: currentSize = sizes[size];
+  let currentSize = $derived(sizes[size]);
 
   const fontClassesEns = {
     small: 'typo-text-small',
@@ -49,7 +71,7 @@
     huge: 'typo-header-3',
     gigantic: 'typo-header-1',
   };
-  $: currentFontClassEns = fontClassesEns[size];
+  let currentFontClassEns = $derived(fontClassesEns[size]);
 
   const fontClassesAddress = {
     tiny: 'typo-text-small',
@@ -60,9 +82,9 @@
     huge: 'typo-header-3',
     gigantic: 'typo-header-1',
   };
-  $: currentFontClassAddress = fontClassesAddress[size];
+  let currentFontClassAddress = $derived(fontClassesAddress[size]);
 
-  $: currentFontClass = ens?.name ? currentFontClassEns : currentFontClassAddress;
+  let currentFontClass = $derived(ens?.name ? currentFontClassEns : currentFontClassAddress);
 </script>
 
 <Tooltip text={address} copyable disabled={disableTooltip}>
@@ -127,9 +149,9 @@
       {/if}
     {/if}
   </svelte:element>
-  <svelte:fragment slot="tooltip-content">
+  {#snippet tooltip_content()}
     {address}
-  </svelte:fragment>
+  {/snippet}
 </Tooltip>
 
 <style>

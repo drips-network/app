@@ -18,13 +18,17 @@
   import type { Round } from '$lib/utils/rpgf/types/round';
   import unreachable from '$lib/utils/unreachable';
 
-  export let round: Round;
+  interface Props {
+    round: Round;
+  }
 
-  let calcMethod = 'avg';
+  let { round }: Props = $props();
 
-  let forceRecalculate = false;
+  let calcMethod = $state('avg');
 
-  let loading = false;
+  let forceRecalculate = $state(false);
+
+  let loading = $state(false);
   async function handleCalculateResults() {
     await doWithErrorModal(
       async () => {
@@ -66,14 +70,16 @@
     );
   }
 
-  let step: 'calculate' | 'publish' | 'published' | 'linked';
-  $: if (round.resultsPublished) {
-    step = 'published';
-  } else if (round.resultsCalculated && !forceRecalculate) {
-    step = 'publish';
-  } else {
-    step = 'calculate';
-  }
+  let step = $state<'calculate' | 'publish' | 'published' | 'linked'>();
+  $effect(() => {
+    if (round.resultsPublished) {
+      step = 'published';
+    } else if (round.resultsCalculated && !forceRecalculate) {
+      step = 'publish';
+    } else {
+      step = 'calculate';
+    }
+  });
 </script>
 
 <div class="rpgf-results-card">
@@ -101,7 +107,7 @@
       bind:value={calcMethod}
     />
 
-    <Button on:click={handleCalculateResults} {loading} size="large" variant="primary">
+    <Button onclick={handleCalculateResults} {loading} size="large" variant="primary">
       Calculate results
     </Button>
 
@@ -109,7 +115,7 @@
 
     <Button
       icon={File}
-      on:click={() => modal.show(Stepper, undefined, rpgfUploadResultsFlowSteps(round))}
+      onclick={() => modal.show(Stepper, undefined, rpgfUploadResultsFlowSteps(round))}
     >
       Manually upload results
     </Button>
@@ -125,13 +131,13 @@
       Filter the view by allocation amount or download a CSV of the results for review on the left.
     </AnnotationBox>
 
-    <Button on:click={handlePublishResults} {loading} size="large" variant="primary">
+    <Button onclick={handlePublishResults} {loading} size="large" variant="primary">
       Publish results
     </Button>
 
     <OrDivider />
 
-    <Button icon={ArrowLeft} on:click={() => (forceRecalculate = true)} variant="ghost"
+    <Button icon={ArrowLeft} onclick={() => (forceRecalculate = true)} variant="ghost"
       >Recalculate results</Button
     >
   {:else if step === 'published'}
@@ -143,7 +149,7 @@
     </p>
 
     <Button
-      on:click={() =>
+      onclick={() =>
         modal.show(
           Stepper,
           undefined,
@@ -157,8 +163,7 @@
     <OrDivider />
 
     <Button
-      on:click={() =>
-        modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(round.id, []))}
+      onclick={() => modal.show(Stepper, undefined, editRpgfRoundLinkedDripListsFlow(round.id, []))}
       >Manually link Drip Lists</Button
     >
   {/if}

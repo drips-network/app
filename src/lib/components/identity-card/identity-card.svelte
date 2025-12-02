@@ -180,7 +180,7 @@
   {:else if loading}
     <div class="spinner"><Spinner /></div>
   {:else}
-    <div class="avatar-placeholder" />
+    <div class="avatar-placeholder"></div>
     <h3 class="name-placeholder">TBD</h3>
   {/if}
 </svelte:element>

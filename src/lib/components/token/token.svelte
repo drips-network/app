@@ -8,30 +8,36 @@
   import CoinAnimation from '../coin-animation/coin-animation.svelte';
   import FitText from '../fit-text/fit-text.svelte';
 
-  export let address: string;
-  export let show: 'name' | 'symbol' | 'none' = 'name';
-  export let size: 'small' | 'normal' | 'huge' = 'normal';
-  export let fontSize = 'typo-text';
-  export let animateOnMount = false;
+  interface Props {
+    address: string;
+    show?: 'name' | 'symbol' | 'none';
+    size?: 'small' | 'normal' | 'huge';
+    fontSize?: string;
+    animateOnMount?: boolean;
+    /** Manually set token information to display. Used on the landing page's mock dashboard. */
+    overrideToDisplay?:
+      | {
+          name: string;
+          logoURI?: string;
+          symbol: string;
+        }
+      | undefined;
+  }
 
-  /** Manually set token information to display. Used on the landing page's mock dashboard. */
-  export let overrideToDisplay:
-    | {
-        name: string;
-        logoURI?: string;
-        symbol: string;
-      }
-    | undefined = undefined;
+  let {
+    address,
+    show = 'name',
+    size = 'normal',
+    fontSize = 'typo-text',
+    animateOnMount = false,
+    overrideToDisplay = undefined,
+  }: Props = $props();
 
   const sizes = {
     small: 24,
     normal: 32,
     huge: 48,
   };
-
-  $: token = $tokens ? tokens.getByAddress(address) : undefined;
-  $: tokenInfo = overrideToDisplay ?? ($tokens ? token?.info : undefined);
-  $: src = tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined;
 
   function adjustSrcSize(src: string) {
     // Most token URLs are Coingecko assets using the "thumb" quality, which is very low-res.
@@ -42,34 +48,39 @@
     }
   }
 
-  let imageFailed = false;
+  let imageFailed = $state(false);
 
-  $: shouldAnimate = Boolean(tokenInfo);
+  let loaded = $state(false);
 
-  $: placeholderColor = tokenInfo
-    ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
-    : 'var(--color-foreground-level-2)';
-
-  let loaded = false;
-
-  let imgElem: HTMLImageElement;
+  let imgElem = $state<HTMLImageElement>();
 
   onMount(() => {
     if (imgElem && imgElem.complete) loaded = true;
   });
+  let token = $derived($tokens ? tokens.getByAddress(address) : undefined);
+  let tokenInfo = $derived(overrideToDisplay ?? ($tokens ? token?.info : undefined));
+  let src = $derived(
+    tokenInfo?.logoURI ? convertIpfsUri(adjustSrcSize(tokenInfo.logoURI)) : undefined,
+  );
+  let shouldAnimate = $derived(Boolean(tokenInfo));
+  let placeholderColor = $derived(
+    tokenInfo
+      ? seededRandomElement(['red', 'green', 'blue', 'purple'], address)
+      : 'var(--color-foreground-level-2)',
+  );
 </script>
 
 <div class="token size-{size}">
   <div class="logo" style="height: {sizes[size]}px; width: {sizes[size]}px">
     <CoinAnimation enable={shouldAnimate} {animateOnMount}>
       {#if tokenInfo?.logoURI && !imageFailed}
-        <div class="background" class:loaded />
+        <div class="background" class:loaded></div>
         <img
           bind:this={imgElem}
-          on:load={() => (loaded = true)}
+          onload={() => (loaded = true)}
           {src}
           class:loaded
-          on:error={() => (imageFailed = true)}
+          onerror={() => (imageFailed = true)}
           alt={`${tokenInfo.name} logo`}
         />
       {:else}

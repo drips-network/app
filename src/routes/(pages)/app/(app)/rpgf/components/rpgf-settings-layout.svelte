@@ -15,8 +15,13 @@
   import File from '$lib/components/icons/File.svelte';
   import Server from '$lib/components/icons/Server.svelte';
 
-  export let round: Round;
-  export let amountOfVoters: number;
+  interface Props {
+    round: Round;
+    amountOfVoters: number;
+    children?: import('svelte').Snippet;
+  }
+
+  let { round, amountOfVoters, children }: Props = $props();
 
   onMount(() => {
     $forceMainSidebarCollapsed = true;
@@ -26,11 +31,13 @@
     };
   });
 
-  $: settingsBaseUrl = `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}/settings`;
+  let settingsBaseUrl = $derived(
+    `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}/settings`,
+  );
 
-  $: backLink = `/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}`;
+  let backLink = $derived(`/app/rpgf/rounds/${round.published ? round.urlSlug : round.id}`);
 
-  $: name = round.name ?? 'Unnamed round';
+  let name = $derived(round.name ?? 'Unnamed round');
 </script>
 
 <div class="rpgf-settings-layout">
@@ -147,7 +154,7 @@
   </div>
 
   <div class="content">
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

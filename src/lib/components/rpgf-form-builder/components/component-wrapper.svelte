@@ -5,7 +5,7 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import type { ApplicationFieldDto } from '$lib/utils/rpgf/types/application';
-  import { createEventDispatcher, type ComponentType } from 'svelte';
+  import { createEventDispatcher, type Component } from 'svelte';
 
   export const dispatch = createEventDispatcher<{
     moveUp: void;
@@ -14,34 +14,39 @@
     editItem: void;
   }>();
 
-  export let component: ComponentType;
-  export let fieldProp: ApplicationFieldDto;
+  interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component: Component<any>;
+    fieldProp: ApplicationFieldDto;
+  }
+
+  let { component: PassedComponent, fieldProp }: Props = $props();
 </script>
 
 <div class="component-wrapper">
   <div class="content">
-    <svelte:component this={component} field={fieldProp} blockInteraction />
+    <PassedComponent field={fieldProp} blockInteraction></PassedComponent>
   </div>
   <div class="bottom-row">
     <h5>{fieldProp.type}</h5>
     <div class="settings">
       {#if fieldProp.type !== 'divider'}
         <div>
-          <Button size="small" variant="ghost" icon={Pen} on:click={() => dispatch('editItem')} />
+          <Button size="small" variant="ghost" icon={Pen} onclick={() => dispatch('editItem')} />
         </div>
       {/if}
       <div>
-        <Button size="small" variant="ghost" icon={Trash} on:click={() => dispatch('deleteItem')} />
+        <Button size="small" variant="ghost" icon={Trash} onclick={() => dispatch('deleteItem')} />
       </div>
       <div>
-        <Button size="small" variant="ghost" icon={ArrowUp} on:click={() => dispatch('moveUp')} />
+        <Button size="small" variant="ghost" icon={ArrowUp} onclick={() => dispatch('moveUp')} />
       </div>
       <div>
         <Button
           size="small"
           variant="ghost"
           icon={ArrowDown}
-          on:click={() => dispatch('moveDown')}
+          onclick={() => dispatch('moveDown')}
         />
       </div>
     </div>

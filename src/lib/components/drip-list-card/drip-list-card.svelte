@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { gql } from 'graphql-request';
 
   export const DRIP_LIST_CARD_FRAGMENT = gql`
@@ -69,6 +69,8 @@
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import '$lib/utils/multiplayer/multiplayer';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
@@ -136,70 +138,52 @@
   import editDripListSteps from '$lib/flows/edit-drip-list/edit-members/edit-drip-list-steps';
   import { EDIT_DRIP_LIST_FLOW_DRIP_LIST_FRAGMENT } from '$lib/flows/edit-drip-list/fragments';
 
-  export let data: {
-    dripList?: DripListCardFragment | null;
-    votingRound?:
-      | (VotingRound & {
-          splits?: SplitsComponentSplitsReceiver[];
-          allowedReceiversListEditorItems?: Items;
-        })
-      | null;
-  };
-  $: {
-    assert(
-      data.dripList || data.votingRound,
-      'DripListCard requires either a dripList or a votingRound, or both',
-    );
-  }
-
   // "partial" is reduced version w/ link to Drip List page for listing contexts
   // "minimal" is similar, but further reduced to just title, owner, description,
-  //  total funded, and number of splits
-  export let variant: 'full' | 'partial' | 'minimal' = 'full';
 
-  export let isHidden = false;
-  export let hideTotal = false;
-  export let hideSupporterPile = false;
-  export let hideDescription = false;
-  export let clampTitle = true;
-  export let openInNewTab = false;
-  export let maxSplitRows: number | undefined = undefined;
-  export let chainOverride: SupportedChain | undefined = undefined;
+  interface Props {
+    data: {
+      dripList?: DripListCardFragment | null;
+      votingRound?:
+        | (VotingRound & {
+            splits?: SplitsComponentSplitsReceiver[];
+            allowedReceiversListEditorItems?: Items;
+          })
+        | null;
+    };
+    //  total funded, and number of splits
+    variant?: 'full' | 'partial' | 'minimal';
+    isHidden?: boolean;
+    hideTotal?: boolean;
+    hideSupporterPile?: boolean;
+    hideDescription?: boolean;
+    clampTitle?: boolean;
+    openInNewTab?: boolean;
+    maxSplitRows?: number | undefined;
+    chainOverride?: SupportedChain | undefined;
+  }
 
-  $: dripList = data.dripList;
-  $: votingRound = data.votingRound;
-
-  $: listOwner = dripList?.owner;
-  $: isOwnList = dripList && $walletStore && checkIsUser(dripList.owner.accountId);
-
-  $: title = (dripList?.name || votingRound?.name) ?? unreachable();
-  $: description = (dripList?.description || votingRound?.description) ?? '';
-
-  $: supportersPile = dripList && getSupportersPile(dripList.support, 'tiny');
-
-  $: isPartial = variant === 'partial';
-  $: isMinimal = variant === 'minimal';
-  $: clampTitleClass = !clampTitle ? '' : isMinimal ? 'line-clamp-2' : 'line-clamp-1';
+  let {
+    data,
+    variant = 'full',
+    isHidden = false,
+    hideTotal = false,
+    hideSupporterPile = false,
+    hideDescription = false,
+    clampTitle = true,
+    openInNewTab = false,
+    maxSplitRows = undefined,
+    chainOverride = undefined,
+  }: Props = $props();
 
   function triggerEditModal() {
     if (!dripList) return;
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  let activeTab: string;
-  $: {
-    if (dripList && votingRound) {
-      activeTab = 'tab-1';
-    } else if (dripList) {
-      activeTab = 'tab-1';
-    } else if (votingRound) {
-      activeTab = 'tab-2';
-    }
-  }
+  let activeTab = $state<'tab1' | 'tab2'>('tab1');
 
-  $: isOwnVotingRound = votingRound?.publisherAddress === $walletStore?.address;
-
-  let incomingStreamsTotalStreamed: { tokenAddress: string; amount: bigint }[];
+  let incomingStreamsTotalStreamed = $state<{ tokenAddress: string; amount: bigint }[]>();
   function updateIncomingStreamsTotalStreamed() {
     if (!dripList) return;
 
@@ -228,29 +212,58 @@
     return () => tickStore.deregister(tick);
   });
 
-  $: totalEarned = mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []);
-
-  $: urlBase = chainOverride
-    ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
-    : '';
-
-  $: dripListUrl = dripList
-    ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
-    : votingRound
-      ? `${urlBase}/app/drip-lists/${votingRound.id}`
-      : undefined;
-
-  $: downloadableImageUrl = dripList
-    ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
-    : votingRound
-      ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
-      : undefined;
-
-  $: votingEnded = votingRound
-    ? new Date() >= new Date(votingRound.schedule.voting.endsAt)
-    : undefined;
-
-  $: splitsFormatted = formatNumber(dripList?.splits?.length || 0);
+  run(() => {
+    assert(
+      data.dripList || data.votingRound,
+      'DripListCard requires either a dripList or a votingRound, or both',
+    );
+  });
+  let dripList = $derived(data.dripList);
+  let votingRound = $derived(data.votingRound);
+  let listOwner = $derived(dripList?.owner);
+  let isOwnList = $derived(dripList && $walletStore && checkIsUser(dripList.owner.accountId));
+  let title = $derived((dripList?.name || votingRound?.name) ?? unreachable());
+  let description = $derived((dripList?.description || votingRound?.description) ?? '');
+  let supportersPile = $derived(dripList && getSupportersPile(dripList.support, 'tiny'));
+  let isPartial = $derived(variant === 'partial');
+  let isMinimal = $derived(variant === 'minimal');
+  let clampTitleClass = $derived(!clampTitle ? '' : isMinimal ? 'line-clamp-2' : 'line-clamp-1');
+  run(() => {
+    if (dripList && votingRound) {
+      activeTab = 'tab1';
+    } else if (dripList) {
+      activeTab = 'tab1';
+    } else if (votingRound) {
+      activeTab = 'tab2';
+    }
+  });
+  let isOwnVotingRound = $derived(votingRound?.publisherAddress === $walletStore?.address);
+  let totalEarned = $derived(
+    mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []),
+  );
+  let urlBase = $derived(
+    chainOverride
+      ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
+      : '',
+  );
+  let dripListUrl = $derived(
+    dripList
+      ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
+      : votingRound
+        ? `${urlBase}/app/drip-lists/${votingRound.id}`
+        : undefined,
+  );
+  let downloadableImageUrl = $derived(
+    dripList
+      ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
+      : votingRound
+        ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
+        : undefined,
+  );
+  let votingEnded = $derived(
+    votingRound ? new Date() >= new Date(votingRound.schedule.voting.endsAt) : undefined,
+  );
+  let splitsFormatted = $derived(formatNumber(dripList?.splits?.length || 0));
 </script>
 
 {#if !isPartial && !isMinimal && votingRound}
@@ -288,7 +301,7 @@
               disabled={!dripList?.isVisible}
             />
             {#if isOwnList}
-              <Button disabled={!dripList?.isVisible} on:click={triggerEditModal} icon={Pen}
+              <Button disabled={!dripList?.isVisible} onclick={triggerEditModal} icon={Pen}
                 >Edit list</Button
               >
             {/if}
@@ -335,7 +348,7 @@
 
         <TransitionedHeight transitionHeightChanges>
           <div class="tabs">
-            <div class="list tab tab-1" class:active-tab={activeTab === 'tab-1'}>
+            <div class="list tab tab-1" class:active-tab={activeTab === 'tab1'}>
               {#if dripList}
                 <div class="flex flex-col gap-1.5">
                   <div class="totals">
@@ -392,7 +405,7 @@
 
             <div
               class="list tab tab-2"
-              class:active-tab={activeTab === 'tab-2'}
+              class:active-tab={activeTab === 'tab2'}
               class:-mt-6={!votingRound?.result}
             >
               {#if votingRound}
@@ -428,7 +441,7 @@
                       <div>
                         <Button
                           icon={Trash}
-                          on:click={() =>
+                          onclick={() =>
                             modal.show(
                               Stepper,
                               undefined,
@@ -443,7 +456,7 @@
                             variant="primary"
                             icon={Wallet}
                             disabled={!votingRound.result}
-                            on:click={() =>
+                            onclick={() =>
                               modal.show(
                                 Stepper,
                                 undefined,

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   type SocialNetwork = 'com.twitter' | 'com.github' | 'url' | 'ethereum';
 
   export function isNetwork(value: string): value is SocialNetwork {
@@ -11,22 +11,26 @@
   import Web from '$lib/components/icons/Globe.svelte';
   import Ethereum from '$lib/components/icons/Ethereum.svelte';
   import Github from '$lib/components/icons/Github.svelte';
-  import type { ComponentType } from 'svelte';
+  import type { Component } from 'svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import formatAddress from '$lib/utils/format-address';
   import buildExternalUrl from '$lib/utils/build-external-url';
 
-  export let network: SocialNetwork;
-  export let value: string;
+  interface Props {
+    network: SocialNetwork;
+    value: string;
+  }
 
-  const icons: { [key in SocialNetwork]: ComponentType } = {
+  let { network, value }: Props = $props();
+
+  const icons: { [key in SocialNetwork]: Component } = {
     ethereum: Ethereum,
     'com.twitter': X,
     'com.github': Github,
     url: Web,
   };
 
-  $: icon = icons[network];
+  let icon = $derived(icons[network]);
 
   // Undefined = No link. Empty string = link without prefix.
   const supportedOrigins: { [key in SocialNetwork]: string | undefined } = {
@@ -36,7 +40,7 @@
     url: '',
   };
 
-  $: origin = supportedOrigins[network];
+  let origin = $derived(supportedOrigins[network]);
 
   // handle people putting full URLs in their 'com.twitter' ENS records
   function getURLFromENSRecordValue(url: string) {
@@ -57,10 +61,12 @@
       return input.replaceAll('http://', '').replaceAll('https://', '');
     }
   }
+
+  const SvelteComponent = $derived(icon);
 </script>
 
 <div class="social-link flex gap-[0.375rem] text-foreground">
-  <svelte:component this={icon} style="fill: currentColor" />
+  <SvelteComponent style="fill: currentColor" />
   {#if origin !== undefined}
     <a
       target="_blank"
@@ -71,9 +77,9 @@
   {:else if network === 'ethereum'}
     <Tooltip text={value} copyable>
       <div class="typo-text tabular-nums">{formatAddress(value)}</div>
-      <svelte:fragment slot="tooltip-content">
+      {#snippet tooltip_content()}
         {value}
-      </svelte:fragment>
+      {/snippet}
     </Tooltip>
   {/if}
 </div>

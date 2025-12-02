@@ -110,7 +110,7 @@ export async function buildOneTimeDonationTxs(context: OneTimeDonationContext) {
   const sdkReceiver = transformReceiverToSdkReceiver(receiver);
 
   const oneTimeDonationTx = await sdk.donations.prepareOneTime({
-    amount: amountInputValue,
+    amount: String(amountInputValue),
     erc20: tokenAddress as Address,
     tokenDecimals: token.info.decimals,
     receiver: sdkReceiver as SdkReceiver,

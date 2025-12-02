@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export const PROJECT_CARD_FRAGMENT = gql`
     ${PROJECT_AVATAR_FRAGMENT}
     ${PROJECT_NAME_FRAGMENT}
@@ -66,8 +66,12 @@
   } from '$lib/utils/merge-withdrawable-balances';
   import formatNumber from '$lib/utils/format-number';
 
-  export let project: ProjectCardFragment;
-  export let isHidden = false;
+  interface Props {
+    project: ProjectCardFragment;
+    isHidden?: boolean;
+  }
+
+  let { project, isHidden = false }: Props = $props();
 
   let projectChainData = filterCurrentChainData(project.chainData);
 </script>
@@ -98,15 +102,11 @@
         forceUnclaimed
         smallText
         tooltip={false}
-        linkTo="project-page"
+        linkTo="nothing"
         linkToNewTab
         size="tiny"
         {project}
       />
-      <!-- TODO: Add descriptions to product cards · Issue #1579 -->
-      <!-- {#if projectChainData.description}
-        <p class="typo-text-small line-clamp-2">{projectChainData.description}</p>
-      {/if} -->
     </div>
     <div class="cubbies">
       {#if isClaimed(projectChainData)}

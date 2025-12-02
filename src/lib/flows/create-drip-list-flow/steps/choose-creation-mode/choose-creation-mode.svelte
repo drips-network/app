@@ -18,22 +18,28 @@
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
-  export let context: Writable<State>;
-  export let canCancel = false;
+  interface Props {
+    context: Writable<State>;
+    canCancel?: boolean;
+  }
 
-  let textAreaValidationState: TextInputValidationState;
-  $: textAreaValidationState = !$context.dripList.description
-    ? { type: 'valid' }
-    : $context.dripList.description.length >= 1000
-      ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
-      : /<[^>]+>/gi.test($context.dripList.description)
-        ? { type: 'invalid', message: 'HTML currently not allowed.' }
-        : { type: 'valid' };
+  let { context, canCancel = false }: Props = $props();
 
-  $: isValid =
+  let textAreaValidationState: TextInputValidationState = $derived(
+    !$context.dripList.description
+      ? { type: 'valid' }
+      : $context.dripList.description.length >= 1000
+        ? { type: 'invalid', message: `Cannot exceed ${Number(1000).toLocaleString()} characters.` }
+        : /<[^>]+>/gi.test($context.dripList.description)
+          ? { type: 'invalid', message: 'HTML currently not allowed.' }
+          : { type: 'valid' },
+  );
+
+  let isValid = $derived(
     $context.selectedCreationMode !== undefined &&
-    $context.dripList.title.length > 0 &&
-    textAreaValidationState.type === 'valid';
+      $context.dripList.title.length > 0 &&
+      textAreaValidationState.type === 'valid',
+  );
 </script>
 
 <StandaloneFlowStepLayout
@@ -92,15 +98,12 @@
       }}
     />
   </FormField>
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if canCancel}
-      <Button on:click={() => dispatch('conclude')} variant="ghost">Cancel</Button>
+      <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     {/if}
-    <Button
-      disabled={!isValid}
-      icon={Check}
-      variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+    <Button disabled={!isValid} icon={Check} variant="primary" onclick={() => dispatch('goForward')}
+      >Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>
