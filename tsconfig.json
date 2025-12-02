@@ -10,10 +10,12 @@
     "sourceMap": true,
     "strict": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"],
-    "plugins": [{
-      "name": "typescript-svelte-plugin",
-      "enabled": true
-    }]
+    "plugins": [
+      {
+        "name": "typescript-svelte-plugin",
+        "enabled": true
+      }
+    ]
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
   //

@@ -190,7 +190,6 @@
   <OneTimeDonationEditor
     bind:formValid
     bind:amountInputValue={$context.amountInputValue}
-    bind:topUpMax={$context.topUpMax}
     bind:selectedTokenAddress={$context.selectedTokenAddress}
     bind:amount
     bind:selectedTokenAllowance

@@ -67,15 +67,13 @@
       icon={Label}
       backgroundOnActive
     />
-    {#if !round.published}
-      <SidenavItem
-        label="Schedule"
-        href="{settingsBaseUrl}/schedule"
-        active={$page.url.pathname === `${settingsBaseUrl}/schedule`}
-        icon={Calendar}
-        backgroundOnActive
-      />
-    {/if}
+    <SidenavItem
+      label="Schedule"
+      href="{settingsBaseUrl}/schedule"
+      active={$page.url.pathname === `${settingsBaseUrl}/schedule`}
+      icon={Calendar}
+      backgroundOnActive
+    />
     <SidenavItem
       label="Admins"
       href="{settingsBaseUrl}/admins"

@@ -3,12 +3,12 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
   import TextInput from '../text-input/text-input.svelte';
-  import Toggle from '../toggle/toggle.svelte';
   import parseTokenAmount from '$lib/utils/parse-token-amount';
   import formatTokenAmount from '$lib/utils/format-token-amount';
   import Token from '../token/token.svelte';
   import Spinner from '../spinner/spinner.svelte';
   import { formatUnits } from 'ethers';
+  import Button from '../button/button.svelte';
 
   interface Props {
     tokenAddress: string | undefined;
@@ -16,7 +16,6 @@
     loading?: boolean;
     inputValue: string;
     validationState?: TextInputValidationState;
-    topUpMax?: boolean;
     amount?: bigint | undefined;
   }
 
@@ -28,15 +27,16 @@
     validationState = $bindable({
       type: 'unvalidated',
     }),
-    topUpMax = $bindable(false),
     amount = $bindable(),
   }: Props = $props();
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
-  $effect(() => {
-    if (topUpMax && tokenInfo) {
+
+  function setMax() {
+    if (tokenInfo) {
       inputValue = formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals);
     }
-  });
+  }
+
   $effect(() => {
     if (tokenBalance === undefined) {
       inputValue = '0';
@@ -45,9 +45,7 @@
     if (tokenInfo?.info) {
       amount = inputValue ? parseTokenAmount(inputValue, tokenInfo.info.decimals) : undefined;
 
-      if (topUpMax && amount && amount > 0n) {
-        validationState = { type: 'valid' };
-      } else if (amount) {
+      if (amount) {
         if (tokenBalance && amount <= tokenBalance) {
           validationState = { type: 'valid' };
         } else {
@@ -100,9 +98,9 @@
     {validationState}
     variant={{ type: 'number', min: 0 }}
     suffix={tokenInfo?.info.symbol}
-    disabled={topUpMax || !tokenAddress}
+    disabled={!tokenAddress}
   />
   {#snippet action()}
-    <Toggle bind:checked={topUpMax} label="Max" />
+    <Button size="small" variant="ghost" onclick={setMax}>Max</Button>
   {/snippet}
 </FormField>

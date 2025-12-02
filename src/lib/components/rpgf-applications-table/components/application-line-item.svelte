@@ -2,7 +2,6 @@
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import type { ComponentProps } from 'svelte';
   import ApplicationDecisionButtons from './application-decision-buttons.svelte';
-  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import type { Writable } from 'svelte/store';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -15,6 +14,7 @@
     ballotValidationContextKey,
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
+  import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
 
   interface Props {
     round: Round;
@@ -38,7 +38,7 @@
     ellipsis = false,
   }: Props = $props();
 
-  let picked = $state();
+  let picked = $derived($ballotStore[application.id] === undefined ? false : true);
 
   function updateBallot(picked: boolean) {
     if (voteStep !== 'build-ballot') return;
@@ -164,9 +164,6 @@
       };
     }
   }
-  $effect(() => {
-    updateVoteAmount(voteAmountInput);
-  });
 
   onDestroy(() => {
     updateValidationErrors({ type: 'unvalidated' });
@@ -196,20 +193,18 @@
     {/if}
 
     {#if voteStep === 'build-ballot' && application.state === 'approved'}
-      <Checkbox
-        checked={$ballotStore[application.id] !== undefined}
-        oninput={handleCheckboxInput}
-      />
+      <CheckboxSimple checked={picked} oninput={handleCheckboxInput} />
     {/if}
 
     {#if voteStep === 'assign-votes' && application.state === 'approved'}
       <div class="vote-count-input">
         <TextInput
+          bind:value={voteAmountInput}
           onclick={(e) => e.preventDefault()}
           validationState={voteAmountInputValidationState}
-          bind:value={voteAmountInput}
           variant={{ type: 'number', min: round.minVotesPerProjectPerVoter ?? 0 }}
           placeholder={votePlaceholder ?? '0+'}
+          oninput={(e) => updateVoteAmount((e.target as HTMLInputElement).value)}
         />
       </div>
     {/if}

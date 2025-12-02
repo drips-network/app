@@ -100,7 +100,6 @@
         projects={mapFilterUndefined(profileChainData.projects, (v) =>
           v === null ? undefined : v,
         )}
-        withClaimProjectButton={true}
       />
       <YourDripListsSection
         label={isSelf ? 'Your Drip Lists' : 'Drip Lists'}
@@ -113,7 +112,6 @@
         dripLists={mapFilterUndefined(profileChainData.dripLists, (v) =>
           v === null ? undefined : v,
         )}
-        withCreateButton={true}
       />
       <Supporters
         collapsable
@@ -136,15 +134,15 @@
         accountId={data.profileData.account.accountId}
       />
     </div>
-    <aside class="article-sidebar">
-      <SupportCard user={data.profileData} />
-      {#if network.orcids}
+    {#if network.orcids}
+      <aside class="article-sidebar">
+        <SupportCard user={data.profileData} />
         <LinkedIdentitiesCard
           linkedIdentities={profileChainData.linkedIdentities}
           canLinkIdentity={!!isSelf}
         ></LinkedIdentitiesCard>
-      {/if}
-    </aside>
+      </aside>
+    {/if}
   </article>
 {/if}
 

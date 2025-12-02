@@ -407,6 +407,7 @@ async function submitSpreadsheetBallot(
   roundSlug: string,
   data: SpreadsheetBody,
   format: SpreadsheetFormat,
+  addressOverride?: string,
 ): Promise<WrappedBallot> {
   const ballot = await parseBallotSpreadsheet(f, roundSlug, data, format);
   const { signature, chainId } = await signBallot(ballot);
@@ -416,6 +417,10 @@ async function submitSpreadsheetBallot(
     signature,
     chainId: chainId.toString(),
   });
+
+  if (addressOverride) {
+    query.set('addressOverride', addressOverride);
+  }
 
   const res = await authenticatedRpgfServerCall(
     `/rounds/${roundSlug}/ballots/spreadsheet?${query.toString()}`,
@@ -435,16 +440,18 @@ export async function castBallotAsCsv(
   f = fetch,
   roundSlug: string,
   data: string,
+  addressOverride?: string,
 ): Promise<WrappedBallot> {
-  return submitSpreadsheetBallot(f, roundSlug, data, 'csv');
+  return submitSpreadsheetBallot(f, roundSlug, data, 'csv', addressOverride);
 }
 
 export async function castBallotAsXlsx(
   f = fetch,
   roundSlug: string,
   data: ArrayBuffer,
+  addressOverride?: string,
 ): Promise<WrappedBallot> {
-  return submitSpreadsheetBallot(f, roundSlug, data, 'xlsx');
+  return submitSpreadsheetBallot(f, roundSlug, data, 'xlsx', addressOverride);
 }
 
 async function importResultsSpreadsheet(
@@ -494,7 +501,8 @@ export async function getOwnBallot(f = fetch, roundSlug: string): Promise<Wrappe
 
 export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedBallot[]> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots`,
+    // TODO(rpgf) pagination
+    `/rounds/${roundSlug}/ballots?limit=1000`,
     'GET',
     undefined,
     f,
@@ -506,7 +514,7 @@ export async function getBallots(f = fetch, roundSlug: string): Promise<WrappedB
 
 export async function getBallotsCsv(f = fetch, roundSlug: string): Promise<string> {
   const res = await authenticatedRpgfServerCall(
-    `/rounds/${roundSlug}/ballots?format=csv`,
+    `/rounds/${roundSlug}/ballots?format=csv&limit=1000`,
     'GET',
     undefined,
     f,

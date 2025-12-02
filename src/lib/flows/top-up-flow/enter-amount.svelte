@@ -37,19 +37,17 @@
   async function submit() {
     if (!amount) return;
 
-    const { tokenBalance, tokenAllowance } = $context;
-
-    const amountToTopUp = $context.topUpMax ? tokenBalance : amount;
+    const { tokenAllowance } = $context;
 
     context.update((c) => ({
       ...c,
-      amountToTopUp,
+      amount,
     }));
 
     topUp(
       dispatch,
       tokenAddress ?? unreachable(),
-      amountToTopUp ?? unreachable(),
+      amount ?? unreachable(),
       tokenAllowance ?? unreachable(),
     );
   }
@@ -66,7 +64,6 @@
   <InputWalletAmount
     tokenAddress={$context.tokenAddress}
     tokenBalance={$context.tokenBalance}
-    bind:topUpMax={$context.topUpMax}
     bind:inputValue={$context.amountValue}
     bind:amount
     bind:validationState
@@ -79,7 +76,6 @@
           context.set({
             tokenAddress: undefined,
             amountValue: '',
-            topUpMax: false,
           });
           dispatch('goBackward');
         }}

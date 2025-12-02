@@ -13,6 +13,7 @@
   import RpgfSettingsForm from '../../../../components/rpgf-settings-form.svelte';
   import { areStringArraysEqual } from '$lib/utils/compare-string-array';
   import { setRoundVoters, updateRound } from '$lib/utils/rpgf/rpgf';
+  import { invalidate } from '$app/navigation';
 
   let { data } = $props();
 
@@ -23,20 +24,23 @@
 
   let isDraft = $derived(!data.round.published);
 
-  // TODO(rpgf): use address driver account IDs as item keys, not addresses
-  let voterItems: Items = $state(
-    Object.fromEntries(
-      data.roundVoters.map((u) => {
+  function getVoterItemsFromAddresses(addresses: string[]): Items {
+    return Object.fromEntries(
+      addresses.map((address) => {
         return [
-          getAddress(u.walletAddress),
+          address,
           {
             type: 'address',
-            address: getAddress(u.walletAddress),
+            address,
           },
         ];
-      }) ?? [],
-    ),
-  );
+      }),
+    );
+  }
+
+  // TODO(rpgf): use address driver account IDs as item keys, not addresses
+  // svelte-ignore state_referenced_locally
+  let voterItems: Items = $state(getVoterItemsFromAddresses(updatedVoterAddresses));
 
   run(() => {
     updatedVoterAddresses = mapFilterUndefined(
@@ -134,14 +138,9 @@
     }
   });
 
-  // Voters can not be updated after voting has started
-  let canUpdateVoters = $derived(
-    data.round.state
-      ? data.round.state !== 'pending-results' &&
-          data.round.state !== 'results' &&
-          data.round.state !== 'voting'
-      : true,
-  );
+  // Voters can be updated during voting period, but the backend will restrict
+  // deleting voters who have already submitted ballots
+  let canUpdateVoters = $derived(data.round.state ? data.round.state !== 'results' : true);
 
   let voterGuidelinesLinkValidationState = $state<TextInputValidationState>({ type: 'valid' });
   run(() => {
@@ -166,15 +165,19 @@
     ),
   );
 
+  function haveVotersChanged(updated: string[], current: typeof data.roundVoters): boolean {
+    return !areStringArraysEqual(
+      [...updated].map((a) => a.toLowerCase()).sort(),
+      [...current].map((u) => u.walletAddress.toLowerCase()).sort(),
+    );
+  }
+
   let changesMade = $derived(
     updatedRound.maxVotesPerVoter !== data.round.maxVotesPerVoter ||
       updatedRound.maxVotesPerProjectPerVoter !== data.round.maxVotesPerProjectPerVoter ||
       updatedRound.minVotesPerProjectPerVoter !== data.round.minVotesPerProjectPerVoter ||
       updatedRound.voterGuidelinesLink !== data.round.voterGuidelinesLink ||
-      !areStringArraysEqual(
-        updatedVoterAddresses.map((a) => a.toLowerCase()).sort(),
-        data.roundVoters.map((u) => u.walletAddress.toLowerCase()).sort(),
-      ),
+      haveVotersChanged(updatedVoterAddresses, data.roundVoters),
   );
 
   function normalizeOptionalNumberInput(value: unknown): number | null {
@@ -213,13 +216,27 @@
       minVotesPerProjectPerVoter: minVotesPerProject,
     };
 
-    if (canUpdateVoters) {
+    // Always try to update voters when changes are made
+    // The backend will validate and reject if trying to delete voters who have submitted ballots
+    if (haveVotersChanged(updatedVoterAddresses, data.roundVoters)) {
       await setRoundVoters(undefined, data.round.id, updatedVoterAddresses);
     }
   }
+
+  async function saveErrorHandler() {
+    await invalidate('rpgf:round-voters');
+
+    updatedVoterAddresses = [...data.roundVoters.map((u) => getAddress(u.walletAddress))];
+    voterItems = getVoterItemsFromAddresses(updatedVoterAddresses);
+  }
 </script>
 
-<RpgfSettingsForm invalid={!valid} saveEnabled={changesMade} {saveHandler}>
+<RpgfSettingsForm
+  invalid={!valid}
+  saveEnabled={changesMade}
+  {saveHandler}
+  onSaveError={saveErrorHandler}
+>
   {#if !isDraft}
     <div style:align-self="flex-start">
       <AnnotationBox>
@@ -285,6 +302,14 @@
     description="These addresses will be able to vote in the round."
     disabled={!canUpdateVoters}
   >
+    {#if data.round.state === 'voting' || data.round.state === 'pending-results'}
+      <div style:margin-bottom="1rem">
+        <AnnotationBox>
+          You can add new badgeholders but can only remove those who have not yet submitted a
+          ballot.
+        </AnnotationBox>
+      </div>
+    {/if}
     <ListEditor
       bind:items={voterItems}
       allowDripLists={false}
