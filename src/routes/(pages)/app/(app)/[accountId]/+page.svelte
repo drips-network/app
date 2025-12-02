@@ -134,15 +134,15 @@
         accountId={data.profileData.account.accountId}
       />
     </div>
-    <aside class="article-sidebar">
-      <SupportCard user={data.profileData} />
-      {#if network.orcids}
+    {#if network.orcids}
+      <aside class="article-sidebar">
+        <SupportCard user={data.profileData} />
         <LinkedIdentitiesCard
           linkedIdentities={profileChainData.linkedIdentities}
           canLinkIdentity={!!isSelf}
         ></LinkedIdentitiesCard>
-      {/if}
-    </aside>
+      </aside>
+    {/if}
   </article>
 {/if}
 
