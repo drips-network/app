@@ -130,3 +130,12 @@ export async function getIntercomJwt() {
     await authenticatedCall(undefined, '/api/user/intercom-identity'),
   );
 }
+
+export async function getNovuHmac() {
+  return parseRes(
+    z.object({
+      hmacHash: z.string(),
+    }),
+    await authenticatedCall(undefined, '/api/user/novu-identity'),
+  );
+}

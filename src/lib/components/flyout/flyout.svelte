@@ -10,6 +10,9 @@
     visible?: boolean;
     trigger?: import('svelte').Snippet;
     content?: import('svelte').Snippet;
+
+    noPadding?: boolean;
+    forceOpen?: boolean;
   }
 
   let {
@@ -18,6 +21,8 @@
     visible = $bindable(false),
     trigger,
     content,
+    forceOpen = false,
+    noPadding = false,
   }: Props = $props();
   let triggerElem: HTMLDivElement;
 
@@ -66,10 +71,10 @@
     >
       {@render trigger?.()}
     </div>
-    {#if visible}
+    {#if visible || forceOpen}
       <div transition:fly={{ y: 8 }} class="content" class:left={direction === 'left'} style:width>
         <div class="margin"></div>
-        <div class="wrapper">
+        <div class="wrapper" style:padding={noPadding ? '' : '0.5rem'}>
           {@render content?.()}
         </div>
       </div>
@@ -106,8 +111,8 @@
     background-color: var(--color-background);
     box-shadow: var(--elevation-medium);
     border-radius: 1.25rem 0 1.25rem 1.25rem;
-    padding: 0.5rem;
     margin-top: 1rem;
+    overflow: hidden;
   }
 
   .margin {

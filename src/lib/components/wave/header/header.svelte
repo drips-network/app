@@ -1,7 +1,7 @@
 <script lang="ts">
   import Flyout from '$lib/components/flyout/flyout.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
-  import NotificationsButton from '$lib/components/notifications-button/notifications-button.svelte';
+  import NotificationsButton from '$lib/components/notifications/notifications-button.svelte';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import LogInButton from '../log-in-button/log-in-button.svelte';

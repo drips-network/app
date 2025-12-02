@@ -3,7 +3,6 @@
   import Intercom, { onUnreadCountChange } from '@intercom/messenger-js-sdk';
   import QuestionCircle from '../icons/QuestionCircle.svelte';
   import MiniButton from '../mini-button/mini-button.svelte';
-  import { scale } from 'svelte/transition';
   import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
   import type { InitType } from '@intercom/messenger-js-sdk/dist/types';
 
@@ -61,41 +60,10 @@
 </script>
 
 {#if INTERCOM_APP_ID}
-  <div class="support-button">
-    <MiniButton id="intercom-support-button" label="Get support" icon={QuestionCircle} />
-    {#if unreadCount > 0}
-      <div
-        transition:scale={{ duration: 300 }}
-        class="unread-badge tnum"
-        class:hidden={unreadCount === 0}
-      >
-        {unreadCount}
-      </div>
-    {/if}
-  </div>
+  <MiniButton
+    redNumber={unreadCount}
+    id="intercom-support-button"
+    label="Get support"
+    icon={QuestionCircle}
+  />
 {/if}
-
-<style>
-  .support-button {
-    position: relative;
-    display: inline-block;
-  }
-
-  .unread-badge {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    height: 1rem;
-    width: 1rem;
-    background: red;
-    color: white;
-    border-radius: 50%;
-    padding: 0.2em 0.5em;
-    font-size: 0.8em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    pointer-events: none;
-  }
-</style>
