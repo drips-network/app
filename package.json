@@ -130,7 +130,7 @@
     "puppeteer": "^23.6.0",
     "redis": "^4.6.14",
     "sanitize-html": "^2.13.0",
-    "satori": "^0.10.13",
+    "satori": "^0.18.3",
     "satori-html": "^0.3.2",
     "sigma": "^3.0.1",
     "siwe": "^3.0.0",
