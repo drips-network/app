@@ -107,7 +107,10 @@
 
   .content {
     grid-area: content;
-    padding: 0 1rem 1rem 0;
+    max-width: 120rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem 1rem 1rem 0;
     min-height: calc(100vh - 4rem);
     display: flex;
     height: fit-content;

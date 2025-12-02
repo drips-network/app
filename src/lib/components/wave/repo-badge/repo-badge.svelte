@@ -1,9 +1,16 @@
 <script lang="ts">
   import EmojiOrIpfsAvatar from '$lib/components/emoji-or-ipfs-avatar/EmojiOrIpfsAvatar.svelte';
-  import type { Repo } from '$lib/utils/wave/types/repo';
   import GithubIcon from '$lib/components/icons/Github.svelte';
 
-  let { repo, size = 'normal' }: { repo: Repo; size?: 'normal' | 'small' } = $props();
+  let {
+    repo,
+    size = 'normal',
+  }: {
+    repo: {
+      gitHubRepoFullName: string;
+    };
+    size?: 'normal' | 'small';
+  } = $props();
 </script>
 
 <div class="repo-badge">

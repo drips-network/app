@@ -61,3 +61,21 @@ export async function applyToWorkOnIssue(
     }),
   );
 }
+
+export async function acceptIssueApplication(
+  f = fetch,
+  waveId: string,
+  issueId: string,
+  applicationId: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/accept`,
+      {
+        method: 'POST',
+      },
+    ),
+  );
+}

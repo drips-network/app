@@ -1,5 +1,9 @@
 <script lang="ts" module>
-  export function inferBadges(issue: IssueDetailsDto, showNewApplicationsBadge: boolean) {
+  export function inferBadges(
+    issue: IssueDetailsDto,
+    showNewApplicationsBadge: boolean,
+    ownUserId: string | null,
+  ) {
     let badges = [];
 
     if (issue.points) {
@@ -13,6 +17,22 @@
     if (issue.pendingApplicationsCount && !issue.assignedApplicant && showNewApplicationsBadge) {
       badges.push({
         text: 'New applications',
+        color: 'var(--color-caution-level-6)',
+        backgroundColor: 'var(--color-caution-level-1)',
+        bold: true,
+      });
+    }
+
+    if (ownUserId && issue.assignedApplicant?.id === ownUserId) {
+      badges.push({
+        text: 'Assigned to you',
+        color: 'var(--color-positive-level-6)',
+        backgroundColor: 'var(--color-positive-level-1)',
+        bold: true,
+      });
+    } else if (issue.assignedApplicant) {
+      badges.push({
+        text: 'Applicant assigned',
         color: 'var(--color-caution-level-6)',
         backgroundColor: 'var(--color-caution-level-1)',
         bold: true,
@@ -53,6 +73,7 @@
     onselect,
     partOfWave,
     pathPrefix,
+    ownUserId,
     showNewApplicationsBadge = false,
   }: {
     issue: IssueDetailsDto;
@@ -61,15 +82,18 @@
     onselect?: (selected: boolean) => void;
     partOfWave?: WaveDto | null;
     pathPrefix: string;
+    ownUserId: string | null;
     showNewApplicationsBadge?: boolean;
   } = $props();
 
   let numberOfLines = determineAmountOfLines(issue);
-  let itemHeight = $derived(determineIssuesListItemHeight(issue, showNewApplicationsBadge));
+  let itemHeight = $derived(
+    determineIssuesListItemHeight(issue, showNewApplicationsBadge, ownUserId),
+  );
 
   let active = $derived(page.url.pathname.includes(issue.id));
 
-  let badges = $derived.by(() => inferBadges(issue, showNewApplicationsBadge));
+  let badges = $derived.by(() => inferBadges(issue, showNewApplicationsBadge, ownUserId));
 </script>
 
 {#snippet badge(text: string, color: string, backgroundColor: string, bold?: boolean)}

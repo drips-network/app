@@ -10,6 +10,7 @@
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
   import type { Snapshot } from './$types.js';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
 
   let { data } = $props();
 
@@ -31,9 +32,13 @@
     submitting = true;
 
     try {
-      await doWithErrorModal(async () => {
-        await applyToWorkOnIssue(undefined, data.wave.id, data.issue.id, applicationText);
-      });
+      await doWithConfirmationModal(
+        'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
+        () =>
+          doWithErrorModal(async () => {
+            await applyToWorkOnIssue(undefined, data.wave.id, data.issue.id, applicationText);
+          }),
+      );
       await goto(`/wave/contributors/issues/${data.issue.id}`);
     } finally {
       submitting = false;

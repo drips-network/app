@@ -38,6 +38,7 @@
     showNewApplicationsBadge = false,
     waves,
     viewKey,
+    ownUserId,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -58,6 +59,7 @@
     viewKey: string;
 
     showNewApplicationsBadge?: boolean;
+    ownUserId: string | null;
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -204,6 +206,7 @@
         </div>
       {:else}
         <IssuesList
+          {ownUserId}
           {pathPrefix}
           {showNewApplicationsBadge}
           {waves}
@@ -217,7 +220,7 @@
     </Card>
   </div>
 
-  <div class="content" style:padding-top="3.5rem">
+  <div class="content" style:padding-top="2.5rem">
     {@render children()}
   </div>
 </div>

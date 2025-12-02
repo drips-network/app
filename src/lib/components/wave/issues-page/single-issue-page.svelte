@@ -19,6 +19,7 @@
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
   import { beComplexityToFriendlyLabel, removeIssueFromWave } from '$lib/utils/wave/waves';
+  import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-badge/wave-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
@@ -56,7 +57,8 @@
     ),
   );
 
-  let canBeAddedToAWave = $derived(matchingWaveRepos.length > 0 && issue.state === 'open');
+  let isMaintainer = $derived(matchingWaveRepos.length > 0);
+  let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
 
   async function handleRemoveFromWave() {
     if (!partOfWave) {
@@ -72,13 +74,16 @@
     await invalidate('wave:issues');
 
     const newIssue = await getIssue(undefined, issue.id);
-    notifyIssuesUpdated([newIssue]);
+    if (newIssue) notifyIssuesUpdated([newIssue]);
   }
 
   let applications = $state<IssueApplicationWithDetailsDto[] | null>(null);
+  let promisePending = $state(true);
   $effect(() => {
+    promisePending = true;
     issueApplicationsPromise?.then((apps) => {
       applications = apps.data;
+      promisePending = false;
     });
   });
 
@@ -135,7 +140,7 @@
               'Contributors can start applying to work on this issue during active Wave Cycles.',
           }}
           skeleton={{
-            loaded: applications !== null,
+            loaded: !promisePending,
             empty: applications?.length === 0,
             emptyStateEmoji: '🫙',
             emptyStateHeadline: 'No applications yet',
@@ -144,7 +149,7 @@
         >
           <div class="applications-grid">
             {#each applications as application}
-              <IssueApplicationCard {application} />
+              <IssueApplicationCard {issue} {isMaintainer} {application} />
             {/each}
           </div>
         </Section>
@@ -160,6 +165,18 @@
       >
         View on GitHub
       </SidebarButton>
+
+      <div class="sidebar-section">
+        <div class="content">
+          <h5>Assigned applicant</h5>
+
+          {#if issue.assignedApplicant}
+            <GithubUserBadge user={issue.assignedApplicant} />
+          {:else}
+            <p style:color="var(--color-foreground-level-5)">No applicant assigned.</p>
+          {/if}
+        </div>
+      </div>
 
       <div class="sidebar-section">
         <div class="content">

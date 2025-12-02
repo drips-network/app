@@ -17,12 +17,13 @@ export function determineAmountOfLines(issue: IssueDetailsDto): 1 | 2 {
 export function determineIssuesListItemHeight(
   issue: IssueDetailsDto,
   showNewApplicationsBadge: boolean,
+  ownUserId: string | null,
 ): number {
   const amountOfLines = determineAmountOfLines(issue);
 
   let base = amountOfLines === 1 ? ISSUE_ITEM_HEIGHT_SINGLE_LINE : ISSUE_ITEM_HEIGHT_DOUBLE_LINE;
 
-  const hasBadges = inferBadges(issue, showNewApplicationsBadge).length > 0;
+  const hasBadges = inferBadges(issue, showNewApplicationsBadge, ownUserId).length > 0;
 
   if (hasBadges) {
     base += BADGES_ROW_HEIGHT;

@@ -22,6 +22,7 @@
     pathPrefix,
     showNewApplicationsBadge = false,
     onselectchange,
+    ownUserId,
   }: {
     issuesWithPagination: Awaited<ReturnType<typeof getIssues>>;
     getMoreIssues: (
@@ -35,6 +36,7 @@
     /** If true, issues with applications but no applicants receive a badge */
     showNewApplicationsBadge?: boolean;
     onselectchange?: (selectedIssues: IssueDetailsDto[]) => void;
+    ownUserId: string | null;
   } = $props();
 
   let issues = $state(issuesWithPagination.data);
@@ -62,7 +64,9 @@
   }
 
   let itemHeights = $derived(
-    issues.map((issue) => determineIssuesListItemHeight(issue, showNewApplicationsBadge)),
+    issues.map((issue) =>
+      determineIssuesListItemHeight(issue, showNewApplicationsBadge, ownUserId),
+    ),
   );
   let totalItemHeight = $derived(itemHeights.reduce((acc, height) => acc + height, 0));
 
@@ -220,6 +224,7 @@
       {@const issue = issues[index]}
       <div {style}>
         <IssuesListItem
+          {ownUserId}
           {issue}
           {showNewApplicationsBadge}
           selectable={multiselectMode}

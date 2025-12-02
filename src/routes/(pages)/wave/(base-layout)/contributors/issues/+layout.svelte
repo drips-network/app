@@ -24,6 +24,7 @@
 </script>
 
 <IssuesPage
+  ownUserId={data.user?.id ?? null}
   viewKey="contributors"
   waves={data.waves.data}
   issues={data.issues}
