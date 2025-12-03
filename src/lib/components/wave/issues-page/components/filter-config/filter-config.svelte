@@ -60,6 +60,20 @@
             },
           }
         : {}),
+      ...(mode === 'maintainer'
+        ? {
+            isInWave: {
+              type: 'single-select',
+              label: 'Wave Membership',
+              options: [
+                {
+                  label: 'Part of a Wave',
+                  value: 'true',
+                },
+              ],
+            },
+          }
+        : {}),
     }) as const;
 </script>
 
