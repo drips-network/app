@@ -24,6 +24,8 @@
 </script>
 
 <IssuesPage
+  filtersMode="maintainer"
+  noOfPreappliedFilters={2}
   ownUserId={data.user?.id ?? null}
   viewKey="maintainers"
   ownWaveRepos={data.waveRepos.data}

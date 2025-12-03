@@ -17,8 +17,11 @@ export const issueFilters = filterSchema(
     state: z.enum(['open', 'closed']).optional(),
     sortBy: z.enum(['createdAt', 'updatedAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
-    mine: z.boolean().optional(),
-    isInWave: z.boolean().optional(),
+    mine: z.coerce.boolean().optional(),
+    applicantAssigned: z.coerce.boolean().optional(),
+    assignedToUser: z.uuid().optional(),
+    appliedToByUser: z.uuid().optional(),
+    isInWave: z.coerce.boolean().optional(),
     eligibleForWave: z.boolean().optional(),
   }),
 );

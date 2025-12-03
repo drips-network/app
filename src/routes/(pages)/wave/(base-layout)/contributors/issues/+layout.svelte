@@ -24,6 +24,8 @@
 </script>
 
 <IssuesPage
+  filtersMode="contributor"
+  noOfPreappliedFilters={1}
   ownUserId={data.user?.id ?? null}
   viewKey="contributors"
   waves={data.waves.data}

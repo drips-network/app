@@ -19,7 +19,7 @@
   {href}
   target="_blank"
   rel="noopener noreferrer"
-  class="sidebar-button {variant}"
+  class="sidebar-button {variant} typo-text"
   class:disabled
   {onclick}
   aria-label="Sidebar Action"

@@ -42,6 +42,12 @@
     </Button>
   </div>
 
+  {#snippet leftActions()}
+    {#if data.onCancelGoto}
+      <Button href={data.onCancelGoto} variant="ghost">Cancel</Button>
+    {/if}
+  {/snippet}
+
   {#snippet actions()}
     <Button
       variant="primary"

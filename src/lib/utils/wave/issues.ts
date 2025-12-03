@@ -12,6 +12,7 @@ import {
   type PaginationInput,
 } from './types/pagination';
 import parseRes from './utils/parse-res';
+import expect from '$lib/utils/expect';
 
 export async function getIssues(f = fetch, pagination?: PaginationInput, filters?: IssueFilters) {
   return parseRes(
@@ -78,4 +79,25 @@ export async function acceptIssueApplication(
       },
     ),
   );
+}
+
+export async function markIssueAsCompleted(f = fetch, issueId: string) {
+  // endpoint does not immediately return updated issue bc that happens through webhook
+  await authenticatedCall(f, `/api/issues/${issueId}/complete`, {
+    method: 'POST',
+  });
+
+  // wait for the updated issue
+  const expectation = await expect(
+    () => getIssue(f, issueId),
+    (issue) => issue?.state === 'completed',
+    10000,
+    500,
+  );
+
+  if (expectation.failed) {
+    throw new Error('Timed out waiting for issue to be marked as completed.');
+  }
+
+  return expectation.result;
 }

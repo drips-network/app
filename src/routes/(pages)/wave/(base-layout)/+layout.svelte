@@ -11,6 +11,7 @@
   import Orgs from '$lib/components/icons/Orgs.svelte';
   import Patch from '$lib/components/icons/Patch.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
+  import Trophy from '$lib/components/icons/Trophy.svelte';
 
   let {
     data,
@@ -25,7 +26,11 @@
 <ModalLayout />
 
 <div class="header-container">
-  <Header user={data.user} noBackground={page.data.waveHeaderBackground === false} />
+  <Header
+    pointsBalance={data.pointsBalance?.totalPoints || null}
+    user={data.user}
+    noBackground={page.data.waveHeaderBackground === false}
+  />
 </div>
 
 <div class="layout-container">
@@ -78,17 +83,28 @@
         ],
         bottom: [
           {
-            type: 'target',
-            name: 'Settings',
-            href: '/wave/settings',
-            icon: Settings,
-          },
-          {
-            type: 'target',
-            name: 'Help',
-            href: 'https://docs.drips.network/wave',
-            newTab: true,
-            icon: InfoCircle,
+            type: 'collection',
+            items: [
+              {
+                type: 'target',
+                name: 'Points history',
+                href: '/wave/points',
+                icon: Trophy,
+              },
+              {
+                type: 'target',
+                name: 'Settings',
+                href: '/wave/settings',
+                icon: Settings,
+              },
+              {
+                type: 'target',
+                name: 'Help',
+                href: 'https://docs.drips.network/wave',
+                newTab: true,
+                icon: InfoCircle,
+              },
+            ],
           },
         ],
       }}

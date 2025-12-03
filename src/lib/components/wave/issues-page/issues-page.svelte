@@ -39,6 +39,8 @@
     waves,
     viewKey,
     ownUserId,
+    noOfPreappliedFilters,
+    filtersMode,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -60,6 +62,14 @@
 
     showNewApplicationsBadge?: boolean;
     ownUserId: string | null;
+
+    /** Some views have implicit initial filters applied - pass their count so that the
+     * amount of user-configurable filters is accurate
+     */
+    noOfPreappliedFilters: number;
+
+    /** Determines the set of filters shown */
+    filtersMode: 'maintainer' | 'contributor';
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -145,6 +155,8 @@
       );
     }
   });
+
+  let noOfFilters = $derived(Object.keys(appliedFilters).length - noOfPreappliedFilters);
 </script>
 
 <div class="wrapper">
@@ -177,7 +189,14 @@
         <Button icon={MagnifyingGlass}>Search</Button>
 
         <div>
-          <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>Filter</Button>
+          <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>
+            Filter
+            {#if noOfFilters > 0}
+              <div class="filter-count">
+                {noOfFilters}
+              </div>
+            {/if}
+          </Button>
           <Button icon={SortMostToLeast}>Sort</Button>
         </div>
       </div>
@@ -187,6 +206,8 @@
       <div class="filter-config">
         <Card>
           <FilterConfig
+            mode={filtersMode}
+            {ownUserId}
             bind:this={filterConfigInstance}
             {appliedFilters}
             onapply={handleApplyFilters}
@@ -283,6 +304,19 @@
 
   .filter-config {
     padding-bottom: 1rem;
+  }
+
+  .filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.25rem;
+    margin-left: 0.25rem;
+    width: 1.25rem;
+    font-size: 0.75rem;
+    border-radius: 50%;
+    background-color: var(--color-primary-level-1);
+    color: var(--color-primary-level-6);
   }
 
   .spinner {

@@ -5,7 +5,14 @@
   import { fade } from 'svelte/transition';
 
   interface Props {
-    variant?: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' | 'muted';
+    variant?:
+      | 'normal'
+      | 'primary'
+      | 'destructive'
+      | 'destructive-outline'
+      | 'ghost'
+      | 'muted'
+      | 'caution';
     icon?: Component | undefined;
     disabled?: boolean;
     ariaLabel?: string | undefined;
@@ -70,6 +77,8 @@
   $effect(() => {
     if (variant === 'destructive-outline') {
       textColor = 'var(--color-negative-level-6)';
+    } else if (variant === 'caution') {
+      textColor = 'var(--color-caution-level-6)';
     } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
       textColor = getContrastColor(primaryColor);
     } else {
@@ -115,11 +124,7 @@
   >
     {#if icon}
       {@const SvelteComponent = icon}
-      <SvelteComponent
-        style={variant === 'destructive' || variant === 'primary'
-          ? `fill: ${textColor}; transition: fill 0.3s;`
-          : 'fill: var(--color-foreground); transition: fill 0.3s;'}
-      />
+      <SvelteComponent style="fill: {textColor}; transition: fill 0.3s;" />
     {/if}
     {@render children?.()}
     {#if loading}
@@ -214,6 +219,10 @@
     background-color: var(--color-negative);
   }
 
+  .button .inner.caution {
+    background-color: var(--color-caution-level-1);
+  }
+
   .button .inner.with-icon-text {
     padding: 0 0.75rem 0 0.5rem;
   }
@@ -228,6 +237,15 @@
       0px 0px 0px 1px var(--color-foreground),
       0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
+    transform: translateY(-2px);
+  }
+
+  .button:not(.disabled):hover .inner.caution,
+  .button:not(.disabled):focus-visible .inner.caution {
+    box-shadow:
+      0px 0px 0px 1px var(--color-caution),
+      0 2px 0px 1px var(--color-caution),
+      inset 0 0px 0px 0px var(--color-caution);
     transform: translateY(-2px);
   }
 

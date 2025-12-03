@@ -27,11 +27,11 @@
 
 <div class="single-select-filter-item">
   {#each config.options as { label, value }}
-    <label for={value} class:selected={selected === value}>{label}</label>
+    <label for={label} class:selected={selected === value}>{label}</label>
     <input
       onchange={(e) => handleSelect(e)}
       checked={selected === value}
-      id={value}
+      id={label}
       type="checkbox"
       name={config.label}
       {value}

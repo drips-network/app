@@ -12,8 +12,8 @@ export const load = async ({ parent, fetch, url }) => {
 
   const hasOrgs = userOrgs.data.length > 0;
 
-  if (!user) {
-    throw redirect(302, '/wave/login?backTo=/wave/maintainer-onboarding/install-app');
+  if (!hasOrgs) {
+    throw redirect(302, '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave');
   }
 
   return {

@@ -16,7 +16,7 @@
 
   type Collection = {
     type: 'collection';
-    name: string;
+    name?: string;
     items: NavTarget[];
   };
 
@@ -68,7 +68,7 @@
       if (navEl && !navEl.matches(':hover')) {
         hovering = false;
       }
-    }, 500);
+    }, 300);
   });
 
   function isActive(href: string) {
@@ -100,7 +100,16 @@
   );
 
   let highlighterOffset = $derived(activeTargetEl ? activeTargetEl.offsetTop : 0);
+
+  function handleWindowResize() {
+    // Force re-calculation of highlighter offset
+    if (activeTargetEl) {
+      highlighterOffset = activeTargetEl.offsetTop;
+    }
+  }
 </script>
+
+<svelte:window onresize={handleWindowResize} />
 
 {#snippet navList(items: Item[])}
   {#each items as item}
@@ -108,10 +117,12 @@
       {@render navTarget(item, isActive(item.href))}
     {:else if item.type === 'collection'}
       <div class="collection">
-        {#if !shouldBeCollapsed}
-          <h5>{item.name}</h5>
-        {:else}
-          <div class="divider"></div>
+        {#if item.name}
+          {#if !shouldBeCollapsed}
+            <h5>{item.name}</h5>
+          {:else}
+            <div class="divider"></div>
+          {/if}
         {/if}
 
         {#each item.items as subItem}
@@ -153,7 +164,7 @@
     // Delay the expansion by 100ms
     hoverTimeout = setTimeout(() => {
       hovering = true;
-    }, 100);
+    }, 50);
   }}
   onmouseleave={() => {
     // If user leaves before 100ms, cancel the expansion

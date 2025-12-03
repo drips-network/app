@@ -3,7 +3,13 @@ import { issueFilters, type IssueFilters } from '$lib/utils/wave/types/issue.js'
 import { getWaves } from '$lib/utils/wave/waves.js';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch, url, depends }) => {
+export const load = async ({ fetch, url, depends, parent }) => {
+  const { user } = await parent();
+
+  if (!user) {
+    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
+  }
+
   depends('wave:issues');
 
   const filtersParam = url.searchParams.get('filters');

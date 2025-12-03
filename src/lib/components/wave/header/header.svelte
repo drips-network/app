@@ -1,5 +1,7 @@
 <script lang="ts">
+  import Button from '$lib/components/button/button.svelte';
   import Flyout from '$lib/components/flyout/flyout.svelte';
+  import Trophy from '$lib/components/icons/Trophy.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
   import NotificationsButton from '$lib/components/notifications/notifications-button.svelte';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
@@ -9,9 +11,11 @@
 
   let {
     user,
+    pointsBalance,
     noBackground = false,
   }: {
     user: WaveLoggedInUser | null;
+    pointsBalance: number | null;
     noBackground?: boolean;
   } = $props();
 </script>
@@ -27,6 +31,10 @@
     <SupportButton {user} />
 
     {#if user}
+      <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
+        {pointsBalance ?? 0} Points
+      </Button>
+
       <Flyout>
         {#snippet trigger()}
           <GithubUserBadge {user} />

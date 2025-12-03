@@ -1,20 +1,66 @@
 <script lang="ts" module>
-  export const AVAILABLE_FILTERS: Partial<Record<keyof IssueFilters, FilterConfig>> = {
-    state: {
-      type: 'single-select',
-      label: 'Status',
-      options: [
-        {
-          label: 'Open',
-          value: 'open',
-        },
-        {
-          label: 'Closed',
-          value: 'closed',
-        },
-      ],
-    },
-  };
+  export const AVAILABLE_FILTERS = (
+    ownUserId: string | null,
+    mode: 'maintainer' | 'contributor',
+  ): Partial<Record<keyof IssueFilters, FilterConfig>> =>
+    ({
+      state: {
+        type: 'single-select',
+        label: 'Status',
+        options: [
+          {
+            label: 'Open',
+            value: 'open',
+          },
+          {
+            label: 'Closed',
+            value: 'closed',
+          },
+        ],
+      },
+      ...(ownUserId && mode === 'contributor'
+        ? {
+            assignedToUser: {
+              type: 'single-select',
+              label: 'Assignment',
+              options: [
+                {
+                  label: 'Assigned to me',
+                  value: ownUserId,
+                },
+              ],
+            },
+          }
+        : {}),
+      ...(ownUserId && mode === 'contributor'
+        ? {
+            appliedToByUser: {
+              type: 'single-select',
+              label: 'Applications',
+              options: [
+                {
+                  label: 'Applied to by me',
+                  value: ownUserId,
+                },
+              ],
+            },
+          }
+        : {}),
+      ...(mode === 'maintainer'
+        ? {
+            applicantAssigned: {
+              type: 'single-select',
+              label: 'Assignment',
+              options: [
+                {
+                  label: 'Assigned to applicant',
+                  value: 'true',
+                },
+              ],
+            },
+          }
+        : {}),
+    }) as const;
 </script>
 
 <script lang="ts">
@@ -26,9 +72,13 @@
   let {
     onapply,
     appliedFilters,
+    ownUserId,
+    mode,
   }: {
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
+    ownUserId: string | null;
+    mode: 'maintainer' | 'contributor';
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);
@@ -63,13 +113,13 @@
 </script>
 
 <div class="filter-config-wrapper">
-  {#each Object.entries(AVAILABLE_FILTERS) as [filterKey, filterConfig], i}
+  {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode)) as [filterKey, filterConfig], i (filterKey)}
     <div class="filter-config-item">
       <h5>{filterConfig.label}</h5>
       {#if filterConfig.type === 'single-select'}
         <SingleSelectFilterItem
           bind:this={filterItems[i]}
-          selected={filters[filterKey as keyof IssueFilters]}
+          selected={filters[filterKey as keyof IssueFilters] as string | undefined}
           config={filterConfig}
           onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
         />

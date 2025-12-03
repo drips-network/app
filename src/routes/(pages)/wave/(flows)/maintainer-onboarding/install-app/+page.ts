@@ -1,7 +1,7 @@
 import { getOrgs } from '$lib/utils/wave/orgs.js';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ parent, fetch }) => {
+export const load = async ({ parent, fetch, url }) => {
   const { user } = await parent();
 
   if (!user) {
@@ -10,7 +10,11 @@ export const load = async ({ parent, fetch }) => {
 
   const userOrgs = await getOrgs(fetch);
 
+  const onCancelGoto = url.searchParams.get('onCancelGoto');
+  const decoded = decodeURIComponent(onCancelGoto || '');
+
   return {
     userOrgs,
+    onCancelGoto: decoded,
   };
 };

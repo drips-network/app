@@ -2,6 +2,7 @@
   import { invalidate } from '$app/navigation';
   import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import Check from '$lib/components/icons/Check.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -14,7 +15,7 @@
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
-  import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
+  import { getIssue, getIssueApplications, markIssueAsCompleted } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
@@ -92,6 +93,16 @@
       // Don't allow applying to own issue
       !allowAddingOrRemovingWave,
   );
+
+  async function handleMarkIssueCompleted() {
+    await doWithConfirmationModal(
+      'Are you sure you want to mark this issue as completed? This will close the issue on GitHub and award points to the assigned applicant.',
+      () =>
+        doWithErrorModal(async () => {
+          await markIssueAsCompleted(undefined, issue.id);
+        }),
+    );
+  }
 </script>
 
 <div
@@ -122,7 +133,7 @@
         {/if}
       </div>
 
-      {#if issueApplicationsPromise}
+      {#if issueApplicationsPromise && issue.state === 'open'}
         <Section
           header={{
             label: 'Applications',
@@ -159,6 +170,14 @@
 
   <div class="sidebar">
     <Card style="height: fit-content; padding: 0;">
+      {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
+        <div>
+          <SidebarButton icon={Check} variant="primary" onclick={handleMarkIssueCompleted}>
+            Mark completed
+          </SidebarButton>
+        </div>
+      {/if}
+
       <SidebarButton
         icon={ArrowBoxUpRight}
         href={`https://github.com/${issue.repo.gitHubRepoFullName}/issues/${issue.gitHubIssueNumber}`}
@@ -177,6 +196,16 @@
           {/if}
         </div>
       </div>
+
+      {#if issue.points}
+        <div class="sidebar-section">
+          <div class="content">
+            <h5>Points</h5>
+
+            <span class="typo-text">{issue.points}</span>
+          </div>
+        </div>
+      {/if}
 
       <div class="sidebar-section">
         <div class="content">
