@@ -50,11 +50,15 @@
         ? {
             applicantAssigned: {
               type: 'single-select',
-              label: 'Assignment',
+              label: 'Applicant assignment',
               options: [
                 {
-                  label: 'Assigned to applicant',
+                  label: 'Assigned to an applicant',
                   value: 'true',
+                },
+                {
+                  label: 'Not assigned',
+                  value: 'false',
                 },
               ],
             },
