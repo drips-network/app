@@ -5,6 +5,13 @@ UI=false
 PROD_BUILD=false
 
 cleanup() {
+    # Dump logs if in CI
+    if [ "${CI:-false}" = "true" ]; then
+        echo "Dumping docker logs..."
+        mkdir -p playwright-logs
+        docker compose -f docker-compose.yml logs --no-color > playwright-logs/docker-compose.log 2>&1 || true
+        docker compose -f docker-compose.yml logs --no-color graphql-api > playwright-logs/graphql-api.log 2>&1 || true
+    fi
     docker compose -f docker-compose.yml rm -fsv
 }
 trap cleanup EXIT
