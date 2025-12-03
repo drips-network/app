@@ -9,6 +9,10 @@ export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
 });
 export type AssignedApplicantDto = z.infer<typeof assignedApplicantDtoSchema>;
 
+const booleanString = z
+  .union([z.boolean(), z.literal('true'), z.literal('false')])
+  .transform((value) => value === true || value === 'true');
+
 export const issueFilters = filterSchema(
   z.object({
     orgId: z.uuid().optional(),
@@ -17,11 +21,11 @@ export const issueFilters = filterSchema(
     state: z.enum(['open', 'closed']).optional(),
     sortBy: z.enum(['createdAt', 'updatedAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
-    mine: z.coerce.boolean().optional(),
-    applicantAssigned: z.coerce.boolean().optional(),
+    mine: booleanString.optional(),
+    applicantAssigned: booleanString.optional(),
+    isInWave: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
     appliedToByUser: z.uuid().optional(),
-    isInWave: z.coerce.boolean().optional(),
     eligibleForWave: z.boolean().optional(),
   }),
 );
