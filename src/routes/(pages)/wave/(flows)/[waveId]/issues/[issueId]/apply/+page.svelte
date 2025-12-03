@@ -39,7 +39,7 @@
             await applyToWorkOnIssue(undefined, data.wave.id, data.issue.id, applicationText);
           }),
       );
-      await goto(`/wave/contributors/issues/${data.issue.id}`);
+      await goto(`/wave/${data.wave.id}/issues/${data.issue.id}/apply/success`);
     } finally {
       submitting = false;
     }
