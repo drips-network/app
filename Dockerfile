@@ -8,9 +8,6 @@ ENV NODE_ENV=production
 ARG CODEGEN_GQL_URL
 ARG GQL_ACCESS_TOKEN
 
-# Defaults to robots-allow.txt to serve a permissive robots.txt file
-ARG ROBOTS_FILE=robots-allow.txt
-
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
@@ -102,7 +99,6 @@ COPY . .
 RUN npm run postinstall
 
 # Set up robots
-RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
 # Fetch GQL schema from API at `CODEGEN_GQL_URL` and save it to schema.graphql for type generation.
 RUN npm run gql:generate-schema
