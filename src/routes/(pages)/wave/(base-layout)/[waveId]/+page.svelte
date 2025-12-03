@@ -59,6 +59,7 @@
     gap: 3rem;
     max-width: 90rem;
     margin: 0 auto;
+    width: 100%;
   }
 
   .hero {
