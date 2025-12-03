@@ -22,6 +22,15 @@ jobs:
         ORCID_CLIENT_ID: ${{ secrets.ORCID_CLIENT_ID }}
         ORCID_CLIENT_SECRET: ${{ secrets.ORCID_CLIENT_SECRET }}
       run: npm run test:e2e:headless
+      # Insert after docker-compose up (or after containers are started)
+    - name: Dump graphql container logs
+      if: always()
+      run: |
+        mkdir -p playwright-artifacts
+        # If you use docker-compose service name 'graphql-api'
+        docker-compose logs --no-color graphql-api > playwright-artifacts/graphql-api-compose.log 2>&1 || true
+        # Fallback: capture Docker container by the name seen in the job logs (app-graphql-api-1)
+        docker logs app-graphql-api-1 > playwright-artifacts/app-graphql-api-1.log 2>&1 || true
     - name: Upload Playwright report
       uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -29,3 +38,9 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+    - name: Upload graphql logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: graphql-logs
+        path: playwright-artifacts/*.log
