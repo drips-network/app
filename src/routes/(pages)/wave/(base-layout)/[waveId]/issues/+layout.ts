@@ -4,7 +4,7 @@ import { getWaves } from '$lib/utils/wave/waves.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, url, depends, parent }) => {
-  const { user } = await parent();
+  const { user, wave } = await parent();
 
   if (!user) {
     throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
@@ -26,10 +26,7 @@ export const load = async ({ fetch, url, depends, parent }) => {
   const filters: IssueFilters = filtersParamParseResult.data || {};
 
   // Contributors can only see issues that are part of a wave
-  filters.isInWave = true;
-
-  // Contributors can only see issues they have applied to on this view
-  filters.appliedToByUser = user.id;
+  filters.waveId = wave.id;
 
   const [issues, waves] = await Promise.all([
     getIssues(fetch, { limit: 10 }, filters),

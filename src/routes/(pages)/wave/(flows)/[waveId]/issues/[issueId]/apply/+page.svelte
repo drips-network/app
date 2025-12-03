@@ -110,7 +110,7 @@
   {/if}
 
   {#snippet leftActions()}
-    <Button href={`/wave/contributors/issues/${data.issue.id}`}>View issue details</Button>
+    <Button href={`/wave/${data.wave.id}/issues/${data.issue.id}`}>View issue details</Button>
   {/snippet}
 
   {#snippet actions()}

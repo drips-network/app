@@ -79,12 +79,17 @@ export async function removeIssueFromWave(f = fetch, waveId: string, issueId: st
   });
 }
 
-export async function getWaveCycles(f = fetch, waveId: string, filters: WaveCycleFilters = {}) {
+export async function getWaveCycles(
+  f = fetch,
+  waveId: string,
+  pagination: PaginationInput = {},
+  filters: WaveCycleFilters = {},
+) {
   return parseRes(
     paginatedResponseSchema(waveCycleDtoSchema),
     await authenticatedCall(
       f,
-      `/api/waves/${waveId}/cycles?${toFilterParams(waveCycleFiltersSchema, filters)}`,
+      `/api/waves/${waveId}/cycles?${toFilterParams(waveCycleFiltersSchema, filters)}&${toPaginationParams(pagination)}`,
     ),
   );
 }

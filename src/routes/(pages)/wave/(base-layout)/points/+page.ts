@@ -5,7 +5,7 @@ export const load = async ({ parent, url, fetch }) => {
   const { user } = await parent();
 
   if (!user) {
-    throw redirect(302, `/wave/login${encodeURIComponent(url.pathname + url.search)}`);
+    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
   }
 
   // TODO(wave): Pagination

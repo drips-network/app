@@ -1,7 +1,7 @@
 <script lang="ts" module>
   export const AVAILABLE_FILTERS = (
     ownUserId: string | null,
-    mode: 'maintainer' | 'contributor',
+    mode: 'maintainer' | 'contributor' | 'wave',
   ): Partial<Record<keyof IssueFilters, FilterConfig>> =>
     ({
       state: {
@@ -32,7 +32,7 @@
             },
           }
         : {}),
-      ...(ownUserId && mode === 'contributor'
+      ...(ownUserId && mode === 'wave'
         ? {
             appliedToByUser: {
               type: 'single-select',
@@ -46,7 +46,7 @@
             },
           }
         : {}),
-      ...(mode === 'maintainer'
+      ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
               type: 'single-select',
@@ -96,7 +96,7 @@
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
     ownUserId: string | null;
-    mode: 'maintainer' | 'contributor';
+    mode: 'maintainer' | 'contributor' | 'wave';
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);

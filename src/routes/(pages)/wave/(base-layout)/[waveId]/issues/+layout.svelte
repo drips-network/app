@@ -24,16 +24,20 @@
 </script>
 
 <IssuesPage
-  filtersMode="contributor"
-  noOfPreappliedFilters={2}
+  filtersMode="wave"
+  noOfPreappliedFilters={1}
   ownUserId={data.user?.id ?? null}
-  viewKey="contributors"
+  viewKey={data.wave.id}
   waves={data.waves.data}
   issues={data.issues}
-  pathPrefix="/wave/contributors/issues/"
+  pathPrefix="/wave/{data.wave.id}/issues/"
   appliedFilters={data.appliedFilters}
   onapplyfilters={handleApplyFilters}
-  breadcrumbs={[{ label: 'Contributor Dashboard' }, { label: 'Issues' }]}
+  breadcrumbs={[
+    { label: 'Waves', href: '/wave' },
+    { label: data.wave.name, href: `/wave/${data.wave.id}` },
+    { label: 'Issues' },
+  ]}
 >
   {@render children()}
 </IssuesPage>

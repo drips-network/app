@@ -15,6 +15,12 @@ const DATE_FORMAT_CONVENTIONS = {
     minute: '2-digit',
     year: 'numeric',
   },
+  standardWithoutYear: {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  },
   verbose: {
     month: 'long',
     year: 'numeric',

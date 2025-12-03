@@ -15,9 +15,14 @@ export const load = async ({ parent, fetch, params, url }) => {
   const [issue, wave, cycles, ownOrgs] = await Promise.all([
     getIssue(fetch, issueId),
     getWave(fetch, waveId),
-    getWaveCycles(fetch, waveId, {
-      status: 'active',
-    }),
+    getWaveCycles(
+      fetch,
+      waveId,
+      {},
+      {
+        status: 'active',
+      },
+    ),
     getOrgs(fetch, { limit: 100 }),
   ]);
 

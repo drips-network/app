@@ -46,7 +46,7 @@
           { type: 'target', name: 'Explore Waves', href: '/wave', icon: Explore },
           {
             type: 'collection',
-            name: 'Contributors',
+            name: 'Contributor',
             items: [
               {
                 type: 'target',
@@ -58,7 +58,7 @@
           },
           {
             type: 'collection',
-            name: 'Maintainers',
+            name: 'Maintainer',
             items: [
               {
                 type: 'target',
@@ -99,7 +99,7 @@
               },
               {
                 type: 'target',
-                name: 'Help',
+                name: 'Docs',
                 href: 'https://docs.drips.network/wave',
                 newTab: true,
                 icon: InfoCircle,
@@ -134,6 +134,7 @@
     transition:
       transform 0.2s,
       opacity 0.2s;
+    min-width: 0;
   }
 
   .content.sidenavExpanded {

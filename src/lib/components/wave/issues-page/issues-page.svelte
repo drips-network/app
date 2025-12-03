@@ -69,7 +69,7 @@
     noOfPreappliedFilters: number;
 
     /** Determines the set of filters shown */
-    filtersMode: 'maintainer' | 'contributor';
+    filtersMode: 'maintainer' | 'contributor' | 'wave';
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {

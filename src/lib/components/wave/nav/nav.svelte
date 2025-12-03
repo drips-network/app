@@ -68,7 +68,7 @@
       if (navEl && !navEl.matches(':hover')) {
         hovering = false;
       }
-    }, 300);
+    }, 400);
   });
 
   function isActive(href: string) {
