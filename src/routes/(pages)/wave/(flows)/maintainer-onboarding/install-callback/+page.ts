@@ -26,5 +26,3 @@ export const load = async ({ parent, fetch, url, depends }) => {
     throw redirect(302, '/wave/maintainer-onboarding/review-repos');
   }
 };
-
-export const ssr = false;

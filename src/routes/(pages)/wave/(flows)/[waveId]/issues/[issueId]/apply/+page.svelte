@@ -67,6 +67,11 @@
       You already applied to this issue in the current Wave Cycle. First withdraw your previous
       application if you want to re-apply.
     </AnnotationBox>
+  {:else if data.isOwnIssue}
+    <AnnotationBox>
+      You cannot apply to work on an issue in a repository you maintain. Please choose issues from
+      other repositories.
+    </AnnotationBox>
   {:else if waveHasActiveCycle}
     <FormField
       title="Application Text*"
