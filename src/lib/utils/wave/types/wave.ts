@@ -118,7 +118,6 @@ export const waveIssueWithDetailsDtoSchema = z.object({
   id: z.uuid(),
   addedAt: z.coerce.date(),
   removedAt: z.coerce.date().nullable(),
-  complexity: complexitySchema.nullable(),
   issue: z.object({
     id: z.uuid(),
     gitHubIssueNumber: z.number(),

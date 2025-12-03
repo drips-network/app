@@ -33,10 +33,8 @@
   </Card>
 
   {#snippet leftActions()}
-    <Button
-      icon={ArrowLeft}
-      href="/wave/maintainer-onboarding/review-repos"
-      disabled={data.waves.data.length === 0}>Review synced repos</Button
+    <Button icon={ArrowLeft} href="/wave/maintainer-onboarding/review-repos"
+      >Review synced repos</Button
     >
   {/snippet}
 

@@ -64,9 +64,9 @@
           throw new Error('Some issues could not be added to the Wave. Please try again.');
         }
 
-        const updatedIssues = await Promise.all(
-          eligibleIssues.map((issue) => getIssue(undefined, issue.id)),
-        );
+        const updatedIssues = (
+          await Promise.all(eligibleIssues.map((issue) => getIssue(undefined, issue.id)))
+        ).filter((issue): issue is IssueDetailsDto => issue !== null);
 
         notifyIssuesUpdated(updatedIssues);
         await invalidate('wave:issues');
