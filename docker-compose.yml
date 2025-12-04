@@ -337,3 +337,21 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        if [ -z "$$TUNNEL_TOKEN" ]; then
+          echo "No TUNNEL_TOKEN provided, starting Quick Tunnel...";
+          cloudflared tunnel --url http://wave:8000;
+        else
+          echo "TUNNEL_TOKEN provided, starting Named Tunnel...";
+          cloudflared tunnel run;
+        fi
+    depends_on:
+      - wave
