@@ -56,13 +56,7 @@
         {/if}
 
         {#if !notification.isRead}
-          <Button
-            loading={markingAsRead}
-            icon={EyeOpen}
-            variant="ghost"
-            size="small"
-            onclick={handleMarkRead}
-          >
+          <Button loading={markingAsRead} icon={EyeOpen} size="small" onclick={handleMarkRead}>
             Mark read
           </Button>
         {/if}

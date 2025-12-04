@@ -109,7 +109,7 @@
           <Button size="small" onclick={markAllAsRead} disabled={unreadCount === 0} icon={EyeOpen}
             >All read</Button
           >
-          <Button size="small" icon={Settings}>Settings</Button>
+          <Button size="small" href="/wave/settings/notifications" icon={Settings}>Settings</Button>
         </div>
       </div>
 
