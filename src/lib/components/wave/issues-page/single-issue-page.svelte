@@ -40,7 +40,7 @@
     waves: WaveDto[];
 
     /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
-    issueApplicationsPromise: ReturnType<typeof getIssueApplications> | null;
+    applicationsPromise: ReturnType<typeof getIssueApplications> | null;
   }
 
   let {
@@ -49,7 +49,7 @@
     waveRepos = [],
     partOfWave,
     waves,
-    issueApplicationsPromise,
+    applicationsPromise: issueApplicationsPromise,
   }: Props = $props();
 
   let matchingWaveRepos = $derived(
@@ -159,7 +159,7 @@
           }}
         >
           <div class="applications-grid">
-            {#each applications as application}
+            {#each applications as application (application.id)}
               <IssueApplicationCard {issue} {isMaintainer} {application} />
             {/each}
           </div>

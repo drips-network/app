@@ -9,9 +9,7 @@ export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
 });
 export type AssignedApplicantDto = z.infer<typeof assignedApplicantDtoSchema>;
 
-const booleanString = z
-  .union([z.boolean(), z.literal('true'), z.literal('false')])
-  .transform((value) => value === true || value === 'true');
+const booleanString = z.union([z.boolean(), z.literal('true'), z.literal('false')]);
 
 export const issueFilters = filterSchema(
   z.object({
@@ -19,17 +17,20 @@ export const issueFilters = filterSchema(
     repoId: z.uuid().optional(),
     waveId: z.uuid().optional(),
     state: z.enum(['open', 'closed']).optional(),
-    sortBy: z.enum(['createdAt', 'updatedAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
     mine: booleanString.optional(),
     applicantAssigned: booleanString.optional(),
     isInWave: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
     appliedToByUser: z.uuid().optional(),
-    eligibleForWave: z.boolean().optional(),
+    eligibleForWave: booleanString.optional(),
+    hasApplications: booleanString.optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;
+
+export const issueSortByOptionsSchema = z.enum(['createdAt', 'updatedAt', 'points']);
+export type IssueSortByOption = z.infer<typeof issueSortByOptionsSchema>;
 
 export const issueDetailsDtoSchema = z.object({
   id: z.uuid(),

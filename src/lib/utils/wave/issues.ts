@@ -1,6 +1,11 @@
 import { authenticatedCall } from './call';
 import { toFilterParams } from './types/filter';
-import { issueDetailsDtoSchema, issueFilters, type IssueFilters } from './types/issue';
+import {
+  issueDetailsDtoSchema,
+  issueFilters,
+  type IssueFilters,
+  type IssueSortByOption,
+} from './types/issue';
 import {
   issueApplicationFiltersSchema,
   issueApplicationWithDetailsDtoSchema,
@@ -14,12 +19,17 @@ import {
 import parseRes from './utils/parse-res';
 import expect from '$lib/utils/expect';
 
-export async function getIssues(f = fetch, pagination?: PaginationInput, filters?: IssueFilters) {
+export async function getIssues(
+  f = fetch,
+  pagination?: PaginationInput,
+  filters?: IssueFilters,
+  sortBy?: IssueSortByOption,
+) {
   return parseRes(
     paginatedResponseSchema(issueDetailsDtoSchema),
     await authenticatedCall(
       f,
-      `/api/issues?${toPaginationParams(pagination)}&${toFilterParams(issueFilters, filters)}`,
+      `/api/issues?${toPaginationParams(pagination)}&${toFilterParams(issueFilters, filters)}${sortBy ? `&sortBy=${sortBy}` : ''}`,
     ),
   );
 }

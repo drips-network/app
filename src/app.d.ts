@@ -20,6 +20,9 @@ declare namespace App {
     /** If true, the /wave route header will have a transparent background
      * and pass through clicks. */
     waveHeaderBackground?: false;
+
+    /** If true, flow will fill the screen rather than be constrained to a small centered window */
+    waveFullscreenFlow?: boolean;
   }
 
   interface Locals {

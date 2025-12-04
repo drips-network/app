@@ -10,7 +10,11 @@
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import FilterConfig from './components/filter-config/filter-config.svelte';
   import TransitionedHeight from '$lib/components/transitioned-height/transitioned-height.svelte';
-  import { type IssueDetailsDto, type IssueFilters } from '$lib/utils/wave/types/issue';
+  import {
+    type IssueDetailsDto,
+    type IssueFilters,
+    type IssueSortByOption,
+  } from '$lib/utils/wave/types/issue';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
@@ -23,14 +27,16 @@
     registerIssueUpdateListener,
     unregisterIssueUpdateListener,
   } from './issue-update-coordinator';
-  import { beforeNavigate } from '$app/navigation';
+  import { beforeNavigate, goto } from '$app/navigation';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import SortByConfig from './components/sort-by-config/sort-by-config.svelte';
+  import { page } from '$app/state';
 
   let {
     issues,
     children,
-    onapplyfilters,
     appliedFilters,
+    appliedSort,
     breadcrumbs,
     allowAddToWave = false,
     ownWaveRepos = [],
@@ -41,11 +47,12 @@
     ownUserId,
     noOfPreappliedFilters,
     filtersMode,
+    availableSortByOptions,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
     appliedFilters: IssueFilters;
-    onapplyfilters?: (filters: IssueFilters) => void | Promise<void>;
+    appliedSort: IssueSortByOption;
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
     allowAddToWave?: boolean;
 
@@ -70,6 +77,8 @@
 
     /** Determines the set of filters shown */
     filtersMode: 'maintainer' | 'contributor' | 'wave';
+
+    availableSortByOptions: IssueSortByOption[];
   } = $props();
 
   async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
@@ -98,8 +107,16 @@
     applyingFilters = true;
     filtersOpen = false;
 
-    // this should cause the `issues` prop to update
-    await onapplyfilters?.(filters);
+    const encodedFilters = Object.values(filters).length === 0 ? '' : btoa(JSON.stringify(filters));
+
+    const currentUrl = new URL(page.url);
+    currentUrl.searchParams.set('filters', encodedFilters);
+
+    await goto(currentUrl.toString(), {
+      replaceState: true,
+      noScroll: true,
+      keepFocus: true,
+    });
 
     applyingFilters = false;
   }
@@ -110,6 +127,36 @@
 
   function handleClear() {
     listInstance?.clearSelection();
+  }
+
+  let sortingOpen = $state<boolean>(false);
+
+  let sortByConfigInstance: SortByConfig;
+
+  function handleSortingClick() {
+    sortingOpen = !sortingOpen;
+
+    if (!sortingOpen) {
+      sortByConfigInstance?.reset();
+    }
+  }
+
+  let applyingSorting = $state<boolean>(false);
+
+  async function handleApplySorting(sortBy: IssueSortByOption) {
+    applyingSorting = true;
+    sortingOpen = false;
+
+    const currentUrl = new URL(page.url);
+    currentUrl.searchParams.set('sortBy', sortBy);
+
+    await goto(`${currentUrl.pathname}?${currentUrl.searchParams.toString()}`, {
+      replaceState: true,
+      noScroll: true,
+      keepFocus: true,
+    });
+
+    applyingSorting = false;
   }
 
   onMount(() => {
@@ -186,10 +233,15 @@
       </div>
     {:else}
       <div class="issue-list-configuration">
-        <Button icon={MagnifyingGlass}>Search</Button>
+        <Button icon={MagnifyingGlass} disabled={filtersOpen || sortingOpen}>Search</Button>
 
         <div>
-          <Button icon={Filter} onclick={handleFilterClick} highlit={filtersOpen}>
+          <Button
+            icon={Filter}
+            onclick={handleFilterClick}
+            highlit={filtersOpen}
+            disabled={sortingOpen}
+          >
             Filter
             {#if noOfFilters > 0}
               <div class="filter-count">
@@ -197,10 +249,29 @@
               </div>
             {/if}
           </Button>
-          <Button icon={SortMostToLeast}>Sort</Button>
+
+          <Button
+            icon={SortMostToLeast}
+            disabled={filtersOpen}
+            highlit={sortingOpen}
+            onclick={handleSortingClick}>Sort</Button
+          >
         </div>
       </div>
     {/if}
+
+    <TransitionedHeight collapsed={!sortingOpen}>
+      <div class="filter-config">
+        <Card>
+          <SortByConfig
+            {availableSortByOptions}
+            bind:this={sortByConfigInstance}
+            initiallySelected={appliedSort}
+            onapply={handleApplySorting}
+          />
+        </Card>
+      </div>
+    </TransitionedHeight>
 
     <TransitionedHeight collapsed={!filtersOpen}>
       <div class="filter-config">
@@ -217,7 +288,7 @@
     </TransitionedHeight>
 
     <Card style="padding: 0;" disabled={filtersOpen}>
-      {#if applyingFilters}
+      {#if applyingFilters || applyingSorting}
         <div class="spinner">
           <Spinner />
         </div>

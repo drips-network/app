@@ -1,43 +1,13 @@
-import { getIssues } from '$lib/utils/wave/issues';
-import { issueFilters, type IssueFilters } from '$lib/utils/wave/types/issue.js';
-import { getWaves } from '$lib/utils/wave/waves.js';
-import { redirect } from '@sveltejs/kit';
+import { issuesPageLayoutLoad } from '$lib/components/wave/issues-page/load-fns/issues-page-layout-load.js';
 
-export const load = async ({ fetch, url, depends, parent }) => {
-  const { user, wave } = await parent();
-
-  if (!user) {
-    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
-  }
-
-  depends('wave:issues');
-
-  const filtersParam = url.searchParams.get('filters');
-  const filtersParamDecoded = filtersParam ? atob(filtersParam) : null;
-  const filtersParamParseResult = issueFilters
-    .nullable()
-    .safeParse(filtersParamDecoded ? JSON.parse(filtersParamDecoded) : null);
-
-  if (!filtersParamParseResult.success) {
-    // redirect to same page without invalid filters
-    throw redirect(302, '/wave/maintainers/issues');
-  }
-
-  const filters: IssueFilters = filtersParamParseResult.data || {};
-
-  // Contributors can only see issues that are part of a wave
-  filters.waveId = wave.id;
-
-  const [issues, waves] = await Promise.all([
-    getIssues(fetch, { limit: 10 }, filters),
-    // todo(wave): Only fetch waves included in the issues list
-    getWaves(fetch, { limit: 100 }),
-  ]);
-
-  return {
-    issues,
-    appliedFilters: filters,
-    waves,
-    waveHeaderBackground: false,
-  };
-};
+export const load = (context) =>
+  issuesPageLayoutLoad(context, () => ({
+    preappliedFilters: {
+      waveId: context.params.waveId,
+    },
+    pathPrefix: `/wave/${context.params.waveId}/issues/`,
+    filtersMode: 'wave',
+    breadcrumbs: [{ label: 'Maintainer Dashboard' }, { label: 'Issues' }],
+    viewKey: context.params.waveId,
+    availableSortByOptions: ['updatedAt', 'createdAt', 'points'],
+  }));

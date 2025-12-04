@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Header from '$lib/components/wave/header/header.svelte';
@@ -14,7 +15,7 @@
 
 <ModalLayout />
 
-<div class="flow-base-layout">
+<div class="flow-base-layout" class:fullscreen={page.data.waveFullscreenFlow}>
   <div class="header-container">
     <Header
       pointsBalance={data.pointsBalance?.totalPoints || null}
@@ -23,7 +24,11 @@
     />
   </div>
 
-  <div class="content" style:view-transition-name="flow-content">
+  <div
+    class="content"
+    class:fullscreen={page.data.waveFullscreenFlow}
+    style:view-transition-name="flow-content"
+  >
     {@render children?.()}
   </div>
 
@@ -50,6 +55,10 @@
     max-width: 100vw;
   }
 
+  .flow-base-layout.fullscreen {
+    gap: 0.5rem;
+  }
+
   .content {
     width: 100%;
     max-width: 48rem;
@@ -65,5 +74,14 @@
     text-align: center;
     padding: 1rem;
     gap: 1rem;
+  }
+
+  .content.fullscreen {
+    width: 100%;
+    max-width: min(calc(100vw - 2rem), 100rem);
+    height: 100%;
+    min-height: auto;
+    padding: 0;
+    flex: 1;
   }
 </style>

@@ -15,6 +15,10 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
     data: z.array(itemSchema),
     pagination: paginationSchema,
   });
+export type PaginatedResponse<T> = {
+  data: T[];
+  pagination: Pagination;
+};
 
 export type PaginationInput =
   | {

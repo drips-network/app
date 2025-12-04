@@ -146,8 +146,8 @@
     flex-shrink: 0;
   }
 
-  .button:not(:hover).highlit .inner {
-    background-color: var(--color-primary-level-1);
+  .button.highlit .inner {
+    background-color: var(--color-primary-level-1) !important;
   }
 
   .button.size-large {

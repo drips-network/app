@@ -1,46 +1,56 @@
-import { getIssues } from '$lib/utils/wave/issues';
-import { issueFilters, type IssueFilters } from '$lib/utils/wave/types/issue.js';
-import { getWaves } from '$lib/utils/wave/waves.js';
-import { redirect } from '@sveltejs/kit';
+import { issuesPageLayoutLoad } from '$lib/components/wave/issues-page/load-fns/issues-page-layout-load.js';
 
-export const load = async ({ fetch, url, depends, parent }) => {
-  const { user } = await parent();
+export const load = (context) =>
+  issuesPageLayoutLoad(context, (user) => ({
+    requireLogin: true,
+    preappliedFilters: {
+      isInWave: true,
+      appliedToByUser: user?.id,
+    },
+    pathPrefix: '/wave/contributors/issues/',
+    filtersMode: 'contributor',
+    breadcrumbs: [{ label: 'Contributor Dashboard' }, { label: 'Issues' }],
+    viewKey: 'contributors',
+  }));
 
-  if (!user) {
-    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
-  }
+// export const load = async ({ fetch, url, depends, parent }) => {
+//   const { user } = await parent();
 
-  depends('wave:issues');
+//   if (!user) {
+//     throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
+//   }
 
-  const filtersParam = url.searchParams.get('filters');
-  const filtersParamDecoded = filtersParam ? atob(filtersParam) : null;
-  const filtersParamParseResult = issueFilters
-    .nullable()
-    .safeParse(filtersParamDecoded ? JSON.parse(filtersParamDecoded) : null);
+//   depends('wave:issues');
 
-  if (!filtersParamParseResult.success) {
-    // redirect to same page without invalid filters
-    throw redirect(302, '/wave/maintainers/issues');
-  }
+//   const filtersParam = url.searchParams.get('filters');
+//   const filtersParamDecoded = filtersParam ? atob(filtersParam) : null;
+//   const filtersParamParseResult = issueFilters
+//     .nullable()
+//     .safeParse(filtersParamDecoded ? JSON.parse(filtersParamDecoded) : null);
 
-  const filters: IssueFilters = filtersParamParseResult.data || {};
+//   if (!filtersParamParseResult.success) {
+//     // redirect to same page without invalid filters
+//     throw redirect(302, '/wave/maintainers/issues');
+//   }
 
-  // Contributors can only see issues that are part of a wave
-  filters.isInWave = true;
+//   const filters: IssueFilters = filtersParamParseResult.data || {};
 
-  // Contributors can only see issues they have applied to on this view
-  filters.appliedToByUser = user.id;
+//   // Contributors can only see issues that are part of a wave
+//   filters.isInWave = true;
 
-  const [issues, waves] = await Promise.all([
-    getIssues(fetch, { limit: 10 }, filters),
-    // todo(wave): Only fetch waves included in the issues list
-    getWaves(fetch, { limit: 100 }),
-  ]);
+//   // Contributors can only see issues they have applied to on this view
+//   filters.appliedToByUser = user.id;
 
-  return {
-    issues,
-    appliedFilters: filters,
-    waves,
-    waveHeaderBackground: false,
-  };
-};
+//   const [issues, waves] = await Promise.all([
+//     getIssues(fetch, { limit: 10 }, filters),
+//     // todo(wave): Only fetch waves included in the issues list
+//     getWaves(fetch, { limit: 100 }),
+//   ]);
+
+//   return {
+//     issues,
+//     appliedFilters: filters,
+//     waves,
+//     waveHeaderBackground: false,
+//   };
+// };

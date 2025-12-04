@@ -32,20 +32,6 @@
             },
           }
         : {}),
-      ...(ownUserId && mode === 'wave'
-        ? {
-            appliedToByUser: {
-              type: 'single-select',
-              label: 'Applications',
-              options: [
-                {
-                  label: 'Applied to by me',
-                  value: ownUserId,
-                },
-              ],
-            },
-          }
-        : {}),
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
@@ -58,6 +44,24 @@
                 },
                 {
                   label: 'Not assigned',
+                  value: 'false',
+                },
+              ],
+            },
+          }
+        : {}),
+      ...(mode === 'maintainer' || mode === 'wave'
+        ? {
+            hasApplications: {
+              type: 'single-select',
+              label: 'Applications',
+              options: [
+                {
+                  label: 'Has applications',
+                  value: 'true',
+                },
+                {
+                  label: 'No applications',
                   value: 'false',
                 },
               ],
@@ -147,7 +151,7 @@
 
   <div class="actions">
     <Button onclick={handleClear}>Clear all</Button>
-    <Button variant="primary" onclick={handleApply}>Apply Filters</Button>
+    <Button variant="primary" onclick={handleApply}>Apply filters</Button>
   </div>
 </div>
 

@@ -2,8 +2,6 @@
   import type { Snippet } from 'svelte';
   import type { PageData } from './$types';
   import IssuesPage from '$lib/components/wave/issues-page/issues-page.svelte';
-  import type { IssueFilters } from '$lib/utils/wave/types/issue';
-  import { goto } from '$app/navigation';
 
   let {
     data,
@@ -12,28 +10,8 @@
     data: PageData;
     children: Snippet;
   } = $props();
-
-  async function handleApplyFilters(filters: IssueFilters) {
-    const encodedFilters = Object.values(filters).length === 0 ? '' : btoa(JSON.stringify(filters));
-    await goto(`?filters=${encodedFilters}`, {
-      replaceState: true,
-      noScroll: true,
-      keepFocus: true,
-    });
-  }
 </script>
 
-<IssuesPage
-  filtersMode="contributor"
-  noOfPreappliedFilters={2}
-  ownUserId={data.user?.id ?? null}
-  viewKey="contributors"
-  waves={data.waves.data}
-  issues={data.issues}
-  pathPrefix="/wave/contributors/issues/"
-  appliedFilters={data.appliedFilters}
-  onapplyfilters={handleApplyFilters}
-  breadcrumbs={[{ label: 'Contributor Dashboard' }, { label: 'Issues' }]}
->
+<IssuesPage {...data}>
   {@render children()}
 </IssuesPage>
