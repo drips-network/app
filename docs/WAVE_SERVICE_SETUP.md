@@ -18,19 +18,22 @@ To fully utilize the Wave service locally, you must create a GitHub App.
 2.  **Basic Information**:
     - **GitHub App Name**: Choose a unique name (e.g., `drips-wave-local-<yourname>`).
     - **Homepage URL**: `http://localhost:5173` (or your local frontend URL).
-    - **Callback URL**: `http://localhost:8000/api/auth/github/callback`
-        - *Note: This matches the `GITHUB_OAUTH_CALLBACK_URL` in `docker-compose.yml`.*
+    - **Callback URL**:
+        - **Option A (Localhost)**: `http://localhost:8000/api/auth/github/callback`
+        - **Option B (Static Tunnel)**: `https://<your-domain>/api/auth/github/callback`
+        - *Note: This must match the `GITHUB_OAUTH_CALLBACK_URL` configured in `docker-compose.yml` (via `WAVE_PUBLIC_URL`).*
     - **Webhook URL**:
         - **Option A (Quick Tunnel - Random URL)**:
             - Leave `CLOUDFLARED_TUNNEL_TOKEN` empty in your `.env`.
-            - Check logs for the URL: `docker compose logs cloudflared | grep trycloudflare.com`
+            - The Wave service will automatically detect the random URL on startup.
+            - Check logs for the URL: `docker compose logs wave | grep "Found Tunnel URL"`
             - Example: `https://<random>.trycloudflare.com/api/webhooks/github`
         - **Option B (Static Tunnel - Fixed URL)**:
             - Set `CLOUDFLARED_TUNNEL_TOKEN` in your `.env` (see instructions below).
             - Use your configured domain: `https://<your-domain>/api/webhooks/github`
         - *Active*: Check this box.
 
-3.  **Permissions**:
+3.  **Permissions and Events**:
     - Configure the following permissions (adjust based on specific development needs, but these are standard for Drips integrations):
         - **Repository permissions**:
             - `Contents`: Read-only (to read `FUNDING.json` etc.)
@@ -39,14 +42,26 @@ To fully utilize the Wave service locally, you must create a GitHub App.
             - `Issues`: Read & Write
         - **Organization permissions**:
             - `Members`: Read-only
-        - **User permissions**:
+        - **Account permissions**:
             - `Email addresses`: Read-only
+    - Configure the following events:
+        - `Installation target`
+        - `Issues`
+        - `Organization`
+        - `Membership`
+        - `Repository`
 
-4.  **Generate Private Key**:
+4.  **Generate Client Secret**:
+    - Scroll to the "Client secrets" section.
+    - Click **Generate a new client secret**.
+    - Copy this secret immediately (you won't see it again).
+
+5.  **Generate Private Key**:
+    - (After saving the app, you will be prompted to generate a private key.)
     - Scroll down to "Private keys" and click **Generate a private key**.
     - This will download a `.pem` file. You will need the contents of this file.
 
-5.  **Install the App**:
+6.  **Install the App**:
     - Go to **Install App** in the sidebar.
     - Install the app on your personal account or a test organization.
 
@@ -77,6 +92,10 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 -   **`GITHUB_APP_BOT_USER_ID`**: You can find this by making a request to `https://api.github.com/users/<app-slug>[bot]`. Alternatively, for local dev, this might be less critical depending on the specific logic, but try to find the ID of the bot user created for your app.
 -   **`GITHUB_WEBHOOK_SECRET`**: The secret you set in the "Webhook URL" section (if you enabled webhooks). If you didn't set one, you can define any string here, but it must match what you configured in GitHub if webhooks are active.
 -   **`CLOUDFLARED_TUNNEL_TOKEN`**: (Optional) Token for a persistent Cloudflare Tunnel. If set, the service will use this token to run a named tunnel with a static URL. If not set, it defaults to a random Quick Tunnel.
+-   **`WAVE_PUBLIC_URL`**: (Optional) The public URL where your Wave service is accessible.
+    -   If using **localhost**, leave empty (defaults to `http://localhost:8000`).
+    -   If using a **Static Tunnel**, set this to your tunnel URL (e.g., `https://wave-dev.example.com`).
+    -   If using a **Quick Tunnel**, leave empty. The service will automatically detect the random URL from the Cloudflare tunnel logs and configure itself.
 
 ## 🚀 Running the Service
 
@@ -97,10 +116,14 @@ docker compose logs -f wave
 ### Option 1: Quick Tunnel (Random URL)
 The default setup uses a Cloudflare Quick Tunnel, which generates a random URL each time.
 
-1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` empty in `.env`.
+1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` and `WAVE_PUBLIC_URL` empty in `.env`.
 2.  Start the stack: `npm run dev:docker`.
-3.  Find your URL: `docker compose logs cloudflared | grep trycloudflare.com`.
-4.  Update GitHub App Webhook URL.
+3.  The `wave` service will wait for the tunnel to establish and automatically configure its `GITHUB_OAUTH_CALLBACK_URL`.
+4.  Find your URL in the logs:
+    ```bash
+    docker compose logs wave | grep "Found Tunnel URL"
+    ```
+5.  Update GitHub App Webhook URL with this new URL.
 
 ### Option 2: Static Tunnel (Fixed URL)
 For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflare Tunnel.
@@ -116,6 +139,8 @@ For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflar
     - Copy the token string from the install command (it's the long string after `--token`).
 4.  **Update Environment**:
     - Add `CLOUDFLARED_TUNNEL_TOKEN=<your-token>` to your `.env` file.
+    - Add `WAVE_PUBLIC_URL=https://<your-hostname>` to your `.env` file.
 5.  **Restart**:
     - `npm run dev:docker`.
     - Your service is now available at your configured hostname.
+    - The `GITHUB_OAUTH_CALLBACK_URL` will automatically update to use this URL.

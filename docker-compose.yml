@@ -307,10 +307,38 @@ services:
   wave:
     image: 'j537/wave:${WAVE_TAG-main}'
     pull_policy: always
-    command: bash -c "deno task db:migrate && deno task start"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        # If WAVE_PUBLIC_URL is not set, try to find it from Cloudflare Tunnel
+        if [ -z "$$WAVE_PUBLIC_URL" ]; then
+          echo "WAVE_PUBLIC_URL not set. Checking for Cloudflare Tunnel..."
+          # Wait for url.txt (timeout 30s)
+          TIMEOUT=30
+          COUNT=0
+          while [ ! -f /tmp/tunnel/url.txt ] && [ $$COUNT -lt $$TIMEOUT ]; do
+            sleep 1
+            COUNT=$$((COUNT+1))
+          done
+
+          if [ -f /tmp/tunnel/url.txt ]; then
+            export WAVE_PUBLIC_URL=$$(cat /tmp/tunnel/url.txt)
+            echo "Found Tunnel URL: $$WAVE_PUBLIC_URL"
+          else
+            echo "No tunnel URL found. Defaulting to localhost."
+            export WAVE_PUBLIC_URL="http://localhost:8000"
+          fi
+        fi
+
+        export BASE_URL="$$WAVE_PUBLIC_URL"
+        export GITHUB_OAUTH_CALLBACK_URL="$${WAVE_PUBLIC_URL}/api/auth/github/callback"
+
+        echo "Starting Wave with BASE_URL=$$BASE_URL"
+        deno task db:migrate && deno task start
     environment:
       - PORT=8000
-      - BASE_URL=http://localhost:8000
+      - BASE_URL=${WAVE_PUBLIC_URL:-http://localhost:8000}
       - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
@@ -323,11 +351,13 @@ services:
       # Placeholders for required secrets
       - GITHUB_OAUTH_CLIENT_ID={GITHUB_OAUTH_CLIENT_ID-placeholder}
       - GITHUB_OAUTH_CLIENT_SECRET={GITHUB_OAUTH_CLIENT_SECRET-placeholder}
-      - GITHUB_OAUTH_CALLBACK_URL=http://localhost:8000/api/auth/github/callback
-      - GITHUB_APP_ID={GITHUB_APP_ID-placeholder}
+      - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL:-http://localhost:8000}/api/auth/github/callback
+      - GITHUB_APP_ID={GITHUB_APP_ID-0000000}
       - GITHUB_APP_PRIVATE_KEY={GITHUB_APP_PRIVATE_KEY-placeholder}
       - GITHUB_APP_BOT_USER_ID={GITHUB_APP_BOT_USER_ID-placeholder}
-      - GITHUB_WEBHOOK_SECRET={GITHUB_WEBHOOK_SECRET-placeholder}
+      - GITHUB_WEBHOOK_SECRET={GITHUB_WEBHOOK_SECRET-1234}
+    volumes:
+      - tunnel-data:/tmp/tunnel
     ports:
       - 8000:8000
     depends_on:
@@ -340,18 +370,32 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
+    volumes:
+      - tunnel-data:/tmp/tunnel
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
     entrypoint:
       - /bin/sh
       - -c
       - |
+        mkdir -p /tmp/tunnel
+        rm -f /tmp/tunnel/url.txt
         if [ -z "$$TUNNEL_TOKEN" ]; then
-          echo "No TUNNEL_TOKEN provided, starting Quick Tunnel...";
-          cloudflared tunnel --url http://wave:8000;
+          echo "No TUNNEL_TOKEN provided, starting Quick Tunnel..."
+          # Run cloudflared in background, piping logs to file
+          cloudflared tunnel --url http://wave:8000 2>&1 | tee /tmp/tunnel/tunnel.log &
+          PID=$$!
+          # Wait for URL to appear in logs
+          echo "Waiting for URL..."
+          ( tail -f /tmp/tunnel/tunnel.log | grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' | head -n 1 > /tmp/tunnel/url.txt && echo "URL captured: $$(cat /tmp/tunnel/url.txt)" ) &
+          wait $$PID
         else
-          echo "TUNNEL_TOKEN provided, starting Named Tunnel...";
-          cloudflared tunnel run;
+          echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
+          cloudflared tunnel run
         fi
     depends_on:
       - wave
+
+volumes:
+  tunnel-data:
+
