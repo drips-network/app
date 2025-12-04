@@ -11,7 +11,7 @@
 
 <div class="setting" class:disabled>
   <div class="title">
-    <h3>{title}</h3>
+    <h4>{title}</h4>
     <p>{subtitle}</p>
   </div>
   {@render children?.()}
@@ -33,6 +33,7 @@
 
   p {
     max-width: 40rem;
+    color: var(--color-foreground-level-5);
   }
 
   @media (max-width: 1024px) {

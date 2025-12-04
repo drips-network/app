@@ -5,6 +5,7 @@
   import { fade } from 'svelte/transition';
   import { sineInOut } from 'svelte/easing';
   import { page } from '$app/state';
+  import { browser } from '$app/environment';
 
   type NavTarget = {
     type: 'target';
@@ -112,7 +113,7 @@
 <svelte:window onresize={handleWindowResize} />
 
 {#snippet navList(items: Item[])}
-  {#each items as item}
+  {#each items as item (item.name)}
     {#if item.type === 'target'}
       {@render navTarget(item, isActive(item.href))}
     {:else if item.type === 'collection'}
@@ -125,7 +126,7 @@
           {/if}
         {/if}
 
-        {#each item.items as subItem}
+        {#each item.items as subItem (subItem.name)}
           {@render navTarget(subItem, isActive(subItem.href))}
         {/each}
       </div>
@@ -174,11 +175,14 @@
     hovering = false;
   }}
 >
-  <div
-    class="item-highlighter"
-    bind:this={highlightEl}
-    style:transform="translateY({highlighterOffset}px)"
-  ></div>
+  {#if browser}
+    <div
+      class="item-highlighter"
+      bind:this={highlightEl}
+      in:fade={{ duration: 200 }}
+      style:transform="translateY({highlighterOffset}px)"
+    ></div>
+  {/if}
 
   <div class="inner">
     {@render navList(items.top)}

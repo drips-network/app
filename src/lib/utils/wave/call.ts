@@ -57,6 +57,9 @@ export async function authenticatedCall(
 
     // retry the original request with the new token
     return authenticatedCall(f, path, options, false);
+  } else if (!res.ok && res.status !== 404) {
+    const errorText = await res.text();
+    throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
   }
 
   return res;

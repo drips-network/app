@@ -3,8 +3,8 @@ import ts from 'typescript-eslint';
 import svelte from 'eslint-plugin-svelte';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
+import svelteConfig from './svelte.config.js';
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
   js.configs.recommended,
   ...ts.configs.recommended,
@@ -23,7 +23,10 @@ export default [
     files: ['**/*.svelte'],
     languageOptions: {
       parserOptions: {
+        projectService: true,
+        extraFileExtensions: ['.svelte'],
         parser: ts.parser,
+        svelteConfig,
       },
     },
   },
@@ -43,6 +46,15 @@ export default [
           varsIgnorePattern: '^_',
           argsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'svelte/no-navigation-without-resolve': [
+        'error',
+        {
+          ignoreGoto: false,
+          ignoreLinks: true,
+          ignorePushState: false,
+          ignoreReplaceState: false,
         },
       ],
     },

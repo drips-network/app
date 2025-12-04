@@ -6,7 +6,7 @@
   import Button from '$lib/components/button/button.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
-  import Setting from '../../../../routes/(pages)/app/(app)/settings/components/setting.svelte';
+  import Setting from '$lib/components/setting/setting.svelte';
   import {
     SupportButtonBackground,
     SupportButtonStat,

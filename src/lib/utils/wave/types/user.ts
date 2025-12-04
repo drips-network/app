@@ -6,3 +6,16 @@ export const waveUserDtoSchema = z.object({
   gitHubAvatarUrl: z.url(),
 });
 export type WaveUser = z.infer<typeof waveUserDtoSchema>;
+
+export const waveOwnProfileUserDataSchema = z.object({
+  id: z.uuid(),
+  gitHubName: z.string().nullable(),
+  gitHubAvatarUrl: z.url(),
+  gitHubUsername: z.string(),
+  email: z.email(),
+  payoutAddresses: z
+    .object({
+      stellar: z.string().nullable(),
+    })
+    .nullable(),
+});

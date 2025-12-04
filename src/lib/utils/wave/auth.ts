@@ -15,6 +15,11 @@ const accessClaimJwtSchema = z.object({
   email: z.email(),
   picture: z.url(),
   signUpDate: z.coerce.date(),
+  payoutAddresses: z
+    .object({
+      stellar: z.string().nullable(),
+    })
+    .optional(),
 });
 
 export type WaveLoggedInUser = WaveUser & {
@@ -22,6 +27,9 @@ export type WaveLoggedInUser = WaveUser & {
   email: string;
   avatarUrl: string;
   isSuperAdmin: boolean;
+  payoutAddresses?: {
+    stellar: string | null;
+  };
   signUpDate: Date;
 };
 
@@ -54,6 +62,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
     isSuperAdmin: content.isSuperAdmin,
     avatarUrl: content.picture,
     signUpDate: content.signUpDate,
+    payoutAddresses: content.payoutAddresses,
   };
 }
 
