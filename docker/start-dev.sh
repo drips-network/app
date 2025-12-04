@@ -27,6 +27,8 @@ export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
 # source .env file
-export $(grep -v '^#' .env | xargs)
+set -a
+source .env
+set +a
 
 docker compose -f docker-compose.yml -f docker-compose.dev.yml build && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --renew-anon-volumes --attach app
