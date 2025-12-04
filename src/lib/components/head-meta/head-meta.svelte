@@ -35,4 +35,5 @@
   <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
   <meta name="twitter:card" content={twitterCardType} />
   <meta name="twitter:site" content="@dripsnetwork" />
+  <link rel="canonical" href={$page.url.href} />
 </svelte:head>

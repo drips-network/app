@@ -8,9 +8,6 @@ ENV NODE_ENV=production
 ARG CODEGEN_GQL_URL
 ARG GQL_ACCESS_TOKEN
 
-# Pass robots-allow.txt to serve a permissive robots.txt file
-ARG ROBOTS_FILE=robots-disallow.txt
-
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
@@ -81,7 +78,7 @@ ARG PUBLIC_INTERNAL_DRIPS_RPGF_URL
 ARG PUBLIC_ORCID_API_URL
 
 RUN apt-get update \
- && apt-get install -y chromium \
+    && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends
 
@@ -102,7 +99,6 @@ COPY . .
 RUN npm run postinstall
 
 # Set up robots
-RUN mv ${ROBOTS_FILE} ./static/robots.txt
 
 # Fetch GQL schema from API at `CODEGEN_GQL_URL` and save it to schema.graphql for type generation.
 RUN npm run gql:generate-schema
