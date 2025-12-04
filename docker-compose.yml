@@ -303,3 +303,37 @@ services:
         condition: service_healthy
       graphql-api:
         condition: service_healthy
+
+  wave:
+    image: 'j537/wave:${WAVE_TAG-main}'
+    pull_policy: always
+    command: bash -c "deno task db:migrate && deno task start"
+    environment:
+      - PORT=8000
+      - BASE_URL=http://localhost:8000
+      - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - REDIS_URL=redis://redis:6379
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_MASTER_KEY=1234
+      - JWT_SECRET=123
+      - ENCRYPTION_KEY=12345678901234567890123456789012
+      - LOG_LEVEL=DEBUG
+      - ENV=development
+      - FRONTEND_BASE_URL=http://localhost:5173
+      # Placeholders for required secrets
+      - GITHUB_OAUTH_CLIENT_ID={GITHUB_OAUTH_CLIENT_ID-placeholder}
+      - GITHUB_OAUTH_CLIENT_SECRET={GITHUB_OAUTH_CLIENT_SECRET-placeholder}
+      - GITHUB_OAUTH_CALLBACK_URL=http://localhost:8000/api/auth/github/callback
+      - GITHUB_APP_ID={GITHUB_APP_ID-placeholder}
+      - GITHUB_APP_PRIVATE_KEY={GITHUB_APP_PRIVATE_KEY-placeholder}
+      - GITHUB_APP_BOT_USER_ID={GITHUB_APP_BOT_USER_ID-placeholder}
+      - GITHUB_WEBHOOK_SECRET={GITHUB_WEBHOOK_SECRET-placeholder}
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
