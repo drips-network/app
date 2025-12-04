@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import Flyout from '$lib/components/flyout/flyout.svelte';
+  import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
   import NotificationsButton from '$lib/components/notifications/notifications-button.svelte';
@@ -21,7 +22,10 @@
 </script>
 
 <header class:noBackground>
-  <a class="typo-header-3" href="/wave">Drips Wave</a>
+  <a class="typo-header-3 logo" href="/wave">
+    <DripsLogo />
+    <span>Wave</span>
+  </a>
 
   <div class="right">
     {#if user}
@@ -32,7 +36,7 @@
 
     {#if user}
       <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
-        {pointsBalance ?? 0} Points
+        {pointsBalance ?? 0}
       </Button>
 
       <Flyout>
@@ -51,6 +55,19 @@
 </header>
 
 <style>
+  .logo {
+    height: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 0;
+    color: var(--color-primary);
+  }
+
+  .logo span {
+    padding-top: 0.125rem;
+  }
+
   header {
     height: 4.5rem;
     display: flex;
