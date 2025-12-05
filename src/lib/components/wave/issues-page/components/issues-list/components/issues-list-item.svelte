@@ -130,7 +130,7 @@
   >
     {#if badges.length > 0}
       <div class="badges">
-        {#each badges as { text, color, backgroundColor, bold }}
+        {#each badges as { text, color, backgroundColor, bold } (text)}
           {@render badge(text, color, backgroundColor, bold)}
         {/each}
       </div>
@@ -158,6 +158,7 @@
     gap: 8px;
     box-sizing: border-box;
     background-color: var(--color-background);
+    transition: background-color 0.2s;
   }
 
   .issue-list-item .details {
@@ -191,7 +192,8 @@
     background-color: var(--color-primary-level-1);
   }
 
-  .issue-list-item:not(.active):hover {
+  .issue-list-item:not(.active):hover,
+  .issue-list-item:not(.active):focus-visible {
     background-color: var(--color-foreground-level-1);
   }
 

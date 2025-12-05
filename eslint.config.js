@@ -8,9 +8,9 @@ import svelteConfig from './svelte.config.js';
 export default [
   js.configs.recommended,
   ...ts.configs.recommended,
-  ...svelte.configs['flat/recommended'],
+  ...svelte.configs.recommended,
   prettier,
-  ...svelte.configs['flat/prettier'],
+  ...svelte.configs.prettier,
   {
     languageOptions: {
       globals: {

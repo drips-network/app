@@ -43,7 +43,13 @@
       bind:isCurrentlyExpanded={sidenavExpanded}
       items={{
         top: [
-          { type: 'target', name: 'Explore Waves', href: '/wave', icon: Explore },
+          {
+            type: 'target',
+            name: 'Explore Waves',
+            href: '/wave',
+            icon: Explore,
+            allowBacktrack: true,
+          },
           {
             type: 'collection',
             name: 'Contributor',
@@ -126,7 +132,7 @@
     max-width: 120rem;
     width: 100%;
     margin: 0 auto;
-    padding: 1rem 1rem 1rem 0;
+    padding: 0.5rem 1rem 1rem 0;
     min-height: calc(100vh - 4rem);
     display: flex;
     height: fit-content;
@@ -142,6 +148,7 @@
     filter: blur(2px);
     opacity: 0.5;
     pointer-events: none;
+    user-select: none;
   }
 
   .layout-container {

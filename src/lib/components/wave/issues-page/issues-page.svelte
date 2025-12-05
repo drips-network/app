@@ -264,7 +264,7 @@
       </div>
     {/if}
 
-    <TransitionedHeight collapsed={!sortingOpen}>
+    <TransitionedHeight removeFromTabIndexWhileCollapsed collapsed={!sortingOpen}>
       <div class="filter-config">
         <Card>
           <SortByConfig
@@ -277,7 +277,7 @@
       </div>
     </TransitionedHeight>
 
-    <TransitionedHeight collapsed={!filtersOpen}>
+    <TransitionedHeight removeFromTabIndexWhileCollapsed collapsed={!filtersOpen}>
       <div class="filter-config">
         <Card>
           <FilterConfig
@@ -317,7 +317,7 @@
     </Card>
   </div>
 
-  <div class="content" style:padding-top="2.5rem">
+  <div class="content" style:padding-top="3rem">
     {@render children()}
   </div>
 </div>

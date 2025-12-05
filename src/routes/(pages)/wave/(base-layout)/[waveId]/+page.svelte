@@ -25,9 +25,10 @@
   <div class="hero">
     <div class="wave-name">
       <Card style="height: 100%;">
+        <div class="bg"></div>
         <div class="wave-name-inner">
           <WaveAvatar {wave} size={128} />
-          <h1>{wave.name}</h1>
+          <h1>{wave.name} Wave</h1>
 
           <p style:color="var(--color-foreground-level-6)">{wave.description}</p>
 
@@ -74,6 +75,17 @@
     grid-area: name;
     min-height: 0;
     position: relative;
+  }
+
+  .wave-name .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5rem;
+    border-radius: 1rem 0 0 0;
+    background-color: var(--color-primary-level-1);
+    z-index: 0;
   }
 
   .wave-name-inner {
