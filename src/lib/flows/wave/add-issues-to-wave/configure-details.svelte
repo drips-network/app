@@ -4,7 +4,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
+  import type { Complexity, WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
@@ -98,6 +98,17 @@
   let selectedWaveIds = $state<string[]>([]);
 
   let valid = $derived(selectedWaveIds.length > 0);
+
+  function getPointsForComplexity(complexity: Complexity): number {
+    switch (complexity) {
+      case 'small':
+        return 0;
+      case 'medium':
+        return 50;
+      case 'large':
+        return 100;
+    }
+  }
 </script>
 
 <StandaloneFlowStepLayout
@@ -106,7 +117,9 @@
 >
   <FormField
     title="Complexity*"
-    description="This will be used to determine the points earned when closing this issue. You can update the complexity later."
+    description="This will be used to determine the points earned when closing {pluralS
+      ? 'these issues'
+      : 'this issue'}. You can update the complexity later."
     type="div"
   >
     <div style:width="max-content">
@@ -121,11 +134,24 @@
     </div>
   </FormField>
 
-  <!-- TODO(Wave): visual that shows points depending on complexity -->
+  <FormField
+    title="Points"
+    description="The amount of Points earned for solving the issue{pluralS} is determined by the complexity you choose."
+    type="div"
+  >
+    <span class="typo-text complexity-calc">
+      <span style:color="var(--color-foreground-level-5)">
+        100 <span class="typo-text-bold">Base Points</span> + {getPointsForComplexity(
+          activeComplexity,
+        )} <span class="typo-text-bold">Complexity Bonus</span> =
+      </span>
+      <span class="typo-text-bold">{100 + getPointsForComplexity(activeComplexity)} Points</span>
+    </span>
+  </FormField>
 
   <FormField
     title="Wave*"
-    description="Choose which Wave you'd like to add the issue to."
+    description="Choose which Wave you'd like to add the issue{pluralS} to."
     type="div"
   >
     <Card style="padding: 0; text-align: left; width: 100%;">
@@ -142,7 +168,19 @@
 
   {#snippet actions()}
     <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}
-      >Add issue to Wave</Button
+      >Add issue{pluralS} to Wave</Button
     >
   {/snippet}
 </StandaloneFlowStepLayout>
+
+<style>
+  .complexity-calc {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background-color: var(--color-foreground-level-1);
+    width: fit-content;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem 0 2rem 2rem;
+  }
+</style>
