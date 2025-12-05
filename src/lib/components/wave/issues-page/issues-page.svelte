@@ -39,7 +39,7 @@
     appliedSort,
     breadcrumbs,
     allowAddToWave = false,
-    ownWaveRepos = [],
+    waveRepos: ownWaveRepos = [],
     pathPrefix,
     showNewApplicationsBadge = false,
     waves,
@@ -58,8 +58,8 @@
 
     pathPrefix: string;
 
-    /** For determining what Waves, if any, issues may be added to */
-    ownWaveRepos?: WaveRepoWithDetailsDto[];
+    /** User's own wave repos for determining what Waves, if any, issues may be added to */
+    waveRepos?: WaveRepoWithDetailsDto[];
 
     /** For displaying wave data in list items */
     waves: WaveDto[];
