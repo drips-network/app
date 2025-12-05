@@ -6,13 +6,16 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
+  import Sharrow from '$lib/components/icons/Sharrow.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
+  import shareSteps from '$lib/flows/share/share-steps';
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave/add-issues-to-wave-flow';
   import modal from '$lib/stores/modal';
+  import { BASE_URL } from '$lib/utils/base-url';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { getIssue, getIssueApplications, markIssueAsCompleted } from '$lib/utils/wave/issues';
@@ -174,6 +177,25 @@
         <div>
           <SidebarButton icon={Check} variant="primary" onclick={handleMarkIssueCompleted}>
             Mark completed
+          </SidebarButton>
+        </div>
+      {/if}
+
+      {#if issue.waveId && !issue.assignedApplicant}
+        <div>
+          <SidebarButton
+            icon={Sharrow}
+            onclick={() =>
+              modal.show(
+                Stepper,
+                undefined,
+                shareSteps({
+                  url: `${BASE_URL}/wave/${issue.waveId}/issues/${issue.id}/apply`,
+                  shareModalText: 'Share a link for applicants to apply on this issue.',
+                }),
+              )}
+          >
+            Share apply link
           </SidebarButton>
         </div>
       {/if}
