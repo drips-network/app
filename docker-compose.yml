@@ -343,19 +343,19 @@ services:
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_MASTER_KEY=1234
-      - JWT_SECRET=123
-      - ENCRYPTION_KEY=12345678901234567890123456789012
+      - JWT_SECRET=j1t85O+R+4cgHNRP6QWXDjaLHrGkaEgoXm5s4NCutYY=
+      - ENCRYPTION_KEY=ikUgRhl6Eezw8Asv4C3PLa8Z5eSAv2YaavZ3jb/bTVs=
       - LOG_LEVEL=DEBUG
       - ENV=development
       - FRONTEND_BASE_URL=http://localhost:5173
       # Placeholders for required secrets
-      - GITHUB_OAUTH_CLIENT_ID={GITHUB_OAUTH_CLIENT_ID-placeholder}
-      - GITHUB_OAUTH_CLIENT_SECRET={GITHUB_OAUTH_CLIENT_SECRET-placeholder}
+      - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID-placeholder}
+      - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET-placeholder}
       - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL-http://localhost:8000}/api/auth/github/callback
-      - GITHUB_APP_ID={GITHUB_APP_ID-0000000}
-      - GITHUB_APP_PRIVATE_KEY={GITHUB_APP_PRIVATE_KEY-placeholder}
-      - GITHUB_APP_BOT_USER_ID={GITHUB_APP_BOT_USER_ID-placeholder}
-      - GITHUB_WEBHOOK_SECRET={GITHUB_WEBHOOK_SECRET-1234}
+      - GITHUB_APP_ID=${GITHUB_APP_ID-0000000}
+      - GITHUB_APP_PRIVATE_KEY=${GITHUB_APP_PRIVATE_KEY-placeholder}
+      - GITHUB_APP_BOT_USER_ID=${GITHUB_APP_BOT_USER_ID-placeholder}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET-1234}
     volumes:
       - tunnel-data:/tmp/tunnel
     ports:
