@@ -89,7 +89,11 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 -   **`GITHUB_OAUTH_CLIENT_SECRET`**: Generate a new Client Secret on the "General" settings page.
 -   **`GITHUB_APP_ID`**: Found on the "General" settings page (App ID).
 -   **`GITHUB_APP_PRIVATE_KEY`**: The content of the `.pem` file you downloaded. **Important**: Ensure you preserve newlines or use `\n` if setting it as a single line string in some environments, though `.env` files usually handle multi-line strings if quoted properly.
--   **`GITHUB_APP_BOT_USER_ID`**: You can find this by making a request to `https://api.github.com/users/<app-slug>[bot]`. Alternatively, for local dev, this might be less critical depending on the specific logic, but try to find the ID of the bot user created for your app.
+-   **`GITHUB_APP_BOT_USER_ID`**: The unique numeric ID for your GitHub App's bot user.
+    1.  **Find your App Slug**: On your App's public page (e.g. `https://github.com/apps/my-app`), the slug is the last part of the URL (`my-app`).
+    2.  **Query the API**: Run `curl https://api.github.com/users/<slug>[bot]`.
+        - Note: If using `curl` in Z sh/Bash, you may need to escape brackets or use URL encoding: `https://api.github.com/users/<slug>%5Bbot%5D`
+    3.  **Get the ID**: Use the integer `id` field from the JSON response.
 -   **`GITHUB_WEBHOOK_SECRET`**: The secret you set in the "Webhook URL" section (if you enabled webhooks). If you didn't set one, you can define any string here, but it must match what you configured in GitHub if webhooks are active.
 -   **`CLOUDFLARED_TUNNEL_TOKEN`**: (Optional) Token for a persistent Cloudflare Tunnel. If set, the service will use this token to run a named tunnel with a static URL. If not set, it defaults to a random Quick Tunnel.
 -   **`WAVE_PUBLIC_URL`**: (Optional) The public URL where your Wave service is accessible.
