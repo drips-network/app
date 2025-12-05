@@ -159,7 +159,7 @@
   });
 
   export function clearSelection() {
-    selectedIndices = new SvelteSet();
+    selectedIndices.clear();
   }
 
   function getWaveById(waveId: string | null): WaveDto | null {

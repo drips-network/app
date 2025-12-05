@@ -10,4 +10,5 @@ export const load = (context) =>
     filtersMode: 'maintainer',
     breadcrumbs: [{ label: 'Maintainer Dashboard' }, { label: 'Issues' }],
     viewKey: 'maintainers',
+    allowAddToWave: true,
   }));
