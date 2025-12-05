@@ -95,7 +95,12 @@
               const { data, pagination } = res;
 
               currentPagination = pagination;
-              issues = [...issues, ...data];
+
+              // filter against duplicates in case of unstable pagination
+              issues = [
+                ...issues,
+                ...data.filter((newIssue) => !issues.find((issue) => issue.id === newIssue.id)),
+              ];
 
               loadingMore = false;
             });
@@ -118,7 +123,7 @@
 
   let shiftKeyHeld = $state<boolean>(false);
   let lastClickedIndex = $state<number | null>(null);
-  let selectedIndices = $state<Set<number>>(new SvelteSet<number>());
+  let selectedIndices = new SvelteSet<number>();
 
   function handleItemSelect(index: number, selected: boolean) {
     if (selected) {

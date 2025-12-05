@@ -81,12 +81,16 @@
     availableSortByOptions: IssueSortByOption[];
   } = $props();
 
-  async function getMoreIssues(pagination: Pagination, filters: IssueFilters) {
+  async function getMoreIssues(
+    pagination: Pagination,
+    filters: IssueFilters,
+    sort: IssueSortByOption,
+  ) {
     const nextPage = pagination.page + 1;
 
     if (!nextPage) return null;
 
-    return await getIssues(undefined, { page: nextPage, limit: pagination.limit }, filters);
+    return await getIssues(undefined, { page: nextPage, limit: pagination.limit }, filters, sort);
   }
 
   let filtersOpen = $state<boolean>(false);
@@ -305,7 +309,8 @@
           bind:this={listInstance}
           multiselectMode={allowAddToWave}
           issuesWithPagination={issues}
-          getMoreIssues={(currentPagination) => getMoreIssues(currentPagination, appliedFilters)}
+          getMoreIssues={(currentPagination) =>
+            getMoreIssues(currentPagination, appliedFilters, appliedSort)}
           onselectchange={(selected) => (selectedIssues = selected)}
         />
       {/if}
