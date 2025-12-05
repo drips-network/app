@@ -308,7 +308,7 @@ services:
     image: 'j537/wave:${WAVE_TAG-main}'
     pull_policy: always
     command:
-      - /bin/bash
+      - /bin/sh
       - -c
       - |
         # If WAVE_PUBLIC_URL is not set, try to find it from Cloudflare Tunnel
@@ -338,7 +338,7 @@ services:
         deno task db:migrate && deno task start
     environment:
       - PORT=8000
-      - BASE_URL=${WAVE_PUBLIC_URL:-http://localhost:8000}
+      - BASE_URL=${WAVE_PUBLIC_URL-http://localhost:8000}
       - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
@@ -351,7 +351,7 @@ services:
       # Placeholders for required secrets
       - GITHUB_OAUTH_CLIENT_ID={GITHUB_OAUTH_CLIENT_ID-placeholder}
       - GITHUB_OAUTH_CLIENT_SECRET={GITHUB_OAUTH_CLIENT_SECRET-placeholder}
-      - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL:-http://localhost:8000}/api/auth/github/callback
+      - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL-http://localhost:8000}/api/auth/github/callback
       - GITHUB_APP_ID={GITHUB_APP_ID-0000000}
       - GITHUB_APP_PRIVATE_KEY={GITHUB_APP_PRIVATE_KEY-placeholder}
       - GITHUB_APP_BOT_USER_ID={GITHUB_APP_BOT_USER_ID-placeholder}
@@ -369,7 +369,7 @@ services:
         condition: service_healthy
 
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: debian:stable-slim
     volumes:
       - tunnel-data:/tmp/tunnel
     environment:
@@ -378,6 +378,9 @@ services:
       - /bin/sh
       - -c
       - |
+        apt-get update && apt-get install -y curl ca-certificates
+        curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+        chmod +x /usr/local/bin/cloudflared
         mkdir -p /tmp/tunnel
         rm -f /tmp/tunnel/url.txt
         if [ -z "$$TUNNEL_TOKEN" ]; then
@@ -387,7 +390,7 @@ services:
           PID=$$!
           # Wait for URL to appear in logs
           echo "Waiting for URL..."
-          ( tail -f /tmp/tunnel/tunnel.log | grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' | head -n 1 > /tmp/tunnel/url.txt && echo "URL captured: $$(cat /tmp/tunnel/url.txt)" ) &
+          ( while true; do if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt; echo "URL captured: $$(cat /tmp/tunnel/url.txt)"; break; fi; sleep 1; done ) &
           wait $$PID
         else
           echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
