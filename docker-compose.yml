@@ -304,6 +304,23 @@ services:
       graphql-api:
         condition: service_healthy
 
+  postgres-wave:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: wave_db
+      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
+    ports:
+      - 54324:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'wave_db']
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
   wave:
     image: 'j537/wave:${WAVE_TAG-main}'
     pull_policy: always
@@ -339,7 +356,7 @@ services:
     environment:
       - PORT=8000
       - BASE_URL=${WAVE_PUBLIC_URL-http://localhost:8000}
-      - DB_CONNECTION_STRING=postgresql://user:admin@postgres:5432/dripsdb
+      - DB_CONNECTION_STRING=postgresql://user:admin@postgres-wave:5432/wave_db
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_MASTER_KEY=1234
@@ -361,7 +378,7 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      postgres:
+      postgres-wave:
         condition: service_healthy
       redis:
         condition: service_healthy
