@@ -18,7 +18,12 @@
   import { BASE_URL } from '$lib/utils/base-url';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
-  import { getIssue, getIssueApplications, markIssueAsCompleted } from '$lib/utils/wave/issues';
+  import {
+    getIssue,
+    getIssueApplications,
+    markIssueAsCompleted,
+    renderIssueTitle,
+  } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
@@ -120,7 +125,7 @@
           <div class="left">
             <h1 class="typo-header-2 line-clamp-3">
               <span style:color="var(--color-foreground-level-5)">#{issue.gitHubIssueNumber}</span>
-              {issue.title}
+              {@html renderIssueTitle(issue.title)}
             </h1>
 
             <RepoBadge repo={issue.repo} />

@@ -18,6 +18,8 @@ import {
 } from './types/pagination';
 import parseRes from './utils/parse-res';
 import expect from '$lib/utils/expect';
+import { marked } from 'marked';
+import sanitize from 'sanitize-html';
 
 export async function getIssues(
   f = fetch,
@@ -110,4 +112,23 @@ export async function markIssueAsCompleted(f = fetch, issueId: string) {
   }
 
   return expectation.result;
+}
+
+export function renderIssueTitle(title: string): string {
+  marked.use({
+    renderer: {
+      codespan({ text }) {
+        return `<code style="font-family: var(--typeface-mono-regular); color: var(--color-foreground-level-6); border-radius: 4px; padding: 0.2rem 0.4rem 0 0.4rem; background-color: var(--color-foreground-level-2);">${text}</code>`;
+      },
+    },
+  });
+
+  const markup = marked(title, { async: false });
+
+  return sanitize(markup, {
+    allowedTags: ['code'],
+    allowedAttributes: {
+      code: ['style'],
+    },
+  });
 }

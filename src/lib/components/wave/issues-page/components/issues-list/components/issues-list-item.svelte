@@ -65,6 +65,7 @@
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import type { WaveDto } from '$lib/utils/wave/types/wave';
   import WaveBadge from '$lib/components/wave/wave-badge/wave-badge.svelte';
+  import { renderIssueTitle } from '$lib/utils/wave/issues';
 
   let {
     issue,
@@ -138,7 +139,7 @@
 
     <h3 class="typo-text line-clamp-{numberOfLines}">
       <span class="issue-number-badge">#{issue.gitHubIssueNumber}</span>
-      {issue.title}
+      {@html renderIssueTitle(issue.title)}
     </h3>
 
     <div class="repo-and-wave">

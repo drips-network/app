@@ -1,8 +1,19 @@
 <script lang="ts">
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import type { WaveUser } from '$lib/utils/wave/types/user';
+  import type { ComponentProps } from 'svelte';
 
-  let { user, link = true }: { user: WaveUser; link?: boolean } = $props();
+  let {
+    user,
+    link = true,
+    size,
+    hideName = false,
+  }: {
+    user: WaveUser;
+    link?: boolean;
+    size?: ComponentProps<typeof UserAvatar>['size'];
+    hideName?: boolean;
+  } = $props();
 </script>
 
 <svelte:element
@@ -12,8 +23,10 @@
   target="_blank"
   rel="noopener noreferrer"
 >
-  <UserAvatar src={user.gitHubAvatarUrl} />
-  <span class="typo-text">{user.gitHubUsername}</span>
+  <UserAvatar {size} src={user.gitHubAvatarUrl} />
+  {#if !hideName}
+    <span class="typo-text">{user.gitHubUsername}</span>
+  {/if}
 </svelte:element>
 
 <style>
