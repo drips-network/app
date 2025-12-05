@@ -21,7 +21,7 @@
       <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
       <p>
         With Drips Wave, open-source ecosystems run recurring one-week contribution sprints. During
-        these Wave Cycles, contributors earn Points, for which they earn rewards.
+        these Wave Cycles, contributors receive Points, for which they earn rewards.
       </p>
     </div>
 

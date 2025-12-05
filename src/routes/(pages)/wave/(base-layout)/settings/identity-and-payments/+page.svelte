@@ -2,7 +2,11 @@
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Check from '$lib/components/icons/Check.svelte';
+  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
+  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import Setting from '$lib/components/setting/setting.svelte';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import TextInput from '$lib/components/text-input/text-input.svelte';
@@ -13,7 +17,7 @@
   import z from 'zod';
 
   let { data } = $props();
-  let { user } = $derived(data);
+  let { user, kycStatus } = $derived(data);
 
   const stellarAddressSchema = z.string().regex(/^G[A-Z2-7]{55}$/);
 
@@ -90,7 +94,56 @@
   title="Identity Verification"
   subtitle="To receive rewards, we need to verify your identity using a quick ID check."
 >
-  todo(wave): kyc
+  {#if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN'}
+    <div
+      class="kyc-status"
+      style="color: var(--color-positive-level-6); background-color: var(--color-positive-level-1);"
+    >
+      <CheckCircle style="fill: var(--color-positive-level-6);" />
+      <div class="description">Your identity has been successfully verified.</div>
+    </div>
+  {:else if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'RED' && !kycStatus.canRetry}
+    <div
+      class="kyc-status with-action"
+      style="color: var(--color-negative-level-6); background-color: var(--color-negative-level-1);"
+    >
+      <CrossCircle style="fill: var(--color-negative-level-6);" />
+      <div class="description">
+        Your identity couldn't be verified. Please contact support for assistance.
+      </div>
+      <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
+    </div>
+  {:else if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'RED' && kycStatus.canRetry}
+    <div
+      class="kyc-status with-action"
+      style="color: var(--color-caution-level-6); background-color: var(--color-caution-level-1);"
+    >
+      <ExclamationCircle style="fill: var(--color-caution-level-6);" />
+      <div class="description">Your identity couldn't be verified. Please try again.</div>
+      <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
+    </div>
+  {:else if !kycStatus.status || kycStatus.status === 'pending' || kycStatus.status === 'applicantReset' || kycStatus.status === 'applicantCreated'}
+    <div
+      class="kyc-status with-action"
+      style="color: var(--color-caution-level-6); background-color: var(--color-caution-level-1);"
+    >
+      <div class="description">
+        <ExclamationCircle style="fill: var(--color-caution-level-6);" />
+        Verify your identity now to be eligible for Cycle rewards.
+      </div>
+      <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
+    </div>
+  {:else if kycStatus.status === 'applicantPending' || kycStatus.status === 'applicantOnHold'}
+    <div
+      class="kyc-status"
+      style="color: var(--color-foreground); background-color: var(--color-foreground-level-1);"
+    >
+      <div class="description">
+        Your provided documents are being reviewed. You will be notified once the review is
+        complete.
+      </div>
+    </div>
+  {/if}
 </Setting>
 
 <Divider />
@@ -111,5 +164,25 @@
     gap: 0.5rem;
     flex-direction: column;
     align-items: flex-end;
+  }
+
+  .kyc-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-foreground-level-1);
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    border-radius: 2rem 0 2rem 2rem;
+  }
+
+  .kyc-status.with-action {
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+  }
+
+  .kyc-status .description {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
   }
 </style>

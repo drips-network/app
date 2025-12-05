@@ -49,7 +49,6 @@
             size="small"
             icon={ArrowUpRight}
             href={notification.primaryAction.redirect.url}
-            target={notification.primaryAction.redirect.target || '_self'}
           >
             {notification.primaryAction.label}
           </Button>

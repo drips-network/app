@@ -4,7 +4,7 @@
   import themeStore from '$lib/stores/theme/theme.store.js';
   import { getSumsubSessionToken } from '$lib/utils/wave/kyc.js';
   import snsWebSdk, { type SnsWebSdk } from '@sumsub/websdk';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let { data } = $props();
 
@@ -30,6 +30,7 @@
   }
 
   onMount(() => launchWebSdk(data.sumsubToken));
+  onDestroy(() => snsWebSdkInstance?.destroy());
 </script>
 
 <div class="wrapper">

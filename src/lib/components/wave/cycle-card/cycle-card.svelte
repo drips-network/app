@@ -30,8 +30,10 @@
         <h2 class="pixelated">Cycle {cycle.cycleNumber}</h2>
       </div>
       <div class="cycle-dates">
-        {formatDate(cycle.startDate, 'standardWithoutYear')} -{' '}
-        {formatDate(cycle.endDate, 'standardWithoutYear')}
+        {formatDate(cycle.startDate, 'standardWithoutYear')} - {formatDate(
+          cycle.endDate,
+          'standardWithoutYear',
+        )}
       </div>
     </div>
 
