@@ -18,6 +18,7 @@
   import { BASE_URL } from '$lib/utils/base-url';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import {
     getIssue,
     getIssueApplications,
@@ -49,6 +50,8 @@
 
     /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
     applicationsPromise: ReturnType<typeof getIssueApplications> | null;
+
+    user: WaveLoggedInUser | null;
   }
 
   let {
@@ -58,6 +61,7 @@
     partOfWave,
     waves,
     applicationsPromise: issueApplicationsPromise,
+    user,
   }: Props = $props();
 
   let matchingWaveRepos = $derived(
@@ -91,7 +95,18 @@
   $effect(() => {
     promisePending = true;
     issueApplicationsPromise?.then((apps) => {
-      applications = apps.data;
+      applications = apps.data
+        // own application, if any, first
+        .sort((a, b) => {
+          const ownUserId = user?.id || '';
+          if (a.applicant.id === ownUserId && b.applicant.id !== ownUserId) {
+            return -1;
+          } else if (a.applicant.id !== ownUserId && b.applicant.id === ownUserId) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
       promisePending = false;
     });
   });

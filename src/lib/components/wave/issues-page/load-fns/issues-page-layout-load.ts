@@ -96,7 +96,7 @@ export const issuesPageLayoutLoad = async (
   const [issues, waveRepos, waves] = await Promise.all([
     getIssues(fetch, { limit: 10 }, filters, sortBy),
     // todo(wave): pagination
-    (await getOwnWaveRepos(fetch, { limit: 100 })).data,
+    user ? (await getOwnWaveRepos(fetch, { limit: 100 })).data : [],
     // todo(wave): Only fetch waves included in the issues list
     (await getWaves(fetch, { limit: 100 })).data,
   ]);
