@@ -20,6 +20,7 @@
     options: Option[];
     dropdownWidth?: { pixels: number; align: 'left' | 'right' } | undefined;
     toggle?: { label: string } | undefined;
+    onchange?: (value: string) => void;
   }
 
   let {
@@ -30,6 +31,7 @@
     options,
     dropdownWidth = undefined,
     toggle = undefined,
+    onchange = undefined,
   }: Props = $props();
 
   let selectedOptionIndex = $derived(options.findIndex((o) => o.value === value));
@@ -53,6 +55,8 @@
     value = option.value;
     setExpanded(false);
     dropdownElem.focus();
+
+    if (onchange) onchange(option.value);
   }
 
   function handleWrapperClick() {
@@ -155,7 +159,7 @@
           <Toggle label={toggle.label} bind:checked={toggleValue} />
         </div>
       {/if}
-      {#each options as option, index}
+      {#each options as option, index (option.value)}
         <div
           class="option"
           role="option"
