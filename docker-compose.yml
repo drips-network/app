@@ -368,6 +368,7 @@ services:
       - LOG_LEVEL=DEBUG
       - ENV=development
       - FRONTEND_BASE_URL=http://localhost:5173
+      - CORS_ALLOW_ALL_ORIGINS=true
       # Placeholders for required secrets
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID-placeholder}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET-placeholder}
