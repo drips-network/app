@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ -n "$WAVE_PUBLIC_URL" ]; then
+  echo "WAVE_PUBLIC_URL is set to '$WAVE_PUBLIC_URL'. Skipping Cloudflare Tunnel startup."
+  exit 0
+fi
+
 apt-get update && apt-get install -y curl ca-certificates
 curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
 chmod +x /usr/local/bin/cloudflared

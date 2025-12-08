@@ -351,7 +351,6 @@ services:
       - GITHUB_APP_PRIVATE_KEY=${GITHUB_APP_PRIVATE_KEY-placeholder}
       - GITHUB_APP_BOT_USER_ID=${GITHUB_APP_BOT_USER_ID-placeholder}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET-1234}
-
     ports:
       - 8000:8000
     depends_on:
@@ -366,6 +365,7 @@ services:
     image: debian:stable-slim
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+      - WAVE_PUBLIC_URL=${WAVE_PUBLIC_URL}
     entrypoint: /usr/local/bin/cloudflared-entrypoint.sh
     volumes:
       - tunnel-data:/tmp/tunnel
