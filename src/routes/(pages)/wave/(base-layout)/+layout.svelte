@@ -133,7 +133,7 @@
     width: 100%;
     margin: 0 auto;
     padding: 0.5rem 1rem 1rem 0;
-    min-height: calc(100vh - 4rem);
+    min-height: calc(100svh - 4rem);
     display: flex;
     height: fit-content;
     flex-direction: column;
@@ -159,7 +159,7 @@
     grid-template-areas: 'nav content';
     gap: 2rem;
     padding: 0rem 1rem 0 0;
-    min-height: calc(100vh - 4rem);
+    min-height: calc(100svh - 4rem);
   }
 
   .nav-wrapper {
@@ -174,5 +174,21 @@
 
   :root::view-transition-group(sidenav) {
     z-index: 10;
+  }
+
+  @media (max-width: 1024px) {
+    .layout-container {
+      gap: 0;
+      padding: 0 1rem;
+      grid-template-columns: 0rem 1fr;
+    }
+
+    .nav-wrapper {
+      display: none;
+    }
+
+    .content {
+      padding: 0;
+    }
   }
 </style>

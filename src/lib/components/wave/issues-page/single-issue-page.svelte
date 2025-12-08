@@ -1,7 +1,9 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
+  import Button from '$lib/components/button/button.svelte';
   import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import Check from '$lib/components/icons/Check.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
@@ -51,6 +53,9 @@
     /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
     applicationsPromise: ReturnType<typeof getIssueApplications> | null;
 
+    /** Configuration for button link back to issues list on mobile  */
+    backToConfig: { label: string; href: string };
+
     user: WaveLoggedInUser | null;
   }
 
@@ -62,6 +67,7 @@
     waves,
     applicationsPromise: issueApplicationsPromise,
     user,
+    backToConfig,
   }: Props = $props();
 
   let matchingWaveRepos = $derived(
@@ -127,6 +133,12 @@
     );
   }
 </script>
+
+<div class="back-to-issues-link">
+  <Button href={backToConfig.href} icon={ArrowLeft} size="small">
+    {backToConfig.label}
+  </Button>
+</div>
 
 <div
   class="wrapper"
@@ -379,5 +391,20 @@
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+
+  .back-to-issues-link {
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .wrapper {
+      grid-template-columns: 1fr;
+    }
+
+    .back-to-issues-link {
+      display: block;
+    }
   }
 </style>

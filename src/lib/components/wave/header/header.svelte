@@ -149,4 +149,20 @@
     background-color: var(--color-primary-level-1);
     border-radius: 0.5rem 0.5rem 0 0;
   }
+
+  @media (max-width: 1024px) {
+    header {
+      height: 3.5rem;
+      padding: 0 1rem 0.5rem 1rem;
+    }
+
+    header.noBackground {
+      background: linear-gradient(
+        180deg,
+        var(--color-background) 0%,
+        var(--color-background) 90%,
+        transparent 100%
+      );
+    }
+  }
 </style>

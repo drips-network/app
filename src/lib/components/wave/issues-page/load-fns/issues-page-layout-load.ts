@@ -17,11 +17,13 @@ export const issuesPageLayoutLoad = async (
     url,
     depends,
     parent,
+    params,
   }: {
     fetch: typeof global.fetch;
     url: URL;
     depends: (...deps: `${string}:${string}`[]) => void;
     parent: () => Promise<{ user: WaveLoggedInUser | null }>;
+    params: { issueId?: string };
   },
   config: (user: WaveLoggedInUser | null) => {
     requireLogin?: boolean;
@@ -101,6 +103,8 @@ export const issuesPageLayoutLoad = async (
     (await getWaves(fetch, { limit: 100 })).data,
   ]);
 
+  const isViewingIssue = params.issueId !== undefined;
+
   return {
     issues,
     appliedFilters: filters,
@@ -115,6 +119,7 @@ export const issuesPageLayoutLoad = async (
     viewKey,
     availableSortByOptions: availableSortByOptions ?? ['updatedAt', 'createdAt'],
     allowAddToWave: allowAddToWave ?? false,
+    isViewingIssue,
 
     waveHeaderBackground: false,
   };

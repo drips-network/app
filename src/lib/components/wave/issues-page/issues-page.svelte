@@ -48,6 +48,7 @@
     noOfPreappliedFilters,
     filtersMode,
     availableSortByOptions,
+    isViewingIssue,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -79,6 +80,7 @@
     filtersMode: 'maintainer' | 'contributor' | 'wave';
 
     availableSortByOptions: IssueSortByOption[];
+    isViewingIssue: boolean;
   } = $props();
 
   async function getMoreIssues(
@@ -210,7 +212,7 @@
   let noOfFilters = $derived(Object.keys(appliedFilters).length - noOfPreappliedFilters);
 </script>
 
-<div class="wrapper">
+<div class="wrapper" class:isViewingIssue>
   <div class="issues" style:view-transition-name={viewTransitionName}>
     <div class="breadcrumbs-wrapper">
       <Breadcrumbs crumbs={breadcrumbs} />
@@ -317,7 +319,7 @@
     </Card>
   </div>
 
-  <div class="content" style:padding-top="3rem">
+  <div class="content">
     {@render children()}
   </div>
 </div>
@@ -332,11 +334,13 @@
     display: grid;
     flex-direction: column;
     grid-template-columns: 24rem 1fr;
+    grid-template-areas: 'issues content';
     grid-template-rows: 1fr;
     gap: 1rem;
   }
 
   .issues {
+    grid-area: issues;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -374,8 +378,10 @@
   }
 
   .content {
+    grid-area: content;
     min-width: 0;
     position: relative;
+    padding-top: 3rem;
   }
 
   .filter-config {
@@ -400,5 +406,29 @@
     height: 100%;
     justify-content: center;
     align-items: center;
+  }
+
+  @media (max-width: 1024px) {
+    .wrapper {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'issues';
+      grid-template-rows: 1fr;
+    }
+
+    .wrapper .content {
+      padding-top: 0;
+    }
+
+    .wrapper.isViewingIssue {
+      grid-template-areas: 'content';
+    }
+
+    .wrapper:not(.isViewingIssue) .content {
+      display: none;
+    }
+
+    .wrapper.isViewingIssue .issues {
+      display: none;
+    }
   }
 </style>

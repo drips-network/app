@@ -15,6 +15,8 @@ export const issuePageLoad = async (
     params: { issueId: string };
   },
   config: {
+    /** On mobile, we display a back button to go back to the issues list. */
+    backToConfig: { label: string; href: string };
     allowAddingOrRemovingWave: boolean;
   },
 ) => {
@@ -46,6 +48,7 @@ export const issuePageLoad = async (
     issue,
     partOfWave,
     allowAddingOrRemovingWave: config.allowAddingOrRemovingWave,
+    backToConfig: config.backToConfig,
 
     // streamed (not awaited)
     applicationsPromise,
