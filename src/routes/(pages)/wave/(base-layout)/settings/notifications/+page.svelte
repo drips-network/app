@@ -17,6 +17,8 @@
   const NOTIFICATION_FRIENDLY_MAP: {
     [workflowId in WORKFLOW_ID]: WorkflowProperties | null;
   } = {
+    //contributor
+
     [WORKFLOW_ID.ISSUE_APPLICATION_RECEIVED]: {
       title: 'Issue application received',
       description: 'You successfully applied to work on an issue in a Wave.',
@@ -34,11 +36,19 @@
         'You have received a compliment from a maintainer for your work on an issue in a Wave.',
       category: 'contributor',
     },
+    [WORKFLOW_ID.ISSUE_POINTS_RECEIVED]: {
+      title: 'Issue points received',
+      description:
+        'You have received points for successfully resolving an issue as part of a Wave.',
+      category: 'contributor',
+    },
     [WORKFLOW_ID.CONTRIBUTOR_UNASSIGNED]: {
       title: 'Contributor unassigned',
       description: 'You have been unassigned from an issue in a Wave by a maintainer.',
       category: 'contributor',
     },
+
+    // maintainer
 
     [WORKFLOW_ID.WELCOME]: null,
     [WORKFLOW_ID.REPO_APPLIED_TO_WAVE]: {
@@ -54,6 +64,12 @@
     [WORKFLOW_ID.REPO_APPLICATION_REJECTED]: {
       title: 'Repo application rejected',
       description: 'Your application for a repository to join a Wave has been rejected.',
+      category: 'maintainer',
+    },
+    [WORKFLOW_ID.ORG_ISSUE_APPLICATION_RECEIVED]: {
+      title: 'Issue application received',
+      description:
+        'A contributor has applied to work on an issue belonging to one of your repos in a Wave.',
       category: 'maintainer',
     },
     [WORKFLOW_ID.CONTRIBUTOR_WITHDREW]: {

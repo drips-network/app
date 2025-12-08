@@ -12,6 +12,8 @@ export enum WORKFLOW_ID {
   COMPLIMENT_RECEIVED = 'compliment-received',
   CONTRIBUTOR_UNASSIGNED = 'contributor-unassigned',
   CONTRIBUTOR_WITHDREW = 'contributor-withdrew',
+  ORG_ISSUE_APPLICATION_RECEIVED = 'org-issue-application-received',
+  ISSUE_POINTS_RECEIVED = 'issue-points-received',
 }
 
 export async function getNotificationPreferences(f = fetch) {
@@ -19,7 +21,7 @@ export async function getNotificationPreferences(f = fetch) {
     z.object({
       preferences: z.array(
         z.object({
-          workflowId: z.enum(Object.values(WORKFLOW_ID)),
+          workflowId: z.enum(Object.values(WORKFLOW_ID)).or(z.string()),
           channels: z.object({
             email: z.boolean(),
             inApp: z.boolean(),

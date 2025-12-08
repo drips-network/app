@@ -6,7 +6,7 @@
   let description = $derived.by(() => {
     switch (page.status) {
       case 404: {
-        return "We weren't able to find this issue.";
+        return "We weren't able to find this.";
       }
       case 500: {
         return 'Something went wrong on our end.';

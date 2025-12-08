@@ -113,6 +113,7 @@
             return 0;
           }
         });
+
       promisePending = false;
     });
   });
@@ -194,8 +195,8 @@
           }}
         >
           <div class="applications-grid">
-            {#each applications as application (application.id)}
-              <IssueApplicationCard {issue} {isMaintainer} {application} />
+            {#each applications?.slice(0, 5) as application (application.id)}
+              <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
             {/each}
           </div>
         </Section>

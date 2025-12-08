@@ -35,7 +35,7 @@ export const load = async ({ parent, fetch, params, url }) => {
     waveId,
     issueId,
     { limit: 1 },
-    { applicantId: user.id },
+    { applicantId: user.id, statusNot: 'withdrawn' },
   );
   const alreadyApplied = previousApplication.pagination.total > 0;
 

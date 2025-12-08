@@ -49,6 +49,7 @@
             size="small"
             icon={ArrowUpRight}
             href={notification.primaryAction.redirect.url}
+            reloadOnLinkClick
           >
             {notification.primaryAction.label}
           </Button>

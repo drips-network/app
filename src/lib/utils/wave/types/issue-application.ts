@@ -2,7 +2,13 @@ import z from 'zod';
 import { waveUserDtoSchema } from './user';
 import { filterSchema } from './filter';
 
-export const issueApplicationStatusSchema = z.enum(['pending', 'accepted', 'rejected']);
+export const issueApplicationStatusSchema = z.enum([
+  'pending',
+  'accepted',
+  'rejected',
+  'withdrawn',
+  'unassigned',
+]);
 export type IssueApplicationStatus = z.infer<typeof issueApplicationStatusSchema>;
 
 export const submitIssueApplicationDtoSchema = z.object({
@@ -43,6 +49,7 @@ export const issueApplicationFiltersSchema = filterSchema(
   z.object({
     includeRemoved: z.boolean().optional(),
     status: issueApplicationStatusSchema.optional(),
+    statusNot: issueApplicationStatusSchema.optional(),
     cycleId: z.union([z.uuid(), z.literal('current')]).optional(),
     applicantId: z.uuid().optional(),
   }),

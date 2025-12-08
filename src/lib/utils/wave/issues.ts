@@ -93,6 +93,39 @@ export async function acceptIssueApplication(
   );
 }
 
+export async function withdrawIssueApplication(
+  f = fetch,
+  waveId: string,
+  issueId: string,
+  applicationId: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/withdraw`,
+      {
+        method: 'POST',
+      },
+    ),
+  );
+}
+
+export async function unassignContributorFromIssue(
+  f = fetch,
+  waveId: string,
+  issueId: string,
+  applicationId: string,
+) {
+  return await authenticatedCall(
+    f,
+    `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/unassign`,
+    {
+      method: 'POST',
+    },
+  );
+}
+
 export async function markIssueAsCompleted(f = fetch, issueId: string) {
   // endpoint does not immediately return updated issue bc that happens through webhook
   await authenticatedCall(f, `/api/issues/${issueId}/complete`, {
