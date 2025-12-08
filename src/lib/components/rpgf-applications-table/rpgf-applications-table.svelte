@@ -74,6 +74,7 @@
   {displayVisibilityNote}
   bind:decisions
   hideState={shouldHideState}
+  ellipsis
 />
 
 <style>
