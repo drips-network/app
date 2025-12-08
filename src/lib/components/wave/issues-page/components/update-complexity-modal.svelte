@@ -13,6 +13,7 @@
   import { updateWaveIssueComplexity } from '$lib/utils/wave/waves';
   import { notifyIssuesUpdated } from '../issue-update-coordinator';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   interface Props {
     issue: IssueDetailsDto;
@@ -50,6 +51,8 @@
       loading = false;
     }
   }
+
+  const applicantAccepted = $derived(!!issue.assignedApplicant);
 </script>
 
 <div class="modal">
@@ -57,6 +60,13 @@
     headline="Update issue complexity"
     description="Adjust the complexity level for this issue to reflect its difficulty and reward contributors accordingly."
   >
+    {#if applicantAccepted}
+      <AnnotationBox type="warning">
+        Because an applicant is already accepted for this issue, you can only increase the
+        complexity.
+      </AnnotationBox>
+    {/if}
+
     <div class="fields">
       <FormField
         title="Complexity*"
@@ -67,9 +77,23 @@
           <SegmentedControl
             bind:active={activeComplexity}
             options={[
-              { title: 'Trivial', value: 'small' },
-              { title: 'Medium', value: 'medium' },
-              { title: 'High', value: 'large' },
+              {
+                title: 'Trivial',
+                value: 'small',
+                disabled:
+                  applicantAccepted &&
+                  (initialComplexity === 'medium' || initialComplexity === 'large'),
+              },
+              {
+                title: 'Medium',
+                value: 'medium',
+                disabled: applicantAccepted && initialComplexity === 'large',
+              },
+              {
+                title: 'High',
+                value: 'large',
+                disabled: applicantAccepted && initialComplexity === 'large',
+              },
             ]}
           />
         </div>
