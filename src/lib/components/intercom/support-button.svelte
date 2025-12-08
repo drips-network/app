@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getIntercomJwt, type WaveLoggedInUser } from '$lib/utils/wave/auth';
-  import Intercom, { onUnreadCountChange } from '@intercom/messenger-js-sdk';
+  import Intercom, { onUnreadCountChange, shutdown } from '@intercom/messenger-js-sdk';
   import QuestionCircle from '../icons/QuestionCircle.svelte';
   import MiniButton from '../mini-button/mini-button.svelte';
   import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
@@ -52,6 +52,7 @@
         initIntercom(res.token);
       });
     } else {
+      shutdown();
       initIntercom(null);
     }
   });
