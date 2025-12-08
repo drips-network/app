@@ -4,7 +4,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
-  import type { Complexity, WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
+  import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
@@ -16,6 +16,7 @@
   import { notifyIssuesUpdated } from '$lib/components/wave/issues-page/issue-update-coordinator';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
+  import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -98,17 +99,6 @@
   let selectedWaveIds = $state<string[]>([]);
 
   let valid = $derived(selectedWaveIds.length > 0);
-
-  function getPointsForComplexity(complexity: Complexity): number {
-    switch (complexity) {
-      case 'small':
-        return 0;
-      case 'medium':
-        return 50;
-      case 'large':
-        return 100;
-    }
-  }
 </script>
 
 <StandaloneFlowStepLayout

@@ -105,4 +105,13 @@
     grid-area: stats;
     min-height: 0;
   }
+
+  @media (max-width: 1024px) {
+    .hero {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'name'
+        'stats';
+    }
+  }
 </style>

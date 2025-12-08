@@ -78,6 +78,7 @@
     transition:
       transform 0.2s,
       box-shadow 0.2s;
+    flex-wrap: wrap;
   }
 
   .wave-item:hover:not(:active),

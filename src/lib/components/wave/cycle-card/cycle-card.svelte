@@ -42,9 +42,11 @@
         <KeyValuePair key="Budget">{cycle.budgetUSD}</KeyValuePair>
       </div>
 
-      <Button variant="primary" icon={Ledger} size="large" href="/wave/{cycle.waveId}/issues">
-        Start contributing
-      </Button>
+      <div class="action">
+        <Button variant="primary" icon={Ledger} size="large" href="/wave/{cycle.waveId}/issues">
+          Start contributing
+        </Button>
+      </div>
     </div>
   </div>
 </Card>
@@ -71,5 +73,28 @@
     display: flex;
     align-items: center;
     gap: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    .cycle-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .right {
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .budget {
+      width: 100%;
+    }
+
+    .action {
+      display: flex;
+      width: 100%;
+      justify-content: flex-end;
+    }
   }
 </style>

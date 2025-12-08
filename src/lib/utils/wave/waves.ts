@@ -93,3 +93,20 @@ export async function getWaveCycles(
     ),
   );
 }
+
+export async function updateWaveIssueComplexity(
+  f = fetch,
+  waveId: string,
+  issueId: string,
+  complexity: Complexity,
+) {
+  return parseRes(
+    waveIssueWithDetailsDtoSchema,
+    await authenticatedCall(f, `/api/waves/${waveId}/issues/${issueId}/complexity`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        complexity,
+      }),
+    }),
+  );
+}

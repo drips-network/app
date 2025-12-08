@@ -69,7 +69,7 @@
 
 <div class="segmented-control" class:disabled bind:this={containerElem}>
   <div class="options" role={containerRole} aria-label={ariaLabel}>
-    {#each options as option}
+    {#each options as option (option.value)}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
         role={itemRole}
@@ -169,7 +169,7 @@
   }
 
   .option:hover .background,
-  .option:focus .background {
+  .option:focus-visible .background {
     background-color: var(--color-primary-level-2);
     outline: none;
   }

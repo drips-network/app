@@ -7,6 +7,7 @@
   import Check from '$lib/components/icons/Check.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Minus from '$lib/components/icons/Minus.svelte';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
@@ -34,6 +35,7 @@
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-badge/wave-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
+  import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
 
@@ -78,6 +80,9 @@
 
   let isMaintainer = $derived(matchingWaveRepos.length > 0);
   let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
+  let canUpdateComplexity = $derived(
+    Boolean(partOfWave && allowAddingOrRemovingWave && isMaintainer),
+  );
 
   async function handleRemoveFromWave() {
     if (!partOfWave) {
@@ -132,6 +137,20 @@
           await markIssueAsCompleted(undefined, issue.id);
         }),
     );
+  }
+
+  function handleIssueUpdated(updatedIssue: IssueDetailsDto) {
+    issue = updatedIssue;
+  }
+
+  function openUpdateComplexityModal() {
+    if (!partOfWave) return;
+
+    modal.show(UpdateComplexityModal, undefined, {
+      issue,
+      wave: partOfWave,
+      onIssueUpdated: handleIssueUpdated,
+    });
   }
 </script>
 
@@ -252,16 +271,6 @@
         </div>
       </div>
 
-      {#if issue.points}
-        <div class="sidebar-section">
-          <div class="content">
-            <h5>Points</h5>
-
-            <span class="typo-text">{issue.points}</span>
-          </div>
-        </div>
-      {/if}
-
       <div class="sidebar-section">
         <div class="content">
           <h5>Wave</h5>
@@ -292,6 +301,16 @@
         {/if}
       </div>
 
+      {#if issue.points}
+        <div class="sidebar-section">
+          <div class="content">
+            <h5>Points</h5>
+
+            <span class="typo-text">{issue.points}</span>
+          </div>
+        </div>
+      {/if}
+
       {#if issue.complexity || issue.waveId}
         <div class="sidebar-section">
           <div class="content">
@@ -303,6 +322,12 @@
               <p style:color="var(--color-foreground-level-5)">Not set</p>
             {/if}
           </div>
+
+          {#if canUpdateComplexity}
+            <SidebarButton icon={Pen} onclick={openUpdateComplexityModal}>
+              Update complexity
+            </SidebarButton>
+          {/if}
         </div>
       {/if}
 
