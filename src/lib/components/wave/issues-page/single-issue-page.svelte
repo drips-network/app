@@ -224,7 +224,7 @@
   </Card>
 
   <div class="sidebar">
-    <Card style="height: fit-content; padding: 0;">
+    <Card style="height: fit-content; padding: 0; overflow: auto;">
       {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
         <div>
           <SidebarButton icon={Check} variant="primary" onclick={handleMarkIssueCompleted}>
@@ -354,6 +354,7 @@
     position: sticky;
     top: 7.5rem;
     height: fit-content;
+    max-height: calc(100vh - 8.5rem);
     display: flex;
     flex-direction: column;
     gap: 1rem;
