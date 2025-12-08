@@ -358,7 +358,7 @@ services:
         deno task db:migrate && deno task start
     environment:
       - PORT=8000
-      - BASE_URL=${WAVE_PUBLIC_URL-http://localhost:8000}
+      - BASE_URL=${WAVE_BASE_URL-http://localhost:8000}
       - DB_CONNECTION_STRING=postgresql://user:admin@postgres-wave:5432/wave_db
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
@@ -369,7 +369,6 @@ services:
       - ENV=development
       - FRONTEND_BASE_URL=http://localhost:5173
       - CORS_ALLOW_ALL_ORIGINS=true
-      # Placeholders for required secrets
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID-placeholder}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET-placeholder}
       - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL-http://localhost:8000}/api/auth/github/callback
