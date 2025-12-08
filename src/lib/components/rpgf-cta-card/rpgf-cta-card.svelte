@@ -8,14 +8,24 @@
   import { locallyStoredApplicationExists } from '../../../routes/(pages)/app/(app)/rpgf/rounds/[slugOrId]/applications/new/locally-stored-application';
   import Divider from '../divider/divider.svelte';
   import ArrowRight from '../icons/ArrowRight.svelte';
+  import SectionSkeleton from '../section-skeleton/section-skeleton.svelte';
+  import DripList from '../icons/DripList.svelte';
 
   interface Props {
     hasExistingBallot: boolean;
     round: Round;
     signedInUserId: string | null;
+    hasLinkedList: boolean;
+    linkedListsSectionSkeleton?: SectionSkeleton;
   }
 
-  let { hasExistingBallot, round, signedInUserId }: Props = $props();
+  let {
+    hasExistingBallot,
+    round,
+    signedInUserId,
+    hasLinkedList,
+    linkedListsSectionSkeleton,
+  }: Props = $props();
   let state = $derived(round.state);
   let isRoundVoter = $derived(round.isVoter);
 
@@ -117,20 +127,43 @@
         distribution.
       </p>
     {:else if round.resultsPublished}
-      <h2 class="pixelated">Results available</h2>
-      <p class="typo-text">
-        The round's results have been published, and the distribution is being prepared by the round
-        organizers.
-      </p>
+      {#if hasLinkedList}
+        <h2 class="pixelated">Distribution in progress</h2>
+        <p class="typo-text">
+          The round admins have created a Drip List to distribute funds according to the published
+          results.
+        </p>
 
-      <Button
-        href="/app/rpgf/rounds/{round.urlSlug}/applications?sortBy=allocation"
-        icon={Trophy}
-        variant="primary"
-        size="large"
-      >
-        View results
-      </Button>
+        <Button
+          variant="primary"
+          size="large"
+          icon={DripList}
+          href="#distribution"
+          onclick={() => linkedListsSectionSkeleton?.highlightSection()}>View Drip List</Button
+        >
+
+        <Button
+          href="/app/rpgf/rounds/{round.urlSlug}/applications?sortBy=allocation"
+          icon={Trophy}
+        >
+          View results
+        </Button>
+      {:else}
+        <h2 class="pixelated">Results available</h2>
+        <p class="typo-text">
+          The round's results have been published, and the distribution is being prepared by the
+          round organizers.
+        </p>
+
+        <Button
+          href="/app/rpgf/rounds/{round.urlSlug}/applications?sortBy=allocation"
+          icon={Trophy}
+          variant="primary"
+          size="large"
+        >
+          View results
+        </Button>
+      {/if}
     {/if}
   </div>
 {/if}
