@@ -11,4 +11,5 @@ export const load = (context) =>
     filtersMode: 'contributor',
     breadcrumbs: [{ label: 'Contributor Dashboard' }, { label: 'Issues' }],
     viewKey: 'contributors',
+    headMetaTitle: 'Contributor dashboard',
   }));

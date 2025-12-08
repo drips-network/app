@@ -14,10 +14,11 @@ export const issuePageLoad = async (
     parent: () => Promise<{ issues: PaginatedResponse<IssueDetailsDto>; waves: WaveDto[] }>;
     params: { issueId: string };
   },
-  config: {
+  config: (issue: IssueDetailsDto) => {
     /** On mobile, we display a back button to go back to the issues list. */
     backToConfig: { label: string; href: string };
     allowAddingOrRemovingWave: boolean;
+    headMetaTitle: string;
   },
 ) => {
   const { issues, waves } = await parent();
@@ -43,12 +44,15 @@ export const issuePageLoad = async (
 
   const partOfWave = waves.find((wave) => wave.id === issue.waveId) ?? null;
 
+  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle } = config(issue);
+
   return {
     issues,
     issue,
     partOfWave,
-    allowAddingOrRemovingWave: config.allowAddingOrRemovingWave,
-    backToConfig: config.backToConfig,
+    allowAddingOrRemovingWave: allowAddingOrRemovingWave,
+    backToConfig: backToConfig,
+    headMetaTitle: headMetaTitle,
 
     // streamed (not awaited)
     applicationsPromise,

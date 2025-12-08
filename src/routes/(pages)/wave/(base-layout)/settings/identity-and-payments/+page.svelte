@@ -2,6 +2,7 @@
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Check from '$lib/components/icons/Check.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
@@ -66,6 +67,8 @@
     );
   }
 </script>
+
+<HeadMeta title="Identity & Payments | Settings | Wave" />
 
 <h5>Payment</h5>
 <Setting

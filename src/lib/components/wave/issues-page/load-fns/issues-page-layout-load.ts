@@ -34,6 +34,7 @@ export const issuesPageLayoutLoad = async (
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
     availableSortByOptions?: IssueSortByOption[];
     allowAddToWave?: boolean;
+    headMetaTitle: string;
   },
 ) => {
   depends('wave:issues');
@@ -49,6 +50,7 @@ export const issuesPageLayoutLoad = async (
     viewKey,
     availableSortByOptions,
     allowAddToWave,
+    headMetaTitle = 'Issues',
   } = config(user);
 
   if (requireLogin) {
@@ -120,6 +122,7 @@ export const issuesPageLayoutLoad = async (
     availableSortByOptions: availableSortByOptions ?? ['updatedAt', 'createdAt'],
     allowAddToWave: allowAddToWave ?? false,
     isViewingIssue,
+    headMetaTitle,
 
     waveHeaderBackground: false,
   };

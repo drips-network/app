@@ -28,8 +28,8 @@
 
   interface Props {
     items: {
-      top: Item[];
-      bottom?: Item[];
+      top: readonly Item[];
+      bottom?: readonly Item[];
     };
     collapsed?: boolean;
     isCurrentlyExpanded?: boolean;
@@ -159,7 +159,7 @@
   </svelte:element>
 {/snippet}
 
-{#snippet navList(items: Item[])}
+{#snippet navList(items: readonly Item[])}
   {#each items as item (item.name)}
     {#if item.type === 'target'}
       {@render navTarget(item, isActive(item.href), allowBacktrack(item))}

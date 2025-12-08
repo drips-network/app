@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Setting from '$lib/components/setting/setting.svelte';
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
@@ -119,6 +120,8 @@
     }
   }
 </script>
+
+<HeadMeta title="Notifications | Settings | Wave" />
 
 {#snippet setting(
   channel: WorkflowProperties,

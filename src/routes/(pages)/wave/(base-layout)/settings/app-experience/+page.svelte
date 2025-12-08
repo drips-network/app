@@ -1,4 +1,5 @@
 <script>
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Setting from '$lib/components/setting/setting.svelte';
   import animationsStore from '$lib/stores/animations/animations.store';
@@ -7,6 +8,8 @@
   const { primaryColor } = themeStore;
   const { selectedSetting: animationsSetting } = animationsStore;
 </script>
+
+<HeadMeta title="App Experience | Settings | Wave" />
 
 <Setting title="Theme" subtitle="Adjust the appearance of UI elements across the app.">
   <SegmentedControl

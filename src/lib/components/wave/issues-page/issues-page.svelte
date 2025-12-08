@@ -31,6 +31,7 @@
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import SortByConfig from './components/sort-by-config/sort-by-config.svelte';
   import { page } from '$app/state';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   let {
     issues,
@@ -49,6 +50,7 @@
     filtersMode,
     availableSortByOptions,
     isViewingIssue,
+    headMetaTitle,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -81,6 +83,8 @@
 
     availableSortByOptions: IssueSortByOption[];
     isViewingIssue: boolean;
+
+    headMetaTitle: string;
   } = $props();
 
   async function getMoreIssues(
@@ -211,6 +215,8 @@
 
   let noOfFilters = $derived(Object.keys(appliedFilters).length - noOfPreappliedFilters);
 </script>
+
+<HeadMeta title={headMetaTitle} />
 
 <div class="wrapper" class:isViewingIssue>
   <div class="issues" style:view-transition-name={viewTransitionName}>

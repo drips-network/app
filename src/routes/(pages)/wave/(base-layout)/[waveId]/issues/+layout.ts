@@ -17,5 +17,6 @@ export const load = async (context) => {
     ],
     viewKey: context.params.waveId,
     availableSortByOptions: ['updatedAt', 'createdAt', 'points'],
+    headMetaTitle: `Issues | ${wave.name} Wave`,
   }));
 };

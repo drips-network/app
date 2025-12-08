@@ -1,4 +1,5 @@
 <script lang="ts">
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -71,6 +72,8 @@
     getCoreRowModel: getCoreRowModel(),
   });
 </script>
+
+<HeadMeta title="Points History | Wave" />
 
 <Section
   header={{

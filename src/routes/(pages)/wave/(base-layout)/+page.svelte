@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import File from '$lib/components/icons/File.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
@@ -14,6 +15,8 @@
 
   const now = new Date();
 </script>
+
+<HeadMeta title="Explore Waves | Wave" />
 
 <div class="page">
   <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">

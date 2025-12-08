@@ -1,4 +1,5 @@
 <script lang="ts">
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -15,6 +16,8 @@
     <RepoBadge repo={d.repo} />
   </div>
 {/snippet}
+
+<HeadMeta title="Orgs & Repos | Maintainer Dashboard" />
 
 <!-- TODO(wave): Show all repos with wave applications & their statuses -->
 <Section
@@ -42,7 +45,7 @@
   }}
 >
   <div class="repo-applications-list">
-    {#each waveRepos.data as repoApplication}
+    {#each waveRepos.data as repoApplication (repoApplication.id)}
       {@render waveRepo(repoApplication)}
     {/each}
   </div>

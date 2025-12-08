@@ -38,6 +38,7 @@
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   interface Props {
     issue: IssueDetailsDto;
@@ -59,6 +60,7 @@
     backToConfig: { label: string; href: string };
 
     user: WaveLoggedInUser | null;
+    headMetaTitle: string;
   }
 
   let {
@@ -70,6 +72,7 @@
     applicationsPromise: issueApplicationsPromise,
     user,
     backToConfig,
+    headMetaTitle,
   }: Props = $props();
 
   let matchingWaveRepos = $derived(
@@ -159,6 +162,8 @@
     {backToConfig.label}
   </Button>
 </div>
+
+<HeadMeta title={headMetaTitle} />
 
 <div
   class="wrapper"

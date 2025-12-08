@@ -1,4 +1,5 @@
 <script lang="ts">
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -20,6 +21,8 @@
       now <= new Date(upcomingOrActiveCycle.endDate),
   );
 </script>
+
+<HeadMeta title="{wave.name} Wave" description={wave.description} />
 
 <div class="page">
   <div class="hero">
