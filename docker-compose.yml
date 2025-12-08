@@ -327,10 +327,10 @@ services:
   wave:
     image: 'j537/wave:${WAVE_TAG-main}'
     pull_policy: always
-    command: /usr/local/bin/start-wave.sh
+    command: /usr/local/bin/wave-command.sh
     volumes:
       - tunnel-data:/tmp/tunnel
-      - ./docker/start-wave.sh:/usr/local/bin/start-wave.sh
+      - ./docker/wave-command.sh:/usr/local/bin/wave-command.sh
     environment:
       - PORT=8000
       - BASE_URL=http://localhost:8000
@@ -364,32 +364,12 @@ services:
 
   cloudflared:
     image: debian:stable-slim
-    volumes:
-      - tunnel-data:/tmp/tunnel
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        apt-get update && apt-get install -y curl ca-certificates
-        curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-        chmod +x /usr/local/bin/cloudflared
-        mkdir -p /tmp/tunnel
-        rm -f /tmp/tunnel/url.txt
-        if [ -z "$$TUNNEL_TOKEN" ]; then
-          echo "No TUNNEL_TOKEN provided, starting Quick Tunnel..."
-          # Run cloudflared in background, piping logs to file
-          cloudflared tunnel --url http://wave:8000 2>&1 | tee /tmp/tunnel/tunnel.log &
-          PID=$$!
-          # Wait for URL to appear in logs
-          echo "Waiting for URL..."
-          ( while true; do if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt; echo "URL captured: $$(cat /tmp/tunnel/url.txt)"; break; fi; sleep 1; done ) &
-          wait $$PID
-        else
-          echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
-          cloudflared tunnel run
-        fi
+    entrypoint: /usr/local/bin/cloudflared-entrypoint.sh
+    volumes:
+      - tunnel-data:/tmp/tunnel
+      - ./docker/cloudflared-entrypoint.sh:/usr/local/bin/cloudflared-entrypoint.sh
     depends_on:
       - wave
 
