@@ -351,7 +351,7 @@ export const applicationSchema = z.object({
   createdAt: z.string().pipe(z.coerce.date()),
   updatedAt: z.string().pipe(z.coerce.date()),
   roundId: z.string(),
-  allocation: z.number().nullable(),
+  allocation: z.coerce.number().nullable(),
   submitter: userSchema,
   projectName: z.string().min(1).max(255),
   dripsProjectDataSnapshot: projectChainDataSchema,
@@ -379,7 +379,7 @@ export const listingApplicationSchema = z.object({
   state: applicationStateSchema,
   projectName: z.string().min(1).max(255),
   dripsProjectDataSnapshot: projectChainDataSchema,
-  allocation: z.number().nullable(),
+  allocation: z.coerce.number().nullable(),
 });
 export type ListingApplication = z.infer<typeof listingApplicationSchema>;
 

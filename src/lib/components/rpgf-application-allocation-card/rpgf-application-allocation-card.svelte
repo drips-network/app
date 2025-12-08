@@ -3,8 +3,15 @@
   import RpgfApplicationDetailsCard from '../rpgf-application-details-card/rpgf-application-details-card.svelte';
   import TitleAndValue from '../title-and-value/title-and-value.svelte';
 
-  export let allocation: number | null;
-  export let resultsPublished: boolean;
+  interface Props {
+    allocation: number | null;
+    resultsPublished: boolean;
+  }
+
+  let { allocation, resultsPublished }: Props = $props();
+
+  // Up to two decimal places
+  const normalizedAllocation = $derived(Math.round((allocation ?? 0) * 100) / 100);
 </script>
 
 {#if allocation !== null}
@@ -15,7 +22,7 @@
       {/if}
 
       <TitleAndValue title="Vote result">
-        <h3 class="typo-header-3" style:font-weight="bold">{allocation}</h3>
+        <h3 class="typo-header-3" style:font-weight="bold">{normalizedAllocation}</h3>
       </TitleAndValue>
     </div>
   </RpgfApplicationDetailsCard>
