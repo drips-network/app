@@ -25,7 +25,7 @@
     user: WaveLoggedInUser | null;
     pointsBalance: number | null;
     noBackground?: boolean;
-    mobileNavItems: ComponentProps<typeof Nav>['items'];
+    mobileNavItems: ComponentProps<typeof Nav>['items'] | null;
   } = $props();
 
   const viewWidth = $derived($breakpointsStore?.dimensions.width);
@@ -41,7 +41,7 @@
 
 <header class:noBackground>
   <div class="left">
-    {#if mobileMode}
+    {#if mobileMode && mobileNavItems}
       <button
         onclick={() =>
           cupertinoPaneStore.openSheet(Nav, {

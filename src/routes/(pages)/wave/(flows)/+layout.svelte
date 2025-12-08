@@ -18,6 +18,7 @@
 <div class="flow-base-layout" class:fullscreen={page.data.waveFullscreenFlow}>
   <div class="header-container">
     <Header
+      mobileNavItems={null}
       pointsBalance={data.pointsBalance?.totalPoints || null}
       user={data.user}
       noBackground={false}
@@ -60,7 +61,7 @@
   }
 
   .content {
-    width: 100%;
+    width: calc(100% - 1rem);
     max-width: 48rem;
     min-height: 20rem;
     background-color: var(--color-background);
