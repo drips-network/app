@@ -364,14 +364,13 @@ services:
           fi
         fi
 
-        export BASE_URL="$$WAVE_PUBLIC_URL"
         export GITHUB_OAUTH_CALLBACK_URL="$${WAVE_PUBLIC_URL}/api/auth/github/callback"
 
-        echo "Starting Wave with BASE_URL=$$BASE_URL"
+        echo "Starting Wave with GITHUB_OAUTH_CALLBACK_URL=$$GITHUB_OAUTH_CALLBACK_URL"
         deno task db:migrate && deno task start
     environment:
       - PORT=8000
-      - BASE_URL=${WAVE_BASE_URL-http://localhost:8000}
+      - BASE_URL=http://localhost:8000
       - DB_CONNECTION_STRING=postgresql://user:admin@postgres-wave:5432/wave_db
       - REDIS_URL=redis://redis:6379
       - MEILISEARCH_HOST=http://meilisearch:7700
