@@ -3,29 +3,68 @@
   import Flyout from '$lib/components/flyout/flyout.svelte';
   import DripsLogo from '$lib/components/header/drips-logo.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
+  import Drip from '$lib/components/illustrations/drip.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
   import NotificationsButton from '$lib/components/notifications/notifications-button.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
+  import type { ComponentProps } from 'svelte';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import LogInButton from '../log-in-button/log-in-button.svelte';
-  import LogOutButton from '../log-out-button/log-out-button.svelte';
+  import Nav from '../nav/nav.svelte';
+  import UserMenu from './components/user-menu.svelte';
+  import Hamburger from '$lib/components/icons/Hamburger.svelte';
 
   let {
     user,
     pointsBalance,
     noBackground = false,
+    mobileNavItems,
   }: {
     user: WaveLoggedInUser | null;
     pointsBalance: number | null;
     noBackground?: boolean;
+    mobileNavItems: ComponentProps<typeof Nav>['items'];
   } = $props();
+
+  const viewWidth = $derived($breakpointsStore?.dimensions.width);
+  const mobileMode = $derived(viewWidth ? viewWidth <= 1024 : false);
+
+  function handleMobileUserMenuClick() {
+    if (!mobileMode) return;
+    if (!user) return;
+
+    cupertinoPaneStore.openSheet(UserMenu, { user });
+  }
 </script>
 
 <header class:noBackground>
-  <a class="typo-header-3 logo" href="/wave">
-    <DripsLogo />
-    <span>Wave</span>
-  </a>
+  <div class="left">
+    {#if mobileMode}
+      <button
+        onclick={() =>
+          cupertinoPaneStore.openSheet(Nav, {
+            items: mobileNavItems,
+            collapsed: false,
+            mode: 'hamburger',
+          })}
+        aria-label="Open navigation menu"
+      >
+        <Hamburger />
+      </button>
+    {/if}
+
+    <a class="typo-header-3 logo" href="/wave">
+      <div class="desktop-only" style:height="100%">
+        <DripsLogo />
+      </div>
+      <div class="mobile-only">
+        <Drip height="1.5rem" />
+      </div>
+      <span>Wave</span>
+    </a>
+  </div>
 
   <div class="right">
     {#if user}
@@ -39,27 +78,18 @@
         {pointsBalance ?? 0}
       </Button>
 
-      <Flyout noPadding width="16rem">
+      <Flyout
+        disabled={mobileMode}
+        noPadding
+        width="16rem"
+        onclickWhileDisabled={handleMobileUserMenuClick}
+      >
         {#snippet trigger()}
           <GithubUserBadge {user} size={32} link={false} hideName />
         {/snippet}
 
         {#snippet content()}
-          <div class="user-flyout">
-            <div class="profile-info">
-              <div class="bg"></div>
-              <GithubUserBadge {user} size={64} link={false} hideName />
-              <span class="typo-header-3">{user.name}</span>
-              <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
-                >{user.email}</span
-              >
-            </div>
-
-            <div class="actions">
-              <Button href="/wave/settings">Settings</Button>
-              <LogOutButton />
-            </div>
-          </div>
+          <UserMenu {user} />
         {/snippet}
       </Flyout>
     {:else}
@@ -98,6 +128,12 @@
     view-transition-name: header;
   }
 
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   header.noBackground {
     background: transparent;
   }
@@ -108,46 +144,12 @@
     gap: 1rem;
   }
 
-  .user-flyout {
-    position: relative;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  .mobile-only {
+    display: none;
   }
 
-  .user-flyout .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .user-flyout .profile-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    min-width: 0;
-  }
-
-  .user-flyout .profile-info > * {
-    min-width: 0;
-    width: 100%;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .user-flyout .profile-info .bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3rem;
-    background-color: var(--color-primary-level-1);
-    border-radius: 0.5rem 0.5rem 0 0;
+  .desktop-only {
+    display: block;
   }
 
   @media (max-width: 1024px) {
@@ -163,6 +165,14 @@
         var(--color-background) 90%,
         transparent 100%
       );
+    }
+
+    .mobile-only {
+      display: block;
+    }
+
+    .desktop-only {
+      display: none;
     }
   }
 </style>

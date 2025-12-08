@@ -4,12 +4,11 @@
   import { Novu, type Notification } from '@novu/js';
   import { onMount } from 'svelte';
   import Bell from '$lib/components/icons/Bell.svelte';
-  import Button from '$lib/components/button/button.svelte';
   import MiniButton from '../mini-button/mini-button.svelte';
   import Flyout from '../flyout/flyout.svelte';
-  import EyeOpen from '../icons/EyeOpen.svelte';
-  import Settings from '../icons/Settings.svelte';
-  import NotificationItem from './components/notification-item.svelte';
+  import NotificationsMenu from './components/notifications-menu.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   const NOVU_APP_ID = getOptionalEnvVar(
     'PUBLIC_NOVU_APP_ID',
@@ -94,64 +93,31 @@
       console.error('Failed to mark all as read:', error);
     }
   }
+
+  const viewWidth = $derived($breakpointsStore?.dimensions.width);
+  const mobileMode = $derived(viewWidth ? viewWidth <= 1024 : false);
+
+  function handleMobileClick() {
+    if (!mobileMode) return;
+    if (!user) return;
+
+    cupertinoPaneStore.openSheet(NotificationsMenu, {
+      notifications,
+      unreadCount,
+      markAllAsRead,
+      cupertinoPaneMode: true,
+    });
+  }
 </script>
 
 {#if initialized}
-  <Flyout noPadding>
+  <Flyout disabled={mobileMode} onclickWhileDisabled={handleMobileClick} noPadding>
     {#snippet trigger()}
       <MiniButton redNumber={unreadCount} label="Notifications" icon={Bell} />
     {/snippet}
 
     {#snippet content()}
-      <div class="panel-header">
-        <h2 class="pixelated">Inbox</h2>
-        <div class="header-actions">
-          <Button size="small" onclick={markAllAsRead} disabled={unreadCount === 0} icon={EyeOpen}
-            >All read</Button
-          >
-          <Button size="small" href="/wave/settings/notifications" icon={Settings}>Settings</Button>
-        </div>
-      </div>
-
-      <div class="notifications-list">
-        {#if notifications.length === 0}
-          <div class="empty-state">
-            <p class="typo-text" style:color="var(--color-foreground-level-6)">No notifications</p>
-          </div>
-        {:else}
-          {#each notifications as notification (notification.id)}
-            <NotificationItem {notification} />
-          {/each}
-        {/if}
-      </div>
+      <NotificationsMenu {notifications} {unreadCount} {markAllAsRead} />
     {/snippet}
   </Flyout>
 {/if}
-
-<style>
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid var(--color-foreground-level-3);
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .notifications-list {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    max-height: min(calc(100vh - 10rem), 500px);
-  }
-
-  .empty-state {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-  }
-</style>

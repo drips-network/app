@@ -2,7 +2,7 @@
   import { type Component } from 'svelte';
   import { Tween } from 'svelte/motion';
   import { afterNavigate, beforeNavigate } from '$app/navigation';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import { sineInOut } from 'svelte/easing';
   import { page } from '$app/state';
   import { browser } from '$app/environment';
@@ -15,12 +15,13 @@
     /** Whether it's possible to click on the item to go to the root href while active. */
     allowBacktrack?: boolean;
     icon: Component<{ style?: string }>;
+    count?: number | null;
   };
 
   type Collection = {
     type: 'collection';
     name?: string;
-    items: NavTarget[];
+    items: readonly NavTarget[];
   };
 
   type Item = NavTarget | Collection;
@@ -32,9 +33,15 @@
     };
     collapsed?: boolean;
     isCurrentlyExpanded?: boolean;
+    mode?: 'side' | 'hamburger';
   }
 
-  let { items, collapsed = true, isCurrentlyExpanded = $bindable(false) }: Props = $props();
+  let {
+    items,
+    collapsed = true,
+    isCurrentlyExpanded = $bindable(false),
+    mode = 'side',
+  }: Props = $props();
 
   let isNavigating = $state(false);
   let hovering = $state(false);
@@ -130,6 +137,28 @@
 
 <svelte:window onresize={handleWindowResize} />
 
+{#snippet navTarget(item: NavTarget, isActive: boolean, allowBacktrack: boolean)}
+  <svelte:element
+    this={isActive && !allowBacktrack ? 'div' : 'a'}
+    href={item.href}
+    target={item.newTab ? '_blank' : undefined}
+    class="nav-item"
+    style:width={mode === 'hamburger' ? '100%' : '12rem'}
+    class:active={isActive}
+    bind:this={navTargetEls[item.href]}
+  >
+    <item.icon
+      style="fill: {isActive ? 'var(--color-primary-level-6)' : 'var(--color-foreground-level-6)'}"
+    />
+    {#if !shouldBeCollapsed}
+      <span class="name typo-text" transition:fly={{ x: -4, duration: 200 }}>{item.name}</span>
+      {#if item.count !== null && item.count !== undefined}
+        <span class="count typo-text-small-bold">{item.count}</span>
+      {/if}
+    {/if}
+  </svelte:element>
+{/snippet}
+
 {#snippet navList(items: Item[])}
   {#each items as item (item.name)}
     {#if item.type === 'target'}
@@ -138,7 +167,7 @@
       <div class="collection">
         {#if item.name}
           {#if !shouldBeCollapsed}
-            <h5>{item.name}</h5>
+            <h5 in:fly={{ x: -4, duration: 200 }}>{item.name}</h5>
           {:else}
             <div class="divider"></div>
           {/if}
@@ -152,28 +181,9 @@
   {/each}
 {/snippet}
 
-{#snippet navTarget(item: NavTarget, isActive: boolean, allowBacktrack: boolean)}
-  <svelte:element
-    this={isActive && !allowBacktrack ? 'div' : 'a'}
-    href={item.href}
-    target={item.newTab ? '_blank' : undefined}
-    class="nav-item"
-    style:width="12rem"
-    class:active={isActive}
-    bind:this={navTargetEls[item.href]}
-  >
-    <item.icon
-      style="fill: {isActive ? 'var(--color-primary-level-6)' : 'var(--color-foreground-level-6)'}"
-    />
-    {#if !shouldBeCollapsed}
-      <span transition:fade={{ duration: 200 }}>{item.name}</span>
-    {/if}
-  </svelte:element>
-{/snippet}
-
 <nav
   bind:this={navEl}
-  style:width="{width.current}rem"
+  style:width={mode === 'hamburger' ? '100%' : `${width.current}rem`}
   onmouseenter={() => {
     isNavigating = false;
     hoverTimeout = setTimeout(() => {
@@ -196,6 +206,7 @@
       focusedWithin = false;
     }
   }}
+  class:hamburgerMode={mode === 'hamburger'}
 >
   {#if browser}
     <div
@@ -229,6 +240,10 @@
     view-transition-name: nav-highlighter;
   }
 
+  .hamburgerMode .item-highlighter {
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+  }
+
   nav {
     height: 100%;
     overflow: hidden;
@@ -246,6 +261,10 @@
     width: 14rem;
   }
 
+  nav.hamburgerMode .inner {
+    width: 100%;
+  }
+
   .nav-item {
     z-index: 2;
     display: flex;
@@ -253,7 +272,7 @@
     gap: 0.5rem;
     height: 2.5rem;
     border-radius: 0 0 1.25rem 0;
-    padding: 0 1rem;
+    padding: 0 0.5rem 0 1rem;
     transition:
       0.2s background-color,
       0.2s color;
@@ -272,13 +291,22 @@
     cursor: pointer;
   }
 
-  /* 4. Focus Visible Styles */
-  /* We use focus-visible so mouse clicks don't trigger the outline, only keyboard */
   .nav-item:focus-visible {
     z-index: 3; /* Ensure it sits above highlighter */
     background-color: var(--color-primary-level-1);
     /* Create a distinct focus ring inside the element */
     box-shadow: inset 0 0 0 2px var(--color-primary-level-6);
+  }
+
+  .nav-item .count {
+    margin-left: auto;
+    background-color: var(--color-primary-level-2);
+    color: var(--color-primary-level-6);
+    height: 1.5rem;
+    line-height: 1.5rem;
+    padding: 0 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    text-align: center;
   }
 
   .collection {

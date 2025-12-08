@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { stopPropagation } from 'svelte/legacy';
-
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
@@ -10,6 +8,8 @@
     visible?: boolean;
     trigger?: import('svelte').Snippet;
     content?: import('svelte').Snippet;
+    disabled?: boolean;
+    onclickWhileDisabled?: () => void;
 
     noPadding?: boolean;
     forceOpen?: boolean;
@@ -23,12 +23,16 @@
     content,
     forceOpen = false,
     noPadding = false,
+    disabled = false,
+    onclickWhileDisabled = undefined,
   }: Props = $props();
   let triggerElem: HTMLDivElement;
 
   let timerId: NodeJS.Timeout;
 
   function handleHover(hovering: boolean) {
+    if (disabled && hovering) return;
+
     clearTimeout(timerId);
 
     if (hovering) {
@@ -41,10 +45,14 @@
   }
 
   function handleFocusChange(e: FocusEvent) {
-    if (e.target === triggerElem) return (visible = true);
+    if (e.target === triggerElem && !disabled) return (visible = true);
     if (triggerElem.contains(e.target as HTMLDivElement)) return;
 
     visible = false;
+  }
+
+  function handleClick() {
+    if (disabled) onclickWhileDisabled?.();
   }
 
   onMount(() => {
@@ -64,11 +72,7 @@
     onmouseleave={() => handleHover(false)}
   >
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      class="trigger-content"
-      onkeydown={() => handleHover(true)}
-      onclick={stopPropagation(() => handleHover(true))}
-    >
+    <div class="trigger-content" onkeydown={() => handleHover(true)} onclick={handleClick}>
       {@render trigger?.()}
     </div>
     {#if visible || forceOpen}

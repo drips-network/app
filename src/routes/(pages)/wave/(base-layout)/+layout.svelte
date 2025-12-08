@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import type { PageProps } from './$types';
   import Header from '$lib/components/wave/header/header.svelte';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
@@ -12,6 +12,9 @@
   import Patch from '$lib/components/icons/Patch.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
 
   let {
     data,
@@ -21,12 +24,100 @@
   } = $props();
 
   let sidenavExpanded = $state(false);
+
+  onMount(() => {
+    breakpointsStore.attach();
+    return () => breakpointsStore.detach();
+  });
+
+  onMount(() => {
+    cupertinoPaneStore.attach();
+    return () => cupertinoPaneStore.detach();
+  });
+
+  const NAV_ITEMS = {
+    top: [
+      {
+        type: 'target',
+        name: 'Explore Waves',
+        href: '/wave',
+        icon: Explore,
+        allowBacktrack: true,
+      },
+      {
+        type: 'collection',
+        name: 'Contributor',
+        items: [
+          {
+            type: 'target',
+            name: 'Issues',
+            href: '/wave/contributors/issues',
+            icon: ExclamationCircle,
+            count: data.counts.contributorIssuesCount,
+          },
+        ],
+      },
+      {
+        type: 'collection',
+        name: 'Maintainer',
+        items: [
+          {
+            type: 'target',
+            name: 'Issues',
+            href: '/wave/maintainers/issues',
+            icon: ExclamationCircle,
+          },
+          {
+            type: 'target',
+            name: 'Orgs & repos',
+            href: '/wave/maintainers/repos',
+            icon: Orgs,
+          },
+          {
+            type: 'target',
+            name: 'Review queue',
+            href: '/wave/maintainers/review-queue',
+            icon: Patch,
+          },
+        ],
+      },
+    ],
+    bottom: [
+      {
+        type: 'collection',
+        items: [
+          {
+            type: 'target',
+            name: 'Points history',
+            href: '/wave/points',
+            icon: Trophy,
+          },
+          {
+            type: 'target',
+            name: 'Settings',
+            href: '/wave/settings',
+            icon: Settings,
+          },
+          {
+            type: 'target',
+            name: 'Docs',
+            href: 'https://docs.drips.network/wave',
+            newTab: true,
+            icon: InfoCircle,
+          },
+        ],
+      },
+    ],
+  } as const;
 </script>
 
 <ModalLayout />
 
+<CupertinoPaneTarget />
+
 <div class="header-container">
   <Header
+    mobileNavItems={NAV_ITEMS}
     pointsBalance={data.pointsBalance?.totalPoints || null}
     user={data.user}
     noBackground={page.data.waveHeaderBackground === false}
@@ -39,82 +130,7 @@
   </div>
 
   <div class="nav-wrapper">
-    <Nav
-      bind:isCurrentlyExpanded={sidenavExpanded}
-      items={{
-        top: [
-          {
-            type: 'target',
-            name: 'Explore Waves',
-            href: '/wave',
-            icon: Explore,
-            allowBacktrack: true,
-          },
-          {
-            type: 'collection',
-            name: 'Contributor',
-            items: [
-              {
-                type: 'target',
-                name: 'Issues',
-                href: '/wave/contributors/issues',
-                icon: ExclamationCircle,
-              },
-            ],
-          },
-          {
-            type: 'collection',
-            name: 'Maintainer',
-            items: [
-              {
-                type: 'target',
-                name: 'Issues',
-                href: '/wave/maintainers/issues',
-                icon: ExclamationCircle,
-              },
-              {
-                type: 'target',
-                name: 'Orgs & repos',
-                href: '/wave/maintainers/repos',
-                icon: Orgs,
-              },
-              {
-                type: 'target',
-                name: 'Review queue',
-                href: '/wave/maintainers/review-queue',
-                icon: Patch,
-              },
-            ],
-          },
-        ],
-        bottom: [
-          {
-            type: 'collection',
-            items: [
-              {
-                type: 'target',
-                name: 'Points history',
-                href: '/wave/points',
-                icon: Trophy,
-              },
-              {
-                type: 'target',
-                name: 'Settings',
-                href: '/wave/settings',
-                icon: Settings,
-              },
-              {
-                type: 'target',
-                name: 'Docs',
-                href: 'https://docs.drips.network/wave',
-                newTab: true,
-                icon: InfoCircle,
-              },
-            ],
-          },
-        ],
-      }}
-    />
+    <Nav bind:isCurrentlyExpanded={sidenavExpanded} items={NAV_ITEMS} />
   </div>
 </div>
 
@@ -189,6 +205,7 @@
 
     .content {
       padding: 0;
+      padding-bottom: 1rem;
     }
   }
 </style>
