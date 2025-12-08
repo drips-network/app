@@ -4,7 +4,7 @@
   import ProjectBadge from '$lib/components/project-badge/project-badge.svelte';
   import RpgfApplicationBadge from '$lib/components/rpgf-application-badge/rpgf-application-badge.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import RpgfApplicationKycCard from '$lib/components/rpgf-application-kyc-card/rpgf-application-kyc-card.svelte';
@@ -26,7 +26,7 @@
 
   let latestVersion = $derived(application.latestVersion);
 
-  let backToBallot = $derived($page.url.searchParams.get('backToBallot') !== null);
+  let backToBallot = $derived(page.url.searchParams.get('backToBallot') !== null);
 </script>
 
 <HeadMeta title="{application.projectName} | {round.name}" />
@@ -57,14 +57,14 @@
       <RpgfApplicationBadge hideState {application} hideName size="huge" />
       <div class="actions">
         <ShareButton
-          url={$page.url.toString().replaceAll('?backToBallot', '')}
+          url={page.url.toString().replaceAll('?backToBallot', '')}
           shareModalText={application.state !== 'approved'
             ? "Please note that only the applicant or round admins can see this application before it's approved."
             : undefined}
         />
 
         <Button
-          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history${$page.url.search}`}
+          href={`/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}/history${page.url.search}`}
           icon={ArrowCounterClockwiseHeart}
           variant="ghost">History</Button
         >

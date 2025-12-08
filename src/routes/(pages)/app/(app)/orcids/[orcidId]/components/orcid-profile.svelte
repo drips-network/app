@@ -53,11 +53,8 @@
   description="Support {orcidDisplayName} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
+  canonical={`https://drips.network/app/orcids/${orcidAccount.orcid}`}
 />
-
-<svelte:head>
-  <link rel="canonical" href={`https://drips.network/app/orcids/${orcidAccount.orcid}`} />
-</svelte:head>
 
 <PrimaryColorThemer colorHex={undefined}>
   {#if !orcidAccount.isClaimed}

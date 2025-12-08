@@ -5,7 +5,7 @@
   import Divider from '../divider/divider.svelte';
   import ArrowBoxUpRight from '../icons/ArrowBoxUpRight.svelte';
   import CheckCircle from '../icons/CheckCircle.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Proposals from '../icons/Proposals.svelte';
   import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
@@ -42,9 +42,9 @@
   $effect(() => {
     if (!voterGuidelinesSeen) {
       voteStep = null;
-    } else if ($page.url.pathname.includes('/applications/ballot')) {
+    } else if (page.url.pathname.includes('/applications/ballot')) {
       voteStep = 'assign-votes';
-    } else if ($page.url.pathname.includes('/applications')) {
+    } else if (page.url.pathname.includes('/applications')) {
       voteStep = 'build-ballot';
     } else {
       voteStep = null;

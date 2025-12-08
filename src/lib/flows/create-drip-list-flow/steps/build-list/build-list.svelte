@@ -6,7 +6,7 @@
   import Check from '$lib/components/icons/Check.svelte';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
   import ListEditor from '$lib/components/list-editor/list-editor.svelte';
@@ -26,7 +26,7 @@
 
   let { context }: Props = $props();
 
-  const { searchParams } = $page.url;
+  const { searchParams } = page.url;
   const urlToAdd = searchParams.get('urlToAdd') ?? undefined;
 
   let listValid = $state(false);

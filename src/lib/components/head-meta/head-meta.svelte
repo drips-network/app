@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   interface Props {
     title?: string;
@@ -7,6 +7,7 @@
     twitterImage?: string;
     description?: string;
     twitterCardType?: 'summary' | 'summary_large_image';
+    canonical?: string;
   }
 
   let {
@@ -17,6 +18,7 @@
     twitterCardType = twitterImage === '/assets/share/twitter-summary.png'
       ? 'summary'
       : 'summary_large_image',
+    canonical = page.url.href,
   }: Props = $props();
 
   let fullTitle = $derived(`${title}${title?.startsWith('Drips') ? '' : ' | Drips'}`);
@@ -29,11 +31,11 @@
     <meta name="twitter:title" content={fullTitle} />
   {/if}
   <meta name="description" content={description?.substring(0, 160)} />
-  <meta property="og:image" content="https://{$page.url.host}{image}" />
+  <meta property="og:image" content="https://{page.url.host}{image}" />
   <meta property="og:description" content={description?.substring(0, 160)} />
   <meta name="twitter:description" content={description?.substring(0, 160)} />
-  <meta name="twitter:image" content="https://{$page.url.host}{twitterImage}" />
+  <meta name="twitter:image" content="https://{page.url.host}{twitterImage}" />
   <meta name="twitter:card" content={twitterCardType} />
   <meta name="twitter:site" content="@dripsnetwork" />
-  <link rel="canonical" href={$page.url.href} />
+  <link rel="canonical" href={canonical} />
 </svelte:head>

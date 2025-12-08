@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { forceCollapsed as forceMainSidebarCollapsed } from '$lib/components/sidenav/sidenav-store';
   import SidenavItem from '$lib/components/sidenav/components/sidenav-item.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Label from '$lib/components/icons/Label.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import Calendar from '$lib/components/icons/Calendar.svelte';
@@ -63,49 +63,49 @@
     <SidenavItem
       label="Representation"
       href="{settingsBaseUrl}/representation"
-      active={$page.url.pathname === `${settingsBaseUrl}/representation`}
+      active={page.url.pathname === `${settingsBaseUrl}/representation`}
       icon={Label}
       backgroundOnActive
     />
     <SidenavItem
       label="Schedule"
       href="{settingsBaseUrl}/schedule"
-      active={$page.url.pathname === `${settingsBaseUrl}/schedule`}
+      active={page.url.pathname === `${settingsBaseUrl}/schedule`}
       icon={Calendar}
       backgroundOnActive
     />
     <SidenavItem
       label="Admins"
       href="{settingsBaseUrl}/admins"
-      active={$page.url.pathname === `${settingsBaseUrl}/admins`}
+      active={page.url.pathname === `${settingsBaseUrl}/admins`}
       icon={User}
       backgroundOnActive
     />
     <SidenavItem
       label="Voting"
       href="{settingsBaseUrl}/voting"
-      active={$page.url.pathname === `${settingsBaseUrl}/voting`}
+      active={page.url.pathname === `${settingsBaseUrl}/voting`}
       icon={Proposals}
       backgroundOnActive
     />
     <SidenavItem
       label="Applications"
       href="{settingsBaseUrl}/application"
-      active={$page.url.pathname === `${settingsBaseUrl}/application`}
+      active={page.url.pathname === `${settingsBaseUrl}/application`}
       icon={Ledger}
       backgroundOnActive
     />
     <SidenavItem
       label="Custom datasets"
       href="{settingsBaseUrl}/custom-datasets"
-      active={$page.url.pathname === `${settingsBaseUrl}/custom-datasets`}
+      active={page.url.pathname === `${settingsBaseUrl}/custom-datasets`}
       icon={Server}
       backgroundOnActive
     />
     <SidenavItem
       label="Audit log"
       href="{settingsBaseUrl}/audit-log"
-      active={$page.url.pathname === `${settingsBaseUrl}/audit-log`}
+      active={page.url.pathname === `${settingsBaseUrl}/audit-log`}
       icon={File}
       backgroundOnActive
     />

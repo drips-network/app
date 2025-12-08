@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -15,7 +15,7 @@
   <div>
     <Button
       icon={ArrowLeft}
-      href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}/history${$page.url.search}`}
+      href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}/history${page.url.search}`}
       >Back to history</Button
     >
   </div>
@@ -24,7 +24,7 @@
     You are viewing a historical version of this application.
     {#snippet actions()}
       <Button
-        href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
+        href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${page.url.search}`}
         >View latest version</Button
       >
     {/snippet}
