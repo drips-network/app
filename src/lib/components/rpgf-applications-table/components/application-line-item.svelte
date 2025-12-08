@@ -211,7 +211,7 @@
 
     {#if application.allocation !== null}
       <span class="typo-text-small-bold">
-        {Math.round(application.allocation)}
+        {Math.round((application.allocation ?? 0) * 100) / 100}
       </span>
     {/if}
   </div>
