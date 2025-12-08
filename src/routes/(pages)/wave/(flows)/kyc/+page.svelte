@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import themeStore from '$lib/stores/theme/theme.store.js';
   import { getSumsubSessionToken } from '$lib/utils/wave/kyc.js';
   import snsWebSdk, { type SnsWebSdk } from '@sumsub/websdk';
@@ -32,6 +33,8 @@
   onMount(() => launchWebSdk(data.sumsubToken));
   onDestroy(() => snsWebSdkInstance?.destroy());
 </script>
+
+<HeadMeta title="Identity verification | Wave" />
 
 <div class="wrapper">
   <div id="sumsub-target"></div>

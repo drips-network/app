@@ -1,9 +1,12 @@
 <script lang="ts">
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import FlowStepWrapper from '../../shared/flow-step-wrapper.svelte';
 </script>
+
+<HeadMeta title="Success | Wave" />
 
 <FlowStepWrapper
   confetti

@@ -11,6 +11,7 @@
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
   import type { Snapshot } from './$types.js';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   let { data } = $props();
 
@@ -50,6 +51,11 @@
     restore: (value) => (applicationText = value),
   };
 </script>
+
+<HeadMeta
+  title="Apply | {data.issue.title} | {data.wave.name} Wave"
+  description="Apply to work on this issue in the {data.wave.name} Wave and get rewarded."
+/>
 
 <!-- TODO(wave): Show wave & cycle info -->
 <!-- TODO(wave): Intro for what Wave is -->
