@@ -26,7 +26,7 @@ export ARCH
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
-# source .env file
+# source .env file, preventing an error related to multiline values e.g. RSA keys
 set -a
 source .env
 set +a
