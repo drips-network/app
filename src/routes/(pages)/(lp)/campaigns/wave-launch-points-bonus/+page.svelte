@@ -9,7 +9,7 @@
 
 <HeadMeta
   title="Kick off your Wave with a boost"
-  description="Join Drips Wave and earn 100 base points for signing up with GitHub. At the end of each wave, points turn into real money."
+  description="Join the Drips Discord, submit the form before January 11th, 2025, and receive 100 Points after you participate in the first Wave early next year."
 />
 
 <div class="page">
