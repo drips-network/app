@@ -97,9 +97,8 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 -   **`GITHUB_WEBHOOK_SECRET`**: The secret you set in the "Webhook URL" section (if you enabled webhooks). If you didn't set one, you can define any string here, but it must match what you configured in GitHub if webhooks are active.
 -   **`CLOUDFLARED_TUNNEL_TOKEN`**: (Optional) Token for a persistent Cloudflare Tunnel. If set, the service will use this token to run a named tunnel with a static URL. If not set, it defaults to a random Quick Tunnel.
 -   **`WAVE_PUBLIC_URL`**: (Optional) The public URL where your Wave service is accessible.
-    -   If using **localhost**, leave empty (defaults to `http://localhost:8000`).
-    -   If using a **Static Tunnel**, set this to your tunnel URL (e.g., `https://wave-dev.example.com`).
-    -   If using a **Quick Tunnel**, leave empty. The service will automatically detect the random URL from the Cloudflare tunnel logs and configure itself.
+    -   **If set** (e.g. `http://localhost:8000`): The Cloudflare tunnel service will be **skipped**, and the Wave service will use this URL as its base.
+    -   **If empty**: The Cloudflare tunnel service will start (either Quick or Named) and the URL will be automatically detected.
 
 ## 🚀 Running the Service
 
@@ -109,7 +108,9 @@ The Wave service is part of the standard Docker Compose stack.
 npm run dev:docker
 ```
 
-This command will start the `wave` service along with other dependencies. You can check the logs to ensure it connected to GitHub successfully:
+This command will start the `wave` service along with other dependencies. The service uses an event-driven startup script (`docker/wave-command.sh`) that waits for the Cloudflare URL if necessary, or starts immediately if `WAVE_PUBLIC_URL` is set.
+
+You can check the logs:
 
 ```bash
 docker compose logs -f wave
@@ -117,19 +118,28 @@ docker compose logs -f wave
 
 ## 🌐 Webhook Integration (Cloudflared)
 
-### Option 1: Quick Tunnel (Random URL)
+### Option 1: Localhost (No Tunnel)
+If you don't need external webhooks (e.g. you're just clicking around the UI), you can skip the tunnel.
+
+1.  Set `WAVE_PUBLIC_URL=http://localhost:8000` in your `.env`.
+2.  Start the stack: `npm run dev:docker`.
+3.  The `cloudflared` service will log "Skipping Cloudflare Tunnel startup" and exit.
+4.  The `wave` service will start immediately with `BASE_URL=http://localhost:8000`.
+
+### Option 2: Quick Tunnel (Random URL)
 The default setup uses a Cloudflare Quick Tunnel, which generates a random URL each time.
 
-1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` and `WAVE_PUBLIC_URL` empty in `.env`.
+1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` **and** `WAVE_PUBLIC_URL` empty in `.env`.
 2.  Start the stack: `npm run dev:docker`.
-3.  The `wave` service will wait for the tunnel to establish and automatically configure its `GITHUB_OAUTH_CALLBACK_URL`.
-4.  Find your URL in the logs:
+3.  The `cloudflared` service will start and generate a random URL.
+4.  The `wave` service will detect this URL immediately via `inotify` and configure itself.
+5.  Find your URL in the logs:
     ```bash
     docker compose logs wave | grep "Found Tunnel URL"
     ```
-5.  Update GitHub App Webhook URL with this new URL.
+6.  On Github, update the GitHub App Webhook URL with this new URL.
 
-### Option 2: Static Tunnel (Fixed URL)
+### Option 3: Static Tunnel (Fixed URL)
 For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflare Tunnel.
 
 1.  **Create a Tunnel**:
@@ -143,7 +153,7 @@ For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflar
     - Copy the token string from the install command (it's the long string after `--token`).
 4.  **Update Environment**:
     - Add `CLOUDFLARED_TUNNEL_TOKEN=<your-token>` to your `.env` file.
-    - Add `WAVE_PUBLIC_URL=https://<your-hostname>` to your `.env` file.
+    - Leave `WAVE_PUBLIC_URL` **empty** (or set it to your static URL if you want, but the auto-detection works with named tunnels too).
 5.  **Restart**:
     - `npm run dev:docker`.
     - Your service is now available at your configured hostname.
