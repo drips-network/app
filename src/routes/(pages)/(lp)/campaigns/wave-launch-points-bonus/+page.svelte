@@ -29,7 +29,9 @@
           points you collect by resolving issues, the higher your share of the rewards pool will be.
           To be eligible for rewards, you'll need to <span class="typo-text-small-bold"
             >resolve at least one issue during the first Wave Cycle</span
-          >, complete <span class="typo-text-small-bold">identity verification</span>, and
+          >
+          using the GitHub account you submitted in the form, complete
+          <span class="typo-text-small-bold">identity verification</span>, and
           <span class="typo-text-small-bold">provide a valid Stellar address for payout</span>.
         </p>
       </div>
