@@ -1,7 +1,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   import type { AnnouncementBannerConfig } from '$lib/components/lp-header/lp-header.svelte';
   import LpHeader from '$lib/components/lp-header/lp-header.svelte';
@@ -20,8 +20,8 @@
 
   let announcementBannerConfig: AnnouncementBannerConfig | undefined = $state();
   run(() => {
-    if ('blogPosts' in $page.data) {
-      const homepageData = $page.data as PageData;
+    if ('blogPosts' in page.data) {
+      const homepageData = page.data as PageData;
 
       const sortedPosts = homepageData.blogPosts.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),

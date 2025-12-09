@@ -30,7 +30,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import query from '$lib/graphql/dripsQL';
   import type { OrcidQuery, OrcidQueryVariables } from './__generated__/gql.generated';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
@@ -59,7 +59,7 @@
 
   let formValid = $derived(validationState.type === 'valid');
 
-  const { searchParams } = $page.url;
+  const { searchParams } = page.url;
   const orcidToAdd = orcidId ?? searchParams.get('orcidId') ?? undefined;
 
   onMount(() => {

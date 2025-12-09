@@ -11,7 +11,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { quintInOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
@@ -27,7 +27,7 @@
   let activeIndex: number | null = $state(null);
 
   run(() => {
-    activeIndex = tabs.findIndex((tab) => tab.href === $page.url.pathname);
+    activeIndex = tabs.findIndex((tab) => tab.href === page.url.pathname);
   });
 
   const highlightBarWidth = tweened(0);

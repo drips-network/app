@@ -2,12 +2,12 @@
   import { run } from 'svelte/legacy';
 
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
 
   let description: string | undefined = $state();
   run(() => {
-    switch ($page.status) {
+    switch (page.status) {
       case 404: {
         description = 'We werenʼt able to find that page.';
         break;
@@ -25,7 +25,7 @@
 
 <LargeEmptyState
   emoji="💀"
-  headline="Error {$page.status}"
+  headline="Error {page.status}"
   {description}
   button={{
     label: 'Go back home',

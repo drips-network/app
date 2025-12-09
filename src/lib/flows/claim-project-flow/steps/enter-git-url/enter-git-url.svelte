@@ -38,7 +38,7 @@
   import UnclaimedProjectCard from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
   import { isSupportedGitUrl, isValidGitUrl } from '$lib/utils/is-valid-git-url';
   import seededRandomElement from '$lib/utils/seeded-random-element';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import possibleRandomEmoji from '$lib/utils/project/possible-random-emoji';
   import query from '$lib/graphql/dripsQL';
   import type { ProjectQuery, ProjectQueryVariables } from './__generated__/gql.generated';
@@ -68,7 +68,7 @@
 
   let formValid = $derived(validationState.type === 'valid');
 
-  const { searchParams } = $page.url;
+  const { searchParams } = page.url;
   const projectUrlToAdd = projectUrl ?? searchParams.get('projectToAdd') ?? undefined;
 
   onMount(() => {

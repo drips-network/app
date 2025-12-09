@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
@@ -55,14 +55,14 @@
     const version = data.history[rowIndex];
 
     goto(
-      `/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}/history/${version.id}${$page.url.search}`,
+      `/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}/history/${version.id}${page.url.search}`,
     );
   }
 </script>
 
 <Button
   icon={ArrowLeft}
-  href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${$page.url.search}`}
+  href={`/app/rpgf/rounds/${data.round.urlSlug}/applications/${data.application.id}${page.url.search}`}
   >Back to application</Button
 >
 

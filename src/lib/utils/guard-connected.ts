@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import wallet from '$lib/stores/wallet/wallet.store';
 import { get } from 'svelte/store';
 import buildUrl from './build-url';
@@ -15,7 +15,7 @@ export default function guardConnected(): boolean {
   const { initialized } = wallet;
 
   if (!connected && get(initialized)) {
-    const { pathname } = get(page).url;
+    const { pathname } = page.url;
     goto(buildUrl('/app/connect', { backTo: encodeURIComponent(pathname) }), {
       replaceState: true,
     });

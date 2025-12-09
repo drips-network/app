@@ -164,7 +164,7 @@
   import Settings from '$lib/components/icons/Settings.svelte';
   import type { SupportButtonData } from '$lib/components/project-support-button/project-support-button';
   import network from '$lib/stores/wallet/network';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import launchClaimProject from '$lib/utils/launch-claim-project';
 
   interface RepoInfo {
@@ -303,31 +303,27 @@
   }
 </script>
 
+<!--
+    Canonical URL is either, in order of priority:
+    - The new repo URL if the project has been renamed
+    - The correct-casing repo URL if the project has different casing to the Drips project
+    - The project URL, without ?exact parameter
+  -->
 <HeadMeta
   title="{project.source.ownerName}/{project.source.repoName}"
   description="Support {project.source
     .repoName} on Drips and help make Open-Source Software sustainable."
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
+  canonical="https://drips.network{buildProjectUrl(
+    Forge.GitHub,
+    canonicalRepoInfo.ownerName,
+    canonicalRepoInfo.repoName,
+    false,
+  )}"
 />
 
 <svelte:head>
-  <!--
-    Canonical URL is either, in order of priority:
-    - The new repo URL if the project has been renamed
-    - The correct-casing repo URL if the project has different casing to the Drips project
-    - The project URL, without ?exact parameter
-  -->
-  <link
-    rel="canonical"
-    href="https://drips.network{buildProjectUrl(
-      Forge.GitHub,
-      canonicalRepoInfo.ownerName,
-      canonicalRepoInfo.repoName,
-      false,
-    )}"
-  />
-
   {#if !project.isVisible}
     <meta name="robots" content="noindex" />
   {/if}
@@ -560,7 +556,7 @@
               <div class="p-6">
                 <ProjectBadge tooltip={false} {project} />
                 <div class="pl-3.5 mt-2.5">
-                  {#key $page.url.pathname}
+                  {#key page.url.pathname}
                     <SplitsComponent
                       disableLinks={false}
                       list={[

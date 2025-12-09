@@ -8,7 +8,7 @@
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { getContext, onDestroy } from 'svelte';
   import {
     ballotValidationContextKey,
@@ -169,12 +169,12 @@
     updateValidationErrors({ type: 'unvalidated' });
   });
 
-  let active = $derived($page.url.href.includes(`/applications/${application.id}`));
+  let active = $derived(page.url.href.includes(`/applications/${application.id}`));
 
   let link = $derived(
     `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
       voteStep === 'assign-votes' ? '?backToBallot' : ''
-    }${$page.url.search}`,
+    }${page.url.search}`,
   );
 </script>
 

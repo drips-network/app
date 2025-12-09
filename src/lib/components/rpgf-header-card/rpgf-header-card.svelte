@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { deleteRound } from '$lib/utils/rpgf/rpgf';
@@ -57,7 +57,7 @@
           shareModalText={!round.published
             ? 'Note that this round draft can only be viewed by the configured round admins.'
             : ''}
-          url={$page.url.toString()}
+          url={page.url.toString()}
           buttonVariant="normal"
           downloadableImageUrl={round.published
             ? `/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png?target=og`

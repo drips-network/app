@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import type { BottomNavItems } from './types';
 
@@ -12,7 +12,7 @@
 
 <div class="mobile-nav-overflow">
   {#each items as item}
-    {@const active = $page.url.pathname === item.href}
+    {@const active = page.url.pathname === item.href}
     <a class="item" href={item.href} class:active onclick={() => cupertinoPaneStore.closeSheet()}>
       <item.icon
         style="fill: {active ? 'var(--color-primary-level-6)' : 'var(--color-foreground)'}"
