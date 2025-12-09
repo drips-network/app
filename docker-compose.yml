@@ -309,6 +309,7 @@ services:
 
   postgres-wave:
     image: postgres:latest
+    profiles: ['wave']
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -326,6 +327,7 @@ services:
 
   wave:
     image: 'j537/wave:${WAVE_TAG-main}'
+    profiles: ['wave']
     pull_policy: always
     command: /usr/local/bin/wave-command.sh
     volumes:
@@ -363,6 +365,7 @@ services:
 
   cloudflared:
     image: debian:stable-slim
+    profiles: ['wave']
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
       - WAVE_PUBLIC_URL=${WAVE_PUBLIC_URL}

@@ -102,15 +102,29 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 
 ## 🚀 Running the Service
 
-The Wave service is part of the standard Docker Compose stack.
+The Wave service is now an **optional** component of the Docker Compose stack, managed via the `wave` profile.
 
+### Option A: Auto-Detection (Default)
+
+When running `npm run dev:docker`, the script automatically detects if you have access to the `wave` Docker image.
+- **Access confirmed**: The `wave` profile is enabled (added to your `COMPOSE_PROFILES`).
+- **No access**: The `wave` profile is skipped.
+
+### Option B: Manual Control
+
+You can manually control the profile if you are not using the startup script or wish to override behavior.
+
+**Enable via CLI:**
 ```bash
-npm run dev:docker
+docker compose --profile wave up
 ```
 
-This command will start the `wave` service along with other dependencies. The service uses an event-driven startup script (`docker/wave-command.sh`) that waits for the Cloudflare URL to be written to a shared volume, or starts immediately if `WAVE_PUBLIC_URL` is set.
+**Enable via Environment:**
+Add `COMPOSE_PROFILES=wave` to your `.env` file. This is useful if you run `docker compose` commands directly.
 
-You can check the logs:
+### Checking Status
+
+You can check the logs to verify it started:
 
 ```bash
 docker compose logs -f wave
