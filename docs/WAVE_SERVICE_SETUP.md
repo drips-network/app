@@ -98,7 +98,7 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 -   **`CLOUDFLARED_TUNNEL_TOKEN`**: (Optional) Token for a persistent Cloudflare Tunnel. If set, the service will use this token to run a named tunnel with a static URL. If not set, it defaults to a random Quick Tunnel.
 -   **`WAVE_PUBLIC_URL`**: (Optional) The public URL where your Wave service is accessible.
     -   **If set** (e.g. `http://localhost:8000`): The Cloudflare tunnel service will be **skipped**, and the Wave service will use this URL as its base.
-    -   **If empty**: The Cloudflare tunnel service will start (either Quick or Named) and the URL will be automatically detected.
+    -   **If empty**: The Cloudflare tunnel service will start (either Quick or Named). The `wave` service will automatically detect the generated URL by monitoring a shared volume where `cloudflared` writes its output.
 
 ## 🚀 Running the Service
 
@@ -108,7 +108,7 @@ The Wave service is part of the standard Docker Compose stack.
 npm run dev:docker
 ```
 
-This command will start the `wave` service along with other dependencies. The service uses an event-driven startup script (`docker/wave-command.sh`) that waits for the Cloudflare URL if necessary, or starts immediately if `WAVE_PUBLIC_URL` is set.
+This command will start the `wave` service along with other dependencies. The service uses an event-driven startup script (`docker/wave-command.sh`) that waits for the Cloudflare URL to be written to a shared volume, or starts immediately if `WAVE_PUBLIC_URL` is set.
 
 You can check the logs:
 
@@ -132,7 +132,7 @@ The default setup uses a Cloudflare Quick Tunnel, which generates a random URL e
 1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` **and** `WAVE_PUBLIC_URL` empty in `.env`.
 2.  Start the stack: `npm run dev:docker`.
 3.  The `cloudflared` service will start and generate a random URL.
-4.  The `wave` service will detect this URL immediately via `inotify` and configure itself.
+4.  The `wave` service will detect this URL immediately via `inotify` (watching the shared volume) and configure itself.
 5.  Find your URL in the logs:
     ```bash
     docker compose logs wave | grep "Found Tunnel URL"
@@ -153,7 +153,7 @@ For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflar
     - Copy the token string from the install command (it's the long string after `--token`).
 4.  **Update Environment**:
     - Add `CLOUDFLARED_TUNNEL_TOKEN=<your-token>` to your `.env` file.
-    - Leave `WAVE_PUBLIC_URL` **empty** (or set it to your static URL if you want, but the auto-detection works with named tunnels too).
+    - Leave `WAVE_PUBLIC_URL` **empty** (the auto-detection works with named tunnels too, or you can set it manually to skip the wait).
 5.  **Restart**:
     - `npm run dev:docker`.
     - Your service is now available at your configured hostname.
