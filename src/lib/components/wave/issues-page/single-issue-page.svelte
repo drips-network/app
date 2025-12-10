@@ -84,7 +84,7 @@
   let isMaintainer = $derived(matchingWaveRepos.length > 0);
   let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
   let canUpdateComplexity = $derived(
-    Boolean(partOfWave && allowAddingOrRemovingWave && isMaintainer),
+    Boolean(partOfWave && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open'),
   );
 
   async function handleRemoveFromWave() {

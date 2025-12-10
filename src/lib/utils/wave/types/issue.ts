@@ -2,7 +2,7 @@ import z from 'zod';
 import { waveUserDtoSchema } from './user';
 import { filterSchema } from './filter';
 import { repoDtoSchema } from './repo';
-import { complexitySchema } from './wave';
+import { complexitySchema, waveCycleDtoSchema } from './wave';
 
 export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
   waveId: z.uuid(),
@@ -54,5 +54,6 @@ export const issueDetailsDtoSchema = z.object({
   points: z.number().int().nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
+  resolvedInCycle: waveCycleDtoSchema.nullable(),
 });
 export type IssueDetailsDto = z.infer<typeof issueDetailsDtoSchema>;

@@ -23,6 +23,7 @@ export const issueApplicationDtoSchema = z.object({
   applicationText: z.string(),
   status: issueApplicationStatusSchema,
   appliedAt: z.coerce.date(),
+  cycleId: z.uuid(),
   reviewedAt: z.coerce.date().nullable(),
   reviewedByUserId: z.uuid().nullable(),
   removedAt: z.coerce.date().nullable(),

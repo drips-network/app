@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { error } from '@sveltejs/kit';
 import getOptionalEnvVarPublic from '../get-optional-env-var/public';
 import { getAccessJwt, getRefreshedAuthToken } from './auth';
 
@@ -59,6 +60,11 @@ export async function authenticatedCall(
     return authenticatedCall(f, path, options, false);
   } else if (!res.ok && res.status !== 404) {
     const errorText = await res.text();
+
+    if (res.status === 401) {
+      throw error(401, 'Unauthorized');
+    }
+
     throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
   }
 
