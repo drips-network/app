@@ -3,8 +3,53 @@
   import Divider from '$lib/components/divider/divider.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import z from 'zod';
   import IllustrationBottom from './components/illustration-bottom.svelte';
   import IllustrationTop from './components/illustration-top.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
+  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
+  import FormField from '$lib/components/form-field/form-field.svelte';
+
+  let emailValue = $state('');
+  let githubHandleValue = $state('');
+  let discordHandleValue = $state('');
+  let marketingConsentValue = $state(false);
+
+  let valid = $derived(
+    z.string().email().safeParse(emailValue).success &&
+      githubHandleValue.trim().length > 0 &&
+      discordHandleValue.trim().length > 0,
+  );
+
+  let success = $state(false);
+  let submitting = $state(false);
+
+  async function handleSubmit() {
+    if (!valid) return;
+
+    submitting = true;
+
+    const response = await fetch('/campaigns/wave-launch-points-bonus/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: emailValue,
+        gitHubUsername: githubHandleValue,
+        discordUsername: discordHandleValue,
+        marketingConsent: marketingConsentValue,
+      }),
+    });
+
+    if (!response.ok) {
+      submitting = false;
+      return;
+    }
+
+    success = true;
+    submitting = false;
+  }
 </script>
 
 <HeadMeta
@@ -25,8 +70,8 @@
           year.
         </p>
         <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
-          Points increase your share of the rewards pool at the end of the Wave Cycle. The more
-          points you collect by resolving issues, the higher your share of the rewards pool will be.
+          Points increase your share of the reward pool at the end of the Wave Cycle. The more
+          points you collect by resolving issues, the higher your share of the reward pool will be.
           To be eligible for rewards, you'll need to <span class="typo-text-small-bold"
             >resolve at least one issue during the first Wave Cycle</span
           >
@@ -36,13 +81,53 @@
         </p>
       </div>
 
-      <iframe
-        src="https://drips-network.notion.site/ebd/2c3c52c95997803ca377e59499e66ec7"
-        width="100%"
-        height="650"
-        frameborder="0"
-        title="Wave Launch Points Bonus Form"
-      ></iframe>
+      {#if success}
+        <CheckCircle
+          style="fill: var(--color-positive); width: 4rem; height: 4rem; margin: 2rem auto;"
+        />
+        <p class="typo-text" style="text-align: center; margin-bottom: 1rem;">
+          Thank you! We'll be in touch when it's time for the first Wave.
+        </p>
+      {:else}
+        <FormField title="Email Address*">
+          <TextInput bind:value={emailValue} placeholder="peter-pan@acme.org" />
+        </FormField>
+
+        <FormField title="GitHub Handle*">
+          <TextInput bind:value={githubHandleValue} placeholder="peter-pan" />
+        </FormField>
+
+        <FormField title="Discord Handle*">
+          <TextInput bind:value={discordHandleValue} placeholder="peter-pan#1234" />
+        </FormField>
+
+        <Checkbox
+          bind:checked={marketingConsentValue}
+          label="I agree to receive occasional marketing emails from Drips."
+        />
+
+        <div class="action">
+          <Button
+            variant="primary"
+            onclick={handleSubmit}
+            disabled={!valid || submitting}
+            loading={submitting}
+            icon={CheckCircle}
+            size="large"
+          >
+            Submit
+          </Button>
+        </div>
+
+        <p class="typo-text-small" style="color: var(--color-foreground-level-5);">
+          By submitting the form, you agree to the <a
+            class="typo-link"
+            href="https://drips.network/legal/privacy">Drips Privacy Policy</a
+          >. If you opt-in to marketing communications, you agree that your email address is stored
+          on <a class="typo-link" href="https://www.intercom.com/legal/privacy">Intercom</a> in the EU
+          for the purpose of sending updates about Drips. Marketing consent can be withdrawn anytime.
+        </p>
+      {/if}
 
       <div class="illustration-top">
         <IllustrationTop />
@@ -124,9 +209,9 @@
 
   .illustration-bottom {
     position: absolute;
-    bottom: -110px;
+    bottom: -150px;
     width: 1000px;
-    right: -400px;
+    right: -500px;
     pointer-events: none;
   }
 
@@ -141,10 +226,6 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-  }
-
-  iframe {
-    border-radius: 1.5rem 0 1.5rem 1.5rem;
   }
 
   h1 {
