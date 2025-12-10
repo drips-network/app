@@ -8,17 +8,25 @@
     href?: string;
     variant?: 'normal' | 'primary';
     disabled?: boolean;
+    target?: string;
   }
 
-  let { icon: Icon, onclick, children, href, variant = 'normal', disabled }: Props = $props();
+  let {
+    icon: Icon,
+    onclick,
+    children,
+    href,
+    variant = 'normal',
+    disabled,
+    target = '_blank',
+  }: Props = $props();
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svelte:element
   this={href ? 'a' : 'button'}
   {href}
-  target="_blank"
-  rel="noopener noreferrer"
+  {target}
   class="sidebar-button {variant} typo-text"
   class:disabled
   {onclick}

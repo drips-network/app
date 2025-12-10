@@ -1,4 +1,6 @@
+import { getComplimentsForIssue } from '$lib/utils/wave/compliments';
 import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
+import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { PaginatedResponse } from '$lib/utils/wave/types/pagination';
 import type { WaveDto } from '$lib/utils/wave/types/wave';
@@ -46,6 +48,14 @@ export const issuePageLoad = async (
 
   const { backToConfig, allowAddingOrRemovingWave, headMetaTitle } = config(issue);
 
+  let givenCompliments: IssueComplimentDto[] = [];
+
+  if (issue.state === 'closed' && issue.assignedApplicant && issue.waveId) {
+    const complimentsRes = await getComplimentsForIssue(fetch, issue.waveId, issue.id);
+
+    givenCompliments = complimentsRes.compliments;
+  }
+
   return {
     issues,
     issue,
@@ -53,6 +63,7 @@ export const issuePageLoad = async (
     allowAddingOrRemovingWave: allowAddingOrRemovingWave,
     backToConfig: backToConfig,
     headMetaTitle: headMetaTitle,
+    givenCompliments,
 
     // streamed (not awaited)
     applicationsPromise,

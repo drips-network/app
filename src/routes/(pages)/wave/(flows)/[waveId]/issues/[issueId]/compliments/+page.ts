@@ -3,7 +3,7 @@ import { getComplimentsForIssue } from '$lib/utils/wave/compliments.js';
 const COMPLIMENT_DEADLINE_DAYS = 7;
 
 export const load = async ({ parent, fetch }) => {
-  const { issue } = await parent();
+  const { issue, isOwnIssue } = await parent();
 
   const issueCompletedInCycle = issue.resolvedInCycle;
 
@@ -24,6 +24,13 @@ export const load = async ({ parent, fetch }) => {
     return {
       canMakeCompliment: false,
       reason: 'deadline-passed',
+    };
+  }
+
+  if (!isOwnIssue) {
+    return {
+      canMakeCompliment: false,
+      reason: 'not-maintainer',
     };
   }
 

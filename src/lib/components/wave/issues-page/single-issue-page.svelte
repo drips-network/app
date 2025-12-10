@@ -39,6 +39,8 @@
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
+  import Heart from '$lib/components/icons/Heart.svelte';
 
   interface Props {
     issue: IssueDetailsDto;
@@ -61,6 +63,7 @@
 
     user: WaveLoggedInUser | null;
     headMetaTitle: string;
+    givenCompliments: IssueComplimentDto[];
   }
 
   let {
@@ -73,6 +76,7 @@
     user,
     backToConfig,
     headMetaTitle,
+    givenCompliments,
   }: Props = $props();
 
   let matchingWaveRepos = $derived(
@@ -312,7 +316,34 @@
             <h5>Points</h5>
 
             <span class="typo-text">{issue.points}</span>
+
+            {#if givenCompliments.length > 0}
+              <h5 style:margin-top="1rem">Compliments</h5>
+              <ul class="compliments-list">
+                {#each givenCompliments as compliment (compliment.complimentType)}
+                  <li class="compliment-list-item">
+                    <span class="typo-text compliment-label">
+                      {COMPLIMENT_TYPES[compliment.complimentType].label}
+                    </span>
+
+                    <span class="typo-text">
+                      +{compliment.points}
+                    </span>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
           </div>
+
+          {#if isMaintainer}
+            <SidebarButton
+              target=""
+              icon={Heart}
+              href="/wave/{issue.waveId}/issues/{issue.id}/compliments"
+            >
+              Make compliment
+            </SidebarButton>
+          {/if}
         </div>
       {/if}
 
@@ -379,6 +410,27 @@
 
   .sidebar-section:not(:last-child) {
     border-bottom: 1px solid var(--color-foreground-level-3);
+  }
+
+  .compliment-label {
+    min-width: 0;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .compliments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .compliment-list-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    align-items: space-between;
   }
 
   .issue {

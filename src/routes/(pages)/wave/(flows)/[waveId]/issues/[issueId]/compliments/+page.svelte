@@ -92,6 +92,10 @@
       {new Date(complimentDeadline!).toLocaleDateString()}). Compliments can be made within seven
       days after the Wave Cycle that the issue has been resolved in has ended.
     </AnnotationBox>
+  {:else if reason === 'not-maintainer'}
+    <AnnotationBox type="warning">
+      Only members of the org the issue is from can make compliments on issues.
+    </AnnotationBox>
   {/if}
 
   <FormField title="Compliment type*" type="div" disabled={!canMakeCompliment}>
