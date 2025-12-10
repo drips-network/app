@@ -341,7 +341,7 @@
               icon={Heart}
               href="/wave/{issue.waveId}/issues/{issue.id}/compliments"
             >
-              Make compliment
+              Give compliment
             </SidebarButton>
           {/if}
         </div>

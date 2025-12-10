@@ -63,12 +63,12 @@
 </script>
 
 <HeadMeta
-  title="Make a compliment | {data.issue.title} | {data.wave.name} Wave"
-  description="Make a compliment on this issue in the {data.wave.name} Wave."
+  title="Give a compliment | {data.issue.title} | {data.wave.name} Wave"
+  description="Give a compliment on this issue in the {data.wave.name} Wave."
 />
 
 <FlowStepWrapper
-  headline="Make a compliment"
+  headline="Give a compliment"
   description="Submit your compliment for this issue in the {data.wave.name} Wave."
 >
   <FormField title="Issue*" type="div">
@@ -78,7 +78,7 @@
   {#if canMakeCompliment}
     <AnnotationBox type="info">
       By making a compliment, you'll reward the applicant that resolved the issue with additional
-      points for their outstanding work. You can make compliments within seven days after the Wave
+      points for their outstanding work. You can give compliments within seven days after the Wave
       Cycle that the issue has been resolved in has ended.
     </AnnotationBox>
   {:else if reason === 'not-completed'}
@@ -88,13 +88,13 @@
     </AnnotationBox>
   {:else if reason === 'deadline-passed'}
     <AnnotationBox type="warning">
-      The deadline to make a compliment for this issue has passed (
+      The deadline to give a compliment for this issue has passed (
       {new Date(complimentDeadline!).toLocaleDateString()}). Compliments can be made within seven
       days after the Wave Cycle that the issue has been resolved in has ended.
     </AnnotationBox>
   {:else if reason === 'not-maintainer'}
     <AnnotationBox type="warning">
-      Only members of the org the issue is from can make compliments on issues.
+      Only members of the org the issue is from can give compliments on issues.
     </AnnotationBox>
   {/if}
 
