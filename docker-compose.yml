@@ -362,6 +362,8 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_healthy
+      cloudflared:
+        condition: service_healthy
 
   cloudflared:
     image: debian:stable-slim
@@ -373,8 +375,11 @@ services:
     volumes:
       - tunnel-data:/tmp/tunnel
       - ./docker/cloudflared-entrypoint.sh:/usr/local/bin/cloudflared-entrypoint.sh
-    depends_on:
-      - wave
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/tunnel/ready ]']
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
 volumes:
   tunnel-data:
