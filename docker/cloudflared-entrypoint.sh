@@ -3,7 +3,10 @@
 if [ -n "$WAVE_PUBLIC_URL" ]; then
   echo "WAVE_PUBLIC_URL is set to '$WAVE_PUBLIC_URL'. Skipping Cloudflare Tunnel startup."
   touch /tmp/tunnel/ready
-  exit 0
+  while true; do
+    touch /tmp/tunnel/ready
+    sleep 5
+  done
 fi
 
 apt-get update && apt-get install -y curl ca-certificates
@@ -21,7 +24,22 @@ if [ -z "$TUNNEL_TOKEN" ]; then
   PID=$!
   # Wait for URL to appear in logs
   echo "Waiting for URL..."
-  ( while true; do if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt; touch /tmp/tunnel/ready; echo "URL captured: $(cat /tmp/tunnel/url.txt)"; break; fi; sleep 1; done ) &
+  (
+    while true; do
+      if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then
+        mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt
+        touch /tmp/tunnel/ready
+        echo "URL captured: $(cat /tmp/tunnel/url.txt)"
+        # Keep ready file fresh
+        while true; do
+          sleep 5
+          touch /tmp/tunnel/ready
+        done
+        break
+      fi
+      sleep 1
+    done
+  ) &
   wait $PID
 else
   echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
