@@ -30,27 +30,31 @@
 
     submitting = true;
 
-    const response = await fetch('/campaigns/wave-launch-points-bonus/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: emailValue,
-        gitHubUsername: githubHandleValue,
-        discordUsername: discordHandleValue,
-        marketingConsent: marketingConsentValue,
-      }),
-    });
+    try {
+      const response = await fetch('/campaigns/wave-launch-points-bonus/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailValue,
+          gitHubUsername: githubHandleValue,
+          discordUsername: discordHandleValue,
+          marketingConsent: marketingConsentValue,
+        }),
+      });
+      if (!response.ok) {
+        submitting = false;
+        error = true;
+        return;
+      }
 
-    if (!response.ok) {
+      success = true;
+      submitting = false;
+    } catch {
       submitting = false;
       error = true;
-      return;
     }
-
-    success = true;
-    submitting = false;
   }
 </script>
 
