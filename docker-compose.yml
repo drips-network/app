@@ -376,7 +376,7 @@ services:
       - tunnel-data:/tmp/tunnel
       - ./docker/cloudflared-entrypoint.sh:/usr/local/bin/cloudflared-entrypoint.sh
     healthcheck:
-      test: ['CMD-SHELL', '[ -f /tmp/tunnel/ready ]']
+      test: ['CMD-SHELL', '[ -f /tmp/tunnel/ready ] && [ $(( $(date +%s) - $(stat -c %Y /tmp/tunnel/ready) )) -lt 15 ]']
       interval: 5s
       timeout: 5s
       retries: 20
