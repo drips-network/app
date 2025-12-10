@@ -335,7 +335,7 @@
             {/if}
           </div>
 
-          {#if isMaintainer}
+          {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant}
             <SidebarButton
               target=""
               icon={Heart}
