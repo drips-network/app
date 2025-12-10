@@ -366,12 +366,16 @@ services:
         condition: service_healthy
 
   cloudflared:
-    image: debian:stable-slim
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.cloudflared
     profiles: ['wave']
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
       - WAVE_PUBLIC_URL=${WAVE_PUBLIC_URL}
-    entrypoint: /usr/local/bin/cloudflared-entrypoint.sh
+    # Entrypoint is defined in Dockerfile, but can be overridden.
+    # However we kept it as ENTRYPOINT in Dockerfile so we don't strictly need it here unless we want to map the volume.
+    # The file is COPY'd in Dockerfile, but we also volume mount it for dev iteration.
     volumes:
       - tunnel-data:/tmp/tunnel
       - ./docker/cloudflared-entrypoint.sh:/usr/local/bin/cloudflared-entrypoint.sh
