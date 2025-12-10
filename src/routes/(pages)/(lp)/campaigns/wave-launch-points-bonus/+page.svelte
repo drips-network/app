@@ -60,7 +60,7 @@
 
 <HeadMeta
   title="Kick off your Wave with a boost"
-  description="Join the Drips Discord, submit the form before January 11th, 2025, and receive 100 Points after you participate in the first Wave early next year."
+  description="Join the Drips Discord, submit the form before January 11th, 2026, and receive 100 Points after you participate in the first Wave early next year."
 />
 
 <div class="page">
@@ -71,7 +71,7 @@
       <div class="info-text">
         <p style:margin-bottom="1rem">
           Join the <a class="typo-link" href="https://discord.gg/t8XBXZAEs5">Drips Discord</a>,
-          submit the form before January 11th, 2025, and receive
+          submit the form before January 11th, 2026, and receive
           <span class="highlight">100 Points</span> after you participate in the first Wave early next
           year.
         </p>
