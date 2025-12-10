@@ -10,6 +10,8 @@ curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudf
 chmod +x /usr/local/bin/cloudflared
 mkdir -p /tmp/tunnel
 rm -f /tmp/tunnel/url.txt
+rm -f /tmp/tunnel/tunnel.log
+rm -f /tmp/tunnel/ready
 
 if [ -z "$TUNNEL_TOKEN" ]; then
   echo "No TUNNEL_TOKEN provided, starting Quick Tunnel..."
@@ -18,7 +20,7 @@ if [ -z "$TUNNEL_TOKEN" ]; then
   PID=$!
   # Wait for URL to appear in logs
   echo "Waiting for URL..."
-  ( while true; do if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt; echo "URL captured: $(cat /tmp/tunnel/url.txt)"; break; fi; sleep 1; done ) &
+  ( while true; do if grep -o 'https://[-a-z0-9.]*\.trycloudflare\.com' /tmp/tunnel/tunnel.log | head -n 1 > /tmp/tunnel/url.tmp && [ -s /tmp/tunnel/url.tmp ]; then mv /tmp/tunnel/url.tmp /tmp/tunnel/url.txt; touch /tmp/tunnel/ready; echo "URL captured: $(cat /tmp/tunnel/url.txt)"; break; fi; sleep 1; done ) &
   wait $PID
 else
   echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
