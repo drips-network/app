@@ -23,6 +23,7 @@
 
   let success = $state(false);
   let submitting = $state(false);
+  let error = $state(false);
 
   async function handleSubmit() {
     if (!valid) return;
@@ -44,6 +45,7 @@
 
     if (!response.ok) {
       submitting = false;
+      error = true;
       return;
     }
 
@@ -88,6 +90,17 @@
         <p class="typo-text" style="text-align: center; margin-bottom: 1rem;">
           Thank you! We'll be in touch when it's time for the first Wave.
         </p>
+      {:else if error}
+        <p
+          class="typo-text"
+          style="text-align: center; color: var(--color-negative); margin-bottom: 1rem;"
+        >
+          Something went wrong while submitting the form. Please try again later.
+        </p>
+
+        <div>
+          <Button onclick={() => (error = false)}>Try again</Button>
+        </div>
       {:else}
         <FormField title="Email Address*">
           <TextInput bind:value={emailValue} placeholder="peter-pan@acme.org" />
