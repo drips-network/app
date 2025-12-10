@@ -2,6 +2,7 @@
 
 if [ -n "$WAVE_PUBLIC_URL" ]; then
   echo "WAVE_PUBLIC_URL is set to '$WAVE_PUBLIC_URL'. Skipping Cloudflare Tunnel startup."
+  touch /tmp/tunnel/ready
   exit 0
 fi
 
