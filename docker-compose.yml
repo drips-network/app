@@ -348,7 +348,7 @@ services:
       - CORS_ALLOW_ALL_ORIGINS=true
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID-placeholder}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET-placeholder}
-      - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL-http://localhost:8000}/api/auth/github/callback
+      - GITHUB_OAUTH_CALLBACK_URL=${WAVE_PUBLIC_URL-http://localhost:8000}/api/auth/oauth/github/callback
       - GITHUB_APP_ID=${GITHUB_APP_ID-0000000}
       - GITHUB_APP_PRIVATE_KEY=${GITHUB_APP_PRIVATE_KEY-placeholder}
       - GITHUB_APP_BOT_USER_ID=${GITHUB_APP_BOT_USER_ID-placeholder}
