@@ -33,7 +33,13 @@ if [ -z "$WAVE_PUBLIC_URL" ]; then
   fi
 fi
 
-export GITHUB_OAUTH_CALLBACK_URL="${WAVE_PUBLIC_URL}/api/auth/github/callback"
+if [ -n "$GITHUB_OAUTH_CALLBACK_URL" ]; then
+  # Extract path component from existing URL (remove scheme://host:port)
+  CALLBACK_PATH=$(echo "$GITHUB_OAUTH_CALLBACK_URL" | sed -E 's|^[^:]+://[^/]+(/.*)$|\1|')
+  export GITHUB_OAUTH_CALLBACK_URL="${WAVE_PUBLIC_URL}${CALLBACK_PATH}"
+else
+  export GITHUB_OAUTH_CALLBACK_URL="${WAVE_PUBLIC_URL}/api/auth/oauth/github/callback"
+fi
 
 echo "Starting Wave with GITHUB_OAUTH_CALLBACK_URL=$GITHUB_OAUTH_CALLBACK_URL"
 deno task db:migrate && deno task start
