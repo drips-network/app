@@ -9,9 +9,6 @@ if [ -n "$WAVE_PUBLIC_URL" ]; then
   done
 fi
 
-apt-get update && apt-get install -y curl ca-certificates
-curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-chmod +x /usr/local/bin/cloudflared
 mkdir -p /tmp/tunnel
 rm -f /tmp/tunnel/url.txt
 rm -f /tmp/tunnel/tunnel.log
