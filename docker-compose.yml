@@ -371,7 +371,7 @@ services:
       dockerfile: Dockerfile.cloudflared
     profiles: ['wave']
     environment:
-      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+
       - WAVE_PUBLIC_URL=${WAVE_PUBLIC_URL}
     # Entrypoint is defined in Dockerfile, but can be overridden.
     # However we kept it as ENTRYPOINT in Dockerfile so we don't strictly need it here unless we want to map the volume.
