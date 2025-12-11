@@ -39,18 +39,18 @@
   <OrDivider text="Current waves" />
 
   {#each data.waves.data as wave (wave.id)}
-    {@const nextCycle: WaveCycleDto | undefined = data.nextCycles[wave.id]}
+    {@const upcomingCycle: WaveCycleDto | null = data.upcomingCycles[wave.id]}
     <a href="/wave/{wave.id}" class="wave-item">
       <WaveAvatar {wave} size={128} />
 
       <div class="details">
-        {#if nextCycle}
+        {#if upcomingCycle}
           <div class="next-cycle-badge">
-            {#if nextCycle.startDate > now}
-              Next cycle starts {formatDate(nextCycle.startDate)}
-            {:else if nextCycle.endDate > now}
+            {#if upcomingCycle.startDate > now}
+              Next cycle starts {formatDate(upcomingCycle.startDate, 'onlyDay')}
+            {:else if upcomingCycle.endDate > now}
               <PulsatingCircle />
-              Active cycle until {formatDate(nextCycle.endDate, 'onlyDay')}
+              Active cycle until {formatDate(upcomingCycle.endDate, 'onlyDay')}
             {/if}
           </div>
         {/if}

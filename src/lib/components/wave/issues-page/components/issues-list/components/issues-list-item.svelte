@@ -32,11 +32,31 @@
       });
     } else if (issue.assignedApplicant) {
       badges.push({
-        text: 'Applicant assigned',
+        text: 'Assigned',
         color: 'var(--color-caution-level-6)',
         backgroundColor: 'var(--color-caution-level-1)',
         bold: true,
       });
+    }
+
+    if (issue.assignedApplicant) {
+      const isOverdue = issue.assignedApplicant.dueDate < new Date();
+
+      badges.push(
+        isOverdue
+          ? {
+              text: 'Overdue',
+              color: 'var(--color-negative-level-6)',
+              backgroundColor: 'var(--color-negative-level-1)',
+              bold: true,
+            }
+          : {
+              text: `Due ${formatDate(issue.assignedApplicant.dueDate, 'short')}`,
+              color: 'var(--color-caution-level-6)',
+              backgroundColor: 'var(--color-caution-level-1)',
+              bold: true,
+            },
+      );
     }
 
     if (issue.state === 'closed') {
@@ -66,6 +86,7 @@
   import type { WaveDto } from '$lib/utils/wave/types/wave';
   import WaveBadge from '$lib/components/wave/wave-badge/wave-badge.svelte';
   import { renderIssueTitle } from '$lib/utils/wave/issues';
+  import formatDate from '$lib/utils/format-date';
 
   let {
     issue,

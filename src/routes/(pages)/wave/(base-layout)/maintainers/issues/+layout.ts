@@ -6,10 +6,14 @@ export const load = (context) =>
       mine: true,
       eligibleForWave: true,
     },
+    defaultFilters: {
+      state: 'open',
+    },
     pathPrefix: '/wave/maintainers/issues/',
     filtersMode: 'maintainer',
     breadcrumbs: [{ label: 'Maintainer Dashboard' }, { label: 'Issues' }],
     viewKey: 'maintainers',
     allowAddToWave: true,
     headMetaTitle: 'Issues | Maintainer Dashboard',
+    showNewApplicationsBadge: true,
   }));

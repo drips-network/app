@@ -158,7 +158,7 @@ export const waveCycleDtoSchema = z.object({
   cycleNumber: z.number().int(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
-  budgetUSD: z.string(),
+  budgetUSD: z.coerce.number(),
   status: waveCycleStatusSchema,
   createdAt: z.coerce.date(),
 });

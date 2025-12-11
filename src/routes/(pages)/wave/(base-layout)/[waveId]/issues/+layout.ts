@@ -8,6 +8,9 @@ export const load = async (context) => {
     preappliedFilters: {
       waveId: context.params.waveId,
     },
+    defaultFilters: {
+      state: 'open',
+    },
     pathPrefix: `/wave/${context.params.waveId}/issues/`,
     filtersMode: 'wave',
     breadcrumbs: [

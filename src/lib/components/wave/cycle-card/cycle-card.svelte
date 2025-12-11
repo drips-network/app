@@ -12,17 +12,14 @@
   }
 
   let { cycle }: Props = $props();
-
-  let now = new Date();
-
-  let cycleActive = $derived(new Date(cycle.startDate) <= now && now <= new Date(cycle.endDate));
+  const { status } = $derived(cycle);
 </script>
 
 <Card>
   <div class="cycle-card">
     <div class="cycle-info">
       <div class="cycle-name">
-        {#if cycleActive}
+        {#if status === 'active'}
           <div class="active-dot">
             <PulsatingCircle />
           </div>
@@ -39,14 +36,16 @@
 
     <div class="right">
       <div class="budget">
-        <KeyValuePair key="Budget">{cycle.budgetUSD}</KeyValuePair>
+        <KeyValuePair key="Budget">${cycle.budgetUSD}</KeyValuePair>
       </div>
 
-      <div class="action">
-        <Button variant="primary" icon={Ledger} size="large" href="/wave/{cycle.waveId}/issues">
-          Start contributing
-        </Button>
-      </div>
+      {#if status === 'active' || status === 'upcoming'}
+        <div class="action">
+          <Button variant="primary" icon={Ledger} size="large" href="/wave/{cycle.waveId}/issues">
+            {status === 'active' ? 'Start contributing' : 'View issues'}
+          </Button>
+        </div>
+      {/if}
     </div>
   </div>
 </Card>

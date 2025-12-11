@@ -28,6 +28,7 @@ export const issuesPageLayoutLoad = async (
   config: (user: WaveLoggedInUser | null) => {
     requireLogin?: boolean;
     preappliedFilters?: IssueFilters;
+    defaultFilters?: IssueFilters;
     pathPrefix: string;
     viewKey: string;
     filtersMode: 'maintainer' | 'contributor' | 'wave';
@@ -35,6 +36,7 @@ export const issuesPageLayoutLoad = async (
     availableSortByOptions?: IssueSortByOption[];
     allowAddToWave?: boolean;
     headMetaTitle: string;
+    showNewApplicationsBadge?: boolean;
   },
 ) => {
   depends('wave:issues');
@@ -51,6 +53,8 @@ export const issuesPageLayoutLoad = async (
     availableSortByOptions,
     allowAddToWave,
     headMetaTitle = 'Issues',
+    defaultFilters,
+    showNewApplicationsBadge,
   } = config(user);
 
   if (requireLogin) {
@@ -76,6 +80,11 @@ export const issuesPageLayoutLoad = async (
   }
 
   const filters: IssueFilters = filtersParamParseResult.data || {};
+
+  // if there are no current filters, apply default filters
+  if (Object.keys(filters).length === 0 && defaultFilters) {
+    Object.assign(filters, defaultFilters);
+  }
 
   // Apply any preapplied filters from the layout config
   Object.assign(filters, preappliedFilters ?? {});
@@ -123,6 +132,7 @@ export const issuesPageLayoutLoad = async (
     allowAddToWave: allowAddToWave ?? false,
     isViewingIssue,
     headMetaTitle,
+    showNewApplicationsBadge,
 
     waveHeaderBackground: false,
   };

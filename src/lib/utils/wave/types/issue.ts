@@ -6,6 +6,7 @@ import { complexitySchema, waveCycleDtoSchema } from './wave';
 
 export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
   waveId: z.uuid(),
+  dueDate: z.coerce.date(),
 });
 export type AssignedApplicantDto = z.infer<typeof assignedApplicantDtoSchema>;
 

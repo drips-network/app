@@ -9,17 +9,17 @@
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
+  const { wave, cycles } = $derived(data);
 
-  let wave = $derived(data.wave);
+  let upcomingCycle = $derived(cycles.data.find((cycle) => cycle.status === 'upcoming') ?? null);
+  let activeCycle = $derived(cycles.data.find((cycle) => cycle.status === 'active') ?? null);
+  let upcomingOrActiveCycle = $derived(upcomingCycle ?? activeCycle);
 
-  let now = new Date();
-
-  let upcomingOrActiveCycle = $derived(data.cycles.data[0]);
-
-  let cycleActive = $derived(
-    new Date(upcomingOrActiveCycle.startDate) <= now &&
-      now <= new Date(upcomingOrActiveCycle.endDate),
+  let otherCycles = $derived(
+    cycles.data.filter((cycle) => cycle.id !== (upcomingOrActiveCycle?.id ?? '')),
   );
+
+  let cycleActive = $derived(activeCycle !== null);
 </script>
 
 <HeadMeta title="{wave.name} Wave" description={wave.description} />
@@ -49,11 +49,37 @@
     </div>
   </div>
 
-  <div class="divider">
-    <OrDivider text={cycleActive ? 'Current Cycle' : 'Upcoming Cycle'} />
-  </div>
+  <section>
+    <div class="divider">
+      <OrDivider text={cycleActive ? 'Current Cycle' : 'Upcoming Cycle'} />
+    </div>
 
-  <CycleCard cycle={data.cycles.data[0]} />
+    {#if upcomingOrActiveCycle}
+      <CycleCard cycle={upcomingOrActiveCycle} />
+    {:else}
+      <Card>
+        <div class="no-next-cycle">
+          <p class="typo-text">
+            There are no upcoming or active cycles for this Wave at the moment. Please check back
+            later for updates.
+          </p>
+          <!-- todo(wave): NEWSLETTER SIGNUP -->
+        </div>
+      </Card>
+    {/if}
+  </section>
+
+  <section>
+    {#if otherCycles}
+      <div class="divider">
+        <OrDivider text="Explore past cycles" />
+      </div>
+    {/if}
+
+    {#each otherCycles as cycle (cycle.id)}
+      <CycleCard {cycle} />
+    {/each}
+  </section>
 </div>
 
 <style>
@@ -64,6 +90,19 @@
     max-width: 90rem;
     margin: 0 auto;
     width: 100%;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+  }
+
+  .no-next-cycle {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-foreground-level-5);
   }
 
   .hero {

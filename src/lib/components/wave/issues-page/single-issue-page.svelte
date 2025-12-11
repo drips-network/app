@@ -41,6 +41,9 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
   import Heart from '$lib/components/icons/Heart.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
 
   interface Props {
     issue: IssueDetailsDto;
@@ -274,6 +277,22 @@
 
           {#if issue.assignedApplicant}
             <GithubUserBadge user={issue.assignedApplicant} />
+
+            <div class="section-headline-with-info" style:margin-top="1rem">
+              <h5>Due date</h5>
+
+              <Tooltip>
+                <InfoCircle style="height: 1.25rem;" />
+
+                {#snippet tooltip_content()}
+                  Issues assigned as part of a Wave Cycle are due on the end date of that cycle. If
+                  the issue is resolved after this date, the applicant may not receive points for
+                  completing it.
+                {/snippet}
+              </Tooltip>
+            </div>
+
+            <p>{formatDate(issue.assignedApplicant.dueDate)}</p>
           {:else}
             <p style:color="var(--color-foreground-level-5)">No applicant assigned.</p>
           {/if}
@@ -399,6 +418,12 @@
   .sidebar-section {
     display: flex;
     flex-direction: column;
+  }
+
+  .section-headline-with-info {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .sidebar-section .content {
