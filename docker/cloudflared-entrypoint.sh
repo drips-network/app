@@ -14,8 +14,7 @@ rm -f /tmp/tunnel/url.txt
 rm -f /tmp/tunnel/tunnel.log
 rm -f /tmp/tunnel/ready
 
-if [ -z "$TUNNEL_TOKEN" ]; then
-  echo "No TUNNEL_TOKEN provided, starting Quick Tunnel..."
+  echo "Starting Quick Tunnel..."
   # Run cloudflared in background, piping logs to file
   cloudflared tunnel --url http://wave:8000 2>&1 | tee /tmp/tunnel/tunnel.log &
   PID=$!
@@ -38,7 +37,3 @@ if [ -z "$TUNNEL_TOKEN" ]; then
     done
   ) &
   wait $PID
-else
-  echo "TUNNEL_TOKEN provided, starting Named Tunnel..."
-  cloudflared tunnel run
-fi

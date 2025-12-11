@@ -19,17 +19,18 @@ To fully utilize the Wave service locally, you must create a GitHub App.
     - **GitHub App Name**: Choose a unique name (e.g., `drips-wave-local-<yourname>`).
     - **Homepage URL**: `http://localhost:5173` (or your local frontend URL).
     - **Callback URL**:
-        - **Option A (Localhost)**: `http://localhost:8000/api/auth/github/callback`
-        - **Option B (Static Tunnel)**: `https://<your-domain>/api/auth/github/callback`
+        - **Option A (Localhost)**: `http://localhost:8000/api/auth/oauth/github/callback`
+        - **Option B (Static Tunnel)**: `https://<your-domain>/api/auth/oauth/github/callback`
         - *Note: This must match the `GITHUB_OAUTH_CALLBACK_URL` configured in `docker-compose.yml` (via `WAVE_PUBLIC_URL`).*
     - **Webhook URL**:
         - **Option A (Quick Tunnel - Random URL)**:
-            - Leave `CLOUDFLARED_TUNNEL_TOKEN` empty in your `.env`.
+            - Leave `WAVE_PUBLIC_URL` empty in your `.env`.
             - The Wave service will automatically detect the random URL on startup.
             - Check logs for the URL: `docker compose logs wave | grep "Found Tunnel URL"`
             - Example: `https://<random>.trycloudflare.com/api/webhooks/github`
-        - **Option B (Static Tunnel - Fixed URL)**:
-            - Set `CLOUDFLARED_TUNNEL_TOKEN` in your `.env` (see instructions below).
+        - **Option B (Static URL)**:
+            - Set `WAVE_PUBLIC_URL` in your `.env` (e.g. `https://my-tunnel.example.com`).
+            - Use your configured domain: `https://<your-domain>/api/webhooks/github`
             - Use your configured domain: `https://<your-domain>/api/webhooks/github`
         - *Active*: Check this box.
 
@@ -95,10 +96,12 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
         - Note: If using `curl` in Z sh/Bash, you may need to escape brackets or use URL encoding: `https://api.github.com/users/<slug>%5Bbot%5D`
     3.  **Get the ID**: Use the integer `id` field from the JSON response.
 -   **`GITHUB_WEBHOOK_SECRET`**: The secret you set in the "Webhook URL" section (if you enabled webhooks). If you didn't set one, you can define any string here, but it must match what you configured in GitHub if webhooks are active.
--   **`CLOUDFLARED_TUNNEL_TOKEN`**: (Optional) Token for a persistent Cloudflare Tunnel. If set, the service will use this token to run a named tunnel with a static URL. If not set, it defaults to a random Quick Tunnel.
 -   **`WAVE_PUBLIC_URL`**: (Optional) The public URL where your Wave service is accessible.
-    -   **If set** (e.g. `http://localhost:8000`): The Cloudflare tunnel service will be **skipped**, and the Wave service will use this URL as its base.
-    -   **If empty**: The Cloudflare tunnel service will start (either Quick or Named). The `wave` service will automatically detect the generated URL by monitoring a shared volume where `cloudflared` writes its output.
+    -   **If set** (e.g. `http://localhost:8000` or `https://my-dev.com`): The Cloudflare tunnel service will be **skipped** (it will log a message and wait in idle state), and the Wave service will use this URL as its base.
+    -   **If empty**: The Cloudflare tunnel service will start a **Quick Tunnel** (random URL). The `wave` service will automatically detect the generated URL by monitoring a shared volume where `cloudflared` writes its output.
+
+### Postgres Wave
+A dedicated database service `postgres-wave` will be automatically started alongside the `wave` service. It runs on port 54324 by default and uses the `wave_db` database. No manual configuration is required.
 
 ## 🚀 Running the Service
 
@@ -137,13 +140,13 @@ If you don't need external webhooks (e.g. you're just clicking around the UI), y
 
 1.  Set `WAVE_PUBLIC_URL=http://localhost:8000` in your `.env`.
 2.  Start the stack: `npm run dev:docker`.
-3.  The `cloudflared` service will log "Skipping Cloudflare Tunnel startup" and exit.
+3.  The `cloudflared` service will log "Skipping Cloudflare Tunnel startup" and wait (it will not exit, but stays idle).
 4.  The `wave` service will start immediately with `BASE_URL=http://localhost:8000`.
 
 ### Option 2: Quick Tunnel (Random URL)
 The default setup uses a Cloudflare Quick Tunnel, which generates a random URL each time.
 
-1.  Leave `CLOUDFLARED_TUNNEL_TOKEN` **and** `WAVE_PUBLIC_URL` empty in `.env`.
+1.  Leave `WAVE_PUBLIC_URL` empty in `.env`.
 2.  Start the stack: `npm run dev:docker`.
 3.  The `cloudflared` service will start and generate a random URL.
 4.  The `wave` service will detect this URL immediately via `inotify` (watching the shared volume) and configure itself.
@@ -153,22 +156,14 @@ The default setup uses a Cloudflare Quick Tunnel, which generates a random URL e
     ```
 6.  On Github, update the GitHub App Webhook URL with this new URL.
 
-### Option 3: Static Tunnel (Fixed URL)
-For a persistent URL (e.g., `https://my-drips-dev.example.com`), use a Cloudflare Tunnel.
+### Option 3: Static URL (Custom Tunnel / Deployment)
+For a persistent URL (e.g., `https://my-drips-dev.example.com`), you can use your own tunneling solution (like ngrok, a manually managed Cloudflare Tunnel, or a VPS).
 
-1.  **Create a Tunnel**:
-    - Go to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/).
-    - Navigate to **Networks > Tunnels**.
-    - Create a new tunnel (select "Docker" environment to see the token, but you only need the token string).
-2.  **Configure the Tunnel**:
-    - In the "Public Hostname" tab of your tunnel, add a hostname (e.g., `wave-dev.yourdomain.com`).
-    - Service: `HTTP` -> `wave:8000`.
-3.  **Get the Token**:
-    - Copy the token string from the install command (it's the long string after `--token`).
-4.  **Update Environment**:
-    - Add `CLOUDFLARED_TUNNEL_TOKEN=<your-token>` to your `.env` file.
-    - Leave `WAVE_PUBLIC_URL` **empty** (the auto-detection works with named tunnels too, or you can set it manually to skip the wait).
-5.  **Restart**:
+1.  **Configure Environment**:
+    - Set `WAVE_PUBLIC_URL=<your-public-url>` in your `.env` file.
+2.  **Restart**:
     - `npm run dev:docker`.
-    - Your service is now available at your configured hostname.
-    - The `GITHUB_OAUTH_CALLBACK_URL` will automatically update to use this URL.
+3.  **Result**:
+    - The built-in Cloudflare service will be skipped.
+    - The Wave service will start with your specified URL.
+    - You must ensure traffic to that URL is routed to `localhost:8000`.
