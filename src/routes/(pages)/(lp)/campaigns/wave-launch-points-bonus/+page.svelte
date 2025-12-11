@@ -88,7 +88,7 @@
 
       {#if success}
         <CheckCircle
-          style="fill: var(--color-positive); width: 4rem; height: 4rem; margin: 2rem auto;"
+          style="fill: var(--color-primary); width: 4rem; height: 4rem; margin: 2rem auto;"
         />
         <p class="typo-text" style="text-align: center; margin-bottom: 1rem;">
           Thank you! We'll be in touch when it's time for the first Wave.
