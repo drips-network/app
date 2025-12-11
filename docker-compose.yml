@@ -371,11 +371,7 @@ services:
       dockerfile: Dockerfile.cloudflared
     profiles: ['wave']
     environment:
-
       - WAVE_PUBLIC_URL=${WAVE_PUBLIC_URL}
-    # Entrypoint is defined in Dockerfile, but can be overridden.
-    # However we kept it as ENTRYPOINT in Dockerfile so we don't strictly need it here unless we want to map the volume.
-    # The file is COPY'd in Dockerfile, but we also volume mount it for dev iteration.
     volumes:
       - tunnel-data:/tmp/tunnel
       - ./docker/cloudflared-entrypoint.sh:/usr/local/bin/cloudflared-entrypoint.sh
