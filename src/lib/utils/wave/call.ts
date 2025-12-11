@@ -41,12 +41,22 @@ export async function authenticatedCall(
     throw new Error('Wave API URL is not configured.');
   }
 
+  let accessToken = getAccessJwt();
+
+  if (browser && !accessToken && refreshOnUnauthorized) {
+    try {
+      accessToken = await getRefreshedAuthToken();
+    } catch (_refreshError) {
+      throw error(401, 'Unauthorized');
+    }
+  }
+
   const res = await f(`${WAVE_API_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${getAccessJwt()}`,
+      Authorization: `Bearer ${accessToken ?? ''}`,
       ...(options.headers || {}),
     },
   });
