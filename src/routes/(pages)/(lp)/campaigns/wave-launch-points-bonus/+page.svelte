@@ -70,10 +70,9 @@
 
       <div class="info-text">
         <p style:margin-bottom="1rem">
-          Join the <a class="typo-link" href="https://discord.gg/t8XBXZAEs5">Drips Discord</a>,
-          submit the form before January 11th, 2026, and receive
-          <span class="highlight">100 Points</span> after you participate in the first Wave early next
-          year.
+          Join the <a href="https://discord.gg/t8XBXZAEs5">Drips Discord</a>, submit the form before
+          January 11th, 2026, and participate in the first Wave early next year to receive
+          <span class="highlight">100 Points</span>.
         </p>
         <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
           Points increase your share of the reward pool at the end of the Wave Cycle. The more
@@ -129,7 +128,6 @@
             onclick={handleSubmit}
             disabled={!valid || submitting}
             loading={submitting}
-            icon={CheckCircle}
             size="large"
           >
             Submit
@@ -137,12 +135,11 @@
         </div>
 
         <p class="typo-text-small" style="color: var(--color-foreground-level-5);">
-          By submitting the form, you agree to the <a
-            class="typo-link"
-            href="https://drips.network/legal/privacy">Drips Privacy Policy</a
+          By submitting the form, you agree to the <a href="https://drips.network/legal/privacy"
+            >Drips Privacy Policy</a
           >. If you opt-in to marketing communications, you agree that your email address is stored
-          on <a class="typo-link" href="https://www.intercom.com/legal/privacy">Intercom</a> in the EU
-          for the purpose of sending updates about Drips. Marketing consent can be withdrawn anytime.
+          on <a href="https://www.intercom.com/legal/privacy">Intercom</a> in the EU for the purpose
+          of sending updates about Drips. Marketing consent can be withdrawn anytime.
         </p>
       {/if}
 
@@ -171,14 +168,14 @@
 
     <div class="steps">
       <div class="step">
-        <CheckCircle style="fill: var(--color-positive)" />
+        <CheckCircle style="fill: var(--color-primary)" />
         <span class="typo-text">Join the Drips Discord and submit the form.</span>
       </div>
 
       <Divider />
 
       <div class="step">
-        <CheckCircle style="fill: var(--color-positive)" />
+        <CheckCircle style="fill: var(--color-primary)" />
         <span class="typo-text">
           Contribute by successfully resolving an issue in the first Wave Cycle, using the GitHub
           account you submitted in the form.
@@ -188,7 +185,7 @@
       <Divider />
 
       <div class="step">
-        <CheckCircle style="fill: var(--color-positive)" />
+        <CheckCircle style="fill: var(--color-primary)" />
         <span class="typo-text">
           You’ll receive an extra 100 Points before rewards for the first Wave Cycle are calculated
           and distributed.
@@ -269,17 +266,15 @@
   }
 
   .how-to-get-points {
-    width: 100%;
-    margin: 4rem auto;
+    max-width: 624px;
+    margin: 0 auto;
     margin-top: 6rem;
-    width: fit-content;
+    width: 100%;
+    text-align: center;
     display: flex;
+    flex-direction: column;
     gap: 3rem;
-    flex-wrap: wrap;
-  }
-
-  .how-to-get-points h3 {
-    flex-shrink: 0;
+    align-items: center;
   }
 
   .steps {
@@ -294,5 +289,11 @@
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
+    text-align: left;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
   }
 </style>
