@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { onMount, type Component } from 'svelte';
   import Knob from './components/knob.svelte';
   import PercentageEditor from '../percentage-editor/percentage-editor.svelte';
@@ -113,24 +111,42 @@
     const totalCount = items.length;
     const maxWidth = blocksElemWidth - totalCount * MIN_ITEM_WIDTH_PX - (totalCount - 1) * 8;
 
-    percentages[draggingItemId] = Math.round(
+    // 1. Calculate new values
+    const newDraggingVal = Math.round(
       ((percentageElems[draggingItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
     );
 
+    let newNextVal = 0;
+    let newRemainderVal = 0;
+
     if (nextItemId !== remainderItem.id) {
-      percentages[nextItemId] = Math.round(
-        ((percentageElems[nextItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100,
-      );
-
-      percentages[remainderItem.id] = 100 - percentages[draggingItemId] - percentages[nextItemId];
+      newNextVal = Math.round(((percentageElems[nextItemId] - MIN_ITEM_WIDTH_PX) / maxWidth) * 100);
+      newRemainderVal = 100 - newDraggingVal - newNextVal;
     } else {
-      const totalPercentage = Object.values(percentages).reduce(
-        (acc, curr, i, arr) => acc + (i === arr.length - 1 ? 0 : curr),
-        0,
-      );
-
-      percentages[remainderItem.id] = 100 - totalPercentage;
+      // Calculate temporary totals to derive remainder
+      // (We can't rely on `percentages` prop here because we haven't written to it yet)
+      const currentTotal = Object.entries(percentages).reduce((acc, [id, val]) => {
+        if (id === draggingItemId) return acc + newDraggingVal;
+        if (id === nextItemId) return acc; // next is remainder, ignore
+        return acc + val;
+      }, 0);
+      newRemainderVal = 100 - currentTotal;
     }
+
+    // 2. Update the main prop
+    percentages[draggingItemId] = newDraggingVal;
+    if (nextItemId !== remainderItem.id) {
+      percentages[nextItemId] = newNextVal;
+    }
+    percentages[remainderItem.id] = newRemainderVal;
+
+    // 3. Explicitly update the input values state during drag
+    // This ensures the inputs see the change immediately without waiting for an effect cycle
+    percentageInputValues[draggingItemId] = newDraggingVal;
+    if (nextItemId !== remainderItem.id) {
+      percentageInputValues[nextItemId] = newNextVal;
+    }
+    percentageInputValues[remainderItem.id] = newRemainderVal;
 
     if (!itemThatHitMin) lastXPos = e.clientX;
   }
@@ -145,14 +161,15 @@
     document.removeEventListener('mouseup', stopDragging);
   }
 
-  let percentageInputValues: { [id: string]: number } = $state({});
+  let percentageInputValues: { [id: string]: number } = $state({ ...percentages });
 
-  let prevPercentages: { [id: string]: number } = {};
-  function updatePercentageInputs(percentages: { [id: string]: number }) {
-    if (percentages !== prevPercentages) percentageInputValues = { ...percentages };
-
-    prevPercentages = { ...percentages };
-  }
+  // Sync inputs with external prop changes (e.g. initial load or parent updates)
+  // We guard this with `!dragging` so it doesn't fight our manual updates in `drag()`
+  $effect(() => {
+    if (!dragging) {
+      percentageInputValues = { ...percentages };
+    }
+  });
 
   function handleConfirmPercentageInput(id: string) {
     const percentagesWithoutRemainder = Object.fromEntries(
@@ -182,8 +199,11 @@
       };
     }
 
+    // Ensure inputs are synced after calculation
+    percentageInputValues = { ...percentages };
     updatePercentageElemsBasedOnPercentages();
   }
+
   /** The last item provided always takes the remainder of all previous percentages. */
   let remainderItem = $derived(items[items.length - 1]);
   let overflownBlockDivs = $derived(
@@ -192,15 +212,12 @@
         Object.entries(blockDivs).filter(([, div]) => div.scrollWidth > div.clientWidth),
       ),
   );
-  run(() => {
-    updatePercentageInputs(percentages);
-  });
 </script>
 
 <div class="visual-percentage-editor">
   <div class="blocks" bind:this={blocksElem}>
     {#if percentageElems}
-      {#each Object.entries(percentageElems) as [id, width], index}
+      {#each Object.entries(percentageElems) as [id, width], index (id)}
         <div class="block-wrapper" style="width: {width}px">
           <div class="block" bind:this={blockDivs[id]} class:zero-percent={percentages[id] === 0}>
             <h4

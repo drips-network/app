@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { run, stopPropagation, createBubbler } from 'svelte/legacy';
+  import { stopPropagation, createBubbler } from 'svelte/legacy';
+  import { createEventDispatcher, untrack } from 'svelte';
 
   const bubble = createBubbler();
-  import { createEventDispatcher } from 'svelte';
 
   interface Props {
     percentage?: number;
@@ -18,61 +18,64 @@
     emptyIsError = true,
   }: Props = $props();
 
-  let error = $state(false);
-  let empty = $state(false);
-  let inputWidth = $state('auto');
+  let prevPercentage: number = percentage;
+  let prevPercentageValue: number = Number(percentage);
 
   let percentageValue: string | number = $state((Math.round(percentage * 100) / 100).toString());
 
-  let prevPercentage: number = $state(percentage);
-  let prevPercentageValue = $state(percentage);
+  let error = $derived(Number(percentage) > 100);
+  let empty = $derived(Number(percentage) === 0);
+  let inputWidth = $derived(`${percentageValue?.toString().length ?? 1}ch`);
 
-  run(() => {
-    const percentageChanged = prevPercentage !== percentage;
-    const percentageValueChanged = Number(prevPercentageValue) !== Number(percentageValue);
+  $effect(() => {
+    const p = percentage;
+    const pv = percentageValue;
 
-    if (percentageValueChanged) {
-      let pv = percentageValue;
+    // Use untrack so the logic inside doesn't cause the effect to re-run recursively
+    untrack(() => {
+      const percentageChanged = prevPercentage !== p;
+      // Compare numeric values to handle cases like "10" vs "10.0"
+      const percentageValueChanged = Number(prevPercentageValue) !== Number(pv);
 
-      if (pv === null || pv === '') pv = 0;
+      // PRIORITY 1: Handle User Input (Local State Changed)
+      if (percentageValueChanged) {
+        let newPv = pv;
 
-      if (typeof pv === 'string') {
-        pv = Number(
-          pv
-            // Only allow numbers and dots
-            .replace(/[^0-9.]/g, '')
-            // Prevent multiple periods
-            .replace(/([.])\1{1,}/g, '.'),
-        );
+        if (newPv === null || newPv === '') newPv = 0;
 
-        if (isNaN(pv)) pv = 0;
+        if (typeof newPv === 'string') {
+          newPv = Number(newPv.replace(/[^0-9.]/g, '').replace(/([.])\1{1,}/g, '.'));
+
+          if (isNaN(newPv)) newPv = 0;
+        }
+
+        if (newPv?.toString().startsWith('0')) {
+          newPv = parseFloat(newPv.toString().trim());
+        }
+
+        // Update the bound prop
+        percentage = newPv;
+
+        // Update history tracking
+        prevPercentage = newPv;
+        prevPercentageValue = newPv;
       }
+      // PRIORITY 2: Handle Prop Update (External State Changed)
+      else if (percentageChanged) {
+        // Update local display value
+        percentageValue = (Math.round(p * 100) / 100).toString();
 
-      if (pv?.toString().startsWith('0')) {
-        pv = parseFloat(pv.toString().trim());
+        // Update history tracking
+        prevPercentage = p;
+        prevPercentageValue = Number(percentageValue);
       }
-
-      percentage = pv;
-      percentageValue = pv;
-    } else if (percentageChanged) {
-      percentageValue = (Math.round(percentage * 100) / 100).toString();
-    }
-
-    inputWidth = `${percentageValue?.toString().length ?? 1}ch`;
-
-    error = Number(percentage) > 100;
-    empty = Number(percentage) === 0;
-
-    prevPercentage = percentage;
-    prevPercentageValue = Number(percentageValue);
+    });
   });
 
   let focus = $state(false);
-
   let inputElem: HTMLInputElement;
 
   const dispatch = createEventDispatcher<{
-    /** Fired when the user blurs the input after selecting or hits enter to confirm. */
     confirm: void;
   }>();
 
@@ -80,7 +83,6 @@
     if (focus) {
       dispatch('confirm');
     }
-
     focus = false;
   }
 
@@ -145,9 +147,6 @@
 
   .percentage-editor.disabled {
     pointer-events: none;
-  }
-
-  .percentage-editor.disabled {
     color: var(--color-foreground-level-5);
   }
 
