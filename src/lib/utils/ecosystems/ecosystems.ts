@@ -13,7 +13,7 @@ async function _authenticatedCall<ST extends ZodSchema>(
   responseSchema: ST | undefined,
   body?: Record<string, unknown>,
   fetch = window.fetch,
-): Promise<z.infer<ST> | undefined> {
+): Promise<z.infer<ST>> {
   const response = await fetch(`/api/ecosystems${path}`, {
     method,
     body: body && JSON.stringify(body),
@@ -22,8 +22,7 @@ async function _authenticatedCall<ST extends ZodSchema>(
   if (response.headers.get('Content-Type') === null) {
     if (!response.ok) throw new Error('Server error');
     if (responseSchema) throw new Error('Unexpected empty body');
-
-    return;
+    throw new Error('Problematic response: no content type');
   }
 
   const parsed = await response.json();
