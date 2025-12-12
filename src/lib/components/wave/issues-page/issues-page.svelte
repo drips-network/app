@@ -5,7 +5,7 @@
   import SortMostToLeast from '$lib/components/icons/SortMostToLeast.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import IssuesList from '$lib/components/wave/issues-page/components/issues-list/issues-list.svelte';
-  import { onMount, type ComponentProps, type Snippet } from 'svelte';
+  import { onMount, tick, type ComponentProps, type Snippet } from 'svelte';
   import { getIssues } from '$lib/utils/wave/issues';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import FilterConfig from './components/filter-config/filter-config.svelte';
@@ -32,6 +32,7 @@
   import SortByConfig from './components/sort-by-config/sort-by-config.svelte';
   import { page } from '$app/state';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
 
   let {
     issues,
@@ -213,7 +214,58 @@
     }
   });
 
-  let noOfFilters = $derived(Object.keys(appliedFilters).length - noOfPreappliedFilters);
+  let noOfFilters = $derived(
+    Object.keys(appliedFilters).filter((key) => key !== 'search').length - noOfPreappliedFilters,
+  );
+
+  let searchOpen = $state(false);
+
+  let searchTerm = $state('');
+  let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // debounce searchTerm, after 500ms apply search filter
+  $effect(() => {
+    searchTerm;
+
+    applyingFilters = true;
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    searchTimeout = setTimeout(async () => {
+      handleApplyFilters({
+        ...appliedFilters,
+        ...(searchTerm.trim().length > 0 ? { search: searchTerm.trim() } : { search: undefined }),
+      });
+    }, 500);
+
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  });
+
+  let searchInputElem = $state<HTMLInputElement | null>(null);
+
+  async function handleSearchOpen() {
+    searchOpen = true;
+    await tick();
+    searchInputElem?.focus();
+  }
+
+  function handleSearchClose() {
+    // clear search term and apply filters without search
+    searchTerm = '';
+
+    searchOpen = false;
+
+    handleApplyFilters({
+      ...appliedFilters,
+      search: undefined,
+    });
+  }
 </script>
 
 <HeadMeta title={headMetaTitle} />
@@ -243,9 +295,26 @@
           >
         </div>
       </div>
+    {:else if searchOpen}
+      <div class="search-bar" in:fade={{ duration: 150 }}>
+        <MagnifyingGlass />
+        <input
+          bind:this={searchInputElem}
+          bind:value={searchTerm}
+          type="text"
+          placeholder="Search issues..."
+        />
+        <button onclick={handleSearchClose} aria-label="Close search">
+          <CrossCircle style="fill: var(--color-foreground-level-6)" />
+        </button>
+      </div>
     {:else}
       <div class="issue-list-configuration">
-        <Button icon={MagnifyingGlass} disabled={filtersOpen || sortingOpen}>Search</Button>
+        <Button
+          icon={MagnifyingGlass}
+          disabled={filtersOpen || sortingOpen}
+          onclick={handleSearchOpen}>Search</Button
+        >
 
         <div>
           <Button
@@ -381,6 +450,37 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+
+  .search-bar {
+    margin-bottom: 1rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .search-bar input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background-color: var(--color-foreground-level-1);
+    border-radius: 1.125rem;
+    padding: 0 1rem;
+    font-size: 1rem;
+    color: var(--color-foreground-level-6);
+  }
+
+  .search-bar button {
+    transition: background-color 0.2s;
+    border-radius: 50%;
+    padding: 0.25rem;
+  }
+
+  .search-bar button:hover {
+    background-color: var(--color-foreground-level-1);
   }
 
   .content {

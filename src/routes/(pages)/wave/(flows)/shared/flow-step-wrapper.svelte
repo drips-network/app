@@ -8,7 +8,8 @@
   interface Props {
     headline?: string | undefined;
     description?: string | undefined;
-    icon?: Component | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon?: Component<any> | undefined;
     children?: import('svelte').Snippet;
     leftActions?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
