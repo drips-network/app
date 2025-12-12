@@ -48,7 +48,7 @@
       icon: Ledger,
       actions: [
         {
-          label: 'Apply repos to a Wave',
+          label: 'Add repos',
           icon: Plus,
           variant: 'primary',
           disabled: false,
