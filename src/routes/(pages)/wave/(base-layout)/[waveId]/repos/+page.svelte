@@ -1,5 +1,6 @@
 <script lang="ts">
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
@@ -17,7 +18,18 @@
     ]}
   />
 
-  <SectionHeader icon={Trophy} label="Repos" />
+  <SectionHeader
+    icon={Trophy}
+    label="Repos"
+    actions={[
+      {
+        label: 'Apply your repo',
+        icon: ArrowRight,
+        href:
+          '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/' + data.wave.id + '/repos',
+      },
+    ]}
+  />
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)"
     >Showing {repos.pagination.total} repos that are approved for the {data.wave.name} Wave.
