@@ -111,13 +111,6 @@ export const waveRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveRepoWithDetailsDto = z.infer<typeof waveRepoWithDetailsDtoSchema>;
 
-export const waveRepoFiltersSchema = filterSchema(
-  z.object({
-    status: waveRepoStatusSchema.optional(),
-  }),
-);
-export type WaveRepoFilters = z.infer<typeof waveRepoFiltersSchema>;
-
 export const complexitySchema = z.enum(['small', 'medium', 'large']);
 export type Complexity = z.infer<typeof complexitySchema>;
 

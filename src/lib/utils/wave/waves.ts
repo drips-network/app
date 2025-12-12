@@ -10,11 +10,9 @@ import {
   waveCycleFiltersSchema,
   waveDtoSchema,
   waveIssueWithDetailsDtoSchema,
-  waveRepoFiltersSchema,
   waveRepoWithDetailsDtoSchema,
   type Complexity,
   type WaveCycleFilters,
-  type WaveRepoFilters,
 } from './types/wave';
 import parseRes from './utils/parse-res';
 
@@ -57,18 +55,10 @@ export async function getOwnWaveRepos(f = fetch, pagination?: PaginationInput) {
   );
 }
 
-export async function getWaveRepos(
-  f = fetch,
-  waveId: string,
-  pagination: PaginationInput = {},
-  filters: WaveRepoFilters = {},
-) {
+export async function getWaveRepos(f = fetch, waveId: string, pagination: PaginationInput = {}) {
   return parseRes(
     paginatedResponseSchema(waveRepoWithDetailsDtoSchema),
-    await authenticatedCall(
-      f,
-      `/api/waves/${waveId}/repos?${toFilterParams(waveRepoFiltersSchema, filters)}&${toPaginationParams(pagination)}`,
-    ),
+    await authenticatedCall(f, `/api/waves/${waveId}/repos?${toPaginationParams(pagination)}`),
   );
 }
 
