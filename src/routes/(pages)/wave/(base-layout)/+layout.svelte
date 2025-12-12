@@ -9,7 +9,6 @@
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
-  import Patch from '$lib/components/icons/Patch.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
@@ -72,12 +71,6 @@
             name: 'Orgs & repos',
             href: '/wave/maintainers/repos',
             icon: Orgs,
-          },
-          {
-            type: 'target',
-            name: 'Review queue',
-            href: '/wave/maintainers/review-queue',
-            icon: Patch,
           },
         ],
       },

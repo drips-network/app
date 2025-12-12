@@ -128,10 +128,8 @@
 </script>
 
 {#snippet badge(text: string, color: string, backgroundColor: string, bold?: boolean)}
-  <span
-    class="state-badge typo-text-small{bold ? '-bold' : ''}"
-    style:color
-    style:background-color={backgroundColor}>{text}</span
+  <span class="state-badge" class:bold style:color style:background-color={backgroundColor}
+    >{text}</span
   >
 {/snippet}
 
@@ -210,9 +208,18 @@
   .state-badge {
     border-radius: 1rem 0 1rem 1rem;
     width: fit-content;
-    padding: 0.25rem 0.5rem;
-    height: 24px;
-    display: inline-block;
+    padding: 0 0.5rem;
+    height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .state-badge.bold {
+    font-weight: 600;
   }
 
   .issue-number-badge {

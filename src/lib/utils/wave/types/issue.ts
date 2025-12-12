@@ -26,6 +26,7 @@ export const issueFilters = filterSchema(
     appliedToByUser: z.uuid().optional(),
     eligibleForWave: booleanString.optional(),
     hasApplications: booleanString.optional(),
+    hasPr: booleanString.optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;

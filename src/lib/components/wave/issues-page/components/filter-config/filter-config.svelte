@@ -18,6 +18,7 @@
           },
         ],
       },
+
       ...(ownUserId && mode === 'contributor'
         ? {
             assignedToUser: {
@@ -32,6 +33,7 @@
             },
           }
         : {}),
+
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
@@ -50,6 +52,7 @@
             },
           }
         : {}),
+
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             hasApplications: {
@@ -68,6 +71,22 @@
             },
           }
         : {}),
+
+      hasPr: {
+        type: 'single-select',
+        label: 'Pull Requests',
+        options: [
+          {
+            label: 'Has linked PR',
+            value: 'true',
+          },
+          {
+            label: 'No linked PR',
+            value: 'false',
+          },
+        ],
+      },
+
       ...(mode === 'maintainer'
         ? {
             isInWave: {
