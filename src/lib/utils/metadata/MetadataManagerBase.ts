@@ -11,6 +11,12 @@ import type { MetadataKeyValue } from '../sdk/sdk-types';
 type IpfsHash = string;
 type AccountId = string;
 
+interface MetadataWithDescribes {
+  describes: {
+    accountId: AccountId;
+  };
+}
+
 export interface IMetadataManager<TParser extends Parser> {
   fetchMetadataHashByAccountId(accountId: AccountId): Promise<string | null>;
 
@@ -20,7 +26,7 @@ export interface IMetadataManager<TParser extends Parser> {
 
   pinAccountMetadata(data: LatestVersion<TParser>): Promise<string>;
 
-  updateAccountMetadata<T extends z.ZodType>(
+  updateAccountMetadata<T extends z.ZodType<MetadataWithDescribes>>(
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
     schema: T,
@@ -128,15 +134,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
     return res.text();
   }
 
-  /**
-   * Updates account metadata.
-   * @param newData The new account metadata.
-   * @param lastKnownHash The last known IPFS hash of the account metadata.
-   * @returns The new IPFS hash of the account metadata, and the transaction that emitted the new metadata.
-   * @throws If the last known hash doesnʼt match the on-chain value.
-   * @throws If the update fails.
-   */
-  public async updateAccountMetadata<T extends z.ZodType>(
+  public async updateAccountMetadata<T extends z.ZodType<MetadataWithDescribes>>(
     newData: z.infer<T>,
     lastKnownHash: IpfsHash | undefined,
   ): Promise<{ newHash: IpfsHash; tx: TransactionResponse }> {
@@ -150,7 +148,7 @@ export default abstract class MetadataManagerBase<TParser extends Parser>
       );
     }
 
-    const newHash = await this.pinAccountMetadata(newData);
+    const newHash = await this.pinAccountMetadata(newData as LatestVersion<TParser>);
 
     const tx = await this.emitAccountMetadata(newHash, accountId);
 
