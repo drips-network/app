@@ -39,7 +39,7 @@
       });
     }
 
-    if (issue.assignedApplicant) {
+    if (issue.assignedApplicant && !issue.hasPr) {
       const isOverdue = issue.assignedApplicant.dueDate < new Date();
 
       badges.push(
@@ -57,6 +57,15 @@
               bold: true,
             },
       );
+    }
+
+    if (issue.hasPr) {
+      badges.push({
+        text: 'PR submitted',
+        color: 'var(--color-caution-level-6)',
+        backgroundColor: 'var(--color-caution-level-1)',
+        bold: true,
+      });
     }
 
     if (issue.state === 'closed') {
