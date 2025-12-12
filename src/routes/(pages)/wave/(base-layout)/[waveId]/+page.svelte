@@ -44,7 +44,7 @@
 
     <div class="wave-stats">
       <Card style="height: 100%;">
-        <WaveStats {wave} />
+        <WaveStats leaderboard={data.leaderboard} {wave} />
       </Card>
     </div>
   </div>

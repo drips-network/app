@@ -1,24 +1,48 @@
 <script lang="ts">
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+
+  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import Pile from '$lib/components/pile/pile.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
+  import type { LeaderboardEntryDto } from '$lib/utils/wave/types/leaderboard';
   import type { WaveDto } from '$lib/utils/wave/types/wave';
+  import type { Component, ComponentProps } from 'svelte';
+  import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
 
   let {
     wave,
+    leaderboard,
   }: {
     wave: WaveDto;
+    leaderboard: {
+      totalCount: number;
+      firstThreeEntries: LeaderboardEntryDto[];
+    };
   } = $props();
 
-  let stats = $derived([
+  type ComponentAndProps<C extends Component<any>> = {
+    component: C;
+    props: ComponentProps<C>;
+  };
+
+  interface Stat<CT extends Component<any> = Component<any>> {
+    key: string;
+    value: number | string | ComponentAndProps<CT>;
+    tooltip?: string;
+    href?: string;
+  }
+
+  let stats = $derived<Stat[]>([
     {
       key: 'Issues',
       value: wave.issueCount,
-      tooltip: 'Count of issues added to the Wave by maintainers.',
+      href: `/wave/${wave.id}/issues`,
     },
     {
       key: 'Repos',
       value: wave.approvedRepoCount,
-      tooltip: 'Count of repositories approved for the Wave.',
+      href: `/wave/${wave.id}/repos`,
     },
     {
       key: 'Maintainers',
@@ -26,14 +50,22 @@
       tooltip: 'Count of orgs and users approved to add their issues into the Wave.',
     },
     {
-      key: 'Funds rewarded',
-      value: '', // TODO(wave)
-      tooltip: 'Total funds rewarded to contributors in the Wave.',
-    },
-    {
       key: 'Leaderboard',
-      value: '', // TODO(wave)
-      tooltip: 'Current leaderboard standings of points earned for the Wave.',
+      value: {
+        component: Pile,
+        props: {
+          maxItems: 3,
+          countOverride: leaderboard.totalCount,
+          components: leaderboard.firstThreeEntries.map(({ user }) => ({
+            component: GithubUserBadge,
+            props: {
+              user,
+              hideName: true,
+            },
+          })),
+        },
+      },
+      href: `/wave/${wave.id}/leaderboard`,
     },
     {
       key: 'Cycles',
@@ -43,25 +75,44 @@
   ]);
 </script>
 
-{#snippet stat(key: string, value: number | string, tooltip: string)}
-  <div class="wave-stat">
+{#snippet stat(
+  key: string,
+  value: number | string | ComponentAndProps<any>,
+  tooltip?: string,
+  href?: string,
+)}
+  <svelte:element this={href ? 'a' : 'div'} class="wave-stat" {href}>
     <div class="header">
       <h5>{key}</h5>
-      <Tooltip>
-        <InfoCircle style="width: 16px; height: 16px;" />
 
-        {#snippet tooltip_content()}
-          <p class="typo-text">{tooltip}</p>
-        {/snippet}
-      </Tooltip>
+      {#if tooltip}
+        <Tooltip>
+          <InfoCircle style="width: 16px; height: 16px;" />
+
+          {#snippet tooltip_content()}
+            <p class="typo-text">{tooltip}</p>
+          {/snippet}
+        </Tooltip>
+      {/if}
+
+      {#if href}
+        <div class="right">
+          <ChevronRight />
+        </div>
+      {/if}
     </div>
-    <p class="value typo-text">{value}</p>
-  </div>
+
+    {#if typeof value === 'string' || typeof value === 'number'}
+      <p class="value typo-text">{value}</p>
+    {:else}
+      <value.component {...value.props} />
+    {/if}
+  </svelte:element>
 {/snippet}
 
 <div class="wave-stats">
-  {#each stats as { key, value, tooltip }}
-    {@render stat(key, value, tooltip)}
+  {#each stats as { key, value, tooltip, href } (key)}
+    {@render stat(key, value, tooltip, href)}
   {/each}
 </div>
 
@@ -79,6 +130,13 @@
     color: var(--color-foreground-level-6);
   }
 
+  .header .right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    color: var(--color-foreground-level-5);
+  }
+
   .value {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -92,7 +150,16 @@
 
   .wave-stat {
     border-radius: 0.5rem 0 0.5rem 0.5rem;
-    border: 1px solid var(--color-foreground-level-3);
+    box-shadow: var(--elevation-low);
     padding: 0.25rem 0.5rem;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s;
+  }
+
+  a.wave-stat:hover:not(:active),
+  a.wave-stat:focus-visible:not(:active) {
+    box-shadow: var(--elevation-medium);
+    transform: translateY(-4px);
   }
 </style>
