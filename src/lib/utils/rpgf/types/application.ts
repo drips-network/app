@@ -215,7 +215,7 @@ export const applicationListAnswerSchema = z.object({
   fieldId: z.string().min(1).max(255),
   field: applicationListFieldDtoSchema,
   entries: z
-    .array(z.record(z.union([z.string().max(1000), z.number()])))
+    .array(z.record(z.string(), z.union([z.string().max(1000), z.number()])))
     .max(100)
     .nullable(),
 });
@@ -224,7 +224,7 @@ export type ApplicationListAnswer = z.infer<typeof applicationListAnswerSchema>;
 export const applicationListAnswerDtoSchema = z.object({
   fieldId: z.string().min(1).max(255),
   value: z
-    .array(z.record(z.union([z.string().max(1000), z.number()])))
+    .array(z.record(z.string(), z.union([z.string().max(1000), z.number()])))
     .max(100)
     .nullable(),
 });

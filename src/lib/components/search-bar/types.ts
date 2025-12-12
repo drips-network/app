@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const commonMeiliAttributes = z.object({
   _matchesPosition: z
-    .record(z.array(z.object({ start: z.number(), length: z.number() })))
+    .record(z.string(), z.array(z.object({ start: z.number(), length: z.number() })))
     .optional(),
 });
 

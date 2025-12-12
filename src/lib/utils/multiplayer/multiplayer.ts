@@ -48,13 +48,13 @@ import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-dr
 import type { OxString } from '../sdk/sdk-types';
 import network, { type ChainId } from '$lib/stores/wallet/network';
 
-async function _authenticatedCall<ST extends ZodSchema>(
+async function _authenticatedCall<T = void>(
   method: 'GET' | 'POST' | 'DELETE',
   path: string,
-  responseSchema: ST | undefined,
+  responseSchema?: ZodSchema<T>,
   body?: Record<string, unknown>,
   fetch = window.fetch,
-): Promise<z.infer<ST>> {
+): Promise<T> {
   const response = await fetch(`/api/multiplayer${path}`, {
     method,
     body: body && JSON.stringify(body),
@@ -64,7 +64,7 @@ async function _authenticatedCall<ST extends ZodSchema>(
     if (!response.ok) throw new Error('Server error');
     if (responseSchema) throw new Error('Unexpected empty body');
 
-    return;
+    return undefined as T;
   }
 
   const parsed = await response.json();
