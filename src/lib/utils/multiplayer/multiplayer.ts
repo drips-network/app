@@ -48,13 +48,13 @@ import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-dr
 import type { OxString } from '../sdk/sdk-types';
 import network, { type ChainId } from '$lib/stores/wallet/network';
 
-async function _authenticatedCall<ST extends ZodSchema>(
+async function _authenticatedCall<T = void>(
   method: 'GET' | 'POST' | 'DELETE',
   path: string,
-  responseSchema: ST | undefined,
+  responseSchema?: ZodSchema<T>,
   body?: Record<string, unknown>,
   fetch = window.fetch,
-): Promise<z.infer<ST>> {
+): Promise<T> {
   const response = await fetch(`/api/multiplayer${path}`, {
     method,
     body: body && JSON.stringify(body),
@@ -283,9 +283,9 @@ export async function getVotingRoundVotes(
     await _authenticatedCall(
       'GET',
       `/votingRounds/${votingRoundId}/votes` +
-        (adminSignature
-          ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
-          : ''),
+      (adminSignature
+        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+        : ''),
       getVotingRoundVotesResponseSchema,
       undefined,
       fetch,
@@ -430,11 +430,10 @@ export async function getCollaborator(
   return _authenticatedCall(
     'GET',
     `/votingRounds/${votingRoundId}/collaborators/${address}` +
-      (collaboratorSignature
-        ? `?signature=${
-            collaboratorSignature.signature
-          }&date=${collaboratorSignature.date.toISOString()}`
-        : ''),
+    (collaboratorSignature
+      ? `?signature=${collaboratorSignature.signature
+      }&date=${collaboratorSignature.date.toISOString()}`
+      : ''),
     getCollaboratorResponseSchema,
   );
 }
@@ -464,9 +463,9 @@ export async function revealResults(
   return _authenticatedCall(
     'GET',
     `/votingRounds/${votingRoundId}/result` +
-      (adminSignature
-        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
-        : ''),
+    (adminSignature
+      ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+      : ''),
     revealResultsResponseSchema,
   );
 }
