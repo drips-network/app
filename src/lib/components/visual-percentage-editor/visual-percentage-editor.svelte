@@ -43,7 +43,7 @@
 
   let blockDivs: { [id: string]: HTMLDivElement } = $state({});
 
-  let dragging = false;
+  let dragging = $state(false);
   let draggingIndex: number | undefined = $state();
   let startDraggingAtXPos: number | undefined;
 
