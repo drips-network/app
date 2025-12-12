@@ -6,7 +6,7 @@ export const load = async ({ fetch, depends }) => {
   const [waveRepos, waves] = await Promise.all([
     // todo(wave): pagination
     getOwnWaveRepos(fetch, { limit: 100 }),
-    // todo(wave): Only fetch waves included in the issues list
+    // todo(wave): Only fetch waves included in the repos list
     getWaves(fetch, { limit: 100 }),
   ]);
 
