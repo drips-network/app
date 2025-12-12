@@ -60,7 +60,6 @@ test('create a drip list', async ({ page, connectedSession }) => {
     .getByRole('spinbutton')
     .press('Enter');
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
-  await page.getByRole('button', { name: 'Support later' }).click();
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
   await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
   await page.getByRole('link', { name: 'View your Drip List' }).click();
