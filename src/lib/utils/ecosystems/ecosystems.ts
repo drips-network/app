@@ -13,7 +13,7 @@ async function _authenticatedCall<ST extends ZodSchema>(
   responseSchema: ST | undefined,
   body?: Record<string, unknown>,
   fetch = window.fetch,
-): Promise<z.infer<ST> | undefined> {
+): Promise<z.infer<ST>> {
   const response = await fetch(`/api/ecosystems${path}`, {
     method,
     body: body && JSON.stringify(body),
