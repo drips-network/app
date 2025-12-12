@@ -22,6 +22,7 @@
       pointsBalance={data.pointsBalance?.totalPoints || null}
       user={data.user}
       noBackground={false}
+      hidePoints
     />
   </div>
 

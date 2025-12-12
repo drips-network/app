@@ -21,11 +21,13 @@
     pointsBalance,
     noBackground = false,
     mobileNavItems,
+    hidePoints = false,
   }: {
     user: WaveLoggedInUser | null;
     pointsBalance: number | null;
     noBackground?: boolean;
     mobileNavItems: ComponentProps<typeof Nav>['items'] | null;
+    hidePoints?: boolean;
   } = $props();
 
   const viewWidth = $derived($breakpointsStore?.dimensions.width);
@@ -74,9 +76,11 @@
     <SupportButton {user} />
 
     {#if user}
-      <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
-        {pointsBalance ?? 0}
-      </Button>
+      {#if !hidePoints}
+        <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
+          {pointsBalance ?? 0}
+        </Button>
+      {/if}
 
       <Flyout
         disabled={mobileMode}
