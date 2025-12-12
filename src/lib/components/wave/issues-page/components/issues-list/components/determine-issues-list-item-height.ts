@@ -4,7 +4,7 @@ import { inferBadges } from './issues-list-item.svelte';
 const ISSUE_ITEM_HEIGHT_SINGLE_LINE = 85; // in px
 const ISSUE_ITEM_HEIGHT_DOUBLE_LINE = 110; // in px
 
-const BADGES_ROW_HEIGHT = 20 + 8; // in px (24px for badges height + 8px gap)
+const BADGES_ROW_HEIGHT = 18 + 8; // in px
 
 export function determineAmountOfLines(issue: IssueDetailsDto): 1 | 2 {
   if (issue.title.length > 50) {

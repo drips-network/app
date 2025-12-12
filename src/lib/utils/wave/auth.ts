@@ -4,6 +4,7 @@ import { authenticatedCall, call } from './call';
 import { jwtDecode } from 'jwt-decode';
 import type { WaveUser } from './types/user';
 import parseRes from './utils/parse-res';
+import { invalidateAll } from '$app/navigation';
 
 const accessClaimJwtSchema = z.object({
   iss: z.literal('drips-wave'),
@@ -84,20 +85,30 @@ export function getAccessJwt() {
 }
 
 export async function getRefreshedAuthToken(manualCookie?: string) {
-  const res = await call('/api/auth/token/refresh', {
-    method: 'POST',
-    credentials: 'include',
-    headers: manualCookie ? { Cookie: manualCookie } : {},
-  });
+  try {
+    const res = await call('/api/auth/token/refresh', {
+      method: 'POST',
+      credentials: 'include',
+      headers: manualCookie ? { Cookie: manualCookie } : {},
+    });
 
-  const data = z
-    .object({
-      accessToken: z.string(),
-    })
-    .parse(res);
+    const data = z
+      .object({
+        accessToken: z.string(),
+      })
+      .parse(res);
 
-  setAccessJwt(data.accessToken);
-  return data.accessToken;
+    setAccessJwt(data.accessToken);
+    return data.accessToken;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to refresh auth token:', e);
+
+    await logOut();
+    await invalidateAll();
+
+    return null;
+  }
 }
 
 export async function redeemGitHubOAuthCode(code: string, state: string) {
