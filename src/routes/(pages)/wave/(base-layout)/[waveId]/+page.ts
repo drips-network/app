@@ -8,7 +8,7 @@ export const load = async ({ params, fetch }) => {
   return {
     leaderboard: {
       firstThreeEntries: firstThreeLeaderboardEntries.data,
-      totalCount: 32, // firstThreeLeaderboardEntries.pagination.total,
+      totalCount: firstThreeLeaderboardEntries.pagination.total,
     },
   };
 };
