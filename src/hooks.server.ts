@@ -54,9 +54,11 @@ export const handle = async ({ event, resolve }) => {
             });
           }
         }
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to refresh Wave access token:', e);
+      } catch {
+        // user is logged out, clear the cookies and render as logged out
+        event.cookies.delete('wave_refresh_token', { path: '/' });
+        delete event.locals.waveRefreshToken;
+        delete event.locals.newWaveAccessToken;
       }
     }
   }
