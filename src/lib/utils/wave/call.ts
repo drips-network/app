@@ -48,7 +48,7 @@ export async function authenticatedCall(
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken ?? ''}`,
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
       ...(options.headers || {}),
     },
   });
