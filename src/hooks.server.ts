@@ -72,7 +72,7 @@ export const handleFetch = async ({ event, request, fetch }) => {
     const accessToken = event.locals.newWaveAccessToken;
     const refreshToken = event.locals.waveRefreshToken;
 
-    request.headers.set('Authorization', `Bearer ${accessToken}`);
+    request.headers.set('Authorization', accessToken ? `Bearer ${accessToken}` : '');
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
   }
 

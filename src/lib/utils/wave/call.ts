@@ -35,7 +35,7 @@ export async function authenticatedCall(
   f = fetch,
   path: string,
   options: RequestInit = {},
-  refreshOnUnauthorized = true,
+  refreshOnUnauthorized = browser,
 ) {
   if (!WAVE_API_URL) {
     throw new Error('Wave API URL is not configured.');
