@@ -48,13 +48,13 @@ import { executeAddressDriverReadMethod } from '../sdk/address-driver/address-dr
 import type { OxString } from '../sdk/sdk-types';
 import network, { type ChainId } from '$lib/stores/wallet/network';
 
-async function _authenticatedCall<T = void>(
+async function _authenticatedCall<ST extends ZodSchema>(
   method: 'GET' | 'POST' | 'DELETE',
   path: string,
-  responseSchema?: ZodSchema<T>,
+  responseSchema: ST | undefined,
   body?: Record<string, unknown>,
   fetch = window.fetch,
-): Promise<T> {
+): Promise<z.infer<ST>> {
   const response = await fetch(`/api/multiplayer${path}`, {
     method,
     body: body && JSON.stringify(body),
