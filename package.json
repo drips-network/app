@@ -84,7 +84,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@drips-network/sdk": "0.1.0-alpha.15",
-    "@efstajas/svelte-stored-writable": "^0.3.0",
+    "@efstajas/svelte-stored-writable": "^1.0.0",
     "@efstajas/versioned-parser": "^0.1.4",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
     "@gelatonetwork/relay-sdk": "^5.5.6",
