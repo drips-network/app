@@ -20,9 +20,16 @@
   );
 
   let cycleActive = $derived(activeCycle !== null);
+
+  let shareImageUrl = $derived(`/api/share-images/wave/${wave.id}.png`);
 </script>
 
-<HeadMeta title="{wave.name} Wave" description={wave.description} />
+<HeadMeta
+  title="{wave.name} Wave"
+  description={wave.description}
+  image={shareImageUrl}
+  twitterImage={shareImageUrl}
+/>
 
 <div class="page">
   <div class="hero">
@@ -36,7 +43,11 @@
           <p style:color="var(--color-foreground-level-6)">{wave.description}</p>
 
           <div class="share">
-            <ShareButton buttonVariant="normal" url={`https://drips.app/wave/${wave.id}`} />
+            <ShareButton
+              downloadableImageUrl={shareImageUrl}
+              buttonVariant="normal"
+              url={`https://drips.app/wave/${wave.id}`}
+            />
           </div>
         </div>
       </Card>
