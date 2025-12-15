@@ -62,7 +62,9 @@ async function _authenticatedCall<ST extends ZodSchema>(
   if (response.headers.get('Content-Type') === null) {
     if (!response.ok) throw new Error('Server error');
     if (responseSchema) throw new Error('Unexpected empty body');
-    throw new Error('Problematic response: no content type');
+
+    // for #vote, response conforms to this logical end
+    return undefined as z.infer<ST>;
   }
 
   const parsed = await response.json();
