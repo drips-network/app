@@ -5,6 +5,8 @@ UI=false
 PROD_BUILD=false
 
 cleanup() {
+    printf "\n📋 Dumping cloudflared logs...\n"
+    docker compose logs cloudflared 2>/dev/null || echo "Failed to fetch cloudflared logs"
     docker compose -f docker-compose.yml rm -fsv
 }
 trap cleanup EXIT

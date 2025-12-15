@@ -2,7 +2,10 @@ FROM debian:stable-slim
 
 RUN apt-get update && apt-get install -y curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && \
+ARG TARGETARCH
+RUN ARCH=${TARGETARCH:-$(dpkg --print-architecture)} && \
+    echo "Building for architecture: $ARCH" && \
+    curl -L --output /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$ARCH && \
   chmod +x /usr/local/bin/cloudflared
 
 COPY cloudflared-entrypoint.sh /usr/local/bin/cloudflared-entrypoint.sh
