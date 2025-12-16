@@ -27,7 +27,6 @@
     bind:formValid
     bind:selectedTokenAddress={$context.oneTimeDonationConfig.selectedTokenAddress}
     bind:amountInputValue={$context.oneTimeDonationConfig.amountInputValue}
-    bind:topUpMax={$context.oneTimeDonationConfig.topUpMax}
     bind:amount={$context.oneTimeDonationConfig.amount}
   />
   {#snippet actions()}

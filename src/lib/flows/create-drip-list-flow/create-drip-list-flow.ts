@@ -30,6 +30,11 @@ export interface State {
   };
   newVotingRoundId: string | undefined;
   dripListId: string | undefined;
+  oneTimeDonationConfig: {
+    selectedTokenAddress: string[];
+    amountInputValue: string;
+    amount: bigint | undefined;
+  };
 }
 
 export const flowState = () =>
@@ -46,6 +51,11 @@ export const flowState = () =>
     },
     newVotingRoundId: undefined,
     dripListId: undefined,
+    oneTimeDonationConfig: {
+      selectedTokenAddress: [],
+      amountInputValue: '',
+      amount: undefined,
+    },
   });
 
 const staticHeaderComponent = {

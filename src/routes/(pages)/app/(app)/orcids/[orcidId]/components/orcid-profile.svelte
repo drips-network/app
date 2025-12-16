@@ -154,7 +154,7 @@
 
     <aside>
       <div class="become-supporter-card">
-        <SupportCard orcid={supportCardOrcidData} />
+        <SupportCard orcid={orcidAccount} />
       </div>
     </aside>
   </article>

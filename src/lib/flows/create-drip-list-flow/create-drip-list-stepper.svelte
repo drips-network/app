@@ -6,6 +6,7 @@
   interface Props {
     skipWalletConnect?: boolean;
     isModal?: boolean;
+    displaySlots?: boolean;
     blueprintOrBlueprintError:
       | {
           blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined;
