@@ -20,9 +20,9 @@
   headline="One-time donation"
   description="Choose a token and how much you would like to donate."
 >
-  <svelte:fragment slot="left-actions">
+  {#snippet left_actions()}
     <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
-  </svelte:fragment>
+  {/snippet}
   <OneTimeDonationEditor
     bind:formValid
     bind:selectedTokenAddress={$context.oneTimeDonationConfig.selectedTokenAddress}
@@ -30,12 +30,12 @@
     bind:topUpMax={$context.oneTimeDonationConfig.topUpMax}
     bind:amount={$context.oneTimeDonationConfig.amount}
   />
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     <Button
       disabled={!formValid}
       icon={Check}
       variant="primary"
       on:click={() => dispatch('goForward')}>Continue</Button
     >
-  </svelte:fragment>
+  {/snippet}
 </StandaloneFlowStepLayout>
