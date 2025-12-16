@@ -114,7 +114,7 @@
     </FormField>
   {/if}
 
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     {#if canCancel}
       <Button onclick={() => dispatch('conclude')} variant="ghost">Cancel</Button>
     {/if}

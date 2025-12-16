@@ -21,14 +21,6 @@ import type {
   CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 
-// TODO: integrate into SDK
-type SdkOrcidReceiver = {
-  type: 'orcid-account';
-  accountId: bigint;
-};
-
-type SdkReceiverWithOrcid = SdkReceiver | SdkOrcidReceiver;
-
 const WAITING_WALLET_ICON = {
   component: 'Emoji',
   props: {
