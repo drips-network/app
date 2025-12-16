@@ -39,7 +39,7 @@
   <PaddedHorizontalScroll>
     <Card>
       <div class="orgs-and-repos">
-        {#each orgsAndRepos as org}
+        {#each orgsAndRepos as org (org.id)}
           <div class="org">
             <div class="org-line">
               <div class="badge">
@@ -55,9 +55,9 @@
             </div>
             {#if org.repos.length > 0}
               <ul>
-                {#each org.repos as repo}
+                {#each org.repos as repo (repo.id)}
                   <div class="repo">
-                    <RepoBadge repo={{ ...repo, org: org.org }} />
+                    <RepoBadge repo={{ ...repo }} />
                   </div>
                 {/each}
               </ul>

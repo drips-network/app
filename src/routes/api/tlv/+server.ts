@@ -52,7 +52,7 @@ export const GET = async ({ fetch }) => {
   }
 
   const cmcIdMapRes = await (await fetch('/api/fiat-estimates/id-map')).json();
-  const cmcIdMap = z.record(z.number()).parse(cmcIdMapRes);
+  const cmcIdMap = z.record(z.string(), z.number()).parse(cmcIdMapRes);
 
   const relevantCmcIds = Object.fromEntries(
     Object.entries(cmcIdMap).filter(([address]) =>
@@ -63,7 +63,7 @@ export const GET = async ({ fetch }) => {
   const fiatConversionsRes = await (
     await fetch(`/api/fiat-estimates/price/${Object.values(relevantCmcIds).join(',')}`)
   ).json();
-  const fiatConversions = z.record(z.number()).parse(fiatConversionsRes);
+  const fiatConversions = z.record(z.string(), z.number()).parse(fiatConversionsRes);
 
   let total = 0;
 
