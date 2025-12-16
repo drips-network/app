@@ -16,13 +16,7 @@
   } = $props();
 </script>
 
-<svelte:element
-  this={link ? 'a' : 'div'}
-  class="github-user-badge"
-  href="https://github.com/{user.gitHubUsername}"
-  target="_blank"
-  rel="noopener noreferrer"
->
+<svelte:element this={link ? 'a' : 'div'} class="github-user-badge" href="/wave/users/{user.id}">
   <UserAvatar {size} src={user.gitHubAvatarUrl} />
   {#if !hideName}
     <span class="typo-text">{user.gitHubUsername}</span>

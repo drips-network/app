@@ -89,7 +89,7 @@
         onclickWhileDisabled={handleMobileUserMenuClick}
       >
         {#snippet trigger()}
-          <GithubUserBadge {user} size={32} link={false} hideName />
+          <GithubUserBadge {user} size={32} hideName />
         {/snippet}
 
         {#snippet content()}
