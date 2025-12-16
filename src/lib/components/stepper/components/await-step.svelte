@@ -27,10 +27,12 @@
     link?: { url: string; label: string } | undefined;
     icon?: { component: Component; props: Record<string, unknown> } | undefined;
     promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
-    progressBar?: {
-      progressFn: ProgressFn;
-      centeredProgressText?: boolean;
-    } | undefined;
+    progressBar?:
+      | {
+          progressFn: ProgressFn;
+          centeredProgressText?: boolean;
+        }
+      | undefined;
   }
 
   let {
@@ -42,8 +44,7 @@
     progressBar = $bindable(),
   }: Props = $props();
 
-
-  const dispatch = createEventDispatcher<{ result: Result }>();
+  // const dispatch = createEventDispatcher<{ result: Result }>();
 
   // export let message: string;
   // export let subtitle: string | undefined = undefined;
@@ -116,6 +117,7 @@
   {/if}
 
   {#if link}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
     <a class="typo-link" href={link.url} target="_blank" rel="noreferrer">{link.label}</a>
   {/if}
 </div>
