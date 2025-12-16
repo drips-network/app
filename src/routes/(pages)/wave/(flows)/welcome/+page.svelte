@@ -6,6 +6,7 @@
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
 
   let { data } = $props();
 </script>
@@ -20,7 +21,7 @@
           <Wallet style="fill: var(--color-primary)" />
         </div>
 
-        <p>Add payment information and verify your identity to be eligible for rewards.</p>
+        <p>Add payment information to be eligible for rewards.</p>
         <Button href="/wave/settings/identity-and-payments">Payment settings</Button>
       </div>
 
@@ -31,6 +32,15 @@
 
         <p>Discover current Waves and apply to work on issues.</p>
         <Button href="/wave">View waves</Button>
+      </div>
+
+      <div class="option">
+        <div class="icon">
+          <InfoCircle style="fill: var(--color-primary)" />
+        </div>
+
+        <p>Read the docs to learn how to use the platform.</p>
+        <Button href="https://docs.drips.network/wave" target="_blank">Open docs</Button>
       </div>
     </div>
   </Card>
@@ -64,10 +74,13 @@
     flex-direction: column;
     align-items: center;
     min-width: 12rem;
-
     gap: 1rem;
     flex: 1;
     text-align: center;
+  }
+
+  p {
+    margin-bottom: auto;
   }
 
   .maintainer-entrypoint {
