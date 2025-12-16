@@ -21,7 +21,7 @@
   description="Choose a token and how much you would like to donate."
 >
   {#snippet left_actions()}
-    <Button icon={ArrowLeftIcon} on:click={() => dispatch('goBackward')}>Back</Button>
+    <Button icon={ArrowLeftIcon} onclick={() => dispatch('goBackward')}>Back</Button>
   {/snippet}
   <OneTimeDonationEditor
     bind:formValid
@@ -35,7 +35,7 @@
       disabled={!formValid}
       icon={Check}
       variant="primary"
-      on:click={() => dispatch('goForward')}>Continue</Button
+      onclick={() => dispatch('goForward')}>Continue</Button
     >
   {/snippet}
 </StandaloneFlowStepLayout>
