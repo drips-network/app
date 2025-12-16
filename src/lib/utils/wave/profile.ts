@@ -1,5 +1,5 @@
 import { authenticatedCall } from './call';
-import { waveOwnProfileUserDataSchema } from './types/user';
+import { newsletterSubscriptionStatusDtoSchema, waveOwnProfileUserDataSchema } from './types/user';
 import parseRes from './utils/parse-res';
 
 export async function patchProfile(
@@ -17,4 +17,23 @@ export async function patchProfile(
       body: JSON.stringify(profileData),
     }),
   );
+}
+
+export async function getNewsletterSubscriptionStatus(f = fetch) {
+  return parseRes(
+    newsletterSubscriptionStatusDtoSchema,
+    await authenticatedCall(f, '/api/user/newsletter/status'),
+  );
+}
+
+export async function setNewsletterSubscription(isSubscribed: boolean) {
+  if (isSubscribed) {
+    return authenticatedCall(undefined, '/api/user/newsletter/subscribe', {
+      method: 'POST',
+    });
+  } else {
+    return authenticatedCall(undefined, '/api/user/newsletter/unsubscribe', {
+      method: 'POST',
+    });
+  }
 }

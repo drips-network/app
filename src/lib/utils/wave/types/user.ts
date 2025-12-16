@@ -19,3 +19,8 @@ export const waveOwnProfileUserDataSchema = z.object({
     })
     .nullable(),
 });
+
+export const newsletterSubscriptionStatusDtoSchema = z.object({
+  isSubscribed: z.boolean(),
+});
+export type NewsletterSubscriptionStatusDto = z.infer<typeof newsletterSubscriptionStatusDtoSchema>;

@@ -5,9 +5,11 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
   import { patchNotificationPreference, WORKFLOW_ID } from '$lib/utils/wave/notifications';
+  import { setNewsletterSubscription } from '$lib/utils/wave/profile';
   import { SvelteMap } from 'svelte/reactivity';
 
   let { data } = $props();
+  let { newsletterStatus } = $derived(data);
 
   interface WorkflowProperties {
     title: string;
@@ -119,6 +121,13 @@
       updatingWorkflowChannels.delete(`${workflowId}-${channel}`);
     }
   }
+
+  async function handleNewsletterToggle(enabled: boolean) {
+    await doWithErrorModal(async () => {
+      await setNewsletterSubscription(enabled);
+      await invalidate('wave:user:notifications-preferences');
+    });
+  }
 </script>
 
 <HeadMeta title="Notifications | Settings | Wave" />
@@ -153,6 +162,22 @@
     </div>
   </Setting>
 {/snippet}
+
+<Setting
+  title="Email address"
+  subtitle="To change this, update your primary email address on GitHub, then log out and back into Drips Wave."
+>
+  <span class="typo-text">{data.user?.email}</span>
+</Setting>
+
+<div class="newsletter">
+  <Setting
+    title="Drips Wave Newsletter"
+    subtitle="Receive occasional updates on new Wave Cycles, features, and more."
+  >
+    <Toggle checked={newsletterStatus.isSubscribed} onchange={(v) => handleNewsletterToggle(v)} />
+  </Setting>
+</div>
 
 <div class="notifications-table">
   {#each categories as category (category)}
@@ -204,8 +229,9 @@
   .toggle {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 6rem;
+    gap: 0.125rem;
   }
 
   .category-header {
@@ -236,6 +262,10 @@
     .toggles {
       width: auto;
       gap: 2rem;
+    }
+
+    .toggle {
+      justify-content: space-between;
     }
   }
 </style>
