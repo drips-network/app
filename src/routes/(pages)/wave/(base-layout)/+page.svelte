@@ -19,7 +19,7 @@
 <HeadMeta title="Explore Waves | Wave" />
 
 <div class="page">
-  <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
+  <FeatureCard imageUrl="/assets/wave/wave-hp.png">
     <div>
       <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
       <p>
