@@ -169,7 +169,7 @@
   {/each}
 
   <div class="actions">
-    <Button onclick={handleClear}>Clear all</Button>
+    <Button onclick={handleClear}>Reset</Button>
     <Button variant="primary" onclick={handleApply}>Apply filters</Button>
   </div>
 </div>
