@@ -13,7 +13,7 @@ import type { AddItemError } from '$lib/components/list-editor/errors';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
 import DripList from '$lib/components/illustrations/drip-list.svelte';
-import type { Blueprint } from '../../../routes/api/list-blueprints/blueprintSchema';
+import type { BlueprintOrBlueprintError } from '../../../routes/api/list-blueprints/blueprintSchema';
 import PopulateBlueprint from './steps/populate-blueprint/populate-blueprint.svelte';
 
 export interface State {
@@ -69,14 +69,7 @@ export const steps = (
   state: Writable<State>,
   skipWalletConnect = false,
   isModal = false,
-  blueprintOrBlueprintError:
-    | {
-        blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined;
-      }
-    | {
-        blueprint: Blueprint;
-      }
-    | undefined,
+  blueprintOrBlueprintError: BlueprintOrBlueprintError | undefined,
 ) => [
   ...(blueprintOrBlueprintError
     ? [

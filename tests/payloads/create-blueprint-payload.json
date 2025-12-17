@@ -1,0 +1,21 @@
+{
+  "listName": "Test List",
+  "listDescription": "This is a test list",
+  "splits": [
+    {
+      "type": "orcid-id",
+      "orcidId": "0009-0007-5482-8654",
+      "percentage": 100
+    },
+    {
+      "type": "project",
+      "repoName": "mhgbrown/drips.test",
+      "percentage": 100
+    },
+    {
+      "type": "address",
+      "ethAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "percentage": 100
+    }
+  ]
+}

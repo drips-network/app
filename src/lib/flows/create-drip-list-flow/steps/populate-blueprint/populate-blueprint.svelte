@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { Blueprint } from '../../../../../routes/api/list-blueprints/blueprintSchema';
+  import type { BlueprintOrBlueprintError } from '../../../../../routes/api/list-blueprints/blueprintSchema';
   import type { Items, Weights } from '$lib/components/list-editor/types';
   import {
     getAddress,
@@ -15,13 +15,7 @@
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   export let context: Writable<State>;
-  export let blueprintOrBlueprintError:
-    | {
-        blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined;
-      }
-    | {
-        blueprint: Blueprint;
-      };
+  export let blueprintOrBlueprintError: BlueprintOrBlueprintError;
 
   let amountOfSplitsToProcess = 0;
   let splitsProcessed = 0;

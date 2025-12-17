@@ -1,4 +1,4 @@
-/* 
+/*
 "List Blueprints" allow submitting a list of splits in return for a "blueprint ID".
 Then, the user can be sent off to /app/funder-onboarding?blueprintId=XYZ, which will retrieve
 the blueprint and pre-fill the splits in the onboarding flow.

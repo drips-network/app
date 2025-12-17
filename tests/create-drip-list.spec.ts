@@ -1,5 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
+import createBlueprintPayload from './payloads/create-blueprint-payload.json' with { type: 'json' };
 
 const test = base.extend<{ connectedSession: ConnectedSession }>({
   connectedSession: async ({ page }, use) => {
@@ -159,4 +160,46 @@ test('create collaborative drip list', async ({ page, connectedSession }) => {
   await expect(page.getByText('this list is in voting').nth(0)).not.toBeVisible();
   await expect(page.getByText('Test collaborative list').nth(0)).toBeVisible();
   await expect(page.getByText('This is a test for a collaborative drip list').nth(0)).toBeVisible();
+});
+
+test('create drip list with blueprint', async ({ page, connectedSession, request }) => {
+  test.setTimeout(240_000);
+
+  // First, create the blueprint
+  const blueprintCreatedResponse = await request.put('http://localhost:5173/api/list-blueprints', {
+    data: {
+      ...createBlueprintPayload,
+    },
+  });
+  expect(blueprintCreatedResponse.ok()).toBeTruthy();
+  const { id: blueprintId } = await blueprintCreatedResponse.json();
+
+  await page.goto('http://localhost:5173/app/funder-onboarding?blueprintId=' + blueprintId);
+  await connectedSession.connect();
+
+  await page.getByRole('button', { name: 'Create Drip List' }).click();
+  await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
+  await page.getByRole('textbox', { name: 'Title*' }).fill('E2E test list');
+  await page.getByRole('textbox', { name: 'Title*' }).press('Tab');
+  await page
+    .getByRole('textbox', { name: 'Description' })
+    .fill('This is the description right here!');
+  await page
+    .getByRole('radio', {
+      name: 'Collaborate on recipients Invite collaborators to decide together Set a voting period Publish your list after voting Recipients*',
+      exact: true,
+    })
+    .click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  await page.getByRole('button', { name: 'Confirm in wallet' }).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
+  await page.getByRole('link', { name: 'View your Drip List' }).click();
+
+  await page.waitForURL('http://localhost:5173/app/drip-lists/*');
+
+  await expect(page.getByText('drips-test-repo-10').nth(0)).toBeVisible();
+  await expect(page.getByText('E2E test list').nth(0)).toBeVisible();
+  await expect(page.getByText('This is the description right here!').nth(0)).toBeVisible();
+  await expect(page.getByText('60%').nth(0)).toBeVisible();
+  await expect(page.getByText('40%').nth(0)).toBeVisible();
 });
