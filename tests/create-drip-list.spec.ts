@@ -162,7 +162,7 @@ test('create collaborative drip list', async ({ page, connectedSession }) => {
   await expect(page.getByText('This is a test for a collaborative drip list').nth(0)).toBeVisible();
 });
 
-test('create drip list with blueprint', async ({ page, connectedSession, request }) => {
+test('create drip list with blueprint', async ({ page, request }) => {
   test.setTimeout(240_000);
 
   // First, create the blueprint
@@ -175,31 +175,30 @@ test('create drip list with blueprint', async ({ page, connectedSession, request
   const { id: blueprintId } = await blueprintCreatedResponse.json();
 
   await page.goto('http://localhost:5173/app/funder-onboarding?blueprintId=' + blueprintId);
-  await connectedSession.connect();
 
-  await page.getByRole('button', { name: 'Create Drip List' }).click();
-  await page.getByRole('textbox', { name: 'Title*' }).press('ControlOrMeta+a');
-  await page.getByRole('textbox', { name: 'Title*' }).fill('E2E test list');
-  await page.getByRole('textbox', { name: 'Title*' }).press('Tab');
-  await page
-    .getByRole('textbox', { name: 'Description' })
-    .fill('This is the description right here!');
-  await page
-    .getByRole('radio', {
-      name: 'Collaborate on recipients Invite collaborators to decide together Set a voting period Publish your list after voting Recipients*',
-      exact: true,
-    })
-    .click();
+  // Move past the confirmation that you're using a blueprint
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  // Move past the configuration of your splits
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  // Connect wallet
+  await page.getByRole('button', { name: 'Connect wallet' }).nth(0).click();
+  await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  // Begin the transaction
   await page.getByRole('button', { name: 'Confirm in wallet' }).click();
+  // Wait for the transaction to be confirmed
   await page.getByRole('button', { name: 'Continue' }).nth(0).click({ timeout: 120_000 });
+  // Move to the drip list page
   await page.getByRole('link', { name: 'View your Drip List' }).click();
-
+  // Wait for the drip list page to load
   await page.waitForURL('http://localhost:5173/app/drip-lists/*');
 
-  await expect(page.getByText('drips-test-repo-10').nth(0)).toBeVisible();
-  await expect(page.getByText('E2E test list').nth(0)).toBeVisible();
-  await expect(page.getByText('This is the description right here!').nth(0)).toBeVisible();
-  await expect(page.getByText('60%').nth(0)).toBeVisible();
-  await expect(page.getByText('40%').nth(0)).toBeVisible();
+  // Verify that the drip list is created as expected
+  await expect(page.getByText(createBlueprintPayload.listName).nth(0)).toBeVisible();
+  await expect(page.getByText(createBlueprintPayload.listDescription).nth(0)).toBeVisible();
+  await expect(
+    page.getByText(createBlueprintPayload.splits.at(1)?.repoName as string).nth(0),
+  ).toBeVisible();
+  const fullWeight: number = createBlueprintPayload.splits.at(1)?.weight as number;
+  const percentage = ((fullWeight / 1000000) * 100).toFixed(2);
+  await expect(page.getByText(`${percentage}%`).nth(0)).toBeVisible();
 });
