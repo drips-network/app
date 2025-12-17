@@ -44,21 +44,6 @@
     progressBar = $bindable(),
   }: Props = $props();
 
-  // const dispatch = createEventDispatcher<{ result: Result }>();
-
-  // export let message: string;
-  // export let subtitle: string | undefined = undefined;
-  // export let link: { url: string; label: string } | undefined = undefined;
-  // export let icon: { component: ComponentType; props: Record<string, unknown> } | undefined =
-  //   undefined;
-  // export let promise: (updateFn: UpdateAwaitStepFn) => Promise<unknown>;
-  // export let progressBar:
-  //   | {
-  //       progressFn: ProgressFn;
-  //       centeredProgressText?: boolean;
-  //     }
-  //   | undefined = undefined;
-
   const updateFn: UpdateAwaitStepFn = (params) => {
     message = params.message ?? message;
     subtitle = params.subtitle;

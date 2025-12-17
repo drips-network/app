@@ -24,9 +24,6 @@
     canCancel?: boolean;
     blueprintMode?: boolean;
   }
-  // export let context: Writable<State>;
-  // export let canCancel = false;
-  // export let blueprintMode = false;
 
   let { context, canCancel = false, blueprintMode = false }: Props = $props();
 

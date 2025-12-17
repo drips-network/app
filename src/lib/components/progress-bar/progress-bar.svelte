@@ -16,12 +16,13 @@
     errorMessage?: string | undefined;
     centeredProgressText?: boolean;
   }
-  // export let progressFn: ProgressFn;
-  // export let updateFrequencyMs = 10;
-  // export let errorMessage: string | undefined = undefined;
-  // export let centeredProgressText = true;
 
-  let { progressFn, updateFrequencyMs = 10, errorMessage = undefined, centeredProgressText = true }: Props = $props();
+  let {
+    progressFn,
+    updateFrequencyMs = 10,
+    errorMessage = undefined,
+    centeredProgressText = true,
+  }: Props = $props();
 
   let interval: ReturnType<typeof setInterval> | undefined = $state();
 
