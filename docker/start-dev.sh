@@ -26,7 +26,13 @@ export ARCH
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
-# source .env file
-export $(grep -v '^#' .env | xargs)
+# source .env file, preventing an error related to multiline values e.g. RSA keys
+set -a
+source .env
+set +a
+
+# Auto-enable 'wave' profile if image is accessible and profiles aren't manually set
+# Check for Wave service access
+source ./docker/detect-wave.sh
 
 docker compose -f docker-compose.yml -f docker-compose.dev.yml build && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --renew-anon-volumes --attach app

@@ -283,9 +283,9 @@ export async function getVotingRoundVotes(
     await _authenticatedCall(
       'GET',
       `/votingRounds/${votingRoundId}/votes` +
-        (adminSignature
-          ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
-          : ''),
+      (adminSignature
+        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+        : ''),
       getVotingRoundVotesResponseSchema,
       undefined,
       fetch,
@@ -430,11 +430,10 @@ export async function getCollaborator(
   return _authenticatedCall(
     'GET',
     `/votingRounds/${votingRoundId}/collaborators/${address}` +
-      (collaboratorSignature
-        ? `?signature=${
-            collaboratorSignature.signature
-          }&date=${collaboratorSignature.date.toISOString()}`
-        : ''),
+    (collaboratorSignature
+      ? `?signature=${collaboratorSignature.signature
+      }&date=${collaboratorSignature.date.toISOString()}`
+      : ''),
     getCollaboratorResponseSchema,
   );
 }
@@ -464,9 +463,9 @@ export async function revealResults(
   return _authenticatedCall(
     'GET',
     `/votingRounds/${votingRoundId}/result` +
-      (adminSignature
-        ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
-        : ''),
+    (adminSignature
+      ? `?signature=${adminSignature.signature}&date=${adminSignature.date.toISOString()}`
+      : ''),
     revealResultsResponseSchema,
   );
 }
