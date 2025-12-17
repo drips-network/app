@@ -139,8 +139,8 @@ export async function markIssueAsCompleted(f = fetch, issueId: string) {
   // wait for the updated issue
   const expectation = await expect(
     () => getIssue(f, issueId),
-    (issue) => issue?.state === 'completed',
-    10000,
+    (issue) => issue?.state === 'closed' || issue?.state === 'completed',
+    30000,
     500,
   );
 
