@@ -1,22 +1,27 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import Settings from '$lib/components/icons/Settings.svelte';
+  import User from '$lib/components/icons/User.svelte';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import GithubUserBadge from '../../github-user-badge/github-user-badge.svelte';
   import LogOutButton from '../../log-out-button/log-out-button.svelte';
 
-  let { user }: { user: WaveLoggedInUser } = $props();
+  let { user, noBackground }: { user: WaveLoggedInUser; noBackground?: boolean } = $props();
 </script>
 
 <div class="user-flyout">
   <div class="profile-info">
-    <div class="bg"></div>
+    {#if !noBackground}
+      <div class="bg"></div>
+    {/if}
     <GithubUserBadge {user} size={64} link={false} hideName />
     <span class="typo-header-3">{user.name}</span>
     <span class="typo-text-small" style:color="var(--color-foreground-level-5)">{user.email}</span>
   </div>
 
   <div class="actions">
-    <Button href="/wave/settings">Settings</Button>
+    <Button href="/wave/users/{user.id}" variant="primary" icon={User}>View profile</Button>
+    <Button href="/wave/settings" icon={Settings}>Settings</Button>
     <LogOutButton />
   </div>
 </div>
@@ -33,7 +38,7 @@
   .user-flyout .actions {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
   }
 
   .user-flyout .profile-info {

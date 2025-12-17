@@ -44,7 +44,7 @@ export async function getIssue(f = fetch, issueId: string) {
 
 export async function getIssueApplications(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   pagination?: PaginationInput,
   filters?: IssueApplicationFilters,
@@ -53,31 +53,35 @@ export async function getIssueApplications(
     paginatedResponseSchema(issueApplicationWithDetailsDtoSchema),
     await authenticatedCall(
       f,
-      `/api/waves/${waveId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}`,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}`,
     ),
   );
 }
 
 export async function applyToWorkOnIssue(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   applicationText: string,
 ) {
   return parseRes(
     issueApplicationWithDetailsDtoSchema,
-    await authenticatedCall(f, `/api/waves/${waveId}/issues/${issueId}/applications`, {
-      method: 'POST',
-      body: JSON.stringify({
-        applicationText,
-      }),
-    }),
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          applicationText,
+        }),
+      },
+    ),
   );
 }
 
 export async function acceptIssueApplication(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   applicationId: string,
 ) {
@@ -85,7 +89,7 @@ export async function acceptIssueApplication(
     issueApplicationWithDetailsDtoSchema,
     await authenticatedCall(
       f,
-      `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/accept`,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/accept`,
       {
         method: 'POST',
       },
@@ -95,7 +99,7 @@ export async function acceptIssueApplication(
 
 export async function withdrawIssueApplication(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   applicationId: string,
 ) {
@@ -103,7 +107,7 @@ export async function withdrawIssueApplication(
     issueApplicationWithDetailsDtoSchema,
     await authenticatedCall(
       f,
-      `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/withdraw`,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/withdraw`,
       {
         method: 'POST',
       },
@@ -113,13 +117,13 @@ export async function withdrawIssueApplication(
 
 export async function unassignContributorFromIssue(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   applicationId: string,
 ) {
   return await authenticatedCall(
     f,
-    `/api/waves/${waveId}/issues/${issueId}/applications/${applicationId}/unassign`,
+    `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/unassign`,
     {
       method: 'POST',
     },

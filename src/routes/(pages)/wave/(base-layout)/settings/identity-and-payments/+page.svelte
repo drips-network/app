@@ -45,7 +45,7 @@
 
     await doWithConfirmationModal(
       `
-      Updating your Stellar payout address will affect where you receive payouts for any rewards earned in upcoming Cycles.
+      Updating your Stellar payout address will affect where you receive payouts for any rewards earned in upcoming Waves.
       Please make absolutely sure your address is correct. Drips cannot recover funds sent to an incorrect address.
     `,
       () =>
@@ -73,7 +73,7 @@
 <h5>Payment</h5>
 <Setting
   title="Stellar payout address"
-  subtitle="Set the Stellar address where you want to receive earned rewards after a Cycle ends."
+  subtitle="Set the Stellar address where you want to receive earned rewards after a Wave ends."
 >
   <div class="address-input">
     <TextInput
@@ -132,7 +132,7 @@
     >
       <div class="description">
         <ExclamationCircle style="fill: var(--color-caution-level-6);" />
-        Verify your identity now to be eligible for Cycle rewards.
+        Verify your identity now to be eligible for Wave rewards.
       </div>
       <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
     </div>

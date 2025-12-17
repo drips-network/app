@@ -20,7 +20,7 @@
       source: PointsLedgerEntryDto['source'];
     };
     earnedAt: string;
-    waveAndCycle: string;
+    programAndWave: string;
   }
 
   let tableData = $derived(
@@ -31,8 +31,8 @@
           source: entry.source,
         },
         earnedAt: formatDate(entry.createdAt),
-        waveAndCycle: entry.wave
-          ? `${entry.wave.name}${entry.waveCycle ? ` - Cycle ${entry.waveCycle.cycleNumber}` : ''}`
+        programAndWave: entry.waveProgram
+          ? `${entry.waveProgram.name}${entry.wave ? ` - Wave ${entry.wave.waveNumber}` : ''}`
           : 'N/A',
       }),
     ),
@@ -53,8 +53,8 @@
       cell: () => Source,
     },
     {
-      header: 'Wave & Cycle',
-      accessorKey: 'waveAndCycle',
+      header: 'Program & Wave',
+      accessorKey: 'programAndWave',
       enableSorting: false,
       cell: (c) => c,
     },
@@ -80,7 +80,7 @@
     label: 'Points history',
     icon: Trophy,
     infoTooltip:
-      "Earn points by completing tasks within Wave Cycles. At the end of each Cycle, you'll receive a percentage of the Wave's total reward pool based on the points you earned.",
+      "Earn points by completing tasks within Waves. At the end of each Wave, you'll receive a percentage of the Wave's total reward pool based on the points you earned.",
   }}
   skeleton={{
     loaded: true,

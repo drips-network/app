@@ -16,7 +16,7 @@
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
   import shareSteps from '$lib/flows/share/share-steps';
-  import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave/add-issues-to-wave-flow';
+  import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
   import modal from '$lib/stores/modal';
   import { BASE_URL } from '$lib/utils/base-url';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
@@ -30,10 +30,12 @@
   } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
-  import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
-  import { beComplexityToFriendlyLabel, removeIssueFromWave } from '$lib/utils/wave/waves';
+  import {
+    beComplexityToFriendlyLabel,
+    removeIssueFromWaveProgram,
+  } from '$lib/utils/wave/wavePrograms';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
-  import WaveBadge from '../wave-badge/wave-badge.svelte';
+  import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
@@ -44,19 +46,23 @@
   import formatDate from '$lib/utils/format-date';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import type {
+    WaveProgramDto,
+    WaveProgramRepoWithDetailsDto,
+  } from '$lib/utils/wave/types/waveProgram';
 
   interface Props {
     issue: IssueDetailsDto;
     allowAddingOrRemovingWave?: boolean;
 
     /** User's wave repos - used to determine which waves the issue may be added to */
-    waveRepos?: WaveRepoWithDetailsDto[];
+    waveProgramRepos?: WaveProgramRepoWithDetailsDto[];
 
     /** Wave the issue is part of, if any */
-    partOfWave: WaveDto | null;
+    partOfWaveProgram: WaveProgramDto | null;
 
-    /** For listing available waves to add the issue to */
-    waves: WaveDto[];
+    /** For listing available wave programs to add the issue to */
+    wavePrograms: WaveProgramDto[];
 
     /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
     applicationsPromise: ReturnType<typeof getIssueApplications> | null;
@@ -72,9 +78,9 @@
   let {
     issue,
     allowAddingOrRemovingWave,
-    waveRepos = [],
-    partOfWave,
-    waves,
+    waveProgramRepos = [],
+    partOfWaveProgram,
+    wavePrograms,
     applicationsPromise: issueApplicationsPromise,
     user,
     backToConfig,
@@ -82,27 +88,33 @@
     givenCompliments,
   }: Props = $props();
 
-  let matchingWaveRepos = $derived(
-    waveRepos.filter(
-      (waveRepo) => waveRepo.repo.id === issue.repo.id && waveRepo.status === 'approved',
+  let matchingWaveProgramRepos = $derived(
+    waveProgramRepos.filter(
+      (waveProgramRepo) =>
+        waveProgramRepo.repo.id === issue.repo.id && waveProgramRepo.status === 'approved',
     ),
   );
 
-  let isMaintainer = $derived(matchingWaveRepos.length > 0);
+  let isMaintainer = $derived(matchingWaveProgramRepos.length > 0);
   let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
   let canUpdateComplexity = $derived(
-    Boolean(partOfWave && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open'),
+    Boolean(
+      partOfWaveProgram && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open',
+    ),
   );
 
   async function handleRemoveFromWave() {
-    if (!partOfWave) {
+    if (!partOfWaveProgram) {
       return;
     }
 
     await doWithConfirmationModal(
       // todo(wave): when someone is assigned, make this message more scary
-      `Are you sure you want to remove this issue from the "${partOfWave.name}" Wave?`,
-      () => doWithErrorModal(async () => removeIssueFromWave(undefined, partOfWave?.id, issue.id)),
+      `Are you sure you want to remove this issue from the ${partOfWaveProgram.name} Wave Program?`,
+      () =>
+        doWithErrorModal(async () =>
+          removeIssueFromWaveProgram(undefined, partOfWaveProgram?.id, issue.id),
+        ),
     );
 
     await invalidate('wave:issues');
@@ -134,7 +146,7 @@
   });
 
   let canApplyToIssue = $derived(
-    partOfWave !== null &&
+    partOfWaveProgram !== null &&
       // Don't allow applying to own issue
       !allowAddingOrRemovingWave,
   );
@@ -154,11 +166,11 @@
   }
 
   function openUpdateComplexityModal() {
-    if (!partOfWave) return;
+    if (!partOfWaveProgram) return;
 
     modal.show(UpdateComplexityModal, undefined, {
       issue,
-      wave: partOfWave,
+      waveProgram: partOfWaveProgram,
       onIssueUpdated: handleIssueUpdated,
     });
   }
@@ -211,11 +223,11 @@
                 icon: Ledger,
                 variant: 'primary',
                 disabled: !canApplyToIssue,
-                href: `/wave/${partOfWave?.id}/issues/${issue.id}/apply`,
+                href: `/wave/${partOfWaveProgram?.id}/issues/${issue.id}/apply`,
               },
             ],
             infoTooltip:
-              'Contributors can start applying to work on this issue during active Wave Cycles.',
+              'Contributors can start applying to work on this issue during active Waves.',
           }}
           skeleton={{
             loaded: !promisePending,
@@ -245,7 +257,7 @@
         </div>
       {/if}
 
-      {#if issue.waveId && !issue.assignedApplicant}
+      {#if issue.waveProgramId && !issue.assignedApplicant}
         <div>
           <SidebarButton
             icon={Sharrow}
@@ -254,8 +266,8 @@
                 Stepper,
                 undefined,
                 shareSteps({
-                  url: `${BASE_URL}/wave/${issue.waveId}/issues/${issue.id}/apply`,
-                  shareModalText: 'Share a link for applicants to apply on this issue.',
+                  url: `${BASE_URL}/wave/${issue.waveProgramId}/issues/${issue.id}/apply`,
+                  shareModalText: 'Share a link for applicants to apply for this issue.',
                 }),
               )}
           >
@@ -285,8 +297,8 @@
                 <InfoCircle style="height: 1.25rem;" />
 
                 {#snippet tooltip_content()}
-                  Issues assigned as part of a Wave Cycle are due on the end date of that cycle. If
-                  the issue is resolved after this date, the applicant may not receive points for
+                  Issues assigned as part of a Wave are due on the end date of that Wave. If the
+                  issue is resolved after this date, the applicant may not receive points for
                   completing it.
                 {/snippet}
               </Tooltip>
@@ -301,19 +313,21 @@
 
       <div class="sidebar-section">
         <div class="content">
-          <h5>Wave</h5>
+          <h5>Wave Program</h5>
 
-          {#if partOfWave}
-            <WaveBadge wave={partOfWave} />
+          {#if partOfWaveProgram}
+            <WaveBadge waveProgram={partOfWaveProgram} />
           {:else}
-            <p style:color="var(--color-foreground-level-5)">Issue isn't part of a Wave yet.</p>
+            <p style:color="var(--color-foreground-level-5)">
+              Issue isn't part of a Wave Program yet.
+            </p>
           {/if}
         </div>
 
         {#if allowAddingOrRemovingWave}
-          {#if partOfWave}
+          {#if partOfWaveProgram}
             <SidebarButton icon={Minus} onclick={handleRemoveFromWave}>
-              Remove from Wave
+              Remove from Wave Program
             </SidebarButton>
           {:else}
             <SidebarButton
@@ -321,9 +335,13 @@
               variant="primary"
               disabled={!canBeAddedToAWave}
               onclick={() =>
-                modal.show(Stepper, undefined, addIssuesToWaveFlow(waveRepos, [issue], waves))}
+                modal.show(
+                  Stepper,
+                  undefined,
+                  addIssuesToWaveFlow(waveProgramRepos, [issue], wavePrograms),
+                )}
             >
-              Add to Wave
+              Add to Wave Program
             </SidebarButton>
           {/if}
         {/if}
@@ -358,7 +376,7 @@
             <SidebarButton
               target=""
               icon={Heart}
-              href="/wave/{issue.waveId}/issues/{issue.id}/compliments"
+              href="/wave/{issue.waveProgramId}/issues/{issue.id}/compliments"
             >
               Give compliment
             </SidebarButton>
@@ -366,7 +384,7 @@
         </div>
       {/if}
 
-      {#if issue.complexity || issue.waveId}
+      {#if issue.complexity || issue.waveProgramId}
         <div class="sidebar-section">
           <div class="content">
             <h5>Complexity</h5>
@@ -402,7 +420,7 @@
     height: 100%;
     display: grid;
     gap: 1rem;
-    grid-template-columns: 1fr 16rem;
+    grid-template-columns: 1fr 18rem;
   }
 
   .sidebar {
@@ -477,6 +495,10 @@
     overflow-wrap: break-word;
   }
 
+  h5 {
+    color: var(--color-foreground-level-5);
+  }
+
   .details .left {
     display: flex;
     flex-direction: column;
@@ -507,11 +529,17 @@
     display: none;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1400px) {
     .wrapper {
       grid-template-columns: 1fr;
     }
 
+    .sidebar {
+      max-height: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
     .back-to-issues-link {
       display: block;
     }

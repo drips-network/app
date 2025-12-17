@@ -9,19 +9,19 @@
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import { getIssue } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
-  import type { Complexity, WaveDto } from '$lib/utils/wave/types/wave';
-  import { updateWaveIssueComplexity } from '$lib/utils/wave/waves';
+  import type { Complexity, WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+  import { updateWaveProgramIssueComplexity } from '$lib/utils/wave/wavePrograms';
   import { notifyIssuesUpdated } from '../issue-update-coordinator';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   interface Props {
     issue: IssueDetailsDto;
-    wave: WaveDto;
+    waveProgram: WaveProgramDto;
     onIssueUpdated?: (issue: IssueDetailsDto) => void;
   }
 
-  let { issue, wave, onIssueUpdated }: Props = $props();
+  let { issue, waveProgram, onIssueUpdated }: Props = $props();
 
   const initialComplexity: Complexity | null = issue.complexity ?? null;
 
@@ -35,7 +35,12 @@
 
     try {
       await doWithErrorModal(async () => {
-        await updateWaveIssueComplexity(undefined, wave.id, issue.id, activeComplexity);
+        await updateWaveProgramIssueComplexity(
+          undefined,
+          waveProgram.id,
+          issue.id,
+          activeComplexity,
+        );
         const updatedIssue = await getIssue(undefined, issue.id);
 
         if (!updatedIssue) {

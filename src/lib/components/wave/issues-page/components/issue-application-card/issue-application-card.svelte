@@ -39,10 +39,10 @@
       `,
       () =>
         doWithErrorModal(async () => {
-          if (!issue.waveId) throw new Error('Issue is not part of a Wave');
+          if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
           try {
-            await acceptIssueApplication(undefined, issue.waveId, issue.id, application.id);
+            await acceptIssueApplication(undefined, issue.waveProgramId, issue.id, application.id);
           } finally {
             await invalidate('wave:issues');
 
@@ -65,10 +65,15 @@
       `,
       () =>
         doWithErrorModal(async () => {
-          if (!issue.waveId) throw new Error('Issue is not part of a Wave');
+          if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
           try {
-            await withdrawIssueApplication(undefined, issue.waveId, issue.id, application.id);
+            await withdrawIssueApplication(
+              undefined,
+              issue.waveProgramId,
+              issue.id,
+              application.id,
+            );
           } finally {
             await invalidate('wave:issues');
 
@@ -87,10 +92,15 @@
       `,
       () =>
         doWithErrorModal(async () => {
-          if (!issue.waveId) throw new Error('Issue is not part of a Wave');
+          if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
           try {
-            await unassignContributorFromIssue(undefined, issue.waveId, issue.id, application.id);
+            await unassignContributorFromIssue(
+              undefined,
+              issue.waveProgramId,
+              issue.id,
+              application.id,
+            );
           } finally {
             await invalidate('wave:issues');
 

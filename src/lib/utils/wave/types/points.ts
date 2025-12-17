@@ -1,5 +1,5 @@
 import z from 'zod';
-import { waveCycleDtoSchema, waveDtoSchema } from './wave';
+import { waveDtoSchema, waveProgramDtoSchema } from './waveProgram';
 import { complimentTypeSchema } from './compliment';
 
 export const pointsDtoSchema = z.object({
@@ -46,8 +46,8 @@ export const pointsLedgerEntryDtoSchema = z.object({
   reason: z.string().nullable(),
   source: pointsSourceSchema,
   referenceEntryId: z.uuid().nullable(),
+  waveProgram: waveProgramDtoSchema.nullable(),
   wave: waveDtoSchema.nullable(),
-  waveCycle: waveCycleDtoSchema.nullable(),
   metadata: z.record(z.string(), z.unknown()),
   occurredAt: z.coerce.date(),
   createdAt: z.coerce.date(),

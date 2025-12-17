@@ -6,7 +6,6 @@
   import { page } from '$app/state';
   import Nav from '$lib/components/wave/nav/nav.svelte';
   import Explore from '$lib/components/icons/Explore.svelte';
-  import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
@@ -14,6 +13,7 @@
   import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
+  import Issue from '$lib/components/icons/Issue.svelte';
 
   let {
     data,
@@ -51,7 +51,7 @@
             type: 'target',
             name: 'Issues',
             href: '/wave/contributors/issues',
-            icon: ExclamationCircle,
+            icon: Issue,
             count: data.counts.contributorIssuesCount,
           },
         ],
@@ -64,7 +64,7 @@
             type: 'target',
             name: 'Issues',
             href: '/wave/maintainers/issues',
-            icon: ExclamationCircle,
+            icon: Issue,
           },
           {
             type: 'target',

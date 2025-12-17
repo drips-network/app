@@ -21,8 +21,11 @@
   import { fade } from 'svelte/transition';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
-  import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave/add-issues-to-wave-flow';
-  import type { WaveDto, WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
+  import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
+  import type {
+    WaveProgramDto,
+    WaveProgramRepoWithDetailsDto,
+  } from '$lib/utils/wave/types/waveProgram';
   import {
     registerIssueUpdateListener,
     unregisterIssueUpdateListener,
@@ -40,11 +43,11 @@
     appliedFilters,
     appliedSort,
     breadcrumbs,
-    allowAddToWave = false,
-    waveRepos: ownWaveRepos = [],
+    allowAddToWaveProgram = false,
+    waveProgramRepos: ownWaveProgramRepos = [],
     pathPrefix,
     showNewApplicationsBadge = false,
-    waves,
+    wavePrograms,
     viewKey,
     ownUserId,
     noOfPreappliedFilters,
@@ -58,15 +61,15 @@
     appliedFilters: IssueFilters;
     appliedSort: IssueSortByOption;
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
-    allowAddToWave?: boolean;
+    allowAddToWaveProgram?: boolean;
 
     pathPrefix: string;
 
     /** User's own wave repos for determining what Waves, if any, issues may be added to */
-    waveRepos?: WaveRepoWithDetailsDto[];
+    waveProgramRepos?: WaveProgramRepoWithDetailsDto[];
 
-    /** For displaying wave data in list items */
-    waves: WaveDto[];
+    /** For displaying wave program data in list items */
+    wavePrograms: WaveProgramDto[];
 
     /** Unique name for the route the view is on to enable coherent view transitions */
     viewKey: string;
@@ -290,8 +293,8 @@
               modal.show(
                 Stepper,
                 undefined,
-                addIssuesToWaveFlow(ownWaveRepos, selectedIssues, waves, handleClear),
-              )}>Add to Wave</Button
+                addIssuesToWaveFlow(ownWaveProgramRepos, selectedIssues, wavePrograms, handleClear),
+              )}>Add to Wave Program</Button
           >
         </div>
       </div>
@@ -382,9 +385,9 @@
           {ownUserId}
           {pathPrefix}
           {showNewApplicationsBadge}
-          {waves}
+          {wavePrograms}
           bind:this={listInstance}
-          multiselectMode={allowAddToWave}
+          multiselectMode={allowAddToWaveProgram}
           issuesWithPagination={issues}
           getMoreIssues={(currentPagination) =>
             getMoreIssues(currentPagination, appliedFilters, appliedSort)}

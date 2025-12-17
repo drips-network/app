@@ -4,9 +4,9 @@ import parseRes from './utils/parse-res';
 
 export enum WORKFLOW_ID {
   WELCOME = 'welcome',
-  REPO_APPLIED_TO_WAVE = 'repo-applied-to-wave',
-  REPO_APPLICATION_APPROVED = 'repo-approved-for-wave',
-  REPO_APPLICATION_REJECTED = 'repo-declined-for-wave',
+  REPO_APPLIED_TO_WAVE = 'repo-applied-to-wave-program',
+  REPO_APPLICATION_APPROVED = 'repo-approved-for-wave-program',
+  REPO_APPLICATION_REJECTED = 'repo-declined-for-wave-program',
   ISSUE_APPLICATION_RECEIVED = 'issue-application-received',
   ISSUE_APPLICATION_APPROVED = 'issue-application-approved',
   COMPLIMENT_RECEIVED = 'compliment-received',

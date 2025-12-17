@@ -92,8 +92,8 @@
     determineIssuesListItemHeight,
   } from './determine-issues-list-item-height';
   import Checkbox from '$lib/components/checkbox/checkbox.svelte';
-  import type { WaveDto } from '$lib/utils/wave/types/wave';
-  import WaveBadge from '$lib/components/wave/wave-badge/wave-badge.svelte';
+  import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+  import WaveBadge from '$lib/components/wave/wave-program-badge/wave-program-badge.svelte';
   import { renderIssueTitle } from '$lib/utils/wave/issues';
   import formatDate from '$lib/utils/format-date';
 
@@ -102,7 +102,7 @@
     selectable = false,
     selected = false,
     onselect,
-    partOfWave,
+    partOfWaveProgram,
     pathPrefix,
     ownUserId,
     showNewApplicationsBadge = false,
@@ -111,7 +111,7 @@
     selectable?: boolean;
     selected?: boolean;
     onselect?: (selected: boolean) => void;
-    partOfWave?: WaveDto | null;
+    partOfWaveProgram?: WaveProgramDto | null;
     pathPrefix: string;
     ownUserId: string | null;
     showNewApplicationsBadge?: boolean;
@@ -172,8 +172,8 @@
 
     <div class="repo-and-wave">
       <RepoBadge size="small" repo={issue.repo} />
-      {#if partOfWave}
-        <WaveBadge hideName size="small" wave={partOfWave} />
+      {#if partOfWaveProgram}
+        <WaveBadge hideName size="small" waveProgram={partOfWaveProgram} />
       {/if}
     </div>
   </svelte:element>

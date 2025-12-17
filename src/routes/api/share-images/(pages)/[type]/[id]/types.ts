@@ -9,7 +9,7 @@ export const DIMENSIONS: Record<RenderTarget, { width: number; height: number }>
 };
 
 export enum ShareImageType {
-  WAVE = 'wave',
+  WAVE_PROGRAM = 'wave-program',
   PROJECT = 'project',
   DRIP_LIST = 'drip-list',
   ECOSYSTEM = 'ecosystem',

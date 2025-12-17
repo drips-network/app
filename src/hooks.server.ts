@@ -2,6 +2,7 @@ import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
+import { error } from '@sveltejs/kit';
 
 PuppeteerManager.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -63,7 +64,14 @@ export const handle = async ({ event, resolve }) => {
     }
   }
 
-  return resolve(event);
+  try {
+    return resolve(event);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Error during request handling:', e);
+
+    throw error(500, 'Internal Server Error');
+  }
 };
 
 export const handleFetch = async ({ event, request, fetch }) => {

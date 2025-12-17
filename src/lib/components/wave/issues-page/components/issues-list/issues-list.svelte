@@ -7,7 +7,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import { SvelteSet } from 'svelte/reactivity';
-  import type { WaveDto } from '$lib/utils/wave/types/wave';
+  import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
   import { onMount } from 'svelte';
   import {
     registerIssueUpdateListener,
@@ -17,7 +17,7 @@
   let {
     issuesWithPagination,
     getMoreIssues,
-    waves,
+    wavePrograms,
     multiselectMode = false,
     pathPrefix,
     showNewApplicationsBadge = false,
@@ -30,8 +30,8 @@
     ) => Promise<Awaited<ReturnType<typeof getIssues>> | null>;
     /** For building hrefs for issues links, e.g. '/wave/maintainers/issues' */
     pathPrefix: string;
-    /** For displaying wave data in list items */
-    waves: WaveDto[];
+    /** For displaying wave program data in list items */
+    wavePrograms: WaveProgramDto[];
     multiselectMode?: boolean;
     /** If true, issues with applications but no applicants receive a badge */
     showNewApplicationsBadge?: boolean;
@@ -162,10 +162,10 @@
     selectedIndices.clear();
   }
 
-  function getWaveById(waveId: string | null): WaveDto | null {
-    if (!waveId) return null;
+  function getWaveProgramById(waveProgramId: string | null): WaveProgramDto | null {
+    if (!waveProgramId) return null;
 
-    return waves.find((wave) => wave.id === waveId) || null;
+    return wavePrograms.find((waveProgram) => waveProgram.id === waveProgramId) || null;
   }
 
   let virtualListInstance: VirtualList;
@@ -235,7 +235,7 @@
           selectable={multiselectMode}
           selected={selectedIndices.has(index)}
           onselect={(selected) => handleItemSelect(index, selected)}
-          partOfWave={getWaveById(issue.waveId)}
+          partOfWaveProgram={getWaveProgramById(issue.waveProgramId)}
           {pathPrefix}
         />
       </div>

@@ -5,20 +5,20 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Section from '$lib/components/section/section.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
-  import WaveBadge from '$lib/components/wave/wave-badge/wave-badge.svelte';
-  import type { WaveRepoWithDetailsDto } from '$lib/utils/wave/types/wave';
+  import WaveBadge from '$lib/components/wave/wave-program-badge/wave-program-badge.svelte';
+  import type { WaveProgramRepoWithDetailsDto } from '$lib/utils/wave/types/waveProgram.js';
 
   let { data } = $props();
 
-  let { waveRepos } = $derived(data);
+  let { wavePrograms, waveProgramRepos } = $derived(data);
 </script>
 
-{#snippet waveRepo(d: WaveRepoWithDetailsDto)}
-  {@const wave = data.waves.data.find((w) => w.id === d.waveId)}
+{#snippet waveProgramRepo(d: WaveProgramRepoWithDetailsDto)}
+  {@const waveProgram = wavePrograms.data.find((w) => w.id === d.waveProgramId)}
   <div class="repo-application-item typo-text">
     <div class="name-and-wave">
-      <RepoBadge size="small" repo={d.repo} /> → {#if wave}
-        <WaveBadge {wave} size="small" />
+      <RepoBadge size="small" repo={d.repo} /> → {#if waveProgram}
+        <WaveBadge {waveProgram} size="small" />
       {/if}
     </div>
 
@@ -60,15 +60,15 @@
     }}
     skeleton={{
       loaded: true,
-      empty: waveRepos.pagination.total === 0,
+      empty: waveProgramRepos.pagination.total === 0,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No repo applications yet',
       emptyStateText: 'Apply your repos to a Wave to get started.',
     }}
   >
     <div class="repo-applications-list">
-      {#each waveRepos.data as repoApplication (repoApplication.id)}
-        {@render waveRepo(repoApplication)}
+      {#each waveProgramRepos.data as repoApplication (repoApplication.id)}
+        {@render waveProgramRepo(repoApplication)}
       {/each}
     </div>
   </Section>

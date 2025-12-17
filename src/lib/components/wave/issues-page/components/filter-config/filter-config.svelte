@@ -89,7 +89,7 @@
 
       ...(mode === 'maintainer'
         ? {
-            isInWave: {
+            isInWaveProgram: {
               type: 'single-select',
               label: 'Wave Membership',
               options: [

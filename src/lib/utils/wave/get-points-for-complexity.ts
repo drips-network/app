@@ -1,4 +1,4 @@
-import type { Complexity } from './types/wave';
+import type { Complexity } from './types/waveProgram';
 
 export function getPointsForComplexity(complexity: Complexity): number {
   switch (complexity) {

@@ -5,10 +5,10 @@
   import Wave from '$lib/components/icons/Wave.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
   import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
-  import WaveAvatar from '$lib/components/wave/wave-avatar/wave-avatar.svelte';
+  import WaveAvatar from '$lib/components/wave/wave-program-avatar/wave-program-avatar.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import formatDate from '$lib/utils/format-date';
-  import type { WaveCycleDto } from '$lib/utils/wave/types/wave';
+  import type { WaveDto } from '$lib/utils/wave/types/waveProgram';
   import FeatureCard from '../../app/(app)/components/feature-card.svelte';
 
   let { data } = $props();
@@ -16,7 +16,7 @@
   const now = new Date();
 </script>
 
-<HeadMeta title="Explore Waves | Wave" />
+<HeadMeta title="Explore Wave Programs | Wave" />
 
 <div class="page">
   <FeatureCard imageUrl="/assets/wave/wave-hp.png">
@@ -24,7 +24,7 @@
       <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
       <p>
         With Drips Wave, open-source ecosystems run recurring one-week contribution sprints. During
-        these Wave Cycles, contributors receive Points, for which they earn rewards.
+        these Waves, contributors receive Points, for which they earn rewards.
       </p>
     </div>
 
@@ -36,26 +36,26 @@
     {/snippet}
   </FeatureCard>
 
-  <OrDivider text="Current waves" />
+  <OrDivider text="Wave programs" />
 
-  {#each data.waves.data as wave (wave.id)}
-    {@const upcomingCycle: WaveCycleDto | null = data.upcomingCycles[wave.id]}
-    <a href="/wave/{wave.id}" class="wave-item">
-      <WaveAvatar {wave} size={128} />
+  {#each data.wavePrograms.data as waveProgram (waveProgram.id)}
+    {@const upcomingWave: WaveDto | null = data.upcomingWaves[waveProgram.id]}
+    <a href="/wave/{waveProgram.id}" class="wave-program-item">
+      <WaveAvatar {waveProgram} size={128} />
 
       <div class="details">
-        {#if upcomingCycle}
-          <div class="next-cycle-badge">
-            {#if upcomingCycle.startDate > now}
-              Next cycle starts {formatDate(upcomingCycle.startDate, 'onlyDay')}
-            {:else if upcomingCycle.endDate > now}
+        {#if upcomingWave}
+          <div class="next-wave-badge">
+            {#if upcomingWave.startDate > now}
+              Next Wave starts {formatDate(upcomingWave.startDate, 'onlyDay')}
+            {:else if upcomingWave.endDate > now}
               <PulsatingCircle />
-              Active cycle until {formatDate(upcomingCycle.endDate, 'onlyDay')}
+              Active Wave until {formatDate(upcomingWave.endDate, 'onlyDay')}
             {/if}
           </div>
         {/if}
-        <h1>{wave.name} Wave</h1>
-        <p style:color="var(--color-foreground-level-6)">{wave.description}</p>
+        <h1>{waveProgram.name}</h1>
+        <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
       </div>
     </a>
   {/each}
@@ -71,7 +71,7 @@
     width: 100%;
   }
 
-  .wave-item {
+  .wave-program-item {
     padding: 1rem;
     border-radius: 1rem 0 1rem 1rem;
     display: flex;
@@ -84,13 +84,13 @@
     flex-wrap: wrap;
   }
 
-  .wave-item:hover:not(:active),
-  .wave-item:focus-visible {
+  .wave-program-item:hover:not(:active),
+  .wave-program-item:focus-visible {
     box-shadow: var(--elevation-medium);
     transform: translateY(-2px);
   }
 
-  .next-cycle-badge {
+  .next-wave-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;

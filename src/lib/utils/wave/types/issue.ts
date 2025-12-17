@@ -2,10 +2,10 @@ import z from 'zod';
 import { waveUserDtoSchema } from './user';
 import { filterSchema } from './filter';
 import { repoDtoSchema } from './repo';
-import { complexitySchema, waveCycleDtoSchema } from './wave';
+import { complexitySchema, waveDtoSchema } from './waveProgram';
 
 export const assignedApplicantDtoSchema = waveUserDtoSchema.extend({
-  waveId: z.uuid(),
+  waveProgramId: z.uuid(),
   dueDate: z.coerce.date(),
 });
 export type AssignedApplicantDto = z.infer<typeof assignedApplicantDtoSchema>;
@@ -16,15 +16,15 @@ export const issueFilters = filterSchema(
   z.object({
     orgId: z.uuid().optional(),
     repoId: z.uuid().optional(),
-    waveId: z.uuid().optional(),
+    waveProgramId: z.uuid().optional(),
     state: z.enum(['open', 'closed']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
     mine: booleanString.optional(),
     applicantAssigned: booleanString.optional(),
-    isInWave: booleanString.optional(),
+    isInWaveProgram: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
     appliedToByUser: z.uuid().optional(),
-    eligibleForWave: booleanString.optional(),
+    eligibleForWaveProgram: booleanString.optional(),
     hasApplications: booleanString.optional(),
     hasPr: booleanString.optional(),
     search: z.string().optional(),
@@ -52,12 +52,12 @@ export const issueDetailsDtoSchema = z.object({
   repo: repoDtoSchema,
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  waveId: z.uuid().nullable(),
+  waveProgramId: z.uuid().nullable(),
   complexity: complexitySchema.nullable(),
   points: z.number().int().nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
-  resolvedInCycle: waveCycleDtoSchema.nullable(),
+  resolvedInWave: waveDtoSchema.nullable(),
   hasPr: z.boolean(),
 });
 export type IssueDetailsDto = z.infer<typeof issueDetailsDtoSchema>;

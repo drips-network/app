@@ -81,8 +81,10 @@
   </div>
 
   {#snippet actions()}
-    <Button icon={ArrowRight} variant="primary" href="/wave/maintainer-onboarding/apply-to-wave"
-      >Continue to Apply to Wave</Button
+    <Button
+      icon={ArrowRight}
+      variant="primary"
+      href="/wave/maintainer-onboarding/apply-to-wave-program">Continue</Button
     >
   {/snippet}
 </FlowStepWrapper>

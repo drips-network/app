@@ -4,7 +4,7 @@ export const load = (context) =>
   issuesPageLayoutLoad(context, (user) => ({
     requireLogin: true,
     preappliedFilters: {
-      isInWave: true,
+      isInWaveProgram: true,
       appliedToByUser: user?.id,
     },
     pathPrefix: '/wave/contributors/issues/',

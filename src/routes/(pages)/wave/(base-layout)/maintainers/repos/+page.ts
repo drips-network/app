@@ -1,17 +1,17 @@
-import { getOwnWaveRepos, getWaves } from '$lib/utils/wave/waves.js';
+import { getOwnWaveProgramRepos, getWavePrograms } from '$lib/utils/wave/wavePrograms.js';
 
 export const load = async ({ fetch, depends }) => {
   depends('wave:orgs-and-repos');
 
-  const [waveRepos, waves] = await Promise.all([
+  const [waveProgramRepos, wavePrograms] = await Promise.all([
     // todo(wave): pagination
-    getOwnWaveRepos(fetch, { limit: 100 }),
+    getOwnWaveProgramRepos(fetch, { limit: 100 }),
     // todo(wave): Only fetch waves included in the repos list
-    getWaves(fetch, { limit: 100 }),
+    getWavePrograms(fetch, { limit: 100 }),
   ]);
 
   return {
-    waveRepos,
-    waves,
+    waveProgramRepos,
+    wavePrograms,
   };
 };

@@ -4,8 +4,8 @@ import { waveUserDtoSchema } from './user';
 
 export const leaderboardFiltersSchema = filterSchema(
   z.object({
-    cycleId: z.uuid().optional(),
     waveId: z.uuid().optional(),
+    waveProgramId: z.uuid(),
   }),
 );
 export type LeaderboardFilters = z.infer<typeof leaderboardFiltersSchema>;

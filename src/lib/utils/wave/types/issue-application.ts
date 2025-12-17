@@ -23,7 +23,7 @@ export const issueApplicationDtoSchema = z.object({
   applicationText: z.string(),
   status: issueApplicationStatusSchema,
   appliedAt: z.coerce.date(),
-  cycleId: z.uuid(),
+  waveId: z.uuid(),
   reviewedAt: z.coerce.date().nullable(),
   reviewedByUserId: z.uuid().nullable(),
   removedAt: z.coerce.date().nullable(),
@@ -51,7 +51,7 @@ export const issueApplicationFiltersSchema = filterSchema(
     includeRemoved: z.boolean().optional(),
     status: issueApplicationStatusSchema.optional(),
     statusNot: issueApplicationStatusSchema.optional(),
-    cycleId: z.union([z.uuid(), z.literal('current')]).optional(),
+    waveId: z.union([z.uuid(), z.literal('current')]).optional(),
     applicantId: z.uuid().optional(),
   }),
 );

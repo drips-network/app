@@ -3,7 +3,7 @@ import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
 import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { PaginatedResponse } from '$lib/utils/wave/types/pagination';
-import type { WaveDto } from '$lib/utils/wave/types/wave';
+import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
 import { error } from '@sveltejs/kit';
 
 export const issuePageLoad = async (
@@ -13,7 +13,10 @@ export const issuePageLoad = async (
     params,
   }: {
     fetch: typeof global.fetch;
-    parent: () => Promise<{ issues: PaginatedResponse<IssueDetailsDto>; waves: WaveDto[] }>;
+    parent: () => Promise<{
+      issues: PaginatedResponse<IssueDetailsDto>;
+      wavePrograms: WaveProgramDto[];
+    }>;
     params: { issueId: string };
   },
   config: (issue: IssueDetailsDto) => {
@@ -21,9 +24,11 @@ export const issuePageLoad = async (
     backToConfig: { label: string; href: string };
     allowAddingOrRemovingWave: boolean;
     headMetaTitle: string;
+
+    // todo(wave): Add option to block viewing an issue if it's not ones own (e.g. on maintainers issues view)
   },
 ) => {
-  const { issues, waves } = await parent();
+  const { issues, wavePrograms } = await parent();
 
   // issues is paginated so may not include the issue. in this case, fetch it directly
 
@@ -39,19 +44,19 @@ export const issuePageLoad = async (
     }
   }
 
+  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle } = config(issue);
+
   // todo(wave): what if more than 100 applications?
-  const applicationsPromise = issue.waveId
-    ? getIssueApplications(fetch, issue.waveId, issue.id, { limit: 100 })
+  const applicationsPromise = issue.waveProgramId
+    ? getIssueApplications(fetch, issue.waveProgramId, issue.id, { limit: 100 })
     : null;
 
-  const partOfWave = waves.find((wave) => wave.id === issue.waveId) ?? null;
-
-  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle } = config(issue);
+  const partOfWaveProgram = wavePrograms.find((wave) => wave.id === issue.waveProgramId) ?? null;
 
   let givenCompliments: IssueComplimentDto[] = [];
 
-  if (issue.state === 'closed' && issue.assignedApplicant && issue.waveId) {
-    const complimentsRes = await getComplimentsForIssue(fetch, issue.waveId, issue.id);
+  if (issue.state === 'closed' && issue.assignedApplicant && issue.waveProgramId) {
+    const complimentsRes = await getComplimentsForIssue(fetch, issue.waveProgramId, issue.id);
 
     givenCompliments = complimentsRes.compliments;
   }
@@ -59,7 +64,7 @@ export const issuePageLoad = async (
   return {
     issues,
     issue,
-    partOfWave,
+    partOfWaveProgram,
     allowAddingOrRemovingWave: allowAddingOrRemovingWave,
     backToConfig: backToConfig,
     headMetaTitle: headMetaTitle,

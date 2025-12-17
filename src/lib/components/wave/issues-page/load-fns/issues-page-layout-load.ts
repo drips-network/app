@@ -7,7 +7,7 @@ import {
   type IssueFilters,
   type IssueSortByOption,
 } from '$lib/utils/wave/types/issue';
-import { getOwnWaveRepos, getWaves } from '$lib/utils/wave/waves';
+import { getOwnWaveProgramRepos, getWavePrograms } from '$lib/utils/wave/wavePrograms';
 import { redirect } from '@sveltejs/kit';
 import type { ComponentProps } from 'svelte';
 
@@ -34,7 +34,7 @@ export const issuesPageLayoutLoad = async (
     filtersMode: 'maintainer' | 'contributor' | 'wave';
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
     availableSortByOptions?: IssueSortByOption[];
-    allowAddToWave?: boolean;
+    allowAddToWaveProgram?: boolean;
     headMetaTitle: string;
     showNewApplicationsBadge?: boolean;
   },
@@ -51,7 +51,7 @@ export const issuesPageLayoutLoad = async (
     breadcrumbs,
     viewKey,
     availableSortByOptions,
-    allowAddToWave,
+    allowAddToWaveProgram,
     headMetaTitle = 'Issues',
     defaultFilters,
     showNewApplicationsBadge,
@@ -106,12 +106,12 @@ export const issuesPageLayoutLoad = async (
 
   // fetch data
 
-  const [issues, waveRepos, waves] = await Promise.all([
+  const [issues, waveProgramRepos, wavePrograms] = await Promise.all([
     getIssues(fetch, { limit: 10 }, filters, sortBy),
     // todo(wave): pagination
-    user ? (await getOwnWaveRepos(fetch, { limit: 100 })).data : [],
+    user ? (await getOwnWaveProgramRepos(fetch, { limit: 100 })).data : [],
     // todo(wave): Only fetch waves included in the issues list
-    (await getWaves(fetch, { limit: 100 })).data,
+    (await getWavePrograms(fetch, { limit: 100 })).data,
   ]);
 
   const isViewingIssue = params.issueId !== undefined;
@@ -120,8 +120,8 @@ export const issuesPageLayoutLoad = async (
     issues,
     appliedFilters: filters,
     appliedSort: sortBy,
-    waveRepos,
-    waves,
+    waveProgramRepos,
+    wavePrograms,
     pathPrefix,
     ownUserId: user?.id ?? null,
     noOfPreappliedFilters: Object.keys(preappliedFilters ?? {}).length,
@@ -129,7 +129,7 @@ export const issuesPageLayoutLoad = async (
     breadcrumbs,
     viewKey,
     availableSortByOptions: availableSortByOptions ?? ['updatedAt', 'createdAt'],
-    allowAddToWave: allowAddToWave ?? false,
+    allowAddToWaveProgram: allowAddToWaveProgram ?? false,
     isViewingIssue,
     headMetaTitle,
     showNewApplicationsBadge,

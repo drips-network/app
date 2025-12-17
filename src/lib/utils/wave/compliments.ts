@@ -5,13 +5,13 @@ import parseRes from './utils/parse-res';
 
 export async function makeCompliment(
   f = fetch,
-  waveId: string,
+  waveProgramId: string,
   issueId: string,
   compliments: {
     type: ComplimentType;
   }[],
 ) {
-  return authenticatedCall(f, `/api/waves/${waveId}/compliments`, {
+  return authenticatedCall(f, `/api/wave-programs/${waveProgramId}/compliments`, {
     method: 'POST',
     body: JSON.stringify(
       compliments.map((v) => ({
@@ -22,13 +22,17 @@ export async function makeCompliment(
   });
 }
 
-export async function getComplimentsForIssue(f = fetch, waveId: string, issueId: string) {
+export async function getComplimentsForIssue(f = fetch, waveProgramId: string, issueId: string) {
   return parseRes(
     z.object({
       compliments: z.array(issueComplimentDtoSchema),
     }),
-    await authenticatedCall(f, `/api/waves/${waveId}/issues/${issueId}/compliments`, {
-      method: 'GET',
-    }),
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/compliments`,
+      {
+        method: 'GET',
+      },
+    ),
   );
 }

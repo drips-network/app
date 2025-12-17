@@ -1,4 +1,3 @@
-import { getWave } from '$lib/utils/wave/waves.js';
 import { error } from '@sveltejs/kit';
 import { ShareImageType } from './types.js';
 import { gql } from 'graphql-request';
@@ -17,18 +16,19 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
 import { getRound } from '$lib/utils/rpgf/rpgf.js';
+import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
 
 function isShareImageType(value: string): value is ShareImageType {
   return Object.values(ShareImageType).includes(value as ShareImageType);
 }
 
-async function loadWaveData(f: typeof fetch, id: string) {
-  const wave = await getWave(f, id);
+async function loadWaveProgramData(f: typeof fetch, id: string) {
+  const wave = await getWaveProgram(f, id);
   if (!wave) return null;
 
   return {
     bgColor: '#5555FF',
-    type: 'Wave',
+    type: 'Wave Program',
     headline: wave.name,
     avatarSrc: wave.avatarUrl,
     stats: [],
@@ -231,7 +231,7 @@ async function loadRpgfRoundData(f: typeof fetch, id: string) {
 }
 
 const LOAD_FNS = {
-  [ShareImageType.WAVE]: loadWaveData,
+  [ShareImageType.WAVE_PROGRAM]: loadWaveProgramData,
   [ShareImageType.PROJECT]: loadProjectData,
   [ShareImageType.DRIP_LIST]: loadDripListData,
   [ShareImageType.ECOSYSTEM]: loadEcosystemData,

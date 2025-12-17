@@ -14,8 +14,8 @@ import parseRes from './utils/parse-res';
 
 export async function getLeaderboard(
   f = fetch,
+  filters: LeaderboardFilters,
   pagination?: PaginationInput,
-  filters: LeaderboardFilters = {},
 ) {
   return parseRes(
     paginatedResponseSchema(leaderboardEntryDtoSchema),

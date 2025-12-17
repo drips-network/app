@@ -37,7 +37,7 @@
     if (!mobileMode) return;
     if (!user) return;
 
-    cupertinoPaneStore.openSheet(UserMenu, { user });
+    cupertinoPaneStore.openSheet(UserMenu, { user, noBackground: true });
   }
 </script>
 
@@ -89,7 +89,7 @@
         onclickWhileDisabled={handleMobileUserMenuClick}
       >
         {#snippet trigger()}
-          <GithubUserBadge {user} size={32} hideName />
+          <GithubUserBadge {user} size={32} hideName link={!mobileMode} />
         {/snippet}
 
         {#snippet content()}
