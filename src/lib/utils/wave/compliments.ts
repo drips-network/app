@@ -1,6 +1,10 @@
 import z from 'zod';
 import { authenticatedCall } from './call';
-import { issueComplimentDtoSchema, type ComplimentType } from './types/compliment';
+import {
+  issueComplimentDtoSchema,
+  userComplimentCountsResponseSchema,
+  type ComplimentType,
+} from './types/compliment';
 import parseRes from './utils/parse-res';
 
 export async function makeCompliment(
@@ -34,5 +38,17 @@ export async function getComplimentsForIssue(f = fetch, waveProgramId: string, i
         method: 'GET',
       },
     ),
+  );
+}
+
+export async function getComplimentCountSummaryForUser(f = fetch, userId: string) {
+  return parseRes(
+    userComplimentCountsResponseSchema,
+    await authenticatedCall(f, `/api/users/${userId}/compliments`, {
+      method: 'GET',
+    }),
+    {
+      expect404: true,
+    },
   );
 }

@@ -15,6 +15,7 @@ export const load = async ({ url }) => {
   const parsedState = z
     .object({
       backTo: z.string().optional().nullable(),
+      skipWelcome: z.boolean().optional(),
     })
     .safeParse(stateJson);
 
@@ -22,9 +23,7 @@ export const load = async ({ url }) => {
     throw error(400, 'Invalid state parameter');
   }
 
-  const { backTo } = parsedState.data;
-
-  const skipWelcome = url.searchParams.get('skip_welcome') === 'true';
+  const { backTo, skipWelcome } = parsedState.data;
 
   if (newUser && !skipWelcome) {
     return redirect(302, `/wave/welcome?backTo=${backTo || ''}`);

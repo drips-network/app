@@ -12,7 +12,9 @@ export async function getOwnPointsBalance(f = fetch) {
 }
 
 export async function getPointsBalanceForUser(f = fetch, userId: string) {
-  return parseRes(pointsDtoSchema, await authenticatedCall(f, `/api/points/balance/${userId}`));
+  return parseRes(pointsDtoSchema, await authenticatedCall(f, `/api/points/balance/${userId}`), {
+    expect404: true,
+  });
 }
 
 export async function getOwnPointsHistory(f = fetch, pagination?: PaginationInput) {

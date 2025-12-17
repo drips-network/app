@@ -10,4 +10,4 @@
 <h1>Sign in to Drips Wave</h1>
 <p>To start using Drips Wave, please sign in with your GitHub account.</p>
 
-<LogInButton primary wordy backTo={data.backTo || '/wave'} />
+<LogInButton primary wordy backTo={data.backTo || '/wave'} skipWelcome={data.skipWelcome} />

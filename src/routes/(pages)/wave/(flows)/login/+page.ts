@@ -5,17 +5,20 @@ export const load = async ({ url, parent }) => {
   const { user } = await parent();
 
   const backTo = url.searchParams.get('backTo');
-  const decoded = decodeURIComponent(backTo || '');
+  const decodedBackTo = decodeURIComponent(backTo || '');
 
   if (backTo && user) {
-    const isSafe = isSafePath(decoded);
+    const isSafe = isSafePath(decodedBackTo);
 
-    if (isSafe) redirect(301, decoded);
+    if (isSafe) redirect(301, decodedBackTo);
   } else if (user) {
     redirect(301, '/wave');
   }
 
+  const skipWelcome = url.searchParams.get('skipWelcome') === 'true';
+
   return {
-    backTo: decoded,
+    backTo: decodedBackTo,
+    skipWelcome,
   };
 };

@@ -10,7 +10,7 @@ export const load = async ({ parent, fetch, params, url }) => {
   const { waveProgramId, issueId } = params;
 
   if (!user) {
-    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}&skip_welcome=true`);
+    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}&skipWelcome=true`);
   }
 
   const [issue, waveProgram, ownOrgs] = await Promise.all([

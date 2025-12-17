@@ -1,3 +1,8 @@
+import FastAndEasy from '$lib/components/wave/compliment-illustrations/fast-and-easy.svelte';
+import GoodCommunicator from '$lib/components/wave/compliment-illustrations/good-communicator.svelte';
+import HighQualityCode from '$lib/components/wave/compliment-illustrations/high-quality-code.svelte';
+import ProblemSolver from '$lib/components/wave/compliment-illustrations/problem-solver.svelte';
+import type { Component } from 'svelte';
 import z from 'zod';
 
 export enum ComplimentType {
@@ -7,22 +12,29 @@ export enum ComplimentType {
   PROBLEM_SOLVER = 'problem_solver',
 }
 
-export const COMPLIMENT_TYPES: Record<ComplimentType, { label: string; points: number }> = {
+export const COMPLIMENT_TYPES: Record<
+  ComplimentType,
+  { label: string; points: number; illustration: Component }
+> = {
   [ComplimentType.GOOD_COMMUNICATOR]: {
     label: 'Good Communicator',
     points: 50,
+    illustration: GoodCommunicator,
   },
   [ComplimentType.FAST_AND_EASY]: {
     label: 'Fast & Easy',
     points: 50,
+    illustration: FastAndEasy,
   },
   [ComplimentType.HIGH_QUALITY_CODE]: {
     label: 'High-Quality Code',
     points: 50,
+    illustration: HighQualityCode,
   },
   [ComplimentType.PROBLEM_SOLVER]: {
     label: 'Problem Solver',
     points: 50,
+    illustration: ProblemSolver,
   },
 } as const;
 
@@ -43,3 +55,18 @@ export const issueComplimentDtoSchema = z.object({
   createdAt: z.coerce.date(),
 });
 export type IssueComplimentDto = z.infer<typeof issueComplimentDtoSchema>;
+
+export const complimentCountSummarySchema = z.object({
+  complimentType: complimentTypeSchema,
+  label: z.string(),
+  points: z.number().int(),
+  count: z.number().int().nonnegative(),
+});
+export type ComplimentCountSummary = z.infer<typeof complimentCountSummarySchema>;
+
+export const userComplimentCountsResponseSchema = z.object({
+  userId: z.uuid(),
+  totals: z.array(complimentCountSummarySchema),
+  totalReceived: z.number().int().nonnegative(),
+});
+export type UserComplimentCountsResponse = z.infer<typeof userComplimentCountsResponseSchema>;

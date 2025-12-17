@@ -6,33 +6,16 @@
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import type { Items } from '$lib/components/list-select/list-select.types';
   import { COMPLIMENT_TYPES, ComplimentType } from '$lib/utils/wave/types/compliment';
-  import Card from '$lib/components/wave/card/card.svelte';
-  import ListSelect from '$lib/components/list-select/list-select.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import { makeCompliment } from '$lib/utils/wave/compliments';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import ComplimentCard from '$lib/components/wave/compliment-card/compliment-card.svelte';
 
   let { data } = $props();
-  const { canMakeCompliment, complimentDeadline, reason, previousCompliments } = data;
+  let { canMakeCompliment, complimentDeadline, reason, previousCompliments } = $derived(data);
 
   let submitting = $state(false);
-
-  let compliments: Items = $derived(
-    Object.fromEntries(
-      Object.values(ComplimentType).map((type) => [
-        type,
-        {
-          type: 'selectable',
-          label: COMPLIMENT_TYPES[type].label,
-          text: `${COMPLIMENT_TYPES[type].points} Points`,
-          value: type,
-          disabled: previousCompliments?.compliments.some((c) => c.complimentType === type),
-        },
-      ]),
-    ),
-  );
 
   let selected = $state<ComplimentType[]>([]);
 
@@ -98,10 +81,37 @@
     </AnnotationBox>
   {/if}
 
-  <FormField title="Compliment type*" type="div" disabled={!canMakeCompliment}>
-    <Card style="padding: 0; text-align: left; width: 100%;">
-      <ListSelect multiselect searchable={false} items={compliments} bind:selected />
-    </Card>
+  <FormField
+    title="Compliments to give*"
+    description="Each compliment can be given once per issue."
+    type="div"
+    disabled={!canMakeCompliment}
+  >
+    <div class="compliments-grid">
+      {#each Object.values(ComplimentType) as type (type)}
+        {@const { label: title, points, illustration } = COMPLIMENT_TYPES[type]}
+        {@const disabled = Boolean(
+          previousCompliments?.compliments.find((c) => c.complimentType === type),
+        )}
+        <label class:selected={selected.includes(type)} for={type} class:disabled>
+          <input
+            type="checkbox"
+            checked={selected.includes(type)}
+            oninput={(e) => {
+              if (e.currentTarget.checked) {
+                selected = [...selected, type];
+              } else {
+                selected = selected.filter((t) => t !== type);
+              }
+            }}
+            id={type}
+            value={type}
+            {disabled}
+          />
+          <ComplimentCard {title} {illustration} {points} />
+        </label>
+      {/each}
+    </div>
   </FormField>
 
   {#snippet leftActions()}
@@ -118,3 +128,51 @@
     >
   {/snippet}
 </FlowStepWrapper>
+
+<style>
+  .compliments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+  }
+
+  .compliments-grid label {
+    transform: scale(0.95);
+    opacity: 0.7;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+    cursor: pointer;
+    filter: grayscale(0.5);
+  }
+
+  .compliments-grid input {
+    /* Remove display: none so the browser "sees" it */
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+    /* Ensure it doesn't mess with layout */
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .compliments-grid label.disabled {
+    pointer-events: none;
+    opacity: 0.25;
+    cursor: default;
+    filter: grayscale(1);
+  }
+
+  .compliments-grid label:hover:not(.selected):not(.disabled),
+  .compliments-grid label:focus-within:not(.selected):not(.disabled) {
+    filter: grayscale(0.25);
+    opacity: 0.8;
+  }
+
+  .compliments-grid label.selected {
+    transform: scale(1);
+    opacity: 1;
+    filter: grayscale(0);
+  }
+</style>

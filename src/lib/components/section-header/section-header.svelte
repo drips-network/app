@@ -8,6 +8,7 @@
   interface Props {
     icon?: Component | undefined;
     label: string;
+    count?: number;
     actions?: {
       handler?: (event: MouseEvent) => void;
       href?: string;
@@ -28,6 +29,7 @@
   let {
     icon = undefined,
     label,
+    count = undefined,
     actions = [],
     actionsDisabled = false,
     anchorTarget = undefined,
@@ -58,6 +60,13 @@
       </div>
     {/if}
     <h3>{label}</h3>
+
+    {#if count !== undefined}
+      <div class="count typo-text-bold">
+        {count}
+      </div>
+    {/if}
+
     {#if infoTooltip}
       <Tooltip>
         <InfoCircle style="height: 1.5rem; width: 1.5rem;" />
@@ -73,7 +82,7 @@
     {/if}
   </div>
   <div class="actions">
-    {#each actions as action}
+    {#each actions as action (action.label)}
       <Button
         disabled={action.disabled || actionsDisabled}
         loading={action.loading}
@@ -177,6 +186,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .count {
+    background-color: var(--color-foreground-level-2);
+    padding: 0rem 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   @media (max-width: 768px) {

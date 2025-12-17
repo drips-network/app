@@ -110,6 +110,7 @@
     justify-content: space-between;
     gap: 1rem;
     margin-top: 2rem;
+    flex-wrap: wrap;
   }
 
   .actions > .right {

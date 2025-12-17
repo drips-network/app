@@ -38,22 +38,22 @@
 
 <Card>
   <a href={issueUrl} target="_blank" rel="noopener noreferrer" class="issue-preview-card">
-    <div class="top-row">
-      <RepoBadge size="small" repo={issue.repo} />
-    </div>
-
     {#if badges.length > 0}
       <div class="badges">
-        {#each badges as { text, color, backgroundColor }}
+        {#each badges as { text, color, backgroundColor } (text)}
           {@render badge(text, color, backgroundColor)}
         {/each}
       </div>
     {/if}
 
-    <h3 class="typo-text-bold title">
+    <h3 class="typo-text-bold title line-clamp-2">
       <span class="issue-number-badge">#{issue.gitHubIssueNumber}</span>
       {issue.title}
     </h3>
+
+    <div class="bottom-row">
+      <RepoBadge size="small" repo={issue.repo} />
+    </div>
   </a>
 </Card>
 
@@ -64,13 +64,15 @@
     gap: 0.75rem;
     background-color: var(--color-background);
     text-align: left;
+    height: 100%;
   }
 
-  .top-row {
+  .bottom-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
+    margin-top: auto;
   }
 
   .badges {
