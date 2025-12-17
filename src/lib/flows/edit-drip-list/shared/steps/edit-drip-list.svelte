@@ -53,7 +53,6 @@
   import { invalidateAll } from '$app/navigation';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { buildDripListUpdateTxs } from '$lib/utils/driplist/buildDripListUpdateTxs';
-  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 

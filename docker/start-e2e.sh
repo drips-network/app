@@ -37,11 +37,10 @@ export ARCH
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
-# TODO: REMOVE!
 if [ $PROD_BUILD = true ]; then
-  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true CONTRACTS_TAG=igor-orcid docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml -f docker-compose.e2e.yml up --renew-anon-volumes --detach
 else
-  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true CONTRACTS_TAG=igor-orcid docker compose -f docker-compose.yml up --renew-anon-volumes --detach
+  docker compose build && APP_USE_LOCAL_TESTNET_WALLET_STORE=true docker compose -f docker-compose.yml up --renew-anon-volumes --detach
 fi
 
 rm -rf ./test-data/project-states.json
