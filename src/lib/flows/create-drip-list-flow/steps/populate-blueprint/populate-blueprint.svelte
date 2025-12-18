@@ -11,6 +11,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import type { Writable } from 'svelte/store';
   import type { State } from '../../create-drip-list-flow';
+  import { AddItemError, AddItemSuberror } from '$lib/components/list-editor/errors';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -77,7 +78,9 @@
         let splitsToAdd: Items = {};
         let weightsToAdd: Weights = {};
 
-        for (const split of blueprintSplits) {
+        let errors: Array<AddItemSuberror> = [];
+
+        for (const [index, split] of blueprintSplits.entries()) {
           switch (split.type) {
             case 'address': {
               const recipientResult = await getAddress(split.ethAddress);
@@ -89,6 +92,13 @@
                 };
 
                 weightsToAdd[recipientResult.accountId] = split.weight;
+              } else {
+                const error = new AddItemSuberror(
+                  "We couldn't process this address.",
+                  split.ethAddress,
+                  index + 1,
+                );
+                errors.push(error);
               }
 
               break;
@@ -104,7 +114,15 @@
                 };
 
                 weightsToAdd[recipientResult.accountId] = split.weight;
+              } else {
+                const error = new AddItemSuberror(
+                  "We couldn't process this project.",
+                  split.repoName,
+                  index + 1,
+                );
+                errors.push(error);
               }
+
               break;
             }
 
@@ -118,6 +136,13 @@
                 };
 
                 weightsToAdd[recipientResult.accountId] = split.weight;
+              } else {
+                const error = new AddItemSuberror(
+                  "We couldn't process this drip list.",
+                  split.accountId,
+                  index + 1,
+                );
+                errors.push(error);
               }
 
               break;
@@ -134,12 +159,32 @@
                   };
 
                   weightsToAdd[recipientResult.accountId] = split.weight;
+                } else {
+                  const error = new AddItemSuberror(
+                    "We couldn't process this ORCID iD.",
+                    split.orcidId,
+                    index + 1,
+                  );
+                  errors.push(error);
                 }
               }
               break;
           }
 
           splitsProcessed++;
+        }
+
+        if (errors.length) {
+          const recipientError = new AddItemError(
+            'Some of your blueprint recipients were invalid',
+            'error',
+            'They won’t be included in your splits.',
+            errors,
+          );
+          context.update((c) => {
+            c.recipientErrors = [recipientError];
+            return c;
+          });
         }
 
         $context.dripList.items = splitsToAdd;
