@@ -12,7 +12,7 @@
         return 'Something went wrong on our end.';
       }
       default: {
-        return 'Something went wrong.';
+        return page.error?.message || 'Something went wrong.';
       }
     }
   });

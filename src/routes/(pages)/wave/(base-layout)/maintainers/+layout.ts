@@ -8,7 +8,10 @@ export const load = async ({ parent, fetch, url }) => {
     throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
   }
 
-  const userOrgs = await getOrgs(fetch, { limit: 1 });
+  // todo(wave): avoid fetching all orgs here
+  // we currently do that so that the single issues page can check whether
+  // the issue is part of the user's orgs
+  const userOrgs = await getOrgs(fetch, { limit: 100 });
 
   const hasOrgs = userOrgs.data.length > 0;
 
@@ -18,5 +21,6 @@ export const load = async ({ parent, fetch, url }) => {
 
   return {
     hasOrgs,
+    userOrgs,
   };
 };

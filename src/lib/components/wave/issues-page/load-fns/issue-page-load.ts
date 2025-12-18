@@ -25,7 +25,13 @@ export const issuePageLoad = async (
     allowAddingOrRemovingWave: boolean;
     headMetaTitle: string;
 
-    // todo(wave): Add option to block viewing an issue if it's not ones own (e.g. on maintainers issues view)
+    /** Prevent viewing the issue artificially (e.g. on maintainers view, we only want to show
+     * issues from the user's own orgs)
+    ) */
+    block?: {
+      errorCode: number;
+      message: string;
+    } | null;
   },
 ) => {
   const { issues, wavePrograms } = await parent();
@@ -44,7 +50,11 @@ export const issuePageLoad = async (
     }
   }
 
-  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle } = config(issue);
+  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle, block } = config(issue);
+
+  if (block) {
+    throw error(block.errorCode, block.message);
+  }
 
   // todo(wave): what if more than 100 applications?
   const applicationsPromise = issue.waveProgramId
