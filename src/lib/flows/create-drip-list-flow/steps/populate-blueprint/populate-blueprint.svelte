@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { BlueprintOrBlueprintError } from '../../../../utils/blueprints/schemas';
-  import type { Items, Weights } from '$lib/components/list-editor/types';
+  import type { BlueprintOrBlueprintError, Split } from '../../../../utils/blueprints/schemas';
+  import type { Items, Weights, ListEditorItem, RecipientResult } from '$lib/components/list-editor/types';
   import {
     getAddress,
     getDripList,
@@ -80,94 +80,99 @@
 
         let errors: Array<AddItemSuberror> = [];
 
+        const processRecipient = async (
+          promise: Promise<RecipientResult>,
+          splitType: Split['type'],
+          identifier: string,
+          errorMessage: string,
+          weight: number,
+          itemIndex: number
+        ) => {
+          const result = await promise;
+
+          let key: keyof Omit<NonNullable<RecipientResult>, 'accountId'>;
+          let type: ListEditorItem['type'];
+
+          switch (splitType) {
+            case 'address':
+              key = 'address';
+              type = 'address';
+              break;
+            case 'project':
+              key = 'project';
+              type = 'project';
+              break;
+            case 'drip-list':
+              key = 'dripList';
+              type = 'drip-list';
+              break;
+            case 'orcid-id':
+              key = 'orcid';
+              type = 'orcid';
+              break;
+          }
+
+          if (result && result[key]) {
+            splitsToAdd[result.accountId] = {
+              type,
+              [key]: result[key],
+            } as any;
+
+            weightsToAdd[result.accountId] = weight;
+          } else {
+            const error = new AddItemSuberror(
+              errorMessage,
+              identifier,
+              itemIndex + 1,
+            );
+            errors.push(error);
+          }
+        };
+
         for (const [index, split] of blueprintSplits.entries()) {
           switch (split.type) {
-            case 'address': {
-              const recipientResult = await getAddress(split.ethAddress);
-
-              if (recipientResult && recipientResult.address) {
-                splitsToAdd[recipientResult.accountId] = {
-                  type: 'address',
-                  address: recipientResult.address,
-                };
-
-                weightsToAdd[recipientResult.accountId] = split.weight;
-              } else {
-                const error = new AddItemSuberror(
-                  "We couldn't process this address.",
-                  split.ethAddress,
-                  index + 1,
-                );
-                errors.push(error);
-              }
-
+            case 'address':
+              await processRecipient(
+                getAddress(split.ethAddress),
+                split.type,
+                split.ethAddress,
+                "This address is invalid.",
+                split.weight,
+                index
+              );
               break;
-            }
 
-            case 'project': {
-              const recipientResult = await getProject(`https://github.com/${split.repoName}`);
-
-              if (recipientResult && recipientResult.project) {
-                splitsToAdd[recipientResult.accountId] = {
-                  type: 'project',
-                  project: recipientResult.project,
-                };
-
-                weightsToAdd[recipientResult.accountId] = split.weight;
-              } else {
-                const error = new AddItemSuberror(
-                  "We couldn't process this project.",
-                  split.repoName,
-                  index + 1,
-                );
-                errors.push(error);
-              }
-
+            case 'project':
+              await processRecipient(
+                getProject(`https://github.com/${split.repoName}`),
+                split.type,
+                split.repoName,
+                "This project is invalid.",
+                split.weight,
+                index
+              );
               break;
-            }
 
-            case 'drip-list': {
-              const recipientResult = await getDripList(split.accountId);
-
-              if (recipientResult && recipientResult.dripList) {
-                splitsToAdd[recipientResult.accountId] = {
-                  type: 'drip-list',
-                  dripList: recipientResult.dripList,
-                };
-
-                weightsToAdd[recipientResult.accountId] = split.weight;
-              } else {
-                const error = new AddItemSuberror(
-                  "We couldn't process this drip list.",
-                  split.accountId,
-                  index + 1,
-                );
-                errors.push(error);
-              }
-
+            case 'drip-list':
+              await processRecipient(
+                getDripList(split.accountId),
+                split.type,
+                split.accountId,
+                "This drip list is invalid.",
+                split.weight,
+                index
+              );
               break;
-            }
 
             case 'orcid-id':
-              {
-                const recipientResult = await getOrcid(split.orcidId);
-
-                if (recipientResult && recipientResult.orcid) {
-                  splitsToAdd[recipientResult.accountId] = {
-                    type: 'orcid',
-                    orcid: recipientResult.orcid,
-                  };
-
-                  weightsToAdd[recipientResult.accountId] = split.weight;
-                } else {
-                  const error = new AddItemSuberror(
-                    "We couldn't process this ORCID iD.",
-                    split.orcidId,
-                    index + 1,
-                  );
-                  errors.push(error);
-                }
-              }
+              await processRecipient(
+                getOrcid(split.orcidId),
+                split.type,
+                split.orcidId,
+                "This ORCID iD is invalid.",
+                split.weight,
+                index
+              );
               break;
           }
 

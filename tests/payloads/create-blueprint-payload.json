@@ -16,6 +16,11 @@
       "type": "address",
       "ethAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "weight": 333333
+    },
+    {
+      "type": "project",
+      "repoName": "drips-network/drips-network",
+      "weight": 333333
     }
   ]
 }

@@ -178,6 +178,8 @@ test('create drip list with blueprint', async ({ page, request }) => {
 
   // Move past the confirmation that you're using a blueprint
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
+  // There's one invalid recipient, so we should see a warning
+  await expect(page.getByText('Some of your blueprint recipients were invalid').nth(0)).toBeVisible();
   // Move past the configuration of your splits
   await page.getByRole('button', { name: 'Continue' }).nth(0).click();
   // Connect wallet
