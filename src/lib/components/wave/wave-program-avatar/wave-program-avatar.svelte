@@ -12,5 +12,4 @@
   } = $props();
 </script>
 
-<!-- TODO(wave): Proper placeholder -->
-<UserAvatar src={waveProgram.avatarUrl} placeholderSrc="https://placehold.co/128" {size} />
+<UserAvatar src={waveProgram.avatarUrl} {size} />

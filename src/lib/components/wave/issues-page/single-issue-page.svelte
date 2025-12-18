@@ -189,8 +189,8 @@
   style:view-transition-name={`issue-${issue.id}`}
   style:view-transition-class="element-handover"
 >
-  <Card>
-    <div class="issue">
+  <div class="issue">
+    <Card>
       <div class="details-and-description">
         <div class="details">
           <div class="left">
@@ -211,41 +211,40 @@
           <p style:color="var(--color-foreground-level-4)">No description provided.</p>
         {/if}
       </div>
+    </Card>
 
-      {#if issueApplicationsPromise && issue.state === 'open'}
-        <Section
-          header={{
-            label: 'Applications',
-            icon: Ledger,
-            actions: [
-              {
-                label: 'Apply to work on this issue',
-                icon: Ledger,
-                variant: 'primary',
-                disabled: !canApplyToIssue,
-                href: `/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
-              },
-            ],
-            infoTooltip:
-              'Contributors can start applying to work on this issue during active Waves.',
-          }}
-          skeleton={{
-            loaded: !promisePending,
-            empty: applications?.length === 0,
-            emptyStateEmoji: '🫙',
-            emptyStateHeadline: 'No applications yet',
-            emptyStateText: 'No one has applied to work on this issue in the Wave yet.',
-          }}
-        >
-          <div class="applications-grid">
-            {#each applications?.slice(0, 5) as application (application.id)}
-              <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
-            {/each}
-          </div>
-        </Section>
-      {/if}
-    </div>
-  </Card>
+    {#if issueApplicationsPromise && issue.state === 'open'}
+      <Section
+        header={{
+          label: 'Applications',
+          icon: Ledger,
+          actions: [
+            {
+              label: 'Apply to work on this issue',
+              icon: Ledger,
+              variant: 'primary',
+              disabled: !canApplyToIssue,
+              href: `/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
+            },
+          ],
+          infoTooltip: 'Contributors can start applying to work on this issue during active Waves.',
+        }}
+        skeleton={{
+          loaded: !promisePending,
+          empty: applications?.length === 0,
+          emptyStateEmoji: '🫙',
+          emptyStateHeadline: 'No applications yet',
+          emptyStateText: 'No one has applied to work on this issue in the Wave yet.',
+        }}
+      >
+        <div class="applications-grid">
+          {#each applications?.slice(0, 5) as application (application.id)}
+            <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
+          {/each}
+        </div>
+      </Section>
+    {/if}
+  </div>
 
   <div class="sidebar">
     <Card style="height: fit-content; padding: 0; overflow: auto;">
@@ -479,7 +478,7 @@
   .issue {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 2rem;
     min-width: 0;
     height: 100%;
     justify-content: space-between;
@@ -532,6 +531,7 @@
   @media (max-width: 1400px) {
     .wrapper {
       grid-template-columns: 1fr;
+      gap: 2rem;
     }
 
     .sidebar {
