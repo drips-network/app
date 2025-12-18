@@ -4,6 +4,7 @@ import z from 'zod';
 export enum ConsentType {
   AUTHENTICATION = 'authentication',
   INTERCOM = 'intercom',
+  FARO = 'faro',
 }
 
 type ConsentTypeDefinition = {
@@ -31,6 +32,13 @@ export const OPTIONAL_CONSENTS: ConsentTypeDefinition[] = [
       'This cookie enables the Intercom chat widget on the Drips Wave website to provide user support and assistance. It is used to identify you as a returning user and to store your chat history with our support team. Important: Even if initially disabled, Intercom cookies will be set when you later explicitly open the chat widget.',
     required: false,
   },
+  {
+    value: ConsentType.FARO,
+    label: 'Faro Monitoring',
+    description:
+      'Grafana Faro helps us track errors and performance issues on our website to improve your experience. It collects data about how you interact with our site, but does not collect personal information. Note: After turning this off, you may need to refresh the page to fully disable Faro monitoring.',
+    required: false,
+  },
 ];
 
 export const CONSENT_TYPES: ConsentTypeDefinition[] = [...REQUIRED_CONSENTS, ...OPTIONAL_CONSENTS];
@@ -41,6 +49,7 @@ export default (() => {
   const consentMap: Record<ConsentType, boolean> = $state({
     [ConsentType.AUTHENTICATION]: true,
     [ConsentType.INTERCOM]: false,
+    [ConsentType.FARO]: false,
   });
 
   // load from localstorage

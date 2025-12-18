@@ -1,6 +1,6 @@
-import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { getWebInstrumentations, initializeFaro } from '@grafana/faro-web-sdk';
 import { TracingInstrumentation } from '@grafana/faro-web-tracing';
+import getOptionalEnvVar from '../get-optional-env-var/public';
 
 export const init = () => {
   const FARO_ENABLED = getOptionalEnvVar('PUBLIC_FARO_ENABLED', false, null);

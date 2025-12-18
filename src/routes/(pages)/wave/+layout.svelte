@@ -1,6 +1,7 @@
 <script lang="ts">
   import NavProgressBar from '$lib/components/nav-progress-bar/nav-progress-bar.svelte';
   import CookieConsentBanner from '$lib/components/wave/cookie-consent-banner/cookie-consent-banner.svelte';
+  import FaroInitializer from '$lib/utils/faro/faro-initializer.svelte';
   import type { Snippet } from 'svelte';
 
   let { children }: { children?: Snippet } = $props();
@@ -9,6 +10,8 @@
 <div class="nav-progress-bar">
   <NavProgressBar color="var(--color-primary)" />
 </div>
+
+<FaroInitializer />
 
 <CookieConsentBanner />
 
