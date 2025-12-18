@@ -55,6 +55,7 @@
     availableSortByOptions,
     isViewingIssue,
     headMetaTitle,
+    currentWaveProgramId,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -89,6 +90,9 @@
     isViewingIssue: boolean;
 
     headMetaTitle: string;
+
+    /** If in wave mode, the current wave program ID for filters */
+    currentWaveProgramId: string | undefined;
   } = $props();
 
   async function getMoreIssues(
@@ -105,6 +109,7 @@
 
   let filtersOpen = $state<boolean>(false);
 
+  // svelte-ignore non_reactive_update
   let filterConfigInstance: FilterConfig;
 
   function handleFilterClick() {
@@ -359,14 +364,17 @@
 
     <TransitionedHeight removeFromTabIndexWhileCollapsed collapsed={!filtersOpen}>
       <div class="filter-config">
-        <Card>
-          <FilterConfig
-            mode={filtersMode}
-            {ownUserId}
-            bind:this={filterConfigInstance}
-            {appliedFilters}
-            onapply={handleApplyFilters}
-          />
+        <Card style="padding: 0;">
+          {#key appliedFilters}
+            <FilterConfig
+              mode={filtersMode}
+              {ownUserId}
+              bind:this={filterConfigInstance}
+              {appliedFilters}
+              onapply={handleApplyFilters}
+              {currentWaveProgramId}
+            />
+          {/key}
         </Card>
       </div>
     </TransitionedHeight>

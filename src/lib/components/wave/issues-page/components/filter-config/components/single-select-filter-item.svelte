@@ -26,7 +26,7 @@
 </script>
 
 <div class="single-select-filter-item">
-  {#each config.options as { label, value }}
+  {#each config.options as { label, value } (value)}
     <label for={label} class:selected={selected === value}>{label}</label>
     <input
       onchange={(e) => handleSelect(e)}
@@ -40,12 +40,26 @@
 </div>
 
 <style>
+  .single-select-filter-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   label {
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-radius: 0.5rem;
     border: 1px solid var(--color-foreground-level-3);
     user-select: none;
+    transition:
+      border-color 0.3s,
+      background-color 0.3s;
+  }
+
+  label:hover,
+  label:focus-within {
+    background-color: var(--color-foreground-level-2);
   }
 
   label.selected {

@@ -4,4 +4,12 @@ export type SingleSelectConfig<OT extends { label: string; value: string }[]> = 
   options: OT;
 };
 
-export type FilterConfig = SingleSelectConfig<{ label: string; value: string }[]>;
+export type DropdownConfig<OT extends { label: string; value: string }[]> = {
+  type: 'dropdown';
+  label: string;
+  optionsPromise: Promise<OT>;
+};
+
+export type FilterConfig =
+  | SingleSelectConfig<{ label: string; value: string }[]>
+  | DropdownConfig<{ label: string; value: string }[]>;

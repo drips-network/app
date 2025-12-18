@@ -2,6 +2,8 @@
   export const AVAILABLE_FILTERS = (
     ownUserId: string | null,
     mode: 'maintainer' | 'contributor' | 'wave',
+    /** The wave ID if mode is `wave`. Used to fetch available repo filters */
+    currentWaveProgramId?: string,
   ): Partial<Record<keyof IssueFilters, FilterConfig>> =>
     ({
       state: {
@@ -87,6 +89,45 @@
         ],
       },
 
+      ...(mode === 'maintainer' || mode === 'wave'
+        ? {
+            repoId: {
+              type: 'dropdown',
+              label: 'Repository',
+              optionsPromise: (async () => {
+                if (mode === 'wave') {
+                  if (!currentWaveProgramId) {
+                    throw new Error('currentWaveId is required for wave mode');
+                  }
+
+                  const { data: reposInWave } = await getWaveProgramRepos(
+                    undefined,
+                    currentWaveProgramId,
+                    // todo(wave): pagination
+                    { limit: 100 },
+                  );
+
+                  return reposInWave.map((waveProgramRepo) => ({
+                    label: waveProgramRepo.repo.gitHubRepoFullName,
+                    value: waveProgramRepo.repo.id,
+                  }));
+                } else {
+                  const { data: allRepos } = await getOwnWaveProgramRepos(
+                    undefined,
+                    // todo(wave): pagination
+                    { limit: 100 },
+                  );
+
+                  return allRepos.map((waveProgramRepo) => ({
+                    label: waveProgramRepo.repo.gitHubRepoFullName,
+                    value: waveProgramRepo.repo.id,
+                  }));
+                }
+              })(),
+            },
+          }
+        : {}),
+
       ...(mode === 'maintainer'
         ? {
             isInWaveProgram: {
@@ -107,6 +148,8 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
+  import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
+  import DropdownFilterItem from './components/dropdown-filter-item.svelte';
   import SingleSelectFilterItem from './components/single-select-filter-item.svelte';
   import type { FilterConfig } from './types';
 
@@ -115,11 +158,13 @@
     appliedFilters,
     ownUserId,
     mode,
+    currentWaveProgramId,
   }: {
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
     ownUserId: string | null;
     mode: 'maintainer' | 'contributor' | 'wave';
+    currentWaveProgramId?: string;
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);
@@ -154,19 +199,27 @@
 </script>
 
 <div class="filter-config-wrapper">
-  {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode)) as [filterKey, filterConfig], i (filterKey)}
-    <div class="filter-config-item">
-      <h5>{filterConfig.label}</h5>
-      {#if filterConfig.type === 'single-select'}
-        <SingleSelectFilterItem
-          bind:this={filterItems[i]}
-          selected={filters[filterKey as keyof IssueFilters] as string | undefined}
-          config={filterConfig}
-          onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-        />
-      {/if}
-    </div>
-  {/each}
+  <div class="options">
+    {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
+      <div class="filter-config-item">
+        <h5>{filterConfig.label}</h5>
+        {#if filterConfig.type === 'single-select'}
+          <SingleSelectFilterItem
+            bind:this={filterItems[i]}
+            selected={filters[filterKey as keyof IssueFilters] as string | undefined}
+            config={filterConfig}
+            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+          />
+        {:else if filterConfig.type === 'dropdown'}
+          <DropdownFilterItem
+            config={filterConfig}
+            selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
+            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+          />
+        {/if}
+      </div>
+    {/each}
+  </div>
 
   <div class="actions">
     <Button onclick={handleClear}>Reset</Button>
@@ -176,9 +229,16 @@
 
 <style>
   .filter-config-wrapper {
+    height: fit-content;
+  }
+
+  .options {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    max-height: 60svh;
+    overflow-y: auto;
+    padding: 1rem 1rem 2rem 1rem;
   }
 
   .filter-config-item {
@@ -188,6 +248,11 @@
   }
 
   .actions {
+    position: sticky;
+    bottom: 0.25rem;
+    padding: 0.5rem;
+    background-color: var(--color-background);
+    border-top: 1px solid var(--color-foreground-level-3);
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;

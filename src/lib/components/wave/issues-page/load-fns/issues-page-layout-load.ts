@@ -22,7 +22,7 @@ export const issuesPageLayoutLoad = async (
     fetch: typeof global.fetch;
     url: URL;
     depends: (...deps: `${string}:${string}`[]) => void;
-    parent: () => Promise<{ user: WaveLoggedInUser | null }>;
+    parent: () => Promise<{ user: WaveLoggedInUser | null; waveProgram?: { id: string } }>;
     params: { issueId?: string };
   },
   config: (user: WaveLoggedInUser | null) => {
@@ -41,7 +41,7 @@ export const issuesPageLayoutLoad = async (
 ) => {
   depends('wave:issues');
 
-  const { user } = await parent();
+  const { user, waveProgram } = await parent();
 
   const {
     requireLogin,
@@ -110,7 +110,7 @@ export const issuesPageLayoutLoad = async (
     getIssues(fetch, { limit: 10 }, filters, sortBy),
     // todo(wave): pagination
     user ? (await getOwnWaveProgramRepos(fetch, { limit: 100 })).data : [],
-    // todo(wave): Only fetch waves included in the issues list
+    // todo(wave): Only fetch wave programs included in the issues list
     (await getWavePrograms(fetch, { limit: 100 })).data,
   ]);
 
@@ -133,6 +133,7 @@ export const issuesPageLayoutLoad = async (
     isViewingIssue,
     headMetaTitle,
     showNewApplicationsBadge,
+    currentWaveProgramId: waveProgram?.id,
 
     waveHeaderBackground: false,
   };

@@ -33,7 +33,7 @@
           ),
       );
 
-      await goto(`/wave/${data.waveProgram.id}/issues/${data.issue.id}/compliments/success`);
+      await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/compliments/success`);
     } finally {
       submitting = false;
       selected = [];
