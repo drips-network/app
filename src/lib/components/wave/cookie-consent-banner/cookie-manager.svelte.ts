@@ -36,7 +36,7 @@ export const OPTIONAL_CONSENTS: ConsentTypeDefinition[] = [
     value: ConsentType.FARO,
     label: 'Faro Monitoring',
     description:
-      'Grafana Faro helps us track errors and performance issues on our website to improve your experience. It collects data about how you interact with our site, but does not collect personal information. Note: After turning this off, you may need to refresh the page to fully disable Faro monitoring.',
+      'Grafana Faro helps us track errors and performance issues on our website to improve your experience. It collects data about how you interact with our site, but does not collect personal information. Faro uses cookie-like technologies to understand user sessions. Note: After turning this off, you may need to refresh the page to fully disable Faro monitoring.',
     required: false,
   },
 ];
