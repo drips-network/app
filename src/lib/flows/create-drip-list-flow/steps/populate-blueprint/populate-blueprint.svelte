@@ -1,7 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import type { BlueprintOrBlueprintError, Split } from '../../../../utils/blueprints/schemas';
-  import type { Items, Weights, ListEditorItem, RecipientResult } from '$lib/components/list-editor/types';
+  import type {
+    Items,
+    Weights,
+    ListEditorItem,
+    RecipientResult,
+  } from '$lib/components/list-editor/types';
   import {
     getAddress,
     getDripList,
@@ -86,7 +91,7 @@
           identifier: string,
           errorMessage: string,
           weight: number,
-          itemIndex: number
+          itemIndex: number,
         ) => {
           const result = await promise;
 
@@ -116,15 +121,11 @@
             splitsToAdd[result.accountId] = {
               type,
               [key]: result[key],
-            } as any;
+            } as unknown as ListEditorItem;
 
             weightsToAdd[result.accountId] = weight;
           } else {
-            const error = new AddItemSuberror(
-              errorMessage,
-              identifier,
-              itemIndex + 1,
-            );
+            const error = new AddItemSuberror(errorMessage, identifier, itemIndex + 1);
             errors.push(error);
           }
         };
@@ -136,9 +137,9 @@
                 getAddress(split.ethAddress),
                 split.type,
                 split.ethAddress,
-                "This address is invalid.",
+                'This address is invalid.',
                 split.weight,
-                index
+                index,
               );
               break;
 
@@ -147,9 +148,9 @@
                 getProject(`https://github.com/${split.repoName}`),
                 split.type,
                 split.repoName,
-                "This project is invalid.",
+                'This project is invalid.',
                 split.weight,
-                index
+                index,
               );
               break;
 
@@ -158,9 +159,9 @@
                 getDripList(split.accountId),
                 split.type,
                 split.accountId,
-                "This drip list is invalid.",
+                'This drip list is invalid.',
                 split.weight,
-                index
+                index,
               );
               break;
 
@@ -169,9 +170,9 @@
                 getOrcid(split.orcidId),
                 split.type,
                 split.orcidId,
-                "This ORCID iD is invalid.",
+                'This ORCID iD is invalid.',
                 split.weight,
-                index
+                index,
               );
               break;
           }
