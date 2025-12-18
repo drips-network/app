@@ -60,7 +60,7 @@ type BaseItem = {
   };
 };
 
-export type ProjectItem = BaseItem & {
+type ProjectItem = BaseItem & {
   type: 'project';
   project: ListEditorProjectFragment;
 };
@@ -70,7 +70,7 @@ export type DripListItem = BaseItem & {
   dripList: ListEditorDripListFragment;
 };
 
-export type EthAddressItem = BaseItem & {
+type EthAddressItem = BaseItem & {
   type: 'address';
   address: string;
 };
