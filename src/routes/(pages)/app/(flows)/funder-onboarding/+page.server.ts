@@ -12,15 +12,15 @@ export const load = async ({ fetch, url }) => {
 
     if (!blueprintResponse.ok) {
       blueprintError = blueprintResponse.status === 404 ? 'not-found' : 'unknown';
-    }
-
-    const asJson = await blueprintResponse.json().catch(() => null);
-    const parsedBlueprint = blueprintSchema.safeParse(asJson);
-
-    if (!parsedBlueprint.success) {
-      blueprintError = 'invalid';
     } else {
-      blueprint = parsedBlueprint.data;
+      const asJson = await blueprintResponse.json().catch(() => null);
+      const parsedBlueprint = blueprintSchema.safeParse(asJson);
+
+      if (!parsedBlueprint.success) {
+        blueprintError = 'invalid';
+      } else {
+        blueprint = parsedBlueprint.data;
+      }
     }
   }
 
