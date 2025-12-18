@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import z from 'zod';
 
 export const load = async ({ params, fetch }) => {
-  const { waveSlug: waveProgramSlug } = params;
+  const { waveProgramSlug } = params;
 
   // block fetching by UUID (we only want the slug URLs to work)
   if (z.uuid().safeParse(waveProgramSlug).success) {

@@ -1,8 +1,12 @@
 <script>
+  import Button from '$lib/components/button/button.svelte';
+  import Divider from '$lib/components/divider/divider.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Setting from '$lib/components/setting/setting.svelte';
+  import CookieModal from '$lib/components/wave/cookie-consent-banner/cookie-modal.svelte';
   import animationsStore from '$lib/stores/animations/animations.store';
+  import modal from '$lib/stores/modal';
   import themeStore from '$lib/stores/theme/theme.store';
 
   const { primaryColor } = themeStore;
@@ -91,4 +95,10 @@
       },
     ]}
   />
+</Setting>
+
+<Divider />
+
+<Setting title="Cookies" subtitle="Manage your cookie preferences for Drips Wave.">
+  <Button onclick={() => modal.show(CookieModal, undefined, {})}>Open Cookie Settings</Button>
 </Setting>

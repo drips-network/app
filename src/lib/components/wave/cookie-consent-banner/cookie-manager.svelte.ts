@@ -1,0 +1,128 @@
+import { browser } from '$app/environment';
+import z from 'zod';
+
+export enum ConsentType {
+  AUTHENTICATION = 'authentication',
+  INTERCOM = 'intercom',
+}
+
+type ConsentTypeDefinition = {
+  value: ConsentType;
+  label: string;
+  description: string;
+  required: boolean;
+};
+
+export const REQUIRED_CONSENTS: ConsentTypeDefinition[] = [
+  {
+    value: ConsentType.AUTHENTICATION,
+    label: 'Authentication',
+    description:
+      'A strictly necessary cookie that enables user login and session management. This cookie is set only on the Drips Wave website and read only by our systems to authenticate your requests after a login.',
+    required: true,
+  },
+];
+
+export const OPTIONAL_CONSENTS: ConsentTypeDefinition[] = [
+  {
+    value: ConsentType.INTERCOM,
+    label: 'Intercom support chat',
+    description:
+      'This cookie enables the Intercom chat widget on the Drips Wave website to provide user support and assistance. It is used to identify you as a returning user and to store your chat history with our support team. Important: Even if initially disabled, Intercom cookies will be set when you later explicitly open the chat widget.',
+    required: false,
+  },
+];
+
+export const CONSENT_TYPES: ConsentTypeDefinition[] = [...REQUIRED_CONSENTS, ...OPTIONAL_CONSENTS];
+
+export default (() => {
+  if (!browser) return;
+
+  const consentMap: Record<ConsentType, boolean> = $state({
+    [ConsentType.AUTHENTICATION]: true,
+    [ConsentType.INTERCOM]: false,
+  });
+
+  // load from localstorage
+  const storedConsent = localStorage.getItem('cookie-consent');
+  let consentRestored = false;
+
+  const parsed = z
+    .partialRecord(z.enum(ConsentType), z.boolean())
+    .safeParse(storedConsent ? JSON.parse(storedConsent) : {});
+
+  if (parsed.success) {
+    Object.entries(parsed.data).forEach(([key, value]) => {
+      consentMap[key as ConsentType] = value as boolean;
+    });
+
+    consentRestored = true;
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn('Failed to parse cookie consent from localStorage:', parsed.error);
+
+    // clear invalid data
+    localStorage.removeItem('cookie-consent');
+  }
+
+  function setConsent(type: ConsentType, value: boolean) {
+    // check that type is valid and not required
+    const consentType = CONSENT_TYPES.find((ct) => ct.value === type);
+    if (!consentType) {
+      throw new Error(`Invalid consent type: ${type}`);
+    }
+    if (consentType.required && value === false) {
+      throw new Error(`Cannot change required consent type: ${type}`);
+    }
+
+    consentMap[type] = value;
+
+    localStorage.setItem('cookie-consent', JSON.stringify(consentMap));
+  }
+
+  function acceptAll() {
+    Object.keys(consentMap).forEach((key) => {
+      consentMap[key as ConsentType] = true;
+    });
+
+    localStorage.setItem('cookie-consent', JSON.stringify(consentMap));
+  }
+
+  function rejectAllNonEssential() {
+    Object.entries(consentMap).forEach(([key, _]) => {
+      const consentType = CONSENT_TYPES.find((ct) => ct.value === key);
+      if (consentType && !consentType.required) {
+        consentMap[key as ConsentType] = false;
+      }
+    });
+
+    localStorage.setItem('cookie-consent', JSON.stringify(consentMap));
+  }
+
+  /** tracks whether the user has interacted with cookie banner */
+  let cookiesConfigured = $state(false);
+
+  // restore from localstorage
+  const storedCookiesConfigured = localStorage.getItem('cookies-configured');
+  if (storedCookiesConfigured === 'true' && consentRestored) {
+    cookiesConfigured = true;
+  } else {
+    cookiesConfigured = false;
+  }
+
+  function setCookiesConfigured() {
+    localStorage.setItem('cookies-configured', 'true');
+    cookiesConfigured = true;
+  }
+
+  return {
+    consentMap,
+    setConsent,
+    acceptAll,
+    rejectAllNonEssential,
+    get cookiesConfigured() {
+      return cookiesConfigured;
+    },
+    setCookiesConfigured,
+  };
+})();

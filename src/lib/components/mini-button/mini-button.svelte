@@ -12,6 +12,7 @@
     open?: boolean;
     id?: string | undefined;
     redNumber?: number | null;
+    onclick?: () => void;
   }
 
   let {
@@ -21,12 +22,24 @@
     open = false,
     id = undefined,
     redNumber = null,
+    onclick = undefined,
   }: Props = $props();
 
   const SvelteComponent = $derived(icon);
 </script>
 
-<button class:highlight class:open onclick={bubble('click')} aria-label={label} {id}>
+<button
+  class:highlight
+  class:open
+  onclick={() => {
+    bubble('click');
+    if (onclick) {
+      onclick();
+    }
+  }}
+  aria-label={label}
+  {id}
+>
   <SvelteComponent style="fill: var(--color-foreground)" />
   {#if redNumber && redNumber > 0}
     <div

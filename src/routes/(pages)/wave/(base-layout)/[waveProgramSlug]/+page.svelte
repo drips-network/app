@@ -1,5 +1,8 @@
 <script lang="ts">
+  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Globe from '$lib/components/icons/Globe.svelte';
+  import X from '$lib/components/icons/X.svelte';
   import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -56,7 +59,27 @@
 
     <div class="wave-stats">
       <Card style="height: 100%;">
-        <WaveProgramStats leaderboard={data.leaderboard} {waveProgram} />
+        <div class="wave-stats-inner">
+          <WaveProgramStats leaderboard={data.leaderboard} {waveProgram} />
+
+          {#if (waveProgram.metadata?.length ?? 0) > 0}
+            <div class="metadata">
+              {#each waveProgram.metadata as { type, value } (type)}
+                {#if type === 'website'}
+                  {@const url = new URL(value)}
+                  <Button icon={Globe} href={value} target="_blank" rel="noopener noreferrer"
+                    >{url.hostname}</Button
+                  >
+                {:else if type === 'x'}
+                  {@const url = new URL(value)}
+                  <Button icon={X} href={value} target="_blank" rel="noopener noreferrer"
+                    >@{url.pathname.slice(1)}</Button
+                  >
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
       </Card>
     </div>
   </div>
@@ -158,6 +181,20 @@
   .wave-stats {
     grid-area: stats;
     min-height: 0;
+  }
+
+  .wave-stats-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+  }
+
+  .wave-stats-inner .metadata {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
   }
 
   @media (max-width: 1024px) {

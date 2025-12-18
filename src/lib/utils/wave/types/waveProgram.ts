@@ -56,6 +56,15 @@ export const waveProgramDtoSchema = z.object({
 
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+
+  metadata: z
+    .array(
+      z.object({
+        type: z.enum(['website', 'x']),
+        value: z.url(),
+      }),
+    )
+    .nullable(),
 });
 export type WaveProgramDto = z.infer<typeof waveProgramDtoSchema>;
 
