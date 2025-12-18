@@ -45,7 +45,7 @@
             );
           }),
       );
-      await goto(`/wave/${data.waveProgram.id}/issues/${data.issue.id}/apply/success`);
+      await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/apply/success`);
     } finally {
       submitting = false;
     }
