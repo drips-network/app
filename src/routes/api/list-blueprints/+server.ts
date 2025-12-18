@@ -1,11 +1,11 @@
-/* *
+/**
  * "List Blueprints" allow submitting a list of splits in return for a "blueprint ID".
  * Then, the user can be sent off to /app/funder-onboarding?blueprintId=XYZ, which will retrieve
  * the blueprint and pre-fill the splits in the onboarding flow.
  *
  * We store blueprints on Redis with a short TTL of 6 hours, since they are meant to be
  * short-lived and temporary.
- * */
+ */
 
 import { error } from '@sveltejs/kit';
 import { redis } from '../redis';
