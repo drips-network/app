@@ -13,16 +13,18 @@ export const GET = async ({ params }) => {
     throw error(404, 'Blueprint not found or expired');
   }
 
+  let asJson: unknown;
   try {
-    const asJson = JSON.parse(data);
-    const parsed = blueprintSchema.safeParse(asJson);
-
-    if (!parsed.success) {
-      throw error(500, 'Invalid blueprint stored');
-    }
-
-    return new Response(JSON.stringify(parsed.data));
+    asJson = JSON.parse(data);
   } catch {
     throw error(500, 'Failed to parse blueprint');
   }
+
+  const parsed = blueprintSchema.safeParse(asJson);
+
+  if (!parsed.success) {
+    throw error(500, 'Invalid blueprint stored');
+  }
+
+  return new Response(JSON.stringify(parsed.data));
 };
