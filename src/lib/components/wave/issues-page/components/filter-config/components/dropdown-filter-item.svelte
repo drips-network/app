@@ -27,7 +27,7 @@
       popoverEl.style.position = 'absolute';
       popoverEl.style.top = `${rect.bottom + window.scrollY + 8}px`;
       popoverEl.style.left = `${rect.left + window.scrollX}px`;
-      popoverEl.style.minWidth = `${rect.width}px`;
+      popoverEl.style.width = `${rect.width}px`;
     }
   }
 
@@ -60,28 +60,38 @@
     popoverOpen = false;
     scrollStore.unlock();
   }
+
+  function handleWindowResize() {
+    if (popoverOpen) {
+      positionPopover();
+    }
+  }
 </script>
+
+<svelte:window on:resize={handleWindowResize} />
 
 <button
   bind:this={triggerEl}
-  class="dropdown-trigger"
+  class="dropdown-trigger typo-text"
   class:has-selection={!!selectedOption}
   popovertarget={`dropdown-${uid}`}
 >
-  {#if !selectedOption}
-    Any
-  {:else}
-    {#await optionsPromise}
-      <span>Loading...</span>
-    {:then options}
-      {@const selected = options.find((option) => option.value === selectedOption)}
-      {#if selected}
-        {selected.label}
-      {:else}
-        Unknown
-      {/if}
-    {/await}
-  {/if}
+  <span class="name">
+    {#if !selectedOption}
+      Any
+    {:else}
+      {#await optionsPromise}
+        Loading...
+      {:then options}
+        {@const selected = options.find((option) => option.value === selectedOption)}
+        {#if selected}
+          {selected.label}
+        {:else}
+          Unknown
+        {/if}
+      {/await}
+    {/if}
+  </span>
 
   <div class="chevron" class:rotated={popoverOpen}>
     <ChevronDown />
@@ -142,6 +152,15 @@
     transition:
       border-color 0.3s,
       background-color 0.3s;
+    max-width: 20rem;
+  }
+
+  .dropdown-trigger .name {
+    flex-grow: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .dropdown-trigger.has-selection {
@@ -207,15 +226,20 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    min-width: 0;
   }
 
   .dropdown-options button {
+    min-width: 0;
     padding: 0.5rem 0.5rem;
     background: none;
     border: none;
     text-align: left;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .dropdown-options button:hover {

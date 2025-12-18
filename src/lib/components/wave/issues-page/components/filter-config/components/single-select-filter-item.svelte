@@ -25,7 +25,7 @@
   }
 </script>
 
-<div class="single-select-filter-item">
+<div class="single-select-filter-item typo-text">
   {#each config.options as { label, value } (value)}
     <label for={label} class:selected={selected === value}>{label}</label>
     <input
