@@ -9,9 +9,12 @@
 
   interface Props {
     wave: WaveDto;
+    waveProgram: {
+      slug: string;
+    };
   }
 
-  let { wave }: Props = $props();
+  let { wave, waveProgram }: Props = $props();
   const { status } = $derived(wave);
 </script>
 
@@ -45,7 +48,7 @@
             variant="primary"
             icon={Ledger}
             size="large"
-            href="/wave/{wave.waveProgramId}/issues"
+            href="/wave/{waveProgram.slug}/issues"
           >
             {status === 'active' ? 'Start contributing' : 'View issues'}
           </Button>

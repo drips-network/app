@@ -3,8 +3,8 @@ import type { LeaderboardFilters } from '$lib/utils/wave/types/leaderboard.js';
 import { redirect } from '@sveltejs/kit';
 import z from 'zod';
 
-export const load = async ({ params, fetch, url, parent }) => {
-  const { waves } = await parent();
+export const load = async ({ fetch, url, parent }) => {
+  const { waves, waveProgram } = await parent();
 
   const filterParam = url.searchParams.get('filter');
   const filterParsed = z.enum(['all-time', 'current-wave']).nullable().safeParse(filterParam);
@@ -19,7 +19,7 @@ export const load = async ({ params, fetch, url, parent }) => {
 
   let currentWaveOnly = false;
 
-  const filters: LeaderboardFilters = { waveProgramId: params.waveProgramId };
+  const filters: LeaderboardFilters = { waveProgramId: waveProgram.id };
 
   if (filterParsed.data === 'current-wave') {
     const currentWave = waves.data[0];

@@ -47,6 +47,7 @@ export const waveProgramDtoSchema = z.object({
   waveDurationDays: z.number().int(),
   presetBudgetUSD: z.string(),
   avatarUrl: z.url().nullable(),
+  slug: z.string(),
 
   issueCount: z.number().int(),
   approvedRepoCount: z.number().int(),

@@ -37,12 +37,12 @@
     {
       key: 'Issues',
       value: waveProgram.issueCount,
-      href: `/wave/${waveProgram.id}/issues`,
+      href: `/wave/${waveProgram.slug}/issues`,
     },
     {
       key: 'Repos',
       value: waveProgram.approvedRepoCount,
-      href: `/wave/${waveProgram.id}/repos`,
+      href: `/wave/${waveProgram.slug}/repos`,
     },
     {
       key: 'Maintainers',
@@ -65,7 +65,7 @@
           })),
         },
       },
-      href: `/wave/${waveProgram.id}/leaderboard`,
+      href: `/wave/${waveProgram.slug}/leaderboard`,
     },
     {
       key: 'Waves',

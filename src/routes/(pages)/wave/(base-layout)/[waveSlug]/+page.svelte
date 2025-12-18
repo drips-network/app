@@ -6,6 +6,7 @@
   import WaveCard from '$lib/components/wave/wave-card/wave-card.svelte';
   import WaveProgramAvatar from '$lib/components/wave/wave-program-avatar/wave-program-avatar.svelte';
   import WaveProgramStats from '$lib/components/wave/wave-program-stats/wave-program-stats.svelte';
+  import { BASE_URL } from '$lib/utils/base-url';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -38,7 +39,7 @@
         <div class="bg"></div>
         <div class="wave-program-name-inner">
           <WaveProgramAvatar {waveProgram} size={128} />
-          <h1>{waveProgram.name} Wave</h1>
+          <h1>{waveProgram.name}</h1>
 
           <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
 
@@ -46,7 +47,7 @@
             <ShareButton
               downloadableImageUrl={shareImageUrl}
               buttonVariant="normal"
-              url={`https://drips.app/wave/${waveProgram.id}`}
+              url={`${BASE_URL}/wave/${waveProgram.slug}`}
             />
           </div>
         </div>
@@ -66,7 +67,7 @@
     </div>
 
     {#if upcomingOrActiveWave}
-      <WaveCard wave={upcomingOrActiveWave} />
+      <WaveCard wave={upcomingOrActiveWave} {waveProgram} />
     {:else}
       <Card>
         <div class="no-next-wave">
@@ -81,14 +82,14 @@
   </section>
 
   <section>
-    {#if otherWaves}
+    {#if otherWaves.length > 0}
       <div class="divider">
         <OrDivider text="Explore past waves" />
       </div>
     {/if}
 
     {#each otherWaves as wave (wave.id)}
-      <WaveCard {wave} />
+      <WaveCard {wave} {waveProgram} />
     {/each}
   </section>
 </div>

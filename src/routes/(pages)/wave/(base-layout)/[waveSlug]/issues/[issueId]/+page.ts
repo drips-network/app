@@ -5,7 +5,7 @@ export const load = async (context) => {
 
   return issuePageLoad(context, (issue) => ({
     allowAddingOrRemovingWave: false,
-    backToConfig: { label: 'Back to issues', href: `/wave/${context.params.waveProgramId}/issues` },
+    backToConfig: { label: 'Back to issues', href: `/wave/${waveProgram.slug}/issues` },
     headMetaTitle: `${issue.title} | ${waveProgram.name} Wave`,
   }));
 };

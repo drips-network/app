@@ -40,7 +40,7 @@
 
   {#each data.wavePrograms.data as waveProgram (waveProgram.id)}
     {@const upcomingWave: WaveDto | null = data.upcomingWaves[waveProgram.id]}
-    <a href="/wave/{waveProgram.id}" class="wave-program-item">
+    <a href="/wave/{waveProgram.slug}" class="wave-program-item">
       <WaveAvatar {waveProgram} size={128} />
 
       <div class="details">

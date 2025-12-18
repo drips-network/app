@@ -1,9 +1,13 @@
 import { getLeaderboard } from '$lib/utils/wave/leaderboard.js';
 
-export const load = async ({ params, fetch }) => {
-  const { waveProgramId } = params;
+export const load = async ({ parent, fetch }) => {
+  const { waveProgram } = await parent();
 
-  const firstThreeLeaderboardEntries = await getLeaderboard(fetch, { waveProgramId }, { limit: 3 });
+  const firstThreeLeaderboardEntries = await getLeaderboard(
+    fetch,
+    { waveProgramId: waveProgram.id },
+    { limit: 3 },
+  );
 
   return {
     leaderboard: {

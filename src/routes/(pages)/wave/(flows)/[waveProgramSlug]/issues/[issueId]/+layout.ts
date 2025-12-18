@@ -3,11 +3,17 @@ import { getOrgs } from '$lib/utils/wave/orgs.js';
 import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
 import { redirect } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import z from 'zod';
 
 export const load = async ({ parent, fetch, params, url }) => {
   const { user } = await parent();
 
-  const { waveProgramId, issueId } = params;
+  const { waveProgramSlug, issueId } = params;
+
+  // block fetching by UUID (we only want the slug URLs to work)
+  if (z.uuid().safeParse(waveProgramSlug).success) {
+    throw error(404, 'Wave not found');
+  }
 
   if (!user) {
     throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}&skipWelcome=true`);
@@ -15,7 +21,7 @@ export const load = async ({ parent, fetch, params, url }) => {
 
   const [issue, waveProgram, ownOrgs] = await Promise.all([
     getIssue(fetch, issueId),
-    getWaveProgram(fetch, waveProgramId),
+    getWaveProgram(fetch, waveProgramSlug),
     getOrgs(fetch, { limit: 100 }),
   ]);
 

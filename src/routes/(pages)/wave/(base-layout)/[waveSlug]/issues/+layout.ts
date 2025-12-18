@@ -6,19 +6,19 @@ export const load = async (context) => {
 
   return issuesPageLayoutLoad(context, () => ({
     preappliedFilters: {
-      waveProgramId: context.params.waveProgramId,
+      waveProgramId: waveProgram.id,
     },
     defaultFilters: {
       state: 'open',
     },
-    pathPrefix: `/wave/${context.params.waveProgramId}/issues/`,
+    pathPrefix: `/wave/${waveProgram.slug}/issues/`,
     filtersMode: 'wave',
     breadcrumbs: [
       { label: 'Wave Programs', href: `/wave` },
-      { label: waveProgram.name, href: `/wave/${context.params.waveProgramId}` },
+      { label: waveProgram.name, href: `/wave/${waveProgram.slug}` },
       { label: 'Issues' },
     ],
-    viewKey: context.params.waveProgramId,
+    viewKey: waveProgram.slug,
     availableSortByOptions: ['updatedAt', 'createdAt', 'points'],
     headMetaTitle: `Issues | ${waveProgram.name} Wave`,
   }));

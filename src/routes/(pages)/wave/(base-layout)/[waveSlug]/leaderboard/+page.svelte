@@ -17,7 +17,7 @@
   <Breadcrumbs
     crumbs={[
       { label: 'Wave Programs', href: '/wave' },
-      { label: data.waveProgram.name, href: `/wave/${data.waveProgram.id}` },
+      { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
       { label: 'Leaderboard', href: '' },
     ]}
   />

@@ -223,7 +223,7 @@
                 icon: Ledger,
                 variant: 'primary',
                 disabled: !canApplyToIssue,
-                href: `/wave/${partOfWaveProgram?.id}/issues/${issue.id}/apply`,
+                href: `/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
               },
             ],
             infoTooltip:
@@ -266,7 +266,7 @@
                 Stepper,
                 undefined,
                 shareSteps({
-                  url: `${BASE_URL}/wave/${issue.waveProgramId}/issues/${issue.id}/apply`,
+                  url: `${BASE_URL}/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
                   shareModalText: 'Share a link for applicants to apply for this issue.',
                 }),
               )}

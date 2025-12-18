@@ -2,14 +2,14 @@ import { getIssueApplications } from '$lib/utils/wave/issues.js';
 import { getWaves } from '$lib/utils/wave/wavePrograms.js';
 
 export const load = async ({ fetch, params, parent }) => {
-  const { user } = await parent();
+  const { user, waveProgram } = await parent();
 
-  const { waveProgramId, issueId } = params;
+  const { issueId } = params;
 
   const [waves] = await Promise.all([
     getWaves(
       fetch,
-      waveProgramId,
+      waveProgram.id,
       {},
       {
         status: 'active',
@@ -19,7 +19,7 @@ export const load = async ({ fetch, params, parent }) => {
 
   const previousApplication = await getIssueApplications(
     fetch,
-    waveProgramId,
+    waveProgram.id,
     issueId,
     { limit: 1 },
     { applicantId: user.id, statusNot: 'withdrawn' },

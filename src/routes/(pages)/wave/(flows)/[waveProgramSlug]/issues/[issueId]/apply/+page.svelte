@@ -121,7 +121,8 @@
   {/if}
 
   {#snippet leftActions()}
-    <Button href={`/wave/${data.waveProgram.id}/issues/${data.issue.id}`}>View issue details</Button
+    <Button href={`/wave/${data.waveProgram.slug}/issues/${data.issue.id}`}
+      >View issue details</Button
     >
   {/snippet}
 
