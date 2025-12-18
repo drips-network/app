@@ -235,6 +235,10 @@
   $effect(() => {
     searchTerm;
 
+    if (!searchOpen || searchTerm.trim().length === 0) {
+      return;
+    }
+
     applyingFilters = true;
 
     if (searchTimeout) {
