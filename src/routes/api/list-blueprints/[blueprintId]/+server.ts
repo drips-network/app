@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { redis } from '../../redis';
 import network from '$lib/stores/wallet/network';
-import { blueprintSchema } from '../blueprintSchema';
+import { blueprintSchema } from '../../../../lib/utils/blueprints/schemas';
 
 export const GET = async ({ params }) => {
   if (!redis) return error(503, 'Redis not available');

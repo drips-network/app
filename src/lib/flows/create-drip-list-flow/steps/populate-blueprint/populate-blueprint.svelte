@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { BlueprintOrBlueprintError } from '../../../../../routes/api/list-blueprints/blueprintSchema';
+  import type { BlueprintOrBlueprintError } from '../../../../utils/blueprints/schemas';
   import type { Items, Weights } from '$lib/components/list-editor/types';
   import {
     getAddress,

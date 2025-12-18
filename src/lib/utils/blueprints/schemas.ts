@@ -40,10 +40,11 @@ export type AddressReceiver = z.infer<typeof addressReceiver>;
 export type ProjectReceiver = z.infer<typeof projectReceiver>;
 export type DripListReceiver = z.infer<typeof dripListReceiver>;
 export type Blueprint = z.infer<typeof blueprintSchema>;
+export type BlueprintError = 'not-found' | 'unknown' | 'invalid';
 
 export type BlueprintOrBlueprintError =
   | {
-      blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined;
+      blueprintError: BlueprintError | undefined;
     }
   | {
       blueprint: Blueprint;

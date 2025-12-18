@@ -1,7 +1,7 @@
 <script lang="ts">
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { flowState, steps } from './create-drip-list-flow';
-  import type { BlueprintOrBlueprintError } from '../../../routes/api/list-blueprints/blueprintSchema';
+  import type { BlueprintOrBlueprintError } from '../../utils/blueprints/schemas';
 
   interface Props {
     skipWalletConnect?: boolean;

@@ -1,11 +1,11 @@
-import type z from 'zod';
-import { blueprintSchema } from '../../../../api/list-blueprints/blueprintSchema.js';
+import { blueprintSchema } from '../../../../../lib/utils/blueprints/schemas.js';
+import type { Blueprint, BlueprintError } from '../../../../../lib/utils/blueprints/schemas.js';
 
 export const load = async ({ fetch, url }) => {
   const blueprintIdParam = url.searchParams.get('blueprintId');
 
-  let blueprint: z.infer<typeof blueprintSchema> | undefined = undefined;
-  let blueprintError: 'not-found' | 'unknown' | 'invalid' | undefined = undefined;
+  let blueprint: Blueprint | undefined = undefined;
+  let blueprintError: BlueprintError | undefined = undefined;
 
   if (blueprintIdParam) {
     const blueprintResponse = await fetch(`/api/list-blueprints/${blueprintIdParam}`);
