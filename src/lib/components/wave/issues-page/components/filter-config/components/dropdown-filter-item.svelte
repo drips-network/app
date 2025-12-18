@@ -2,6 +2,7 @@
   import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
+  import scrollStore from '$lib/stores/scroll/scroll.store';
   import type { DropdownConfig } from '../types';
 
   const uid = crypto.randomUUID();
@@ -50,11 +51,14 @@
   function handlePopoverOpen() {
     popoverOpen = true;
     positionPopover();
+
+    scrollStore.lock();
   }
 
   function handlePopoverClose() {
     searchTerm = '';
     popoverOpen = false;
+    scrollStore.unlock();
   }
 </script>
 
