@@ -371,11 +371,11 @@
             {/if}
           </div>
 
-          {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant}
+          {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
             <SidebarButton
               target=""
               icon={Heart}
-              href="/wave/{issue.waveProgramId}/issues/{issue.id}/compliments"
+              href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/compliments"
             >
               Give compliment
             </SidebarButton>
