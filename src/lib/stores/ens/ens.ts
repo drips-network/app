@@ -83,7 +83,7 @@ export async function resolveEnsProfile(
 
       return {
         ensName,
-        avatarUrl,
+        avatarUrl: avatarUrl ?? undefined,
         records: Object.fromEntries(records) as Record<string, string | undefined>,
       };
     }

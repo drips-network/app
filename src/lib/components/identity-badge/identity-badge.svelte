@@ -27,7 +27,7 @@
      * If provided, this URL will be used for the avatar instead of the one fetched from the ENS store.
      * This is useful for contexts entirely rendered on the server (like share images) or to prevent flash of content on initial load.
      */
-    avatarSrc?: string | null | undefined;
+    avatarSrc?: string | undefined;
   }
 
   let {
