@@ -17,6 +17,13 @@ import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[eco
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
 import { getRound } from '$lib/utils/rpgf/rpgf.js';
 import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
+import { resolveAccountIdToAddress } from '$lib/utils/sdk/utils/resolve-account-id-to-address';
+import formatAddress from '$lib/utils/format-address';
+import { JsonRpcProvider } from 'ethers';
+import { getMainnetProvider, resolveEnsProfile } from '$lib/stores/ens/ens';
+
+const currentNetworkProvider = new JsonRpcProvider(network.rpcUrl);
+const mainnetProvider = network.enableEns ? getMainnetProvider() : null;
 
 function isShareImageType(value: string): value is ShareImageType {
   return Object.values(ShareImageType).includes(value as ShareImageType);
@@ -230,6 +237,82 @@ async function loadRpgfRoundData(f: typeof fetch, id: string) {
   };
 }
 
+async function loadProfileData(f: typeof fetch, universalAccountId: string) {
+  const resolution = await resolveAccountIdToAddress(
+    universalAccountId,
+    currentNetworkProvider,
+    mainnetProvider,
+    network.chainId,
+  );
+
+  let address: string;
+
+  switch (resolution.type) {
+    case 'success':
+      address = resolution.address;
+      break;
+    case 'driver-account':
+      if (resolution.driver === 'nft' || resolution.driver === 'repo') {
+        throw error(404, 'Use the Drip List share image for this account type');
+      }
+      throw error(404, 'Not Found');
+    case 'ens-not-resolved':
+      throw error(404, 'ENS not resolvable');
+    case 'not-found':
+    default:
+      throw error(404, 'Not Found');
+  }
+
+  const profileQuery = gql`
+    query Profile($address: String!, $chains: [SupportedChain!]) {
+      userByAddress(address: $address, chains: $chains) {
+        account {
+          driver
+          address
+          accountId
+        }
+        chainData {
+          chain
+          support {
+            __typename
+          }
+        }
+      }
+    }
+  `;
+
+  const [userRes, ensProfile] = await Promise.all([
+    query(profileQuery, { address, chains: [network.gqlName] }, fetch),
+    resolveEnsProfile(address, currentNetworkProvider, mainnetProvider, network.chainId),
+  ]);
+
+  const { userByAddress } = userRes;
+
+  if (!userByAddress) {
+    return null;
+  }
+
+  const chainData = filterCurrentChainData(userByAddress.chainData);
+
+  return {
+    bgColor: '#5555FF',
+    type: '',
+    headline: ensProfile?.ensName ?? formatAddress(address),
+    avatarSrc: null,
+    stats: [
+      {
+        icon: 'Ethereum',
+        label: formatAddress(address),
+      },
+      {
+        icon: 'Heart',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        label: `${(chainData as any)?.support?.length ?? 0} Supporters`,
+      },
+    ],
+  };
+}
+
 const LOAD_FNS = {
   [ShareImageType.WAVE_PROGRAM]: loadWaveProgramData,
   [ShareImageType.PROJECT]: loadProjectData,
@@ -237,6 +320,7 @@ const LOAD_FNS = {
   [ShareImageType.ECOSYSTEM]: loadEcosystemData,
   [ShareImageType.ORCID]: loadOrcidData,
   [ShareImageType.RPGF_ROUND]: loadRpgfRoundData,
+  [ShareImageType.PROFILE]: loadProfileData,
 } as const;
 
 export const load = async ({ params }) => {

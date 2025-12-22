@@ -1,5 +1,7 @@
 <script lang="ts">
   import DripList from '$lib/components/icons/DripList.svelte';
+  import Ethereum from '$lib/components/icons/Ethereum.svelte';
+  import Heart from '$lib/components/icons/Heart.svelte';
   import getContrastColor from '$lib/utils/get-contrast-text-color';
   import type { Component } from 'svelte';
   import backgroundImage from './background-image';
@@ -9,6 +11,8 @@
 
   const ICON_MAP: Record<string, Component<{ style?: string }>> = {
     DripList: DripList,
+    Ethereum: Ethereum,
+    Heart: Heart,
   };
 
   const contrastColor = $derived(getContrastColor(bgColor));

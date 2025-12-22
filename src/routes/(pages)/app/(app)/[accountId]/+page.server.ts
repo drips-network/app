@@ -10,10 +10,8 @@ import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated_
 import { getVotingRounds } from '$lib/utils/multiplayer';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
-import { isAddress } from 'ethers';
-import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
-import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-driver-from-accountId';
-import { getMainnetProvider, safeReverseLookup } from '$lib/stores/ens/ens';
+import { resolveAccountIdToAddress } from '$lib/utils/sdk/utils/resolve-account-id-to-address';
+import { getMainnetProvider, resolveEnsProfile } from '$lib/stores/ens/ens';
 import { JsonRpcProvider } from 'ethers';
 import { LINKED_IDENTITIES_CARD_FRAGMENT } from './components/linked-identities-card.svelte';
 
@@ -60,91 +58,48 @@ const PROFILE_PAGE_QUERY = gql`
   }
 `;
 
-async function resolveEnsFields(address: string) {
-  if (!mainnetProvider) {
-    return null;
-  }
-
-  try {
-    const ensName = await safeReverseLookup(
-      currentNetworkProvider,
-      mainnetProvider,
-      network.chainId,
-      address,
-    );
-
-    if (ensName) {
-      const resolver = await mainnetProvider.getResolver(ensName);
-
-      const promises = ['description', 'url', 'com.twitter', 'com.github'].map(
-        async (recordName) => [recordName, await resolver?.getText(recordName)],
-      );
-
-      return {
-        ensName,
-        records: Object.fromEntries(await Promise.all(promises)),
-      };
-    }
-  } catch {
-    return null;
-  }
-}
-
 export const load = async ({ params, fetch }) => {
   // Account ID here may be either a Drips Account ID, ENS name or an Ethereum address
   const { accountId: universalAccountId } = params;
 
+  const resolution = await resolveAccountIdToAddress(
+    universalAccountId,
+    currentNetworkProvider,
+    mainnetProvider,
+    network.chainId,
+  );
+
   let address: string;
 
-  if (isAddress(universalAccountId)) {
-    address = universalAccountId;
-  } else if ((universalAccountId as string).endsWith('.eth')) {
-    if (!mainnetProvider) {
-      return { error: true, type: 'ens-not-resolved' as const };
-    }
-
-    const lookupRes = await safeReverseLookup(
-      currentNetworkProvider,
-      mainnetProvider,
-      network.chainId,
-      universalAccountId,
-    );
-
-    if (!lookupRes) {
-      return { error: true, type: 'ens-not-resolved' as const };
-    }
-
-    address = lookupRes;
-  } else if (/^\d+$/.test(universalAccountId)) {
-    const driver = extractDriverNameFromAccountId(universalAccountId);
-
-    switch (driver) {
-      case 'address': {
-        address = extractAddressFromAccountId(universalAccountId);
-        break;
+  switch (resolution.type) {
+    case 'success':
+      address = resolution.address;
+      break;
+    case 'driver-account':
+      if (resolution.driver === 'nft') {
+        return redirect(301, `/app/drip-lists/${resolution.accountId}`);
       }
-      case 'nft': {
-        return redirect(301, `/app/drip-lists/${universalAccountId}`);
-      }
-      case 'repo': {
+
+      if (resolution.driver === 'repo') {
         return { error: true, type: 'is-repo-driver-account-id' as const };
       }
-      default: {
-        error(404, 'Not Found');
-      }
-    }
-  } else {
-    error(404, 'Not Found');
+
+      return error(404, 'Not Found');
+    case 'ens-not-resolved':
+      return { error: true, type: 'ens-not-resolved' as const };
+    case 'not-found':
+    default:
+      error(404, 'Not Found');
   }
 
   const [votingRounds, userRes, ensData] = await Promise.all([
-    await getVotingRounds({ publisherAddress: address }, fetch),
+    getVotingRounds({ publisherAddress: address }, fetch),
     query<ProfilePageQuery, ProfilePageQueryVariables>(
       PROFILE_PAGE_QUERY,
       { address, chains: [network.gqlName] },
       fetch,
     ),
-    resolveEnsFields(address),
+    resolveEnsProfile(address, currentNetworkProvider, mainnetProvider, network.chainId),
   ]);
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
