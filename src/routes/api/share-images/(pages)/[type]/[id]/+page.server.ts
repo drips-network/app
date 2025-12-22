@@ -253,9 +253,14 @@ async function loadProfileData(f: typeof fetch, universalAccountId: string) {
       address = resolution.address;
       break;
     case 'driver-account':
-      if (resolution.driver === 'nft' || resolution.driver === 'repo') {
-        throw error(404, 'Use the Drip List share image for this account type');
+      if (resolution.driver === 'nft') {
+        throw error(404, 'Universal account ID is Drip List');
       }
+
+      if (resolution.driver === 'repo') {
+        throw error(404, 'Universal account ID is Project');
+      }
+
       throw error(404, 'Not Found');
     case 'ens-not-resolved':
       throw error(404, 'ENS not resolvable');
