@@ -110,7 +110,7 @@ async function loadProjectData(f: typeof fetch, projectUrl: string) {
       ? [
           {
             icon: 'DripList',
-            label: `${chainData.splits.dependencies.length} dependencie${chainData.splits.dependencies.length === 1 ? '' : 's'}`,
+            label: `${chainData.splits.dependencies.length} dependenc${chainData.splits.dependencies.length === 1 ? 'y' : 'ies'}`,
           },
         ]
       : [],
@@ -308,7 +308,7 @@ async function loadProfileData(f: typeof fetch, universalAccountId: string) {
       {
         icon: 'Heart',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        label: `${(chainData as any)?.support?.length ?? 0} Supporters`,
+        label: `${(chainData as any)?.support?.length ?? 0} Supporter${(chainData as any)?.support?.length === 1 ? '' : 's'}`,
       },
     ],
   };
