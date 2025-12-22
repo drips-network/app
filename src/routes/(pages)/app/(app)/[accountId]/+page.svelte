@@ -35,9 +35,16 @@
     data.profileData.account.address.toLowerCase() === $walletStore.address?.toLowerCase();
 
   $: profileChainData = filterCurrentChainData(data.profileData?.chainData ?? []);
+  $: shareImage =
+    data.profileData?.account.address &&
+    `/api/share-images/profile/${data.profileData.account.address}`;
 </script>
 
-<HeadMeta title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined} />
+<HeadMeta
+  title={data.ensData?.ensName ?? data.profileData?.account.address ?? undefined}
+  image={shareImage}
+  twitterImage={shareImage}
+/>
 
 {#if data.error && data.type === 'is-repo-driver-account-id'}
   <LargeEmptyState
