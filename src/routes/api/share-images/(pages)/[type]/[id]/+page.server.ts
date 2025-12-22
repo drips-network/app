@@ -11,6 +11,7 @@ import type {
   ProjectQueryVariables,
   OrcidQuery,
   OrcidQueryVariables,
+  ProfileQuery,
 } from './__generated__/gql.generated.js';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
@@ -286,7 +287,7 @@ async function loadProfileData(f: typeof fetch, universalAccountId: string) {
     resolveEnsProfile(address, currentNetworkProvider, mainnetProvider, network.chainId),
   ]);
 
-  const { userByAddress } = userRes;
+  const { userByAddress } = userRes as ProfileQuery;
 
   if (!userByAddress) {
     return null;
@@ -298,7 +299,7 @@ async function loadProfileData(f: typeof fetch, universalAccountId: string) {
     bgColor: '#5555FF',
     type: '',
     headline: ensProfile?.ensName ?? formatAddress(address),
-    avatarSrc: null,
+    avatarSrc: ensProfile?.avatarUrl ?? null,
     stats: [
       {
         icon: 'Ethereum',

@@ -76,12 +76,15 @@ export async function resolveEnsProfile(
         async (recordName) => [recordName, await resolver?.getText(recordName)],
       );
 
+      const [records, avatarUrl] = await Promise.all([
+        Promise.all(promises),
+        resolver?.getAvatar(),
+      ]);
+
       return {
         ensName,
-        records: Object.fromEntries(await Promise.all(promises)) as Record<
-          string,
-          string | undefined
-        >,
+        avatarUrl,
+        records: Object.fromEntries(records) as Record<string, string | undefined>,
       };
     }
     return null;

@@ -23,6 +23,11 @@
     avatarImgElem?: HTMLImageElement | undefined;
     isReverse?: boolean;
     tag?: string | undefined;
+    /**
+     * If provided, this URL will be used for the avatar instead of the one fetched from the ENS store.
+     * This is useful for contexts entirely rendered on the server (like share images) or to prevent flash of content on initial load.
+     */
+    avatarSrc?: string | null | undefined;
   }
 
   let {
@@ -40,6 +45,7 @@
     avatarImgElem = $bindable(),
     isReverse = false,
     tag = undefined,
+    avatarSrc = undefined,
   }: Props = $props();
 
   run(() => {
@@ -108,7 +114,7 @@
         <Avatar
           size={currentSize}
           bind:imgElem={avatarImgElem}
-          src={ens?.avatarUrl}
+          src={avatarSrc ?? ens?.avatarUrl}
           placeholderSrc={blockyUrl}
         />
       {/key}

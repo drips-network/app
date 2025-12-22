@@ -62,6 +62,7 @@
             size="gigantic"
             showIdentity={false}
             disableTooltip
+            avatarSrc={data.ensData?.avatarUrl}
           />
           <div class="flex items-center sm:py-4">
             <div class="flex flex-col gap-4">
@@ -72,13 +73,14 @@
                   size="gigantic"
                   showAvatar={false}
                   disableTooltip
+                  avatarSrc={data.ensData?.avatarUrl}
                 />
               </h1>
               <ul class="social-links">
                 <div in:fade>
                   <SocialLink network="ethereum" value={data.profileData.account.address} />
                 </div>
-                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value] (value)}
                   {#if value}<li in:fade>
                       <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                     </li>{/if}
