@@ -1,5 +1,6 @@
 <script lang="ts">
   import DripList from '$lib/components/icons/DripList.svelte';
+  import CoinFlying from '$lib/components/icons/CoinFlying.svelte';
   import getContrastColor from '$lib/utils/get-contrast-text-color';
   import type { Component } from 'svelte';
   import backgroundImage from './background-image';
@@ -9,6 +10,7 @@
 
   const ICON_MAP: Record<string, Component<{ style?: string }>> = {
     DripList: DripList,
+    CoinFlying: CoinFlying,
   };
 
   const contrastColor = $derived(getContrastColor(bgColor));

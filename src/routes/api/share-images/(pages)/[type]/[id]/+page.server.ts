@@ -315,7 +315,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
     // Placeholder icons for now - we will need to improve this or pass generic icons
     const senderIcon = `/api/twemoji-avatar.png?emoji=👤&bgColor=FFFFFF`;
-    const tokenIcon = token?.logoURI || `/api/twemoji-avatar.png?emoji=💰&bgColor=FFFFFF`;
+    const tokenIcon = 'CoinFlying';
     const receiverIcon = `/api/twemoji-avatar.png?emoji=📥&bgColor=FFFFFF`;
 
     return {
