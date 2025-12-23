@@ -15,4 +15,5 @@ export enum ShareImageType {
   ECOSYSTEM = 'ecosystem',
   ORCID = 'orcid',
   RPGF_ROUND = 'rpgf-round',
+  STREAM = 'stream',
 }
