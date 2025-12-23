@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ShareImageType } from './types.js';
+import { ShareImageType, type VisualBadge } from './types.js';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL.js';
 import network from '$lib/stores/wallet/network.js';
@@ -12,6 +12,9 @@ import type {
   OrcidQuery,
   OrcidQueryVariables,
 } from './__generated__/gql.generated.js';
+import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+import { ECOSYSTEM_BADGE_FRAGMENT } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
+import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId.js';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
@@ -239,6 +242,8 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
     const streamQuery = gql`
       query StreamShareImage($senderAccountId: ID!, $chains: [SupportedChain!]) {
+        ${DRIP_LIST_BADGE_FRAGMENT}
+        ${ECOSYSTEM_BADGE_FRAGMENT}
         streams(chains: $chains, where: { senderId: $senderAccountId }) {
           id
           name
@@ -259,15 +264,8 @@ async function loadStreamData(f: typeof fetch, id: string) {
                 driver
               }
             }
-            ... on DripList {
-              name
-            }
-            ... on EcosystemMainAccount {
-              name
-              owner {
-                address
-              }
-            }
+            ...DripListBadge
+            ...EcosystemBadge
           }
           config {
             amountPerSecond {
@@ -313,10 +311,56 @@ async function loadStreamData(f: typeof fetch, id: string) {
       false,
     );
 
-    // Placeholder icons for now - we will need to improve this or pass generic icons
-    const senderIcon = `/api/twemoji-avatar.png?emoji=👤&bgColor=FFFFFF`;
+    // Construct visuals
+    const senderDriverId = stream.sender.account.driver;
+    let senderVisual: VisualBadge = {
+      type: 'identity',
+      data: '0x0000000000000000000000000000000000000000',
+    };
+
+    // If sender is AddressDriver (standard user), convert ID to address
+    if (senderDriverId === network.contracts.ADDRESS_DRIVER) {
+      const senderAddress = extractAddressFromAccountId(stream.sender.account.accountId);
+      senderVisual = { type: 'identity', data: senderAddress };
+    } else {
+      // TODO: Handle other drivers (e.g. NFT driver) if needed.
+      // For now fallback to a placeholder or maybe try to treat as address if possible.
+      // But usually stream sender is a user.
+    }
+
     const tokenIcon = 'CoinFlying';
-    const receiverIcon = `/api/twemoji-avatar.png?emoji=📥&bgColor=FFFFFF`;
+
+    let receiverVisual: VisualBadge;
+
+    switch (stream.receiver.__typename) {
+      case 'DripList':
+        receiverVisual = { type: 'drip-list', data: stream.receiver };
+        break;
+      case 'EcosystemMainAccount':
+        receiverVisual = { type: 'ecosystem', data: stream.receiver };
+        break;
+      case 'User':
+      default:
+        // Handle User receiver
+        if (stream.receiver.__typename === 'User') {
+          const receiverDriverId = stream.receiver.account.driver;
+
+          if (receiverDriverId === network.contracts.ADDRESS_DRIVER) {
+            const receiverAddress = extractAddressFromAccountId(stream.receiver.account.accountId);
+            receiverVisual = { type: 'identity', data: receiverAddress };
+          } else {
+            // Fallback
+            receiverVisual = {
+              type: 'identity',
+              data: '0x0000000000000000000000000000000000000000',
+            };
+          }
+        } else {
+          // Fallback for unknown
+          receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
+        }
+        break;
+    }
 
     return {
       bgColor: '#5555FF', // Default stream color
@@ -330,7 +374,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
       avatarSrc: null,
       stats: [
         {
-          icons: [senderIcon, tokenIcon, receiverIcon],
+          icons: [senderVisual, tokenIcon, receiverVisual],
           label: `${formattedAmount} ${symbol} / month`,
         },
       ],
