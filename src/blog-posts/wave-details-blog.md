@@ -3,12 +3,12 @@ title: 'Drips Wave: What’s Launching in January'
 date: '2025-12-23'
 coverImage: '/assets/blog-images/waves-blog-post-2.png'
 coverImageAlt: 'Illustration showing a Wave cycle on Drips Wave'
-excerpt: 'Why we built Wave, what they enable for developers and maintainers, and what to expect from the first Wave.'
+excerpt: 'Why we built Wave, what it enables for developers and maintainers, and what to expect from the first Wave.'
 author: 'kat'
 announcementBannerCopy: 'Drips Wave: What’s Launching in January'
 ---
 
-Last month we announced Drips Wave, a new way for ecosystems to run contribution cycles using Drips’ infrastructure. We want to give you more details about what’s coming up: why we built Waves, what they enable for developers and maintainers, and what to expect from the first wave launching with the [Stellar Development Foundation](https://stellar.org/foundation) in January 2026.
+Last month we announced Drips Wave, a new way for ecosystems to run contribution cycles using Drips’ infrastructure. We want to give you more details about what’s coming up: why we built Wave, what it enables for developers and maintainers, and what to expect from the first wave launching with the [Stellar Development Foundation](https://stellar.org/foundation) in January 2026.
 
 ![Illustration showing a Wave cycle on Drips Wave](/assets/blog-images/waves-blog-post-2.png)
 
