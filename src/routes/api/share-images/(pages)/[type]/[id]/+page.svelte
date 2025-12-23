@@ -5,7 +5,7 @@
   import backgroundImage from './background-image';
 
   const { data } = $props();
-  const { bgColor, type, headline, avatarSrc, stats, streamIcons, streamAmount } = $derived(data);
+  const { bgColor, type, headline, avatarSrc, stats } = $derived(data);
 
   const ICON_MAP: Record<string, Component<{ style?: string }>> = {
     DripList: DripList,
@@ -39,28 +39,19 @@
       {#if (stats?.length ?? 0) > 0}
         <div class="stats">
           {#each stats as stat (stat.label)}
-            {@const Icon = ICON_MAP[stat.icon]}
             <div class="stat">
-              {#if Icon}
-                <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
-              {/if}
+              {#each stat.icons as visual (visual)}
+                {#if ICON_MAP[visual]}
+                  {@const Icon = ICON_MAP[visual]}
+                  <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
+                {:else}
+                  <!-- svelte-ignore a11y_missing_attribute -->
+                  <img src={visual} class="stat-icon" />
+                {/if}
+              {/each}
               <span class="label">{stat.label}</span>
             </div>
           {/each}
-        </div>
-      {/if}
-
-      {#if streamIcons && streamIcons.length > 0}
-        <div class="stream-footer">
-          <div class="stream-icons">
-            {#each streamIcons as icon (icon)}
-              <!-- svelte-ignore a11y_missing_attribute -->
-              <img src={icon} class="stream-icon" />
-            {/each}
-          </div>
-          {#if streamAmount}
-            <span class="stream-amount">{streamAmount}</span>
-          {/if}
         </div>
       {/if}
     </div>
@@ -152,28 +143,12 @@
     gap: 8px;
   }
 
-  .stream-footer {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-top: 24px;
-  }
-
-  .stream-icons {
-    display: flex;
-    gap: 8px;
-  }
-
-  .stream-icon {
-    width: 64px;
-    height: 64px;
+  .stat-icon {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 2px solid black;
+    border: 1px solid black;
     object-fit: cover;
-    background-color: white; /* Fallback */
-  }
-
-  .stream-amount {
-    font-size: 32px;
+    background-color: white;
   }
 </style>

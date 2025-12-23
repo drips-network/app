@@ -104,7 +104,7 @@ async function loadProjectData(f: typeof fetch, projectUrl: string) {
     stats: claimed
       ? [
           {
-            icon: 'DripList',
+            icons: ['DripList'],
             label: `${chainData.splits.dependencies.length} dependencie${chainData.splits.dependencies.length === 1 ? '' : 's'}`,
           },
         ]
@@ -143,7 +143,7 @@ async function loadDripListData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        icon: 'DripList',
+        icons: ['DripList'],
         label: `${dripList.splits.length} recipient${dripList.splits.length === 1 ? '' : 's'}`,
       },
     ],
@@ -164,7 +164,7 @@ async function loadEcosystemData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        icon: 'DripList',
+        icons: ['DripList'],
         label: `${ecosystem.graph.nodes.length - 1} recipient${ecosystem.graph.nodes.length - 2 === 1 ? '' : 's'}`,
       },
     ],
@@ -328,9 +328,12 @@ async function loadStreamData(f: typeof fetch, id: string) {
           ? stream.receiver.name
           : 'Unnamed stream'),
       avatarSrc: null,
-      streamIcons: [senderIcon, tokenIcon, receiverIcon],
-      streamAmount: `${formattedAmount} ${symbol} / month`,
-      stats: [],
+      stats: [
+        {
+          icons: [senderIcon, tokenIcon, receiverIcon],
+          label: `${formattedAmount} ${symbol} / month`,
+        },
+      ],
     };
   } catch (_) {
     return null;
