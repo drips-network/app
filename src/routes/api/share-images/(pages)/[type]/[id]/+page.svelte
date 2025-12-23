@@ -5,7 +5,7 @@
   import backgroundImage from './background-image';
 
   const { data } = $props();
-  const { bgColor, type, headline, avatarSrc, stats } = $derived(data);
+  const { bgColor, type, headline, avatarSrc, stats, streamIcons, streamAmount } = $derived(data);
 
   const ICON_MAP: Record<string, Component<{ style?: string }>> = {
     DripList: DripList,
@@ -47,6 +47,20 @@
               <span class="label">{stat.label}</span>
             </div>
           {/each}
+        </div>
+      {/if}
+
+      {#if streamIcons && streamIcons.length > 0}
+        <div class="stream-footer">
+          <div class="stream-icons">
+            {#each streamIcons as icon (icon)}
+              <!-- svelte-ignore a11y_missing_attribute -->
+              <img src={icon} class="stream-icon" />
+            {/each}
+          </div>
+          {#if streamAmount}
+            <span class="stream-amount">{streamAmount}</span>
+          {/if}
         </div>
       {/if}
     </div>
@@ -136,5 +150,30 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .stream-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .stream-icons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .stream-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid black;
+    object-fit: cover;
+    background-color: white; /* Fallback */
+  }
+
+  .stream-amount {
+    font-size: 32px;
   }
 </style>

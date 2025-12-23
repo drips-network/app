@@ -17,6 +17,9 @@ import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[eco
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
 import { getRound } from '$lib/utils/rpgf/rpgf.js';
 import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
+import makeStreamId, { decodeStreamId } from '$lib/utils/streams/make-stream-id.js';
+import formatTokenAmount from '$lib/utils/format-token-amount.js';
+import { DRIPS_DEFAULT_TOKEN_LIST } from '$lib/stores/tokens/token-list.js';
 
 function isShareImageType(value: string): value is ShareImageType {
   return Object.values(ShareImageType).includes(value as ShareImageType);
@@ -230,6 +233,107 @@ async function loadRpgfRoundData(f: typeof fetch, id: string) {
   };
 }
 
+async function loadStreamData(f: typeof fetch, id: string) {
+  try {
+    const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
+
+    const streamQuery = gql`
+      query StreamShareImage($senderAccountId: ID!, $chains: [SupportedChain!]) {
+        streams(chains: $chains, where: { senderId: $senderAccountId }) {
+          id
+          name
+          sender {
+            account {
+              accountId
+              driver
+            }
+            chainData {
+              chain
+            }
+          }
+          receiver {
+            __typename
+            ... on User {
+              account {
+                accountId
+                driver
+              }
+            }
+            ... on DripList {
+              name
+            }
+            ... on EcosystemMainAccount {
+              name
+              owner {
+                address
+              }
+            }
+          }
+          config {
+            amountPerSecond {
+              amount
+              tokenAddress
+            }
+          }
+        }
+      }
+    `;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await query<any, any>(
+      streamQuery,
+      { senderAccountId, chains: [network.gqlName] },
+      f,
+    );
+
+    const expectedStreamId = makeStreamId(senderAccountId, tokenAddress, dripId);
+
+    const stream = res.streams.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (s: any) => s.id.toLowerCase() === expectedStreamId.toLowerCase(),
+    );
+
+    if (!stream) return null;
+
+    const token = DRIPS_DEFAULT_TOKEN_LIST.find(
+      (t) =>
+        t.address.toLowerCase() === tokenAddress.toLowerCase() && t.chainId === network.chainId,
+    );
+
+    const decimals = token?.decimals ?? 18;
+    const symbol = token?.symbol ?? 'Tokens';
+
+    const formattedAmount = formatTokenAmount(
+      {
+        amount: BigInt(stream.config.amountPerSecond.amount),
+        tokenAddress: stream.config.amountPerSecond.tokenAddress,
+      },
+      decimals,
+      undefined,
+      false,
+    );
+
+    // Placeholder icons for now - we will need to improve this or pass generic icons
+    const senderIcon = `/api/twemoji-avatar.png?emoji=👤&bgColor=FFFFFF`;
+    const tokenIcon = token?.logoURI || `/api/twemoji-avatar.png?emoji=💰&bgColor=FFFFFF`;
+    const receiverIcon = `/api/twemoji-avatar.png?emoji=📥&bgColor=FFFFFF`;
+
+    return {
+      bgColor: '#5555FF', // Default stream color
+      type: 'Stream',
+      headline:
+        stream.name ||
+        (stream.receiver.__typename === 'DripList' ? 'Continuous donation' : 'Unnamed stream'),
+      avatarSrc: null,
+      streamIcons: [senderIcon, tokenIcon, receiverIcon],
+      streamAmount: `${formattedAmount} ${symbol} / month`,
+      stats: [],
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
 const LOAD_FNS = {
   [ShareImageType.WAVE_PROGRAM]: loadWaveProgramData,
   [ShareImageType.PROJECT]: loadProjectData,
@@ -237,6 +341,7 @@ const LOAD_FNS = {
   [ShareImageType.ECOSYSTEM]: loadEcosystemData,
   [ShareImageType.ORCID]: loadOrcidData,
   [ShareImageType.RPGF_ROUND]: loadRpgfRoundData,
+  [ShareImageType.STREAM]: loadStreamData,
 } as const;
 
 export const load = async ({ params }) => {
