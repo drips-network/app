@@ -12,9 +12,9 @@ import type {
   OrcidQuery,
   OrcidQueryVariables,
 } from './__generated__/gql.generated.js';
+import type { AddressDriverAccount } from '$lib/graphql/__generated__/base-types';
 import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
 import { ECOSYSTEM_BADGE_FRAGMENT } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
-import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId.js';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
@@ -251,6 +251,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
             account {
               accountId
               driver
+              address
             }
             chainData {
               chain
@@ -262,6 +263,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
               account {
                 accountId
                 driver
+                address
               }
             }
             ...DripListBadge
@@ -320,7 +322,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
     // If sender is AddressDriver (standard user), convert ID to address
     if (senderDriverId === network.contracts.ADDRESS_DRIVER) {
-      const senderAddress = extractAddressFromAccountId(stream.sender.account.accountId);
+      const senderAddress = (stream.sender.account as AddressDriverAccount).address;
       senderVisual = { type: 'identity', data: senderAddress };
     } else {
       // TODO: Handle other drivers (e.g. NFT driver) if needed.
@@ -346,7 +348,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
           const receiverDriverId = stream.receiver.account.driver;
 
           if (receiverDriverId === network.contracts.ADDRESS_DRIVER) {
-            const receiverAddress = extractAddressFromAccountId(stream.receiver.account.accountId);
+            const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
             receiverVisual = { type: 'identity', data: receiverAddress };
           } else {
             // Fallback
