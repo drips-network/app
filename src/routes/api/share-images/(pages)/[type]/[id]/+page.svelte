@@ -18,10 +18,13 @@
 
   const BADGE_CONFIG: Record<
     string,
-    { component: Component; getProps: (data: unknown) => Record<string, unknown> }
+    {
+      component: Component<Record<string, unknown>>;
+      getProps: (data: unknown) => Record<string, unknown>;
+    }
   > = {
     identity: {
-      component: IdentityBadge,
+      component: IdentityBadge as unknown as Component<Record<string, unknown>>,
       getProps: (data) => ({
         address: data as string,
         showIdentity: false,
@@ -32,7 +35,7 @@
       }),
     },
     'drip-list': {
-      component: DripListBadge,
+      component: DripListBadge as unknown as Component<Record<string, unknown>>,
       getProps: (data) => ({
         dripList:
           data as import('$lib/components/drip-list-badge/__generated__/gql.generated').DripListBadgeFragment,
@@ -43,7 +46,7 @@
       }),
     },
     ecosystem: {
-      component: EcosystemBadge,
+      component: EcosystemBadge as unknown as Component<Record<string, unknown>>,
       getProps: (data) => ({
         ecosystem:
           data as import('$lib/components/ecosystem-badge/__generated__/gql.generated').EcosystemBadgeFragment,
