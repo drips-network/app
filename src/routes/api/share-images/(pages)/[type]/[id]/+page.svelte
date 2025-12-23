@@ -1,16 +1,58 @@
 <script lang="ts">
-  import DripList from '$lib/components/icons/DripList.svelte';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
   import CoinFlying from '$lib/components/icons/CoinFlying.svelte';
   import getContrastColor from '$lib/utils/get-contrast-text-color';
   import type { Component } from 'svelte';
+  import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
+  import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+  import EcosystemBadge from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
   import backgroundImage from './background-image';
 
   const { data } = $props();
   const { bgColor, type, headline, avatarSrc, stats } = $derived(data);
 
   const ICON_MAP: Record<string, Component<{ style?: string }>> = {
-    DripList: DripList,
+    DripList: DripListIcon,
     CoinFlying: CoinFlying,
+  };
+
+  const BADGE_CONFIG: Record<
+    string,
+    { component: Component; getProps: (data: unknown) => Record<string, unknown> }
+  > = {
+    identity: {
+      component: IdentityBadge,
+      getProps: (data) => ({
+        address: data as string,
+        showIdentity: false,
+        showAvatar: true,
+        size: 'medium',
+        disableLink: true,
+        disableTooltip: true,
+      }),
+    },
+    'drip-list': {
+      component: DripListBadge,
+      getProps: (data) => ({
+        dripList:
+          data as import('$lib/components/drip-list-badge/__generated__/gql.generated').DripListBadgeFragment,
+        showName: false,
+        showAvatar: true,
+        avatarSize: 'small',
+        disabled: true,
+      }),
+    },
+    ecosystem: {
+      component: EcosystemBadge,
+      getProps: (data) => ({
+        ecosystem:
+          data as import('$lib/components/ecosystem-badge/__generated__/gql.generated').EcosystemBadgeFragment,
+        showName: false,
+        showAvatar: true,
+        avatarSize: 'small',
+        disabled: true,
+      }),
+    },
   };
 
   const contrastColor = $derived(getContrastColor(bgColor));
@@ -43,12 +85,20 @@
           {#each stats as stat (stat.label)}
             <div class="stat">
               {#each stat.icons as visual (visual)}
-                {#if ICON_MAP[visual]}
-                  {@const Icon = ICON_MAP[visual]}
-                  <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
-                {:else}
-                  <!-- svelte-ignore a11y_missing_attribute -->
-                  <img src={visual} class="stat-icon" />
+                {#if typeof visual === 'string'}
+                  {#if ICON_MAP[visual]}
+                    {@const Icon = ICON_MAP[visual]}
+                    <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
+                  {:else}
+                    <!-- svelte-ignore a11y_missing_attribute -->
+                    <img src={visual} class="stat-icon" />
+                  {/if}
+                {:else if BADGE_CONFIG[visual.type]}
+                  {@const config = BADGE_CONFIG[visual.type]}
+                  {@const Badge = config.component}
+                  <div class="badge-wrapper">
+                    <Badge {...config.getProps(visual.data)} />
+                  </div>
                 {/if}
               {/each}
               <span class="label">{stat.label}</span>
@@ -152,5 +202,11 @@
     border: 1px solid black;
     object-fit: cover;
     background-color: white;
+  }
+
+  .badge-wrapper {
+    /* Ensure badges don't have unexpected margins */
+    display: flex;
+    align-items: center;
   }
 </style>
