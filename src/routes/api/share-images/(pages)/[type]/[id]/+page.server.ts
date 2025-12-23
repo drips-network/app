@@ -320,10 +320,13 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
     return {
       bgColor: '#5555FF', // Default stream color
-      type: 'Stream',
+      type: 'Continuous Donation',
       headline:
         stream.name ||
-        (stream.receiver.__typename === 'DripList' ? 'Continuous donation' : 'Unnamed stream'),
+        (stream.receiver.__typename === 'DripList' ||
+        stream.receiver.__typename === 'EcosystemMainAccount'
+          ? stream.receiver.name
+          : 'Unnamed stream'),
       avatarSrc: null,
       streamIcons: [senderIcon, tokenIcon, receiverIcon],
       streamAmount: `${formattedAmount} ${symbol} / month`,
