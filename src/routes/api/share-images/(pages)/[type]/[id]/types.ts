@@ -22,7 +22,7 @@ import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__ge
 import type { EcosystemBadgeFragment } from '$lib/components/ecosystem-badge/__generated__/gql.generated';
 
 export type VisualBadge =
-  | string
+  | { type: 'icon'; data: string }
   | { type: 'identity'; data: string }
   | { type: 'drip-list'; data: DripListBadgeFragment }
   | { type: 'ecosystem'; data: EcosystemBadgeFragment };

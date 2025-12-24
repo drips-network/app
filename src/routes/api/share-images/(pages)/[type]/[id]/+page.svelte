@@ -19,10 +19,18 @@
   const BADGE_CONFIG: Record<
     string,
     {
-      component: Component<Record<string, unknown>>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      component: Component<any>;
       getProps: (data: unknown) => Record<string, unknown>;
     }
   > = {
+    icon: {
+      component: null as unknown as Component<Record<string, unknown>>, // Special case handled manually in the template for now, or we can make a wrapper.
+      // To strictly follow the pattern, we'd need an IconWrapper component.
+      // But for now, let's keep the manual check but triggered by `type === 'icon'`.
+      getProps: (_) => ({}),
+    },
+
     identity: {
       component: IdentityBadge as unknown as Component<Record<string, unknown>>,
       getProps: (data) => ({
@@ -87,14 +95,11 @@
         <div class="stats">
           {#each stats as stat (stat.label)}
             <div class="stat">
-              {#each stat.icons as visual (visual)}
-                {#if typeof visual === 'string'}
-                  {#if ICON_MAP[visual]}
-                    {@const Icon = ICON_MAP[visual]}
+              {#each stat.visuals as visual (visual)}
+                {#if visual.type === 'icon'}
+                  {#if ICON_MAP[visual.data]}
+                    {@const Icon = ICON_MAP[visual.data]}
                     <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
-                  {:else}
-                    <!-- svelte-ignore a11y_missing_attribute -->
-                    <img src={visual} class="stat-icon" />
                   {/if}
                 {:else if BADGE_CONFIG[visual.type]}
                   {@const config = BADGE_CONFIG[visual.type]}
