@@ -341,26 +341,24 @@ async function loadStreamData(f: typeof fetch, id: string) {
       case 'EcosystemMainAccount':
         receiverVisual = { type: 'ecosystem', data: stream.receiver };
         break;
-      case 'User':
-      default:
-        // Handle User receiver
-        if (stream.receiver.__typename === 'User') {
-          const receiverDriverId = stream.receiver.account.driver;
+      case 'User': {
+        const receiverDriverId = stream.receiver.account.driver;
 
-          if (receiverDriverId === network.contracts.ADDRESS_DRIVER) {
-            const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
-            receiverVisual = { type: 'identity', data: receiverAddress };
-          } else {
-            // Fallback
-            receiverVisual = {
-              type: 'identity',
-              data: '0x0000000000000000000000000000000000000000',
-            };
-          }
+        if (receiverDriverId === network.contracts.ADDRESS_DRIVER) {
+          const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
+          receiverVisual = { type: 'identity', data: receiverAddress };
         } else {
-          // Fallback for unknown
-          receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
+          // Fallback
+          receiverVisual = {
+            type: 'identity',
+            data: '0x0000000000000000000000000000000000000000',
+          };
         }
+        break;
+      }
+      default:
+        // Fallback for unknown
+        receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
         break;
     }
 
