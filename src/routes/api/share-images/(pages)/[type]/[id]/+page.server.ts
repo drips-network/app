@@ -314,21 +314,8 @@ async function loadStreamData(f: typeof fetch, id: string) {
     );
 
     // Construct visuals
-    const senderDriverId = stream.sender.account.driver;
-    let senderVisual: VisualBadge = {
-      type: 'identity',
-      data: '0x0000000000000000000000000000000000000000',
-    };
-
-    // If sender is AddressDriver (standard user), convert ID to address
-    if (senderDriverId === network.contracts.ADDRESS_DRIVER) {
-      const senderAddress = (stream.sender.account as AddressDriverAccount).address;
-      senderVisual = { type: 'identity', data: senderAddress };
-    } else {
-      // TODO: Handle other drivers (e.g. NFT driver) if needed.
-      // For now fallback to a placeholder or maybe try to treat as address if possible.
-      // But usually stream sender is a user.
-    }
+    const senderAddress = (stream.sender.account as AddressDriverAccount).address;
+    const senderVisual: VisualBadge = { type: 'identity', data: senderAddress };
 
     const tokenIcon = 'CoinFlying';
 
@@ -342,18 +329,8 @@ async function loadStreamData(f: typeof fetch, id: string) {
         receiverVisual = { type: 'ecosystem', data: stream.receiver };
         break;
       case 'User': {
-        const receiverDriverId = stream.receiver.account.driver;
-
-        if (receiverDriverId === network.contracts.ADDRESS_DRIVER) {
-          const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
-          receiverVisual = { type: 'identity', data: receiverAddress };
-        } else {
-          // Fallback
-          receiverVisual = {
-            type: 'identity',
-            data: '0x0000000000000000000000000000000000000000',
-          };
-        }
+        const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
+        receiverVisual = { type: 'identity', data: receiverAddress };
         break;
       }
       default:
