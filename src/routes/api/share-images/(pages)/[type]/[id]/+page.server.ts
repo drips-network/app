@@ -107,7 +107,7 @@ async function loadProjectData(f: typeof fetch, projectUrl: string) {
     stats: claimed
       ? [
           {
-            visuals: [{ type: 'drip-list-icon', data: undefined }],
+            visuals: [{ type: 'drip-list-icon', data: undefined } as const],
             label: `${chainData.splits.dependencies.length} dependencie${chainData.splits.dependencies.length === 1 ? '' : 's'}`,
           },
         ]
@@ -146,7 +146,7 @@ async function loadDripListData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        visuals: [{ type: 'drip-list-icon', data: undefined }],
+        visuals: [{ type: 'drip-list-icon', data: undefined } as const],
         label: `${dripList.splits.length} recipient${dripList.splits.length === 1 ? '' : 's'}`,
       },
     ],
@@ -167,7 +167,7 @@ async function loadEcosystemData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        visuals: [{ type: 'drip-list-icon', data: undefined }],
+        visuals: [{ type: 'drip-list-icon', data: undefined } as const],
         label: `${ecosystem.graph.nodes.length - 1} recipient${ecosystem.graph.nodes.length - 2 === 1 ? '' : 's'}`,
       },
     ],
