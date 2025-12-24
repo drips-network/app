@@ -237,128 +237,119 @@ async function loadRpgfRoundData(f: typeof fetch, id: string) {
 }
 
 async function loadStreamData(f: typeof fetch, id: string) {
-  try {
-    const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
+  const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
 
-    const streamQuery = gql`
-      query StreamShareImage($senderAccountId: ID!, $chains: [SupportedChain!]) {
-        ${DRIP_LIST_BADGE_FRAGMENT}
-        ${ECOSYSTEM_BADGE_FRAGMENT}
-        streams(chains: $chains, where: { senderId: $senderAccountId }) {
-          id
-          name
-          sender {
+  const streamQuery = gql`
+    query StreamShareImage($senderAccountId: ID!, $chains: [SupportedChain!]) {
+      ${DRIP_LIST_BADGE_FRAGMENT}
+      ${ECOSYSTEM_BADGE_FRAGMENT}
+      streams(chains: $chains, where: { senderId: $senderAccountId }) {
+        id
+        name
+        sender {
+          account {
+            accountId
+            driver
+            address
+          }
+          chainData {
+            chain
+          }
+        }
+        receiver {
+          __typename
+          ... on User {
             account {
               accountId
               driver
               address
             }
-            chainData {
-              chain
-            }
           }
-          receiver {
-            __typename
-            ... on User {
-              account {
-                accountId
-                driver
-                address
-              }
-            }
-            ...DripListBadge
-            ...EcosystemBadge
-          }
-          config {
-            amountPerSecond {
-              amount
-              tokenAddress
-            }
+          ...DripListBadge
+          ...EcosystemBadge
+        }
+        config {
+          amountPerSecond {
+            amount
+            tokenAddress
           }
         }
       }
-    `;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = await query<any, any>(
-      streamQuery,
-      { senderAccountId, chains: [network.gqlName] },
-      f,
-    );
-
-    const expectedStreamId = makeStreamId(senderAccountId, tokenAddress, dripId);
-
-    const stream = res.streams.find(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (s: any) => s.id.toLowerCase() === expectedStreamId.toLowerCase(),
-    );
-
-    if (!stream) return null;
-
-    const token = DRIPS_DEFAULT_TOKEN_LIST.find(
-      (t) =>
-        t.address.toLowerCase() === tokenAddress.toLowerCase() && t.chainId === network.chainId,
-    );
-
-    const decimals = token?.decimals ?? 18;
-    const symbol = token?.symbol ?? 'Tokens';
-
-    const formattedAmount = formatTokenAmount(
-      {
-        amount: BigInt(stream.config.amountPerSecond.amount),
-        tokenAddress: stream.config.amountPerSecond.tokenAddress,
-      },
-      decimals,
-      undefined,
-      false,
-    );
-
-    // Construct visuals
-    const senderAddress = (stream.sender.account as AddressDriverAccount).address;
-    const senderVisual: VisualBadge = { type: 'identity', data: senderAddress };
-
-    const tokenIcon = 'CoinFlying';
-
-    let receiverVisual: VisualBadge;
-
-    switch (stream.receiver.__typename) {
-      case 'DripList':
-        receiverVisual = { type: 'drip-list', data: stream.receiver };
-        break;
-      case 'EcosystemMainAccount':
-        receiverVisual = { type: 'ecosystem', data: stream.receiver };
-        break;
-      case 'User': {
-        const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
-        receiverVisual = { type: 'identity', data: receiverAddress };
-        break;
-      }
-      default:
-        // Fallback for unknown
-        receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
-        break;
     }
+  `;
 
-    return {
-      bgColor: '#5555FF', // Default stream color
-      type: 'Continuous Donation',
-      headline:
-        stream.name ||
-        (stream.receiver.__typename === 'DripList' ||
-        stream.receiver.__typename === 'EcosystemMainAccount'
-          ? stream.receiver.name
-          : 'Unnamed stream'),
-      avatarSrc: null,
-      stats: [
-        {
-          icons: [senderVisual, tokenIcon, receiverVisual],
-          label: `${formattedAmount} ${symbol} / month`,
-        },
-      ],
-    };
-  } catch (_) {
-    return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const res = await query<any, any>(streamQuery, { senderAccountId, chains: [network.gqlName] }, f);
+
+  const expectedStreamId = makeStreamId(senderAccountId, tokenAddress, dripId);
+
+  const stream = res.streams.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (s: any) => s.id.toLowerCase() === expectedStreamId.toLowerCase(),
+  );
+
+  if (!stream) return null;
+
+  const token = DRIPS_DEFAULT_TOKEN_LIST.find(
+    (t) => t.address.toLowerCase() === tokenAddress.toLowerCase() && t.chainId === network.chainId,
+  );
+
+  const decimals = token?.decimals ?? 18;
+  const symbol = token?.symbol ?? 'Tokens';
+
+  const formattedAmount = formatTokenAmount(
+    {
+      amount: BigInt(stream.config.amountPerSecond.amount),
+      tokenAddress: stream.config.amountPerSecond.tokenAddress,
+    },
+    decimals,
+    undefined,
+    false,
+  );
+
+  // Construct visuals
+  const senderAddress = (stream.sender.account as AddressDriverAccount).address;
+  const senderVisual: VisualBadge = { type: 'identity', data: senderAddress };
+
+  const tokenIcon = 'CoinFlying';
+
+  let receiverVisual: VisualBadge;
+
+  switch (stream.receiver.__typename) {
+    case 'DripList':
+      receiverVisual = { type: 'drip-list', data: stream.receiver };
+      break;
+    case 'EcosystemMainAccount':
+      receiverVisual = { type: 'ecosystem', data: stream.receiver };
+      break;
+    case 'User': {
+      const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
+      receiverVisual = { type: 'identity', data: receiverAddress };
+      break;
+    }
+    default:
+      // Fallback for unknown
+      receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
+      break;
   }
+
+  return {
+    bgColor: '#5555FF', // Default stream color
+    type: 'Continuous Donation',
+    headline:
+      stream.name ||
+      (stream.receiver.__typename === 'DripList' ||
+      stream.receiver.__typename === 'EcosystemMainAccount'
+        ? stream.receiver.name
+        : 'Unnamed stream'),
+    avatarSrc: null,
+    stats: [
+      {
+        icons: [senderVisual, tokenIcon, receiverVisual],
+        label: `${formattedAmount} ${symbol} / month`,
+      },
+    ],
+  };
 }
 
 const LOAD_FNS = {
