@@ -1,20 +1,15 @@
 <script lang="ts">
-  import DripListIcon from '$lib/components/icons/DripList.svelte';
-  import CoinFlying from '$lib/components/icons/CoinFlying.svelte';
-  import getContrastColor from '$lib/utils/get-contrast-text-color';
   import type { Component } from 'svelte';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import EcosystemBadge from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
   import backgroundImage from './background-image';
+  import getContrastColor from '$lib/utils/get-contrast-text-color';
+  import DripListIcon from '$lib/components/icons/DripList.svelte';
+  import CoinFlying from '$lib/components/icons/CoinFlying.svelte';
 
   const { data } = $props();
   const { bgColor, type, headline, avatarSrc, stats } = $derived(data);
-
-  const ICON_MAP: Record<string, Component<{ style?: string }>> = {
-    DripList: DripListIcon,
-    CoinFlying: CoinFlying,
-  };
 
   const BADGE_CONFIG: Record<
     string,
@@ -24,11 +19,17 @@
       getProps: (data: unknown) => Record<string, unknown>;
     }
   > = {
-    icon: {
-      component: null as unknown as Component<Record<string, unknown>>, // Special case handled manually in the template for now, or we can make a wrapper.
-      // To strictly follow the pattern, we'd need an IconWrapper component.
-      // But for now, let's keep the manual check but triggered by `type === 'icon'`.
-      getProps: (_) => ({}),
+    'coin-flying': {
+      component: CoinFlying as unknown as Component<Record<string, unknown>>,
+      getProps: () => ({
+        style: `fill: ${contrastColor}; height: 32px; width: 32px;`,
+      }),
+    },
+    'drip-list-icon': {
+      component: DripListIcon as unknown as Component<Record<string, unknown>>,
+      getProps: () => ({
+        style: `fill: ${contrastColor}; height: 32px; width: 32px;`,
+      }),
     },
 
     identity: {
@@ -96,12 +97,7 @@
           {#each stats as stat (stat.label)}
             <div class="stat">
               {#each stat.visuals as visual (visual)}
-                {#if visual.type === 'icon'}
-                  {#if ICON_MAP[visual.data]}
-                    {@const Icon = ICON_MAP[visual.data]}
-                    <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
-                  {/if}
-                {:else if BADGE_CONFIG[visual.type]}
+                {#if BADGE_CONFIG[visual.type]}
                   {@const config = BADGE_CONFIG[visual.type]}
                   {@const Badge = config.component}
                   <div class="badge-wrapper">

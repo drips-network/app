@@ -107,7 +107,7 @@ async function loadProjectData(f: typeof fetch, projectUrl: string) {
     stats: claimed
       ? [
           {
-            visuals: [{ type: 'icon', data: 'DripList' }],
+            visuals: [{ type: 'drip-list-icon', data: undefined }],
             label: `${chainData.splits.dependencies.length} dependencie${chainData.splits.dependencies.length === 1 ? '' : 's'}`,
           },
         ]
@@ -146,7 +146,7 @@ async function loadDripListData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        visuals: [{ type: 'icon', data: 'DripList' }],
+        visuals: [{ type: 'drip-list-icon', data: undefined }],
         label: `${dripList.splits.length} recipient${dripList.splits.length === 1 ? '' : 's'}`,
       },
     ],
@@ -167,7 +167,7 @@ async function loadEcosystemData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        visuals: [{ type: 'icon', data: 'DripList' }],
+        visuals: [{ type: 'drip-list-icon', data: undefined }],
         label: `${ecosystem.graph.nodes.length - 1} recipient${ecosystem.graph.nodes.length - 2 === 1 ? '' : 's'}`,
       },
     ],
@@ -311,7 +311,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
   const senderAddress = (stream.sender.account as AddressDriverAccount).address;
   const senderVisual: VisualBadge = { type: 'identity', data: senderAddress };
 
-  const tokenIcon: VisualBadge = { type: 'icon', data: 'CoinFlying' };
+  const tokenIcon: VisualBadge = { type: 'coin-flying', data: undefined };
 
   let receiverVisual: VisualBadge;
 

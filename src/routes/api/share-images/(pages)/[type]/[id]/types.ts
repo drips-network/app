@@ -22,7 +22,8 @@ import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__ge
 import type { EcosystemBadgeFragment } from '$lib/components/ecosystem-badge/__generated__/gql.generated';
 
 export type VisualBadge =
-  | { type: 'icon'; data: string }
+  | { type: 'coin-flying'; data: undefined }
+  | { type: 'drip-list-icon'; data: undefined }
   | { type: 'identity'; data: string }
   | { type: 'drip-list'; data: DripListBadgeFragment }
   | { type: 'ecosystem'; data: EcosystemBadgeFragment };
