@@ -1,5 +1,5 @@
 <script lang="ts">
-  import VisualRenderer from './VisualRenderer.svelte';
+  import ShareImageVisualRenderer from './ShareImageVisualRenderer.svelte';
   import backgroundImage from './background-image';
   import getContrastColor from '$lib/utils/get-contrast-text-color';
 
@@ -36,7 +36,7 @@
           {#each stats as stat (stat.label)}
             <div class="stat">
               {#each stat.visuals as visual (visual)}
-                <VisualRenderer {visual} color={contrastColor} />
+                <ShareImageVisualRenderer {visual} color={contrastColor} />
               {/each}
               <span class="label">{stat.label}</span>
             </div>

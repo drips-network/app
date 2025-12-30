@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ShareImageType, type VisualBadge } from './types.js';
+import { ShareImageType, type ShareImageVisual } from './types.js';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL.js';
 import network from '$lib/stores/wallet/network.js';
@@ -309,11 +309,11 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
   // Construct visuals
   const senderAddress = (stream.sender.account as AddressDriverAccount).address;
-  const senderVisual: VisualBadge = { type: 'identity', data: senderAddress };
+  const senderVisual: ShareImageVisual = { type: 'identity', data: senderAddress };
 
-  const tokenIcon: VisualBadge = { type: 'coin-flying', data: undefined };
+  const tokenIcon: ShareImageVisual = { type: 'coin-flying', data: undefined };
 
-  let receiverVisual: VisualBadge;
+  let receiverVisual: ShareImageVisual;
 
   switch (stream.receiver.__typename) {
     case 'DripList':

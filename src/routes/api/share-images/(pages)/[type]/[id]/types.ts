@@ -21,7 +21,7 @@ export enum ShareImageType {
 import type { DripListBadgeFragment } from '$lib/components/drip-list-badge/__generated__/gql.generated';
 import type { EcosystemBadgeFragment } from '$lib/components/ecosystem-badge/__generated__/gql.generated';
 
-export type VisualBadge =
+export type ShareImageVisual =
   | { type: 'coin-flying'; data: undefined }
   | { type: 'drip-list-icon'; data: undefined }
   | { type: 'identity'; data: string }

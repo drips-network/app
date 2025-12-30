@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { VisualBadge } from './types';
+  import type { ShareImageVisual } from './types';
   import IdentityBadge from '$lib/components/identity-badge/identity-badge.svelte';
   import DripListBadge from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import EcosystemBadge from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
@@ -7,7 +7,7 @@
   import CoinFlying from '$lib/components/icons/CoinFlying.svelte';
 
   interface Props {
-    visual: VisualBadge;
+    visual: ShareImageVisual;
     color: string;
   }
 
