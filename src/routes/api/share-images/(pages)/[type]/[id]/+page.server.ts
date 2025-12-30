@@ -11,6 +11,8 @@ import type {
   ProjectQueryVariables,
   OrcidQuery,
   OrcidQueryVariables,
+  StreamQuery,
+  StreamQueryVariables,
 } from './__generated__/gql.generated.js';
 import type { AddressDriverAccount } from '$lib/graphql/__generated__/base-types';
 import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
@@ -240,7 +242,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
   const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
 
   const streamQuery = gql`
-    query StreamShareImage($senderAccountId: ID!, $chains: [SupportedChain!]) {
+    query Stream($senderAccountId: ID!, $chains: [SupportedChain!]) {
       ${DRIP_LIST_BADGE_FRAGMENT}
       ${ECOSYSTEM_BADGE_FRAGMENT}
       streams(chains: $chains, where: { senderId: $senderAccountId }) {
@@ -278,15 +280,15 @@ async function loadStreamData(f: typeof fetch, id: string) {
     }
   `;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res = await query<any, any>(streamQuery, { senderAccountId, chains: [network.gqlName] }, f);
+  const res = await query<StreamQuery, StreamQueryVariables>(
+    streamQuery,
+    { senderAccountId, chains: [network.gqlName] },
+    f,
+  );
 
   const expectedStreamId = makeStreamId(senderAccountId, tokenAddress, dripId);
 
-  const stream = res.streams.find(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (s: any) => s.id.toLowerCase() === expectedStreamId.toLowerCase(),
-  );
+  const stream = res.streams.find((s) => s.id.toLowerCase() === expectedStreamId.toLowerCase());
 
   if (!stream) return null;
 
