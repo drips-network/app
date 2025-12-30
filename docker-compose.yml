@@ -155,7 +155,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: postgres:latest
+    image: postgres:16
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -172,7 +172,7 @@ services:
       start_period: 80s
 
   postgres-multiplayer:
-    image: postgres:latest
+    image: postgres:16
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -189,7 +189,7 @@ services:
       start_period: 80s
 
   postgres-ecosystems:
-    image: postgres:latest
+    image: postgres:16
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -266,7 +266,7 @@ services:
         condition: service_healthy
 
   postgres-rpgf:
-    image: postgres:latest
+    image: postgres:16
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
