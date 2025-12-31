@@ -9,6 +9,7 @@
     ${EDIT_STREAM_FLOW_STREAM}
     ${STREAM_STATE_BADGE_STREAM_FRAGMENT}
     fragment StreamPageStream on Stream {
+      id
       ...StreamStateBadgeStream
       ...EditStreamFlowStream
       ...DeleteStreamConfirmStep
@@ -196,7 +197,11 @@
   );
 </script>
 
-<HeadMeta title={stream.name ?? 'Stream'} />
+<HeadMeta
+  title={stream.name ?? 'Stream'}
+  image="/api/share-images/stream/{stream.id}.png"
+  twitterImage="/api/share-images/stream/{stream.id}.png"
+/>
 
 <div class="wrapper">
   <div class="header">
