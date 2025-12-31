@@ -242,9 +242,9 @@ async function loadStreamData(f: typeof fetch, id: string) {
   const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
 
   const streamQuery = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    ${ECOSYSTEM_BADGE_FRAGMENT}
     query Stream($senderAccountId: ID!, $chains: [SupportedChain!]) {
-      ${DRIP_LIST_BADGE_FRAGMENT}
-      ${ECOSYSTEM_BADGE_FRAGMENT}
       streams(chains: $chains, where: { senderId: $senderAccountId }) {
         id
         name
