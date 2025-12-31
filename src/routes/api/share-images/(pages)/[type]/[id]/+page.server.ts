@@ -25,6 +25,7 @@ import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
 import makeStreamId, { decodeStreamId } from '$lib/utils/streams/make-stream-id.js';
 import formatTokenAmount from '$lib/utils/format-token-amount.js';
 import { DRIPS_DEFAULT_TOKEN_LIST } from '$lib/stores/tokens/token-list.js';
+import { MULTIPLIERS } from '$lib/stores/amt-delta-unit/amt-delta-unit.store.js';
 
 function isShareImageType(value: string): value is ShareImageType {
   return Object.values(ShareImageType).includes(value as ShareImageType);
@@ -301,7 +302,7 @@ async function loadStreamData(f: typeof fetch, id: string) {
 
   const formattedAmount = formatTokenAmount(
     {
-      amount: BigInt(stream.config.amountPerSecond.amount),
+      amount: BigInt(stream.config.amountPerSecond.amount) * BigInt(MULTIPLIERS['30-days']),
       tokenAddress: stream.config.amountPerSecond.tokenAddress,
     },
     decimals,
