@@ -31,7 +31,9 @@
   {:else if visual.type === 'drip-list'}
     <DripListBadge
       dripList={visual.data}
-      showName={false}
+      showName={true}
+      showOwner={false}
+      isLinked={false}
       showAvatar={true}
       avatarSize="small"
       disabled={true}
