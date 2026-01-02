@@ -1,9 +1,8 @@
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { getNetwork, SUPPORTED_CHAIN_IDS } from '$lib/stores/wallet/network';
-import { get } from 'svelte/store';
 
 export default function getChainDeploymentUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]) {
-  const currentPage = get(page);
+  const currentPage = page;
 
   const path = currentPage.url.pathname;
 

@@ -15,7 +15,7 @@
   import type { Writable } from 'svelte/store';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
   import type { ApplicationCategory, ListingApplication } from '$lib/utils/rpgf/types/application';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import type { FilterParam, SortByParam } from '../+layout';
   import type { TDropdownOption } from '$lib/components/table-view-configurator/components/mini-dropdown.svelte';
 
@@ -80,7 +80,7 @@
     selectedFilter = filterBy as FilterParam | null;
 
     await goto(
-      buildUrl($page.url.pathname, {
+      buildUrl(page.url.pathname, {
         sortBy: sortByToSet,
         filter: filterBy ?? null,
       }),

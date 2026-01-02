@@ -1,7 +1,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { fade } from 'svelte/transition';
   import type { BottomNavItems } from './types';
   import { browser } from '$app/environment';
@@ -49,7 +49,7 @@
   }
   let bottomNavItems = $derived(items.slice(0, 4));
   let isOverflowing = $derived(items.length > 4);
-  let activeElem = $derived(itemElems[$page.url.pathname]);
+  let activeElem = $derived(itemElems[page.url.pathname]);
   run(() => {
     activeElem;
     updateSelectorPos();
@@ -63,16 +63,16 @@
 
 <div class="bottom-nav">
   <div class="items">
-    {#each bottomNavItems as item}
+    {#each bottomNavItems as item (item.href)}
       <a
         data-highlightid="bottomnav-{item.href}"
         class="item typo-text-small-bold"
-        class:active={$page.url.pathname === item.href}
+        class:active={page.url.pathname === item.href}
         bind:this={itemElems[item.href]}
         href={item.href}
       >
         <item.icon
-          style="{$page.url.pathname === item.href
+          style="{page.url.pathname === item.href
             ? 'fill: var(--color-primary-level-6)'
             : 'fill: var(--color-foreground)'}; transition: fill 0.3s;"
         />

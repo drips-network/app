@@ -10,4 +10,4 @@
 
 <HeadMeta title="Create Drip List" />
 
-<CreateDripListStepper displaySlots />
+<CreateDripListStepper />

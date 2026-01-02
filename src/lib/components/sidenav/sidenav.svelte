@@ -1,7 +1,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
 
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { fade, fly } from 'svelte/transition';
   import SidenavItem from './components/sidenav-item.svelte';
   import type { SidenavItems } from './types';
@@ -34,7 +34,7 @@
   }
 
   let hoveringOver: string | undefined = $state(undefined);
-  let activeElem = $derived(itemElems[$page.url.pathname]);
+  let activeElem = $derived(itemElems[page.url.pathname]);
   run(() => {
     activeElem;
     updateSelectorPos();
@@ -45,9 +45,9 @@
 <svelte:window onresize={updateSelectorPos} />
 
 <nav class="sidenav" class:force-collapsed={$forceCollapsed}>
-  {#each Object.values(items) as block}
+  {#each Object.values(items) as block, index (index)}
     <div class="block">
-      {#each block as item}
+      {#each block as item (item.href)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
           style="position: relative"
@@ -57,7 +57,7 @@
           onmouseleave={() => (hoveringOver = undefined)}
           onfocusout={() => (hoveringOver = undefined)}
         >
-          <SidenavItem {...item} active={$page.url.pathname === item.href} />
+          <SidenavItem {...item} active={page.url.pathname === item.href} />
           {#if shouldShowTooltips && hoveringOver === item.href}
             <div class="tooltip" transition:fly={{ duration: 300, x: -8 }}>
               {item.label}

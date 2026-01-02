@@ -12,7 +12,6 @@
     ListEditorOrcidFragment,
   } from './__generated__/gql.generated';
   import { onMount, tick } from 'svelte';
-  import VirtualList from 'svelte-tiny-virtual-list';
   import type { AddItemError } from './errors';
   import { WEIGHT_FACTOR } from './types';
   import type { AccountId } from '$lib/utils/common-types';
@@ -168,11 +167,14 @@
   }
 
   function handleItemDelete(key: AccountId) {
-    delete items[key];
-    delete weights[key];
+    const newItems = { ...items };
+    const newWeights = { ...weights };
 
-    items = items;
-    weights = weights;
+    delete newItems[key];
+    delete newWeights[key];
+
+    items = newItems;
+    weights = newWeights;
   }
 
   function handleDistributeEquallyAction() {
@@ -212,6 +214,10 @@
     Object.values(weights).some((v) => v > 0) && Object.values(weights).some((v) => v === 0),
   );
   let clearAllActionAvailable = $derived(Object.keys(items).length > 0);
+
+  const itemArray = $derived.by(() => {
+    return Object.entries(items);
+  });
 </script>
 
 <div class="list-editor" class:with-outline={outline}>
@@ -236,36 +242,24 @@
       />
     {/if}
 
-    {#if Object.keys(items).length > 0}
-      {@const itemArray = Object.entries(items)}
+    {#if itemArray.length > 0}
       <div class="items" bind:this={itemsContainer}>
-        <VirtualList
-          height={Math.min(itemArray.length * 56, 384)}
-          width="100%"
-          itemCount={itemArray.length}
-          itemSize={56}
-          getKey={(index) => itemArray[index][0]}
-        >
-          {#snippet item({ index, style })}
-            {@const [key, item] = itemArray[index]}
-            <div {style}>
-              <ListEditorItemComponent
-                hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
-                allowEmptyPercentage={allowEmptyPercentages}
-                canDeleteItems={canDeleteItems &&
-                  (protectedItems ? !protectedItems.includes(key) : true)}
-                {key}
-                highlight={highlightedItemKey === key}
-                {weightsMode}
-                {isEditable}
-                on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
-                on:deleteItem={() => handleItemDelete(key)}
-                {item}
-                weight={weights[key]}
-              />
-            </div>
-          {/snippet}
-        </VirtualList>
+        {#each itemArray as [key, item], index (key)}
+          <ListEditorItemComponent
+            hasBottomBorder={forceBottomBorderOnItems || index < itemArray.length - 1}
+            allowEmptyPercentage={allowEmptyPercentages}
+            canDeleteItems={canDeleteItems &&
+              (protectedItems ? !protectedItems.includes(key) : true)}
+            {key}
+            highlight={highlightedItemKey === key}
+            {weightsMode}
+            {isEditable}
+            on:editPercentage={(e) => handlePercentageEdit(key, e.detail)}
+            on:deleteItem={() => handleItemDelete(key)}
+            {item}
+            weight={weights[key]}
+          />
+        {/each}
       </div>
     {/if}
   </div>

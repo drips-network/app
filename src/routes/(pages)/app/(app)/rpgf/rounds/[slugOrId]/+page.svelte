@@ -22,11 +22,14 @@
   import editRpgfRoundLinkedDripListsFlow from '$lib/flows/edit-rpgf-round-linked-drip-lists/edit-rpgf-round-linked-drip-lists-flow';
   import Pen from '$lib/components/icons/Pen.svelte';
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
 
   let { data } = $props();
   let round = $derived(data.round);
 
   let imageBaseUrl = $derived(`/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`);
+
+  let linkedListsSkeleton = $state<SectionSkeleton>();
 </script>
 
 <HeadMeta
@@ -43,6 +46,8 @@
         hasExistingBallot={Boolean(data.existingBallot)}
         signedInUserId={data.rpgfUserData?.userId ?? null}
         {round}
+        hasLinkedList={data.linkedDripLists.length > 0}
+        linkedListsSectionSkeleton={linkedListsSkeleton}
       />
     {/if}
 
@@ -156,38 +161,41 @@
     </Section>
   {/if}
 
-  <Section
-    header={{
-      label: 'Distribution',
-      anchorTarget: 'distribution',
-      icon: Trophy,
-      actions: round.isAdmin
-        ? [
-            {
-              label: 'Edit linked lists',
-              icon: Pen,
-              disabled: !round.published,
-              handler: () =>
-                modal.show(
-                  Stepper,
-                  undefined,
-                  editRpgfRoundLinkedDripListsFlow(round.id, data.linkedDripLists),
-                ),
-            },
-          ]
-        : [],
-    }}
-    skeleton={{
-      empty: data.linkedDripLists.length === 0,
-      loaded: true,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No linked Drip Lists',
-      emptyStateText:
-        'Rewards for the round will be distributed via Drip Lists, which will appear here.',
-    }}
-  >
-    <DripListsGrid dripLists={data.linkedDripLists} />
-  </Section>
+  <section id="distribution">
+    <Section
+      header={{
+        label: 'Distribution',
+        anchorTarget: 'distribution',
+        icon: Trophy,
+        actions: round.isAdmin
+          ? [
+              {
+                label: 'Edit linked lists',
+                icon: Pen,
+                disabled: !round.published,
+                handler: () =>
+                  modal.show(
+                    Stepper,
+                    undefined,
+                    editRpgfRoundLinkedDripListsFlow(round.id, data.linkedDripLists),
+                  ),
+              },
+            ]
+          : [],
+      }}
+      skeleton={{
+        empty: data.linkedDripLists.length === 0,
+        loaded: true,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No linked Drip Lists',
+        emptyStateText:
+          'Rewards for the round will be distributed via Drip Lists, which will appear here.',
+      }}
+      bind:skeletonInstance={linkedListsSkeleton}
+    >
+      <DripListsGrid dripLists={data.linkedDripLists} />
+    </Section>
+  </section>
 </RpgfBaseLayout>
 
 <style>

@@ -8,13 +8,14 @@
   import type { ListingApplication } from '$lib/utils/rpgf/types/application';
   import type { Round } from '$lib/utils/rpgf/types/round';
   import type { InProgressBallot } from '$lib/utils/rpgf/types/ballot';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { getContext, onDestroy } from 'svelte';
   import {
     ballotValidationContextKey,
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
   import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
+  import { SvelteSet } from 'svelte/reactivity';
 
   interface Props {
     round: Round;
@@ -77,7 +78,7 @@
     if (!ballotValidationErrors) return;
 
     ballotValidationErrors.update((current) => {
-      const next = new Set(current);
+      const next = new SvelteSet(current);
 
       if (state.type === 'invalid') {
         next.add(application.id);
@@ -169,12 +170,12 @@
     updateValidationErrors({ type: 'unvalidated' });
   });
 
-  let active = $derived($page.url.href.includes(`/applications/${application.id}`));
+  let active = $derived(page.url.href.includes(`/applications/${application.id}`));
 
   let link = $derived(
     `/app/rpgf/rounds/${round.urlSlug}/applications/${application.id}${
       voteStep === 'assign-votes' ? '?backToBallot' : ''
-    }${$page.url.search}`,
+    }${page.url.search}`,
   );
 </script>
 
@@ -211,7 +212,7 @@
 
     {#if application.allocation !== null}
       <span class="typo-text-small-bold">
-        {application.allocation}
+        {Math.round((application.allocation ?? 0) * 100) / 100}
       </span>
     {/if}
   </div>

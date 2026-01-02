@@ -4,7 +4,7 @@
   import { sineIn, sineOut } from 'svelte/easing';
 
   function getTransitionDelay(index: number, direction: 'in' | 'out') {
-    return ((direction === 'in' ? components.length : 0) - index) * 15;
+    return Math.abs(((direction === 'out' ? components.length : 0) - index) * 15);
   }
 
   interface Props {

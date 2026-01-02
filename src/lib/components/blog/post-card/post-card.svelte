@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import type { z } from 'zod';
   import type { authorSchema } from '../../../../routes/api/blog/posts/schema';
@@ -82,7 +82,7 @@
       <div style:width="fit-content">
         <ShareButton
           buttonVariant="normal"
-          url={$page.url.toString()}
+          url={page.url.toString()}
           downloadableImageUrl={imageUrl}
         />
       </div>

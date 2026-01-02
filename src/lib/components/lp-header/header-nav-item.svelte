@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import ChevronDown from '../icons/ChevronDown.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   interface Props {
     dropdown?: boolean;
@@ -35,7 +35,7 @@
     }
   }
 
-  let current = $derived(href && $page.url.pathname.includes(href));
+  let current = $derived(href && page.url.pathname.includes(href));
   let externalLink = $derived(href && href.startsWith('http'));
 </script>
 
