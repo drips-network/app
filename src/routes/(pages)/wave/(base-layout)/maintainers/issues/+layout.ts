@@ -4,7 +4,7 @@ export const load = (context) =>
   issuesPageLayoutLoad(context, () => ({
     preappliedFilters: {
       mine: true,
-      eligibleForWave: true,
+      eligibleForWaveProgram: true,
     },
     defaultFilters: {
       state: 'open',
