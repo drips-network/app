@@ -113,6 +113,17 @@ When running `npm run dev:docker`, the script automatically detects if you have 
 - **Access confirmed**: The `wave` profile is enabled (added to your `COMPOSE_PROFILES`).
 - **No access**: The `wave` profile is skipped.
 
+#### Not starting Wave server
+
+If you want to explicitly NOT start the Wave service (for example because you already have it running for development), you can explicitly set `PUBLIC_WAVE_API_URL` and `PUBLIC_INTERNAL_WAVE_API_URL` in your `.env` file. For example:
+
+```
+PUBLIC_WAVE_API_URL=http://localhost:8000
+PUBLIC_INTERNAL_WAVE_API_URL=http://172.17.0.1:8000
+```
+
+Note that `PUBLIC_WAVE_API_URL` should be on `localhost` to ensure cookie scoping works, but at the same time `PUBLIC_INTERNAL_WAVE_API_URL` must be reachable from within the Docker network (hence using the host's Docker bridge IP `172.17.0.1` in this particular case, which may differ depending on your Docker setup).
+
 ### Option B: Manual Control
 
 You can manually control the profile if you are not using the startup script or wish to override behavior.

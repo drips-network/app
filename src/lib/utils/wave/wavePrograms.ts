@@ -74,6 +74,46 @@ export async function getWaveProgramRepos(
   );
 }
 
+export async function getPendingWaveProgramRepos(
+  f = fetch,
+  waveProgramId: string,
+  pagination: PaginationInput = {},
+) {
+  return parseRes(
+    paginatedResponseSchema(waveProgramRepoWithDetailsDtoSchema),
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/repos/pending?${toPaginationParams(pagination)}`,
+    ),
+  );
+}
+
+export async function approveWaveProgramRepo(f = fetch, waveProgramId: string, orgRepoId: string) {
+  return parseRes(
+    waveProgramRepoWithDetailsDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/approve`, {
+      method: 'POST',
+    }),
+  );
+}
+
+export async function rejectWaveProgramRepo(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+  rejectionReason?: string,
+) {
+  return parseRes(
+    waveProgramRepoWithDetailsDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({
+        rejectionReason,
+      }),
+    }),
+  );
+}
+
 export async function addIssueToWaveProgram(
   f = fetch,
   waveProgramId: string,

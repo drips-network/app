@@ -60,11 +60,15 @@ export async function authenticatedCall(
 
     // retry the original request with the new token
     return authenticatedCall(f, path, options, false);
-  } else if (!res.ok && res.status !== 404) {
+  } else if ((!res.ok && res.status !== 404) || res.status === 403) {
     const errorText = await res.text();
 
     if (res.status === 401) {
       throw error(401, 'Unauthorized');
+    }
+
+    if (res.status === 403) {
+      throw error(403, 'Forbidden');
     }
 
     throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
