@@ -453,9 +453,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    height: 2.25rem;
-
-    padding: 0 0 0 1rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
     border-radius: 1.25rem 0 1.25rem 1.25rem;
     background-color: var(--color-primary-level-1);
     color: var(--color-primary-level-6);
