@@ -152,7 +152,7 @@ The default setup uses a Cloudflare Quick Tunnel, which generates a random URL e
 4.  The `wave` service will detect this URL immediately via `inotify` (watching the shared volume) and configure itself.
 5.  Find your URL in the logs:
     ```bash
-    docker compose logs wave | grep "Found Tunnel URL"
+    docker compose logs cloudflared | grep "URL captured"
     ```
 6.  On Github, update the GitHub App Webhook URL with this new URL.
 
