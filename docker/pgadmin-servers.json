@@ -39,6 +39,16 @@
       "Username": "user",
       "PassFile": "/pgpass",
       "SSLMode": "prefer"
+    },
+    "5": {
+      "Name": "Wave DB",
+      "Group": "Servers",
+      "Host": "postgres-wave",
+      "Port": 5432,
+      "MaintenanceDB": "postgres",
+      "Username": "user",
+      "PassFile": "/pgpass",
+      "SSLMode": "prefer"
     }
   }
 }
