@@ -105,8 +105,8 @@
       <Card>
         <div class="no-next-wave">
           <p class="typo-text">
-            There are no upcoming or active waves for this Wave at the moment. Please check back
-            later for updates.
+            There are no upcoming or active Waves at the moment. Please check back later for
+            updates.
           </p>
           <!-- todo(wave): NEWSLETTER SIGNUP -->
         </div>
