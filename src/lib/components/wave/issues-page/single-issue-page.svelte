@@ -257,8 +257,10 @@
     <Card class="sidebar-card" style="border-radius: 2rem 0 2rem 2rem;">
       {#if issue.waveProgramId}
         <div class="metrics-row">
-          <div class="metric-box">
-            <h5>Points</h5>
+          <div class="metric-box metric-box-points">
+            <div class="metric-header">
+              <h5>Points</h5>
+            </div>
             <div class="metric-value metric-value-points">
               {issue.points ?? '—'}
             </div>
@@ -288,7 +290,7 @@
         </div>
       {/if}
 
-      <div class="sidebar-actions">
+      <div class="sidebar-actions" class:has-metrics={issue.waveProgramId}>
         {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
           <Button icon={Check} variant="primary" size="large" onclick={handleMarkIssueCompleted}>
             Mark as complete
@@ -435,7 +437,7 @@
     height: 100%;
     display: grid;
     gap: 1rem;
-    grid-template-columns: 1fr 18rem;
+    grid-template-columns: 1fr 21rem;
   }
 
   .sidebar {
@@ -467,7 +469,7 @@
   .metric-box {
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
-    padding: 0.75rem;
+    padding: 0.6rem 0.75rem 1.5rem;
     height: 80px;
     display: flex;
     flex-direction: column;
@@ -475,11 +477,20 @@
     background-color: var(--color-foreground-level-1);
   }
 
+  .metric-box-points {
+    gap: 0;
+  }
+
   .metric-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
+    min-height: 1.5rem;
+  }
+
+  .metric-header h5 {
+    margin: 0;
   }
 
   .metric-value {
@@ -489,7 +500,8 @@
 
   .metric-value-points {
     font-size: 2rem;
-    line-height: 1.2;
+    line-height: 1.1;
+    margin-top: -0.15rem;
   }
 
   .sidebar-actions {
@@ -497,6 +509,10 @@
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 1rem;
+  }
+
+  .sidebar-actions.has-metrics {
+    margin-top: 1rem;
   }
 
   .sidebar-actions :global(.button) {
@@ -510,8 +526,8 @@
     width: 1.75rem;
     height: 1.75rem;
     border-radius: 999px;
-    border: 1px solid var(--color-foreground-level-3);
-    background-color: var(--color-background);
+    border: none;
+    background-color: transparent;
     transition:
       background-color 0.2s,
       border-color 0.2s;
@@ -519,7 +535,6 @@
 
   .edit-icon-button:hover {
     background-color: var(--color-foreground-level-1);
-    border-color: var(--color-foreground-level-4);
   }
 
   .edit-icon-button:disabled {
