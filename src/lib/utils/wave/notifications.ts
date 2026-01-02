@@ -14,6 +14,8 @@ export enum WORKFLOW_ID {
   CONTRIBUTOR_WITHDREW = 'contributor-withdrew',
   ORG_ISSUE_APPLICATION_RECEIVED = 'org-issue-application-received',
   ISSUE_POINTS_RECEIVED = 'issue-points-received',
+  OPEN_ISSUE_REMINDER_CONTRIBUTORS = 'open-issue-reminder-contributors',
+  OPEN_ISSUE_REMINDER_MAINTAINERS = 'open-issue-reminder-maintainers',
 }
 
 export async function getNotificationPreferences(f = fetch) {

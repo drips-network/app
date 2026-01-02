@@ -1,8 +1,10 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Globe from '$lib/components/icons/Globe.svelte';
   import X from '$lib/components/icons/X.svelte';
+  import Markdown from '$lib/components/markdown/markdown.svelte';
   import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -84,6 +86,14 @@
     </div>
   </div>
 
+  {#if waveProgram.longDescription}
+    <div class="description">
+      <ExpandableText>
+        <Markdown content={waveProgram.longDescription} />
+      </ExpandableText>
+    </div>
+  {/if}
+
   <section>
     <div class="divider">
       <OrDivider text={waveActive ? 'Current Wave' : 'Upcoming Wave'} />
@@ -125,6 +135,12 @@
     max-width: 90rem;
     margin: 0 auto;
     width: 100%;
+  }
+
+  .description {
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
   }
 
   section {

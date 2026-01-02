@@ -48,6 +48,7 @@ export const waveProgramDtoSchema = z.object({
   presetBudgetUSD: z.string(),
   avatarUrl: z.url().nullable(),
   slug: z.string(),
+  longDescription: z.string().nullable(),
 
   issueCount: z.number().int(),
   approvedRepoCount: z.number().int(),

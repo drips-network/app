@@ -18,7 +18,11 @@
   const { status } = $derived(wave);
 </script>
 
-<Card>
+<Card
+  style="background-color: {status === 'active'
+    ? 'var(--color-primary-level-1)'
+    : 'var(--color-background)'}"
+>
   <div class="wave-card">
     <div class="wave-info">
       <div class="wave-name">

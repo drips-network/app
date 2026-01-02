@@ -50,6 +50,12 @@
       description: 'You have been unassigned from an issue in a Wave by a maintainer.',
       category: 'contributor',
     },
+    [WORKFLOW_ID.OPEN_ISSUE_REMINDER_CONTRIBUTORS]: {
+      title: 'Open issue reminder',
+      description:
+        'Receive a reminder shortly before a Wave ends if you still any open issues assigned to you through Wave.',
+      category: 'contributor',
+    },
 
     // maintainer
 
@@ -79,6 +85,12 @@
       title: 'Contributor withdrew',
       description:
         'A contributor you previously assigned has withdrawn from working on an issue in a Wave.',
+      category: 'maintainer',
+    },
+    [WORKFLOW_ID.OPEN_ISSUE_REMINDER_MAINTAINERS]: {
+      title: 'Open issue reminder',
+      description:
+        'Receive a reminder shortly before a Wave ends if you still have any open issues assigned to contributors.',
       category: 'maintainer',
     },
   };
