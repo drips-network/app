@@ -29,8 +29,8 @@ services:
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
       - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
-      - PUBLIC_WAVE_API_URL=http://localhost:8000
-      - PUBLIC_INTERNAL_WAVE_API_URL=http://wave:8000
+      - PUBLIC_WAVE_API_URL=${PUBLIC_WAVE_API_URL-http://localhost:8000}
+      - PUBLIC_INTERNAL_WAVE_API_URL=${PUBLIC_INTERNAL_WAVE_API_URL-http://wave:8000}
       - PUBLIC_WAVE_GITHUB_APP_NAME=${PUBLIC_WAVE_GITHUB_APP_NAME}
     volumes:
       - .:/app
