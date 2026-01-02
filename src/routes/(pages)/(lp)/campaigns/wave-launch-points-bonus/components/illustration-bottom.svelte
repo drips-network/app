@@ -30,9 +30,9 @@
 <path fill-rule="evenodd" clip-rule="evenodd" d="M624 188C613.261 188 604 178.739 604 168C604 178.739 594.739 188 584 188C594.739 188 604 197.261 604 208C604 197.261 613.261 188 624 188Z" fill="var(--color-background)" stroke="var(--color-foreground)"/>
 <defs>
 <linearGradient id="paint0_linear_72_1196" x1="808.821" y1="128.363" x2="407.821" y2="307.363" gradientUnits="userSpaceOnUse">
-<stop stop-color="var(--color-primary)" stop-opacity="0"/>
-<stop offset="0.480445" stop-color="var(--color-primary)"/>
-<stop offset="1" stop-color="var(--color-primary)" stop-opacity="0"/>
+<stop stop-color="var(--color-primary-level-1)" stop-opacity="0"/>
+<stop offset="0.480445" stop-color="var(--color-primary-level-1)"/>
+<stop offset="1" stop-color="var(--color-primary-level-1)" stop-opacity="0"/>
 </linearGradient>
 </defs>
 </svg>
