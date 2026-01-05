@@ -438,7 +438,7 @@
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
     border-radius: 2rem 0 2rem 2rem;
   }
 
@@ -596,7 +596,7 @@
   .details-and-description {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
   }
 
   h1 {
