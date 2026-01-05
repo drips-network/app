@@ -187,11 +187,18 @@
     filters = appliedFilters;
   }
 
+  let filterEntries = $derived(
+    Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [
+      keyof IssueFilters,
+      FilterConfig,
+    ][],
+  );
+
 </script>
 
 <div class="filter-config-wrapper">
   <div class="options">
-    {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
+    {#each filterEntries as [filterKey, filterConfig], i (filterKey)}
       <div class="filter-config-item">
         {#if filterConfig.type === 'single-select'}
           {#if filterKey === 'state'}
