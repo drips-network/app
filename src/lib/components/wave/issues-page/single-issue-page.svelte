@@ -254,7 +254,8 @@
   </div>
 
   <div class="sidebar">
-    <Card class="sidebar-card" style="border-radius: 2rem 0 2rem 2rem;">
+    <div class="sidebar-card">
+      <Card style="border-radius: 2rem 0 2rem 2rem;">
       {#if issue.waveProgramId}
         <div class="metrics-row">
           <div class="metric-box metric-box-points">
@@ -428,7 +429,8 @@
           {/if}
         {/if}
       </div>
-    </Card>
+      </Card>
+    </div>
   </div>
 </div>
 
@@ -451,6 +453,10 @@
   }
 
   .sidebar-card {
+    height: fit-content;
+  }
+
+  .sidebar-card :global(.card) {
     height: fit-content;
     padding: 1rem;
     overflow: auto;
