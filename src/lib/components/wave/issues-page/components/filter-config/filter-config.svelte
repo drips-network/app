@@ -62,6 +62,16 @@
         toggleLabel: 'Has linked PR',
       },
 
+      ...(mode === 'maintainer'
+        ? {
+            isInWaveProgram: {
+              type: 'toggle',
+              label: 'Wave Membership',
+              toggleLabel: 'Part of a Wave',
+            },
+          }
+        : {}),
+
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             repoId: {
@@ -97,16 +107,6 @@
                   }));
                 }
               })(),
-            },
-          }
-        : {}),
-
-      ...(mode === 'maintainer'
-        ? {
-            isInWaveProgram: {
-              type: 'toggle',
-              label: 'Wave Membership',
-              toggleLabel: 'Part of a Wave',
             },
           }
         : {}),
@@ -235,6 +235,11 @@
   .filter-config-item :global(.toggle .label.typo-text-bold) {
     font-weight: 400;
     font-family: var(--typeface-regular);
+  }
+
+  .filter-config-item :global(.dropdown-trigger) {
+    width: 100%;
+    max-width: none;
   }
 
   .actions {
