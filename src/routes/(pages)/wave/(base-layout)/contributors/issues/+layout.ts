@@ -12,4 +12,6 @@ export const load = (context) =>
     breadcrumbs: [{ label: 'Contributor Dashboard' }, { label: 'Issues' }],
     viewKey: 'contributors',
     headMetaTitle: 'Contributor dashboard',
+    emptyStateAnnotation:
+      "This view only shows issues that you've previously applied to. Head to the Explore tab to discover Waves and apply for an issue.",
   }));

@@ -37,6 +37,8 @@ export const issuesPageLayoutLoad = async (
     allowAddToWaveProgram?: boolean;
     headMetaTitle: string;
     showNewApplicationsBadge?: boolean;
+    /** Appears when there are no issues */
+    emptyStateAnnotation?: string;
   },
 ) => {
   depends('wave:issues');
@@ -55,6 +57,7 @@ export const issuesPageLayoutLoad = async (
     headMetaTitle = 'Issues',
     defaultFilters,
     showNewApplicationsBadge,
+    emptyStateAnnotation,
   } = config(user);
 
   if (requireLogin) {
@@ -134,6 +137,7 @@ export const issuesPageLayoutLoad = async (
     headMetaTitle,
     showNewApplicationsBadge,
     currentWaveProgramId: waveProgram?.id,
+    emptyStateAnnotation,
 
     waveHeaderBackground: false,
   };

@@ -30,12 +30,13 @@
     registerIssueUpdateListener,
     unregisterIssueUpdateListener,
   } from './issue-update-coordinator';
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import SortByConfig from './components/sort-by-config/sort-by-config.svelte';
   import { page } from '$app/state';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
 
   let {
     issues,
@@ -56,6 +57,7 @@
     isViewingIssue,
     headMetaTitle,
     currentWaveProgramId,
+    emptyStateAnnotation,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
@@ -93,6 +95,9 @@
 
     /** If in wave mode, the current wave program ID for filters */
     currentWaveProgramId: string | undefined;
+
+    /** Annotation to show when there are no issues */
+    emptyStateAnnotation?: string;
   } = $props();
 
   async function getMoreIssues(
@@ -199,27 +204,31 @@
       viewTransitionName = `issues-list-${viewKey}`;
     } else {
       viewTransitionName = null;
-    }
 
-    // prevent navigation (to ask for confirmation) if there are selected issues
-    if (selectedIssues.length > 0 && !navigation.to?.route.id) {
-      navigation.cancel();
-    } else if (selectedIssues.length > 0) {
-      if (gotExitConfirmation) {
-        // already got confirmation, allow navigation
-        return;
+      // prevent navigation (to ask for confirmation) if there are selected issues
+      if (selectedIssues.length > 0 && !navigation.to?.route.id) {
+        navigation.cancel();
+      } else if (selectedIssues.length > 0) {
+        if (gotExitConfirmation) {
+          // already got confirmation, allow navigation
+          return;
+        }
+
+        navigation.cancel();
+        gotExitConfirmation = true;
+        await doWithConfirmationModal(
+          'Navigating away will discard your current selection.',
+          `${navigation.to?.url.pathname}${navigation.to?.url.searchParams}`,
+          () => {
+            gotExitConfirmation = false;
+          },
+        );
       }
-
-      navigation.cancel();
-      gotExitConfirmation = true;
-      await doWithConfirmationModal(
-        'Navigating away will discard your current selection.',
-        `${navigation.to?.url.pathname}${navigation.to?.url.searchParams}`,
-        () => {
-          gotExitConfirmation = false;
-        },
-      );
     }
+  });
+
+  afterNavigate(() => {
+    gotExitConfirmation = false;
   });
 
   let noOfFilters = $derived(
@@ -389,8 +398,18 @@
           <Spinner />
         </div>
       {:else if issues.pagination.total === 0}
-        <div style="padding: 2rem; text-align: center; color: var(--color-foreground-level-5);">
-          No issues found matching the selected filters.
+        <div style="padding: 1rem; ">
+          <p style="padding: 1rem; text-align: center; color: var(--color-foreground-level-5);">
+            No issues found matching the selected filters.
+          </p>
+
+          {#if emptyStateAnnotation}
+            <div style="margin-top: 1rem">
+              <AnnotationBox type="info">
+                {emptyStateAnnotation}
+              </AnnotationBox>
+            </div>
+          {/if}
         </div>
       {:else}
         <IssuesList

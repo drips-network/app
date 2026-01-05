@@ -47,7 +47,7 @@
     {
       key: 'Maintainers',
       value: waveProgram.approvedOrgCount,
-      tooltip: 'Count of orgs and users approved to add their issues into the Wave.',
+      tooltip: 'Count of orgs and users approved to add their issues into the Wave Program.',
     },
     {
       key: 'Leaderboard',

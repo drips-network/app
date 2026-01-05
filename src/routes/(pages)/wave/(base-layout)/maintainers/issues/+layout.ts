@@ -16,4 +16,6 @@ export const load = (context) =>
     allowAddToWaveProgram: true,
     headMetaTitle: 'Issues | Maintainer Dashboard',
     showNewApplicationsBadge: true,
+    emptyStateAnnotation:
+      'Missing something? This view shows only issues from repos synced with Drips Wave and approved for at least one Wave Program. Head to the Orgs & Repos screen to manage your repos.',
   }));
