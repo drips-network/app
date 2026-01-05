@@ -78,7 +78,7 @@
 >
   <span class="name">
     {#if !selectedOption}
-      All repositories
+      In any repo
     {:else}
       {#await optionsPromise}
         Loading...
@@ -125,7 +125,7 @@
 
       <div class="options-list">
         <button class:selected={!selectedOption} onclick={() => handleSelect(null)}>
-          All repositories
+          In any repo
         </button>
 
         {#each options.filter((option) => option.label
@@ -233,7 +233,7 @@
 
   .dropdown-options button {
     min-width: 0;
-    padding: 0.4rem 0.6rem;
+    padding: 0.3rem 0.7rem;
     background: none;
     border: none;
     text-align: left;

@@ -115,6 +115,7 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
@@ -150,17 +151,14 @@
   }
 
   function handleToggleFilter<K extends keyof IssueFilters>(filterKey: K, checked: boolean) {
-    handleSelectFilter(filterKey, checked ? 'true' : 'false');
+    handleSelectFilter(filterKey, checked ? 'true' : null);
   }
 
   function handleApply() {
     onapply(filters);
   }
 
-  let filterItems = $state<Array<SingleSelectFilterItem<{ label: string; value: string }[]>>>([]);
-
   function handleClear() {
-    filterItems.forEach((item) => item.clear());
     filters = {};
 
     onapply(filters);
@@ -169,6 +167,14 @@
   export function reset() {
     filters = appliedFilters;
   }
+
+  let statusValue = $state((filters.state ?? 'open') as IssueFilters['state']);
+  $effect(() => {
+    const nextValue = (filters.state ?? 'open') as IssueFilters['state'];
+    if (statusValue !== nextValue) {
+      statusValue = nextValue;
+    }
+  });
 </script>
 
 <div class="filter-config-wrapper">
@@ -176,13 +182,28 @@
     {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
       <div class="filter-config-item">
         {#if filterConfig.type === 'single-select'}
-          <h5>{filterConfig.label}</h5>
-          <SingleSelectFilterItem
-            bind:this={filterItems[i]}
-            selected={filters[filterKey as keyof IssueFilters] as string | undefined}
-            config={filterConfig}
-            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-          />
+          {#if filterKey === 'state'}
+            <div class="filter-config-item--row">
+              <span class="filter-row-label">Status</span>
+              <div class="filter-row-control">
+                <SegmentedControl
+                  options={filterConfig.options.map((option) => ({
+                    title: option.label,
+                    value: option.value,
+                  }))}
+                  bind:active={statusValue}
+                  onTabChange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+                />
+              </div>
+            </div>
+          {:else}
+            <h5>{filterConfig.label}</h5>
+            <SingleSelectFilterItem
+              selected={filters[filterKey as keyof IssueFilters] as string | undefined}
+              config={filterConfig}
+              onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+            />
+          {/if}
         {:else if filterConfig.type === 'toggle'}
           <Toggle
             checked={filters[filterKey as keyof IssueFilters] === 'true'}
@@ -224,6 +245,32 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .filter-config-item--row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .filter-row-label {
+    font-weight: 400;
+    font-family: var(--typeface-regular);
+    font-size: 1rem;
+  }
+
+  .filter-row-control :global(.segmented-control) {
+    font-size: 1rem;
+  }
+
+  .filter-row-control {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .filter-row-control :global(.single-select-filter-item) {
+    justify-content: flex-end;
   }
 
   .filter-config-item :global(.toggle .label) {
