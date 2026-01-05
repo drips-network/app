@@ -387,8 +387,10 @@
 
         {#if partOfWaveProgram}
           <div class="wave-row">
-            <WaveBadge waveProgram={partOfWaveProgram} />
             {#if allowAddingOrRemovingWave}
+              <button class="wave-badge-button" onclick={openWaveProgramModal}>
+                <WaveBadge waveProgram={partOfWaveProgram} />
+              </button>
               <button
                 class="edit-icon-button"
                 onclick={openWaveProgramModal}
@@ -397,6 +399,10 @@
               >
                 <Pen style="fill: var(--color-foreground-level-6);" />
               </button>
+            {:else}
+              <a class="wave-badge-link" href={`/wave/${partOfWaveProgram.slug}`}>
+                <WaveBadge waveProgram={partOfWaveProgram} />
+              </a>
             {/if}
           </div>
         {:else}
@@ -480,6 +486,35 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
+  }
+
+  .wave-badge-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .wave-badge-button:focus-visible {
+    outline: 2px solid var(--color-foreground-level-4);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  .wave-badge-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .wave-badge-link:hover {
+    text-decoration: underline;
   }
 
   .metric-value {
