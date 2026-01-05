@@ -151,10 +151,27 @@
   }
 
   type ToggleFilterKey = 'applicantAssigned' | 'hasApplications' | 'hasPr' | 'isInWaveProgram';
+  type StatusValue = 'open' | 'closed';
 
   function handleToggleFilter(filterKey: ToggleFilterKey, checked: boolean) {
     handleSelectFilter(filterKey, checked ? 'true' : null);
   }
+
+  function isToggleFilterKey(filterKey: keyof IssueFilters): filterKey is ToggleFilterKey {
+    return (
+      filterKey === 'applicantAssigned' ||
+      filterKey === 'hasApplications' ||
+      filterKey === 'hasPr' ||
+      filterKey === 'isInWaveProgram'
+    );
+  }
+
+  const statusOptions: { title: string; value: StatusValue }[] = [
+    { title: 'Open', value: 'open' },
+    { title: 'Closed', value: 'closed' },
+  ];
+
+  let statusActive = $derived<StatusValue>((filters.state ?? 'open') as StatusValue);
 
   function handleApply() {
     onapply(filters);
@@ -182,12 +199,9 @@
               <span class="filter-row-label">Status</span>
               <div class="filter-row-control">
                 <SegmentedControl
-                  options={filterConfig.options.map((option) => ({
-                    title: option.label,
-                    value: option.value,
-                  }))}
-                  active={(filters.state ?? 'open') as IssueFilters['state']}
-                  onTabChange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+                  options={statusOptions}
+                  active={statusActive}
+                  onTabChange={(value) => handleSelectFilter('state', value as StatusValue)}
                 />
               </div>
             </div>
@@ -200,11 +214,14 @@
             />
           {/if}
         {:else if filterConfig.type === 'toggle'}
-          <Toggle
-            checked={filters[filterKey as keyof IssueFilters] === 'true'}
-            label={filterConfig.toggleLabel}
-            onchange={(checked) => handleToggleFilter(filterKey as keyof IssueFilters, checked)}
-          />
+          {#if isToggleFilterKey(filterKey)}
+            {@const toggleKey = filterKey}
+            <Toggle
+              checked={filters[filterKey] === 'true'}
+              label={filterConfig.toggleLabel}
+              onchange={(checked) => handleToggleFilter(toggleKey, checked)}
+            />
+          {/if}
         {:else if filterConfig.type === 'dropdown'}
           <DropdownFilterItem
             config={filterConfig}
