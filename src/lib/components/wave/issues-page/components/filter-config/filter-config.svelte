@@ -150,7 +150,9 @@
     }
   }
 
-  function handleToggleFilter<K extends keyof IssueFilters>(filterKey: K, checked: boolean) {
+  type ToggleFilterKey = 'applicantAssigned' | 'hasApplications' | 'hasPr' | 'isInWaveProgram';
+
+  function handleToggleFilter(filterKey: ToggleFilterKey, checked: boolean) {
     handleSelectFilter(filterKey, checked ? 'true' : null);
   }
 
@@ -168,13 +170,6 @@
     filters = appliedFilters;
   }
 
-  let statusValue = $state((filters.state ?? 'open') as IssueFilters['state']);
-  $effect(() => {
-    const nextValue = (filters.state ?? 'open') as IssueFilters['state'];
-    if (statusValue !== nextValue) {
-      statusValue = nextValue;
-    }
-  });
 </script>
 
 <div class="filter-config-wrapper">
@@ -191,7 +186,7 @@
                     title: option.label,
                     value: option.value,
                   }))}
-                  bind:active={statusValue}
+                  active={(filters.state ?? 'open') as IssueFilters['state']}
                   onTabChange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
                 />
               </div>
