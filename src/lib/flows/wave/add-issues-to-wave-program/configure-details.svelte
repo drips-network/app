@@ -4,6 +4,7 @@
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import Minus from '$lib/components/icons/Minus.svelte';
   import type {
     WaveProgramDto,
     WaveProgramRepoWithDetailsDto,
@@ -14,7 +15,7 @@
   import Card from '$lib/components/wave/card/card.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
-  import { addIssueToWaveProgram } from '$lib/utils/wave/wavePrograms';
+  import { addIssueToWaveProgram, removeIssueFromWaveProgram } from '$lib/utils/wave/wavePrograms';
   import { invalidate } from '$app/navigation';
   import { notifyIssuesUpdated } from '$lib/components/wave/issues-page/issue-update-coordinator';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
@@ -49,6 +50,7 @@
       }),
   );
   let hasIneligibleIssues = $derived(eligibleIssues.length < issues.length);
+  let issuesInWave = $derived(issues.filter((issue) => issue.waveProgramId));
 
   async function handleSubmit() {
     dispatch('await', {
@@ -71,6 +73,34 @@
 
         const updatedIssues = (
           await Promise.all(eligibleIssues.map((issue) => getIssue(undefined, issue.id)))
+        ).filter((issue): issue is IssueDetailsDto => issue !== null);
+
+        notifyIssuesUpdated(updatedIssues);
+        await invalidate('wave:issues');
+
+        onsuccess?.();
+      },
+    });
+  }
+
+  async function handleRemoveFromWave() {
+    dispatch('await', {
+      message: `Removing issue${pluralS} from Wave Program…`,
+      promise: async () => {
+        const results = await Promise.allSettled(
+          issuesInWave.map((issue) =>
+            removeIssueFromWaveProgram(undefined, issue.waveProgramId as string, issue.id),
+          ),
+        );
+
+        const failedResults = results.filter((result) => result.status === 'rejected');
+
+        if (failedResults.length > 0) {
+          throw new Error('Some issues could not be removed from the Wave. Please try again.');
+        }
+
+        const updatedIssues = (
+          await Promise.all(issuesInWave.map((issue) => getIssue(undefined, issue.id)))
         ).filter((issue): issue is IssueDetailsDto => issue !== null);
 
         notifyIssuesUpdated(updatedIssues);
@@ -151,6 +181,13 @@
     <Card style="padding: 0; text-align: left; width: 100%;">
       <ListSelect {items} bind:selected={selectedWaveIds} />
     </Card>
+    {#if issuesInWave.length > 0}
+      <div class="remove-from-wave">
+        <Button variant="destructive" icon={Minus} onclick={handleRemoveFromWave}
+          >Remove from Wave</Button
+        >
+      </div>
+    {/if}
   </FormField>
 
   {#if hasIneligibleIssues}
@@ -161,13 +198,30 @@
   {/if}
 
   {#snippet actions()}
-    <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}
-      >Add issue{pluralS} to Wave</Button
-    >
+    <div class="actions">
+      <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}
+        >Add issue{pluralS} to Wave</Button
+      >
+    </div>
   {/snippet}
 </StandaloneFlowStepLayout>
 
 <style>
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .remove-from-wave {
+    display: flex;
+    margin-top: 0.75rem;
+  }
+
+  .remove-from-wave :global(.button) {
+    width: 100%;
+  }
+
   .complexity-calc {
     display: flex;
     gap: 0.5rem;

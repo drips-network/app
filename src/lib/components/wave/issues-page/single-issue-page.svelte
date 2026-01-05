@@ -6,7 +6,6 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import Check from '$lib/components/icons/Check.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
-  import Minus from '$lib/components/icons/Minus.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
@@ -32,7 +31,6 @@
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import {
     beComplexityToFriendlyLabel,
-    removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
@@ -102,25 +100,6 @@
     ),
   );
 
-  async function handleRemoveFromWave() {
-    if (!partOfWaveProgram) {
-      return;
-    }
-
-    await doWithConfirmationModal(
-      // todo(wave): when someone is assigned, make this message more scary
-      `Are you sure you want to remove this issue from the ${partOfWaveProgram.name} Wave Program?`,
-      () =>
-        doWithErrorModal(async () =>
-          removeIssueFromWaveProgram(undefined, partOfWaveProgram?.id, issue.id),
-        ),
-    );
-
-    await invalidate('wave:issues');
-
-    const newIssue = await getIssue(undefined, issue.id);
-    if (newIssue) notifyIssuesUpdated([newIssue]);
-  }
 
   let applications = $state<IssueApplicationWithDetailsDto[] | null>(null);
   let promisePending = $state(true);
@@ -292,6 +271,18 @@
       {/if}
 
       <div class="sidebar-actions" class:has-metrics={issue.waveProgramId}>
+        {#if allowAddingOrRemovingWave && !partOfWaveProgram}
+          <Button
+            icon={Plus}
+            variant="primary"
+            size="large"
+            disabled={!canBeAddedToAWave}
+            onclick={openWaveProgramModal}
+          >
+            Add to Wave Program
+          </Button>
+        {/if}
+
         {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
           <Button icon={Check} variant="primary" size="large" onclick={handleMarkIssueCompleted}>
             Mark as complete
@@ -331,7 +322,7 @@
         {#if issue.assignedApplicant}
           <GithubUserBadge user={issue.assignedApplicant} />
         {:else}
-          <p style:color="var(--color-foreground-level-5)">No assignee yet.</p>
+          <p style:color="var(--color-foreground-level-5)">No assignee yet</p>
         {/if}
       </div>
 
@@ -365,7 +356,7 @@
                   {COMPLIMENT_TYPES[compliment.complimentType].label}
                 </span>
 
-                <span class="typo-text">
+                <span class="typo-text compliment-points">
                   +{compliment.points}
                 </span>
               </li>
@@ -392,42 +383,27 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="metric-header">
-          <h5>Wave</h5>
-          {#if allowAddingOrRemovingWave}
-            <button
-              class="edit-icon-button"
-              onclick={openWaveProgramModal}
-              aria-label="Edit wave"
-              disabled={!canBeAddedToAWave && !partOfWaveProgram}
-            >
-              <Pen style="fill: var(--color-foreground-level-6);" />
-            </button>
-          {/if}
-        </div>
+        <h5>Wave</h5>
 
         {#if partOfWaveProgram}
-          <WaveBadge waveProgram={partOfWaveProgram} />
+          <div class="wave-row">
+            <WaveBadge waveProgram={partOfWaveProgram} />
+            {#if allowAddingOrRemovingWave}
+              <button
+                class="edit-icon-button"
+                onclick={openWaveProgramModal}
+                aria-label="Edit wave"
+                disabled={!canBeAddedToAWave && !partOfWaveProgram}
+              >
+                <Pen style="fill: var(--color-foreground-level-6);" />
+              </button>
+            {/if}
+          </div>
         {:else}
-          <p style:color="var(--color-foreground-level-5)">
-            Issue isn't part of a Wave Program yet.
-          </p>
+          <p style:color="var(--color-foreground-level-5)">Not part of a Wave Program</p>
         {/if}
 
-        {#if allowAddingOrRemovingWave}
-          {#if partOfWaveProgram}
-            <Button icon={Minus} onclick={handleRemoveFromWave}>Remove from Wave Program</Button>
-          {:else}
-            <Button
-              icon={Plus}
-              variant="primary"
-              disabled={!canBeAddedToAWave}
-              onclick={openWaveProgramModal}
-            >
-              Add to Wave Program
-            </Button>
-          {/if}
-        {/if}
+      {#if allowAddingOrRemovingWave && !partOfWaveProgram}{/if}
       </div>
       </Card>
     </div>
@@ -480,7 +456,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    background-color: var(--color-foreground-level-1);
+    background-color: transparent;
   }
 
   .metric-box-points {
@@ -497,6 +473,13 @@
 
   .metric-header h5 {
     margin: 0;
+  }
+
+  .wave-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
 
   .metric-value {
@@ -581,6 +564,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .compliment-points {
+    color: var(--color-caution-level-6);
+    font-weight: 700;
   }
 
   .compliments-list {
