@@ -39,18 +39,9 @@
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
-              type: 'single-select',
+              type: 'toggle',
               label: 'Applicant assignment',
-              options: [
-                {
-                  label: 'Assigned to an applicant',
-                  value: 'true',
-                },
-                {
-                  label: 'Not assigned',
-                  value: 'false',
-                },
-              ],
+              toggleLabel: 'Assigned to an applicant',
             },
           }
         : {}),
@@ -58,35 +49,17 @@
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             hasApplications: {
-              type: 'single-select',
+              type: 'toggle',
               label: 'Applications',
-              options: [
-                {
-                  label: 'Has applications',
-                  value: 'true',
-                },
-                {
-                  label: 'No applications',
-                  value: 'false',
-                },
-              ],
+              toggleLabel: 'Has applications',
             },
           }
         : {}),
 
       hasPr: {
-        type: 'single-select',
+        type: 'toggle',
         label: 'Pull Requests',
-        options: [
-          {
-            label: 'Has linked PR',
-            value: 'true',
-          },
-          {
-            label: 'No linked PR',
-            value: 'false',
-          },
-        ],
+        toggleLabel: 'Has linked PR',
       },
 
       ...(mode === 'maintainer' || mode === 'wave'
@@ -131,14 +104,9 @@
       ...(mode === 'maintainer'
         ? {
             isInWaveProgram: {
-              type: 'single-select',
+              type: 'toggle',
               label: 'Wave Membership',
-              options: [
-                {
-                  label: 'Part of a Wave',
-                  value: 'true',
-                },
-              ],
+              toggleLabel: 'Part of a Wave',
             },
           }
         : {}),
@@ -151,6 +119,7 @@
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
   import SingleSelectFilterItem from './components/single-select-filter-item.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
   import type { FilterConfig } from './types';
 
   let {
@@ -180,6 +149,10 @@
     }
   }
 
+  function handleToggleFilter<K extends keyof IssueFilters>(filterKey: K, checked: boolean) {
+    handleSelectFilter(filterKey, checked ? 'true' : 'false');
+  }
+
   function handleApply() {
     onapply(filters);
   }
@@ -202,15 +175,22 @@
   <div class="options">
     {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
       <div class="filter-config-item">
-        <h5>{filterConfig.label}</h5>
         {#if filterConfig.type === 'single-select'}
+          <h5>{filterConfig.label}</h5>
           <SingleSelectFilterItem
             bind:this={filterItems[i]}
             selected={filters[filterKey as keyof IssueFilters] as string | undefined}
             config={filterConfig}
             onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
           />
+        {:else if filterConfig.type === 'toggle'}
+          <Toggle
+            checked={filters[filterKey as keyof IssueFilters] === 'true'}
+            label={filterConfig.toggleLabel}
+            onchange={(checked) => handleToggleFilter(filterKey as keyof IssueFilters, checked)}
+          />
         {:else if filterConfig.type === 'dropdown'}
+          <h5>{filterConfig.label}</h5>
           <DropdownFilterItem
             config={filterConfig}
             selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
@@ -245,6 +225,16 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .filter-config-item :global(.toggle .label) {
+    font-weight: 400;
+    font-family: var(--typeface-regular);
+  }
+
+  .filter-config-item :global(.toggle .label.typo-text-bold) {
+    font-weight: 400;
+    font-family: var(--typeface-regular);
   }
 
   .actions {

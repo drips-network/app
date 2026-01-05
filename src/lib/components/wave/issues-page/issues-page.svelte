@@ -337,7 +337,7 @@
           >
             Filter
             {#if noOfFilters > 0}
-              <div class="filter-count">
+              <div class="filter-count" class:filter-count-open={filtersOpen}>
                 {noOfFilters}
               </div>
             {/if}
@@ -518,8 +518,13 @@
     width: 1.25rem;
     font-size: 0.75rem;
     border-radius: 50%;
-    background-color: var(--color-primary-level-1);
-    color: var(--color-primary-level-6);
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    font-weight: 700;
+  }
+
+  .filter-count.filter-count-open {
+    background-color: var(--color-primary);
   }
 
   .spinner {
