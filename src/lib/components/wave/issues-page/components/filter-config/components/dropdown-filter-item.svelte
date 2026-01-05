@@ -142,7 +142,7 @@
   .dropdown-trigger {
     cursor: pointer;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem 0 0.5rem 0.5rem;
     border: 1px solid var(--color-foreground-level-3);
     user-select: none;
     display: flex;
