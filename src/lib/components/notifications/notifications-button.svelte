@@ -45,8 +45,18 @@
         notifications = [notification, ...notifications];
       });
 
-      novu.on('notification.read.resolved', () => {
-        loadNotifications();
+      novu.on('notifications.list.updated', (e) => {
+        notifications = e.data.notifications;
+      });
+
+      novu.on('notification.read.pending', (e) => {
+        if (e.data) {
+          // optimistically patch the notification in the list to isRead: true
+          const index = notifications.findIndex((n) => e.data && n.id === e.data.id);
+          if (index !== -1) {
+            notifications[index] = { ...notifications[index], isRead: true } as Notification;
+          }
+        }
       });
 
       novu.on('notifications.unread_count_changed', (data) => {
