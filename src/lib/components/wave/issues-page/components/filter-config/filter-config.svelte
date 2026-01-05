@@ -190,7 +190,6 @@
             onchange={(checked) => handleToggleFilter(filterKey as keyof IssueFilters, checked)}
           />
         {:else if filterConfig.type === 'dropdown'}
-          <h5>{filterConfig.label}</h5>
           <DropdownFilterItem
             config={filterConfig}
             selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
