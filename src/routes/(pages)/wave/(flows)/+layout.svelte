@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import LegalLinks from '$lib/components/legal-links/legal-links.svelte';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Header from '$lib/components/wave/header/header.svelte';
   import type { PageData } from '../(base-layout)/$types';
@@ -35,7 +34,22 @@
   </div>
 
   <div style:view-transition-name="legal-links">
-    <LegalLinks />
+    <ul class="links typo-text-small">
+      <li>
+        <a href="https://docs.drips.network/wave" target="_blank" rel="noreferrer">Docs</a>
+      </li>
+      <li>
+        <a href="https://docs.drips.network/wave/terms-and-rules" target="_blank" rel="noreferrer"
+          >Terms</a
+        >
+      </li>
+      <li>
+        <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy</a>
+      </li>
+      <li>
+        <a href="/legal/disclaimer" target="_blank" rel="noreferrer">Disclaimer</a>
+      </li>
+    </ul>
   </div>
 </div>
 
@@ -85,5 +99,25 @@
     min-height: auto;
     padding: 0;
     flex: 1;
+  }
+
+  .links {
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .links > li {
+    color: var(--color-foreground-level-6);
+  }
+
+  .links > li:not(:last-child)::after {
+    margin-left: 0.5rem;
+    content: '•';
+  }
+
+  .links a {
+    text-decoration: underline;
   }
 </style>

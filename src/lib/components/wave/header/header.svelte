@@ -11,10 +11,11 @@
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import type { ComponentProps } from 'svelte';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
-  import LogInButton from '../log-in-button/log-in-button.svelte';
   import Nav from '../nav/nav.svelte';
   import UserMenu from './components/user-menu.svelte';
   import Hamburger from '$lib/components/icons/Hamburger.svelte';
+  import { page } from '$app/state';
+  import Github from '$lib/components/icons/Github.svelte';
 
   let {
     user,
@@ -96,8 +97,10 @@
           <UserMenu {user} />
         {/snippet}
       </Flyout>
-    {:else}
-      <LogInButton />
+    {:else if page.route.id !== '/(pages)/wave/(flows)/login'}
+      <Button href="/wave/login?backTo={page.url.pathname + page.url.search}" icon={Github}>
+        Log in
+      </Button>
     {/if}
   </div>
 </header>
