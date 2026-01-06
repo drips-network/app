@@ -222,9 +222,16 @@
     }
   });
 
-  let noOfFilters = $derived(
-    Object.keys(appliedFilters).filter((key) => key !== 'search').length - noOfPreappliedFilters,
-  );
+  let noOfFilters = $derived(() => {
+    const filterKeys = Object.keys(appliedFilters).filter((key) => key !== 'search');
+    let count = filterKeys.length - noOfPreappliedFilters;
+
+    if (filtersMode === 'maintainer' && appliedFilters.state === 'open') {
+      count -= 1;
+    }
+
+    return Math.max(0, count);
+  });
 
   let searchOpen = $state(false);
 

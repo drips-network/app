@@ -169,7 +169,9 @@
     { title: 'Closed', value: 'closed' },
   ];
 
-  let statusActive = $derived<StatusValue>((filters.state ?? 'all') as StatusValue);
+  const statusDefault: StatusValue = mode === 'maintainer' ? 'open' : 'all';
+
+  let statusActive = $derived<StatusValue>((filters.state ?? statusDefault) as StatusValue);
 
   function getSegmentedValue(value: string | boolean | undefined | null) {
     if (value === undefined || value === null) return 'all';
@@ -187,6 +189,34 @@
 
     onapply(filters);
   }
+
+  function normalizedFilterEntries(value: IssueFilters) {
+    return Object.entries(value).filter(([key, entryValue]) => {
+      if (entryValue === undefined) return false;
+      if (key === 'state' && entryValue === 'open' && (mode === 'maintainer' || mode === 'wave')) {
+        return false;
+      }
+      if (mode === 'maintainer' && key === 'mine' && entryValue === true) return false;
+      if (mode === 'maintainer' && key === 'eligibleForWave' && entryValue === true) return false;
+      if (mode === 'contributor' && key === 'isInWaveProgram' && entryValue === true) return false;
+      if (mode === 'contributor' && key === 'appliedToByUser' && entryValue === ownUserId)
+        return false;
+      if (mode === 'wave' && key === 'waveProgramId') return false;
+      return true;
+    });
+  }
+
+  function isSameFilters(a: IssueFilters, b: IssueFilters) {
+    const aEntries = normalizedFilterEntries(a);
+    const bEntries = normalizedFilterEntries(b);
+
+    if (aEntries.length !== bEntries.length) return false;
+
+    return aEntries.every(([key, value]) => b[key as keyof IssueFilters] === value);
+  }
+
+  let hasChanges = $derived(!isSameFilters(filters, appliedFilters));
+  let hasAppliedFilters = $derived(normalizedFilterEntries(appliedFilters).length > 0);
 
   export function reset() {
     filters = appliedFilters;
@@ -213,6 +243,7 @@
                 <SegmentedControl
                   options={statusOptions}
                   active={statusActive}
+                  defaultValue={statusDefault}
                   onTabChange={(value) =>
                     handleSelectFilter(
                       'state',
@@ -231,6 +262,7 @@
                     value: option.value,
                   }))}
                   active={getSegmentedValue(filters[filterKey as keyof IssueFilters])}
+                  defaultValue="all"
                   onTabChange={(value) =>
                     handleSelectFilter(
                       filterKey as keyof IssueFilters,
@@ -271,8 +303,8 @@
   </div>
 
   <div class="actions">
-    <Button onclick={handleClear}>Reset</Button>
-    <Button variant="primary" onclick={handleApply}>Apply filters</Button>
+    <Button onclick={handleClear} disabled={!hasChanges && !hasAppliedFilters}>Reset</Button>
+    <Button variant="primary" onclick={handleApply} disabled={!hasChanges}>Apply filters</Button>
   </div>
 </div>
 

@@ -9,6 +9,7 @@
   interface Props {
     options: Option<keyof T>;
     active: keyof T;
+    defaultValue?: keyof T | undefined;
     disabled?: boolean;
     containerRole?: string;
     itemRole?: string;
@@ -19,6 +20,7 @@
   let {
     options,
     active = $bindable(),
+    defaultValue = undefined,
     disabled = false,
     containerRole = 'radiogroup',
     itemRole = 'radio',
@@ -67,7 +69,12 @@
   }
 </script>
 
-<div class="segmented-control" class:disabled bind:this={containerElem}>
+<div
+  class="segmented-control"
+  class:disabled
+  class:default-active={defaultValue !== undefined && active === defaultValue}
+  bind:this={containerElem}
+>
   <div class="options" role={containerRole} aria-label={ariaLabel}>
     {#each options as option (option.value)}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -195,5 +202,13 @@
   .segmented-control.disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .segmented-control.default-active .selector {
+    background-color: var(--color-foreground-level-5);
+  }
+
+  .segmented-control.default-active .option.selected {
+    color: var(--color-background);
   }
 </style>
