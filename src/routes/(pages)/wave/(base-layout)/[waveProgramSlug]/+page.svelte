@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -38,51 +39,57 @@
 />
 
 <div class="page">
-  <div class="hero">
-    <div class="wave-program-name">
-      <Card style="height: 100%;">
-        <div class="bg"></div>
-        <div class="wave-program-name-inner">
-          <WaveProgramAvatar {waveProgram} size={128} />
-          <h1>{waveProgram.name}</h1>
+  <div class="top" style:display="flex" style:flex-direction="column" style:gap="1.5rem">
+    <Breadcrumbs
+      crumbs={[{ label: 'Wave Programs', href: '/wave' }, { label: data.waveProgram.name }]}
+    />
 
-          <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
+    <div class="hero">
+      <div class="wave-program-name">
+        <Card style="height: 100%;">
+          <div class="bg"></div>
+          <div class="wave-program-name-inner">
+            <WaveProgramAvatar {waveProgram} size={128} />
+            <h1>{waveProgram.name}</h1>
 
-          <div class="share">
-            <ShareButton
-              downloadableImageUrl={shareImageUrl}
-              buttonVariant="normal"
-              url={`${BASE_URL}/wave/${waveProgram.slug}`}
-            />
-          </div>
-        </div>
-      </Card>
-    </div>
+            <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
 
-    <div class="wave-stats">
-      <Card style="height: 100%;">
-        <div class="wave-stats-inner">
-          <WaveProgramStats leaderboard={data.leaderboard} {waveProgram} />
-
-          {#if (waveProgram.metadata?.length ?? 0) > 0}
-            <div class="metadata">
-              {#each waveProgram.metadata as { type, value } (type)}
-                {#if type === 'website'}
-                  {@const url = new URL(value)}
-                  <Button icon={Globe} href={value} target="_blank" rel="noopener noreferrer"
-                    >{url.hostname}</Button
-                  >
-                {:else if type === 'x'}
-                  {@const url = new URL(value)}
-                  <Button icon={X} href={value} target="_blank" rel="noopener noreferrer"
-                    >@{url.pathname.slice(1)}</Button
-                  >
-                {/if}
-              {/each}
+            <div class="share">
+              <ShareButton
+                downloadableImageUrl={shareImageUrl}
+                buttonVariant="normal"
+                url={`${BASE_URL}/wave/${waveProgram.slug}`}
+              />
             </div>
-          {/if}
-        </div>
-      </Card>
+          </div>
+        </Card>
+      </div>
+
+      <div class="wave-stats">
+        <Card style="height: 100%;">
+          <div class="wave-stats-inner">
+            <WaveProgramStats leaderboard={data.leaderboard} {waveProgram} />
+
+            {#if (waveProgram.metadata?.length ?? 0) > 0}
+              <div class="metadata">
+                {#each waveProgram.metadata as { type, value } (type)}
+                  {#if type === 'website'}
+                    {@const url = new URL(value)}
+                    <Button icon={Globe} href={value} target="_blank" rel="noopener noreferrer"
+                      >{url.hostname}</Button
+                    >
+                  {:else if type === 'x'}
+                    {@const url = new URL(value)}
+                    <Button icon={X} href={value} target="_blank" rel="noopener noreferrer"
+                      >@{url.pathname.slice(1)}</Button
+                    >
+                  {/if}
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </Card>
+      </div>
     </div>
   </div>
 
