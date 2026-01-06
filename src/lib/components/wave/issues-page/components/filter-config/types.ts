@@ -13,7 +13,7 @@ export type DropdownConfig<OT extends { label: string; value: string }[]> = {
 export type ToggleConfig = {
   type: 'toggle';
   label: string;
-  toggleLabel: string;
+  onValue: string;
 };
 
 export type FilterConfig =

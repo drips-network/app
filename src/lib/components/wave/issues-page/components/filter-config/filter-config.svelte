@@ -21,16 +21,15 @@
         ],
       },
 
-      ...(ownUserId && mode === 'contributor'
+      ...(mode === 'maintainer' || mode === 'wave'
         ? {
-            assignedToUser: {
+            applicantAssigned: {
               type: 'single-select',
-              label: 'Assignment',
+              label: 'Assigned',
               options: [
-                {
-                  label: 'Assigned to me',
-                  value: ownUserId,
-                },
+                { label: 'All', value: 'all' },
+                { label: 'Yes', value: 'true' },
+                { label: 'No', value: 'false' },
               ],
             },
           }
@@ -38,36 +37,48 @@
 
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
-            applicantAssigned: {
-              type: 'toggle',
-              label: 'Applicant assignment',
-              toggleLabel: 'Assigned to an applicant',
-            },
-          }
-        : {}),
-
-      ...(mode === 'maintainer' || mode === 'wave'
-        ? {
             hasApplications: {
-              type: 'toggle',
+              type: 'single-select',
               label: 'Applications',
-              toggleLabel: 'Has applications',
+              options: [
+                { label: 'All', value: 'all' },
+                { label: 'Has', value: 'true' },
+                { label: 'None', value: 'false' },
+              ],
             },
           }
         : {}),
 
       hasPr: {
-        type: 'toggle',
-        label: 'Pull Requests',
-        toggleLabel: 'Has linked PR',
+        type: 'single-select',
+        label: 'Linked PR',
+        options: [
+          { label: 'All', value: 'all' },
+          { label: 'Linked', value: 'true' },
+          { label: 'None', value: 'false' },
+        ],
       },
+
+      ...(ownUserId && mode === 'contributor'
+        ? {
+            assignedToUser: {
+              type: 'toggle',
+              label: 'Assigned to me',
+              onValue: ownUserId,
+            },
+          }
+        : {}),
 
       ...(mode === 'maintainer'
         ? {
             isInWaveProgram: {
-              type: 'toggle',
-              label: 'Wave Membership',
-              toggleLabel: 'Part of a Wave',
+              type: 'single-select',
+              label: 'Part of Wave',
+              options: [
+                { label: 'All', value: 'all' },
+                { label: 'Yes', value: 'true' },
+                { label: 'No', value: 'false' },
+              ],
             },
           }
         : {}),
@@ -116,11 +127,11 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
   import SingleSelectFilterItem from './components/single-select-filter-item.svelte';
-  import Toggle from '$lib/components/toggle/toggle.svelte';
   import type { FilterConfig } from './types';
 
   let {
@@ -150,28 +161,22 @@
     }
   }
 
-  type ToggleFilterKey = 'applicantAssigned' | 'hasApplications' | 'hasPr' | 'isInWaveProgram';
-  type StatusValue = 'open' | 'closed';
-
-  function handleToggleFilter(filterKey: ToggleFilterKey, checked: boolean) {
-    handleSelectFilter(filterKey, checked ? 'true' : null);
-  }
-
-  function isToggleFilterKey(filterKey: keyof IssueFilters): filterKey is ToggleFilterKey {
-    return (
-      filterKey === 'applicantAssigned' ||
-      filterKey === 'hasApplications' ||
-      filterKey === 'hasPr' ||
-      filterKey === 'isInWaveProgram'
-    );
-  }
+  type StatusValue = 'open' | 'closed' | 'all';
 
   const statusOptions: { title: string; value: StatusValue }[] = [
+    { title: 'All', value: 'all' },
     { title: 'Open', value: 'open' },
     { title: 'Closed', value: 'closed' },
   ];
 
-  let statusActive = $derived<StatusValue>((filters.state ?? 'open') as StatusValue);
+  let statusActive = $derived<StatusValue>((filters.state ?? 'all') as StatusValue);
+
+  function getSegmentedValue(value: string | boolean | undefined | null) {
+    if (value === undefined || value === null) return 'all';
+    if (value === true) return 'true';
+    if (value === false) return 'false';
+    return value;
+  }
 
   function handleApply() {
     onapply(filters);
@@ -208,33 +213,58 @@
                 <SegmentedControl
                   options={statusOptions}
                   active={statusActive}
-                  onTabChange={(value) => handleSelectFilter('state', value as StatusValue)}
+                  onTabChange={(value) =>
+                    handleSelectFilter(
+                      'state',
+                      (value as StatusValue) === 'all' ? null : (value as StatusValue),
+                    )}
                 />
               </div>
             </div>
           {:else}
-            <h5>{filterConfig.label}</h5>
-            <SingleSelectFilterItem
-              selected={filters[filterKey as keyof IssueFilters] as string | undefined}
-              config={filterConfig}
-              onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-            />
+            <div class="filter-config-item--row">
+              <span class="filter-row-label">{filterConfig.label}</span>
+              <div class="filter-row-control">
+                <SegmentedControl
+                  options={filterConfig.options.map((option) => ({
+                    title: option.label,
+                    value: option.value,
+                  }))}
+                  active={getSegmentedValue(filters[filterKey as keyof IssueFilters])}
+                  onTabChange={(value) =>
+                    handleSelectFilter(
+                      filterKey as keyof IssueFilters,
+                      value === 'all' ? null : (value as IssueFilters[keyof IssueFilters]),
+                    )}
+                />
+              </div>
+            </div>
           {/if}
         {:else if filterConfig.type === 'toggle'}
-          {#if isToggleFilterKey(filterKey)}
-            {@const toggleKey = filterKey}
-            <Toggle
-              checked={filters[filterKey] === 'true'}
-              label={filterConfig.toggleLabel}
-              onchange={(checked) => handleToggleFilter(toggleKey, checked)}
-            />
-          {/if}
+          <div class="filter-config-item--row">
+            <span class="filter-row-label">{filterConfig.label}</span>
+            <div class="filter-row-control">
+              <Toggle
+                checked={filters[filterKey as keyof IssueFilters] === filterConfig.onValue}
+                onchange={(checked) =>
+                  handleSelectFilter(
+                    filterKey as keyof IssueFilters,
+                    checked ? (filterConfig.onValue as IssueFilters[keyof IssueFilters]) : null,
+                  )}
+              />
+            </div>
+          </div>
         {:else if filterConfig.type === 'dropdown'}
-          <DropdownFilterItem
-            config={filterConfig}
-            selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
-            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-          />
+          <div class="filter-config-item--row">
+            <span class="filter-row-label">{filterConfig.label}</span>
+            <div class="filter-row-control">
+              <DropdownFilterItem
+                config={filterConfig}
+                selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
+                onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+              />
+            </div>
+          </div>
         {/if}
       </div>
     {/each}
@@ -286,20 +316,15 @@
   .filter-row-control {
     display: flex;
     justify-content: flex-end;
+    flex: 1;
   }
 
   .filter-row-control :global(.single-select-filter-item) {
     justify-content: flex-end;
   }
 
-  .filter-config-item :global(.toggle .label) {
+  .filter-config-item :global(.segmented-control .option) {
     font-weight: 400;
-    font-family: var(--typeface-regular);
-  }
-
-  .filter-config-item :global(.toggle .label.typo-text-bold) {
-    font-weight: 400;
-    font-family: var(--typeface-regular);
   }
 
   .filter-config-item :global(.dropdown-trigger) {
