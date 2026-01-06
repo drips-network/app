@@ -255,7 +255,7 @@
   }
 
   .dropdown-options button {
-    width: unset;
+    width: 100%;
     min-width: 0;
     padding: 0.3rem 0.7rem;
     background: none;
@@ -271,7 +271,7 @@
   }
 
   .dropdown-options button:hover {
-    background-color: transparent;
+    background-color: var(--color-foreground-level-1);
   }
 
   @keyframes fadeIn {
