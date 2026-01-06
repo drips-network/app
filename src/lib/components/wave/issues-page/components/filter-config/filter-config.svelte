@@ -33,20 +33,6 @@
 
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
-            applicantAssigned: {
-              type: 'single-select',
-              label: 'Assigned',
-              options: [
-                { label: 'All', value: 'all' },
-                { label: 'Yes', value: 'true' },
-                { label: 'No', value: 'false' },
-              ],
-            },
-          }
-        : {}),
-
-      ...(mode === 'maintainer' || mode === 'wave'
-        ? {
             hasApplications: {
               type: 'single-select',
               label: 'Applications',
@@ -54,6 +40,20 @@
                 { label: 'All', value: 'all' },
                 { label: 'Has', value: 'true' },
                 { label: 'None', value: 'false' },
+              ],
+            },
+          }
+        : {}),
+
+      ...(mode === 'maintainer' || mode === 'wave'
+        ? {
+            applicantAssigned: {
+              type: 'single-select',
+              label: 'Assigned',
+              options: [
+                { label: 'All', value: 'all' },
+                { label: 'Yes', value: 'true' },
+                { label: 'No', value: 'false' },
               ],
             },
           }
@@ -87,7 +87,7 @@
         ? {
             repoId: {
               type: 'dropdown',
-              label: 'Repository',
+              label: 'Repo',
               optionsPromise: (async () => {
                 if (mode === 'wave') {
                   if (!currentWaveProgramId) {
@@ -140,12 +140,14 @@
     ownUserId,
     mode,
     currentWaveProgramId,
+    flash = false,
   }: {
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
     ownUserId: string | null;
     mode: 'maintainer' | 'contributor' | 'wave';
     currentWaveProgramId?: string;
+    flash?: boolean;
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);
@@ -220,6 +222,14 @@
 
   export function reset() {
     filters = appliedFilters;
+  }
+
+  export function hasChangesInFilters() {
+    return hasChanges;
+  }
+
+  export function hasAppliedFiltersInView() {
+    return hasAppliedFilters;
   }
 
   let filterEntries = $derived(
@@ -302,7 +312,7 @@
     {/each}
   </div>
 
-  <div class="actions">
+  <div class="actions" class:actions-flash={flash}>
     <Button onclick={handleClear} disabled={!hasChanges && !hasAppliedFilters}>Reset</Button>
     <Button variant="primary" onclick={handleApply} disabled={!hasChanges}>Apply filters</Button>
   </div>
@@ -373,5 +383,10 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+    transition: background-color 0.3s;
+  }
+
+  .actions.actions-flash {
+    background-color: var(--color-primary-level-1);
   }
 </style>

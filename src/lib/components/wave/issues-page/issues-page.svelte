@@ -108,6 +108,10 @@
   }
 
   let filtersOpen = $state<boolean>(false);
+  let filterFlash = $state(false);
+  let filterFlashTimeout: ReturnType<typeof setTimeout> | null = null;
+  let filterDropdownEl = $state<HTMLDivElement | null>(null);
+  let filterButtonEl = $state<HTMLDivElement | null>(null);
 
   // svelte-ignore non_reactive_update
   let filterConfigInstance: FilterConfig;
@@ -118,6 +122,39 @@
     if (!filtersOpen) {
       filterConfigInstance?.reset();
     }
+  }
+
+  function triggerFilterFlash() {
+    if (filterFlashTimeout) {
+      clearTimeout(filterFlashTimeout);
+    }
+
+    filterFlash = true;
+    filterFlashTimeout = setTimeout(() => {
+      filterFlash = false;
+    }, 450);
+  }
+
+  function handleFilterOutsideClick(event: MouseEvent) {
+    if (!filtersOpen) return;
+
+    const target = event.target as Node | null;
+    if (!target) return;
+
+    if (filterDropdownEl?.contains(target) || filterButtonEl?.contains(target)) {
+      return;
+    }
+
+    if (
+      filterConfigInstance?.hasChangesInFilters() ||
+      filterConfigInstance?.hasAppliedFiltersInView()
+    ) {
+      triggerFilterFlash();
+      return;
+    }
+
+    filtersOpen = false;
+    filterConfigInstance?.reset();
   }
 
   let applyingFilters = $state<boolean>(false);
@@ -287,6 +324,8 @@
   }
 </script>
 
+<svelte:window on:click={handleFilterOutsideClick} />
+
 <HeadMeta title={headMetaTitle} />
 
 <div class="wrapper" class:isViewingIssue>
@@ -335,20 +374,22 @@
           onclick={handleSearchOpen}>Search</Button
         >
 
-        <div>
-          <Button
-            icon={Filter}
-            onclick={handleFilterClick}
-            highlit={filtersOpen}
-            disabled={sortingOpen}
-          >
-            Filter
-            {#if noOfFilters > 0}
-              <div class="filter-count" class:filter-count-open={filtersOpen}>
-                {noOfFilters}
-              </div>
-            {/if}
-          </Button>
+        <div class="filter-sort-buttons">
+          <div bind:this={filterButtonEl}>
+            <Button
+              icon={Filter}
+              onclick={handleFilterClick}
+              highlit={filtersOpen}
+              disabled={sortingOpen}
+            >
+              Filter
+              {#if noOfFilters > 0}
+                <div class="filter-count" class:filter-count-open={filtersOpen}>
+                  {noOfFilters}
+                </div>
+              {/if}
+            </Button>
+          </div>
 
           <Button
             icon={SortMostToLeast}
@@ -374,8 +415,12 @@
     </TransitionedHeight>
 
     <TransitionedHeight removeFromTabIndexWhileCollapsed collapsed={!filtersOpen}>
-      <div class="filter-config">
-        <Card style="padding: 0;">
+      <div class="filter-config" bind:this={filterDropdownEl}>
+        <Card
+          style={`padding: 0; background-color: ${
+            filterFlash ? 'var(--color-primary-level-1)' : 'var(--color-background)'
+          }; transition: background-color 0.3s;`}
+        >
           {#key appliedFilters}
             <FilterConfig
               mode={filtersMode}
@@ -384,6 +429,7 @@
               {appliedFilters}
               onapply={handleApplyFilters}
               {currentWaveProgramId}
+              flash={filterFlash}
             />
           {/key}
         </Card>
@@ -472,6 +518,12 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+
+  .filter-sort-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .search-bar {
