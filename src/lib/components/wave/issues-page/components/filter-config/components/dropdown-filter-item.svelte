@@ -24,10 +24,18 @@
     const popoverEl = document.getElementById(`dropdown-${uid}`);
 
     if (popoverEl) {
-      popoverEl.style.position = 'absolute';
-      popoverEl.style.top = `${rect.bottom + window.scrollY + 8}px`;
-      popoverEl.style.left = `${rect.left + window.scrollX}px`;
+      popoverEl.style.position = 'fixed';
+      popoverEl.style.left = `${rect.left}px`;
       popoverEl.style.width = `${rect.width}px`;
+
+      const spaceBelow = window.innerHeight - rect.bottom - 16;
+      const maxHeight = Math.max(spaceBelow, 160);
+
+      popoverEl.style.maxHeight = `${maxHeight}px`;
+      popoverEl.style.bottom = '';
+
+      const top = Math.min(rect.bottom + 8, window.innerHeight - maxHeight - 8);
+      popoverEl.style.top = `${top}px`;
     }
   }
 
@@ -160,6 +168,7 @@
 
   .dropdown-trigger .name {
     flex-grow: 1;
+    min-width: 0;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -184,6 +193,9 @@
     box-shadow: var(--shadow-elevation-4);
     padding: 0;
     z-index: 5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     transition:
       opacity 0.2s ease-in-out,
       transform 0.2s ease-in-out,
@@ -192,6 +204,7 @@
 
     opacity: 0;
     transform: translateY(0.25rem);
+    pointer-events: none;
   }
 
   .dropdown-content .search-bar {
@@ -215,6 +228,7 @@
   .dropdown-content:popover-open {
     opacity: 1;
     transform: translateY(0);
+    pointer-events: auto;
   }
 
   @starting-style {
@@ -225,14 +239,23 @@
   }
 
   .options-list {
-    max-height: 15rem;
+    flex: 1 1 auto;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    overflow-x: hidden;
+    display: block;
     min-width: 0;
   }
 
+  .dropdown-options {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    min-height: 0;
+    flex: 1;
+  }
+
   .dropdown-options button {
+    width: unset;
     min-width: 0;
     padding: 0.3rem 0.7rem;
     background: none;
@@ -240,13 +263,15 @@
     text-align: left;
     cursor: pointer;
     transition: background-color 0.2s;
+    box-sizing: border-box;
+    max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .dropdown-options button:hover {
-    background-color: var(--color-foreground-level-1);
+    background-color: transparent;
   }
 
   @keyframes fadeIn {

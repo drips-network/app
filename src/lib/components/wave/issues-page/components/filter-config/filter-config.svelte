@@ -343,12 +343,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    min-width: 0;
   }
 
   .filter-row-label {
     font-weight: 400;
     font-family: var(--typeface-regular);
     font-size: 1rem;
+    flex-shrink: 0;
   }
 
   .filter-row-control :global(.segmented-control) {
@@ -359,6 +361,7 @@
     display: flex;
     justify-content: flex-end;
     flex: 1;
+    min-width: 0;
   }
 
   .filter-row-control :global(.single-select-filter-item) {

@@ -112,6 +112,7 @@
   let filterFlashTimeout: ReturnType<typeof setTimeout> | null = null;
   let filterDropdownEl = $state<HTMLDivElement | null>(null);
   let filterButtonEl = $state<HTMLDivElement | null>(null);
+  let ignoreFilterOutsideClick = $state(false);
 
   // svelte-ignore non_reactive_update
   let filterConfigInstance: FilterConfig;
@@ -138,23 +139,45 @@
   function handleFilterOutsideClick(event: MouseEvent) {
     if (!filtersOpen) return;
 
+    if (ignoreFilterOutsideClick) {
+      ignoreFilterOutsideClick = false;
+      return;
+    }
+
     const target = event.target as Node | null;
     if (!target) return;
+
+    const path = event.composedPath?.() ?? [];
+    const clickedInPopover = path.some(
+      (node) => node instanceof HTMLElement && node.classList.contains('dropdown-content'),
+    );
+    if (clickedInPopover) {
+      return;
+    }
 
     if (filterDropdownEl?.contains(target) || filterButtonEl?.contains(target)) {
       return;
     }
 
-    if (
-      filterConfigInstance?.hasChangesInFilters() ||
-      filterConfigInstance?.hasAppliedFiltersInView()
-    ) {
+    if (filterConfigInstance?.hasChangesInFilters()) {
       triggerFilterFlash();
       return;
     }
 
     filtersOpen = false;
     filterConfigInstance?.reset();
+  }
+
+  function handleFilterPointerDown(event: PointerEvent) {
+    if (!filtersOpen) return;
+
+    const target = event.target as Node | null;
+    if (!target) return;
+
+    const openPopover = document.querySelector('.dropdown-content:popover-open');
+    if (openPopover && !openPopover.contains(target)) {
+      ignoreFilterOutsideClick = true;
+    }
   }
 
   let applyingFilters = $state<boolean>(false);
@@ -324,7 +347,7 @@
   }
 </script>
 
-<svelte:window on:click={handleFilterOutsideClick} />
+<svelte:window on:pointerdown|capture={handleFilterPointerDown} on:click={handleFilterOutsideClick} />
 
 <HeadMeta title={headMetaTitle} />
 
