@@ -78,7 +78,7 @@
 >
   <span class="name">
     {#if !selectedOption}
-      Any
+      In any repo
     {:else}
       {#await optionsPromise}
         Loading...
@@ -124,7 +124,9 @@
       </div>
 
       <div class="options-list">
-        <button class:selected={!selectedOption} onclick={() => handleSelect(null)}> Any </button>
+        <button class:selected={!selectedOption} onclick={() => handleSelect(null)}>
+          In any repo
+        </button>
 
         {#each options.filter((option) => option.label
             .toLowerCase()
@@ -142,7 +144,8 @@
   .dropdown-trigger {
     cursor: pointer;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.5rem;
+    min-height: 42px;
+    border-radius: 0.5rem 0 0.5rem 0.5rem;
     border: 1px solid var(--color-foreground-level-3);
     user-select: none;
     display: flex;
@@ -231,7 +234,7 @@
 
   .dropdown-options button {
     min-width: 0;
-    padding: 0.5rem 0.5rem;
+    padding: 0.3rem 0.7rem;
     background: none;
     border: none;
     text-align: left;

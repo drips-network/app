@@ -21,35 +21,15 @@
         ],
       },
 
-      ...(ownUserId && mode === 'contributor'
-        ? {
-            assignedToUser: {
-              type: 'single-select',
-              label: 'Assignment',
-              options: [
-                {
-                  label: 'Assigned to me',
-                  value: ownUserId,
-                },
-              ],
-            },
-          }
-        : {}),
-
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
               type: 'single-select',
-              label: 'Applicant assignment',
+              label: 'Assigned',
               options: [
-                {
-                  label: 'Assigned to an applicant',
-                  value: 'true',
-                },
-                {
-                  label: 'Not assigned',
-                  value: 'false',
-                },
+                { label: 'All', value: 'all' },
+                { label: 'Yes', value: 'true' },
+                { label: 'No', value: 'false' },
               ],
             },
           }
@@ -61,14 +41,9 @@
               type: 'single-select',
               label: 'Applications',
               options: [
-                {
-                  label: 'Has applications',
-                  value: 'true',
-                },
-                {
-                  label: 'No applications',
-                  value: 'false',
-                },
+                { label: 'All', value: 'all' },
+                { label: 'Has', value: 'true' },
+                { label: 'None', value: 'false' },
               ],
             },
           }
@@ -76,18 +51,37 @@
 
       hasPr: {
         type: 'single-select',
-        label: 'Pull Requests',
+        label: 'Linked PR',
         options: [
-          {
-            label: 'Has linked PR',
-            value: 'true',
-          },
-          {
-            label: 'No linked PR',
-            value: 'false',
-          },
+          { label: 'All', value: 'all' },
+          { label: 'Linked', value: 'true' },
+          { label: 'None', value: 'false' },
         ],
       },
+
+      ...(ownUserId && mode === 'contributor'
+        ? {
+            assignedToUser: {
+              type: 'toggle',
+              label: 'Assigned to me',
+              onValue: ownUserId,
+            },
+          }
+        : {}),
+
+      ...(mode === 'maintainer'
+        ? {
+            isInWaveProgram: {
+              type: 'single-select',
+              label: 'Part of Wave',
+              options: [
+                { label: 'All', value: 'all' },
+                { label: 'Yes', value: 'true' },
+                { label: 'No', value: 'false' },
+              ],
+            },
+          }
+        : {}),
 
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
@@ -127,26 +121,13 @@
             },
           }
         : {}),
-
-      ...(mode === 'maintainer'
-        ? {
-            isInWaveProgram: {
-              type: 'single-select',
-              label: 'Wave Membership',
-              options: [
-                {
-                  label: 'Part of a Wave',
-                  value: 'true',
-                },
-              ],
-            },
-          }
-        : {}),
     }) as const;
 </script>
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
+  import Toggle from '$lib/components/toggle/toggle.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
@@ -180,14 +161,28 @@
     }
   }
 
+  type StatusValue = 'open' | 'closed' | 'all';
+
+  const statusOptions: { title: string; value: StatusValue }[] = [
+    { title: 'All', value: 'all' },
+    { title: 'Open', value: 'open' },
+    { title: 'Closed', value: 'closed' },
+  ];
+
+  let statusActive = $derived<StatusValue>((filters.state ?? 'all') as StatusValue);
+
+  function getSegmentedValue(value: string | boolean | undefined | null) {
+    if (value === undefined || value === null) return 'all';
+    if (value === true) return 'true';
+    if (value === false) return 'false';
+    return value;
+  }
+
   function handleApply() {
     onapply(filters);
   }
 
-  let filterItems = $state<Array<SingleSelectFilterItem<{ label: string; value: string }[]>>>([]);
-
   function handleClear() {
-    filterItems.forEach((item) => item.clear());
     filters = {};
 
     onapply(filters);
@@ -196,26 +191,80 @@
   export function reset() {
     filters = appliedFilters;
   }
+
+  let filterEntries = $derived(
+    Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [
+      keyof IssueFilters,
+      FilterConfig,
+    ][],
+  );
+
 </script>
 
 <div class="filter-config-wrapper">
   <div class="options">
-    {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
+    {#each filterEntries as [filterKey, filterConfig], i (filterKey)}
       <div class="filter-config-item">
-        <h5>{filterConfig.label}</h5>
         {#if filterConfig.type === 'single-select'}
-          <SingleSelectFilterItem
-            bind:this={filterItems[i]}
-            selected={filters[filterKey as keyof IssueFilters] as string | undefined}
-            config={filterConfig}
-            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-          />
+          {#if filterKey === 'state'}
+            <div class="filter-config-item--row">
+              <span class="filter-row-label">Status</span>
+              <div class="filter-row-control">
+                <SegmentedControl
+                  options={statusOptions}
+                  active={statusActive}
+                  onTabChange={(value) =>
+                    handleSelectFilter(
+                      'state',
+                      (value as StatusValue) === 'all' ? null : (value as StatusValue),
+                    )}
+                />
+              </div>
+            </div>
+          {:else}
+            <div class="filter-config-item--row">
+              <span class="filter-row-label">{filterConfig.label}</span>
+              <div class="filter-row-control">
+                <SegmentedControl
+                  options={filterConfig.options.map((option) => ({
+                    title: option.label,
+                    value: option.value,
+                  }))}
+                  active={getSegmentedValue(filters[filterKey as keyof IssueFilters])}
+                  onTabChange={(value) =>
+                    handleSelectFilter(
+                      filterKey as keyof IssueFilters,
+                      value === 'all' ? null : (value as IssueFilters[keyof IssueFilters]),
+                    )}
+                />
+              </div>
+            </div>
+          {/if}
+        {:else if filterConfig.type === 'toggle'}
+          <div class="filter-config-item--row">
+            <span class="filter-row-label">{filterConfig.label}</span>
+            <div class="filter-row-control">
+              <Toggle
+                checked={filters[filterKey as keyof IssueFilters] === filterConfig.onValue}
+                onchange={(checked) =>
+                  handleSelectFilter(
+                    filterKey as keyof IssueFilters,
+                    checked ? (filterConfig.onValue as IssueFilters[keyof IssueFilters]) : null,
+                  )}
+              />
+            </div>
+          </div>
         {:else if filterConfig.type === 'dropdown'}
-          <DropdownFilterItem
-            config={filterConfig}
-            selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
-            onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
-          />
+          <div class="filter-config-item--row">
+            <span class="filter-row-label">{filterConfig.label}</span>
+            <div class="filter-row-control">
+              <DropdownFilterItem
+                config={filterConfig}
+                selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
+                onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
+              />
+            </div>
+          </div>
         {/if}
       </div>
     {/each}
@@ -245,6 +294,42 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .filter-config-item--row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .filter-row-label {
+    font-weight: 400;
+    font-family: var(--typeface-regular);
+    font-size: 1rem;
+  }
+
+  .filter-row-control :global(.segmented-control) {
+    font-size: 1rem;
+  }
+
+  .filter-row-control {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+  }
+
+  .filter-row-control :global(.single-select-filter-item) {
+    justify-content: flex-end;
+  }
+
+  .filter-config-item :global(.segmented-control .option) {
+    font-weight: 400;
+  }
+
+  .filter-config-item :global(.dropdown-trigger) {
+    width: 100%;
+    max-width: none;
   }
 
   .actions {
