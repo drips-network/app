@@ -176,8 +176,8 @@
   }
 
   .dropdown-trigger.has-selection {
-    background-color: var(--color-primary-level-1);
-    border-color: var(--color-primary-level-3);
+    background-color: var(--color-background);
+    border-color: var(--color-foreground-level-3);
   }
 
   .spinner {
