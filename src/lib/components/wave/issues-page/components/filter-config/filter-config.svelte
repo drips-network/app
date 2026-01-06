@@ -21,6 +21,16 @@
         ],
       },
 
+      hasPr: {
+        type: 'single-select',
+        label: 'Linked PR',
+        options: [
+          { label: 'All', value: 'all' },
+          { label: 'Linked', value: 'true' },
+          { label: 'None', value: 'false' },
+        ],
+      },
+
       ...(mode === 'maintainer' || mode === 'wave'
         ? {
             applicantAssigned: {
@@ -48,16 +58,6 @@
             },
           }
         : {}),
-
-      hasPr: {
-        type: 'single-select',
-        label: 'Linked PR',
-        options: [
-          { label: 'All', value: 'all' },
-          { label: 'Linked', value: 'true' },
-          { label: 'None', value: 'false' },
-        ],
-      },
 
       ...(ownUserId && mode === 'contributor'
         ? {
