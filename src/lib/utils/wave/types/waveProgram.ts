@@ -117,6 +117,12 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
     gitHubRepoUrl: z.string(),
     description: z.string().nullable(),
   }),
+  org: z.object({
+    id: z.uuid(),
+    gitHubOrgLogin: z.string(),
+    gitHubOrgAvatarUrl: z.string().nullable(),
+    accountType: z.enum(['User', 'Organization']),
+  }),
   appliedBy: waveUserDtoSchema,
   reviewedBy: waveUserDtoSchema.nullable(),
 });
