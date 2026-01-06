@@ -60,6 +60,7 @@
             component: GithubUserBadge,
             props: {
               user,
+              link: false,
               hideName: true,
             },
           })),
