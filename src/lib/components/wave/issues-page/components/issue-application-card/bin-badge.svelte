@@ -16,16 +16,23 @@
     bad: ['var(--color-caution-level-6)', 'var(--color-caution-level-1)'],
   } as const;
 
-  const GOOD_BINS = ['Exceptional', 'Very High', 'High'];
+  // reserveMetric means that lower is better (e.g. merge latency)
+  const GOOD_BINS = (reverseMetric: boolean) =>
+    reverseMetric ? ['Low', 'Very Low'] : ['Exceptional', 'Very High', 'High'];
   const MID_BINS = ['Medium'];
-  const BAD_BINS = ['Low'];
+  const BAD_BINS = (reverseMetric: boolean) =>
+    reverseMetric ? ['Exceptional', 'Very High', 'High'] : ['Low', 'Very Low'];
 
-  function getBinColors(bin: string | undefined): readonly [string, string] {
-    if (bin && GOOD_BINS.includes(bin)) {
+  const reverseMetricKeys = new Set<string>(['avg_merge_latency_hours', 'pr_drop_rate']);
+
+  function getBinColors(bin: string | undefined, key: string): readonly [string, string] {
+    const reverse = reverseMetricKeys.has(key);
+
+    if (bin && GOOD_BINS(reverse).includes(bin)) {
       return BIN_COLOR_MAP['good'];
     } else if (bin && MID_BINS.includes(bin)) {
       return BIN_COLOR_MAP['mid'];
-    } else if (bin && BAD_BINS.includes(bin)) {
+    } else if (bin && BAD_BINS(reverse).includes(bin)) {
       return BIN_COLOR_MAP['bad'];
     } else {
       return ['', ''];
@@ -46,7 +53,7 @@
     </div>
   {:else if metrics}
     {@const bin = metrics?.metrics[key]?.bin}
-    {@const [textColor, bgColor] = getBinColors(bin)}
+    {@const [textColor, bgColor] = getBinColors(bin, key)}
     <div
       in:fade={{ duration: 200 }}
       class="typo-text-small bin-badge"
