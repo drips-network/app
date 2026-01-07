@@ -8,29 +8,37 @@
   function isLast(index: number) {
     return index === crumbs.length - 1;
   }
+
+  function getViewTransitionStyle(label: string) {
+    return `view-transition-name: breadcrumb-${label.replaceAll(' ', '-').toLowerCase()}; view-transition-class: element-handover`;
+  }
 </script>
 
-<nav
-  aria-label="Breadcrumbs"
-  style:view-transition-name="breadcrumbs-{crumbs.map((c) => c.label).join('-')}"
->
+<nav aria-label="Breadcrumbs">
   <ul class="breadcrumbs">
-    {#each crumbs as crumb, index}
+    {#each crumbs as crumb, index (crumb.href)}
       <li class="breadcrumb">
         {#if isLast(index)}
           <span
             aria-current="page"
             class="typo-text-small-bold"
-            style:color="var(--color-foreground)">{crumb.label}</span
+            style="color: var(--color-foreground); {getViewTransitionStyle(crumb.label)}"
+            >{crumb.label}</span
           >
         {:else}
           <svelte:element
             this={crumb.href ? 'a' : 'span'}
             href={crumb.href}
             class="typo-text-small"
-            style:color="var(--color-foreground-level-6)">{crumb.label}</svelte:element
+            style="color: var(--color-foreground-level-6); {getViewTransitionStyle(crumb.label)}"
           >
-          <span class="separator" aria-hidden="true">/</span>
+            {crumb.label}
+          </svelte:element>
+          <span
+            class="separator"
+            aria-hidden="true"
+            style={getViewTransitionStyle(crumb.label + '-separator')}>/</span
+          >
         {/if}
       </li>
     {/each}
@@ -45,7 +53,6 @@
     padding: 0;
     margin: 0;
     user-select: none;
-    view-transition-class: element-handover;
   }
 
   .breadcrumb {
