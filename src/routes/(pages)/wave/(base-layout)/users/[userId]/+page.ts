@@ -1,7 +1,7 @@
 import { getComplimentCountSummaryForUser } from '$lib/utils/wave/compliments.js';
 import { getIssues } from '$lib/utils/wave/issues.js';
 import { getPointsBalanceForUser } from '$lib/utils/wave/points.js';
-import getUser from '$lib/utils/wave/users.js';
+import { getUser } from '$lib/utils/wave/users.js';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ params }) => {

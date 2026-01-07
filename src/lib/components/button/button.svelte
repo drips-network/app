@@ -124,7 +124,11 @@
   >
     {#if icon}
       {@const SvelteComponent = icon}
-      <SvelteComponent style="fill: {textColor}; transition: fill 0.3s;" />
+      <SvelteComponent
+        style="fill: {textColor}; transition: fill 0.3s; width: {size === 'small'
+          ? '1.25rem'
+          : ''};"
+      />
     {/if}
     {@render children?.()}
     {#if loading}

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
+  import Divider from '$lib/components/divider/divider.svelte';
   import Check from '$lib/components/icons/Check.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
+  import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
@@ -17,7 +19,11 @@
   } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
+  import { getUserCodeMetrics } from '$lib/utils/wave/users';
   import { notifyIssuesUpdated } from '../../issue-update-coordinator';
+  import ApplicationModal from './application-modal.svelte';
+  import BinBadge from './bin-badge.svelte';
+  import { KEY_METRICS } from './metrics';
 
   let {
     application,
@@ -118,6 +124,8 @@
       application.status === 'withdrawn' ||
       application.status === 'unassigned',
   );
+
+  const codeMetricsPromise = getUserCodeMetrics(undefined, application.applicant.id);
 </script>
 
 <Card
@@ -129,13 +137,37 @@
     "
 >
   <div class="issue-application-card" class:is-own={isOwnApplication}>
-    <GithubUserBadge user={application.applicant} />
+    <GithubUserBadge user={application.applicant} link={false} />
     <!-- TODO(wave): Applicant metrics -->
-    <p class="line-clamp-3">
+    <p class="line-clamp-2">
       <Markdown content={application.applicationText} />
     </p>
 
+    <Divider />
+
+    <div class="metrics">
+      {#each KEY_METRICS as { key, label } (key)}
+        <div class="metric">
+          <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
+            {label}
+          </div>
+          <div class="value">
+            <BinBadge {codeMetricsPromise} {key} showUnknown />
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <Divider />
+
     <div class="actions">
+      <Button
+        onclick={() =>
+          modal.show(ApplicationModal, undefined, {
+            codeMetricsPromise,
+            ...application,
+          })}>View details</Button
+      >
       {#if isMaintainer}
         {#if application.status === 'pending'}
           <Button onclick={handleAssignApplicant}>Assign to issue</Button>
@@ -191,5 +223,17 @@
 
   .disabled-text {
     color: var(--color-foreground-level-5);
+  }
+
+  .metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .metric {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 </style>
