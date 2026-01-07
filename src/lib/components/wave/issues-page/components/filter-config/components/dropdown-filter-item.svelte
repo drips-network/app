@@ -28,6 +28,9 @@
       popoverEl.style.top = `${rect.bottom + window.scrollY + 8}px`;
       popoverEl.style.left = `${rect.left + window.scrollX}px`;
       popoverEl.style.width = `${rect.width}px`;
+      // cap height so it doesn't go off screen
+      const maxHeight = window.innerHeight - rect.bottom - 16;
+      popoverEl.style.maxHeight = `${maxHeight}px`;
     }
   }
 
