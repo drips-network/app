@@ -294,7 +294,7 @@
 <div class="wrapper" class:isViewingIssue>
   <div class="issues" style:view-transition-name={viewTransitionName}>
     <div class="breadcrumbs-wrapper">
-      <Breadcrumbs crumbs={breadcrumbs} />
+      <Breadcrumbs crumbs={breadcrumbs} disableViewTransitions />
     </div>
 
     {#if selectedIssues.length > 0}

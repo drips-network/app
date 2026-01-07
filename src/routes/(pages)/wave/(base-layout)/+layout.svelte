@@ -5,7 +5,6 @@
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import { page } from '$app/state';
   import Nav from '$lib/components/wave/nav/nav.svelte';
-  import Explore from '$lib/components/icons/Explore.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
@@ -14,6 +13,7 @@
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
+  import Wave from '$lib/components/icons/Wave.svelte';
 
   let {
     data,
@@ -40,7 +40,7 @@
         type: 'target',
         name: 'Explore Waves',
         href: '/wave',
-        icon: Explore,
+        icon: Wave,
         allowBacktrack: true,
       },
       {

@@ -1,8 +1,10 @@
 <script lang="ts">
   let {
     crumbs,
+    disableViewTransitions = false,
   }: {
     crumbs: { href?: string; label: string }[];
+    disableViewTransitions?: boolean;
   } = $props();
 
   function isLast(index: number) {
@@ -10,13 +12,15 @@
   }
 
   function getViewTransitionStyle(label: string) {
-    return `view-transition-name: breadcrumb-${label.replaceAll(' ', '-').toLowerCase()}; view-transition-class: element-handover`;
+    return disableViewTransitions
+      ? ''
+      : `view-transition-name: breadcrumb-${label.replaceAll(' ', '-').toLowerCase()}; view-transition-class: element-handover`;
   }
 </script>
 
 <nav aria-label="Breadcrumbs">
   <ul class="breadcrumbs">
-    {#each crumbs as crumb, index (crumb.href)}
+    {#each crumbs as crumb, index (crumb.label)}
       <li class="breadcrumb">
         {#if isLast(index)}
           <span

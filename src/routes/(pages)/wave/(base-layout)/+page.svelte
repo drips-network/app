@@ -32,7 +32,9 @@
       <Button icon={File} href="https://docs.drips.network/wave" target="_blank"
         >Read the docs</Button
       >
-      <Button icon={Wave} href={INBOUND_LEAD_FORM_URL} target="_blank">Run your own Wave</Button>
+      <Button icon={Wave} href={INBOUND_LEAD_FORM_URL} target="_blank"
+        >Run your own Wave Program</Button
+      >
     {/snippet}
   </FeatureCard>
 
