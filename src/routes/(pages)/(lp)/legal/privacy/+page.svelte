@@ -14,23 +14,26 @@
         href="https://www.drips.network/app"
         target="_blank"
         rel="noopener noreferrer">https://www.drips.network/app</a
-      >, and other *.drips.network/app instances, hereinafter " Drips Web App ") as well as other
-      Drips websites (such as
+      >, and other *.drips.network/app instances, hereinafter "<strong>Drips Web App</strong>") as
+      well as other Drips websites (such as
       <a href="https://www.drips.network/" target="_blank" rel="noopener noreferrer"
         >https://www.drips.network/</a
-      >, and any other *.drips.network domains, excluding the Drips Web App, hereinafter the " Drips
-      Website "; collectively with Drips Web App referred to as the " Drips Services "), Public
-      Goods Association (hereinafter the "Association" or "we") takes the protection of personal
-      data very seriously. We treat personal data confidentially, in accordance with the statutory
-      data protection regulations and on the basis of this privacy policy. The legal bases can be
-      found particularly in the General Data Protection Regulation (GDPR), the Telecommunications
-      Digital Services Data Protection Act (TDDDG) and the Federal Data Protection Act (BDSG).
+      >, and any other *.drips.network domains, excluding the Drips Web App, hereinafter the "<strong
+        >Drips Website</strong
+      >"; collectively with Drips Web App referred to as the "<strong>Drips Services</strong>"),
+      Public Goods Association (hereinafter the "Association" or "we") takes the protection of
+      personal data very seriously. We treat personal data confidentially, in accordance with the
+      statutory data protection regulations and on the basis of this privacy policy. The legal bases
+      can be found particularly in the General Data Protection Regulation (GDPR), the
+      Telecommunications Digital Services Data Protection Act (TDDDG) and the Federal Data
+      Protection Act (BDSG).
     </p>
     <p>The following services are available:</p>
     <ul>
       <li>Visit of the Drips Services (Drips Website or Drips Web App)</li>
       <li>Use of the 'Get In Touch form'</li>
       <li>Use of the Drips Web App functions</li>
+      <li>Use of Drips Wave</li>
     </ul>
     <p>
       When you use Drips Services, various personal data is processed depending on the type and
@@ -65,7 +68,7 @@
       Public Goods Association<br />
       Bahnhofstrasse 20<br />
       6300 Zug, Switzerland<br />
-      E-Mail: privacy@drips.network<br />
+      E-Mail: privacy@drips.network
     </div>
   </section>
 
@@ -100,16 +103,13 @@
     </p>
     <p>
       Art. 6 (1) sentence 1 lit. f GDPR serves as the legal basis for the temporary storage of
-      Access Data.
-    </p>
-    <p>
-      Where enabled, this includes routing traffic through Cloudflare (edge reverse proxy/CDN and
-      web application firewall). In this context, and acting as our processor (see section 5.3),
-      Cloudflare necessarily processes Access Data (including your IP address and request-related
-      system and routing metadata) to deliver the Drips Services, mitigate attacks, and ensure
-      availability and performance. Our legitimate interest here is to be able to provide you with a
-      technically functioning and user-friendly website and to ensure the security of our systems as
-      well as optimizing our services.
+      Access Data. Where enabled, this includes routing traffic through Cloudflare (edge reverse
+      proxy/CDN and web application firewall). In this context, and acting as our processor (see
+      section 5.3), Cloudflare necessarily processes Access Data (including your IP address and
+      request-related system and routing metadata) to deliver the Drips Services, mitigate attacks,
+      and ensure availability and performance. Our legitimate interest here is to be able to provide
+      you with a technically functioning and user-friendly website and to ensure the security of our
+      systems as well as optimizing our services.
     </p>
     <p>
       Your IP address will be stored on Railway’s server for a maximum of 30 days for IT security
@@ -117,13 +117,16 @@
       rates or visitor counts over time, are evaluated in Grafana dashboards. These statistics are
       non-identifiable and do not permit any conclusions about individual users. As such, they are
       not considered personal data and are retained only as long as necessary to improve and
-      optimize the Drips Services. The storage period and deletion of your Access Data are further
-      governed by Section 7 of this privacy policy.
+      optimize the Drips Services.
+    </p>
+    <p>
+      The storage period and deletion of your Access Data are further governed by Section 7 of this
+      privacy policy.
     </p>
 
     <h3>Use of cookies and similar functions/technologies</h3>
     <p>
-      We do not set our own so-called cookies and similar technologies on the Drips Services. Our
+      We do set our own so-called cookies and similar technologies on the Drips Services. Our
       service providers Railway and Grafana do not set cookies either (see also below section 5.3).
       However, our service provider Cloudflare (see also below section 5.3) may set strictly
       necessary cookies required to provide security and availability. These cookies are essential
@@ -310,6 +313,37 @@
       its nature immutable.
     </p>
 
+    <h3>Use of Drips Wave</h3>
+    <p>
+      Drips Wave is a recurring bounty cycle tool that enables ecosystems to run structured,
+      time-bound funding rounds for open-source contributions. Maintainers submit repositories and
+      issues with assigned point values, contributors apply to work on issues and earn points upon
+      completion, and funding is distributed based on earned points at the end of each cycle.
+    </p>
+    <p>
+      When you use Drips Wave, we process GitHub account information (including contributor and
+      maintainer profile data, repository and issue data), data generated through your use of the
+      service (such as issue applications and approvals, point allocations, and funding distribution
+      data), as well as identity verification data collected via our KYC provider. This data is
+      processed to provide, operate and improve the Drips Wave service, which includes facilitating
+      connections between maintainers and contributors, managing submissions and applications,
+      tracking contributions and point allocations, managing GitHub issue statuses, labels and
+      assignments, facilitating communication via GitHub comments, distributing funding, user
+      sign-up and sign-in via GitHub, and analyzing user engagement. We may, subject to applicable
+      legal requirements, also process GitHub data for marketing purposes. Further, we process this
+      data to ensure service security, prevent fraudulent activity, and to comply with legal
+      obligations including KYC verification.
+    </p>
+    <p>
+      The legal basis for this processing is your contractual relationship with us or another party
+      (Art. 6 (1) sentence 1 lit. b GDPR), where applicable, compliance with legal obligations
+      including KYC verification (Art. 6 (1) sentence 1 lit. c GDPR), or our legitimate interest
+      (Art. 6 (1) sentence 1 lit. f GDPR). Our legitimate interest is to provide a functional and
+      efficient bounty cycle tool, to ensure the security and integrity of the service, to improve
+      user experience through engagement analysis, and to promote our services, subject to your
+      right to object.
+    </p>
+
     <h3>Compliance with legal regulations</h3>
     <p>
       We also process your personal data in order to fulfill legal obligations that may apply to us
@@ -365,7 +399,7 @@
       following companies in particular:
     </p>
 
-    <h3>Hosting and technical service providers</h3>
+    <h4>Hosting and technical service providers</h4>
     <ul>
       <li>
         Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA, certified under the Data
@@ -375,17 +409,38 @@
       </li>
       <li>
         Railway Corporation, 548 Market St PMB 68956, San Francisco, CA 94104, USA, certified under
-        the Data Privacy Framework for hosting of the Drips Services.
+        the Data Privacy Framework, for hosting of the Drips Services.
       </li>
       <li>
         Raintank Inc., dba Grafana Labs, 165 Broadway, 23rd Floor, New York, NY 10006, USA,
-        certified under the Data Privacy Framework for pseudonymised telemetry dashboards.
+        certified under the Data Privacy Framework, for pseudonymised telemetry dashboards.
       </li>
       <li>
         Notion Labs, Inc., 548 Market St 74567, San Francisco, CA 94104, USA, certified under the
-        Data Privacy Framework for hosting the Get In Touch form and possessing respective data.
+        Data Privacy Framework, for hosting the Get In Touch form and possessing respective data.
       </li>
     </ul>
+
+    <h4>Customer Support and Communication</h4>
+    <ul>
+      <li>
+        Intercom, Inc., 55 2nd Street, 4th Floor, San Francisco, CA 94105, USA, certified under the
+        Data Privacy Framework, for customer support and communication management.
+      </li>
+      <li>
+        Noti-Fire Apps Ltd. (Novu), Derech Ben Gurion 132, Ramat Gan, Israel, for transactional
+        email notifications related to Drips Wave.
+      </li>
+    </ul>
+
+    <h4>Identity Verification</h4>
+    <ul>
+      <li>
+        Sum and Substance Ltd (Sumsub), 30 St. Mary Axe, London, England, for Know Your Customer
+        (KYC) verification services in connection with Drips Wave.
+      </li>
+    </ul>
+
     <p>
       Finally, in individual cases we transmit personal data to our consultants in legal or tax
       matters, whereby these recipients are generally already obliged to maintain special
@@ -417,10 +472,9 @@
     </p>
     <p>
       You have the option of accessing the SCC via the <a
-        target="_blank"
-        rel="noopener noreferrer"
         href="https://ec.europa.eu/info/sites/default/files/1_de_annexe_acte_autonome_cp_part1_v3.pdf"
-        >link</a
+        target="_blank"
+        rel="noopener noreferrer">link</a
       > provided or requesting a copy from the data protection officer.
     </p>
   </section>
@@ -429,7 +483,12 @@
     <h2>Duration of data processing and deletion</h2>
     <p>
       We initially process your personal data for the duration for which the respective processing
-      purpose - see above - requires corresponding processing.
+      purpose - see above - requires corresponding processing. Users may request deletion of their
+      personal data at any time by contacting us at privacy@drips.network. We will comply with
+      deletion requests unless we have a legal basis for further processing, e.g. where retention is
+      required by law, processing is necessary to establish, exercise, or defend legal claims, or
+      required to complete ongoing transactions. We may delete data associated with inactive
+      accounts after a reasonable period of inactivity.
     </p>
     <p>
       Insofar as the processing is carried out for the performance of a contract, the processing
@@ -438,13 +497,21 @@
     </p>
     <p>
       Insofar as the processing is carried out to safeguard our legitimate interests, the processing
-      period includes the period until the processing purposes pursued are achieved.
-    </p>
-    <p>
-      Where enabled, Cloudflare retains Access Data (as defined in section 3.1) and
-      strictly-necessary cookies only for the periods necessary to provide the security,
-      availability, and performance of the Drips Services, as further described in Cloudflare’s
-      Privacy Policy and cookie documentation.
+      period includes the period until the processing purposes pursued are achieved. Where enabled,
+      Cloudflare retains Access Data (as defined in section 3.1) and strictly-necessary cookies only
+      for the periods necessary to provide the security, availability, and performance of the Drips
+      Services, as further described in Cloudflare’s
+      <a
+        href="https://www.cloudflare.com/de-de/privacypolicy/"
+        target="_blank"
+        rel="noopener noreferrer">Privacy Policy</a
+      >
+      and
+      <a
+        href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/"
+        target="_blank"
+        rel="noopener noreferrer">cookie documentation</a
+      >.
     </p>
     <p>
       If the processing is based on your consent, the processing period covers the period from the
@@ -464,11 +531,8 @@
     <ul>
       <li>
         Fulfillment of statutory obligations, retention and documentation periods specified there
-        are up to ten years.
-      </li>
-      <li>
-        Where longer retention is necessary to preserve evidence, we perform an annual review to
-        determine whether the purpose still exists.
+        are up to ten years. Where longer retention is necessary to preserve evidence, we perform an
+        annual review to determine whether the purpose still exists.
       </li>
       <li>Preservation of evidence, taking into account the statute of limitations.</li>
     </ul>
@@ -549,10 +613,10 @@
 
     <h3>Right to rectification</h3>
     <p>
-      You have the right to obtain from us without undue delay the rectification of personal data
-      concerning you if it is inaccurate. Taking into account the purposes of the processing, you
-      have the right to have incomplete personal data concerning you completed, including by means
-      of providing a supplementary statement.
+      Right to rectification: You have the right to obtain from us without undue delay the
+      rectification of personal data concerning you if it is inaccurate. Taking into account the
+      purposes of the processing, you have the right to have incomplete personal data concerning you
+      completed, including by means of providing a supplementary statement.
     </p>
 
     <h3>Right to erasure</h3>
