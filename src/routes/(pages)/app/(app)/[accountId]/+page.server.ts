@@ -91,6 +91,15 @@ async function resolveEnsFields(address: string) {
 }
 
 export const load = async ({ params, fetch }) => {
+  // Some ppl tried to access /wave before the wave app was live,
+  // so their browsers cached the redirect to /app/wave.
+  // To not break their links, we redirect /wave to /wave again with 308,
+  // so that they can get the updated redirect to /app/wave.
+  // random query param is to prevent the cache from interfering again.
+  if (params.accountId === 'wave') {
+    return redirect(307, '/wave?t=1');
+  }
+
   // Account ID here may be either a Drips Account ID, ENS name or an Ethereum address
   const { accountId: universalAccountId } = params;
 

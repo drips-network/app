@@ -62,6 +62,16 @@
       {bin}
     </div>
   {/if}
+{:catch}
+  {#if showUnknown}
+    <div
+      in:fade={{ duration: 200 }}
+      class="typo-text-small bin-badge"
+      style="color: var(--color-foreground-level-6); background-color: var(--color-foreground-level-2);"
+    >
+      Unknown
+    </div>
+  {/if}
 {/await}
 
 <style>

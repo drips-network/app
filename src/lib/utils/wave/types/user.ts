@@ -108,6 +108,6 @@ export const CODE_METRICS = [
     key: 'oss_composite',
     label: 'OSS Activity Score',
     fmt: 'number',
-    description: 'Composite metric for OSS contributions',
+    description: 'Composite metric for overall OSS activity. Considers reviews, PRs, and issues.',
   },
 ] as const;

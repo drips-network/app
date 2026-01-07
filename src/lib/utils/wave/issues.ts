@@ -53,7 +53,7 @@ export async function getIssueApplications(
     paginatedResponseSchema(issueApplicationWithDetailsDtoSchema),
     await authenticatedCall(
       f,
-      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}`,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}&sortBy=createdAt&sortOrder=asc`,
     ),
   );
 }

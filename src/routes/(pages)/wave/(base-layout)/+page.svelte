@@ -16,7 +16,7 @@
   const now = new Date();
 </script>
 
-<HeadMeta title="Explore Wave Programs | Wave" />
+<HeadMeta title="Explore Wave Programs | Wave" canonical="https://www.drips.network/wave" />
 
 <div class="page">
   <FeatureCard imageUrl="/assets/wave/wave-hp.png">
