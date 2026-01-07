@@ -14,12 +14,14 @@
   {#await codeMetricsPromise then metrics}
     {#if metrics}
       {@const value = metrics.metrics[key]?.value}
-      {#if value !== undefined}
+      {#if value}
         {#if fmt === 'number'}
           {Math.round(value)}
         {:else if fmt === 'percentage'}
           {(value * 100).toFixed(2)}%
         {/if}
+      {:else if value === null}
+        <span class="no-data">Not enough data</span>
       {:else}
         <span class="no-data">Unknown</span>
       {/if}

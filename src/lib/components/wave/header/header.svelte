@@ -155,10 +155,6 @@
     color: var(--color-primary);
   }
 
-  .logo span {
-    padding-top: 0.125rem;
-  }
-
   header {
     height: 4.5rem;
     display: flex;

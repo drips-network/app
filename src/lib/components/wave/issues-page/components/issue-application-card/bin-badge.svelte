@@ -53,14 +53,32 @@
     </div>
   {:else if metrics}
     {@const bin = metrics?.metrics[key]?.bin}
-    {@const [textColor, bgColor] = getBinColors(bin, key)}
-    <div
-      in:fade={{ duration: 200 }}
-      class="typo-text-small bin-badge"
-      style="color: {textColor}; background-color: {bgColor};"
-    >
-      {bin}
-    </div>
+    {#if bin}
+      {@const [textColor, bgColor] = getBinColors(bin, key)}
+      <div
+        in:fade={{ duration: 200 }}
+        class="typo-text-small bin-badge"
+        style="color: {textColor}; background-color: {bgColor};"
+      >
+        {bin}
+      </div>
+    {:else if bin === null && showUnknown}
+      <div
+        in:fade={{ duration: 200 }}
+        class="typo-text-small bin-badge"
+        style="color: var(--color-foreground-level-6); background-color: var(--color-foreground-level-2);"
+      >
+        Not enough data
+      </div>
+    {:else if showUnknown}
+      <div
+        in:fade={{ duration: 200 }}
+        class="typo-text-small bin-badge"
+        style="color: var(--color-foreground-level-6); background-color: var(--color-foreground-level-2);"
+      >
+        Unknown
+      </div>
+    {/if}
   {/if}
 {:catch}
   {#if showUnknown}

@@ -38,9 +38,9 @@ export const userCodeMetricsDtoSchema = z.object({
   metrics: z.record(
     z.string(),
     z.object({
-      value: z.number(),
-      percentile: z.number(),
-      bin: z.string(),
+      value: z.number().nullable(),
+      percentile: z.number().nullable(),
+      bin: z.string().nullable(),
       description: z.string(),
     }),
   ),
