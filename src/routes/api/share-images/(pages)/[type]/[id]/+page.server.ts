@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { ShareImageType } from './types.js';
+import { ShareImageType, type ShareImageVisual } from './types.js';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL.js';
 import network from '$lib/stores/wallet/network.js';
@@ -11,12 +11,21 @@ import type {
   ProjectQueryVariables,
   OrcidQuery,
   OrcidQueryVariables,
+  StreamQuery,
+  StreamQueryVariables,
 } from './__generated__/gql.generated.js';
+import type { AddressDriverAccount } from '$lib/graphql/__generated__/base-types';
+import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
+import { ECOSYSTEM_BADGE_FRAGMENT } from '$lib/components/ecosystem-badge/ecosystem-badge.svelte';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
 import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
 import { getRound } from '$lib/utils/rpgf/rpgf.js';
 import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
+import makeStreamId, { decodeStreamId } from '$lib/utils/streams/make-stream-id.js';
+import formatTokenAmount from '$lib/utils/format-token-amount.js';
+import { DRIPS_DEFAULT_TOKEN_LIST } from '$lib/stores/tokens/token-list.js';
+import { MULTIPLIERS } from '$lib/stores/amt-delta-unit/amt-delta-unit.store.js';
 
 function isShareImageType(value: string): value is ShareImageType {
   return Object.values(ShareImageType).includes(value as ShareImageType);
@@ -101,7 +110,7 @@ async function loadProjectData(f: typeof fetch, projectUrl: string) {
     stats: claimed
       ? [
           {
-            icon: 'DripList',
+            visuals: [{ type: 'drip-list-icon', data: undefined } as const],
             label: `${chainData.splits.dependencies.length} dependencie${chainData.splits.dependencies.length === 1 ? '' : 's'}`,
           },
         ]
@@ -140,7 +149,7 @@ async function loadDripListData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        icon: 'DripList',
+        visuals: [{ type: 'drip-list-icon', data: undefined } as const],
         label: `${dripList.splits.length} recipient${dripList.splits.length === 1 ? '' : 's'}`,
       },
     ],
@@ -161,7 +170,7 @@ async function loadEcosystemData(f: typeof fetch, id: string) {
     avatarSrc: null,
     stats: [
       {
-        icon: 'DripList',
+        visuals: [{ type: 'drip-list-icon', data: undefined } as const],
         label: `${ecosystem.graph.nodes.length - 1} recipient${ecosystem.graph.nodes.length - 2 === 1 ? '' : 's'}`,
       },
     ],
@@ -230,6 +239,122 @@ async function loadRpgfRoundData(f: typeof fetch, id: string) {
   };
 }
 
+async function loadStreamData(f: typeof fetch, id: string) {
+  const { senderAccountId, tokenAddress, dripId } = decodeStreamId(id);
+
+  const streamQuery = gql`
+    ${DRIP_LIST_BADGE_FRAGMENT}
+    ${ECOSYSTEM_BADGE_FRAGMENT}
+    query Stream($senderAccountId: ID!, $chains: [SupportedChain!]) {
+      streams(chains: $chains, where: { senderId: $senderAccountId }) {
+        id
+        name
+        sender {
+          account {
+            accountId
+            driver
+            address
+          }
+          chainData {
+            chain
+          }
+        }
+        receiver {
+          __typename
+          ... on User {
+            account {
+              accountId
+              driver
+              address
+            }
+          }
+          ...DripListBadge
+          ...EcosystemBadge
+        }
+        config {
+          amountPerSecond {
+            amount
+            tokenAddress
+          }
+        }
+      }
+    }
+  `;
+
+  const res = await query<StreamQuery, StreamQueryVariables>(
+    streamQuery,
+    { senderAccountId, chains: [network.gqlName] },
+    f,
+  );
+
+  const expectedStreamId = makeStreamId(senderAccountId, tokenAddress, dripId);
+
+  const stream = res.streams.find((s) => s.id.toLowerCase() === expectedStreamId.toLowerCase());
+
+  if (!stream) return null;
+
+  const token = DRIPS_DEFAULT_TOKEN_LIST.find(
+    (t) => t.address.toLowerCase() === tokenAddress.toLowerCase() && t.chainId === network.chainId,
+  );
+
+  const decimals = token?.decimals ?? 18;
+  const symbol = token?.symbol ?? 'Tokens';
+
+  const formattedAmount = formatTokenAmount(
+    {
+      amount: BigInt(stream.config.amountPerSecond.amount) * BigInt(MULTIPLIERS['30-days']),
+      tokenAddress: stream.config.amountPerSecond.tokenAddress,
+    },
+    decimals,
+    undefined,
+    false,
+  );
+
+  // Construct visuals
+  const senderAddress = (stream.sender.account as AddressDriverAccount).address;
+  const senderVisual: ShareImageVisual = { type: 'identity', data: senderAddress };
+
+  const tokenIcon: ShareImageVisual = { type: 'coin-flying', data: undefined };
+
+  let receiverVisual: ShareImageVisual;
+
+  switch (stream.receiver.__typename) {
+    case 'DripList':
+      receiverVisual = { type: 'drip-list', data: stream.receiver };
+      break;
+    case 'EcosystemMainAccount':
+      receiverVisual = { type: 'ecosystem', data: stream.receiver };
+      break;
+    case 'User': {
+      const receiverAddress = (stream.receiver.account as AddressDriverAccount).address;
+      receiverVisual = { type: 'identity', data: receiverAddress };
+      break;
+    }
+    default:
+      // Fallback for unknown
+      receiverVisual = { type: 'identity', data: '0x0000000000000000000000000000000000000000' };
+      break;
+  }
+
+  return {
+    bgColor: '#5555FF', // Default stream color
+    type: 'Continuous Donation',
+    headline:
+      stream.name ||
+      (stream.receiver.__typename === 'DripList' ||
+      stream.receiver.__typename === 'EcosystemMainAccount'
+        ? stream.receiver.name
+        : 'Unnamed stream'),
+    avatarSrc: null,
+    stats: [
+      {
+        visuals: [senderVisual, tokenIcon, receiverVisual],
+        label: `${formattedAmount} ${symbol} / month`,
+      },
+    ],
+  };
+}
+
 const LOAD_FNS = {
   [ShareImageType.WAVE_PROGRAM]: loadWaveProgramData,
   [ShareImageType.PROJECT]: loadProjectData,
@@ -237,6 +362,7 @@ const LOAD_FNS = {
   [ShareImageType.ECOSYSTEM]: loadEcosystemData,
   [ShareImageType.ORCID]: loadOrcidData,
   [ShareImageType.RPGF_ROUND]: loadRpgfRoundData,
+  [ShareImageType.STREAM]: loadStreamData,
 } as const;
 
 export const load = async ({ params }) => {

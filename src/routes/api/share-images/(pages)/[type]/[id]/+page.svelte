@@ -1,15 +1,10 @@
 <script lang="ts">
-  import DripList from '$lib/components/icons/DripList.svelte';
-  import getContrastColor from '$lib/utils/get-contrast-text-color';
-  import type { Component } from 'svelte';
+  import ShareImageVisualRenderer from './ShareImageVisualRenderer.svelte';
   import backgroundImage from './background-image';
+  import getContrastColor from '$lib/utils/get-contrast-text-color';
 
   const { data } = $props();
   const { bgColor, type, headline, avatarSrc, stats } = $derived(data);
-
-  const ICON_MAP: Record<string, Component<{ style?: string }>> = {
-    DripList: DripList,
-  };
 
   const contrastColor = $derived(getContrastColor(bgColor));
   const renderedBgImage = $derived(backgroundImage(bgColor, contrastColor));
@@ -39,11 +34,10 @@
       {#if (stats?.length ?? 0) > 0}
         <div class="stats">
           {#each stats as stat (stat.label)}
-            {@const Icon = ICON_MAP[stat.icon]}
             <div class="stat">
-              {#if Icon}
-                <Icon style="fill: {contrastColor}; height: 32px; width: 32px;" />
-              {/if}
+              {#each stat.visuals as visual (visual)}
+                <ShareImageVisualRenderer {visual} color={contrastColor} />
+              {/each}
               <span class="label">{stat.label}</span>
             </div>
           {/each}
@@ -136,5 +130,14 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .stat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid black;
+    object-fit: cover;
+    background-color: white;
   }
 </style>
