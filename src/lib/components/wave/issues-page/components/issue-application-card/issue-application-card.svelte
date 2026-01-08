@@ -138,8 +138,7 @@
 >
   <div class="issue-application-card" class:is-own={isOwnApplication}>
     <GithubUserBadge user={application.applicant} link={false} />
-    <!-- TODO(wave): Applicant metrics -->
-    <p class="line-clamp-2">
+    <p class="application-text line-clamp-2">
       <Markdown content={application.applicationText} />
     </p>
 
@@ -213,6 +212,11 @@
 
   p {
     color: var(--color-foreground-level-6);
+  }
+
+  .application-text {
+    max-height: 4rem;
+    overflow: hidden;
   }
 
   .actions {
