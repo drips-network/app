@@ -156,12 +156,14 @@
   let {
     onapply,
     appliedFilters,
+    defaultFilters,
     ownUserId,
     mode,
     currentWaveProgramId,
   }: {
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
+    defaultFilters: IssueFilters;
     ownUserId: string | null;
     mode: 'maintainer' | 'contributor' | 'wave';
     currentWaveProgramId?: string;
@@ -188,7 +190,7 @@
 
   function handleClear() {
     filterItems.forEach((item) => item.clear());
-    filters = {};
+    filters = defaultFilters;
 
     onapply(filters);
   }
@@ -222,7 +224,7 @@
   </div>
 
   <div class="actions">
-    <Button onclick={handleClear}>Reset</Button>
+    <Button onclick={handleClear}>Reset to default</Button>
     <Button variant="primary" onclick={handleApply}>Apply filters</Button>
   </div>
 </div>

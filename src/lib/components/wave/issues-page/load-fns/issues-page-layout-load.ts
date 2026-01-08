@@ -122,6 +122,7 @@ export const issuesPageLayoutLoad = async (
   return {
     issues,
     appliedFilters: filters,
+    defaultFilters,
     appliedSort: sortBy,
     waveProgramRepos,
     wavePrograms,

@@ -42,6 +42,7 @@
     issues,
     children,
     appliedFilters,
+    defaultFilters,
     appliedSort,
     breadcrumbs,
     allowAddToWaveProgram = false,
@@ -62,6 +63,7 @@
     issues: Awaited<ReturnType<typeof getIssues>>;
     children: Snippet;
     appliedFilters: IssueFilters;
+    defaultFilters: IssueFilters;
     appliedSort: IssueSortByOption;
     breadcrumbs: ComponentProps<typeof Breadcrumbs>['crumbs'];
     allowAddToWaveProgram?: boolean;
@@ -235,9 +237,9 @@
     Object.keys(appliedFilters).filter((key) => key !== 'search').length - noOfPreappliedFilters,
   );
 
-  let searchOpen = $state(false);
+  let searchTerm = $state(appliedFilters.search ?? '');
+  let searchOpen = $state(Boolean(appliedFilters.search && appliedFilters.search.length > 0));
 
-  let searchTerm = $state('');
   let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   // debounce searchTerm, after 500ms apply search filter
@@ -384,6 +386,7 @@
               {ownUserId}
               bind:this={filterConfigInstance}
               {appliedFilters}
+              {defaultFilters}
               onapply={handleApplyFilters}
               {currentWaveProgramId}
             />
@@ -537,8 +540,8 @@
     width: 1.25rem;
     font-size: 0.75rem;
     border-radius: 50%;
-    background-color: var(--color-primary-level-1);
-    color: var(--color-primary-level-6);
+    background-color: var(--color-primary);
+    color: white;
   }
 
   .spinner {

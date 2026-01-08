@@ -69,7 +69,8 @@
   </p>
 
   {#snippet actions()}
-    <Button href="/wave" icon={Settings}>Review notification settings</Button>
+    <Button href="/wave/settings/notifications" icon={Settings}>Review notification settings</Button
+    >
     <Button href="/wave" icon={ArrowRight}>To the homepage</Button>
   {/snippet}
 </FlowStepWrapper>

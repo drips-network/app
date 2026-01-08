@@ -7,7 +7,10 @@ export const load = async ({ fetch, parent, url, depends }) => {
   const { user } = await parent();
 
   if (!user) {
-    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
+    throw redirect(
+      302,
+      `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}&skipWelcome=true`,
+    );
   }
 
   const [newsletterStatus] = await Promise.all([getNewsletterSubscriptionStatus(fetch)]);

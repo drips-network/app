@@ -62,17 +62,17 @@
     [WORKFLOW_ID.WELCOME]: null,
     [WORKFLOW_ID.REPO_APPLIED_TO_WAVE]: {
       title: 'Repo applied to Wave',
-      description: 'One of your repositories has been applied to join a Wave.',
+      description: 'One of your repositories has been applied to join a Wave Program.',
       category: 'maintainer',
     },
     [WORKFLOW_ID.REPO_APPLICATION_APPROVED]: {
       title: 'Repo application approved',
-      description: 'Your application for a repository to join a Wave has been approved.',
+      description: 'Your application for a repository to join a Wave Program has been approved.',
       category: 'maintainer',
     },
     [WORKFLOW_ID.REPO_APPLICATION_REJECTED]: {
       title: 'Repo application rejected',
-      description: 'Your application for a repository to join a Wave has been rejected.',
+      description: 'Your application for a repository to join a Wave Program has been rejected.',
       category: 'maintainer',
     },
     [WORKFLOW_ID.ORG_ISSUE_APPLICATION_RECEIVED]: {

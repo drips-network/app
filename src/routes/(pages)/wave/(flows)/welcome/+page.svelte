@@ -58,7 +58,7 @@
   </Card>
 
   {#snippet actions()}
-    <Button icon={ArrowRight} href={data.backTo}>Skip</Button>
+    <Button icon={ArrowRight} href={data.backTo}>Continue</Button>
   {/snippet}
 </FlowStepWrapper>
 
