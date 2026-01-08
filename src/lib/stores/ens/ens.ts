@@ -50,3 +50,45 @@ export async function safeReverseLookup(
     return undefined;
   }
 }
+
+export async function resolveEnsProfile(
+  address: string,
+  currentNetworkProvider: AbstractProvider,
+  mainnetProvider: AbstractProvider | null,
+  chainId: number,
+) {
+  if (!mainnetProvider) {
+    return null;
+  }
+
+  try {
+    const ensName = await safeReverseLookup(
+      currentNetworkProvider,
+      mainnetProvider,
+      chainId,
+      address,
+    );
+
+    if (ensName) {
+      const resolver = await mainnetProvider.getResolver(ensName);
+
+      const promises = ['description', 'url', 'com.twitter', 'com.github'].map(
+        async (recordName) => [recordName, await resolver?.getText(recordName)],
+      );
+
+      const [records, avatarUrl] = await Promise.all([
+        Promise.all(promises),
+        resolver?.getAvatar(),
+      ]);
+
+      return {
+        ensName,
+        avatarUrl: avatarUrl ?? undefined,
+        records: Object.fromEntries(records) as Record<string, string | undefined>,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
