@@ -169,7 +169,9 @@
       >
       {#if isMaintainer}
         {#if application.status === 'pending'}
-          <Button onclick={handleAssignApplicant}>Assign to issue</Button>
+          <Button variant="primary" icon={Check} onclick={handleAssignApplicant}
+            >Accept & assign</Button
+          >
         {/if}
         {#if application.status === 'rejected'}
           <Button icon={Cross} disabled>Application rejected</Button>
