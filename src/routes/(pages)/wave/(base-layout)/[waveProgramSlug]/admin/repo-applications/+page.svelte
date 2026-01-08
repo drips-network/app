@@ -172,9 +172,4 @@
     gap: 0.5rem;
     flex-shrink: 0;
   }
-
-  .link {
-    color: var(--color-primary);
-    text-decoration: none;
-  }
 </style>
