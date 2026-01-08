@@ -427,7 +427,7 @@
     position: sticky;
     top: 7.5rem;
     height: fit-content;
-    max-height: calc(100vh - 8.5rem);
+    max-height: calc(100svh - 8.5rem);
     display: flex;
     flex-direction: column;
     gap: 1rem;

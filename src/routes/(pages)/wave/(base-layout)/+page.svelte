@@ -150,4 +150,16 @@
     font-size: 0.875rem;
     margin-bottom: 0.5rem;
   }
+
+  @media (max-width: 600px) {
+    .wave-program-item {
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    .details {
+      align-items: center;
+    }
+  }
 </style>
