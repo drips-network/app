@@ -51,21 +51,24 @@
     },
     {
       key: 'Leaderboard',
-      value: {
-        component: Pile,
-        props: {
-          maxItems: 3,
-          countOverride: leaderboard.totalCount,
-          components: leaderboard.firstThreeEntries.map(({ user }) => ({
-            component: GithubUserBadge,
-            props: {
-              user,
-              link: false,
-              hideName: true,
+      value:
+        leaderboard.totalCount === 0
+          ? 'Empty'
+          : {
+              component: Pile,
+              props: {
+                maxItems: 3,
+                countOverride: leaderboard.totalCount,
+                components: leaderboard.firstThreeEntries.map(({ user }) => ({
+                  component: GithubUserBadge,
+                  props: {
+                    user,
+                    link: false,
+                    hideName: true,
+                  },
+                })),
+              },
             },
-          })),
-        },
-      },
       href: `/wave/${waveProgram.slug}/leaderboard?filter=current-wave`,
     },
     {

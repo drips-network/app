@@ -11,6 +11,8 @@
   let { data } = $props();
 
   let moreThanOne = $derived(data.leaderboard.pagination.total !== 1);
+
+  let isEmpty = $derived(data.leaderboard.pagination.total === 0);
 </script>
 
 <div class="page">
@@ -45,14 +47,19 @@
     </div>
   </div>
 
-  <span class="typo-text intro" style:color="var(--color-foreground-level-5)"
-    >Showing {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
-      ? 'have'
-      : 'has'} earned points in {#if data.currentWaveOnly}the current Wave.{:else}all {data
-        .waveProgram.name} Waves.{/if}
+  <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
+    {#if isEmpty}
+      No users have earned points yet. Participate in the {data.waveProgram.name} Wave Program to start
+      earning points!
+    {:else}
+      Showing {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
+        ? 'have'
+        : 'has'} earned points in {#if data.currentWaveOnly}the current Wave.{:else}all {data
+          .waveProgram.name} Waves.{/if}
 
-    At the end of each Wave, rewards are distributed to each contributor according to the share of
-    the total points earned during that Wave.
+      At the end of each Wave, rewards are distributed to each contributor according to the share of
+      the total points earned during that Wave.
+    {/if}
   </span>
 
   <div class="leaderboard">
