@@ -79,15 +79,14 @@
   header={{
     label: 'Points history',
     icon: Trophy,
-    infoTooltip:
-      "Earn points by completing tasks within Waves. At the end of each Wave, you'll receive a percentage of the Wave's total reward pool based on the points you earned.",
+    infoTooltip: 'Earn Points by completing issues within active Waves.',
   }}
   skeleton={{
     loaded: true,
     empty: pointsHistory.length === 0,
     emptyStateEmoji: '🫙',
-    emptyStateHeadline: 'No points history yet',
-    emptyStateText: 'Earn points by completing tasks and participating in the community.',
+    emptyStateHeadline: 'No Points yet',
+    emptyStateText: 'Earn Points by completing issues within active Waves.',
   }}
 >
   <PaddedHorizontalScroll>
