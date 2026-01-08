@@ -1,4 +1,4 @@
-<img width="600" height="400" src="/assets/drippy-cooking.png" alt="Drippy is cooking" />
+<img width="300" height="400" src="/assets/drippy-cooking.webp" alt="Drippy is cooking" />
 
 <h1>Drippy is cooking...</h1>
 
