@@ -157,6 +157,7 @@
       () =>
         doWithErrorModal(async () => {
           await markIssueAsCompleted(undefined, issue.id);
+          await invalidate('wave:issues');
         }),
     );
   }
