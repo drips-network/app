@@ -261,14 +261,16 @@
               : recipientInputValue;
           }
 
+          const shouldSchedule = $context.setStartAndEndDate;
+
           const { batch, newHash } = await buildStreamCreateBatchTx(signer, {
             tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
             amountPerSecond: amountPerSecond ?? unreachable(),
             recipientAccountId,
             name: $context.streamNameValue,
-            startAt: combinedStartDate,
+            startAt: shouldSchedule ? combinedStartDate : undefined,
             durationSeconds:
-              combinedEndDate && combinedStartDate
+              shouldSchedule && combinedEndDate && combinedStartDate
                 ? Math.floor((combinedEndDate.getTime() - combinedStartDate.getTime()) / 1000)
                 : undefined,
           });
@@ -351,7 +353,7 @@
         bind:selected={$context.selectedTokenAddress}
         items={tokenList}
         searchable={Object.keys(tokenList).length > 5}
-        emptyStateText={`No tokens available to stream. Add one by clicking "Add funds" on the Funds page.`}
+        emptyStateText="No tokens available to stream. Add one by clicking &quot;Add funds&quot; on the Funds page."
         type="tokens"
       />
     </div>
