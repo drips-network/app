@@ -87,12 +87,6 @@ export const CODE_METRICS = [
     description: 'Average time taken to merge PRs (in hours)',
   },
   {
-    key: 'oss_prs_opened',
-    label: 'PRs Opened',
-    fmt: 'number',
-    description: 'Count of PRs opened in OSS repos',
-  },
-  {
     key: 'oss_reviews',
     label: 'Reviews',
     fmt: 'number',
