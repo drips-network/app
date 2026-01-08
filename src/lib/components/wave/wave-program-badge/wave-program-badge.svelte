@@ -4,17 +4,17 @@
 
   let {
     waveProgram,
-    size,
+    size = 'normal',
     hideName,
   }: {
     waveProgram: WaveProgramDto;
-    size?: 'normal' | 'small';
+    size?: 'large' | 'normal' | 'small';
     hideName?: boolean;
   } = $props();
 </script>
 
 <div class="wave-badge">
-  <WaveAvatar {waveProgram} />
+  <WaveAvatar {waveProgram} size={size === 'large' ? 32 : 24} />
   {#if !hideName}
     <span class="line-clamp-1 {size === 'small' ? 'typo-text-small' : 'typo-text'}"
       >{waveProgram.name}</span

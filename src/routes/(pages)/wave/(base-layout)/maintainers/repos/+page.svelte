@@ -6,6 +6,7 @@
   import Section from '$lib/components/section/section.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
   import WaveBadge from '$lib/components/wave/wave-program-badge/wave-program-badge.svelte';
+  import formatDate from '$lib/utils/format-date';
   import type { WaveProgramRepoWithDetailsDto } from '$lib/utils/wave/types/waveProgram.js';
 
   let { data } = $props();
@@ -16,10 +17,17 @@
 {#snippet waveProgramRepo(d: WaveProgramRepoWithDetailsDto)}
   {@const waveProgram = wavePrograms.data.find((w) => w.id === d.waveProgramId)}
   <div class="repo-application-item typo-text">
-    <div class="name-and-wave">
-      <RepoBadge size="small" repo={d.repo} /> → {#if waveProgram}
-        <WaveBadge {waveProgram} size="small" />
-      {/if}
+    <div class="name-and-wave-and-date">
+      <div class="name-and-wave">
+        <RepoBadge clamp={false} repo={d.repo} /> → {#if waveProgram}
+          <!-- Really need to align these sizes 😵‍💫 -->
+          <WaveBadge {waveProgram} size="large" />
+        {/if}
+      </div>
+
+      <span class="typo-text-small" style:color="var(--color-foreground-level-5)">
+        {formatDate(d.appliedAt)}
+      </span>
     </div>
 
     <div class="status typo-text-small">
@@ -63,7 +71,8 @@
       empty: waveProgramRepos.pagination.total === 0,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No repo applications yet',
-      emptyStateText: 'Apply your repos to a Wave to get started.',
+      emptyStateText: 'Add a repo and apply it to a Wave Program to get started.',
+      horizontalScroll: true,
     }}
   >
     <div class="repo-applications-list">
@@ -97,6 +106,8 @@
     border-bottom: 1px solid var(--color-foreground-level-2);
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
   }
 
   .repo-application-item:last-child {

@@ -1,10 +1,14 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
+  import Discord from '$lib/components/icons/Discord.svelte';
+  import Email from '$lib/components/icons/Email.svelte';
   import File from '$lib/components/icons/File.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
   import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
+  import Card from '$lib/components/wave/card/card.svelte';
   import WaveAvatar from '$lib/components/wave/wave-program-avatar/wave-program-avatar.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import formatDate from '$lib/utils/format-date';
@@ -59,8 +63,26 @@
         <h1>{waveProgram.name}</h1>
         <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
       </div>
+
+      <ChevronRight />
     </a>
   {/each}
+
+  {#if data.wavePrograms.data.length === 0}
+    <Card>
+      <div class="empty typo-text">
+        There are no active Wave Programs at the moment. Consider subscribing to our email
+        newsletter and joining our Discord for announcements.
+
+        <div class="actions">
+          <Button icon={Email} href="/wave/newsletter">Subscribe to newsletter</Button>
+          <Button icon={Discord} href="https://discord.gg/drips" target="_blank"
+            >Join our Discord</Button
+          >
+        </div>
+      </div>
+    </Card>
+  {/if}
 </div>
 
 <style>
@@ -71,6 +93,24 @@
     max-width: 90rem;
     margin: 0 auto;
     width: 100%;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--color-foreground-level-6);
+    display: flex;
+    padding: 2rem 0;
+    max-width: 40rem;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .empty .actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .wave-program-item {
@@ -84,6 +124,13 @@
       transform 0.2s,
       box-shadow 0.2s;
     flex-wrap: wrap;
+  }
+
+  .details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .wave-program-item:hover:not(:active),

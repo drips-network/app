@@ -21,5 +21,8 @@ export const load = async (context) => {
     viewKey: waveProgram.slug,
     availableSortByOptions: ['updatedAt', 'createdAt', 'points'],
     headMetaTitle: `Issues | ${waveProgram.name} Wave`,
+    emptyStateAnnotation: `
+      This view only shows issues added to the ${waveProgram.name} Wave Program by approved maintainers. Head to the Contributor dashboard to see all issues relevant to you. If you're a maintainer, check your Maintainer dashboard to add issues to this Wave Program.
+    `,
   }));
 };

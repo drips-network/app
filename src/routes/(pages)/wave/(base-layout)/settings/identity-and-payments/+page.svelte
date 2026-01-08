@@ -1,4 +1,16 @@
 <script lang="ts">
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+</script>
+
+<AnnotationBox>
+  Identity verification and reward settings will be enabled close to the launch of the first Stellar
+  Wave. Please keep an eye on the Wave channel in <a
+    class="typo-link"
+    href="https://discord.gg/t8XBXZAEs5">our Discord</a
+  > for announcements!
+</AnnotationBox>
+
+<!-- <script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
@@ -188,4 +200,4 @@
     flex-wrap: wrap;
     align-items: center;
   }
-</style>
+</style> -->

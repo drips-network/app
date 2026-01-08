@@ -3,6 +3,8 @@
   import Button from '$lib/components/button/button.svelte';
   import ExpandableText from '$lib/components/expandable-text/expandable-text.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Discord from '$lib/components/icons/Discord.svelte';
+  import Email from '$lib/components/icons/Email.svelte';
   import Globe from '$lib/components/icons/Globe.svelte';
   import X from '$lib/components/icons/X.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
@@ -110,12 +112,16 @@
       <WaveCard wave={upcomingOrActiveWave} {waveProgram} />
     {:else}
       <Card>
-        <div class="no-next-wave">
-          <p class="typo-text">
-            There are no upcoming or active Waves at the moment. Please check back later for
-            updates.
-          </p>
-          <!-- todo(wave): NEWSLETTER SIGNUP -->
+        <div class="empty typo-text">
+          There are no active or upcoming Waves at the moment. Consider subscribing to our email
+          newsletter and joining our Discord for announcements.
+
+          <div class="actions">
+            <Button icon={Email} href="/wave/newsletter">Subscribe to newsletter</Button>
+            <Button icon={Discord} href="https://discord.gg/drips" target="_blank"
+              >Join our Discord</Button
+            >
+          </div>
         </div>
       </Card>
     {/if}
@@ -169,6 +175,24 @@
     grid-template-rows: min-content;
     grid-template-areas: 'name stats';
     gap: 1rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--color-foreground-level-6);
+    display: flex;
+    padding: 2rem 0;
+    max-width: 40rem;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .empty .actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .wave-program-name {

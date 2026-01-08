@@ -66,7 +66,7 @@
           })),
         },
       },
-      href: `/wave/${waveProgram.slug}/leaderboard`,
+      href: `/wave/${waveProgram.slug}/leaderboard?filter=current-wave`,
     },
     {
       key: 'Waves',
