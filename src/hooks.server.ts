@@ -32,6 +32,8 @@ globalThis.fetch = async (input, init) => {
     }
   }
 
+  console.log('we fetching:', url);
+
   try {
     // 3. Attempt the fetch using the original function
     const response = await originalFetch(input, init);
@@ -101,7 +103,7 @@ export const handle = async ({ event, resolve }) => {
   try {
     return resolve(event, {
       filterSerializedResponseHeaders(name) {
-        if (name === 'content-type') return true;
+        if (['content-type', 'access-control-allow-origin'].includes(name)) return true;
 
         return false;
       },
