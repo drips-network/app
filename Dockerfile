@@ -6,8 +6,6 @@ ENV NODE_ENV=production
 
 # Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
 
-ARG GQL_ACCESS_TOKEN
-
 ARG PUBLIC_PINATA_GATEWAY_URL
 
 ARG INFURA_KEY
