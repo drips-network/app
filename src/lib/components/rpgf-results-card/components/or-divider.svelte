@@ -1,6 +1,10 @@
+<script lang="ts">
+  let { text = 'OR' } = $props();
+</script>
+
 <div class="or-divider">
   <div class="line"></div>
-  <div class="typo-header-5">OR</div>
+  <div class="typo-header-5">{text}</div>
   <div class="line"></div>
 </div>
 

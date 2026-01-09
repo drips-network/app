@@ -85,7 +85,8 @@ h3,
   font-family: var(--typeface-regular);
 }
 
-.tabular-nums {
+.tabular-nums,
+.tnum {
   font-feature-settings: 'tnum', 'zero';
 }
 
@@ -139,4 +140,8 @@ h3,
   :root::view-transition-new(root) {
     animation: none;
   }
+}
+
+::view-transition {
+  pointer-events: none;
 }

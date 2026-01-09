@@ -15,6 +15,7 @@
     type BallotValidationErrorsStore,
   } from '$lib/utils/rpgf/ballot-validation-context';
   import CheckboxSimple from '$lib/components/checkbox/checkbox-simple.svelte';
+  import { SvelteSet } from 'svelte/reactivity';
 
   interface Props {
     round: Round;
@@ -77,7 +78,7 @@
     if (!ballotValidationErrors) return;
 
     ballotValidationErrors.update((current) => {
-      const next = new Set(current);
+      const next = new SvelteSet(current);
 
       if (state.type === 'invalid') {
         next.add(application.id);

@@ -34,7 +34,7 @@
     type: 'unvalidated',
   });
 
-  function submit() {
+  async function submit() {
     if (!amount) return;
 
     const { tokenAllowance } = $context;

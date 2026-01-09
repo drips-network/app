@@ -5,7 +5,14 @@
   import { fade } from 'svelte/transition';
 
   interface Props {
-    variant?: 'normal' | 'primary' | 'destructive' | 'destructive-outline' | 'ghost' | 'muted';
+    variant?:
+      | 'normal'
+      | 'primary'
+      | 'destructive'
+      | 'destructive-outline'
+      | 'ghost'
+      | 'muted'
+      | 'caution';
     icon?: Component | undefined;
     disabled?: boolean;
     ariaLabel?: string | undefined;
@@ -19,6 +26,10 @@
     form?: string | undefined;
     justify?: 'left' | 'right' | 'center';
     circular?: boolean;
+    reloadOnLinkClick?: boolean;
+    noPreload?: boolean;
+    highlit?: boolean;
+    id?: string | undefined;
     onclick?: ((event: MouseEvent) => void) | undefined;
     onmouseenter?: (event: MouseEvent) => void;
     onmouseleave?: (event: MouseEvent) => void;
@@ -42,6 +53,10 @@
     form = undefined,
     justify = 'center',
     circular = false,
+    reloadOnLinkClick = false,
+    noPreload = false,
+    highlit = false,
+    id = undefined,
     onclick = undefined,
     onmouseenter = undefined,
     onmouseleave = undefined,
@@ -62,6 +77,8 @@
   $effect(() => {
     if (variant === 'destructive-outline') {
       textColor = 'var(--color-negative-level-6)';
+    } else if (variant === 'caution') {
+      textColor = 'var(--color-caution-level-6)';
     } else if (primaryColor && (variant === 'destructive' || variant === 'primary')) {
       textColor = getContrastColor(primaryColor);
     } else {
@@ -72,6 +89,7 @@
 
 <svelte:element
   this={href ? 'a' : 'button'}
+  {id}
   bind:this={el}
   aria-label={ariaLabel}
   {href}
@@ -82,8 +100,12 @@
   class:disabled={isDisabled}
   class:loading
   class:circular
+  class:highlit
   disabled={isDisabled}
   aria-disabled={isDisabled}
+  data-sveltekit-reload={reloadOnLinkClick}
+  data-sveltekit-preload-data={noPreload ? 'false' : undefined}
+  data-sveltekit-preload-code={noPreload ? 'false' : undefined}
   {onclick}
   {onmouseenter}
   {onmouseleave}
@@ -103,9 +125,9 @@
     {#if icon}
       {@const SvelteComponent = icon}
       <SvelteComponent
-        style={variant === 'destructive' || variant === 'primary'
-          ? `fill: ${textColor}; transition: fill 0.3s;`
-          : 'fill: var(--color-foreground); transition: fill 0.3s;'}
+        style="fill: {textColor}; transition: fill 0.3s; width: {size === 'small'
+          ? '1.25rem'
+          : ''};"
       />
     {/if}
     {@render children?.()}
@@ -126,6 +148,10 @@
     margin: -4px 0;
     transition: opacity 0.3s;
     flex-shrink: 0;
+  }
+
+  .button.highlit .inner {
+    background-color: var(--color-primary-level-1) !important;
   }
 
   .button.size-large {
@@ -197,6 +223,10 @@
     background-color: var(--color-negative);
   }
 
+  .button .inner.caution {
+    background-color: var(--color-caution-level-1);
+  }
+
   .button .inner.with-icon-text {
     padding: 0 0.75rem 0 0.5rem;
   }
@@ -211,6 +241,15 @@
       0px 0px 0px 1px var(--color-foreground),
       0 2px 0px 1px var(--color-foreground),
       inset 0 0px 0px 0px var(--color-foreground);
+    transform: translateY(-2px);
+  }
+
+  .button:not(.disabled):hover .inner.caution,
+  .button:not(.disabled):focus-visible .inner.caution {
+    box-shadow:
+      0px 0px 0px 1px var(--color-caution),
+      0 2px 0px 1px var(--color-caution),
+      inset 0 0px 0px 0px var(--color-caution);
     transform: translateY(-2px);
   }
 

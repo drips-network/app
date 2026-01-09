@@ -18,6 +18,7 @@
       props: ComponentProps<Component<any>>;
     }[];
     overflowCounterClickable?: boolean;
+    countOverride?: number;
   }
 
   let {
@@ -26,15 +27,16 @@
     itemsClickable = false,
     components,
     overflowCounterClickable = false,
+    countOverride,
   }: Props = $props();
   const dispatch = createEventDispatcher();
   let displayedComponents = $derived(components.slice(0, maxItems));
-  let overflowAmount = $derived(components.length - maxItems);
+  let overflowAmount = $derived((countOverride ?? components.length) - maxItems);
 </script>
 
 {#if components.length !== 0}
   <div class="pile">
-    {#each displayedComponents as component}
+    {#each displayedComponents as component (component.props)}
       {#if !transitionedOut}
         <div
           class="item"

@@ -72,7 +72,7 @@
 <PaddedHorizontalScroll bind:innerElem={wrapperElem}>
   <div class="scrollable-tabs">
     <div style:position="absolute" style:top="-4rem" id="scrollable-tabs-anchor"></div>
-    {#each tabs as { href, icon, label }, i}
+    {#each tabs as { href, icon, label }, i (href)}
       {@const SvelteComponent = icon}
       <a
         bind:this={tabElems[i]}

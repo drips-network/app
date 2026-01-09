@@ -9,7 +9,7 @@ announcementBannerCopy: 'Drips Wave: What’s Launching in January'
 ---
 
 Last month we announced Drips Wave, a new way for ecosystems to run contribution cycles using Drips’ infrastructure. We want to give you more details about what’s coming up: why we built Wave, what it enables for developers and maintainers, and what to expect from the first wave launching with the [Stellar Development Foundation](https://stellar.org/foundation) in January 2026.
- 
+
 ## Why We Built Drips Wave
 
 Across open-source projects and ecosystems there’s a consistent gap between available funding and the day-to-day work that maintainers need help with. Grants and longer programs play an important role, but they aren't necessarily designed to move quickly or focus on every day maintenance work and priorities. On the other side, new developers looking to get involved often lack a defined entry point.

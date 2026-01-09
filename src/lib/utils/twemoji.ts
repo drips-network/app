@@ -5,13 +5,19 @@ import { BASE_URL } from './base-url';
 export default (...args: Parameters<typeof twemoji.parse>) => {
   const options = args[1] || {};
 
-  return twemoji.parse(sanitize(args[0].toString(), { allowedTags: [] }), {
-    ...options,
-    attributes: () => ({
-      loading: 'lazy',
+  return twemoji.parse(
+    sanitize(args[0].toString(), {
+      allowedTags: [],
+      allowedAttributes: { img: ['loading', 'width', 'height'] },
     }),
-    base: BASE_URL,
-    folder: '/twemoji',
-    ext: '.svg',
-  });
+    {
+      attributes: () => ({
+        loading: 'lazy',
+      }),
+      ...options,
+      base: BASE_URL,
+      folder: '/twemoji',
+      ext: '.svg',
+    },
+  );
 };

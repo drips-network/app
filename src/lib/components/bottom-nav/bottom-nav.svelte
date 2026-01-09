@@ -63,7 +63,7 @@
 
 <div class="bottom-nav">
   <div class="items">
-    {#each bottomNavItems as item}
+    {#each bottomNavItems as item (item.href)}
       <a
         data-highlightid="bottomnav-{item.href}"
         class="item typo-text-small-bold"

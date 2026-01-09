@@ -132,7 +132,7 @@
       <div class="share-options__options">
         <CopyLinkButton {url} />
 
-        {#each shareOptions as option}
+        {#each shareOptions as option (option.href)}
           <Button
             target="_blank"
             href={option.href}
@@ -183,7 +183,7 @@
     gap: 1rem;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 16/9;
+    aspect-ratio: 16/8.3;
   }
 
   .downloadable-image .downloadable-image__button {

@@ -24,6 +24,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { page } from '$app/state';
   import Highlight from '$lib/components/highlight/highlight.svelte';
+  import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
   interface Props {
     children?: import('svelte').Snippet;
   }
@@ -126,17 +127,7 @@
 
 <GlobalAdvisory />
 
-<div id="cupertino-pane">
-  <div class="inner">
-    <div class="dragger"></div>
-    {#if $cupertinoPaneStore.component}
-      {@const SvelteComponent = $cupertinoPaneStore.component}
-      <div class="content">
-        <SvelteComponent {...$cupertinoPaneStore.props} />
-      </div>
-    {/if}
-  </div>
-</div>
+<CupertinoPaneTarget />
 
 <ModalLayout />
 
@@ -150,29 +141,6 @@
 </div>
 
 <style>
-  #cupertino-pane {
-    display: none;
-    background-color: var(--color-background);
-    border-radius: 1rem 1rem 0 0;
-  }
-
-  #cupertino-pane > .inner {
-    padding: 0 0.5rem;
-    align-items: center;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  :global(.cupertino-pane-wrapper .pane) {
-    padding-bottom: 1rem;
-    background-color: var(--color-background);
-    box-shadow: var(--elevation-low);
-  }
-
-  :global(.cupertino-pane-wrapper) {
-    z-index: 200;
-  }
-
   .loading-spinner {
     position: fixed;
     top: 0;
@@ -184,14 +152,5 @@
     justify-content: center;
     align-items: center;
     z-index: 99;
-  }
-
-  .dragger {
-    width: 3rem;
-    height: 0.25rem;
-    background-color: var(--color-foreground-level-3);
-    border-radius: 0.25rem;
-    margin: 0 auto;
-    margin-bottom: 0.75rem;
   }
 </style>

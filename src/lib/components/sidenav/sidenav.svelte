@@ -45,9 +45,9 @@
 <svelte:window onresize={updateSelectorPos} />
 
 <nav class="sidenav" class:force-collapsed={$forceCollapsed}>
-  {#each Object.values(items) as block}
+  {#each Object.values(items) as block, index (index)}
     <div class="block">
-      {#each block as item}
+      {#each block as item (item.href)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
           style="position: relative"

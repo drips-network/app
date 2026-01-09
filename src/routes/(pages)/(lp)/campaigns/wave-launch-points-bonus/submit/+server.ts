@@ -21,7 +21,7 @@ export const POST = async ({ request }) => {
     .safeParse(data);
 
   if (!parsed.success) {
-    return new Response(JSON.stringify({ errors: parsed.error.errors }), { status: 400 });
+    return new Response(JSON.stringify({ errors: parsed.error }), { status: 400 });
   }
 
   if (!INTERCOM_ACCESS_TOKEN) {
