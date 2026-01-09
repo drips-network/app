@@ -66,7 +66,13 @@ export const handle = async ({ event, resolve }) => {
   }
 
   try {
-    return resolve(event);
+    return resolve(event, {
+      filterSerializedResponseHeaders(name) {
+        if (name === 'content-type') return true;
+
+        return false;
+      },
+    });
   } catch (e) {
     console.log('Error during request handling:', e);
 
@@ -84,16 +90,5 @@ export const handleFetch = async ({ event, request, fetch }) => {
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
   }
 
-  try {
-    const response = await fetch(request);
-    return response;
-  } catch (error) {
-    console.error('Fetch error:', {
-      url: request.url,
-      method: request.method,
-      error,
-    });
-
-    throw error;
-  }
+  return fetch(request);
 };
