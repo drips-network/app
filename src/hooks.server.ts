@@ -82,7 +82,7 @@ const rpgfInternalApiUrl = getOptionalEnvVar(
 );
 
 const rpgfInternalAccessToken = getOptionalEnvVarPrivate(
-  'PUBLIC_INTERNAL_DRIPS_RPGF_ACCESS_TOKEN',
+  'INTERNAL_DRIPS_RPGF_ACCESS_TOKEN',
   true,
   'RPGF functionality doesnt work.',
 );
