@@ -15,6 +15,39 @@ const WAVE_API_URL = getOptionalEnvVar(
   'Wave functionality will not work.',
 );
 
+// 1. Save the original global fetch
+const originalFetch = globalThis.fetch;
+
+// 2. Overwrite it with a wrapper
+globalThis.fetch = async (input, init) => {
+  // Helper to extract the URL cleanly whether it's a string, URL object, or Request object
+  let url = input;
+  if (typeof input === 'object' && input !== null) {
+    if ('url' in input) {
+      // It's a Request object
+      url = input.url;
+    } else if (input.toString) {
+      // It's a URL object
+      url = input.toString();
+    }
+  }
+
+  try {
+    // 3. Attempt the fetch using the original function
+    const response = await originalFetch(input, init);
+    return response;
+  } catch (error) {
+    // 4. Log the specific URL that caused the crash
+    console.error('------------------------------------------------');
+    console.error('🚨 CAUGHT GLOBAL FETCH ERROR');
+    console.error('❌ URL:', url);
+    // console.error('Error:', error); // Optional: print full error
+    console.error('------------------------------------------------');
+
+    throw error; // Re-throw so the app handles it as usual
+  }
+};
+
 export const handle = async ({ event, resolve }) => {
   // if we're under /wave path, perform access token refresh for Wave.
   // this allows the initial page render to be SSR even for logged-in-only views.
