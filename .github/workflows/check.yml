@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Build GQL types
-        run: GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 GQL_URL=https://gql-api.drips.network/ npm run gql:build  # public access token
+        run: PUBLIC_GQL_URL=https://gql-api.drips.network/ npm run gql:build
 
       - name: Run svelte-check
         run: npm run check
