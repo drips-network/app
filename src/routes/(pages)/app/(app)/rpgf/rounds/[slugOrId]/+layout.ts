@@ -35,6 +35,3 @@ export const load = async ({ fetch, params, url, depends }) => {
     ballotStats,
   };
 };
-
-// temporary while we figure out CORS issue with GQL API
-export const ssr = false;

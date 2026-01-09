@@ -1,4 +1,4 @@
-import { browser, dev } from '$app/environment';
+import { browser } from '$app/environment';
 import {
   createDripsSdk,
   type DripsSdk,
@@ -7,7 +7,6 @@ import {
 } from '@drips-network/sdk';
 import walletStore from '$lib/stores/wallet/wallet.store';
 import { pin } from '$lib/utils/ipfs';
-import { BASE_URL } from '$lib/utils/base-url';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 
 export class SDKManager {
@@ -43,13 +42,11 @@ export class SDKManager {
           return (await pin(metadata)) as `0x${string}`;
         };
 
-        const PORT = getOptionalEnvVar('PUBLIC_PORT', false, null);
-        const graphqlUrl =
-          browser || dev ? `${BASE_URL}/api/gql` : `http://localhost:${PORT ?? '8080'}/api/gql`;
+        const GQL_URL = getOptionalEnvVar('PUBLIC_GQL_URL', true);
 
         const sdk = createDripsSdk(blockchainClient, ipfsMetadataUploader, {
           graphql: {
-            url: graphqlUrl,
+            url: GQL_URL,
           },
         });
 
