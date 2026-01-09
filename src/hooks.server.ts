@@ -1,4 +1,5 @@
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
+import getOptionalEnvVarPrivate from '$lib/utils/get-optional-env-var/private';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
@@ -74,6 +75,18 @@ export const handle = async ({ event, resolve }) => {
   }
 };
 
+const rpgfInternalApiUrl = getOptionalEnvVar(
+  'PUBLIC_INTERNAL_DRIPS_RPGF_URL',
+  true,
+  'RPGF functionality doesnt work.',
+);
+
+const rpgfInternalAccessToken = getOptionalEnvVarPrivate(
+  'PUBLIC_INTERNAL_DRIPS_RPGF_ACCESS_TOKEN',
+  true,
+  'RPGF functionality doesnt work.',
+);
+
 export const handleFetch = async ({ event, request, fetch }) => {
   // if the request is going to Wave API, and we have a new access token in locals, add it to the request
   if (WAVE_API_URL && request.url.startsWith(WAVE_API_URL)) {
@@ -82,6 +95,13 @@ export const handleFetch = async ({ event, request, fetch }) => {
 
     request.headers.set('Authorization', accessToken ? `Bearer ${accessToken}` : '');
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
+  }
+
+  // if the request is going to the rpgf api, inject the drips internal auth token
+  if (rpgfInternalApiUrl && request.url.startsWith(rpgfInternalApiUrl)) {
+    const accessToken = rpgfInternalAccessToken;
+
+    if (accessToken) request.headers.set('X-Drips-Internal-Token', accessToken);
   }
 
   return fetch(request);
