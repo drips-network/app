@@ -3,7 +3,7 @@
 
   import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
-  import Setting from './components/setting.svelte';
+  import Setting from '$lib/components/setting/setting.svelte';
   import ListIcon from '$lib/components/icons/Ledger.svelte';
   import themeStore from '$lib/stores/theme/theme.store';
   import Button from '$lib/components/button/button.svelte';
@@ -13,7 +13,6 @@
   import Toggle from '$lib/components/toggle/toggle.svelte';
   import tickStore from '$lib/stores/tick/tick.store';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import { goto } from '$app/navigation';
   import developerModeStore from '$lib/stores/developer-mode/developer-mode.store';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import network from '$lib/stores/wallet/network';
@@ -175,9 +174,7 @@
       title="Custom tokens"
       subtitle="Select which non-default tokens you want to use with Drips."
     >
-      <Button onclick={() => goto('/app/settings/custom-tokens')} icon={ListIcon}
-        >Edit token list</Button
-      >
+      <Button href="/app/settings/custom-tokens" icon={ListIcon}>Edit token list</Button>
     </Setting>
     <Setting
       title="Reset educational hints"

@@ -1,18 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   interface Props {
-    imageUrl: string;
+    imageUrl?: string;
     children?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
   }
 
   let { imageUrl, children, actions }: Props = $props();
 
-  let imageEl: HTMLImageElement;
+  let imageEl: HTMLImageElement | undefined = $state();
   let imageLoaded = $state(false);
 
-  onMount(() => {
+  $effect(() => {
     if (imageEl?.complete) {
       imageLoaded = true;
     }
@@ -20,15 +18,17 @@
 </script>
 
 <div class="feature-card">
-  <img
-    bind:this={imageEl}
-    class:loaded={imageLoaded}
-    src={imageUrl}
-    onload={() => {
-      imageLoaded = true;
-    }}
-    alt=""
-  />
+  {#if imageUrl}
+    <img
+      bind:this={imageEl}
+      class:loaded={imageLoaded}
+      src={imageUrl}
+      onload={() => {
+        imageLoaded = true;
+      }}
+      alt=""
+    />
+  {/if}
 
   <div class="content">
     {@render children?.()}
@@ -42,7 +42,7 @@
 <style>
   .feature-card {
     position: relative;
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 1rem 0 1rem 1rem;
     border: 1px solid var(--color-primary-level-2);
     overflow: hidden;
     background-color: var(--color-primary-level-1);

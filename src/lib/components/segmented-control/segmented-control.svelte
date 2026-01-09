@@ -4,7 +4,7 @@
   import { browser } from '$app/environment';
   import { createEventDispatcher } from 'svelte';
 
-  type Option<V extends keyof T> = { title: string; value: V }[];
+  type Option<V extends keyof T> = { title: string; value: V; disabled?: boolean }[];
 
   interface Props {
     options: Option<keyof T>;
@@ -69,7 +69,7 @@
 
 <div class="segmented-control" class:disabled bind:this={containerElem}>
   <div class="options" role={containerRole} aria-label={ariaLabel}>
-    {#each options as option}
+    {#each options as option (option.value)}
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
         role={itemRole}
@@ -78,8 +78,13 @@
         bind:this={optionElems[option.value]}
         class:selected={active === option.value}
         tabindex="0"
-        onclick={() => (active = option.value)}
-        onkeydown={(e) => handleKeydown(e, option.value)}
+        onclick={() => {
+          if (!option.disabled) active = option.value;
+        }}
+        onkeydown={(e) => {
+          if (!option.disabled) handleKeydown(e, option.value);
+        }}
+        class:disabled={option.disabled}
         id={String(option.value)}
       >
         <label for={String(option.value)}>{option.title}</label>
@@ -118,6 +123,11 @@
     transition: all 0.3s;
     padding: 0.25rem 0.75rem;
     cursor: pointer;
+  }
+
+  .option.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 
   .option * {
@@ -169,7 +179,7 @@
   }
 
   .option:hover .background,
-  .option:focus .background {
+  .option:focus-visible .background {
     background-color: var(--color-primary-level-2);
     outline: none;
   }

@@ -21,6 +21,8 @@
     onAction?: (() => void) | undefined;
     safeAppMode?: boolean;
     safeDescription?: string | (() => string) | undefined;
+    padding?: boolean;
+    confetti?: boolean;
   }
 
   let {
@@ -31,6 +33,8 @@
     onAction = undefined,
     safeAppMode = false,
     safeDescription = undefined,
+    padding = false,
+    confetti = true,
   }: Props = $props();
 
   function handleConfirm() {
@@ -46,7 +50,7 @@
   }
 </script>
 
-<div class="success-step">
+<div class="success-step" class:with-padding={padding}>
   <StepLayout center>
     {#if safeAppMode}
       <Emoji size="huge" emoji="⏳" />
@@ -58,25 +62,27 @@
             'Please execute the proposed transaction(s) in your Safe. Once executed, come back to see the result.')}
       />
     {:else}
-      <ConfettiOnClick alsoOnMount>
-        {#snippet label()}
-          <CoinAnimation animateOnMount>
-            <div class="circle">
-              <Emoji size="huge" emoji="🎉" />
-            </div>
-          </CoinAnimation>
-        {/snippet}
+      {#if confetti}
+        <ConfettiOnClick alsoOnMount>
+          {#snippet label()}
+            <CoinAnimation animateOnMount>
+              <div class="circle">
+                <Emoji size="huge" emoji="🎉" />
+              </div>
+            </CoinAnimation>
+          {/snippet}
 
-        <Confetti
-          x={[-1, 1]}
-          y={[-0.25, 1]}
-          colorArray={[
-            'var(--color-primary)',
-            'var(--color-primary-level-2)',
-            'var(--color-primary-level-6)',
-          ]}
-        />
-      </ConfettiOnClick>
+          <Confetti
+            x={[-1, 1]}
+            y={[-0.25, 1]}
+            colorArray={[
+              'var(--color-primary)',
+              'var(--color-primary-level-2)',
+              'var(--color-primary-level-6)',
+            ]}
+          />
+        </ConfettiOnClick>
+      {/if}
 
       <StepHeader
         headline="Success"
@@ -98,7 +104,7 @@
         </Button>
       {:else if action !== 'none'}
         <Button variant="primary" onclick={handleConfirm}
-          >{action === 'close' ? 'Got it' : 'Continue'}</Button
+          >{action === 'close' || action === 'hide-modal' ? 'Got it' : 'Continue'}</Button
         >
       {/if}
     {/snippet}
@@ -110,5 +116,9 @@
     padding: 1rem;
     border-radius: 50%;
     border: 2px solid var(--color-primary-level-2);
+  }
+
+  .success-step.with-padding {
+    padding: 1rem;
   }
 </style>

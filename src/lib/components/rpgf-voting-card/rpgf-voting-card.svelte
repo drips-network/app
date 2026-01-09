@@ -257,7 +257,6 @@
                 <span class="typo-text-small-bold">{round.minVotesPerProjectPerVoter}</span> votes.
               {/if}
               {#if round.maxVotesPerProjectPerVoter !== null}
-                {#if round.minVotesPerProjectPerVoter !== null}{' '}{/if}
                 No project may receive more than
                 <span class="typo-text-small-bold">{round.maxVotesPerProjectPerVoter}</span> votes.
               {/if}

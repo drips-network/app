@@ -148,7 +148,7 @@
           <div class="header">
             <h5>Total value on Drips</h5>
             <div class="explorer-icons">
-              {#each enabledNetworks as network}
+              {#each enabledNetworks as network (network.id)}
                 <a
                   href="{network.explorer.base}/address/{network.contracts.DRIPS}"
                   target="_blank"

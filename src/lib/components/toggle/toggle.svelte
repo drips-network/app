@@ -4,16 +4,27 @@
     label?: string | undefined;
     size?: 'small' | 'normal';
     disabled?: boolean;
+    onchange?: (value: boolean, event: Event) => void;
   }
 
   let {
-    checked = $bindable(),
+    checked = $bindable(false),
     label = undefined,
     size = 'normal',
     disabled = false,
+    onchange = undefined,
   }: Props = $props();
 
   let focus = $state(false);
+
+  let previous = $state(checked);
+
+  $effect(() => {
+    if (onchange && previous !== checked) {
+      onchange(checked, new Event('change'));
+      previous = checked;
+    }
+  });
 </script>
 
 <label class="toggle {size}" class:disabled>

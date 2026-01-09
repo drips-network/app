@@ -1,7 +1,7 @@
 <script lang="ts">
   interface Props {
-    src?: string | undefined;
-    placeholderSrc?: string | undefined;
+    src?: string | undefined | null;
+    placeholderSrc?: string | undefined | null;
     size?: number;
     imgElem?: HTMLImageElement | undefined;
   }
@@ -27,7 +27,9 @@
       onerror={() => (error = true)}
     />
   {/if}
-  <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
+  {#if placeholderSrc}
+    <img class="placeholder" src={placeholderSrc} alt="user avatar placeholder" class:loaded />
+  {/if}
 </div>
 
 <style>

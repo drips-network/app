@@ -9,6 +9,7 @@
     icon?: Component | undefined;
     children?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
+    centered?: boolean;
   }
 
   let {
@@ -18,14 +19,12 @@
     icon = undefined,
     children,
     actions,
+    centered = false,
   }: Props = $props();
 </script>
 
-<div
-  class="annotation-box typo-text-small {type} {size} flex flex-wrap items-center justify-between gap-3"
-  class:overlay
->
-  <div class="flex gap-2 items-start">
+<div class="annotation-box typo-text-small {type} {size}" class:centered class:overlay>
+  <div class="content-wrapper">
     <div class="icon-container">
       {#if icon}
         {@const SvelteComponent = icon}
@@ -38,12 +37,14 @@
         <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)" />
       {/if}
     </div>
-    <div class="flex-1 pt-px">
+
+    <div class="text-wrapper">
       {@render children?.()}
     </div>
   </div>
+
   {#if actions}
-    <div class="flex-1 gap-1 flex justify-end">
+    <div class="actions-wrapper">
       {@render actions?.()}
     </div>
   {/if}
@@ -54,8 +55,55 @@
     border-radius: 1rem 0 1rem 1rem;
     padding: 0.75rem;
     text-align: left;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
+  .content-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .text-wrapper {
+    flex: 1;
+    padding-top: 1px;
+  }
+
+  .actions-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.25rem;
+  }
+
+  /* Centered Modifications */
+  .annotation-box.centered {
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .annotation-box.centered .content-wrapper {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .annotation-box.centered .text-wrapper {
+    padding-top: 0;
+  }
+
+  .annotation-box.centered .actions-wrapper {
+    justify-content: center;
+    width: 100%;
+    flex: initial;
+  }
+
+  /* Theme Variants */
   .annotation-box.small {
     border-radius: 0.75rem 0 0.75rem 0.75rem;
     padding: 0.5rem;
@@ -82,7 +130,7 @@
   }
 
   .icon-container {
-    height: 18px; /* Match line-height of typo-text-small */
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;

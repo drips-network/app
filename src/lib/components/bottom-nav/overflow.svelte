@@ -11,7 +11,7 @@
 </script>
 
 <div class="mobile-nav-overflow">
-  {#each items as item}
+  {#each items as item (item.href)}
     {@const active = page.url.pathname === item.href}
     <a class="item" href={item.href} class:active onclick={() => cupertinoPaneStore.closeSheet()}>
       <item.icon

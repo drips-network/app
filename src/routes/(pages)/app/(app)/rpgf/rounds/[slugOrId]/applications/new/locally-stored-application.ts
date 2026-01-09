@@ -21,16 +21,16 @@ export interface ApplicationData {
   answersByCategory: Record<string, z.infer<typeof createApplicationDtoSchema.shape.answers>>;
 }
 
-const args: (roundId: string, userId: string) => Parameters<typeof storedWritable> = (
-  roundId,
-  userId,
-) => [
+const args = (
+  roundId: string,
+  userId: string,
+): [string, z.ZodType<ApplicationData>, ApplicationData, boolean] => [
   storageKey(roundId, userId),
   z.object({
     projectName: z.string().nullable(),
     dripsAccountId: z.array(z.string()).min(0).max(1),
     categoryId: z.array(z.string()).min(0).max(1),
-    answersByCategory: z.record(createApplicationDtoSchema.shape.answers),
+    answersByCategory: z.record(z.string(), createApplicationDtoSchema.shape.answers),
   }),
   {
     projectName: null,
