@@ -28,7 +28,7 @@ export const issuesPageLayoutLoad = async (
   config: (user: WaveLoggedInUser | null) => {
     requireLogin?: boolean;
     preappliedFilters?: IssueFilters;
-    defaultFilters?: IssueFilters;
+    defaultFilters: IssueFilters;
     pathPrefix: string;
     viewKey: string;
     filtersMode: 'maintainer' | 'contributor' | 'wave';
