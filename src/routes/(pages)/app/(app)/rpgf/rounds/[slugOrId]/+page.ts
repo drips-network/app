@@ -56,3 +56,5 @@ export const load = async ({ parent, depends, fetch }) => {
 
   return { fiveApplications, linkedDripLists, blockWhileInitializing: false };
 };
+
+export const ssr = false;
