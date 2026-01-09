@@ -1,8 +1,8 @@
 ---
 title: 'Q4 2025 Roundup: From Asia IRL to Waves on the Horizon'
-date: '2026-01-08'
-coverImage: '/assets/blog-images/q4-2025-roundup.png'
-coverImageAlt: 'TBD'
+date: '2026-01-09'
+coverImage: '/assets/blog-images/drippy-q4.jpg'
+coverImageAlt: 'Drippy in Q4'
 excerpt: 'Q4 was a strong way to close out 2025 for Drips! We spent time with builders across multiple regions, launched and supported real funding rounds and introduced new primitives that will shape how ecosystems use Drips going into 2026.'
 author: 'becca'
 announcementBannerCopy: 'Q4 2025 Roundup: From Asia IRL to Waves on the Horizon'
