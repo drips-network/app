@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
@@ -67,7 +68,6 @@ export const handle = async ({ event, resolve }) => {
   try {
     return resolve(event);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.log('Error during request handling:', e);
 
     throw error(500, 'Internal Server Error');
@@ -84,18 +84,16 @@ export const handleFetch = async ({ event, request, fetch }) => {
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
   }
 
-  // eslint-disable-next-line no-console
-  console.log('Fetching:', request.url);
+  try {
+    const response = await fetch(request);
+    return response;
+  } catch (error) {
+    console.error('Fetch error:', {
+      url: request.url,
+      method: request.method,
+      error,
+    });
 
-  request.headers.delete('origin');
-
-  const res = await fetch(request);
-
-  // eslint-disable-next-line no-console
-  console.log('fetched', {
-    url: request.url,
-    status: res.status,
-    accessControl: res.headers.get('access-control-allow-origin'),
-  });
-  return res;
+    throw error;
+  }
 };
