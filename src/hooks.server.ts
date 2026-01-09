@@ -84,5 +84,16 @@ export const handleFetch = async ({ event, request, fetch }) => {
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
   }
 
-  return fetch(request);
+  // eslint-disable-next-line no-console
+  console.log('Fetching:', request.url);
+
+  const res = await fetch(request);
+
+  // eslint-disable-next-line no-console
+  console.log('fetched', {
+    url: request.url,
+    status: res.status,
+    accessControl: res.headers.get('access-control-allow-origin'),
+  });
+  return res;
 };
