@@ -8,6 +8,11 @@
   }
 
   let { message }: Props = $props();
+
+  function closeModal() {
+    modal.setHideable(true);
+    modal.hide();
+  }
 </script>
 
 <div class="error-modal">
@@ -17,7 +22,7 @@
   <p class="codeblock typo-text-mono">
     {message}
   </p>
-  <Button onclick={modal.hide}>Got it</Button>
+  <Button onclick={closeModal}>Got it</Button>
   <a class="typo-text-small" target="_blank" href="https://discord.gg/BakDKKDpHF"
     >Ask for help on Discord ↗</a
   >

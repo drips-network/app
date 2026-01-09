@@ -196,7 +196,7 @@
   );
 </script>
 
-<HeadMeta title={stream.name ?? 'Stream'} />
+<HeadMeta title={stream.name || 'Stream'} />
 
 <div class="wrapper">
   <div class="header">
