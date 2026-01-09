@@ -11,11 +11,7 @@ if (!process.env.PUBLIC_GQL_URL) {
 const config: CodegenConfig = {
   schema: [
     {
-      [process.env.PUBLIC_GQL_URL]: {
-        headers: {
-          Authorization: `Bearer ${process.env.GQL_ACCESS_TOKEN}`,
-        },
-      },
+      [process.env.PUBLIC_GQL_URL]: {},
     },
   ],
   generates: {
