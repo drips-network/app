@@ -41,7 +41,7 @@ globalThis.fetch = async (input, init) => {
     console.error('------------------------------------------------');
     console.error('🚨 CAUGHT GLOBAL FETCH ERROR');
     console.error('❌ URL:', url);
-    // console.error('Error:', error); // Optional: print full error
+    console.error('Error:', error); // Optional: print full error
     console.error('------------------------------------------------');
 
     throw error; // Re-throw so the app handles it as usual
