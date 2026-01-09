@@ -87,6 +87,8 @@ export const handleFetch = async ({ event, request, fetch }) => {
   // eslint-disable-next-line no-console
   console.log('Fetching:', request.url);
 
+  request.headers.delete('origin');
+
   const res = await fetch(request);
 
   // eslint-disable-next-line no-console
