@@ -5,7 +5,7 @@ FROM node:24
 ENV NODE_ENV=production
 
 # Usually, DO NOT set these in the Dockerfile. This is only for building the image in Railway.
-ARG CODEGEN_GQL_URL
+
 ARG GQL_ACCESS_TOKEN
 
 ARG PUBLIC_PINATA_GATEWAY_URL
@@ -31,9 +31,8 @@ ARG GITHUB_PERSONAL_ACCESS_TOKEN
 
 ARG ETHERSCAN_API_KEY
 
-ARG GQL_URL
-ARG GQL_ACCESS_TOKEN
-ARG CODEGEN_GQL_URL
+ARG PUBLIC_GQL_URL
+ARG PUBLIC_INTERNAL_GQL_URL
 
 ARG CACHE_REDIS_CONNECTION_STRING
 
@@ -110,7 +109,7 @@ RUN npm run postinstall
 
 # Set up robots
 
-# Fetch GQL schema from API at `CODEGEN_GQL_URL` and save it to schema.graphql for type generation.
+# Fetch GQL schema from API at `PUBLIC_GQL_URL` and save it to schema.graphql for type generation.
 RUN npm run gql:generate-schema
 
 # This relies on schema.graphql file being present in the root dir.

@@ -9,8 +9,8 @@ services:
       - CACHE_REDIS_CONNECTION_STRING=redis://redis:6379
       - FAKE_PINATA_URL=http://fake-pinata:3000
       - PUBLIC_IPFS_GATEWAY_URL=http://localhost:3000
-      - GQL_URL=http://graphql-api:8080
-      - GQL_ACCESS_TOKEN=123
+      - PUBLIC_GQL_URL=http://172.17.0.1:8080
+      - PUBLIC_INTERNAL_GQL_URL=http://graphql-api:8080
       - MULTIPLAYER_API_URL=http://multiplayer:5001
       - MULTIPLAYER_API_ACCESS_TOKEN=123
       - PINATA_SDK_KEY=123
@@ -21,7 +21,6 @@ services:
       - LOCAL_UID=${LOCAL_UID-root}
       - LOCAL_GID=${LOCAL_GID-root}
       - PUBLIC_BASE_URL=http://localhost:5173
-      - PUBLIC_PORT=5173
       - PUBLIC_SUPPRESS_MISSING_VAR_IN_PROD_ERRORS=true
       - ECOSYSTEM_API_URL=http://ecosystems:5000
       - ECOSYSTEM_API_ACCESS_TOKEN=123

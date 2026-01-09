@@ -7,6 +7,7 @@ export const load = (context) =>
       isInWaveProgram: true,
       appliedToByUser: user?.id,
     },
+    defaultFilters: {},
     pathPrefix: '/wave/contributors/issues/',
     filtersMode: 'contributor',
     breadcrumbs: [{ label: 'Contributor Dashboard' }, { label: 'Issues' }],

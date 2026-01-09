@@ -163,12 +163,6 @@
     margin-top: 1rem;
   }
 
-  .no-next-wave {
-    padding: 2rem;
-    text-align: center;
-    color: var(--color-foreground-level-5);
-  }
-
   .hero {
     display: grid;
     grid-template-columns: 1fr 2fr;
