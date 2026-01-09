@@ -97,6 +97,14 @@ export const handleFetch = async ({ event, request, fetch }) => {
     request.headers.set('Cookie', `wave_refresh_token=${refreshToken}`);
   }
 
+  // eslint-disable-next-line no-console
+  console.log({
+    url: request.url,
+    rpgfInternalApiUrl,
+    startsWith: rpgfInternalApiUrl ? request.url.startsWith(rpgfInternalApiUrl) : 'n/a',
+    accessToken: rpgfInternalAccessToken,
+  });
+
   // if the request is going to the rpgf api, inject the drips internal auth token
   if (rpgfInternalApiUrl && request.url.startsWith(rpgfInternalApiUrl)) {
     const accessToken = rpgfInternalAccessToken;
