@@ -45,8 +45,8 @@
 
   <AnnotationBox>
     You only need to install the Drips Wave GitHub App if you maintain an open-source project that
-    you want to apply to be part of a Wave. If you're a contributor looking to work on issues in a
-    Wave, explore current Waves on the homepage.
+    you want to apply to be part of a Wave Program. If you're a contributor looking to work on
+    issues in a Wave, explore current Waves on the homepage.
 
     {#snippet actions()}
       <Button href="/wave" icon={ArrowRight}>Explore Waves</Button>
