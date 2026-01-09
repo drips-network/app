@@ -27,6 +27,7 @@ jobs:
           cat > .env << EOF
           PUBLIC_NETWORK=5
           PUBLIC_GQL_URL=https://gql-api.drips.network/
+          PUBLIC_INTERNAL_GQL_URL=https://foo.bar
           ECOSYSTEM_API_URL=https://ecosystems-api-mainnet.up.railway.app/
           ECOSYSTEM_API_ACCESS_TOKEN=123
           PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
