@@ -1,5 +1,4 @@
 import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import { gql } from 'graphql-request';
 import query from '$lib/graphql/dripsQL';
 import type { DripListQuery, DripListQueryVariables } from './__generated__/gql.generated';
@@ -11,7 +10,7 @@ import network from '$lib/stores/wallet/network';
 import type { SplitsComponentSplitsReceiver } from '$lib/components/splits/types';
 import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 
-export const load = (async ({ params, fetch }) => {
+export const load = async ({ params, fetch }) => {
   const { listId } = params;
 
   if (multiplayer.isVotingRoundId(listId)) {
@@ -114,4 +113,4 @@ export const load = (async ({ params, fetch }) => {
     blockWhileInitializing: false,
     preservePathOnNetworkChange: false,
   };
-}) satisfies PageServerLoad;
+};
