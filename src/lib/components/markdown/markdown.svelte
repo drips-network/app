@@ -7,9 +7,10 @@
 
   interface Props {
     content: string;
+    lineClamp?: number;
   }
 
-  let { content }: Props = $props();
+  let { content, lineClamp }: Props = $props();
 
   marked.use({
     renderer: {
@@ -73,7 +74,7 @@
   let rendered = $derived(reRender(content));
 </script>
 
-<div class="markdown">
+<div class="markdown {lineClamp ? `line-clamp-${lineClamp}` : ''}">
   {@html `
     <div class="markdown-component-content">
     ${rendered ?? ''}

@@ -138,8 +138,8 @@
 >
   <div class="issue-application-card" class:is-own={isOwnApplication}>
     <GithubUserBadge user={application.applicant} link={false} />
-    <p class="application-text line-clamp-2">
-      <Markdown content={application.applicationText} />
+    <p class="application-text">
+      <Markdown content={application.applicationText} lineClamp={2} />
     </p>
 
     <Divider />
