@@ -7,11 +7,14 @@
   import Envelope from '$lib/components/icons/Envelope.svelte';
   import { show } from '@intercom/messenger-js-sdk';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   function handleOpenIntercom() {
     show();
   }
 </script>
+
+<HeadMeta title="Support | Wave" description="Get help and support for Drips Wave." />
 
 <FlowStepWrapper
   icon={HelpEmoji}
