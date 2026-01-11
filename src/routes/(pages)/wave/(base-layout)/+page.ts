@@ -9,10 +9,11 @@ export const load = async ({ fetch }) => {
 
   await Promise.all(
     wavePrograms.data.map(async (wave) => {
-      const waves = await getWaves(fetch, wave.id, { limit: 50 });
+      const waves = await getWaves(fetch, wave.id, { limit: 5 });
 
       if (waves.data.length > 0) {
-        const upcomingWave = waves.data.find((wave) => wave.status === 'upcoming') ?? null;
+        const upcomingWave =
+          waves.data.find((wave) => wave.status === 'upcoming' || wave.status === 'active') ?? null;
 
         upcomingWaves[wave.id] = upcomingWave;
       }
