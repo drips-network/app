@@ -4,6 +4,8 @@ export interface TopUpFlowState {
   tokenAddress?: string;
   tokenAllowance?: bigint;
   tokenBalance?: bigint;
+  autoWrap?: boolean;
+  autoWrapPair?: import('$lib/stores/wallet/network').AutoUnwrapPair;
   amountValue: string;
   amountToTopUp?: bigint;
 }

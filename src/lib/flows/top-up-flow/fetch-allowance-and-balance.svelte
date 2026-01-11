@@ -18,17 +18,19 @@
   let { context }: Props = $props();
 
   async function updateContext() {
-    const { tokenAddress } = $context;
+    const { tokenAddress, autoWrap } = $context;
 
     const { address } = $wallet;
     assert(address && tokenAddress);
 
     const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
-    const balance = await executeErc20ReadMethod({
-      functionName: 'balanceOf',
-      token: tokenAddress as OxString,
-      args: [address as OxString],
-    });
+    const balance = autoWrap
+      ? await $wallet.provider.getBalance(address)
+      : await executeErc20ReadMethod({
+          functionName: 'balanceOf',
+          token: tokenAddress as OxString,
+          args: [address as OxString],
+        });
 
     context.update((c) => ({
       ...c,

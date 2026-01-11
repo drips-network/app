@@ -513,34 +513,31 @@
     const safeAppsSdk = new SafeAppsSDK();
 
     let estimatedGasWithBuffer: number;
-    try {
-      const { estimatedGas } = await (
-        await fetch('/api/tenderly/simulate', {
-          method: 'POST',
-          body: JSON.stringify({
-            simulations: onlyNonExternalTransactions.map((tx) => ({
-              network_id: String(network.chainId),
-              save: true,
-              save_if_fails: true,
-              from: address,
-              to: tx.transaction.to,
-              input: tx.transaction.data,
-              value: 0,
-              estimate_gas: true,
-            })),
-          }),
-        })
-      ).json();
 
-      estimatedGasWithBuffer = getGasBuffer(estimatedGas);
-    } catch {
-      throw new Error('Unable to estimate gas for Safe Batch operation.');
-    }
+    const { estimatedGas } = await (
+      await fetch('/api/tenderly/simulate', {
+        method: 'POST',
+        body: JSON.stringify({
+          simulations: onlyNonExternalTransactions.map((tx) => ({
+            network_id: String(network.chainId),
+            save: true,
+            save_if_fails: true,
+            from: address,
+            to: tx.transaction.to,
+            input: tx.transaction.data,
+            value: tx.transaction.value?.toString() ?? 0,
+            estimate_gas: true,
+          })),
+        }),
+      })
+    ).json();
+
+    estimatedGasWithBuffer = getGasBuffer(estimatedGas);
 
     const txs = onlyNonExternalTransactions.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
       data: tx.data ?? unreachable(),
-      value: '0',
+      value: (tx.value ?? 0n).toString(),
     }));
 
     // In case of a batch transaction, we display the last TX in the batch to the user.
@@ -742,7 +739,7 @@
       {:else}
         <!-- Tx "rows" -->
         <div in:fade={{ duration: 300 }}>
-          {#each transactionsTimeline as transactionStatusItem, index}
+          {#each transactionsTimeline as transactionStatusItem, index (index)}
             <div
               class="row"
               class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||

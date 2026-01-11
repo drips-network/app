@@ -22,6 +22,7 @@ export type AutoUnwrapPair = {
   name: string;
   nativeSymbol: string;
   wrappedSymbol: string;
+  wrappedTokenAddress: string;
 };
 
 export type Network = {
@@ -130,7 +131,14 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     isTestnet: false,
     subdomain: 'drips.network',
     gqlName: SupportedChain.Mainnet,
-    autoUnwrapPairs: [{ name: 'Ethereum', nativeSymbol: 'ETH', wrappedSymbol: 'WETH' }],
+    autoUnwrapPairs: [
+      {
+        name: 'Ethereum',
+        nativeSymbol: 'ETH',
+        wrappedSymbol: 'WETH',
+        wrappedTokenAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      },
+    ],
     displayNetworkPicker: true,
     applyGasBuffers: true,
     explorer: {
@@ -426,7 +434,14 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     isTestnet: false,
     subdomain: 'filecoin.drips.network',
     gqlName: SupportedChain.Filecoin,
-    autoUnwrapPairs: [{ name: 'Filecoin', nativeSymbol: 'FIL', wrappedSymbol: 'WFIL' }],
+    autoUnwrapPairs: [
+      {
+        name: 'Filecoin',
+        nativeSymbol: 'FIL',
+        wrappedSymbol: 'WFIL',
+        wrappedTokenAddress: '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A',
+      },
+    ],
     displayNetworkPicker: true,
     applyGasBuffers: false,
     explorer: {

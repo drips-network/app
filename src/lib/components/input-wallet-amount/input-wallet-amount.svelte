@@ -17,6 +17,9 @@
     inputValue: string;
     validationState?: TextInputValidationState;
     amount?: bigint | undefined;
+    displayTokenLabel?: string;
+    displayTokenSymbol?: string;
+    balanceSymbol?: string;
   }
 
   let {
@@ -28,8 +31,14 @@
       type: 'unvalidated',
     }),
     amount = $bindable(),
+    displayTokenLabel,
+    displayTokenSymbol,
+    balanceSymbol,
   }: Props = $props();
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
+  const shownName = $derived(displayTokenLabel ?? tokenInfo?.info.name ?? 'Unknown token');
+  const shownSymbol = $derived(displayTokenSymbol ?? tokenInfo?.info.symbol);
+  const shownBalanceSymbol = $derived(balanceSymbol ?? shownSymbol);
 
   function setMax() {
     if (tokenInfo) {
@@ -52,7 +61,7 @@
           validationState = {
             type: 'invalid',
             message: `You only have ${formatUnits(tokenBalance ?? 0n, tokenInfo.info.decimals)} ${
-              tokenInfo.info.symbol
+              shownBalanceSymbol ?? ''
             } in your wallet.`,
           };
         }
@@ -74,7 +83,7 @@
     {#if tokenAddress && tokenInfo && tokenBalance !== undefined}
       <Token address={tokenAddress} show="none" size="small" />
       <div class="flex-1">
-        {tokenInfo.info.name ?? 'Unknown token'}
+        {shownName}
       </div>
       <div class="text-foreground-level-4 tabular-nums">
         {formatTokenAmount(
@@ -85,7 +94,7 @@
           tokenInfo.info.decimals,
           1n,
         )}
-        {tokenInfo.info.symbol}
+        {shownBalanceSymbol}
       </div>
     {:else if loading}
       <Spinner />
@@ -97,7 +106,7 @@
     bind:value={inputValue}
     {validationState}
     variant={{ type: 'number', min: 0 }}
-    suffix={tokenInfo?.info.symbol}
+    suffix={shownSymbol}
     disabled={!tokenAddress}
   />
   {#snippet action()}
