@@ -42,7 +42,6 @@
 
 <style>
   .wrapper {
-    background-color: #1b1b1f;
     height: 100%;
     width: 100%;
     flex: 1;
