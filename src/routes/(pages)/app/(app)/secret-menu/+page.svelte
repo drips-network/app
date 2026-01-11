@@ -86,6 +86,7 @@
 
   type StreamChange = {
     streamId: string;
+    displayId: string;
     receiverAccountId: string;
     receiverDriver: 'address' | 'nft' | 'repo';
     amountPerSecond: bigint;
@@ -148,6 +149,7 @@
       return {
         key: `${receiver.accountId.toString()}-${cfg.dripId.toString()}`,
         streamId,
+        displayId: cfg.dripId.toString(),
         receiverAccountId: receiver.accountId.toString(),
         config: cfg,
         raw: receiver.config,
@@ -169,6 +171,14 @@
     if (!tokenInfo) return `${amount.toString()} wei`;
 
     return `${formatTokenAmount(amount, tokenInfo.decimals)} ${tokenInfo.symbol}`;
+  }
+
+  function formatTokenLabel(tokenAddress: string) {
+    const tokenInfo = tokensStore.getByAddress(tokenAddress)?.info;
+
+    if (!tokenInfo) return tokenAddress;
+
+    return `${tokenInfo.symbol} (${tokenInfo.name}) — ${tokenAddress}`;
   }
 
   function receiverLink(driver: StreamChange['receiverDriver'], accountId: string) {
@@ -316,6 +326,7 @@
         const metaInfo = meta.streamIndex.get(receiver.streamId);
         const base: Omit<StreamChange, 'amountPerSecond' | 'start' | 'duration'> = {
           streamId: receiver.streamId,
+          displayId: receiver.displayId,
           receiverAccountId: metaInfo?.receiver.accountId ?? receiver.receiverAccountId,
           receiverDriver: metaInfo?.receiver.driver ?? 'address',
           name: metaInfo?.name,
@@ -353,6 +364,7 @@
         const metaInfo = meta.streamIndex.get(receiver.streamId);
         deletedStreams.push({
           streamId: receiver.streamId,
+          displayId: receiver.displayId,
           receiverAccountId: metaInfo?.receiver.accountId ?? receiver.receiverAccountId,
           receiverDriver: metaInfo?.receiver.driver ?? 'address',
           name: metaInfo?.name,
@@ -533,7 +545,7 @@
       <div class="result">
         <h4>Transaction type: Top-Up</h4>
         <p>
-          Token: <span class="typo-text">{decodeResult.tokenAddress}</span>
+          Token: <span class="typo-text">{formatTokenLabel(decodeResult.tokenAddress)}</span>
         </p>
         <p>
           Top up amount: <span class="typo-text tabular-nums"
@@ -553,7 +565,7 @@
           Sender account ID: <span class="typo-text">{decodeResult.accountId}</span>
         </p>
         <p>
-          Token: <span class="typo-text">{decodeResult.tokenAddress}</span>
+          Token: <span class="typo-text">{formatTokenLabel(decodeResult.tokenAddress)}</span>
         </p>
         {#if decodeResult.metadataHash}
           <p>
@@ -565,15 +577,25 @@
           </p>
         {/if}
 
-        {#each [{ title: 'New streams', items: decodeResult.newStreams }, { title: 'Edited streams', items: decodeResult.editedStreams }, { title: 'Deleted streams', items: decodeResult.deletedStreams }] as group (group.title)}
-          {#if group.items.length}
-            <div>
+        {#each [{ title: '➕ New streams', items: decodeResult.newStreams, emptyText: 'No new streams in this batch.' }, { title: '✍️ Edited streams', items: decodeResult.editedStreams, emptyText: 'No edits in this batch.' }, { title: '🗑️ Deleted streams', items: decodeResult.deletedStreams, emptyText: 'No deletions in this batch.' }] as group (group.title)}
+          <div class="stream-section">
+            <div class="stream-section-header">
               <h5>{group.title}</h5>
+              <span class="muted"
+                >{group.items.length} item{group.items.length === 1 ? '' : 's'}</span
+              >
+            </div>
+
+            {#if group.items.length === 0}
+              <div class="empty-box">{group.emptyText}</div>
+            {:else}
               <div class="stream-list">
                 {#each group.items as stream (stream.streamId)}
                   <div class="stream-card">
                     <div class="stream-heading">
-                      <div class="typo-text tabular-nums">{stream.streamId}</div>
+                      <div class="typo-text tabular-nums label-pill">
+                        Stream #{stream.displayId}
+                      </div>
                       <div class="typo-text">
                         {formatAmountPerSecond(stream.amountPerSecond, stream.tokenAddress)}
                       </div>
@@ -612,8 +634,8 @@
                   </div>
                 {/each}
               </div>
-            </div>
-          {/if}
+            {/if}
+          </div>
         {/each}
       </div>
     {/if}
@@ -649,11 +671,32 @@
     margin: 0.5rem 0 1.5rem 0;
   }
 
-  .stream-card {
-    border: 1px solid var(--theme-border-subtle);
+  .stream-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .stream-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .empty-box {
+    border: 1px dashed var(--theme-border-subtle);
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
+    color: var(--theme-text-soft);
     background: var(--theme-surface-raised);
+  }
+
+  .stream-card {
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--theme-surface-raised);
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .stream-heading {
@@ -673,5 +716,11 @@
 
   .muted {
     color: var(--theme-text-soft);
+  }
+
+  .label-pill {
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-foreground-level-2);
   }
 </style>
