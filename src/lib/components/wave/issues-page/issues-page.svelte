@@ -456,7 +456,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: calc(100svh - 6rem);
+    height: calc(100dvh - 6rem);
     position: sticky;
     top: 5rem;
   }

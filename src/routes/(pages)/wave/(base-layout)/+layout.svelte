@@ -142,7 +142,7 @@
     width: 100%;
     margin: 0 auto;
     padding: 0.5rem 1rem 1rem 0;
-    min-height: calc(100svh - 4rem);
+    min-height: calc(100dvh - 4rem);
     display: flex;
     height: fit-content;
     flex-direction: column;
@@ -168,7 +168,7 @@
     grid-template-areas: 'nav content';
     gap: 2rem;
     padding: 0rem 1rem 0 0;
-    min-height: calc(100svh - 4rem);
+    min-height: calc(100dvh - 4rem);
   }
 
   .nav-wrapper {

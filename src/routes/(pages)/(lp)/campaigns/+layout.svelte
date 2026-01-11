@@ -21,7 +21,7 @@
     background-color: var(--color-foreground-level-1);
     padding-bottom: 2rem;
     width: 100vw;
-    min-height: 100svh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
