@@ -29,19 +29,19 @@
   let { context }: Props = $props();
 
   const autoWrapOptions = $derived(
-    (network.autoUnwrapPairs ?? [])
-      .map((pair) => {
-        const wrappedToken = tokens.getByAddress(pair.wrappedTokenAddress);
+    (network.autoUnwrapPairs ?? []).flatMap((pair) => {
+      const wrappedToken = tokens.getByAddress(pair.wrappedTokenAddress);
 
-        if (!wrappedToken) return undefined;
+      if (!wrappedToken) return [];
 
-        return {
+      return [
+        {
           slug: `native-${pair.wrappedTokenAddress}`,
           pair,
           wrappedToken,
-        } as const;
-      })
-      .filter(Boolean),
+        },
+      ];
+    }),
   );
 
   let tokenList: Items = $derived({
