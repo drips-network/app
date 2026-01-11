@@ -4,19 +4,22 @@ import type { createEventDispatcher } from 'svelte';
 import { get } from 'svelte/store';
 import assert from '$lib/utils/assert';
 import { buildBalanceChangePopulatedTx } from '$lib/utils/streams/streams';
-import { MaxUint256 } from 'ethers';
+import { Interface, MaxUint256 } from 'ethers';
 import type { OxString } from '$lib/utils/sdk/sdk-types';
 import { populateErc20WriteTx } from '$lib/utils/sdk/erc20/erc20';
 import tokensStore from '$lib/stores/tokens/tokens.store';
 import unreachable from '$lib/utils/unreachable';
 import EmojiAndToken from '$lib/components/emoji-and-token/emoji-and-token.svelte';
 import network from '$lib/stores/wallet/network';
+import type { AutoUnwrapPair } from '$lib/stores/wallet/network';
 
 export default function (
   dispatch: ReturnType<typeof createEventDispatcher<StepComponentEvents>>,
   tokenAddress: string,
   amountToTopUp: bigint,
   tokenAllowance: bigint,
+  autoWrap = false,
+  autoWrapPair?: AutoUnwrapPair,
 ) {
   const tokenInfo = tokensStore.getByAddress(tokenAddress)?.info || unreachable();
 
@@ -42,6 +45,14 @@ export default function (
           'TriggerTopUpTransaction step is missing required context',
         );
 
+        if (autoWrap) {
+          assert(
+            autoWrapPair &&
+              autoWrapPair.wrappedTokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
+            'Auto-wrap pair missing or does not match selected token',
+          );
+        }
+
         const needApproval = tokenAllowance < amountToTopUp;
 
         const setStreamsPopulatedTx = await buildBalanceChangePopulatedTx(
@@ -51,6 +62,10 @@ export default function (
 
         delete setStreamsPopulatedTx.gasLimit;
 
+        const wrapTx = autoWrap
+          ? await populateWrapTx(autoWrapPair!.wrappedTokenAddress as OxString, amountToTopUp)
+          : undefined;
+
         const tokenApprovalTx = await populateErc20WriteTx({
           token: tokenAddress as OxString,
           functionName: 'approve',
@@ -58,6 +73,7 @@ export default function (
         });
 
         return {
+          wrapTx,
           setStreamsPopulatedTx,
           tokenApprovalTx,
           needApproval,
@@ -65,7 +81,16 @@ export default function (
         };
       },
 
-      transactions: ({ setStreamsPopulatedTx, tokenApprovalTx, needApproval }) => [
+      transactions: ({ wrapTx, setStreamsPopulatedTx, tokenApprovalTx, needApproval }) => [
+        ...(wrapTx
+          ? [
+              {
+                transaction: wrapTx,
+                title: `Wrap to ${tokenInfo.symbol}`,
+                applyGasBuffer: false,
+              },
+            ]
+          : []),
         ...(needApproval
           ? [
               {
@@ -83,4 +108,19 @@ export default function (
       ],
     }),
   );
+}
+
+async function populateWrapTx(wrappedTokenAddress: OxString, amount: bigint) {
+  const { signer } = get(walletStore);
+  assert(signer, 'Wrap transaction requires a signer');
+
+  const iface = new Interface(['function deposit() payable']);
+  const data = iface.encodeFunctionData('deposit');
+
+  return {
+    to: wrappedTokenAddress,
+    data,
+    value: amount,
+    from: await signer.getAddress(),
+  };
 }

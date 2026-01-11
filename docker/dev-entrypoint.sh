@@ -15,7 +15,17 @@ useradd -u $USER_ID -o -m drippy
 groupmod -g $GROUP_ID drippy 2>/dev/null
 export HOME=/home/drippy
 
+# temporarily set PUBLIC_GQL_URL to the value of PUBLIC_INTERNAL_GQL_URL
+# necessary bc during dev the host cannot access the container via localhost
+
+# store original PUBLIC_GQL_URL
+ORIGINAL_PUBLIC_GQL_URL=${PUBLIC_GQL_URL}
+
+export PUBLIC_GQL_URL=${PUBLIC_INTERNAL_GQL_URL}
 /usr/sbin/gosu drippy npm run gql:build
+
+# restore PUBLIC_GQL_URL
+export PUBLIC_GQL_URL=${ORIGINAL_PUBLIC_GQL_URL}
 
 # chown node modules to drippy since it's an anon volume and owned by root
 if [ -d "node_modules" ]; then

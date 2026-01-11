@@ -9,6 +9,7 @@
   import Token from '$lib/components/token/token.svelte';
   import tokens from '$lib/stores/tokens';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import network from '$lib/stores/wallet/network';
   import { createEventDispatcher } from 'svelte';
   import type { Writable } from 'svelte/store';
   import type { TopUpFlowState } from './top-up-flow-state';
@@ -27,7 +28,42 @@
 
   let { context }: Props = $props();
 
+  const autoWrapOptions = $derived(
+    (network.autoUnwrapPairs ?? [])
+      .map((pair) => {
+        const wrappedToken = tokens.getByAddress(pair.wrappedTokenAddress);
+
+        if (!wrappedToken) return undefined;
+
+        return {
+          slug: `native-${pair.wrappedTokenAddress}`,
+          pair,
+          wrappedToken,
+        } as const;
+      })
+      .filter(Boolean),
+  );
+
   let tokenList: Items = $derived({
+    ...Object.fromEntries(
+      autoWrapOptions.map((option) => [
+        option.slug,
+        {
+          type: 'selectable',
+          searchString: [option.pair.name, option.pair.nativeSymbol, option.pair.wrappedSymbol],
+          label: `${option.pair.nativeSymbol} (auto-wrap)`,
+          text: `Will wrap to ${option.pair.wrappedSymbol}`,
+          image: {
+            component: Token,
+            props: {
+              show: 'none',
+              address: option.wrappedToken.info.address,
+              size: 'small',
+            },
+          },
+        },
+      ]),
+    ),
     ...Object.fromEntries(
       $tokens?.map((token) => [
         token.info.address,
@@ -62,26 +98,36 @@
   });
 
   let selected: string[] = $state([]);
-  let selectedToken = $derived(selected[0] ? tokens.getByAddress(selected[0]) : undefined);
+  const selectedAutoWrap = $derived(autoWrapOptions.find((option) => option.slug === selected[0]));
+  const effectiveTokenAddress = $derived(
+    selectedAutoWrap ? selectedAutoWrap.pair.wrappedTokenAddress : selected[0],
+  );
+  let selectedToken = $derived(
+    effectiveTokenAddress ? tokens.getByAddress(effectiveTokenAddress) : undefined,
+  );
 
   async function updateContext() {
-    const tokenAddress = selected[0];
+    const tokenAddress = effectiveTokenAddress;
 
     const { address } = $wallet;
-    assert(address);
+    assert(address && tokenAddress);
 
     const allowance = await getAddressDriverAllowance(tokenAddress as OxString);
-    const balance = await executeErc20ReadMethod({
-      functionName: 'balanceOf',
-      token: tokenAddress as OxString,
-      args: [address as OxString],
-    });
+    const balance = selectedAutoWrap
+      ? await $wallet.provider.getBalance(address)
+      : await executeErc20ReadMethod({
+          functionName: 'balanceOf',
+          token: tokenAddress as OxString,
+          args: [address as OxString],
+        });
 
     context.update((c) => ({
       ...c,
       tokenAddress,
       tokenAllowance: allowance,
       tokenBalance: balance,
+      autoWrap: Boolean(selectedAutoWrap),
+      autoWrapPair: selectedAutoWrap?.pair,
     }));
   }
 

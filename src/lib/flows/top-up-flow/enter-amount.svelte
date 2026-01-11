@@ -27,6 +27,15 @@
   let tokenInfo = $derived(
     tokenAddress ? (tokens.getByAddress(tokenAddress) ?? unreachable()) : undefined,
   );
+  const autoWrapPair = $derived($context.autoWrapPair);
+  const displaySymbol = $derived(
+    $context.autoWrap
+      ? (autoWrapPair?.nativeSymbol ?? tokenInfo?.info.symbol)
+      : tokenInfo?.info.symbol,
+  );
+  const displayLabel = $derived(
+    $context.autoWrap ? (autoWrapPair?.name ?? tokenInfo?.info.name) : tokenInfo?.info.name,
+  );
 
   let amount: bigint | undefined = $state(undefined);
 
@@ -49,6 +58,8 @@
       tokenAddress ?? unreachable(),
       amount ?? unreachable(),
       tokenAllowance ?? unreachable(),
+      Boolean($context.autoWrap),
+      $context.autoWrapPair,
     );
   }
 </script>
@@ -58,12 +69,15 @@
     <EmojiAndToken emoji="💰" tokenAddress={tokenInfo.info.address} animateTokenOnMount />
   {/if}
   <StepHeader
-    headline={`Add ${tokenInfo?.info.symbol}`}
+    headline={`Add ${displaySymbol ?? ''}`}
     description="Add funds to your Drips account's outgoing balance."
   />
   <InputWalletAmount
     tokenAddress={$context.tokenAddress}
     tokenBalance={$context.tokenBalance}
+    displayTokenLabel={displayLabel}
+    displayTokenSymbol={displaySymbol}
+    balanceSymbol={displaySymbol}
     bind:inputValue={$context.amountValue}
     bind:amount
     bind:validationState
@@ -86,7 +100,7 @@
     {/if}
     <span data-testid="confirm-amount-button">
       <Button variant="primary" onclick={submit} disabled={validationState.type !== 'valid'}
-        >Add {tokenInfo?.info.symbol ?? ''}</Button
+        >Add {displaySymbol ?? ''}</Button
       >
     </span>
   {/snippet}

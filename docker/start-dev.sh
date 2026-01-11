@@ -23,6 +23,12 @@ case "$ARCH" in
 esac
 export ARCH
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export HOST_HOSTNAME="host.docker.internal"
+else
+  export HOST_HOSTNAME="172.17.0.1"
+fi
+
 export LOCAL_UID=$(id -u)
 export LOCAL_GID=$(id -g)
 
