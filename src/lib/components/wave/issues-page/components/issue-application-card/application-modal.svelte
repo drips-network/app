@@ -115,6 +115,9 @@
       {/each}
     </ul>
   </section>
+  <a href="https://docs.drips.network/wave/applicant-metrics" class="typo-link" target="_blank">
+    Learn more about these metrics
+  </a>
 </div>
 
 <style>
