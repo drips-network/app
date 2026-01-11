@@ -26,8 +26,8 @@ jobs:
         run: |
           cat > .env << EOF
           PUBLIC_NETWORK=5
-          GQL_URL=https://gql-api.drips.network/
-          GQL_ACCESS_TOKEN=123
+          PUBLIC_GQL_URL=https://gql-api.drips.network/
+          PUBLIC_INTERNAL_GQL_URL=https://foo.bar
           ECOSYSTEM_API_URL=https://ecosystems-api-mainnet.up.railway.app/
           ECOSYSTEM_API_ACCESS_TOKEN=123
           PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
@@ -37,7 +37,7 @@ jobs:
         run: npm ci
 
       - name: Build GQL types
-        run: GQL_ACCESS_TOKEN=7f82c43a-e7f4-47e9-a623-db7066f8bea2 GQL_URL=https://gql-api.drips.network/ npm run gql:build  # public access token
+        run: PUBLIC_GQL_URL=https://gql-api.drips.network/ npm run gql:build
 
       - name: Run svelte-check
         run: npm run check

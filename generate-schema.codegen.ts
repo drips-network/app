@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
-if (!(process.env.GQL_URL || process.env.CODEGEN_GQL_URL) || !process.env.GQL_ACCESS_TOKEN) {
+if (!process.env.PUBLIC_GQL_URL) {
   throw new Error(
-    `In order to build GraphQL types, you must provide GQL_URL and GQL_ACCESS_TOKEN env vars for the Drips GraphQL API.
+    `In order to build GraphQL types, you must provide PUBLIC_GQL_URL environment variable.
      Default values are included in .env.template.`,
   );
 }
@@ -11,11 +11,7 @@ if (!(process.env.GQL_URL || process.env.CODEGEN_GQL_URL) || !process.env.GQL_AC
 const config: CodegenConfig = {
   schema: [
     {
-      [process.env.CODEGEN_GQL_URL ?? process.env.GQL_URL]: {
-        headers: {
-          Authorization: `Bearer ${process.env.GQL_ACCESS_TOKEN}`,
-        },
-      },
+      [process.env.PUBLIC_GQL_URL]: {},
     },
   ],
   generates: {
