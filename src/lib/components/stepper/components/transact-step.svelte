@@ -513,29 +513,26 @@
     const safeAppsSdk = new SafeAppsSDK();
 
     let estimatedGasWithBuffer: number;
-    try {
-      const { estimatedGas } = await (
-        await fetch('/api/tenderly/simulate', {
-          method: 'POST',
-          body: JSON.stringify({
-            simulations: onlyNonExternalTransactions.map((tx) => ({
-              network_id: String(network.chainId),
-              save: true,
-              save_if_fails: true,
-              from: address,
-              to: tx.transaction.to,
-              input: tx.transaction.data,
-              value: tx.transaction.value ?? 0,
-              estimate_gas: true,
-            })),
-          }),
-        })
-      ).json();
 
-      estimatedGasWithBuffer = getGasBuffer(estimatedGas);
-    } catch {
-      throw new Error('Unable to estimate gas for Safe Batch operation.');
-    }
+    const { estimatedGas } = await (
+      await fetch('/api/tenderly/simulate', {
+        method: 'POST',
+        body: JSON.stringify({
+          simulations: onlyNonExternalTransactions.map((tx) => ({
+            network_id: String(network.chainId),
+            save: true,
+            save_if_fails: true,
+            from: address,
+            to: tx.transaction.to,
+            input: tx.transaction.data,
+            value: tx.transaction.value?.toString() ?? 0,
+            estimate_gas: true,
+          })),
+        }),
+      })
+    ).json();
+
+    estimatedGasWithBuffer = getGasBuffer(estimatedGas);
 
     const txs = onlyNonExternalTransactions.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
