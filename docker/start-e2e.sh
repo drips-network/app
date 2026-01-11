@@ -73,6 +73,9 @@ if [ $UI = true ]; then
   npx playwright test --ui-port 0 &
   docker compose logs app --follow
 else
+  # browser runs within the container, so we need to set the GQL URL to the internal one
+  export PUBLIC_GQL_URL=${PUBLIC_INTERNAL_GQL_URL}
+
   printf "\n🚀 Running tests..."
   npx playwright test
 fi
