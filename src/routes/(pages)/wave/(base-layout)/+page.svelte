@@ -140,6 +140,7 @@
   }
 
   .next-wave-badge {
+    width: fit-content;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
