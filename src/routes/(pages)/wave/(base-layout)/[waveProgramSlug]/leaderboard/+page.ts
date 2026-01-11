@@ -24,7 +24,11 @@ export const load = async ({ fetch, url, parent }) => {
   if (filterParsed.data === 'current-wave') {
     const currentWave = waves.data[0];
     if (!currentWave) {
-      throw new Error('No Waves found for Wave Program');
+      // remove the filter param and redirect
+      const newSearchParams = new URLSearchParams(url.searchParams.toString());
+      newSearchParams.delete('filter');
+
+      throw redirect(302, `${url.pathname}?${newSearchParams.toString()}`);
     }
 
     filters.waveId = currentWave?.id;
