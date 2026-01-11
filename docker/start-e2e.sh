@@ -11,6 +11,12 @@ trap cleanup EXIT
 
 touch .env
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export HOST_HOSTNAME="host.docker.internal"
+else
+  export HOST_HOSTNAME="172.17.0.1"
+fi
+
 if [[ $* == *--start-playwright-ui* ]]; then
     UI=true
 fi
