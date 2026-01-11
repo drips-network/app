@@ -10,4 +10,11 @@ printf "  \_____|_|  |_|\n\n"
 printf "\n🏗️ Building app...\n"
 npm run build
 
+# store original PUBLIC_GQL_URL
+ORIGINAL_PUBLIC_GQL_URL=${PUBLIC_GQL_URL}
+
+export PUBLIC_GQL_URL=${PUBLIC_INTERNAL_GQL_URL}
 npm run preview -- --host 0.0.0.0 --port 5173
+
+# restore PUBLIC_GQL_URL
+export PUBLIC_GQL_URL=${ORIGINAL_PUBLIC_GQL_URL}
