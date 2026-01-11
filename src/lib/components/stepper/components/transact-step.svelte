@@ -525,7 +525,7 @@
               from: address,
               to: tx.transaction.to,
               input: tx.transaction.data,
-              value: 0,
+              value: tx.transaction.value ?? 0,
               estimate_gas: true,
             })),
           }),
@@ -540,7 +540,7 @@
     const txs = onlyNonExternalTransactions.map(({ transaction: tx }) => ({
       to: tx.to ?? unreachable(),
       data: tx.data ?? unreachable(),
-      value: '0',
+      value: (tx.value ?? 0n).toString(),
     }));
 
     // In case of a batch transaction, we display the last TX in the batch to the user.
@@ -742,7 +742,7 @@
       {:else}
         <!-- Tx "rows" -->
         <div in:fade={{ duration: 300 }}>
-          {#each transactionsTimeline as transactionStatusItem, index}
+          {#each transactionsTimeline as transactionStatusItem, index (index)}
             <div
               class="row"
               class:grayed={transactionStatusItem.status === 'awaitingPrevious' ||
