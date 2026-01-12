@@ -15,7 +15,7 @@
     const enriched = enrichCodeMetricLanguageBreakdownWithColors(languageProfile);
 
     // merge smaller segments into "Other"
-    const THRESHOLD_PCT = 2;
+    const THRESHOLD_PCT = 3;
     const majorLangs = enriched.filter((lang) => lang.pct >= THRESHOLD_PCT);
     const otherLangs = enriched.filter((lang) => lang.pct < THRESHOLD_PCT);
     const otherPct = otherLangs.reduce((sum, lang) => sum + lang.pct, 0);
