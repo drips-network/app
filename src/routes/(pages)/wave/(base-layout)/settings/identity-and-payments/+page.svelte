@@ -1,113 +1,24 @@
 <script lang="ts">
-  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-</script>
-
-<AnnotationBox>
-  Identity verification and reward settings will be enabled close to the launch of the first Stellar
-  Wave. Please keep an eye on the Wave channel in <a
-    class="typo-link"
-    href="https://discord.gg/t8XBXZAEs5">our Discord</a
-  > for announcements!
-</AnnotationBox>
-
-<!-- <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
   import Divider from '$lib/components/divider/divider.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  import Check from '$lib/components/icons/Check.svelte';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import Setting from '$lib/components/setting/setting.svelte';
-  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
-  import TextInput from '$lib/components/text-input/text-input.svelte';
-  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal.js';
-  import doWithErrorModal from '$lib/utils/do-with-error-modal.js';
-  import { refreshAccessToken } from '$lib/utils/rpgf/siwe.js';
-  import { patchProfile } from '$lib/utils/wave/profile.js';
-  import z from 'zod';
 
   let { data } = $props();
   let { user, kycStatus } = $derived(data);
-
-  const stellarAddressSchema = z.string().regex(/^G[A-Z2-7]{55}$/);
-
-  // svelte-ignore state_referenced_locally
-  let stellarPayoutAddressValue = $state(user.payoutAddresses?.stellar || '');
-
-  let stellarInputValidationState = $derived.by<TextInputValidationState>(() => {
-    if (stellarPayoutAddressValue === '') {
-      return { type: 'valid' };
-    } else if (stellarAddressSchema.safeParse(stellarPayoutAddressValue).success) {
-      return { type: 'valid' };
-    } else {
-      return { type: 'invalid', message: 'Invalid Stellar address format.' };
-    }
-  });
-
-  let stellarPayoutAddressChanged = $derived(
-    stellarPayoutAddressValue !== user.payoutAddresses?.stellar,
-  );
-
-  let updatingAddress = $state(false);
-  async function saveStellarPayoutAddress() {
-    updatingAddress = true;
-
-    await doWithConfirmationModal(
-      `
-      Updating your Stellar payout address will affect where you receive payouts for any rewards earned in upcoming Waves.
-      Please make absolutely sure your address is correct. Drips cannot recover funds sent to an incorrect address.
-    `,
-      () =>
-        doWithErrorModal(async () => {
-          try {
-            await patchProfile(undefined, {
-              payoutAddresses: {
-                stellar: stellarPayoutAddressValue || null,
-              },
-            });
-
-            // profile data is encoded in the access JWT, so we need to acquire a new one and refresh the app state.
-            await refreshAccessToken();
-            await invalidateAll();
-          } finally {
-            updatingAddress = false;
-          }
-        }),
-    );
-  }
 </script>
 
 <HeadMeta title="Identity & Payments | Settings | Wave" />
 
-<h5>Payment</h5>
-<Setting
-  title="Stellar payout address"
-  subtitle="Set the Stellar address where you want to receive earned rewards after a Wave ends."
->
-  <div class="address-input">
-    <TextInput
-      bind:value={stellarPayoutAddressValue}
-      validationState={stellarInputValidationState}
-      placeholder="GAVFNYXA5POGBANFWO2EK52M7CGNY4CQFLI43ARYA6BSZFGRBTRULJGD"
-    />
-    <Button
-      variant="primary"
-      onclick={saveStellarPayoutAddress}
-      icon={Check}
-      loading={updatingAddress}
-      disabled={!stellarPayoutAddressChanged || stellarInputValidationState.type === 'invalid'}
-    >
-      Save address
-    </Button>
-  </div>
-</Setting>
+<h5>Payments and rewards</h5>
 
 <Setting
   title="Identity Verification"
-  subtitle="To receive rewards, we need to verify your identity using a quick ID check."
+  subtitle="Verify your identitiy to be able to withdraw earned rewards."
 >
   {#if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN'}
     <div
@@ -200,4 +111,4 @@
     flex-wrap: wrap;
     align-items: center;
   }
-</style> -->
+</style>
