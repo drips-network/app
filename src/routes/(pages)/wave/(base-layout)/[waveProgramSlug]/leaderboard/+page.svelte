@@ -33,7 +33,7 @@
       <Dropdown
         options={[
           { value: 'all-time', title: 'All Time' },
-          { value: 'current-wave', title: 'Current Wave' },
+          { value: 'current-wave', title: 'Latest Wave' },
         ]}
         value={data.currentWaveOnly ? 'current-wave' : 'all-time'}
         onchange={(val) => {
@@ -54,7 +54,7 @@
     {:else}
       Showing {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
         ? 'have'
-        : 'has'} earned points in {#if data.currentWaveOnly}the current Wave.{:else}all {data
+        : 'has'} earned points in {#if data.currentWaveOnly}the latest Wave.{:else}all {data
           .waveProgram.name} Waves.{/if}
 
       At the end of each Wave, rewards are distributed to each contributor according to the share of
