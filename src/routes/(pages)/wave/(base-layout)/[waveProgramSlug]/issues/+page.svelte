@@ -3,7 +3,7 @@
 </script>
 
 <div class="empty">
-  <EmptyState emoji="👀" headline="" text="Select an application on the left to view details" />
+  <EmptyState emoji="👀" headline="" text="Select an issue on the left to view details" />
 </div>
 
 <style>
