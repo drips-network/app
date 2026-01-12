@@ -4,7 +4,6 @@
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  import Trophy from '$lib/components/icons/Trophy.svelte';
   import convertGhLanguageListToLanguageProfile from '$lib/components/programming-language-breakdown/convert-gh-language-list-to-language-profile';
   import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -21,6 +20,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import MiniButton from '$lib/components/mini-button/mini-button.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
+  import Folder from '$lib/components/icons/Folder.svelte';
 
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
@@ -166,7 +166,7 @@
   />
 
   <SectionHeader
-    icon={Trophy}
+    icon={Folder}
     label="Repos"
     actions={[
       {
