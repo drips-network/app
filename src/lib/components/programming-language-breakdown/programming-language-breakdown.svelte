@@ -30,7 +30,7 @@
 
     // pad with "unknown" if there is a rest
     const totalPct = majorLangs.reduce((sum, lang) => sum + lang.pct, 0);
-    if (totalPct < 100) {
+    if (totalPct < 99) {
       majorLangs.push({
         language: 'Unknown',
         pct: 100 - totalPct,

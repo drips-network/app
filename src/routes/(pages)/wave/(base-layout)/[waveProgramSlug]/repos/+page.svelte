@@ -378,14 +378,6 @@
     flex-direction: column;
   }
 
-  .count-pill {
-    background-color: var(--color-foreground-level-1);
-    border-radius: 1rem;
-    padding: 0.125rem 0.5rem;
-    margin-left: 0.5rem;
-    display: inline-block;
-  }
-
   @media (max-width: 600px) {
     .filter-bar {
       flex-direction: column;
