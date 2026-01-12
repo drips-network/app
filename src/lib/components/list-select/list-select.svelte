@@ -73,7 +73,7 @@
 
       const candidateSlugs = itemsToSelect
         .filter(([, item]) => item.type === 'selectable')
-        .filter(([, item]) => !item.disabled)
+        .filter(([, item]) => !(item.type === 'selectable' && item.disabled))
         .filter(([slug]) => !selected.includes(slug))
         .map(([slug]) => slug);
 
