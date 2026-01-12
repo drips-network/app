@@ -110,6 +110,7 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   appliedAt: z.coerce.date(),
   reviewedAt: z.coerce.date().nullable(),
   rejectionReason: z.string().nullable(),
+  issueCount: z.number().int(),
   repo: z.object({
     id: z.uuid(),
     gitHubRepoName: z.string(),

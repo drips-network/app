@@ -5,7 +5,6 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
-  import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import convertGhLanguageListToLanguageProfile from '$lib/components/programming-language-breakdown/convert-gh-language-list-to-language-profile';
   import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -20,6 +19,8 @@
   import { fade } from 'svelte/transition';
   import type { Snapshot } from '../$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import MiniButton from '$lib/components/mini-button/mini-button.svelte';
+  import Cross from '$lib/components/icons/Cross.svelte';
 
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
@@ -179,21 +180,20 @@
     ]}
   />
 
-  <PaddedHorizontalScroll>
-    <div class="filter-bar typo-text">
-      <span class="typo-text-bold">Filters</span>
+  <div class="filter-bar typo-text">
+    <span class="typo-text-bold">Filters</span>
 
-      <div class="divider"></div>
+    <div class="divider"></div>
 
-      <div class="filter">
-        <span class="label"> Primary language </span>
-        <div class="dropdown">
-          <DropdownFilterItem
-            onchange={(val) => {
-              handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: val ?? undefined });
-            }}
-            selectedOption={filters.primaryLanguage}
-            config={{
+    <div class="filter">
+      <span class="label">Primary language</span>
+      <div class="dropdown">
+        <DropdownFilterItem
+          onchange={(val) => {
+            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: val ?? undefined });
+          }}
+          selectedOption={filters.primaryLanguage}
+          config={{
             type: 'dropdown',
             label: 'Primary Language',
             optionsPromise: new Promise<{ value: string, label: string }[]>((resolve) => {
@@ -205,11 +205,20 @@
               });
             }),
           }}
-          />
-        </div>
+        />
       </div>
+
+      {#if data.filters.primaryLanguage}
+        <MiniButton
+          label="Clear"
+          icon={Cross}
+          onclick={() => {
+            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: undefined });
+          }}
+        />
+      {/if}
     </div>
-  </PaddedHorizontalScroll>
+  </div>
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
     {#if pagination.total === 0}
@@ -223,7 +232,7 @@
   </span>
 
   <div class="repo-grid">
-    {#each repos as { repo, org } (repo.id)}
+    {#each repos as { repo, org, issueCount } (repo.id)}
       <div in:fade={{ duration: 200 }}>
         <Card>
           <div class="repo-item">
@@ -263,9 +272,14 @@
             <div>
               <Button
                 size="small"
+                disabled={issueCount === 0}
                 href={`/wave/${data.waveProgram.slug}/issues?filters=${getIssueFilterString(repo.id)}`}
               >
-                Browse issues
+                {#if issueCount === 0}
+                  No issues added
+                {:else}
+                  Browse {issueCount} issues
+                {/if}
               </Button>
             </div>
           </div>
@@ -362,6 +376,14 @@
     width: 15rem;
     display: flex;
     flex-direction: column;
+  }
+
+  .count-pill {
+    background-color: var(--color-foreground-level-1);
+    border-radius: 1rem;
+    padding: 0.125rem 0.5rem;
+    margin-left: 0.5rem;
+    display: inline-block;
   }
 
   @media (max-width: 600px) {
