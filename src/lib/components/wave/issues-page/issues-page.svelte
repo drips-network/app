@@ -96,7 +96,7 @@
     headMetaTitle: string;
 
     /** If in wave mode, the current wave program for filters */
-    currentWaveProgram?: WaveProgramDto;
+    currentWaveProgram?: Pick<WaveProgramDto, 'id' | 'slug'>;
 
     /** Annotation to show when there are no issues */
     emptyStateAnnotation?: string;

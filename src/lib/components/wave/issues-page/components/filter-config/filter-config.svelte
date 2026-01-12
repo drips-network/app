@@ -175,7 +175,7 @@
     defaultFilters: IssueFilters;
     ownUserId: string | null;
     mode: 'maintainer' | 'contributor' | 'wave';
-    currentWaveProgram?: WaveProgramDto;
+    currentWaveProgram?: Pick<WaveProgramDto, 'id' | 'slug'>;
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);

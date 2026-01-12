@@ -22,7 +22,10 @@ export const issuesPageLayoutLoad = async (
     fetch: typeof global.fetch;
     url: URL;
     depends: (...deps: `${string}:${string}`[]) => void;
-    parent: () => Promise<{ user: WaveLoggedInUser | null; waveProgram?: { id: string } }>;
+    parent: () => Promise<{
+      user: WaveLoggedInUser | null;
+      waveProgram?: { id: string; slug: string };
+    }>;
     params: { issueId?: string };
   },
   config: (user: WaveLoggedInUser | null) => {

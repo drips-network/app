@@ -83,15 +83,6 @@
 </Setting>
 
 <style>
-  .address-input {
-    display: flex;
-    max-width: 400px;
-    width: 100%;
-    gap: 0.5rem;
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
   .kyc-status {
     display: flex;
     align-items: center;
