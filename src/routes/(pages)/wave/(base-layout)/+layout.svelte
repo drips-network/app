@@ -134,6 +134,7 @@
     left: 0;
     width: 100%;
     z-index: 5;
+    max-width: 100vw;
   }
 
   .content {

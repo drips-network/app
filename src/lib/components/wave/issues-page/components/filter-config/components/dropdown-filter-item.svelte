@@ -118,21 +118,27 @@
   {:then options}
     <div class="dropdown-options">
       <div class="search-bar">
-        <input bind:value={searchTerm} type="text" placeholder="Search repos..." />
-        <button aria-label="Clear search" onclick={() => (searchTerm = '')}>
-          {#if searchTerm}
+        <input bind:value={searchTerm} type="text" placeholder="Search..." />
+        {#if searchTerm}
+          <button aria-label="Clear search" onclick={() => (searchTerm = '')}>
             <CrossCircle />
-          {/if}
-        </button>
+          </button>
+        {/if}
       </div>
 
       <div class="options-list">
-        <button class:selected={!selectedOption} onclick={() => handleSelect(null)}> Any </button>
+        <button class="option" class:selected={!selectedOption} onclick={() => handleSelect(null)}>
+          Any
+        </button>
 
         {#each options.filter((option) => option.label
             .toLowerCase()
             .includes(searchTerm.toLowerCase())) as { label, value } (value)}
-          <button class:selected={selectedOption === value} onclick={() => handleSelect(value)}>
+          <button
+            class="option"
+            class:selected={selectedOption === value}
+            onclick={() => handleSelect(value)}
+          >
             {label}
           </button>
         {/each}
@@ -215,6 +221,11 @@
   .dropdown-content:popover-open {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  .option {
+    height: 2.5rem;
+    flex-shrink: 0;
   }
 
   @starting-style {

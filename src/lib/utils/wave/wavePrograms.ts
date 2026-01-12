@@ -10,9 +10,11 @@ import {
   waveFiltersSchema,
   waveProgramDtoSchema,
   waveProgramIssueWithDetailsDtoSchema,
+  waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
   type Complexity,
   type WaveFilters,
+  type WaveProgramReposFilters,
 } from './types/waveProgram';
 
 import parseRes from './utils/parse-res';
@@ -64,12 +66,13 @@ export async function getWaveProgramRepos(
   f = fetch,
   waveProgramId: string,
   pagination: PaginationInput = {},
+  filters: WaveProgramReposFilters = {},
 ) {
   return parseRes(
     paginatedResponseSchema(waveProgramRepoWithDetailsDtoSchema),
     await authenticatedCall(
       f,
-      `/api/wave-programs/${waveProgramId}/repos?${toPaginationParams(pagination)}`,
+      `/api/wave-programs/${waveProgramId}/repos?${toPaginationParams(pagination)}&${toFilterParams(waveProgramReposFiltersSchema, filters)}`,
     ),
   );
 }

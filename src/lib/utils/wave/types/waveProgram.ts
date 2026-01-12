@@ -129,6 +129,17 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
+export const waveProgramReposFiltersSchema = filterSchema(
+  z.object({
+    primaryLanguage: z.string().optional(),
+  }),
+);
+export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;
+
+// ===========================
+// Wave Program Issue Types
+// ===========================
+
 export const complexitySchema = z.enum(['small', 'medium', 'large']);
 export type Complexity = z.infer<typeof complexitySchema>;
 

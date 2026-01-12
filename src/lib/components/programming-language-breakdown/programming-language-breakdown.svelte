@@ -7,7 +7,9 @@
     size?: 'normal' | 'compact';
   }
 
-  let { languageProfile, size = 'normal' }: Props = $props();
+  let { languageProfile: unsortedLanguageProfile, size = 'normal' }: Props = $props();
+
+  let languageProfile = $derived(unsortedLanguageProfile.sort((a, b) => b.pct - a.pct));
 
   let enrichedLanguageProfile = $derived.by(() => {
     const enriched = enrichCodeMetricLanguageBreakdownWithColors(languageProfile);
@@ -81,7 +83,9 @@
           class="color-box"
           style="width: 1rem; height: 1rem; background-color: {label.color}; border: 1px solid var(--color-foreground-level-3);"
         ></div>
-        <span class="typo-text{size === 'compact' ? '-small' : ''}">{label.language}</span>
+        <span class="typo-text{size === 'compact' ? '-small disabled-text' : ''}"
+          >{label.language}</span
+        >
         <span class="typo-text{size === 'compact' ? '-small' : ''} disabled-text"
           >{label.pct.toFixed(2)}%</span
         >
