@@ -2,8 +2,8 @@
   export const AVAILABLE_FILTERS = (
     ownUserId: string | null,
     mode: 'maintainer' | 'contributor' | 'wave',
-    /** The wave ID if mode is `wave`. Used to fetch available repo filters */
-    currentWaveProgramId?: string,
+    /** The wave program info if mode is `wave`. Used to fetch available repo filters */
+    currentWaveProgram: Pick<WaveProgramDto, 'id' | 'slug'> | undefined,
   ): Partial<Record<keyof IssueFilters, FilterConfig>> =>
     ({
       state: {
@@ -94,15 +94,22 @@
             repoId: {
               type: 'dropdown',
               label: 'Repository',
+              link:
+                mode === 'wave'
+                  ? {
+                      label: 'Browse repos',
+                      href: `/wave/${currentWaveProgram?.slug}/repos`,
+                    }
+                  : undefined,
               optionsPromise: (async () => {
                 if (mode === 'wave') {
-                  if (!currentWaveProgramId) {
-                    throw new Error('currentWaveId is required for wave mode');
+                  if (!currentWaveProgram) {
+                    throw new Error('currentWaveProgram is required for wave mode');
                   }
 
                   const { data: reposInWave } = await getWaveProgramRepos(
                     undefined,
-                    currentWaveProgramId,
+                    currentWaveProgram.id,
                     // todo(wave): pagination
                     { limit: 100 },
                   );
@@ -148,7 +155,9 @@
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
+  import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
+  import { onMount } from 'svelte';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
   import SingleSelectFilterItem from './components/single-select-filter-item.svelte';
   import type { FilterConfig } from './types';
@@ -159,14 +168,14 @@
     defaultFilters,
     ownUserId,
     mode,
-    currentWaveProgramId,
+    currentWaveProgram,
   }: {
     onapply: (filters: IssueFilters) => void;
     appliedFilters: IssueFilters;
     defaultFilters: IssueFilters;
     ownUserId: string | null;
     mode: 'maintainer' | 'contributor' | 'wave';
-    currentWaveProgramId?: string;
+    currentWaveProgram?: Pick<WaveProgramDto, 'id' | 'slug'>;
   } = $props();
 
   let filters = $state<IssueFilters>(appliedFilters);
@@ -198,13 +207,25 @@
   export function reset() {
     filters = appliedFilters;
   }
+
+  let availableFilters = $state<ReturnType<typeof AVAILABLE_FILTERS>>({});
+  onMount(() => {
+    availableFilters = AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgram);
+  });
 </script>
 
 <div class="filter-config-wrapper">
   <div class="options">
-    {#each Object.entries(AVAILABLE_FILTERS(ownUserId, mode, currentWaveProgramId)) as [filterKey, filterConfig], i (filterKey)}
+    {#each Object.entries(availableFilters) as [filterKey, filterConfig], i (filterKey)}
       <div class="filter-config-item">
-        <h5>{filterConfig.label}</h5>
+        <div class="label-and-link">
+          <h5>{filterConfig.label}</h5>
+          {#if filterConfig.link}
+            <a href={filterConfig.link.href} class="typo-text-small">
+              {filterConfig.link.label}
+            </a>
+          {/if}
+        </div>
         {#if filterConfig.type === 'single-select'}
           <SingleSelectFilterItem
             bind:this={filterItems[i]}
@@ -247,6 +268,17 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .filter-config-item .label-and-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .filter-config-item .label-and-link a {
+    text-decoration: underline;
+    color: var(--color-foreground-level-6);
   }
 
   .actions {

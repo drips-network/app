@@ -161,7 +161,7 @@
     transition:
       border-color 0.3s,
       background-color 0.3s;
-    max-width: 20rem;
+    max-width: 22rem;
   }
 
   .dropdown-trigger .name {
