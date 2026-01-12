@@ -116,6 +116,7 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
     gitHubRepoFullName: z.string(),
     gitHubRepoUrl: z.string(),
     description: z.string().nullable(),
+    languages: z.record(z.string(), z.number()).nullable(),
   }),
   org: z.object({
     id: z.uuid(),

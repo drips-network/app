@@ -4,9 +4,10 @@
 
   interface Props {
     languageProfile: UserCodeMetricsDto['lifetime_language_profile'];
+    size?: 'normal' | 'compact';
   }
 
-  let { languageProfile }: Props = $props();
+  let { languageProfile, size = 'normal' }: Props = $props();
 
   let enrichedLanguageProfile = $derived.by(() => {
     const enriched = enrichCodeMetricLanguageBreakdownWithColors(languageProfile);
@@ -21,6 +22,16 @@
       majorLangs.push({
         language: 'Other',
         pct: otherPct,
+        color: 'var(--color-foreground-level-3)',
+      });
+    }
+
+    // pad with "unknown" if there is a rest
+    const totalPct = majorLangs.reduce((sum, lang) => sum + lang.pct, 0);
+    if (totalPct < 100) {
+      majorLangs.push({
+        language: 'Unknown',
+        pct: 100 - totalPct,
         color: 'var(--color-foreground-level-3)',
       });
     }
@@ -41,7 +52,7 @@
   let hoveringOverLanguage = $state<string | null>(null);
 </script>
 
-<div class="programming-language-breakdown">
+<div class="programming-language-breakdown {size}">
   <div class="bar">
     {#each enrichedLanguageProfile as lang (lang.language)}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -70,8 +81,10 @@
           class="color-box"
           style="width: 1rem; height: 1rem; background-color: {label.color}; border: 1px solid var(--color-foreground-level-3);"
         ></div>
-        <span class="typo-text-small">{label.language}</span>
-        <span class="typo-text-small disabled-text">{label.pct.toFixed(2)}%</span>
+        <span class="typo-text{size === 'compact' ? '-small' : ''}">{label.language}</span>
+        <span class="typo-text{size === 'compact' ? '-small' : ''} disabled-text"
+          >{label.pct.toFixed(2)}%</span
+        >
       </div>
     {/each}
   </div>
@@ -94,6 +107,10 @@
     background-color: var(--color-foreground-level-1);
   }
 
+  .compact .bar {
+    height: 0.75rem;
+  }
+
   .segment {
     height: 100%;
     transition: opacity 0.2s;
@@ -103,6 +120,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+  }
+
+  .compact .labels {
+    gap: 0.5rem;
   }
 
   .label {

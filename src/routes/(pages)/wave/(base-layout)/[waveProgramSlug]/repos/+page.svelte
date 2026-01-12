@@ -3,6 +3,8 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
+  import convertGhLanguageListToLanguageProfile from '$lib/components/programming-language-breakdown/convert-gh-language-list-to-language-profile';
+  import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -75,8 +77,19 @@
             </div>
 
             <span class="description typo-text-small line-clamp-2">
-              {repo.description}
+              {#if repo.description}
+                {repo.description}
+              {:else}
+                <span style:color="var(--color-foreground-level-4)">No description</span>
+              {/if}
             </span>
+
+            <div class="languages">
+              <ProgrammingLanguageBreakdown
+                size="compact"
+                languageProfile={convertGhLanguageListToLanguageProfile(repo.languages)}
+              />
+            </div>
           </div>
 
           <div>
@@ -133,6 +146,11 @@
   }
 
   .description {
+    min-height: 2.5rem;
     color: var(--color-foreground-level-6);
+  }
+
+  .languages {
+    margin-top: 0.25rem;
   }
 </style>
