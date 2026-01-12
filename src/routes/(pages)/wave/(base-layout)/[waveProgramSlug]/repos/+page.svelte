@@ -227,7 +227,7 @@
       Showing {pagination.total} matching repo{pagination.total === 1 ? '' : 's'} that {pagination.total ===
       1
         ? 'is'
-        : 'are'} approved for the {data.waveProgram.name} Wave.
+        : 'are'} approved for the {data.waveProgram.name} Wave Program.
     {/if}
   </span>
 
