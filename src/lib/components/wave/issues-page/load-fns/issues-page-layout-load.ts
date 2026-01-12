@@ -137,7 +137,7 @@ export const issuesPageLayoutLoad = async (
     isViewingIssue,
     headMetaTitle,
     showNewApplicationsBadge,
-    currentWaveProgramId: waveProgram?.id,
+    currentWaveProgram: waveProgram,
     emptyStateAnnotation,
 
     waveHeaderBackground: false,

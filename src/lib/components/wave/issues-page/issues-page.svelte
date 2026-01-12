@@ -57,7 +57,7 @@
     availableSortByOptions,
     isViewingIssue,
     headMetaTitle,
-    currentWaveProgramId,
+    currentWaveProgram,
     emptyStateAnnotation,
   }: {
     issues: Awaited<ReturnType<typeof getIssues>>;
@@ -95,8 +95,8 @@
 
     headMetaTitle: string;
 
-    /** If in wave mode, the current wave program ID for filters */
-    currentWaveProgramId: string | undefined;
+    /** If in wave mode, the current wave program for filters */
+    currentWaveProgram?: WaveProgramDto;
 
     /** Annotation to show when there are no issues */
     emptyStateAnnotation?: string;
@@ -388,7 +388,7 @@
               {appliedFilters}
               {defaultFilters}
               onapply={handleApplyFilters}
-              {currentWaveProgramId}
+              {currentWaveProgram}
             />
           {/key}
         </Card>
