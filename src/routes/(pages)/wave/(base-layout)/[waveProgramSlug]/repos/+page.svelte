@@ -19,6 +19,7 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import type { Snapshot } from '../$types.js';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
@@ -148,6 +149,11 @@
     },
   };
 </script>
+
+<HeadMeta
+  title="Repos | {data.waveProgram.name} | Wave"
+  description="Explore the repositories approved for the {data.waveProgram.name} Wave Program."
+/>
 
 <div class="page">
   <Breadcrumbs
