@@ -69,13 +69,20 @@
 
       const itemsToSelect = Object.entries(filteredItems).slice(startIndex, endIndex + 1);
 
-      selected = [
-        ...selected,
-        ...itemsToSelect
-          .filter(([, item]) => item.type === 'selectable')
-          .filter(([slug]) => !selected.includes(slug))
-          .map(([slug]) => slug),
-      ];
+      const remainingSlots = Math.max(maxSelected - selected.length, 0);
+
+      const candidateSlugs = itemsToSelect
+        .filter(([, item]) => item.type === 'selectable')
+        .filter(([slug]) => !selected.includes(slug))
+        .map(([slug]) => slug);
+
+      const orderedSlugs = candidateSlugs.includes(slug)
+        ? [slug, ...candidateSlugs.filter((candidate) => candidate !== slug)]
+        : candidateSlugs;
+
+      const newSelections = orderedSlugs.slice(0, remainingSlots);
+
+      selected = [...selected, ...newSelections];
     } else if (multiselect) {
       if (selected.includes(slug)) {
         selected.splice(selected.indexOf(slug), 1);
