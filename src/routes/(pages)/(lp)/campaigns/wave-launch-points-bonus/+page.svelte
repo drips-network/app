@@ -71,7 +71,7 @@
       <div class="info-text">
         <p style:margin-bottom="1rem">
           Join the <a class="typo-link" href="https://discord.gg/t8XBXZAEs5">Drips Discord</a>,
-          submit the form before January 11th, 2026, and receive
+          submit the form before January 14th, 2026, and receive
           <span class="highlight">100 Points</span> after you participate in the first Wave early next
           year.
         </p>
