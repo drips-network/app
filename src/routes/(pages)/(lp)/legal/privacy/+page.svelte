@@ -126,12 +126,35 @@
 
     <h3>Use of cookies and similar functions/technologies</h3>
     <p>
-      We do set our own so-called cookies and similar technologies on the Drips Services. Our
-      service providers Railway and Grafana do not set cookies either (see also below section 5.3).
-      However, our service provider Cloudflare (see also below section 5.3) may set strictly
-      necessary cookies required to provide security and availability. These cookies are essential
-      to operate the Drips Services and do not track users across sites (for storage period and
-      expiry see Section 7).
+      We use cookies and similar technologies on the Drips Services. Our service providers Railway
+      and Cloudflare (see also below section 5.3) do not set cookies.
+    </p>
+    <p>
+      <strong>Drips Wave App:</strong> Specifically when using the Drips Wave application, the following
+      categories of cookies and similar technologies are processed:
+    </p>
+    <ul>
+      <li>
+        <strong>Authentication:</strong> A strictly necessary cookie that enables user login and session
+        management. This cookie is set only on the Drips Wave website and is required to authenticate
+        your requests after a login.
+      </li>
+      <li>
+        <strong>Intercom Support Chat:</strong> This cookie enables the Intercom chat widget to
+        provide user support and assistance. It is used to identify you as a returning user and to
+        store your chat history with our support team. <em>Important:</em> Even if initially disabled
+        in your preferences, Intercom cookies will be set when you later explicitly open the chat widget.
+      </li>
+      <li>
+        <strong>Faro Monitoring (Grafana):</strong> Grafana Faro helps us track errors and performance
+        issues on the website to improve your experience. It collects data about how you interact with
+        our site, but does not collect personal information. It uses cookie-like technologies to understand
+        user sessions.
+      </li>
+    </ul>
+    <p>
+      You can manage your preferences regarding these non-essential cookies directly within the
+      Drips Wave settings.
     </p>
     <p>
       Please note that when using the embedded Get In Touch form via Notion (see below section 3.3),
