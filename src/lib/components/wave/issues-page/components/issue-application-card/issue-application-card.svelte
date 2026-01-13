@@ -137,7 +137,11 @@
     "
 >
   <div class="issue-application-card" class:is-own={isOwnApplication}>
-    <GithubUserBadge user={application.applicant} link={false} />
+    <GithubUserBadge
+      user={application.applicant}
+      link={false}
+      verifiedBadge={application.applicant.verified}
+    />
     <p class="application-text">
       <Markdown content={application.applicationText} lineClamp={2} />
     </p>

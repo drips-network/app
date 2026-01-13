@@ -40,7 +40,9 @@ export const issueApplicationWithDetailsDtoSchema = z.object({
   appliedAt: z.coerce.date(),
   reviewedAt: z.coerce.date().nullable(),
   removedAt: z.coerce.date().nullable(),
-  applicant: waveUserDtoSchema,
+  applicant: waveUserDtoSchema.extend({
+    verified: z.boolean(),
+  }),
   reviewedBy: waveUserDtoSchema.nullable(),
   removedBy: waveUserDtoSchema.nullable(),
 });
