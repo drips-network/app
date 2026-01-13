@@ -21,7 +21,6 @@
 <script lang="ts">
   import Section from '$lib/components/section/section.svelte';
   import BoxIcon from '$lib/components/icons/Box.svelte';
-  import Box from '$lib/components/icons/Box.svelte';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
   import { PROJECT_CARD_FRAGMENT } from '$lib/components/project-card/project-card.svelte';
   import { gql } from 'graphql-request';
@@ -47,13 +46,6 @@
     header={{
       icon: BoxIcon,
       label: 'Recently claimed projects',
-      actions: [
-        {
-          label: 'See all projects',
-          href: '/app/projects/all',
-          icon: Box,
-        },
-      ],
     }}
     skeleton={{ loaded: true }}
   >

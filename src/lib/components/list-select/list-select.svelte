@@ -384,7 +384,7 @@
 
   .list-content {
     flex: 1;
-    overflow: hidden;
+    overflow: scroll;
     min-height: 0;
   }
 

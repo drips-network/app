@@ -238,7 +238,7 @@
                 <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
               </WhatsNextItem>
               <WhatsNextItem icon={CalendarIcon}>
-                The next date that accumulated funds will be distributed on is <span
+                The next date that accumulated funds will be distributed is <span
                   class="typo-text-bold"
                   >{nextSettlementDate === 'daily'
                     ? 'today'

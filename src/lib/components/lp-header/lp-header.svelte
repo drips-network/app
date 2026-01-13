@@ -152,7 +152,7 @@
         <DripsLogo />
       </a>
       <nav class="desktop-nav">
-        {#each menus as menu}
+        {#each menus as menu, index (index)}
           {#if menu.type === 'link'}
             <HeaderNavItem
               tonedDown={Boolean(openMenu)}
@@ -176,7 +176,9 @@
       </nav>
     </div>
     <div data-sveltekit-preload-code="eager" data-sveltekit-reload>
-      <Button variant="primary" href="/app" onmouseenter={() => (openMenu = null)}>Open app</Button>
+      <Button variant="primary" href="/app" onmouseenter={() => (openMenu = null)} reloadOnLinkClick
+        >Open app</Button
+      >
     </div>
   </div>
   {#if openMenu}
@@ -187,7 +189,7 @@
     >
       {#if openMenu === 'all'}
         <div class="menu-content mobile-menu-content">
-          {#each allMenusSorted as menu}
+          {#each allMenusSorted as menu, index (index)}
             {#if menu.type === 'link'}
               <HeaderNavItem href={menu.href} on:navigate={() => (openMenu = null)}
                 >{menu.title}</HeaderNavItem
@@ -195,7 +197,7 @@
             {/if}
             {#if menu.type === 'dropdown'}
               <h5>{menu.title}</h5>
-              {#each menu.entries ?? [] as entry}
+              {#each menu.entries ?? [] as entry (entry.href)}
                 <HeaderNavItem href={entry.href} on:navigate={() => (openMenu = null)}
                   >{entry.title}</HeaderNavItem
                 >
@@ -208,7 +210,7 @@
 
         {#if currentMenu?.type === 'dropdown'}
           <div class="menu-content" style:padding-bottom="1.75rem">
-            {#each currentMenu.entries as entry}
+            {#each currentMenu.entries as entry (entry.href)}
               <HeaderNavItem href={entry.href} on:navigate={() => (openMenu = null)}>
                 {entry.title}
               </HeaderNavItem>

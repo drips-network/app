@@ -81,6 +81,9 @@
     onamountchange={(newValue) => {
       amount = newValue;
     }}
+    oninputvaluechange={(newValue) => {
+      $context.amountValue = newValue;
+    }}
     bind:validationState
   />
   <SafeAppDisclaimer disclaimerType="drips" />

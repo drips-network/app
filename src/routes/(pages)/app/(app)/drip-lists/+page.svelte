@@ -103,13 +103,6 @@
     header={{
       icon: DripListIcon,
       label: 'Recently created Drip Lists',
-      actions: [
-        {
-          label: 'See all Drip Lists',
-          href: '/app/drip-lists/all',
-          icon: DripListIcon,
-        },
-      ],
     }}
     skeleton={{
       loaded: true,
