@@ -6,12 +6,10 @@ export interface TopUpFlowState {
   tokenBalance?: bigint;
   autoWrap?: boolean;
   autoWrapPair?: import('$lib/stores/wallet/network').AutoUnwrapPair;
-  amountValue: string;
   amountToTopUp?: bigint;
 }
 
 export default (tokenAddress: string | undefined) =>
   writable<TopUpFlowState>({
     tokenAddress,
-    amountValue: '',
   });

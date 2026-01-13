@@ -81,9 +81,6 @@
     onamountchange={(newValue) => {
       amount = newValue;
     }}
-    oninputvaluechange={(newValue) => {
-      $context.amountValue = newValue;
-    }}
     bind:validationState
   />
   <SafeAppDisclaimer disclaimerType="drips" />
@@ -93,8 +90,13 @@
         onclick={() => {
           context.set({
             tokenAddress: undefined,
-            amountValue: '',
+            tokenBalance: undefined,
+            tokenAllowance: undefined,
+            autoWrap: false,
           });
+
+          amount = undefined;
+
           dispatch('goBackward');
         }}
         variant="ghost"
