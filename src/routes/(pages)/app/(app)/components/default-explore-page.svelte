@@ -20,16 +20,15 @@
   import LatestNewsSection from './latest-news-section.svelte';
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
-  import ClaimYourProjectCard from './claim-your-project-card.svelte';
   import ProjectsGrid from './projects-grid.svelte';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
   import type { ADripListFragment } from '../drip-lists/components/__generated__/gql.generated';
   import FeatureCard from './feature-card.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowUpRight from '$lib/components/icons/ArrowUpRight.svelte';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
+  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
 
   interface Props {
     projects: DefaultExplorePageFeaturedProjectFragment[];
@@ -85,41 +84,26 @@
 </script>
 
 <div class="explore">
-  <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
-    <div
-      style:background-color="var(--color-primary-level-2)"
-      style:color="var(--color-primary-level-6)"
-      style:width="fit-content"
-      style:padding="0.25rem 0.5rem 0.25rem 0.35rem"
-      style:border-radius="2rem 0 2rem 2rem"
-      style:display="flex"
-      style:align-items="center"
-      style:gap="0.5rem"
-      class="typo-header-5"
-    >
+  <FeatureCard imageUrl="/assets/wave/wave-hp.png">
+    <div class="highlight-badge typo-header-5">
       <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
-      LIVE NOW
+      NEW
     </div>
 
     <div>
-      <h2 style:margin-bottom="0.25rem">Filecoin RetroPGF-3 on Drips</h2>
+      <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
       <p>
-        Filecoin's largest RetroPGF round to date is now live on Drips' new end-to-end RetroPGF
-        platform.
+        With Drips Wave, open-source ecosystems run recurring one-week contribution sprints. During
+        these Waves, contributors receive Points, for which they earn rewards.
       </p>
     </div>
 
     {#snippet actions()}
       <Button
         variant="primary"
-        icon={ArrowUpRight}
-        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
-        target="_blank">Check it out</Button
-      >
-      <Button
-        icon={ArrowCounterClockwiseHeart}
-        href="https://www.drips.network/solutions/retro-pgf"
-        target="_blank">About RetroPGF on Drips</Button
+        icon={ArrowBoxUpRight}
+        href="https://www.drips.network/wave"
+        target="_blank">Open Drips Wave App</Button
       >
     {/snippet}
   </FeatureCard>
@@ -189,7 +173,34 @@
     </Section>
   {/if}
 
-  <ClaimYourProjectCard />
+  <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
+    <div class="highlight-badge typo-header-5">
+      <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
+      LIVE NOW
+    </div>
+
+    <div>
+      <h2 style:margin-bottom="0.25rem">Filecoin RetroPGF-3 on Drips</h2>
+      <p>
+        Filecoin's largest RetroPGF round to date is now live on Drips' new end-to-end RetroPGF
+        platform.
+      </p>
+    </div>
+
+    {#snippet actions()}
+      <Button
+        variant="primary"
+        icon={ArrowBoxUpRight}
+        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
+        target="_blank">Check it out</Button
+      >
+      <Button
+        icon={ArrowCounterClockwiseHeart}
+        href="https://www.drips.network/solutions/retro-pgf"
+        target="_blank">About RetroPGF on Drips</Button
+      >
+    {/snippet}
+  </FeatureCard>
 
   {#if featuredDripLists?.length > 0}
     <Section
@@ -279,6 +290,17 @@
   .stats .value-wrapper .header .explorer-icons a:focus-visible,
   .stats .value-wrapper .header .explorer-icons a:hover {
     opacity: 1;
+  }
+
+  .highlight-badge {
+    background-color: var(--color-primary-level-2);
+    color: var(--color-primary-level-6);
+    width: fit-content;
+    padding: 0.25rem 0.5rem 0.25rem 0.35rem;
+    border-radius: 2rem 0 2rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   @media (max-width: 1070px) {

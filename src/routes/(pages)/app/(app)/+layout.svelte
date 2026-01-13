@@ -22,6 +22,7 @@
   import { forceCollapsed } from '$lib/components/sidenav/sidenav-store';
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
+  import Wave from '$lib/components/icons/Wave.svelte';
 
   interface Props {
     data: LayoutData;
@@ -81,6 +82,13 @@
           href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
           description: 'Your stuff on Drips.',
           icon: User,
+        },
+        {
+          label: 'Wave',
+          href: 'https://www.drips.network/wave',
+          description: 'Join FOSS sprints and earn rewards.',
+          external: true,
+          icon: Wave,
         },
       ],
       (v) => v,
