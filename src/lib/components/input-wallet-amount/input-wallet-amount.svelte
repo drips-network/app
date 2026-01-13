@@ -21,6 +21,7 @@
     balanceSymbol?: string;
 
     onamountchange?: (value: bigint | undefined) => void;
+    oninputvaluechange?: (value: string) => void;
   }
 
   let {
@@ -36,6 +37,7 @@
     balanceSymbol,
 
     onamountchange,
+    oninputvaluechange,
   }: Props = $props();
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
   const shownName = $derived(displayTokenLabel ?? tokenInfo?.info.name ?? 'Unknown token');
@@ -79,6 +81,8 @@
     } else {
       validationState = { type: 'unvalidated' };
     }
+
+    oninputvaluechange?.(inputValue);
   });
 </script>
 

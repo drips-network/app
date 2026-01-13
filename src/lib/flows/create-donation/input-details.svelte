@@ -196,6 +196,9 @@
     ontokenaddresschange={(newAddress) => {
       $context.selectedTokenAddress = [newAddress];
     }}
+    onamountinputvaluechange={(newValue) => {
+      $context.amountInputValue = newValue;
+    }}
   />
 
   {#if amount && selectedToken}

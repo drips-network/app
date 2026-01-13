@@ -72,6 +72,7 @@
 
     onamountchange?: (newValue: bigint | undefined) => void;
     ontokenaddresschange?: (newAddress: string) => void;
+    onamountinputvaluechange?: (newValue: string) => void;
   }
 
   let {
@@ -81,6 +82,7 @@
 
     ontokenaddresschange,
     onamountchange,
+    onamountinputvaluechange,
   }: Props = $props();
 
   let selectedTokenAddress = $state<string[]>([]);
@@ -110,6 +112,9 @@
     tokenBalance={selectedTokenBalance}
     onamountchange={(newValue) => {
       onamountchange?.(newValue);
+    }}
+    oninputvaluechange={(newValue) => {
+      onamountinputvaluechange?.(newValue);
     }}
     bind:validationState={amountValidationState}
     loading={loadingToken}
