@@ -303,7 +303,7 @@
   .list-editor.with-outline .inner {
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1.5rem 0 1.5rem 1.5rem;
-    overflow: hidden;
+    overflow: scroll;
   }
 
   .action-row {
