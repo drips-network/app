@@ -27,7 +27,7 @@
   {/if}
   {#if verifiedBadge}
     <Tooltip>
-      <Registered style="fill: var(--color-primary-level-6)" />
+      <Registered style="fill: var(--color-primary)" />
 
       {#snippet tooltip_content()}
         Successfully verified their identity on Drips Wave
