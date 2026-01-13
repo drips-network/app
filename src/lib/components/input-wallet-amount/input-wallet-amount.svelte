@@ -14,27 +14,30 @@
     tokenAddress: string | undefined;
     tokenBalance: bigint | undefined;
     loading?: boolean;
-    inputValue: string;
     validationState?: TextInputValidationState;
-    amount?: bigint | undefined;
     displayTokenLabel?: string;
     displayTokenSymbol?: string;
     balanceSymbol?: string;
+
+    onamountchange?: (value: bigint | undefined) => void;
+    oninputvaluechange?: (value: string) => void;
   }
 
   let {
     tokenAddress,
     tokenBalance,
     loading = false,
-    inputValue = $bindable(),
     validationState = $bindable({
       type: 'unvalidated',
     }),
-    amount = $bindable(),
     displayTokenLabel,
     displayTokenSymbol,
     balanceSymbol,
+
+    onamountchange,
+    oninputvaluechange,
   }: Props = $props();
+
   let tokenInfo = $derived(tokenAddress ? tokens.getByAddress(tokenAddress) : undefined);
   const shownName = $derived(displayTokenLabel ?? tokenInfo?.info.name ?? 'Unknown token');
   const shownSymbol = $derived(displayTokenSymbol ?? tokenInfo?.info.symbol);
@@ -46,13 +49,17 @@
     }
   }
 
+  let inputValue = $state<string>('');
+
   $effect(() => {
     if (tokenBalance === undefined) {
       inputValue = '0';
     }
 
     if (tokenInfo?.info) {
-      amount = inputValue ? parseTokenAmount(inputValue, tokenInfo.info.decimals) : undefined;
+      const amount = inputValue ? parseTokenAmount(inputValue, tokenInfo.info.decimals) : undefined;
+
+      onamountchange?.(amount);
 
       if (amount) {
         if (tokenBalance && amount <= tokenBalance) {
@@ -73,6 +80,8 @@
     } else {
       validationState = { type: 'unvalidated' };
     }
+
+    oninputvaluechange?.(inputValue);
   });
 </script>
 

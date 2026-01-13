@@ -189,10 +189,16 @@
   />
   <OneTimeDonationEditor
     bind:formValid
-    bind:amountInputValue={$context.amountInputValue}
-    bind:selectedTokenAddress={$context.selectedTokenAddress}
-    bind:amount
     bind:selectedTokenAllowance
+    onamountchange={(newValue) => {
+      amount = newValue;
+    }}
+    ontokenaddresschange={(newAddress) => {
+      $context.selectedTokenAddress = [newAddress];
+    }}
+    onamountinputvaluechange={(newValue) => {
+      $context.amountInputValue = newValue;
+    }}
   />
 
   {#if amount && selectedToken}
@@ -236,7 +242,7 @@
                   class="typo-text-bold"
                   >{nextSettlementDate === 'daily'
                     ? 'today'
-                    : formatDate(nextSettlementDate())}</span
+                    : formatDate(nextSettlementDate(), 'onlyDay')}</span
                 >.
               </WhatsNextItem>
             {/if}
