@@ -120,4 +120,15 @@
   .links a {
     text-decoration: underline;
   }
+
+  @media (max-width: 600px) {
+    .content.fullscreen {
+      max-width: 100vw;
+    }
+
+    .content {
+      border-radius: none;
+      box-shadow: none;
+    }
+  }
 </style>
