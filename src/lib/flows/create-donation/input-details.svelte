@@ -189,10 +189,13 @@
   />
   <OneTimeDonationEditor
     bind:formValid
-    bind:amountInputValue={$context.amountInputValue}
-    bind:selectedTokenAddress={$context.selectedTokenAddress}
-    bind:amount
     bind:selectedTokenAllowance
+    onamountchange={(newValue) => {
+      amount = newValue;
+    }}
+    ontokenaddresschange={(newAddress) => {
+      $context.selectedTokenAddress = [newAddress];
+    }}
   />
 
   {#if amount && selectedToken}
@@ -232,11 +235,11 @@
                 <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
               </WhatsNextItem>
               <WhatsNextItem icon={CalendarIcon}>
-                The next date that accumulated funds will be distributed is <span
+                The next date that accumulated funds will be distributed on is <span
                   class="typo-text-bold"
                   >{nextSettlementDate === 'daily'
                     ? 'today'
-                    : formatDate(nextSettlementDate())}</span
+                    : formatDate(nextSettlementDate(), 'onlyDay')}</span
                 >.
               </WhatsNextItem>
             {/if}

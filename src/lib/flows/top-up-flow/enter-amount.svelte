@@ -78,8 +78,9 @@
     displayTokenLabel={displayLabel}
     displayTokenSymbol={displaySymbol}
     balanceSymbol={displaySymbol}
-    bind:inputValue={$context.amountValue}
-    bind:amount
+    onamountchange={(newValue) => {
+      amount = newValue;
+    }}
     bind:validationState
   />
   <SafeAppDisclaimer disclaimerType="drips" />

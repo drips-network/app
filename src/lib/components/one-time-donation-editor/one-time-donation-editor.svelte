@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import walletStore from '$lib/stores/wallet/wallet.store';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import FormField from '../form-field/form-field.svelte';
@@ -45,9 +43,8 @@
   let loadingToken = $state(false);
 
   let prevTokenAddress: string | undefined;
-  async function getSelectedTokenBalance() {
-    const tokenAddress = selectedTokenAddress[0];
 
+  async function getSelectedTokenBalance(tokenAddress: string | undefined = undefined) {
     if (tokenAddress === prevTokenAddress) return;
     if (!tokenAddress) return;
 
@@ -69,29 +66,26 @@
   }
 
   interface Props {
-    selectedTokenAddress?: string[];
-    // Amount input
-    amountInputValue: string;
-    amount?: bigint | undefined;
     selectedTokenBalance?: bigint | undefined;
     selectedTokenAllowance?: bigint | undefined;
     formValid: boolean;
+
+    onamountchange?: (newValue: bigint | undefined) => void;
+    ontokenaddresschange?: (newAddress: string) => void;
   }
 
   let {
-    selectedTokenAddress = $bindable([]),
-    amountInputValue = $bindable(),
-    amount = $bindable(),
     selectedTokenBalance = $bindable(),
     selectedTokenAllowance = $bindable(),
     formValid = $bindable(),
+
+    ontokenaddresschange,
+    onamountchange,
   }: Props = $props();
 
-  run(() => {
-    selectedTokenAddress;
-    getSelectedTokenBalance();
-  });
-  run(() => {
+  let selectedTokenAddress = $state<string[]>([]);
+
+  $effect(() => {
     formValid = amountValidationState.type === 'valid';
   });
 </script>
@@ -99,10 +93,14 @@
 <FormField title="Token*">
   <div class="list-container">
     <ListSelect
-      bind:selected={selectedTokenAddress}
       searchable={true}
       items={tokenList}
       type="tokens"
+      onchange={(newSelected) => {
+        selectedTokenAddress = newSelected;
+        getSelectedTokenBalance(selectedTokenAddress[0]);
+        ontokenaddresschange?.(selectedTokenAddress[0]);
+      }}
     />
   </div>
 </FormField>
@@ -110,8 +108,9 @@
   <InputWalletAmount
     tokenAddress={selectedTokenAddress[0]}
     tokenBalance={selectedTokenBalance}
-    bind:inputValue={amountInputValue}
-    bind:amount
+    onamountchange={(newValue) => {
+      onamountchange?.(newValue);
+    }}
     bind:validationState={amountValidationState}
     loading={loadingToken}
   />
