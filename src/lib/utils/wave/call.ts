@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
 import getOptionalEnvVarPublic from '../get-optional-env-var/public';
-import { getAccessJwt, getRefreshedAuthToken } from './auth';
+import { getRefreshedAuthToken } from './auth';
 
 const PUBLIC_WAVE_API_URL = getOptionalEnvVarPublic(
   'PUBLIC_WAVE_API_URL',
@@ -41,14 +41,11 @@ export async function authenticatedCall(
     throw new Error('Wave API URL is not configured.');
   }
 
-  const accessToken = getAccessJwt();
-
   const res = await f(`${WAVE_API_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: accessToken ? `Bearer ${accessToken}` : '',
       ...(options.headers || {}),
     },
   });
