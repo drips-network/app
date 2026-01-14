@@ -7,9 +7,11 @@ export const load = async ({ url, parent }) => {
   const backTo = url.searchParams.get('backTo');
   const decodedBackTo = decodeURIComponent(backTo || '');
 
-  if (backTo && user) {
-    const isSafe = isSafePath(decodedBackTo);
+  // Validate to prevent open redirect attacks
+  const isSafe = isSafePath(decodedBackTo);
+  const safeBackTo = isSafe ? decodedBackTo : '';
 
+  if (backTo && user) {
     if (isSafe) redirect(301, decodedBackTo);
   } else if (user) {
     redirect(301, '/wave');
@@ -18,7 +20,7 @@ export const load = async ({ url, parent }) => {
   const skipWelcome = url.searchParams.get('skipWelcome') === 'true';
 
   return {
-    backTo: decodedBackTo,
+    backTo: safeBackTo,
     skipWelcome,
   };
 };

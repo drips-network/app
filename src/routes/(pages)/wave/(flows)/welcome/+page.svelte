@@ -2,11 +2,11 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import FlowStepWrapper from '../shared/flow-step-wrapper.svelte';
-  import Wallet from '$lib/components/icons/Wallet.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import User from '$lib/components/icons/User.svelte';
 
   let { data } = $props();
 </script>
@@ -18,11 +18,11 @@
     <div class="next-steps">
       <div class="option">
         <div class="icon">
-          <Wallet style="fill: var(--color-primary)" />
+          <User style="fill: var(--color-primary)" />
         </div>
 
-        <p>Add payment information to be eligible for rewards.</p>
-        <Button href="/wave/settings/identity-and-payments">Payment settings</Button>
+        <p>Verify your identity to be eligible for rewards.</p>
+        <Button href="/wave/settings/identity-and-payments">Identity settings</Button>
       </div>
 
       <div class="option">
@@ -56,6 +56,19 @@
       </Button>
     </div>
   </Card>
+
+  <p
+    class="typo-text-small"
+    style:margin-top="1.5rem"
+    style:color="var(--color-foreground-level-6)"
+  >
+    By using Drips Wave, you agree to the <a
+      class="typo-link"
+      target="_blank"
+      href="https://docs.drips.network/wave/terms-and-rules">Terms of Service</a
+    >
+    and <a class="typo-link" target="_blank" href="/legal/privacy">Privacy Policy</a>.
+  </p>
 
   {#snippet actions()}
     <Button icon={ArrowRight} href={data.backTo}>Continue</Button>
