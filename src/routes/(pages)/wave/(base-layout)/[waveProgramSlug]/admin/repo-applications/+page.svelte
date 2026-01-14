@@ -75,7 +75,8 @@
       empty: pendingRepoApplications.pagination.total === 0,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No pending applications',
-      emptyStateText: 'There are no repos waiting for review in this Wave program.',
+      emptyStateText:
+        'There are no repos waiting for review in this Wave program or you are not authorized to view them.',
     }}
   >
     <div class="list">

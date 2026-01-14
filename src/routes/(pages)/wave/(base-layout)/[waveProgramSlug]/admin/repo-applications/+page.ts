@@ -1,9 +1,14 @@
 import { getPendingWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
+import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ parent, fetch, depends }) => {
   depends('wave:admin:repo-applications');
 
-  const { waveProgram } = await parent();
+  const { waveProgram, user } = await parent();
+
+  if (!user) {
+    throw redirect(302, `/wave/login?backTo=/wave/${waveProgram.slug}/admin/repo-applications`);
+  }
 
   try {
     const pendingRepoApplications = await getPendingWaveProgramRepos(fetch, waveProgram.id, {
