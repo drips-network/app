@@ -13,7 +13,13 @@
 <div class="mobile-nav-overflow">
   {#each items as item (item.href)}
     {@const active = page.url.pathname === item.href}
-    <a class="item" href={item.href} class:active onclick={() => cupertinoPaneStore.closeSheet()}>
+    <a
+      target={item.external ? '_blank' : '_self'}
+      class="item"
+      href={item.href}
+      class:active
+      onclick={() => cupertinoPaneStore.closeSheet()}
+    >
       <item.icon
         style="fill: {active ? 'var(--color-primary-level-6)' : 'var(--color-foreground)'}"
       />

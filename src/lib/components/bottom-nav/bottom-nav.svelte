@@ -70,6 +70,7 @@
         class:active={page.url.pathname === item.href}
         bind:this={itemElems[item.href]}
         href={item.href}
+        target={item.external ? '_blank' : '_self'}
       >
         <item.icon
           style="{page.url.pathname === item.href
