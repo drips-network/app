@@ -80,8 +80,8 @@
 
 <FlowStepWrapper
   headline="Pick repos to apply"
-  description="Choose which repos you’d like to apply to {data.waveProgram
-    .name}. They must match the criteria set for the Wave Program in order to be eligible."
+  description="Choose which repos you’d like to apply to the {data.waveProgram
+    .name} Wave Program. They must match the criteria set for the Wave Program in order to be eligible."
 >
   <Card style="padding: 0; text-align: left; width: 100%;">
     <ListSelect multiselect {items} bind:selected />
@@ -94,8 +94,9 @@
   {/snippet}
 
   <AnnotationBox type="info">
-    After you apply, we'll email you when your repos have been accepted into {data.waveProgram
-      .name}. You can always check on the status of your applications on the maintainer dashboard.
+    After you apply, we'll email you when your repos have been accepted into the {data.waveProgram
+      .name} Wave Program. You can always check on the status of your applications on the maintainer
+    dashboard.
   </AnnotationBox>
 
   {#snippet actions()}

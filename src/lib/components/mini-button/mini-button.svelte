@@ -65,6 +65,7 @@
   }
 
   button:hover,
+  button:focus-visible,
   button.open {
     background: var(--color-foreground-level-2);
   }

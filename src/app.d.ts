@@ -26,7 +26,7 @@ declare namespace App {
   }
 
   interface Locals {
-    newWaveAccessToken?: string;
+    waveAccessToken?: string;
     waveRefreshToken?: string;
   }
 

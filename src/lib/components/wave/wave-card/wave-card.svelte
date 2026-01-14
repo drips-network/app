@@ -78,12 +78,12 @@
       {#if status === 'active' || status === 'upcoming'}
         <div class="action">
           <Button
-            variant="primary"
+            variant={status === 'active' ? 'primary' : 'normal'}
             icon={Ledger}
             size="large"
             href="/wave/{waveProgram.slug}/issues"
           >
-            {status === 'active' ? 'Start contributing' : 'View issues'}
+            {status === 'active' ? 'Start contributing' : 'Preview issues'}
           </Button>
         </div>
       {/if}

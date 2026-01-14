@@ -1,4 +1,4 @@
-import { redeemGitHubOAuthCode, setAccessJwt } from '$lib/utils/wave/auth';
+import { redeemGitHubOAuthCode } from '$lib/utils/wave/auth';
 import { error } from '@sveltejs/kit';
 
 export default async function performLogin(url: URL) {
@@ -11,13 +11,12 @@ export default async function performLogin(url: URL) {
   }
 
   // exchange for wave login
+  // this sets wave_refresh_token and wave_access_token cookies via the API response
   const { accessToken, newUser } = await redeemGitHubOAuthCode(code, state);
 
   if (!accessToken) {
     throw error(401, 'Failed to exchange GitHub OAuth code for access token');
   }
-
-  setAccessJwt(accessToken);
 
   return { accessToken, newUser };
 }

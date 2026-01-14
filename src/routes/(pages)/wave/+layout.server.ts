@@ -8,6 +8,6 @@ export const load = async ({ locals }) => {
   }
 
   return {
-    newWaveAccessToken: locals.newWaveAccessToken ?? null,
+    waveAccessToken: locals.waveAccessToken ?? null,
   };
 };

@@ -1,10 +1,10 @@
-import { browser } from '$app/environment';
 import z from 'zod';
 import { authenticatedCall, call } from './call';
 import { jwtDecode } from 'jwt-decode';
 import type { WaveUser } from './types/user';
 import parseRes from './utils/parse-res';
 import { invalidateAll } from '$app/navigation';
+import { browser } from '$app/environment';
 
 const accessClaimJwtSchema = z.object({
   iss: z.literal('drips-wave'),
@@ -34,6 +34,14 @@ export type WaveLoggedInUser = WaveUser & {
   signUpDate: Date;
 };
 
+export function getAccessTokenCookieClientSide(): string | null {
+  if (!browser) return null;
+  const match = document.cookie.match(new RegExp('(^| )wave_access_token=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+const EXPIRY_BUFFER_SECONDS = 30; // Refresh if expiring within 30 seconds
+
 export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   if (!jwt) {
     return null;
@@ -50,7 +58,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   const { data: content } = parsed;
 
   const now = Math.floor(Date.now() / 1000);
-  if (content.exp < now) {
+  if (content.exp < now + EXPIRY_BUFFER_SECONDS) {
     return null;
   }
 
@@ -67,23 +75,6 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   };
 }
 
-export function setAccessJwt(token: string | null) {
-  if (browser) {
-    localStorage.setItem('waveAccessJwt', token ?? '');
-  }
-}
-
-export function getAccessJwt() {
-  if (browser) {
-    return z
-      .string()
-      .nullable()
-      .parse(localStorage.getItem('waveAccessJwt') || null);
-  } else {
-    return null;
-  }
-}
-
 export async function getRefreshedAuthToken(manualCookie?: string) {
   try {
     const res = await call('/api/auth/token/refresh', {
@@ -98,7 +89,6 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
       })
       .parse(res);
 
-    setAccessJwt(data.accessToken);
     return data.accessToken;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -128,8 +118,6 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
     })
     .parse(res);
 
-  setAccessJwt(data.accessToken);
-
   return data;
 }
 
@@ -138,8 +126,6 @@ export async function logOut() {
     method: 'POST',
     credentials: 'include',
   });
-
-  setAccessJwt(null);
 }
 
 export async function getIntercomJwt() {

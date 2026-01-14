@@ -1,20 +1,21 @@
 import { browser } from '$app/environment';
-import { getUserData, setAccessJwt } from '$lib/utils/wave/auth.js';
+import { getAccessTokenCookieClientSide, getUserData } from '$lib/utils/wave/auth.js';
 
 export const load = async ({ depends, data }) => {
   depends('wave:user');
 
-  let accessToken: string | null;
+  let accessTokenCookieValue: string | null = null;
 
   if (browser) {
-    // set the new login. if there is none, it means the user is logged out (e.g. expired refresh token)
-
-    setAccessJwt(data.newWaveAccessToken);
-    accessToken = data.newWaveAccessToken;
+    // access token is in cookies on client
+    accessTokenCookieValue = getAccessTokenCookieClientSide();
   } else {
     // on server, just read from locals
-    accessToken = data.newWaveAccessToken ?? null;
+    accessTokenCookieValue = data.waveAccessToken ?? null;
   }
+
+  // parse out the token
+  const accessToken = accessTokenCookieValue ? decodeURIComponent(accessTokenCookieValue) : null;
 
   const userData = getUserData(accessToken);
 
