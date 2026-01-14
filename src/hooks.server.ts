@@ -51,8 +51,6 @@ export const handle = async ({ event, resolve }) => {
             })
             .parse(await res.json());
 
-          console.log('Wave access token refreshed');
-
           event.locals.waveRefreshToken = refreshToken;
           event.locals.waveAccessToken = data.accessToken;
 
