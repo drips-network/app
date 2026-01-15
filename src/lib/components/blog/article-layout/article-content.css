@@ -3,7 +3,7 @@
 }
 
 #blog-article-content p:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 #blog-article-content h1:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
@@ -15,8 +15,17 @@
 
 #blog-article-content h2:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
   font-size: 19px;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
   line-height: 2rem;
+}
+
+#blog-article-content h3:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.75rem;
 }
 
 #blog-article-content ol:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
