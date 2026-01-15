@@ -334,7 +334,7 @@
   }
 
   .description {
-    min-height: 2.5rem;
+    min-height: 2lh;
     color: var(--color-foreground-level-6);
   }
 
