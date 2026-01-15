@@ -29,6 +29,6 @@
   icon={Github}
   variant={primary ? 'primary' : undefined}
   href="{WAVE_API_URL}/api/auth/oauth/github/login{backTo
-    ? `?backTo=${encodeURIComponent(backTo)}&skipWelcome=${skipWelcome}&ref=${attributionRefParam ?? ''}`
+    ? `?backTo=${encodeURIComponent(backTo)}&skipWelcome=${skipWelcome}${attributionRefParam ? `&ref=${encodeURIComponent(attributionRefParam)}` : ''}`
     : ''}">{wordy ? 'Log in with GitHub' : 'Log in'}</Button
 >
