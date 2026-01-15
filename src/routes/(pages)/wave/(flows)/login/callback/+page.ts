@@ -1,13 +1,11 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import performLogin from './perform-login.js';
 import z from 'zod';
 import isSafePath from '$lib/utils/safe-path';
 
 export const load = async ({ url }) => {
-  const { newUser } = await performLogin(url);
+  // decode the state parameter, a base64 encoded JSON string
 
-  // state param is a base 64 encoded JSON string
   let decodedState: string | null = null;
   let stateJson: unknown = null;
 
@@ -37,11 +35,10 @@ export const load = async ({ url }) => {
   // Validate backTo to prevent open redirect attacks
   const safeBackTo = backTo && isSafePath(backTo) ? backTo : '';
 
-  if (newUser && !skipWelcome) {
-    return redirect(302, `/wave/welcome?backTo=${encodeURIComponent(safeBackTo)}`);
-  }
-
-  return redirect(302, `/wave/login?backTo=${encodeURIComponent(safeBackTo)}`);
+  return {
+    backTo: safeBackTo,
+    skipWelcome: skipWelcome || false,
+  };
 };
 
 export const ssr = false;
