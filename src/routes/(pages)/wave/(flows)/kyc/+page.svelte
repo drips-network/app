@@ -1,17 +1,13 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
-  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import themeStore from '$lib/stores/theme/theme.store.js';
   import { getSumsubSessionToken } from '$lib/utils/wave/kyc.js';
   import snsWebSdk, { type SnsWebSdk } from '@sumsub/websdk';
   import { onDestroy, onMount } from 'svelte';
 
   let { data } = $props();
-  let { sumsubSessionToken, user } = $derived(data);
 
   let snsWebSdkInstance: SnsWebSdk | null = null;
 
@@ -34,30 +30,14 @@
     snsWebSdkInstance.launch('#sumsub-target');
   }
 
-  onMount(() => (sumsubSessionToken ? launchWebSdk(sumsubSessionToken) : null));
+  onMount(() => launchWebSdk(data.sumsubToken));
   onDestroy(() => snsWebSdkInstance?.destroy());
 </script>
 
 <HeadMeta title="Identity verification | Wave" />
 
 <div class="wrapper">
-  {#if sumsubSessionToken}
-    <div id="sumsub-target"></div>
-  {:else}
-    <div class="already-done">
-      Your documents have been successfully submitted. No further action is required at this time.
-
-      <AnnotationBox type="info">
-        We'll send email updates to {user.email} when your identity verification status changes.
-      </AnnotationBox>
-
-      <div>
-        <Button href="/wave/settings/identity-and-payments" icon={ArrowRight}
-          >Review KYC Status</Button
-        >
-      </div>
-    </div>
-  {/if}
+  <div id="sumsub-target"></div>
 </div>
 
 <style>
@@ -76,13 +56,5 @@
     border-radius: 1rem;
     overflow: hidden;
     padding: 2rem;
-  }
-
-  .already-done {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 32rem;
-    text-align: center;
   }
 </style>

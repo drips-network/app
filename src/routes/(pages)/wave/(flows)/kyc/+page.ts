@@ -1,4 +1,4 @@
-import { getKycStatus, getSumsubSessionToken } from '$lib/utils/wave/kyc.js';
+import { getSumsubSessionToken } from '$lib/utils/wave/kyc.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ parent, fetch }) => {
@@ -8,21 +8,10 @@ export const load = async ({ parent, fetch }) => {
     throw redirect(302, '/wave/login?backTo=/wave/kyc');
   }
 
-  const kycStatus = await getKycStatus(fetch);
+  const sumsubTokenRes = await getSumsubSessionToken(fetch);
 
-  if (kycStatus.status === 'applicantCreated' || kycStatus.status === 'pending') {
-    const sumsubSessionToken = (await getSumsubSessionToken(fetch)).accessToken;
-
-    return {
-      user,
-      kycStatus,
-      waveFullscreenFlow: true,
-      sumsubSessionToken,
-    };
-  } else {
-    return {
-      user,
-      kycStatus,
-    };
-  }
+  return {
+    sumsubToken: sumsubTokenRes.accessToken,
+    waveFullscreenFlow: true,
+  };
 };
