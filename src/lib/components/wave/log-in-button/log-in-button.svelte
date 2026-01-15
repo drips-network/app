@@ -16,12 +16,19 @@
     true,
     'Wave functionality will not work.',
   );
+
+  /**
+   * Attribution ref param from the URL, if any
+   * These are created by admins and used to track signups from specific
+   * campaigns / communities etc.
+   */
+  let attributionRefParam = page.url.searchParams.get('ref');
 </script>
 
 <Button
   icon={Github}
   variant={primary ? 'primary' : undefined}
   href="{WAVE_API_URL}/api/auth/oauth/github/login{backTo
-    ? `?backTo=${encodeURIComponent(backTo)}&skipWelcome=${skipWelcome}`
+    ? `?backTo=${encodeURIComponent(backTo)}&skipWelcome=${skipWelcome}${attributionRefParam ? `&ref=${encodeURIComponent(attributionRefParam)}` : ''}`
     : ''}">{wordy ? 'Log in with GitHub' : 'Log in'}</Button
 >
