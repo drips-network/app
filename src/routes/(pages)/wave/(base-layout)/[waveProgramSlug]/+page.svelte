@@ -98,7 +98,7 @@
   {#if waveProgram.longDescription}
     <div class="description">
       <ExpandableText>
-        <Markdown content={waveProgram.longDescription} />
+        <Markdown useExternalRoute={false} content={waveProgram.longDescription} />
       </ExpandableText>
     </div>
   {/if}

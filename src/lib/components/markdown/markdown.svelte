@@ -7,17 +7,25 @@
 
   interface Props {
     content: string;
+    useExternalRoute?: boolean;
     lineClamp?: number;
   }
 
-  let { content, lineClamp }: Props = $props();
+  let { content, lineClamp, useExternalRoute = true }: Props = $props();
 
   marked.use({
     renderer: {
       link({ href, text }) {
-        const sameDomain =
-          browser && new URL(href, window.location.href).origin === window.location.origin;
-        const url = sameDomain ? href : buildExternalUrl(href);
+        const isDripsDomain = (url: string) => {
+          try {
+            const parsedUrl = new URL(url, browser ? window.location.origin : undefined);
+            return parsedUrl.hostname.endsWith('drips.network');
+          } catch {
+            return false;
+          }
+        };
+
+        const url = isDripsDomain(href) || !useExternalRoute ? href : buildExternalUrl(href);
 
         return `<a href="${url}" target="_blank" rel="noreferrer">${text}</a>`;
       },
