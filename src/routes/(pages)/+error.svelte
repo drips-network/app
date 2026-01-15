@@ -13,7 +13,7 @@
         break;
       }
       case 500: {
-        description = 'Something went wrong on our end.';
+        description = page.error?.message || 'Something went wrong on our end.';
         break;
       }
       default: {

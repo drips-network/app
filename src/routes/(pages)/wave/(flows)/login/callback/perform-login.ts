@@ -10,13 +10,17 @@ export default async function performLogin(url: URL) {
     throw error(400, 'Missing code or state in callback URL');
   }
 
-  // exchange for wave login
-  // this sets wave_refresh_token and wave_access_token cookies via the API response
-  const { accessToken, newUser } = await redeemGitHubOAuthCode(code, state);
+  try {
+    // exchange for wave login
+    // this sets wave_refresh_token and wave_access_token cookies via the API response
+    const { accessToken, newUser } = await redeemGitHubOAuthCode(code, state);
 
-  if (!accessToken) {
-    throw error(401, 'Failed to exchange GitHub OAuth code for access token');
+    if (!accessToken) {
+      throw error(401, 'Failed to exchange GitHub OAuth code for access token');
+    }
+
+    return { accessToken, newUser };
+  } catch {
+    throw error(500, 'GitHub OAuth exchange failed. GitHub may be experiencing issues.');
   }
-
-  return { accessToken, newUser };
 }
