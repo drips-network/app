@@ -9,7 +9,7 @@
 
 <HeadMeta
   title="Kick off your Wave with a boost"
-  description="Join the Drips Discord, submit the form before January 11th, 2026, and receive 100 Points after you participate in the first Wave early next year."
+  description="Earn 100 bonus points by sharing the official 'I'm joining Stellar Wave 1' GIF on social media and participating in Stellar Wave 1."
 />
 
 <div class="page">
