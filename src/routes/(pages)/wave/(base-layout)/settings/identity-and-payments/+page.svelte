@@ -35,9 +35,8 @@
     >
       <CrossCircle style="fill: var(--color-negative-level-6);" />
       <div class="description">
-        Your identity couldn't be verified. Please contact support for assistance.
+        Your identity couldn't be verified. Reach out to <a href="/wave/support">support</a> for assistance.
       </div>
-      <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
     </div>
   {:else if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'RED' && kycStatus.canRetry}
     <div
@@ -45,7 +44,9 @@
       style="color: var(--color-caution-level-6); background-color: var(--color-caution-level-1);"
     >
       <ExclamationCircle style="fill: var(--color-caution-level-6);" />
-      <div class="description">Your identity couldn't be verified. Please try again.</div>
+      <div class="description">
+        Please re-submit key documents to complete identity verification.
+      </div>
       <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
     </div>
   {:else if !kycStatus.status || kycStatus.status === 'pending' || kycStatus.status === 'applicantReset' || kycStatus.status === 'applicantCreated'}
