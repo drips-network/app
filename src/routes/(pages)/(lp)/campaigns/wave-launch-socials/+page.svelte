@@ -18,6 +18,7 @@
       <h1 class="pixelated">Kick off your Wave with a boost</h1>
 
       <Markdown
+        useExternalRoute={false}
         content={`
 ## Let’s Make Some Waves: Stellar Wave 1 Social Bonus
 
