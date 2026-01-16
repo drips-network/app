@@ -58,6 +58,7 @@
   let repos = $state(initialRepos.data);
   // svelte-ignore state_referenced_locally
   let pagination = $state(initialRepos.pagination);
+  let isLoadingMore = $state(false);
 
   // when initialRepos changes, reset repos and pagination
   $effect(() => {
@@ -73,7 +74,11 @@
   }
 
   async function getMoreRepos() {
-    if (pagination.hasNextPage) {
+    if (isLoadingMore || !pagination.hasNextPage) return;
+
+    isLoadingMore = true;
+
+    try {
       const nextPage = pagination.page + 1;
       const newRepos = await getWaveProgramRepos(
         undefined,
@@ -89,11 +94,13 @@
       pagination = newRepos.pagination;
 
       // retrigger if still in viewport
-      setTimeout(() => {
-        if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem)) {
+      if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem) && pagination.hasNextPage) {
+        setTimeout(() => {
           getMoreRepos();
-        }
-      }, 200);
+        }, 200);
+      }
+    } finally {
+      isLoadingMore = false;
     }
   }
 
