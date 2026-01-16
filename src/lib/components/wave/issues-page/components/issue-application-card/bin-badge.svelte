@@ -16,23 +16,19 @@
     bad: ['var(--color-caution-level-6)', 'var(--color-caution-level-1)'],
   } as const;
 
-  // reserveMetric means that lower is better (e.g. merge latency)
-  const GOOD_BINS = (reverseMetric: boolean) =>
-    reverseMetric ? ['Low', 'Very Low'] : ['Exceptional', 'Very High', 'High'];
+  // lowerIsBetter means that lower values are better (e.g. merge latency)
+  const GOOD_BINS = (lowerIsBetter: boolean) =>
+    lowerIsBetter ? ['Low', 'Very Low'] : ['Extremely High', 'Very High', 'High'];
   const MID_BINS = ['Medium'];
-  const BAD_BINS = (reverseMetric: boolean) =>
-    reverseMetric ? ['Exceptional', 'Very High', 'High'] : ['Low', 'Very Low'];
+  const BAD_BINS = (lowerIsBetter: boolean) =>
+    lowerIsBetter ? ['Extremely High', 'Very High', 'High'] : ['Low', 'Very Low'];
 
-  const reverseMetricKeys = new Set<string>(['avg_merge_latency_hours', 'pr_drop_rate']);
-
-  function getBinColors(bin: string | undefined, key: string): readonly [string, string] {
-    const reverse = reverseMetricKeys.has(key);
-
-    if (bin && GOOD_BINS(reverse).includes(bin)) {
+  function getBinColors(bin: string | undefined, lowerIsBetter: boolean): readonly [string, string] {
+    if (bin && GOOD_BINS(lowerIsBetter).includes(bin)) {
       return BIN_COLOR_MAP['good'];
     } else if (bin && MID_BINS.includes(bin)) {
       return BIN_COLOR_MAP['mid'];
-    } else if (bin && BAD_BINS(reverse).includes(bin)) {
+    } else if (bin && BAD_BINS(lowerIsBetter).includes(bin)) {
       return BIN_COLOR_MAP['bad'];
     } else {
       return ['', ''];
@@ -52,9 +48,11 @@
       Unknown
     </div>
   {:else if metrics}
-    {@const bin = metrics?.metrics[key]?.bin}
+    {@const metric = metrics?.metrics[key]}
+    {@const bin = metric?.bin}
     {#if bin}
-      {@const [textColor, bgColor] = getBinColors(bin, key)}
+      {@const lowerIsBetter = metric?.lower_is_better ?? false}
+      {@const [textColor, bgColor] = getBinColors(bin, lowerIsBetter)}
       <div
         in:fade={{ duration: 200 }}
         class="typo-text-small bin-badge"
