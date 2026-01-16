@@ -403,14 +403,6 @@
           {/if}
         </div>
       {/if}
-
-      <div class="sidebar-section">
-        <div class="content">
-          <h5>Details</h5>
-
-          <p style:color="var(--color-foreground-level-5)">todo(wave): display some deets</p>
-        </div>
-      </div>
     </Card>
   </div>
 </div>
