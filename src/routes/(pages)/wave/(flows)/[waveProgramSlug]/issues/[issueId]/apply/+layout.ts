@@ -6,13 +6,21 @@ export const load = async ({ fetch, params, parent }) => {
 
   const { issueId } = params;
 
-  const [waves] = await Promise.all([
+  const [waves, upcomingWaves] = await Promise.all([
     getWaves(
       fetch,
       waveProgram.id,
       {},
       {
         status: 'active',
+      },
+    ),
+    getWaves(
+      fetch,
+      waveProgram.id,
+      { limit: 1 },
+      {
+        status: 'upcoming',
       },
     ),
   ]);
@@ -26,8 +34,11 @@ export const load = async ({ fetch, params, parent }) => {
   );
   const alreadyApplied = previousApplication.pagination.total > 0;
 
+  const upcomingWave = upcomingWaves.data[0] ?? null;
+
   return {
     waves,
     alreadyApplied,
+    upcomingWave,
   };
 };

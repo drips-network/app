@@ -12,6 +12,9 @@
   import type { Snapshot } from './$types.js';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import Email from '$lib/components/icons/Email.svelte';
+  import Discord from '$lib/components/icons/Discord.svelte';
 
   let { data } = $props();
 
@@ -111,10 +114,26 @@
       </div>
     </FormField>
   {:else}
-    <!-- TODO(wave): nicer styling, info about upcoming Wave -->
     <AnnotationBox>
-      {data.waveProgram.name} does not have an active Wave at the moment, so applications cannot be submitted.
-      Please check back later!
+      {data.waveProgram.name} does not have an active Wave at the moment, so applications cannot be submitted.<br
+      />
+      {#if data.upcomingWave}
+        The <a class="typo-link" href="/wave/{data.waveProgram.slug}"
+          >next {data.waveProgram.name} Wave</a
+        >
+        starts on {formatDate(data.upcomingWave.startDate, 'onlyDay')}. Subscribe to our newsletter
+        and join our Discord to be notified when it goes live!
+      {:else}
+        Consider subscribing to our newsletter and joining our Discord for announcements about
+        upcoming Waves.
+      {/if}
+
+      {#snippet actions()}
+        <Button icon={Email} href="/wave/newsletter">Subscribe to newsletter</Button>
+        <Button icon={Discord} href="https://discord.gg/t8XBXZAEs5" target="_blank"
+          >Join our Discord</Button
+        >
+      {/snippet}
     </AnnotationBox>
   {/if}
 
