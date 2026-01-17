@@ -9,7 +9,7 @@ export const load = async ({ parent, fetch, url }) => {
     throw redirect(302, '/wave/login?backTo=/wave/maintainer-onboarding/install-app');
   }
 
-  const userOrgs = await getOrgs(fetch);
+  const userOrgs = await getOrgs(fetch, { limit: 100 });
 
   const onCancelGoto = url.searchParams.get('onCancelGoto');
   const decoded = decodeURIComponent(onCancelGoto || '');
