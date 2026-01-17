@@ -200,7 +200,10 @@
               {@html renderIssueTitle(issue.title)}
             </h1>
 
-            <RepoBadge repo={issue.repo} />
+            <RepoBadge
+              repo={issue.repo}
+              avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+            />
           </div>
         </div>
 

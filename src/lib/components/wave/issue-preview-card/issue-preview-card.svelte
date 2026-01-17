@@ -52,7 +52,11 @@
     </h3>
 
     <div class="bottom-row">
-      <RepoBadge size="small" repo={issue.repo} />
+      <RepoBadge
+        size="small"
+        repo={issue.repo}
+        avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+      />
     </div>
   </a>
 </Card>

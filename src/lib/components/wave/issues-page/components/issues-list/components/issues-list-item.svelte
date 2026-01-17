@@ -171,7 +171,11 @@
     </h3>
 
     <div class="repo-and-wave">
-      <RepoBadge size="small" repo={issue.repo} />
+      <RepoBadge
+        size="small"
+        repo={issue.repo}
+        avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+      />
       {#if partOfWaveProgram}
         <WaveBadge hideName size="small" waveProgram={partOfWaveProgram} />
       {/if}
