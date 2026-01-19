@@ -25,6 +25,10 @@ export const issuePageLoad = async (
     allowAddingOrRemovingWave: boolean;
     headMetaTitle: string;
 
+    /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
+     * Used to determine if moderation actions should be shown. */
+    isInWaveContext?: boolean;
+
     /** Prevent viewing the issue artificially (e.g. on maintainers view, we only want to show
      * issues from the user's own orgs)
     ) */
@@ -50,7 +54,8 @@ export const issuePageLoad = async (
     }
   }
 
-  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle, block } = config(issue);
+  const { backToConfig, allowAddingOrRemovingWave, headMetaTitle, isInWaveContext, block } =
+    config(issue);
 
   if (block) {
     throw error(block.errorCode, block.message);
@@ -79,6 +84,7 @@ export const issuePageLoad = async (
     backToConfig: backToConfig,
     headMetaTitle: headMetaTitle,
     givenCompliments,
+    isInWaveContext: isInWaveContext ?? false,
 
     // streamed (not awaited)
     applicationsPromise,

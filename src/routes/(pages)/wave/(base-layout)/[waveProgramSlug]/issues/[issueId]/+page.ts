@@ -7,5 +7,6 @@ export const load = async (context) => {
     allowAddingOrRemovingWave: false,
     backToConfig: { label: 'Back to issues', href: `/wave/${waveProgram.slug}/issues` },
     headMetaTitle: `${issue.title} | ${waveProgram.name} Wave`,
+    isInWaveContext: true,
   }));
 };
