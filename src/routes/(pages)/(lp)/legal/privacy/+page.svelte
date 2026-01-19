@@ -146,6 +146,12 @@
         in your preferences, Intercom cookies will be set when you later explicitly open the chat widget.
       </li>
       <li>
+        <strong>In-App Notifications:</strong> This cookie enables the In-App Notifications system powered
+        by Noti-Fire Apps Ltd. ("Novu") to manage and display real-time notifications, an integral part
+        of the Drips Wave experience. Notification system cookies are set only when you log in with an
+        account.
+      </li>
+      <li>
         <strong>Faro Monitoring (Grafana):</strong> Grafana Faro helps us track errors and performance
         issues on the website to improve your experience. It collects data about how you interact with
         our site, but does not collect personal information. It uses cookie-like technologies to understand
