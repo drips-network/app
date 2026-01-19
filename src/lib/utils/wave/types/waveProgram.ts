@@ -132,7 +132,8 @@ export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDe
 
 export const waveProgramReposFiltersSchema = filterSchema(
   z.object({
-    primaryLanguage: z.string().optional(),
+    primaryLanguages: z.string().optional(), // comma-separated list of languages
+    search: z.string().optional(),
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;

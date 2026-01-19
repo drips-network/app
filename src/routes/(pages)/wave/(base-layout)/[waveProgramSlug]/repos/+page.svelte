@@ -10,7 +10,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
-  import DropdownFilterItem from '$lib/components/wave/issues-page/components/filter-config/components/dropdown-filter-item.svelte';
+  import ReposFilterBar from '$lib/components/wave/repos-filter-bar/repos-filter-bar.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import type { WaveProgramReposFilters } from '$lib/utils/wave/types/waveProgram';
   import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
@@ -18,8 +18,6 @@
   import { fade } from 'svelte/transition';
   import type { Snapshot } from '../$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import MiniButton from '$lib/components/mini-button/mini-button.svelte';
-  import Cross from '$lib/components/icons/Cross.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
 
   let { data } = $props();
@@ -164,67 +162,36 @@
 />
 
 <div class="page">
-  <Breadcrumbs
-    crumbs={[
-      { label: 'Wave Programs', href: '/wave' },
-      { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
-      { label: 'Repos', href: '' },
-    ]}
-  />
+  <div
+    style:view-transition-name="repos-page-content"
+    style:display="flex"
+    style:flex-direction="column"
+    style:gap="1.5rem"
+  >
+    <Breadcrumbs
+      crumbs={[
+        { label: 'Wave Programs', href: '/wave' },
+        { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
+        { label: 'Repos', href: '' },
+      ]}
+    />
 
-  <SectionHeader
-    icon={Folder}
-    label="Repos"
-    actions={[
-      {
-        label: 'Apply your repo',
-        icon: ArrowRight,
-        href:
-          '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/' +
-          data.waveProgram.id +
-          '/repos',
-      },
-    ]}
-  />
+    <SectionHeader
+      icon={Folder}
+      label="Repos"
+      actions={[
+        {
+          label: 'Apply your repo',
+          icon: ArrowRight,
+          href:
+            '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/' +
+            data.waveProgram.id +
+            '/repos',
+        },
+      ]}
+    />
 
-  <div class="filter-bar typo-text">
-    <span class="typo-text-bold">Filters</span>
-
-    <div class="divider"></div>
-
-    <div class="filter">
-      <span class="label">Primary language</span>
-      <div class="dropdown">
-        <DropdownFilterItem
-          onchange={(val) => {
-            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: val ?? undefined });
-          }}
-          selectedOption={filters.primaryLanguage}
-          config={{
-            type: 'dropdown',
-            label: 'Primary Language',
-            optionsPromise: new Promise<{ value: string, label: string }[]>((resolve) => {
-              import('$lib/components/programming-language-breakdown/colors.json').then((colors) => {
-                resolve(Object.keys(colors).map((lang) => ({
-                  label: lang,
-                  value: lang,
-                })));
-              });
-            }),
-          }}
-        />
-      </div>
-
-      {#if data.filters.primaryLanguage}
-        <MiniButton
-          label="Clear"
-          icon={Cross}
-          onclick={() => {
-            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: undefined });
-          }}
-        />
-      {/if}
-    </div>
+    <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} />
   </div>
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
@@ -353,52 +320,5 @@
     display: flex;
     height: 2rem;
     justify-content: center;
-  }
-
-  .filter-bar {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .filter-bar .divider {
-    width: 1px;
-    height: 1.5rem;
-    background-color: var(--color-foreground-level-3);
-  }
-
-  .filter-bar .filter {
-    display: flex;
-    gap: 0.5rem;
-    white-space: nowrap;
-    align-items: center;
-  }
-
-  .filter-bar .filter span {
-    color: var(--color-foreground-level-6);
-  }
-
-  .filter-bar .filter .dropdown {
-    max-width: 100%;
-    width: 15rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (max-width: 600px) {
-    .filter-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .filter-bar .divider {
-      display: none;
-    }
-
-    .filter-bar .filter {
-      flex-direction: column;
-      align-items: flex-start;
-    }
   }
 </style>
