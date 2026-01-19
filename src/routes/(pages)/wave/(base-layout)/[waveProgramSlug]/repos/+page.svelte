@@ -164,6 +164,7 @@
 <div class="page">
   <div
     style:view-transition-name="repos-page-content"
+    style:view-transition-class="element-handover"
     style:display="flex"
     style:flex-direction="column"
     style:gap="1.5rem"
