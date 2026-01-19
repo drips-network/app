@@ -20,6 +20,7 @@ const accessClaimJwtSchema = z.object({
       stellar: z.string().nullable(),
     })
     .optional(),
+  permissions: z.array(z.string()).optional(),
 });
 
 export type WaveLoggedInUser = WaveUser & {
@@ -30,6 +31,7 @@ export type WaveLoggedInUser = WaveUser & {
     stellar: string | null;
   };
   signUpDate: Date;
+  permissions?: string[];
 };
 
 export function getAccessTokenCookieClientSide(): string | null {
@@ -69,6 +71,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
     avatarUrl: content.picture,
     signUpDate: content.signUpDate,
     payoutAddresses: content.payoutAddresses,
+    permissions: content.permissions,
   };
 }
 

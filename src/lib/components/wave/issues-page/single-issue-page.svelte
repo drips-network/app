@@ -10,6 +10,8 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
+  import Settings from '$lib/components/icons/Settings.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -38,6 +40,8 @@
   import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
+  import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
+  import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -73,6 +77,10 @@
     user: WaveLoggedInUser | null;
     headMetaTitle: string;
     givenCompliments: IssueComplimentDto[];
+
+    /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
+     * Used to determine if moderation actions should be shown. */
+    isInWaveContext?: boolean;
   }
 
   let {
@@ -86,6 +94,7 @@
     backToConfig,
     headMetaTitle,
     givenCompliments,
+    isInWaveContext = false,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
@@ -101,6 +110,12 @@
     Boolean(
       partOfWaveProgram && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open',
     ),
+  );
+
+  // Moderation permissions
+  let canModerateWaveIssues = $derived(user?.permissions?.includes('moderateWaveIssues') ?? false);
+  let showModerationSection = $derived(
+    canModerateWaveIssues && isInWaveContext && partOfWaveProgram !== null,
   );
 
   async function handleRemoveFromWave() {
@@ -173,6 +188,26 @@
       issue,
       waveProgram: partOfWaveProgram,
       onIssueUpdated: handleIssueUpdated,
+    });
+  }
+
+  // Moderation modal handlers
+  function openModeratorUpdateComplexityModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorUpdateComplexityModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+      onIssueUpdated: handleIssueUpdated,
+    });
+  }
+
+  function openModeratorRemoveFromWaveModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorRemoveFromWaveModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
     });
   }
 </script>
@@ -407,6 +442,30 @@
         </div>
       {/if}
     </Card>
+
+    {#if showModerationSection}
+      <Card style="height: fit-content; padding: 0; overflow: auto;">
+        <div class="sidebar-section moderation-section">
+          <div class="content">
+            <div class="moderation-header">
+              <Settings style="width: 1rem; height: 1rem; fill: var(--color-foreground-level-5)" />
+              <h5>Moderation</h5>
+            </div>
+            <p class="moderation-description">Moderator actions for this issue.</p>
+          </div>
+
+          <SidebarButton icon={Pen} onclick={openModeratorUpdateComplexityModal}>
+            Adjust complexity
+          </SidebarButton>
+
+          <div>
+            <SidebarButton icon={Trash} onclick={openModeratorRemoveFromWaveModal}>
+              Remove from Wave
+            </SidebarButton>
+          </div>
+        </div>
+      </Card>
+    {/if}
   </div>
 </div>
 
@@ -539,5 +598,16 @@
     .back-to-issues-link {
       display: block;
     }
+  }
+
+  .moderation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .moderation-description {
+    font-size: 0.875rem;
+    color: var(--color-foreground-level-5);
   }
 </style>
