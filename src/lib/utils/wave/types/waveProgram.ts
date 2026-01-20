@@ -112,8 +112,8 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
   repo: z.object({
-    stargazersCount: z.number().int(),
-    forksCount: z.number().int(),
+    stargazersCount: z.number().int().nullable().optional(),
+    forksCount: z.number().int().nullable().optional(),
     id: z.uuid(),
     gitHubRepoName: z.string(),
     gitHubRepoFullName: z.string(),

@@ -81,8 +81,8 @@ export const load = (async ({ params, url }) => {
     description: string | null;
     repoName: string;
     ownerName: string;
-    forksCount: number;
-    stargazersCount: number;
+    forksCount?: number | null;
+    stargazersCount?: number | null;
     defaultBranch: string;
   };
 

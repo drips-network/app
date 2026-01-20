@@ -262,11 +262,11 @@
               <div class="repo-stats">
                 <span class="stat">
                   <Star style="width: 1rem; height: 1rem;" />
-                  {repo.stargazersCount.toString()}
+                  {repo.stargazersCount?.toString() ?? '0'}
                 </span>
                 <span class="stat">
                   <Fork style="width: 1rem; height: 1rem;" />
-                  {repo.forksCount.toString()}
+                  {repo.forksCount?.toString() ?? '0'}
                 </span>
               </div>
             </div>
