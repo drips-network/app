@@ -4,6 +4,7 @@
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
@@ -14,6 +15,11 @@
 
   let isEmpty = $derived(data.leaderboard.pagination.total === 0);
 </script>
+
+<HeadMeta
+  title="Leaderboard | {data.waveProgram.name}"
+  description="View the leaderboard for the {data.waveProgram.name} Wave Program."
+/>
 
 <div class="page">
   <Breadcrumbs
