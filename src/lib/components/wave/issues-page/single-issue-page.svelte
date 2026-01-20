@@ -387,7 +387,7 @@
         {/if}
       </div>
 
-      {#if issue.points}
+      {#if (issue.points && issue.state !== 'closed') || issue.pointsEarned}
         {@const multiplier = issue.pointsMultiplier ?? 1}
         {@const hasMultiplier = multiplier > 1}
         {@const complexityBonus = issue.complexity ? getPointsForComplexity(issue.complexity) : 0}
@@ -395,47 +395,55 @@
         {@const basePoints = 100}
         {@const subtotal = basePoints + complexityBonus}
         {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
+        {@const showEarnedPoints = issue.state === 'closed' && issue.pointsEarned != null}
         <div class="sidebar-section">
           <div class="content">
             <h5>Points</h5>
 
-            <ul class="points-table">
-              <li class="points-row">
-                <span class="typo-text">Base Points</span>
-                <span class="typo-text">{basePoints}</span>
-              </li>
-
-              {#if hasComplexityBonus}
+            {#if showEarnedPoints}
+              <div class="points-earned">
+                <span class="typo-text">Points earned</span>
+                <span class="typo-text-bold">{issue.pointsEarned}</span>
+              </div>
+            {:else}
+              <ul class="points-table">
                 <li class="points-row">
-                  <span class="typo-text">Complexity Bonus</span>
-                  <span class="typo-text">+{complexityBonus}</span>
+                  <span class="typo-text">Base Points</span>
+                  <span class="typo-text">{basePoints}</span>
                 </li>
-              {/if}
 
-              {#if hasMultiplier}
-                <li class="points-row featured-row">
-                  <span
-                    class="typo-text"
-                    style:display="flex"
-                    style:align-items="center"
-                    style:gap="0.25rem"
+                {#if hasComplexityBonus}
+                  <li class="points-row">
+                    <span class="typo-text">Complexity Bonus</span>
+                    <span class="typo-text">+{complexityBonus}</span>
+                  </li>
+                {/if}
+
+                {#if hasMultiplier}
+                  <li class="points-row featured-row">
+                    <span
+                      class="typo-text"
+                      style:display="flex"
+                      style:align-items="center"
+                      style:gap="0.25rem"
+                    >
+                      <Multiplier
+                        style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
+                      />
+                      Featured Repo
+                    </span>
+                    <span class="typo-text">{multiplier}x</span>
+                  </li>
+                {/if}
+
+                <li class="points-row total-row">
+                  <span class="typo-text-bold">Total</span>
+                  <span class="typo-text-bold" class:featured-points={hasMultiplier}
+                    >{totalPoints}</span
                   >
-                    <Multiplier
-                      style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
-                    />
-                    Featured Repo
-                  </span>
-                  <span class="typo-text">{multiplier}x</span>
                 </li>
-              {/if}
-
-              <li class="points-row total-row">
-                <span class="typo-text-bold">Total</span>
-                <span class="typo-text-bold" class:featured-points={hasMultiplier}
-                  >{totalPoints}</span
-                >
-              </li>
-            </ul>
+              </ul>
+            {/if}
 
             {#if givenCompliments.length > 0}
               <h5 style:margin-top="1rem">Compliments</h5>
@@ -681,5 +689,12 @@
     margin-top: 0.25rem;
     padding-top: 0.5rem;
     border-top: 1px solid var(--color-foreground-level-3);
+  }
+
+  .points-earned {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>
