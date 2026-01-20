@@ -20,7 +20,7 @@ export const REQUIRED_CONSENTS: ConsentTypeDefinition[] = [
     value: ConsentType.AUTHENTICATION,
     label: 'Authentication',
     description:
-      'The strictly necessary refresh- and access-token cookies enables user login and session management on Drips Wave. Authentication-related cookies are set only on the Drips Wave website and read only by Public Goods Association (Drips) systems to authenticate your requests after a login.',
+      'The strictly necessary refresh- and access-token cookies enable user login and session management on Drips Wave. Authentication-related cookies are set only on the Drips Wave website and read only by Public Goods Association (Drips) systems to authenticate your requests after a login.',
     required: true,
   },
   {
