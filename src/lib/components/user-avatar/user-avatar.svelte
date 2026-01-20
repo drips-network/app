@@ -15,14 +15,29 @@
 
   let loaded = $state(false);
   let error = $state(false);
+
+  const GITHUB_AVATAR_REGEX = /^https:\/\/avatars\.githubusercontent\.com\/u\/(\d+)/;
+
+  const resolvedSrc = $derived.by(() => {
+    if (!src) return undefined;
+
+    const match = src.match(GITHUB_AVATAR_REGEX);
+    if (match) {
+      const userId = match[1];
+      const apiSize = size <= 100 ? 100 : 412;
+      return `/api/github-avatars/${userId}?size=${apiSize}`;
+    }
+
+    return src;
+  });
 </script>
 
 <div class="avatar" style:height={size + 'px'} style:width={size + 'px'}>
-  {#if src && !error}
+  {#if resolvedSrc && !error}
     <img
       bind:this={imgElem}
       alt="user avatar"
-      {src}
+      src={resolvedSrc}
       onload={() => (loaded = true)}
       onerror={() => (error = true)}
     />
