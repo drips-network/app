@@ -84,6 +84,11 @@
       You cannot apply to work on an issue in a repository you maintain. Please choose issues from
       other repositories.
     </AnnotationBox>
+  {:else if data.issue.assignedApplicant}
+    <AnnotationBox>
+      This issue is already assigned to @{data.issue.assignedApplicant.gitHubUsername} in the current
+      Wave. Please choose a different issue to apply to.
+    </AnnotationBox>
   {:else if waveProgramHasActiveWave}
     <FormField
       title="Application Text*"
@@ -144,7 +149,7 @@
   {/snippet}
 
   {#snippet actions()}
-    {#if waveProgramHasActiveWave}
+    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant}
       <Button
         loading={submitting}
         variant="primary"
