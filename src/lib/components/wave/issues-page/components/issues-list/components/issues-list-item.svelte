@@ -25,7 +25,7 @@
         backgroundColor: hasMultiplier
           ? 'var(--color-caution-level-1)'
           : 'var(--color-primary-level-2)',
-        bold: hasMultiplier ? true : undefined,
+        bold: false,
         showMultiplierIcon: hasMultiplier ? true : undefined,
       });
     }
@@ -218,7 +218,9 @@
     gap: 8px;
     box-sizing: border-box;
     background-color: var(--color-background);
-    transition: background-color 0.2s;
+    transition:
+      background-color 0.2s,
+      background-position 0.2s;
   }
 
   .issue-list-item .details {
@@ -268,7 +270,18 @@
   }
 
   .issue-list-item.shiny:not(.active) {
-    background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);
+    background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 300px);
+    background-repeat: no-repeat;
+    background-position-x: -200px;
+  }
+
+  .issue-list-item.shiny:not(.active):hover,
+  .issue-list-item.shiny:not(.active):focus-visible {
+    background-position: 0;
+  }
+
+  .issue-list-item.shiny.active {
+    background: var(--color-primary-level-1);
   }
 
   .badges {
