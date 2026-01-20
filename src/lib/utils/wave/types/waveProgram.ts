@@ -112,6 +112,8 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
   repo: z.object({
+    stargazersCount: z.number().int(),
+    forksCount: z.number().int(),
     id: z.uuid(),
     gitHubRepoName: z.string(),
     gitHubRepoFullName: z.string(),
@@ -130,10 +132,14 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
+export const waveProgramReposSortBySchema = z.enum(['stargazersCount', 'forksCount', 'issueCount']);
+export type WaveProgramReposSortBy = z.infer<typeof waveProgramReposSortBySchema>;
+
 export const waveProgramReposFiltersSchema = filterSchema(
   z.object({
     primaryLanguages: z.string().optional(), // comma-separated list of languages
     search: z.string().optional(),
+    sortBy: waveProgramReposSortBySchema.optional(),
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;

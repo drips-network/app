@@ -20,7 +20,9 @@ export const load = async ({ parent, fetch, url }) => {
     throw redirect(302, `${url.pathname}${currentParams.toString()}`);
   }
 
-  const filters: WaveProgramReposFilters = filtersParamParseResult.data || {};
+  const filters: WaveProgramReposFilters = filtersParamParseResult.data || {
+    sortBy: 'stargazersCount',
+  };
 
   const repos = await getWaveProgramRepos(
     fetch,

@@ -2,7 +2,11 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
   import MagnifyingGlass from '$lib/components/icons/MagnifyingGlass.svelte';
-  import type { WaveProgramReposFilters } from '$lib/utils/wave/types/waveProgram';
+  import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
+  import type {
+    WaveProgramReposFilters,
+    WaveProgramReposSortBy,
+  } from '$lib/utils/wave/types/waveProgram';
   import MultiSelectFilter from './multi-select-filter.svelte';
   import { fly } from 'svelte/transition';
 
@@ -54,6 +58,30 @@
     });
   });
 
+  // Sort options
+  const SORT_OPTIONS: { value: WaveProgramReposSortBy; label: string }[] = [
+    { value: 'stargazersCount', label: 'Stars' },
+    { value: 'forksCount', label: 'Forks' },
+    { value: 'issueCount', label: 'Issue count' },
+  ];
+
+  let currentSort = $derived<WaveProgramReposSortBy>(filters.sortBy ?? 'stargazersCount');
+  let currentSortLabel = $derived(
+    SORT_OPTIONS.find((o) => o.value === currentSort)?.label ?? 'Stars',
+  );
+
+  let showSortDropdown = $state(false);
+  let sortButtonEl = $state<HTMLButtonElement>();
+  let sortDropdownEl = $state<HTMLDivElement>();
+
+  function handleSortChange(sortBy: WaveProgramReposSortBy) {
+    onFiltersChange({
+      ...filters,
+      sortBy,
+    });
+    showSortDropdown = false;
+  }
+
   function handleSearchInput() {
     if (searchTimeout) clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
@@ -93,13 +121,21 @@
   let dropdownEl = $state<HTMLDivElement>();
 
   function handleWindowClick(e: MouseEvent) {
-    if (
-      showAddFilterDropdown &&
-      e.target instanceof HTMLElement &&
-      !addFilterButtonEl?.contains(e.target) &&
-      !dropdownEl?.contains(e.target)
-    ) {
-      showAddFilterDropdown = false;
+    if (e.target instanceof HTMLElement) {
+      if (
+        showAddFilterDropdown &&
+        !addFilterButtonEl?.contains(e.target) &&
+        !dropdownEl?.contains(e.target)
+      ) {
+        showAddFilterDropdown = false;
+      }
+      if (
+        showSortDropdown &&
+        !sortButtonEl?.contains(e.target) &&
+        !sortDropdownEl?.contains(e.target)
+      ) {
+        showSortDropdown = false;
+      }
     }
   }
 </script>
@@ -107,80 +143,118 @@
 <svelte:window onclick={handleWindowClick} />
 
 <div class="filter-bar typo-text">
-  <div class="search-wrapper">
-    <MagnifyingGlass style="fill: var(--color-foreground-level-5)" />
-    <input
-      type="text"
-      class="search-input typo-text"
-      placeholder="Search repos..."
-      bind:value={searchValue}
-      oninput={handleSearchInput}
-    />
-    {#if searchValue}
-      <button
-        class="clear-search"
-        aria-label="Clear search"
-        onclick={() => {
-          searchValue = '';
-          onFiltersChange({ ...filters, search: undefined });
-        }}
-      >
-        <Cross style="fill: var(--color-foreground-level-5); width: 1.25rem; height: 1.25rem;" />
-      </button>
-    {/if}
+  <div class="filter-bar-left">
+    <div class="search-wrapper">
+      <MagnifyingGlass style="fill: var(--color-foreground-level-5)" />
+      <input
+        type="text"
+        class="search-input typo-text"
+        placeholder="Search repos..."
+        bind:value={searchValue}
+        oninput={handleSearchInput}
+      />
+      {#if searchValue}
+        <button
+          class="clear-search"
+          aria-label="Clear search"
+          onclick={() => {
+            searchValue = '';
+            onFiltersChange({ ...filters, search: undefined });
+          }}
+        >
+          <Cross style="fill: var(--color-foreground-level-5); width: 1.25rem; height: 1.25rem;" />
+        </button>
+      {/if}
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="filters-section">
+      {#if visibleFilterKeys.includes('primaryLanguages')}
+        <div class="filter-item" transition:fly={{ duration: 200, y: 8 }}>
+          <span class="filter-label">Language</span>
+          <div class="filter-dropdown">
+            <MultiSelectFilter
+              optionsPromise={languageOptionsPromise}
+              selectedValues={selectedLanguages}
+              onchange={handleLanguagesChange}
+              placeholder="Any"
+            />
+          </div>
+          <button
+            class="remove-filter"
+            aria-label="Remove language filter"
+            onclick={() => removeFilter('primaryLanguages')}
+          >
+            <Cross style="fill: var(--color-foreground-level-5)" />
+          </button>
+        </div>
+      {/if}
+
+      {#if availableFiltersToAdd.length > 0}
+        <div class="add-filter-wrapper">
+          <button
+            bind:this={addFilterButtonEl}
+            class="add-filter-button"
+            in:fly={{ duration: 200, y: -8, delay: 200 }}
+            onclick={() => (showAddFilterDropdown = !showAddFilterDropdown)}
+          >
+            <Plus style="fill: var(--color-foreground)" />
+            <span>Add filter</span>
+          </button>
+
+          {#if showAddFilterDropdown}
+            <div
+              bind:this={dropdownEl}
+              class="add-filter-dropdown"
+              transition:fly={{ duration: 200, y: 8 }}
+            >
+              {#each availableFiltersToAdd as filter (filter.key)}
+                <button class="dropdown-option" onclick={() => addFilter(filter.key)}>
+                  {filter.label}
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 
-  <div class="divider"></div>
+  <div class="sort-section">
+    <span class="sort-label">Sort by</span>
+    <div class="sort-wrapper">
+      <button
+        bind:this={sortButtonEl}
+        class="sort-button"
+        onclick={() => (showSortDropdown = !showSortDropdown)}
+      >
+        <span>{currentSortLabel}</span>
+        <ChevronDown
+          style="width: 1rem; height: 1rem; fill: var(--color-foreground-level-5); transition: transform 0.2s; {showSortDropdown
+            ? 'transform: rotate(180deg);'
+            : ''}"
+        />
+      </button>
 
-  <div class="filters-section">
-    {#if visibleFilterKeys.includes('primaryLanguages')}
-      <div class="filter-item" transition:fly={{ duration: 200, y: 8 }}>
-        <span class="filter-label">Language</span>
-        <div class="filter-dropdown">
-          <MultiSelectFilter
-            optionsPromise={languageOptionsPromise}
-            selectedValues={selectedLanguages}
-            onchange={handleLanguagesChange}
-            placeholder="Any"
-          />
+      {#if showSortDropdown}
+        <div
+          bind:this={sortDropdownEl}
+          class="sort-dropdown"
+          transition:fly={{ duration: 200, y: 8 }}
+        >
+          {#each SORT_OPTIONS as option (option.value)}
+            <button
+              class="dropdown-option"
+              class:active={currentSort === option.value}
+              onclick={() => handleSortChange(option.value)}
+            >
+              {option.label}
+            </button>
+          {/each}
         </div>
-        <button
-          class="remove-filter"
-          aria-label="Remove language filter"
-          onclick={() => removeFilter('primaryLanguages')}
-        >
-          <Cross style="fill: var(--color-foreground-level-5)" />
-        </button>
-      </div>
-    {/if}
-
-    {#if availableFiltersToAdd.length > 0}
-      <div class="add-filter-wrapper">
-        <button
-          bind:this={addFilterButtonEl}
-          class="add-filter-button"
-          in:fly={{ duration: 200, y: -8, delay: 200 }}
-          onclick={() => (showAddFilterDropdown = !showAddFilterDropdown)}
-        >
-          <Plus style="fill: var(--color-foreground)" />
-          <span>Add filter</span>
-        </button>
-
-        {#if showAddFilterDropdown}
-          <div
-            bind:this={dropdownEl}
-            class="add-filter-dropdown"
-            transition:fly={{ duration: 200, y: 8 }}
-          >
-            {#each availableFiltersToAdd as filter (filter.key)}
-              <button class="dropdown-option" onclick={() => addFilter(filter.key)}>
-                {filter.label}
-              </button>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -189,7 +263,16 @@
     display: flex;
     gap: 1rem;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
+  }
+
+  .filter-bar-left {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    flex: 1;
   }
 
   .search-wrapper {
@@ -335,10 +418,67 @@
     border-radius: 0 0 0.5rem 0.5rem;
   }
 
+  .sort-section {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .sort-label {
+    color: var(--color-foreground-level-5);
+    white-space: nowrap;
+  }
+
+  .sort-wrapper {
+    position: relative;
+  }
+
+  .sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 0.5rem;
+    background: var(--color-background);
+    cursor: pointer;
+    color: var(--color-foreground);
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+
+  .sort-button:hover {
+    border-color: var(--color-foreground-level-4);
+    background-color: var(--color-foreground-level-1);
+  }
+
+  .sort-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: var(--color-background);
+    border: 1px solid var(--color-foreground-level-3);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-elevation-4);
+    z-index: 10;
+    min-width: 120px;
+    white-space: nowrap;
+  }
+
+  .dropdown-option.active {
+    background-color: var(--color-foreground-level-1);
+    font-weight: 500;
+  }
+
   @media (max-width: 600px) {
     .filter-bar {
       flex-direction: column;
       align-items: flex-start;
+    }
+
+    .filter-bar-left {
+      width: 100%;
     }
 
     .search-wrapper {
@@ -352,6 +492,11 @@
 
     .filters-section {
       width: 100%;
+    }
+
+    .sort-section {
+      width: 100%;
+      justify-content: flex-end;
     }
   }
 </style>
