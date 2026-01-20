@@ -21,9 +21,9 @@
 
       badges.push({
         text: hasMultiplier ? `${displayPoints} Points` : `${issue.points} Points`,
-        color: hasMultiplier ? 'var(--color-positive-level-6)' : 'var(--color-primary-level-7)',
+        color: hasMultiplier ? 'var(--color-caution-level-6)' : 'var(--color-primary-level-7)',
         backgroundColor: hasMultiplier
-          ? 'var(--color-positive-level-1)'
+          ? 'var(--color-caution-level-1)'
           : 'var(--color-primary-level-2)',
         bold: hasMultiplier ? true : undefined,
         showMultiplierIcon: hasMultiplier ? true : undefined,
@@ -165,6 +165,7 @@
   href="{pathPrefix}{issue.id}?{page.url.searchParams}"
   style:height={itemHeight + 'px'}
   class:active
+  class:shiny={issue.pointsMultiplier && issue.pointsMultiplier > 1}
 >
   {#if selectable}
     <Checkbox
@@ -264,6 +265,10 @@
   .issue-list-item:not(.active):hover,
   .issue-list-item:not(.active):focus-visible {
     background-color: var(--color-foreground-level-1);
+  }
+
+  .issue-list-item.shiny:not(.active) {
+    background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);
   }
 
   .badges {

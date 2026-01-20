@@ -214,7 +214,7 @@
       <div in:fade={{ duration: 200 }}>
         <Card
           style={isFeatured
-            ? 'background: linear-gradient(135deg, var(--color-positive-level-1) 0%, transparent 50%);'
+            ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
             : undefined}
         >
           <div class="repo-item">
@@ -366,8 +366,8 @@
   }
 
   .featured-badge {
-    background-color: var(--color-positive-level-1);
-    color: var(--color-positive-level-6);
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
     padding: 0.125rem 0.5rem;
     border-radius: 1rem 0 1rem 1rem;
     font-size: 0.75rem;

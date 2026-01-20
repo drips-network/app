@@ -657,7 +657,7 @@
   }
 
   .featured-points {
-    color: var(--color-positive-level-6);
+    color: var(--color-caution-level-6);
   }
 
   .points-table {
@@ -674,7 +674,7 @@
   }
 
   .points-row.featured-row {
-    color: var(--color-positive-level-6);
+    color: var(--color-caution-level-6);
   }
 
   .points-row.total-row {

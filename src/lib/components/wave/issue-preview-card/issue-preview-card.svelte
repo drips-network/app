@@ -33,9 +33,9 @@
 
       result.push({
         text: `${displayPoints} Points`,
-        color: hasMultiplier ? 'var(--color-positive-level-6)' : 'var(--color-primary-level-7)',
+        color: hasMultiplier ? 'var(--color-caution-level-6)' : 'var(--color-primary-level-7)',
         backgroundColor: hasMultiplier
-          ? 'var(--color-positive-level-1)'
+          ? 'var(--color-caution-level-1)'
           : 'var(--color-primary-level-2)',
         showMultiplierIcon: hasMultiplier,
       });
