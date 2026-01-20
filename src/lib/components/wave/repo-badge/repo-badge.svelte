@@ -19,13 +19,28 @@
     small: 24,
     normal: 32,
   };
+
+  const GITHUB_AVATAR_REGEX = /^https:\/\/avatars\.githubusercontent\.com\/u\/(\d+)/;
+
+  const resolvedAvatarUrl = $derived.by(() => {
+    if (!avatarUrl) return undefined;
+
+    const match = avatarUrl.match(GITHUB_AVATAR_REGEX);
+
+    if (match) {
+      const userId = match[1];
+      return `/api/github-avatars/${userId}?size=100`;
+    }
+
+    return avatarUrl;
+  });
 </script>
 
 <div class="repo-badge">
-  {#if avatarUrl}
+  {#if resolvedAvatarUrl}
     <img
       class="repo-avatar"
-      src={avatarUrl}
+      src={resolvedAvatarUrl}
       alt="Repo Avatar"
       width={IMAGE_SIZES[size]}
       height={IMAGE_SIZES[size]}
