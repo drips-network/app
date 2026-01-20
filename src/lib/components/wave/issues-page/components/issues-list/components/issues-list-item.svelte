@@ -1,16 +1,32 @@
 <script lang="ts" module>
+  type Badge = {
+    text: string;
+    color: string;
+    backgroundColor: string;
+    bold?: boolean;
+    showMultiplierIcon?: boolean;
+  };
+
   export function inferBadges(
     issue: IssueDetailsDto,
     showNewApplicationsBadge: boolean,
     ownUserId: string | null,
   ) {
-    let badges = [];
+    let badges: Badge[] = [];
 
     if (issue.points) {
+      const multiplier = issue.pointsMultiplier ?? 1;
+      const hasMultiplier = multiplier > 1;
+      const displayPoints = hasMultiplier ? issue.points * multiplier : issue.points;
+
       badges.push({
-        text: `${issue.points} Points`,
-        color: 'var(--color-primary-level-7)',
-        backgroundColor: 'var(--color-primary-level-2)',
+        text: hasMultiplier ? `${displayPoints} Points` : `${issue.points} Points`,
+        color: hasMultiplier ? 'var(--color-positive-level-6)' : 'var(--color-primary-level-7)',
+        backgroundColor: hasMultiplier
+          ? 'var(--color-positive-level-1)'
+          : 'var(--color-primary-level-2)',
+        bold: hasMultiplier ? true : undefined,
+        showMultiplierIcon: hasMultiplier ? true : undefined,
       });
     }
 
@@ -96,6 +112,7 @@
   import WaveBadge from '$lib/components/wave/wave-program-badge/wave-program-badge.svelte';
   import { renderIssueTitle } from '$lib/utils/wave/issues';
   import formatDate from '$lib/utils/format-date';
+  import Multiplier from '$lib/components/icons/Multiplier.svelte';
 
   let {
     issue,
@@ -127,10 +144,19 @@
   let badges = $derived.by(() => inferBadges(issue, showNewApplicationsBadge, ownUserId));
 </script>
 
-{#snippet badge(text: string, color: string, backgroundColor: string, bold?: boolean)}
-  <span class="state-badge" class:bold style:color style:background-color={backgroundColor}
-    >{text}</span
-  >
+{#snippet badge(
+  text: string,
+  color: string,
+  backgroundColor: string,
+  bold?: boolean,
+  showMultiplierIcon?: boolean,
+)}
+  <span class="state-badge" class:bold style:color style:background-color={backgroundColor}>
+    {#if showMultiplierIcon}
+      <Multiplier style="width: 0.875rem; height: 0.875rem; fill: currentColor;" />
+    {/if}
+    {text}
+  </span>
 {/snippet}
 
 <svelte:element
@@ -159,8 +185,8 @@
   >
     {#if badges.length > 0}
       <div class="badges">
-        {#each badges as { text, color, backgroundColor, bold } (text)}
-          {@render badge(text, color, backgroundColor, bold)}
+        {#each badges as { text, color, backgroundColor, bold, showMultiplierIcon } (text)}
+          {@render badge(text, color, backgroundColor, bold, showMultiplierIcon)}
         {/each}
       </div>
     {/if}
@@ -219,6 +245,7 @@
     text-overflow: ellipsis;
     display: inline-flex;
     align-items: center;
+    gap: 0.25rem;
     font-size: 0.8rem;
   }
 

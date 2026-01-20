@@ -56,6 +56,7 @@ export const issueDetailsDtoSchema = z.object({
   waveProgramId: z.uuid().nullable(),
   complexity: complexitySchema.nullable(),
   points: z.number().int().nullable(),
+  pointsMultiplier: z.number().int().optional(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
   resolvedInWave: waveDtoSchema.nullable(),

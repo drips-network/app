@@ -36,6 +36,7 @@
     beComplexityToFriendlyLabel,
     removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
+  import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
@@ -47,6 +48,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
   import Heart from '$lib/components/icons/Heart.svelte';
+  import Multiplier from '$lib/components/icons/Multiplier.svelte';
   import formatDate from '$lib/utils/format-date';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
@@ -386,11 +388,54 @@
       </div>
 
       {#if issue.points}
+        {@const multiplier = issue.pointsMultiplier ?? 1}
+        {@const hasMultiplier = multiplier > 1}
+        {@const complexityBonus = issue.complexity ? getPointsForComplexity(issue.complexity) : 0}
+        {@const hasComplexityBonus = complexityBonus > 0}
+        {@const basePoints = 100}
+        {@const subtotal = basePoints + complexityBonus}
+        {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
         <div class="sidebar-section">
           <div class="content">
             <h5>Points</h5>
 
-            <span class="typo-text">{issue.points}</span>
+            <ul class="points-table">
+              <li class="points-row">
+                <span class="typo-text">Base Points</span>
+                <span class="typo-text">{basePoints}</span>
+              </li>
+
+              {#if hasComplexityBonus}
+                <li class="points-row">
+                  <span class="typo-text">Complexity Bonus</span>
+                  <span class="typo-text">+{complexityBonus}</span>
+                </li>
+              {/if}
+
+              {#if hasMultiplier}
+                <li class="points-row featured-row">
+                  <span
+                    class="typo-text"
+                    style:display="flex"
+                    style:align-items="center"
+                    style:gap="0.25rem"
+                  >
+                    <Multiplier
+                      style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
+                    />
+                    Featured Repo
+                  </span>
+                  <span class="typo-text">{multiplier}x</span>
+                </li>
+              {/if}
+
+              <li class="points-row total-row">
+                <span class="typo-text-bold">Total</span>
+                <span class="typo-text-bold" class:featured-points={hasMultiplier}
+                  >{totalPoints}</span
+                >
+              </li>
+            </ul>
 
             {#if givenCompliments.length > 0}
               <h5 style:margin-top="1rem">Compliments</h5>
@@ -609,5 +654,32 @@
   .moderation-description {
     font-size: 0.875rem;
     color: var(--color-foreground-level-5);
+  }
+
+  .featured-points {
+    color: var(--color-positive-level-6);
+  }
+
+  .points-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .points-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .points-row.featured-row {
+    color: var(--color-positive-level-6);
+  }
+
+  .points-row.total-row {
+    margin-top: 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 </style>
