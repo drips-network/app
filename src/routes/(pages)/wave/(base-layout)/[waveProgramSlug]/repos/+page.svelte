@@ -19,6 +19,8 @@
   import type { Snapshot } from '../$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
+  import Star from '$lib/components/icons/Star.svelte';
+  import Fork from '$lib/components/icons/Fork.svelte';
 
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
@@ -244,7 +246,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="bottom-row">
               <Button
                 size="small"
                 disabled={issueCount === 0}
@@ -256,6 +258,17 @@
                   Browse {issueCount} issues
                 {/if}
               </Button>
+
+              <div class="repo-stats">
+                <span class="stat">
+                  <Star style="width: 1rem; height: 1rem;" />
+                  {repo.stargazersCount.toString()}
+                </span>
+                <span class="stat">
+                  <Fork style="width: 1rem; height: 1rem;" />
+                  {repo.forksCount.toString()}
+                </span>
+              </div>
             </div>
           </div>
         </Card>
@@ -315,6 +328,26 @@
 
   .languages {
     margin-top: 0.25rem;
+  }
+
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .repo-stats {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-foreground-level-5);
+    font-size: 0.875rem;
   }
 
   .fetch-trigger {
