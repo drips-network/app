@@ -46,6 +46,7 @@ export async function authenticatedCall(
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      'X-Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...(options.headers || {}),
     },
   });
