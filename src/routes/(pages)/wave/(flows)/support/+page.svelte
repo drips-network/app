@@ -63,7 +63,7 @@
     <p>
       If you're old-school like that, you can email us at <a
         class="typo-link"
-        href="mailto:support@drips.com">support@drips.com</a
+        href="mailto:support@drips.network">support@drips.network</a
       >.
     </p>
   </div>
