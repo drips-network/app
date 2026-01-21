@@ -42,9 +42,11 @@ export const issueApplicationWithDetailsDtoSchema = z.object({
   removedAt: z.coerce.date().nullable(),
   applicant: waveUserDtoSchema.extend({
     verified: z.boolean(),
+    currentWaveApplicationCount: z.number().int().min(0).nullable(),
+    currentWaveAssignmentCount: z.number().int().min(0).nullable(),
   }),
-  reviewedBy: waveUserDtoSchema.nullable(),
   removedBy: waveUserDtoSchema.nullable(),
+  reviewedBy: waveUserDtoSchema.nullable(),
 });
 export type IssueApplicationWithDetailsDto = z.infer<typeof issueApplicationWithDetailsDtoSchema>;
 

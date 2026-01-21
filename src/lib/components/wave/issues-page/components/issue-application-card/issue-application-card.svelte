@@ -149,6 +149,16 @@
     <Divider />
 
     <div class="metrics">
+      {#if application.applicant.currentWaveAssignmentCount != null}
+        <div class="metric">
+          <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
+            Current assignments
+          </div>
+          <div class="value typo-text-small-bold">
+            {application.applicant.currentWaveAssignmentCount}
+          </div>
+        </div>
+      {/if}
       {#each KEY_METRICS as { key, label } (key)}
         <div class="metric">
           <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
