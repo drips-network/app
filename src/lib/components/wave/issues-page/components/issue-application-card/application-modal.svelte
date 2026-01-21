@@ -6,6 +6,7 @@
   import Graph from '$lib/components/icons/Graph.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Pen from '$lib/components/icons/Pen.svelte';
+  import Wave from '$lib/components/icons/Wave.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -18,7 +19,10 @@
 
   interface Props {
     codeMetricsPromise: Promise<UserCodeMetricsDto | null>;
-    applicant: WaveUser;
+    applicant: WaveUser & {
+      currentWaveApplicationCount: number | null;
+      currentWaveAssignmentCount: number | null;
+    };
     applicationText: string;
     appliedAt: Date;
   }
@@ -53,6 +57,27 @@
       <Markdown content={applicationText} />
     </ExpandableText>
   </section>
+
+  {#if applicant.currentWaveApplicationCount != null || applicant.currentWaveAssignmentCount != null}
+    <section>
+      <SectionHeader label="Wave activity" icon={Wave} />
+
+      <ul class="statistics">
+        {#if applicant.currentWaveApplicationCount != null}
+          <li class="statistic typo-text-small">
+            <span class="label">Issues applied to in current Wave</span>
+            <span class="value">{applicant.currentWaveApplicationCount}</span>
+          </li>
+        {/if}
+        {#if applicant.currentWaveAssignmentCount != null}
+          <li class="statistic typo-text-small">
+            <span class="label">Issues assigned to in current Wave</span>
+            <span class="value">{applicant.currentWaveAssignmentCount}</span>
+          </li>
+        {/if}
+      </ul>
+    </section>
+  {/if}
 
   <section>
     <SectionHeader label="Languages" icon={Device} />
