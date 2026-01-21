@@ -279,7 +279,7 @@
         }}
       >
         <div class="applications-grid">
-          {#each applications?.slice(0, 5) as application (application.id)}
+          {#each applications as application (application.id)}
             <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
           {/each}
         </div>
