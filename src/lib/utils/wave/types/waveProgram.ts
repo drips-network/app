@@ -111,6 +111,7 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   reviewedAt: z.coerce.date().nullable(),
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
+  pointsMultiplier: z.number().int().optional(),
   repo: z.object({
     stargazersCount: z.number().int().nullable().optional(),
     forksCount: z.number().int().nullable().optional(),
@@ -155,6 +156,7 @@ export const waveProgramIssueWithDetailsDtoSchema = z.object({
   id: z.uuid(),
   addedAt: z.coerce.date(),
   removedAt: z.coerce.date().nullable(),
+  pointsMultiplier: z.number().int().optional(),
   issue: z.object({
     id: z.uuid(),
     gitHubIssueNumber: z.number(),

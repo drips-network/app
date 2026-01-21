@@ -209,9 +209,14 @@
   </span>
 
   <div class="repo-grid">
-    {#each repos as { repo, org, issueCount } (repo.id)}
+    {#each repos as { repo, org, issueCount, pointsMultiplier } (repo.id)}
+      {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
       <div in:fade={{ duration: 200 }}>
-        <Card>
+        <Card
+          style={isFeatured
+            ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
+            : undefined}
+        >
           <div class="repo-item">
             <div class="top" style:display="flex" style:flex-direction="column" style:gap="0.5rem">
               <div class="owner-and-repo">
@@ -228,6 +233,10 @@
                   </span>
                   {repo.gitHubRepoFullName.split('/')[1]}
                 </a>
+
+                {#if isFeatured}
+                  <span class="featured-badge">{pointsMultiplier}x Points</span>
+                {/if}
               </div>
 
               <span class="description typo-text-small line-clamp-2">
@@ -354,5 +363,17 @@
     display: flex;
     height: 2rem;
     justify-content: center;
+  }
+
+  .featured-badge {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.125rem 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 </style>
