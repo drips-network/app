@@ -38,6 +38,7 @@
   import network from '$lib/stores/wallet/network';
   import wallet from '$lib/stores/wallet/wallet.store';
   import { writable } from 'svelte/store';
+  import ReadOnlyBanner from '../read-only-banner/read-only-banner.svelte';
 
   interface Props {
     user: HeaderUserFragment | null;
@@ -57,104 +58,112 @@
   let safeAppMode = $derived(Boolean($wallet.safe));
 </script>
 
-<header class:elevated class:search-mode={searchMode}>
-  {#if !connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
-    <a aria-label="Go to explore page" href={'/app'}>
-      <div class="logo flex items-center pb-px">
-        <DripsLogo />
-      </div>
+<div class="header-wrapper">
+  <ReadOnlyBanner />
+  <header class:elevated class:search-mode={searchMode}>
+    {#if !connected || $breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide'}
+      <a aria-label="Go to explore page" href="/app">
+        <div class="logo flex items-center pb-px">
+          <DripsLogo />
+        </div>
 
-      <div class="loading-indicator" class:loading={showLoadingIndicator}>
-        <Spinner />
+        <div class="loading-indicator" class:loading={showLoadingIndicator}>
+          <Spinner />
+        </div>
+      </a>
+    {/if}
+    {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
+      <div data-highlightid="global-collect" class="collect mobile">
+        <CollectButton
+          withdrawableBalances={chainData?.withdrawableBalances}
+          peekAmount={true}
+          bind:isPeeking={collectButtonPeeking}
+        />
       </div>
-    </a>
-  {/if}
-  {#if connected && ($breakpointsStore?.breakpoint === 'mobile' || $breakpointsStore?.breakpoint === 'tablet')}
-    <div data-highlightid="global-collect" class="collect mobile">
-      <CollectButton
-        withdrawableBalances={chainData?.withdrawableBalances}
-        peekAmount={true}
-        bind:isPeeking={collectButtonPeeking}
-      />
+      <div></div>
+    {:else}
+      <!-- ensure nav items are right-aligned on mobile still even though nothing's on the left -->
+      <div></div>
+    {/if}
+    <div class="search-bar">
+      <SearchBar bind:searchOpen={searchMode} />
     </div>
-    <div></div>
-  {:else}
-    <!-- ensure nav items are right-aligned on mobile still even though nothing's on the left -->
-    <div></div>
-  {/if}
-  <div class="search-bar">
-    <SearchBar bind:searchOpen={searchMode} />
-  </div>
-  <div class="right" class:collect-button-peeking={collectButtonPeeking}>
-    <div class="header-buttons">
-      {#if !searchMode}
-        <button
-          class="header-button"
-          onclick={() => (searchMode = true)}
-          transition:fly={{ duration: 300, x: -64, easing: quadInOut }}
-          data-testid="search-button"
-          data-highlightid="search"
-        >
-          <SearchIcon style="fill: var(--color-foreground)" />
-        </button>
-      {/if}
+    <div class="right" class:collect-button-peeking={collectButtonPeeking}>
+      <div class="header-buttons">
+        {#if !searchMode}
+          <button
+            class="header-button"
+            onclick={() => (searchMode = true)}
+            transition:fly={{ duration: 300, x: -64, easing: quadInOut }}
+            data-testid="search-button"
+            data-highlightid="search"
+          >
+            <SearchIcon style="fill: var(--color-foreground)" />
+          </button>
+        {/if}
 
-      {#if network.displayNetworkPicker && !safeAppMode}
-        <div class="network-picker">
-          <div class="desktop-only">
-            <div class="network-picker-flyout">
-              <Flyout width="16rem" bind:visible={networkPickerExpanded}>
-                {#snippet trigger()}
-                  <div>
-                    <NetworkPicker
-                      toggled={networkPickerExpanded}
-                      onclick={() => (networkPickerExpanded = !networkPickerExpanded)}
-                    />
-                  </div>
-                {/snippet}
-                {#snippet content()}
-                  <div>
-                    <NetworkList />
-                  </div>
-                {/snippet}
-              </Flyout>
+        {#if network.displayNetworkPicker && !safeAppMode}
+          <div class="network-picker">
+            <div class="desktop-only">
+              <div class="network-picker-flyout">
+                <Flyout width="16rem" bind:visible={networkPickerExpanded}>
+                  {#snippet trigger()}
+                    <div>
+                      <NetworkPicker
+                        toggled={networkPickerExpanded}
+                        onclick={() => (networkPickerExpanded = !networkPickerExpanded)}
+                      />
+                    </div>
+                  {/snippet}
+                  {#snippet content()}
+                    <div>
+                      <NetworkList />
+                    </div>
+                  {/snippet}
+                </Flyout>
+              </div>
+            </div>
+
+            <div
+              class="mobile-only"
+              role="button"
+              tabindex="0"
+              onclick={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+              onkeydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
+            >
+              <NetworkPicker />
             </div>
           </div>
-
-          <div
-            class="mobile-only"
-            role="button"
-            tabindex="0"
-            onclick={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
-            onkeydown={() => cupertinoPaneStore.openSheet(NetworkList, undefined)}
-          >
-            <NetworkPicker />
-          </div>
+        {/if}
+      </div>
+      <div class="connect">
+        <ConnectButton />
+      </div>
+      {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
+        <div data-highlightid="global-collect" class="collect">
+          <CollectButton withdrawableBalances={chainData?.withdrawableBalances} />
         </div>
       {/if}
     </div>
-    <div class="connect">
-      <ConnectButton />
-    </div>
-    {#if $walletStore.connected && ($breakpointsStore?.breakpoint === 'desktop' || $breakpointsStore?.breakpoint === 'desktopWide')}
-      <div data-highlightid="global-collect" class="collect">
-        <CollectButton withdrawableBalances={chainData?.withdrawableBalances} />
-      </div>
-    {/if}
-  </div>
 
-  {#if searchMode}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      class="search-background"
-      transition:fade={{ duration: 300 }}
-      onclick={() => (searchMode = false)}
-    ></div>
-  {/if}
-</header>
+    {#if searchMode}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="search-background"
+        transition:fade={{ duration: 300 }}
+        onclick={() => (searchMode = false)}
+      ></div>
+    {/if}
+  </header>
+</div>
 
 <style>
+  .header-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
   header {
     height: 4rem;
     width: 100%;

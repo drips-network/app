@@ -37,6 +37,7 @@
   import modal from '$lib/stores/modal';
   import Plus from '$lib/components/icons/Plus.svelte';
   import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
+  import network from '$lib/stores/wallet/network';
 
   interface TokenTableRow {
     token: ComponentProps<typeof Token>;
@@ -144,7 +145,7 @@
       ? 'When you receive or top up tokens, they appear here. Add funds to begin streaming to Drip Lists.'
       : undefined,
     actions:
-      disableActions || !isSelf
+      disableActions || !isSelf || network.readOnlyMode
         ? []
         : [
             {

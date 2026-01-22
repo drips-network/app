@@ -7,6 +7,7 @@
   import AccountMenu from '../account-menu/account-menu.svelte';
   import SafeLogo from '../icons/safe-logo.svelte';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import network from '$lib/stores/wallet/network';
 
   let safeAppMode = $derived(Boolean($wallet.safe));
 
@@ -14,55 +15,57 @@
   const waitingForOnboardStore = wallet.waitingForOnboard;
 </script>
 
-<div class="wrapper">
-  {#if $wallet.connected}
-    <div class="desktop-only">
-      <Flyout>
-        {#snippet trigger()}
-          <div class="trigger">
-            {#if safeAppMode}<div class="safe-logo">
-                <SafeLogo />
-              </div>{/if}
-            <IdentityBadge
-              disableTooltip
-              hideAvatarOnMobile
-              disableLink
-              size="medium"
-              address={$wallet.address}
-            />
-          </div>
-        {/snippet}
-        {#snippet content()}
-          <div>
-            <AccountMenu />
-          </div>
-        {/snippet}
-      </Flyout>
-    </div>
-    <div
-      class="mobile-only"
-      role="button"
-      tabindex="0"
-      onclick={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
-      onkeydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
-    >
-      <IdentityBadge
-        hideAvatarOnMobile
-        disableLink
-        size="medium"
-        address={$wallet.address}
-        disableTooltip
-      />
-    </div>
-  {:else}
-    <Button
-      disabled={$waitingForOnboardStore}
-      loading={!$walletInitializedStore}
-      icon={WalletIcon}
-      onclick={() => wallet.connect()}>Connect</Button
-    >
-  {/if}
-</div>
+{#if !network.readOnlyMode}
+  <div class="wrapper">
+    {#if $wallet.connected}
+      <div class="desktop-only">
+        <Flyout>
+          {#snippet trigger()}
+            <div class="trigger">
+              {#if safeAppMode}<div class="safe-logo">
+                  <SafeLogo />
+                </div>{/if}
+              <IdentityBadge
+                disableTooltip
+                hideAvatarOnMobile
+                disableLink
+                size="medium"
+                address={$wallet.address}
+              />
+            </div>
+          {/snippet}
+          {#snippet content()}
+            <div>
+              <AccountMenu />
+            </div>
+          {/snippet}
+        </Flyout>
+      </div>
+      <div
+        class="mobile-only"
+        role="button"
+        tabindex="0"
+        onclick={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+        onkeydown={() => cupertinoPaneStore.openSheet(AccountMenu, undefined)}
+      >
+        <IdentityBadge
+          hideAvatarOnMobile
+          disableLink
+          size="medium"
+          address={$wallet.address}
+          disableTooltip
+        />
+      </div>
+    {:else}
+      <Button
+        disabled={$waitingForOnboardStore}
+        loading={!$walletInitializedStore}
+        icon={WalletIcon}
+        onclick={() => wallet.connect()}>Connect</Button
+      >
+    {/if}
+  </div>
+{/if}
 
 <style>
   .wrapper {

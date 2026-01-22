@@ -83,6 +83,7 @@ export type Network = {
   ecosystems: boolean;
   retroFunding: DripsRetroFundingConfig;
   orcids: boolean;
+  readOnlyMode: boolean;
 };
 
 type DripsRetroFundingConfig =
@@ -170,6 +171,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [80002]: {
     chainId: 80002,
@@ -215,6 +217,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -260,6 +263,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: true,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -317,6 +321,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     orcids: true,
+    readOnlyMode: false,
   },
   [31337]: {
     chainId: 31337,
@@ -376,6 +381,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     orcids: true,
+    readOnlyMode: false,
   },
   [84532]: {
     chainId: 84532,
@@ -421,6 +427,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
   },
   [314]: {
     chainId: 314,
@@ -496,6 +503,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
   },
   [1088]: {
     chainId: 1088,
@@ -510,7 +518,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     subdomain: 'metis.drips.network',
     gqlName: SupportedChain.Metis,
     autoUnwrapPairs: [],
-    displayNetworkPicker: true,
+    displayNetworkPicker: false,
     applyGasBuffers: false,
     explorer: {
       name: 'Metis Explorer',
@@ -549,6 +557,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: true,
   },
   [10]: {
     chainId: 10,
@@ -602,6 +611,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
   },
 };
 
