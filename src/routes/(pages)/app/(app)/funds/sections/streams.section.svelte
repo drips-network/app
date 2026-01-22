@@ -73,6 +73,7 @@
   import PlusIcon from '$lib/components/icons/Plus.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { decodeStreamId } from '$lib/utils/streams/make-stream-id';
+  import network from '$lib/stores/wallet/network';
 
   interface Props {
     accountId: string | undefined;
@@ -294,15 +295,16 @@
     infoTooltip,
     icon: TokenStreamIcon,
     label: onlyDripListStreams ? 'Streams to your Drip List' : 'Streams',
-    actions: disableActions
-      ? []
-      : [
-          {
-            handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
-            icon: PlusIcon,
-            label: 'Create stream',
-          },
-        ],
+    actions:
+      disableActions || network.readOnlyMode
+        ? []
+        : [
+            {
+              handler: () => modal.show(Stepper, undefined, createStreamFlowSteps(tokenAddress)),
+              icon: PlusIcon,
+              label: 'Create stream',
+            },
+          ],
   }}
   skeleton={{
     horizontalScroll: true,

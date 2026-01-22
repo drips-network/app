@@ -1,4 +1,5 @@
 import { PUBLIC_NETWORK } from '$env/static/public';
+import Metis from '$lib/components/icons/networks/Metis.svelte';
 import Base from '$lib/components/icons/networks/Base.svelte';
 import Ethereum from '$lib/components/icons/networks/Ethereum.svelte';
 import Filecoin from '$lib/components/icons/networks/Filecoin.svelte';
@@ -82,6 +83,7 @@ export type Network = {
   ecosystems: boolean;
   retroFunding: DripsRetroFundingConfig;
   orcids: boolean;
+  readOnlyMode: boolean;
 };
 
 type DripsRetroFundingConfig =
@@ -169,6 +171,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [80002]: {
     chainId: 80002,
@@ -214,6 +217,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -259,6 +263,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     ecosystems: true,
     retroFunding: { enabled: false },
     orcids: false,
+    readOnlyMode: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -316,6 +321,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     orcids: true,
+    readOnlyMode: false,
   },
   [31337]: {
     chainId: 31337,
@@ -375,6 +381,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     orcids: true,
+    readOnlyMode: false,
   },
   [84532]: {
     chainId: 84532,
@@ -420,6 +427,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
   },
   [314]: {
     chainId: 314,
@@ -495,6 +503,61 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
+  },
+  [1088]: {
+    chainId: 1088,
+    name: 'metis',
+    label: 'Metis',
+    token: 'METIS',
+    id: '0x440',
+    rpcUrl: junctionUrl('metis'),
+    icon: Metis,
+    color: '#00D2FF',
+    isTestnet: false,
+    subdomain: 'metis.drips.network',
+    gqlName: SupportedChain.Metis,
+    autoUnwrapPairs: [],
+    displayNetworkPicker: false,
+    applyGasBuffers: false,
+    explorer: {
+      name: 'Metis Explorer',
+      base: 'https://explorer.metis.io',
+      linkTemplate: (txHash: string) => `https://explorer.metis.io/tx/${txHash}`,
+    },
+    contracts: {
+      ADDRESS_DRIVER: '0x04693D13826a37dDdF973Be4275546Ad978cb9EE',
+      DRIPS: '0xd320F59F109c618b19707ea5C5F068020eA333B3',
+      CALLER: '0xd6Ab8e72dE3742d45AdF108fAa112Cd232718828',
+      REPO_DRIVER: '0xe75f56B26857cAe06b455Bfc9481593Ae0FB4257',
+      NFT_DRIVER: '0x2F23217A87cAf04ae586eed7a3d689f6C48498dB',
+      NATIVE_TOKEN_UNWRAPPER: undefined,
+    },
+    settlement: {
+      nextSettlementDate: 'daily',
+      frequencyLabel: 'daily',
+      recipientsExplainerHtml:
+        'Future incoming funds will be split to your recipients <span class="typo-text-bold">daily</span>.',
+      explainerText:
+        'Funds from projects, streams and Drip Lists on Metis settle and become collectable once per day.',
+    },
+    alternativeChainMode: true,
+    gelatoRelayAvailable: true,
+    gaslessTransactions: true,
+    addToWalletConfig: {
+      blockExplorerUrls: ['https://explorer.metis.io/'],
+      nativeCurrency: {
+        decimals: 18,
+        name: 'Metis',
+        symbol: 'METIS',
+      },
+      rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
+    },
+    enableEns: true,
+    retroFunding: { enabled: false },
+    ecosystems: false,
+    orcids: false,
+    readOnlyMode: true,
   },
   [10]: {
     chainId: 10,
@@ -548,6 +611,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
+    readOnlyMode: false,
   },
 };
 

@@ -128,6 +128,7 @@
   export let disabled = false;
   $: {
     if (!project && !dripList && !ecosystem && !orcid && !user) disabled = true;
+    if (network.readOnlyMode) disabled = true;
   }
 
   let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user' = 'dripList';

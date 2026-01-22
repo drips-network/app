@@ -6,13 +6,15 @@
   import getChainDeploymentUrl from '../get-chain-deployment-url';
 
   const networks = Object.values(NETWORK_CONFIG);
-  const networksToShow = networks.filter((n) => (currentNetwork.isTestnet ? true : !n.isTestnet));
+  const networksToShow = networks.filter(
+    (n) => (currentNetwork.isTestnet ? true : !n.isTestnet) && n.displayNetworkPicker,
+  );
 
   const selectedChainId = currentNetwork.chainId;
 </script>
 
 <div class="network-list">
-  {#each networksToShow as { chainId, label, icon, color, isTestnet }}
+  {#each networksToShow as { chainId, label, icon, color, isTestnet } (chainId)}
     {@const colorRgb = hexToRgb(color)}
     {@const SvelteComponent = icon}
     <a href={getChainDeploymentUrl(chainId)} class="network-item">

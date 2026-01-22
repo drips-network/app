@@ -384,12 +384,14 @@
               downloadableImageUrl="{imageBaseUrl}?target=og"
               supportButtonOptions={supportButtonStepConfig}
             />
-            <Button
-              size="small"
-              icon={Registered}
-              variant="primary"
-              onclick={() => launchClaimProject(project.source.url)}>Claim project</Button
-            >
+            {#if !network.readOnlyMode}
+              <Button
+                size="small"
+                icon={Registered}
+                variant="primary"
+                onclick={() => launchClaimProject(project.source.url)}>Claim project</Button
+              >
+            {/if}
           </div>
         {/snippet}
       </AnnotationBox>
@@ -447,7 +449,9 @@
         <ProjectProfileHeader
           {project}
           {description}
-          editButton={isClaimed(chainData) && isOwnProject ? 'Edit' : undefined}
+          editButton={isClaimed(chainData) && isOwnProject && !network.readOnlyMode
+            ? 'Edit'
+            : undefined}
           shareButton={{
             url: `${origin}${buildProjectUrl(
               Forge.GitHub,
@@ -502,7 +506,7 @@
             </a>
           {/if}
         </div>
-        {#if isOwnProject}
+        {#if isOwnProject && !network.readOnlyMode}
           <AnnotationBox type="info">
             Embed a support button on your website.
             {#snippet actions()}
@@ -521,7 +525,7 @@
           <SectionHeader
             icon={DripList}
             label="Splits"
-            actions={isOwnProject
+            actions={isOwnProject && !network.readOnlyMode
               ? [
                   {
                     handler: () =>

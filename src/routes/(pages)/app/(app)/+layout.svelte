@@ -43,12 +43,14 @@
           icon: ExploreIcon,
           description: 'Discover projects and stats across Drips.',
         },
-        {
-          label: 'Funds',
-          href: '/app/funds',
-          icon: TokenStreams,
-          description: 'Manage your balances and streams.',
-        },
+        !network.readOnlyMode
+          ? {
+              label: 'Funds',
+              href: '/app/funds',
+              icon: TokenStreams,
+              description: 'Manage your balances and streams.',
+            }
+          : undefined,
         {
           label: 'Projects',
           href: '/app/projects',
@@ -77,12 +79,14 @@
               description: 'Fund huge numbers of projects in one place',
             }
           : undefined,
-        {
-          label: 'Profile',
-          href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
-          description: 'Your stuff on Drips.',
-          icon: User,
-        },
+        !network.readOnlyMode
+          ? {
+              label: 'Profile',
+              href: !$walletStore.address ? '/app/profile' : `/app/${$walletStore.address}`,
+              description: 'Your stuff on Drips.',
+              icon: User,
+            }
+          : undefined,
         {
           label: 'Wave',
           href: 'https://www.drips.network/wave',
@@ -124,6 +128,7 @@
 <div
   class="main"
   class:sidenav-forced-collapsed={$forceCollapsed === true}
+  class:has-read-only-banner={network.readOnlyMode}
   in:fly|global={{ duration: 300, y: 16 }}
 >
   <div class="page">
@@ -164,6 +169,14 @@
     left: 0;
     width: 100%;
     z-index: 1;
+  }
+
+  .has-read-only-banner .sidenav {
+    padding-top: 8rem;
+  }
+
+  .has-read-only-banner .page {
+    padding-top: 8rem;
   }
 
   .page {
@@ -247,6 +260,11 @@
     .sidenav-forced-collapsed .page {
       padding: 6rem 1rem 6rem 1rem;
       margin-left: 0;
+    }
+
+    .has-read-only-banner .page,
+    .has-read-only-banner.sidenav-forced-collapsed .page {
+      padding-top: 8rem;
     }
 
     .bottom-nav {

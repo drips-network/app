@@ -25,6 +25,7 @@
   import ProjectsGrid from '../components/projects-grid.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import launchClaimProject from '$lib/utils/launch-claim-project';
+  import network from '$lib/stores/wallet/network';
 
   let { data } = $props();
 </script>
@@ -47,9 +48,11 @@
       </p>
     {/snippet}
     {#snippet buttons()}
-      <Button icon={Plus} variant="primary" onclick={() => launchClaimProject()}
-        >Claim your project</Button
-      >
+      {#if !network.readOnlyMode}
+        <Button icon={Plus} variant="primary" onclick={() => launchClaimProject()}
+          >Claim your project</Button
+        >
+      {/if}
     {/snippet}
     {#snippet illustration()}
       <div class="edu-card-illustration-bg"></div>
@@ -59,11 +62,13 @@
     {/snippet}
   </EduCard>
 
-  <YourProjectsSection
-    withClaimProjectButton
-    projects={data.yourProjects}
-    showVisibilityToggle={true}
-  />
+  {#if !network.readOnlyMode}
+    <YourProjectsSection
+      withClaimProjectButton
+      projects={data.yourProjects}
+      showVisibilityToggle={true}
+    />
+  {/if}
 
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations"

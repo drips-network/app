@@ -24,6 +24,7 @@
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
   import launchCreateDripList from '../../utils/launch-create-drip-list';
+  import network from '$lib/stores/wallet/network';
 
   export let dripLists: DripListsSectionDripListFragment[];
   export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
@@ -64,15 +65,16 @@
     icon: DripListIcon,
     label,
     actionsDisabled: !dripLists,
-    actions: withCreateButton
-      ? [
-          {
-            label: 'Create Drip List',
-            icon: Plus,
-            handler: launchCreateDripList,
-          },
-        ]
-      : [],
+    actions:
+      withCreateButton && !network.readOnlyMode
+        ? [
+            {
+              label: 'Create Drip List',
+              icon: Plus,
+              handler: launchCreateDripList,
+            },
+          ]
+        : [],
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
@@ -96,7 +98,7 @@
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each visibleDripListsAndVotingRounds as list}
+      {#each visibleDripListsAndVotingRounds as list, index (index)}
         {@const matchingVotingRound =
           list.type === 'drip-list'
             ? votingRounds.find((vr) => vr.dripListId === list.account.accountId)
@@ -113,7 +115,7 @@
           <DripListCard variant="partial" data={{ votingRound: list }} />
         {/if}
       {/each}
-      {#if showCreateNewListCard}
+      {#if showCreateNewListCard && !network.readOnlyMode}
         <div
           class="shadow-low rounded-drip-lg flex items-center justify-center p-1"
           style:min-height="398px"
@@ -141,7 +143,7 @@
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each hiddenDripListsAndVotingRounds as list}
+      {#each hiddenDripListsAndVotingRounds as list, index (index)}
         {#if list.type === 'drip-list'}
           <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
         {/if}

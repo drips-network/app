@@ -143,6 +143,8 @@ const walletStore = () => {
   ): Promise<WalletStoreState | undefined> {
     if (!browser) throw new Error('Can only connect client-side');
 
+    if (network.readOnlyMode) return;
+
     let clearAdvisory: ReturnType<typeof globalAdvisoryStore.add> | undefined;
     let connected = false;
 

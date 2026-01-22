@@ -30,6 +30,7 @@
   import modal from '$lib/stores/modal';
   import Stepper from '../stepper/stepper.svelte';
   import type { CollectButtonWithdrawableBalanceFragment } from './__generated__/gql.generated';
+  import network from '$lib/stores/wallet/network';
 
   interface Props {
     withdrawableBalances: CollectButtonWithdrawableBalanceFragment[] | undefined;
@@ -135,7 +136,7 @@
 <button
   data-testid="global-collect-button"
   onclick={handleClick}
-  disabled={loading}
+  disabled={loading || network.readOnlyMode}
   class:nothing-to-collect={nothingToCollect}
 >
   <div class="amount-wrapper" style:width="{$amountElemWidth}px">

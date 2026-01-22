@@ -25,6 +25,7 @@
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
   import launchCreateDripList from '../../../../../lib/utils/launch-create-drip-list';
+  import network from '$lib/stores/wallet/network';
 
   interface Props {
     data: PageData;
@@ -51,9 +52,11 @@
       </p>
     {/snippet}
     {#snippet buttons()}
-      <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
-        >Create a Drip List</Button
-      >
+      {#if !network.readOnlyMode}
+        <Button icon={Plus} variant="primary" onclick={launchCreateDripList}
+          >Create a Drip List</Button
+        >
+      {/if}
     {/snippet}
     {#snippet illustration()}
       <div class="edu-card-illustration-bg"></div>
@@ -63,13 +66,15 @@
     {/snippet}
   </EduCard>
 
-  <YourDripListsSection
-    votingRounds={data.votingRounds}
-    dripLists={data.yourDripLists}
-    showCreateNewListCard={true}
-    withCreateButton={true}
-    showVisibilityToggle={true}
-  />
+  {#if !network.readOnlyMode}
+    <YourDripListsSection
+      votingRounds={data.votingRounds}
+      dripLists={data.yourDripLists}
+      showCreateNewListCard={true}
+      withCreateButton={true}
+      showVisibilityToggle={true}
+    />
+  {/if}
 
   <StatsSection>
     <ProminentKeyValuePair key="Total Donations">
