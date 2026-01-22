@@ -119,6 +119,7 @@
   }
 
   const isOwnApplication = $derived(user ? application.applicant.id === user.id : false);
+  const isAcceptedApplication = $derived(application.status === 'accepted');
 
   const disabled = $derived(
     application.status === 'rejected' ||
@@ -130,14 +131,17 @@
 </script>
 
 <Card
-  style="background-color: {isOwnApplication
+  style="background-color: {isOwnApplication || isAcceptedApplication
     ? 'var(--color-primary-level-1)'
     : 'var(--color-background)'};
-    
+
     opacity: {disabled ? 0.6 : 1};
     "
 >
-  <div class="issue-application-card" class:is-own={isOwnApplication}>
+  <div
+    class="issue-application-card"
+    class:is-highlighted={isOwnApplication || isAcceptedApplication}
+  >
     <GithubUserBadge
       user={application.applicant}
       link={false}

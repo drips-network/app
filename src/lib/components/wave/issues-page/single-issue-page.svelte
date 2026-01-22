@@ -146,16 +146,23 @@
     promisePending = true;
     issueApplicationsPromise?.then((apps) => {
       applications = apps.data
-        // own application, if any, first
+        // accepted application first, then own application
         .sort((a, b) => {
           const ownUserId = user?.id || '';
-          if (a.applicant.id === ownUserId && b.applicant.id !== ownUserId) {
-            return -1;
-          } else if (a.applicant.id !== ownUserId && b.applicant.id === ownUserId) {
-            return 1;
-          } else {
-            return 0;
-          }
+          const aIsAccepted = a.status === 'accepted';
+          const bIsAccepted = b.status === 'accepted';
+          const aIsOwn = a.applicant.id === ownUserId;
+          const bIsOwn = b.applicant.id === ownUserId;
+
+          // Accepted applications come first
+          if (aIsAccepted && !bIsAccepted) return -1;
+          if (!aIsAccepted && bIsAccepted) return 1;
+
+          // Then own application
+          if (aIsOwn && !bIsOwn) return -1;
+          if (!aIsOwn && bIsOwn) return 1;
+
+          return 0;
         });
 
       promisePending = false;
