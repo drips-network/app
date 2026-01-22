@@ -62,5 +62,6 @@ export const issueDetailsDtoSchema = z.object({
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
   resolvedInWave: waveDtoSchema.nullable(),
   hasPr: z.boolean(),
+  addedBy: waveUserDtoSchema.nullable(),
 });
 export type IssueDetailsDto = z.infer<typeof issueDetailsDtoSchema>;

@@ -364,6 +364,11 @@
 
           {#if partOfWaveProgram}
             <WaveBadge waveProgram={partOfWaveProgram} />
+
+            {#if issue.addedBy}
+              <h5 style:margin-top="1rem">Added by</h5>
+              <GithubUserBadge user={issue.addedBy} />
+            {/if}
           {:else}
             <p style:color="var(--color-foreground-level-5)">
               Issue isn't part of a Wave Program yet.
