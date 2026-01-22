@@ -35,11 +35,10 @@ export const load = async ({ fetch, url, parent }) => {
     currentWaveOnly = true;
   }
 
-  const leaderboard = await getLeaderboard(fetch, filters, { limit: 20 });
+  const leaderboard = await getLeaderboard(fetch, filters, { limit: 50 });
 
   return {
     leaderboard,
     currentWaveOnly,
-    filters,
   };
 };

@@ -7,130 +7,25 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
-  import { getLeaderboard } from '$lib/utils/wave/leaderboard.js';
-  import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import type { Snapshot } from '../$types.js';
 
   let { data } = $props();
-  const { leaderboard: initialLeaderboard, waveProgram, filters } = $derived(data);
 
-  // pagination
-  // svelte-ignore state_referenced_locally
-  let entries = $state(initialLeaderboard.data);
-  // svelte-ignore state_referenced_locally
-  let pagination = $state(initialLeaderboard.pagination);
-  let isLoadingMore = $state(false);
+  let moreThanOne = $derived(data.leaderboard.pagination.total !== 1);
 
-  // when initialLeaderboard changes, reset entries and pagination
-  $effect(() => {
-    entries = initialLeaderboard.data;
-    pagination = initialLeaderboard.pagination;
-  });
-
-  let fetchTriggerElem = $state<HTMLDivElement>();
-
-  function isTriggerInViewport(elem: HTMLDivElement) {
-    const rect = elem.getBoundingClientRect();
-    return rect.top >= 0 && rect.bottom <= window.innerHeight;
-  }
-
-  async function getMoreEntries() {
-    if (isLoadingMore || !pagination.hasNextPage) return;
-
-    isLoadingMore = true;
-
-    try {
-      const nextPage = pagination.page + 1;
-      const newEntries = await getLeaderboard(undefined, filters, {
-        page: nextPage,
-        limit: 20,
-      });
-
-      entries = [...entries, ...newEntries.data];
-      pagination = newEntries.pagination;
-
-      // retrigger if still in viewport
-      if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem) && pagination.hasNextPage) {
-        setTimeout(() => {
-          getMoreEntries();
-        }, 200);
-      }
-    } finally {
-      isLoadingMore = false;
-    }
-  }
-
-  onMount(() => {
-    const observer = new IntersectionObserver(
-      (observerEntries) => {
-        observerEntries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            getMoreEntries();
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: '0px',
-        threshold: 1.0,
-      },
-    );
-
-    if (fetchTriggerElem) {
-      observer.observe(fetchTriggerElem);
-    }
-
-    return () => {
-      if (fetchTriggerElem) {
-        observer.unobserve(fetchTriggerElem);
-      }
-    };
-  });
-
-  // restore data on navigation back
-  export const snapshot: Snapshot<{
-    entries: typeof entries;
-    pagination: typeof pagination;
-    scrollPos: number;
-  }> = {
-    capture: () => {
-      return {
-        entries,
-        pagination,
-        scrollPos: window.scrollY,
-      };
-    },
-    restore: (snapshotData) => {
-      entries = snapshotData.entries;
-      pagination = snapshotData.pagination;
-
-      setTimeout(() => {
-        window.scrollTo({
-          top: snapshotData.scrollPos,
-          behavior: 'instant',
-        });
-      }, 0);
-    },
-  };
-
-  let moreThanOne = $derived(pagination.total !== 1);
-
-  let isEmpty = $derived(pagination.total === 0);
+  let isEmpty = $derived(data.leaderboard.pagination.total === 0);
 </script>
 
 <HeadMeta
-  title="Leaderboard | {waveProgram.name}"
-  description="View the leaderboard for the {waveProgram.name} Wave Program."
+  title="Leaderboard | {data.waveProgram.name}"
+  description="View the leaderboard for the {data.waveProgram.name} Wave Program."
 />
 
 <div class="page">
   <Breadcrumbs
     crumbs={[
       { label: 'Wave Programs', href: '/wave' },
-      { label: waveProgram.name, href: `/wave/${waveProgram.slug}` },
+      { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
       { label: 'Leaderboard', href: '' },
     ]}
   />
@@ -160,18 +55,19 @@
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
     {#if isEmpty}
-      No users have earned points yet. Participate in the {waveProgram.name} Wave Program to start earning
-      points!
+      No users have earned points yet. Participate in the {data.waveProgram.name} Wave Program to start
+      earning points!
     {:else}
-      Showing {pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne ? 'have' : 'has'} earned
-      Points in {#if data.currentWaveOnly}the latest Wave.{:else}all {waveProgram.name} Waves.{/if}
+      Showing {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
+        ? 'have'
+        : 'has'} earned Points in {#if data.currentWaveOnly}the latest Wave.{:else}all {data
+          .waveProgram.name} Waves.{/if}
     {/if}
   </span>
 
   <div class="leaderboard">
-    {#each entries as { user, totalPoints }, index (user.id)}
+    {#each data.leaderboard.data as { user, totalPoints }, index (user.id)}
       <div
-        in:fade={{ duration: 200 }}
         class="entry typo-text"
         class:first={index === 0}
         class:second={index === 1}
@@ -196,11 +92,6 @@
         <div class="spacer"></div>
       {/if}
     {/each}
-  </div>
-  <div bind:this={fetchTriggerElem} class="fetch-trigger">
-    {#if pagination.hasNextPage}
-      <Spinner />
-    {/if}
   </div>
 </div>
 
@@ -312,11 +203,5 @@
 
   .spacer {
     height: 0.5rem;
-  }
-
-  .fetch-trigger {
-    display: flex;
-    height: 2rem;
-    justify-content: center;
   }
 </style>
