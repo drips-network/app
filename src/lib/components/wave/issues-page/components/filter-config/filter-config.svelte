@@ -107,22 +107,17 @@
                     throw new Error('currentWaveProgram is required for wave mode');
                   }
 
-                  const { data: reposInWave } = await getWaveProgramRepos(
-                    undefined,
-                    currentWaveProgram.id,
-                    // todo(wave): pagination
-                    { limit: 100 },
+                  const allRepos = await getAllPaginated((page, limit) =>
+                    getWaveProgramRepos(undefined, currentWaveProgram.id, { page, limit }),
                   );
 
-                  return reposInWave.map((waveProgramRepo) => ({
+                  return allRepos.map((waveProgramRepo) => ({
                     label: waveProgramRepo.repo.gitHubRepoFullName,
                     value: waveProgramRepo.repo.id,
                   }));
                 } else {
-                  const { data: allRepos } = await getOwnWaveProgramRepos(
-                    undefined,
-                    // todo(wave): pagination
-                    { limit: 100 },
+                  const allRepos = await getAllPaginated((page, limit) =>
+                    getOwnWaveProgramRepos(undefined, { page, limit }),
                   );
 
                   return allRepos.map((waveProgramRepo) => ({
@@ -154,6 +149,7 @@
 
 <script lang="ts">
   import Button from '$lib/components/button/button.svelte';
+  import { getAllPaginated } from '$lib/utils/wave/getAllPaginated';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
   import { getOwnWaveProgramRepos, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
