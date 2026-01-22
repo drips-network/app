@@ -47,13 +47,15 @@
         doWithErrorModal(async () => {
           if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
-          try {
-            await acceptIssueApplication(undefined, issue.waveProgramId, issue.id, application.id);
-          } finally {
-            await invalidate('wave:issues');
+          await acceptIssueApplication(undefined, issue.waveProgramId, issue.id, application.id);
 
+          // Refetch to update UI - errors here shouldn't show error modal since action succeeded
+          try {
+            await invalidate('wave:issues');
             const newIssueDetails = await getIssue(undefined, issue.id);
             if (newIssueDetails) notifyIssuesUpdated([newIssueDetails]);
+          } catch {
+            // Silently handle refetch errors - action already succeeded
           }
         }),
     );
@@ -73,18 +75,15 @@
         doWithErrorModal(async () => {
           if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
-          try {
-            await withdrawIssueApplication(
-              undefined,
-              issue.waveProgramId,
-              issue.id,
-              application.id,
-            );
-          } finally {
-            await invalidate('wave:issues');
+          await withdrawIssueApplication(undefined, issue.waveProgramId, issue.id, application.id);
 
+          // Refetch to update UI - errors here shouldn't show error modal since action succeeded
+          try {
+            await invalidate('wave:issues');
             const newIssueDetails = await getIssue(undefined, issue.id);
             if (newIssueDetails) notifyIssuesUpdated([newIssueDetails]);
+          } catch {
+            // Silently handle refetch errors - action already succeeded
           }
         }),
     );
@@ -100,18 +99,20 @@
         doWithErrorModal(async () => {
           if (!issue.waveProgramId) throw new Error('Issue is not part of a Wave Program');
 
-          try {
-            await unassignContributorFromIssue(
-              undefined,
-              issue.waveProgramId,
-              issue.id,
-              application.id,
-            );
-          } finally {
-            await invalidate('wave:issues');
+          await unassignContributorFromIssue(
+            undefined,
+            issue.waveProgramId,
+            issue.id,
+            application.id,
+          );
 
+          // Refetch to update UI - errors here shouldn't show error modal since action succeeded
+          try {
+            await invalidate('wave:issues');
             const newIssueDetails = await getIssue(undefined, issue.id);
             if (newIssueDetails) notifyIssuesUpdated([newIssueDetails]);
+          } catch {
+            // Silently handle refetch errors - action already succeeded
           }
         }),
     );
@@ -149,6 +150,16 @@
     <Divider />
 
     <div class="metrics">
+      {#if application.applicant.currentWaveAssignmentCount != null}
+        <div class="metric">
+          <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
+            Current assignments
+          </div>
+          <div class="value typo-text-small-bold">
+            {application.applicant.currentWaveAssignmentCount}
+          </div>
+        </div>
+      {/if}
       {#each KEY_METRICS as { key, label } (key)}
         <div class="metric">
           <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">

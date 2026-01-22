@@ -33,7 +33,7 @@
   });
 
   function reRender(content: string): string {
-    const markup = marked(content) as string;
+    const markup = marked(content, { breaks: true }) as string;
 
     return sanitize(markup, {
       allowedTags: [

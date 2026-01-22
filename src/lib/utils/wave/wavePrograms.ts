@@ -176,3 +176,46 @@ export async function updateWaveProgramIssueComplexity(
     }),
   );
 }
+
+// Moderation API functions
+
+export async function moderatorUpdateIssueComplexity(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  complexity: Complexity | null,
+  reason: string,
+) {
+  return parseRes(
+    waveProgramIssueWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/complexity`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          complexity,
+          reason,
+        }),
+      },
+    ),
+  );
+}
+
+export async function moderatorRemoveIssueFromWave(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  reason: string,
+) {
+  return await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}`,
+    {
+      method: 'DELETE',
+      body: JSON.stringify({
+        reason,
+      }),
+    },
+  );
+}

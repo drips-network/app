@@ -10,6 +10,8 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
+  import Settings from '$lib/components/icons/Settings.svelte';
+  import Trash from '$lib/components/icons/Trash.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Section from '$lib/components/section/section.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
@@ -34,15 +36,19 @@
     beComplexityToFriendlyLabel,
     removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
+  import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
+  import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
+  import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
   import Heart from '$lib/components/icons/Heart.svelte';
+  import Multiplier from '$lib/components/icons/Multiplier.svelte';
   import formatDate from '$lib/utils/format-date';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
@@ -73,6 +79,10 @@
     user: WaveLoggedInUser | null;
     headMetaTitle: string;
     givenCompliments: IssueComplimentDto[];
+
+    /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
+     * Used to determine if moderation actions should be shown. */
+    isInWaveContext?: boolean;
   }
 
   let {
@@ -86,6 +96,7 @@
     backToConfig,
     headMetaTitle,
     givenCompliments,
+    isInWaveContext = false,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
@@ -101,6 +112,12 @@
     Boolean(
       partOfWaveProgram && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open',
     ),
+  );
+
+  // Moderation permissions
+  let canModerateWaveIssues = $derived(user?.permissions?.includes('moderateWaveIssues') ?? false);
+  let showModerationSection = $derived(
+    canModerateWaveIssues && isInWaveContext && partOfWaveProgram !== null,
   );
 
   async function handleRemoveFromWave() {
@@ -175,6 +192,26 @@
       onIssueUpdated: handleIssueUpdated,
     });
   }
+
+  // Moderation modal handlers
+  function openModeratorUpdateComplexityModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorUpdateComplexityModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+      onIssueUpdated: handleIssueUpdated,
+    });
+  }
+
+  function openModeratorRemoveFromWaveModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorRemoveFromWaveModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+    });
+  }
 </script>
 
 <div class="back-to-issues-link">
@@ -200,7 +237,10 @@
               {@html renderIssueTitle(issue.title)}
             </h1>
 
-            <RepoBadge repo={issue.repo} />
+            <RepoBadge
+              repo={issue.repo}
+              avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+            />
           </div>
         </div>
 
@@ -239,7 +279,7 @@
         }}
       >
         <div class="applications-grid">
-          {#each applications?.slice(0, 5) as application (application.id)}
+          {#each applications as application (application.id)}
             <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
           {/each}
         </div>
@@ -347,12 +387,63 @@
         {/if}
       </div>
 
-      {#if issue.points}
+      {#if (issue.points && issue.state !== 'closed') || issue.pointsEarned}
+        {@const multiplier = issue.pointsMultiplier ?? 1}
+        {@const hasMultiplier = multiplier > 1}
+        {@const complexityBonus = issue.complexity ? getPointsForComplexity(issue.complexity) : 0}
+        {@const hasComplexityBonus = complexityBonus > 0}
+        {@const basePoints = 100}
+        {@const subtotal = basePoints + complexityBonus}
+        {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
+        {@const showEarnedPoints = issue.state === 'closed' && issue.pointsEarned != null}
         <div class="sidebar-section">
           <div class="content">
             <h5>Points</h5>
 
-            <span class="typo-text">{issue.points}</span>
+            {#if showEarnedPoints}
+              <div class="points-earned">
+                <span class="typo-text">Points earned</span>
+                <span class="typo-text-bold">{issue.pointsEarned}</span>
+              </div>
+            {:else}
+              <ul class="points-table">
+                <li class="points-row">
+                  <span class="typo-text">Base Points</span>
+                  <span class="typo-text">{basePoints}</span>
+                </li>
+
+                {#if hasComplexityBonus}
+                  <li class="points-row">
+                    <span class="typo-text">Complexity Bonus</span>
+                    <span class="typo-text">+{complexityBonus}</span>
+                  </li>
+                {/if}
+
+                {#if hasMultiplier}
+                  <li class="points-row featured-row">
+                    <span
+                      class="typo-text"
+                      style:display="flex"
+                      style:align-items="center"
+                      style:gap="0.25rem"
+                    >
+                      <Multiplier
+                        style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
+                      />
+                      Featured Repo
+                    </span>
+                    <span class="typo-text">{multiplier}x</span>
+                  </li>
+                {/if}
+
+                <li class="points-row total-row">
+                  <span class="typo-text-bold">Total</span>
+                  <span class="typo-text-bold" class:featured-points={hasMultiplier}
+                    >{totalPoints}</span
+                  >
+                </li>
+              </ul>
+            {/if}
 
             {#if givenCompliments.length > 0}
               <h5 style:margin-top="1rem">Compliments</h5>
@@ -403,15 +494,31 @@
           {/if}
         </div>
       {/if}
-
-      <div class="sidebar-section">
-        <div class="content">
-          <h5>Details</h5>
-
-          <p style:color="var(--color-foreground-level-5)">todo(wave): display some deets</p>
-        </div>
-      </div>
     </Card>
+
+    {#if showModerationSection}
+      <Card style="height: fit-content; padding: 0; overflow: auto;">
+        <div class="sidebar-section moderation-section">
+          <div class="content">
+            <div class="moderation-header">
+              <Settings style="width: 1rem; height: 1rem; fill: var(--color-foreground-level-5)" />
+              <h5>Moderation</h5>
+            </div>
+            <p class="moderation-description">Moderator actions for this issue.</p>
+          </div>
+
+          <SidebarButton icon={Pen} onclick={openModeratorUpdateComplexityModal}>
+            Adjust complexity
+          </SidebarButton>
+
+          <div>
+            <SidebarButton icon={Trash} onclick={openModeratorRemoveFromWaveModal}>
+              Remove from Wave
+            </SidebarButton>
+          </div>
+        </div>
+      </Card>
+    {/if}
   </div>
 </div>
 
@@ -544,5 +651,50 @@
     .back-to-issues-link {
       display: block;
     }
+  }
+
+  .moderation-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .moderation-description {
+    font-size: 0.875rem;
+    color: var(--color-foreground-level-5);
+  }
+
+  .featured-points {
+    color: var(--color-caution-level-6);
+  }
+
+  .points-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .points-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .points-row.featured-row {
+    color: var(--color-caution-level-6);
+  }
+
+  .points-row.total-row {
+    margin-top: 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-foreground-level-3);
+  }
+
+  .points-earned {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
   }
 </style>

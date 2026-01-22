@@ -11,7 +11,6 @@ const accessClaimJwtSchema = z.object({
   sub: z.uuid(),
   iat: z.number().int(),
   exp: z.number().int(),
-  isSuperAdmin: z.boolean(),
   name: z.string(),
   email: z.email(),
   picture: z.url(),
@@ -21,17 +20,18 @@ const accessClaimJwtSchema = z.object({
       stellar: z.string().nullable(),
     })
     .optional(),
+  permissions: z.array(z.string()).optional(),
 });
 
 export type WaveLoggedInUser = WaveUser & {
   name: string;
   email: string;
   avatarUrl: string;
-  isSuperAdmin: boolean;
   payoutAddresses?: {
     stellar: string | null;
   };
   signUpDate: Date;
+  permissions?: string[];
 };
 
 export function getAccessTokenCookieClientSide(): string | null {
@@ -68,10 +68,10 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
     name: content.name,
     gitHubAvatarUrl: content.picture,
     email: content.email,
-    isSuperAdmin: content.isSuperAdmin,
     avatarUrl: content.picture,
     signUpDate: content.signUpDate,
     payoutAddresses: content.payoutAddresses,
+    permissions: content.permissions,
   };
 }
 

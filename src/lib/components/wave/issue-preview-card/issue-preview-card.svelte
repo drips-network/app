@@ -2,13 +2,21 @@
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
   import Card from '../card/card.svelte';
+  import Multiplier from '$lib/components/icons/Multiplier.svelte';
+
+  type Badge = {
+    text: string;
+    color: string;
+    backgroundColor: string;
+    showMultiplierIcon?: boolean;
+  };
 
   let { issue }: { issue: IssueDetailsDto } = $props();
 
   let issueUrl = $derived(`${issue.repo.gitHubRepoUrl}/issues/${issue.gitHubIssueNumber}`);
 
   let badges = $derived.by(() => {
-    const result = [];
+    const result: Badge[] = [];
 
     if (issue.state === 'closed') {
       result.push({
@@ -19,10 +27,17 @@
     }
 
     if (issue.points) {
+      const multiplier = issue.pointsMultiplier ?? 1;
+      const hasMultiplier = multiplier > 1;
+      const displayPoints = hasMultiplier ? issue.points * multiplier : issue.points;
+
       result.push({
-        text: `${issue.points} Points`,
-        color: 'var(--color-primary-level-7)',
-        backgroundColor: 'var(--color-primary-level-2)',
+        text: `${displayPoints} Points`,
+        color: hasMultiplier ? 'var(--color-caution-level-6)' : 'var(--color-primary-level-7)',
+        backgroundColor: hasMultiplier
+          ? 'var(--color-caution-level-1)'
+          : 'var(--color-primary-level-2)',
+        showMultiplierIcon: hasMultiplier,
       });
     }
 
@@ -30,18 +45,26 @@
   });
 </script>
 
-{#snippet badge(text: string, color: string, backgroundColor: string)}
-  <span class="state-badge typo-text-small" style:color style:background-color={backgroundColor}
-    >{text}</span
+{#snippet badge(text: string, color: string, backgroundColor: string, showMultiplierIcon?: boolean)}
+  <span
+    class="state-badge typo-text-small"
+    class:has-icon={showMultiplierIcon}
+    style:color
+    style:background-color={backgroundColor}
   >
+    {#if showMultiplierIcon}
+      <Multiplier style="width: 0.875rem; height: 0.875rem; fill: currentColor;" />
+    {/if}
+    {text}
+  </span>
 {/snippet}
 
 <Card>
   <a href={issueUrl} target="_blank" rel="noopener noreferrer" class="issue-preview-card">
     {#if badges.length > 0}
       <div class="badges">
-        {#each badges as { text, color, backgroundColor } (text)}
-          {@render badge(text, color, backgroundColor)}
+        {#each badges as { text, color, backgroundColor, showMultiplierIcon } (text)}
+          {@render badge(text, color, backgroundColor, showMultiplierIcon)}
         {/each}
       </div>
     {/if}
@@ -52,7 +75,11 @@
     </h3>
 
     <div class="bottom-row">
-      <RepoBadge size="small" repo={issue.repo} />
+      <RepoBadge
+        size="small"
+        repo={issue.repo}
+        avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+      />
     </div>
   </a>
 </Card>
@@ -88,6 +115,11 @@
     height: 24px;
     display: inline-flex;
     align-items: center;
+    gap: 0.25rem;
+  }
+
+  .state-badge.has-icon {
+    font-weight: 600;
   }
 
   .title {

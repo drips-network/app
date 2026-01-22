@@ -41,6 +41,7 @@ export const userCodeMetricsDtoSchema = z.object({
       value: z.number().nullable(),
       percentile: z.number().nullable(),
       bin: z.string().nullable(),
+      lower_is_better: z.boolean(),
       description: z.string(),
     }),
   ),

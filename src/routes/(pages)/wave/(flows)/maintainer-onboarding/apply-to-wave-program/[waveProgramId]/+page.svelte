@@ -32,7 +32,11 @@
             type: 'selectable',
             label: {
               component: RepoBadge,
-              props: { repo },
+              props: {
+                repo,
+                avatarUrl: data.ownOrgs.data.find((org) => org.org.id === repo.orgId)?.org
+                  .gitHubOrgAvatarUrl,
+              },
             },
             disabled: checkAlreadyApplied(repo.id),
             text: checkAlreadyApplied(repo.id) ? 'Already applied' : undefined,

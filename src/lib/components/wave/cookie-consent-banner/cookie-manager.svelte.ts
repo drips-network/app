@@ -3,6 +3,7 @@ import z from 'zod';
 
 export enum ConsentType {
   AUTHENTICATION = 'authentication',
+  IN_APP_NOTIFICATIONS = 'in_app_notifications',
   INTERCOM = 'intercom',
   FARO = 'faro',
 }
@@ -19,7 +20,14 @@ export const REQUIRED_CONSENTS: ConsentTypeDefinition[] = [
     value: ConsentType.AUTHENTICATION,
     label: 'Authentication',
     description:
-      'A strictly necessary cookie that enables user login and session management. This cookie is set only on the Drips Wave website and read only by our systems to authenticate your requests after a login.',
+      'The strictly necessary refresh- and access-token cookies enable user login and session management on Drips Wave. Authentication-related cookies are set only on the Drips Wave website and read only by Public Goods Association (Drips) systems to authenticate your requests after a login.',
+    required: true,
+  },
+  {
+    value: ConsentType.IN_APP_NOTIFICATIONS,
+    label: 'In-app notifications',
+    description:
+      'Cookies set and read by Noti-Fire Apps Ltd. ("Novu") are used on the Drips Wave website to enable use of the "Novu" real-time notification system. These cookies are strictly necessary to manage and display real-time notifications, an integral part of the Drips Wave experience. The cookies are set only when you log in with an account.',
     required: true,
   },
 ];
@@ -29,14 +37,14 @@ export const OPTIONAL_CONSENTS: ConsentTypeDefinition[] = [
     value: ConsentType.INTERCOM,
     label: 'Intercom support chat',
     description:
-      'This cookie enables the Intercom chat widget on the Drips Wave website to provide user support and assistance. It is used to identify you as a returning user and to store your chat history with our support team. Important: Even if initially disabled, Intercom cookies will be set when you later explicitly open the chat widget.',
+      'This cookie, set and read by Intercom, Inc. in the EU, enables the Intercom chat widget on the Drips Wave website to provide user support and assistance. It is used to identify you as a returning user and to store your chat history with our support team. Important: Even if initially disabled, Intercom cookies become strictly necessary and are enabled if you later explicitly open the chat widget.',
     required: false,
   },
   {
     value: ConsentType.FARO,
     label: 'Faro Monitoring',
     description:
-      'Grafana Faro helps us track errors and performance issues on our website to improve your experience. It collects data about how you interact with our site, but does not collect personal information. Faro uses cookie-like technologies to understand user sessions. Note: After turning this off, you may need to refresh the page to fully disable Faro monitoring.',
+      'Grafana Faro by Raintank Inc., dba Grafana Labs helps us track errors and performance issues on our website to improve user experience. It collects data about how you interact with our site, but does not collect personally-identifiable information. Grafana Faro uses cookie-like technologies to consolidate user sessions. Note: After turning this off, you may need to refresh the page to fully disable Faro monitoring.',
     required: false,
   },
 ];
@@ -48,6 +56,7 @@ export default (() => {
 
   const consentMap: Record<ConsentType, boolean> = $state({
     [ConsentType.AUTHENTICATION]: true,
+    [ConsentType.IN_APP_NOTIFICATIONS]: true,
     [ConsentType.INTERCOM]: false,
     [ConsentType.FARO]: false,
   });

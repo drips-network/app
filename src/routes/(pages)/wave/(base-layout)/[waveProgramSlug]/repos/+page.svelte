@@ -10,7 +10,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
-  import DropdownFilterItem from '$lib/components/wave/issues-page/components/filter-config/components/dropdown-filter-item.svelte';
+  import ReposFilterBar from '$lib/components/wave/repos-filter-bar/repos-filter-bar.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import type { WaveProgramReposFilters } from '$lib/utils/wave/types/waveProgram';
   import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
@@ -18,9 +18,9 @@
   import { fade } from 'svelte/transition';
   import type { Snapshot } from '../$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import MiniButton from '$lib/components/mini-button/mini-button.svelte';
-  import Cross from '$lib/components/icons/Cross.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
+  import Star from '$lib/components/icons/Star.svelte';
+  import Fork from '$lib/components/icons/Fork.svelte';
 
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
@@ -58,6 +58,7 @@
   let repos = $state(initialRepos.data);
   // svelte-ignore state_referenced_locally
   let pagination = $state(initialRepos.pagination);
+  let isLoadingMore = $state(false);
 
   // when initialRepos changes, reset repos and pagination
   $effect(() => {
@@ -73,7 +74,11 @@
   }
 
   async function getMoreRepos() {
-    if (pagination.hasNextPage) {
+    if (isLoadingMore || !pagination.hasNextPage) return;
+
+    isLoadingMore = true;
+
+    try {
       const nextPage = pagination.page + 1;
       const newRepos = await getWaveProgramRepos(
         undefined,
@@ -89,11 +94,13 @@
       pagination = newRepos.pagination;
 
       // retrigger if still in viewport
-      setTimeout(() => {
-        if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem)) {
+      if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem) && pagination.hasNextPage) {
+        setTimeout(() => {
           getMoreRepos();
-        }
-      }, 200);
+        }, 200);
+      }
+    } finally {
+      isLoadingMore = false;
     }
   }
 
@@ -157,67 +164,37 @@
 />
 
 <div class="page">
-  <Breadcrumbs
-    crumbs={[
-      { label: 'Wave Programs', href: '/wave' },
-      { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
-      { label: 'Repos', href: '' },
-    ]}
-  />
+  <div
+    style:view-transition-name="repos-page-content"
+    style:view-transition-class="element-handover"
+    style:display="flex"
+    style:flex-direction="column"
+    style:gap="1.5rem"
+  >
+    <Breadcrumbs
+      crumbs={[
+        { label: 'Wave Programs', href: '/wave' },
+        { label: data.waveProgram.name, href: `/wave/${data.waveProgram.slug}` },
+        { label: 'Repos', href: '' },
+      ]}
+    />
 
-  <SectionHeader
-    icon={Folder}
-    label="Repos"
-    actions={[
-      {
-        label: 'Apply your repo',
-        icon: ArrowRight,
-        href:
-          '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/' +
-          data.waveProgram.id +
-          '/repos',
-      },
-    ]}
-  />
+    <SectionHeader
+      icon={Folder}
+      label="Repos"
+      actions={[
+        {
+          label: 'Apply your repo',
+          icon: ArrowRight,
+          href:
+            '/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/' +
+            data.waveProgram.id +
+            '/repos',
+        },
+      ]}
+    />
 
-  <div class="filter-bar typo-text">
-    <span class="typo-text-bold">Filters</span>
-
-    <div class="divider"></div>
-
-    <div class="filter">
-      <span class="label">Primary language</span>
-      <div class="dropdown">
-        <DropdownFilterItem
-          onchange={(val) => {
-            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: val ?? undefined });
-          }}
-          selectedOption={filters.primaryLanguage}
-          config={{
-            type: 'dropdown',
-            label: 'Primary Language',
-            optionsPromise: new Promise<{ value: string, label: string }[]>((resolve) => {
-              import('$lib/components/programming-language-breakdown/colors.json').then((colors) => {
-                resolve(Object.keys(colors).map((lang) => ({
-                  label: lang,
-                  value: lang,
-                })));
-              });
-            }),
-          }}
-        />
-      </div>
-
-      {#if data.filters.primaryLanguage}
-        <MiniButton
-          label="Clear"
-          icon={Cross}
-          onclick={() => {
-            handleApplyFilters({ ...(data.filters ?? {}), primaryLanguage: undefined });
-          }}
-        />
-      {/if}
-    </div>
+    <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} />
   </div>
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
@@ -232,9 +209,14 @@
   </span>
 
   <div class="repo-grid">
-    {#each repos as { repo, org, issueCount } (repo.id)}
+    {#each repos as { repo, org, issueCount, pointsMultiplier } (repo.id)}
+      {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
       <div in:fade={{ duration: 200 }}>
-        <Card>
+        <Card
+          style={isFeatured
+            ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
+            : undefined}
+        >
           <div class="repo-item">
             <div class="top" style:display="flex" style:flex-direction="column" style:gap="0.5rem">
               <div class="owner-and-repo">
@@ -251,6 +233,10 @@
                   </span>
                   {repo.gitHubRepoFullName.split('/')[1]}
                 </a>
+
+                {#if isFeatured}
+                  <span class="featured-badge">{pointsMultiplier}x Points</span>
+                {/if}
               </div>
 
               <span class="description typo-text-small line-clamp-2">
@@ -269,7 +255,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="bottom-row">
               <Button
                 size="small"
                 disabled={issueCount === 0}
@@ -281,6 +267,17 @@
                   Browse {issueCount} issues
                 {/if}
               </Button>
+
+              <div class="repo-stats">
+                <span class="stat">
+                  <Star style="width: 1rem; height: 1rem;" />
+                  {repo.stargazersCount?.toString() ?? '0'}
+                </span>
+                <span class="stat">
+                  <Fork style="width: 1rem; height: 1rem;" />
+                  {repo.forksCount?.toString() ?? '0'}
+                </span>
+              </div>
             </div>
           </div>
         </Card>
@@ -334,12 +331,32 @@
   }
 
   .description {
-    min-height: 2.5rem;
+    min-height: 2lh;
     color: var(--color-foreground-level-6);
   }
 
   .languages {
     margin-top: 0.25rem;
+  }
+
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .repo-stats {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-foreground-level-5);
+    font-size: 0.875rem;
   }
 
   .fetch-trigger {
@@ -348,50 +365,15 @@
     justify-content: center;
   }
 
-  .filter-bar {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .filter-bar .divider {
-    width: 1px;
-    height: 1.5rem;
-    background-color: var(--color-foreground-level-3);
-  }
-
-  .filter-bar .filter {
-    display: flex;
-    gap: 0.5rem;
+  .featured-badge {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+    padding: 0.125rem 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
     white-space: nowrap;
-    align-items: center;
-  }
-
-  .filter-bar .filter span {
-    color: var(--color-foreground-level-6);
-  }
-
-  .filter-bar .filter .dropdown {
-    max-width: 100%;
-    width: 15rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (max-width: 600px) {
-    .filter-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .filter-bar .divider {
-      display: none;
-    }
-
-    .filter-bar .filter {
-      flex-direction: column;
-      align-items: flex-start;
-    }
+    margin-left: auto;
+    flex-shrink: 0;
   }
 </style>

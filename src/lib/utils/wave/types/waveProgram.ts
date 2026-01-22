@@ -111,7 +111,10 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   reviewedAt: z.coerce.date().nullable(),
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
+  pointsMultiplier: z.number().int().optional(),
   repo: z.object({
+    stargazersCount: z.number().int().nullable().optional(),
+    forksCount: z.number().int().nullable().optional(),
     id: z.uuid(),
     gitHubRepoName: z.string(),
     gitHubRepoFullName: z.string(),
@@ -130,9 +133,14 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
+export const waveProgramReposSortBySchema = z.enum(['stargazersCount', 'forksCount', 'issueCount']);
+export type WaveProgramReposSortBy = z.infer<typeof waveProgramReposSortBySchema>;
+
 export const waveProgramReposFiltersSchema = filterSchema(
   z.object({
-    primaryLanguage: z.string().optional(),
+    primaryLanguages: z.string().optional(), // comma-separated list of languages
+    search: z.string().optional(),
+    sortBy: waveProgramReposSortBySchema.optional(),
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;
@@ -148,6 +156,7 @@ export const waveProgramIssueWithDetailsDtoSchema = z.object({
   id: z.uuid(),
   addedAt: z.coerce.date(),
   removedAt: z.coerce.date().nullable(),
+  pointsMultiplier: z.number().int().optional(),
   issue: z.object({
     id: z.uuid(),
     gitHubIssueNumber: z.number(),
