@@ -58,7 +58,7 @@
       No users have earned points yet. Participate in the {data.waveProgram.name} Wave Program to start
       earning points!
     {:else}
-      Showing {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
+      Showing the top 100 of {data.leaderboard.pagination.total} user{moreThanOne ? 's' : ''} who {moreThanOne
         ? 'have'
         : 'has'} earned Points in {#if data.currentWaveOnly}the latest Wave.{:else}all {data
           .waveProgram.name} Waves.{/if}
