@@ -38,17 +38,19 @@
     try {
       await doWithConfirmationModal(
         'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
-        () =>
-          doWithErrorModal(async () => {
+        async () => {
+          await doWithErrorModal(async () => {
             await applyToWorkOnIssue(
               undefined,
               data.waveProgram.id,
               data.issue.id,
               applicationText,
             );
-          }),
+
+            await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/apply/success`);
+          });
+        },
       );
-      await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/apply/success`);
     } finally {
       submitting = false;
     }
