@@ -14,7 +14,8 @@
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
   import modal from '$lib/stores/modal';
-  import ReportModal from '$lib/components/wave/report-modal/report-modal.svelte';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import reportFlow from '$lib/flows/wave/report/report-flow';
   import { COMPLIMENT_TYPES } from '$lib/utils/wave/types/compliment.js';
 
   let { data } = $props();
@@ -62,11 +63,7 @@
             icon={Flag}
             variant="normal"
             disabled={user.id === profileUserData.id}
-            onclick={() =>
-              modal.show(ReportModal, undefined, {
-                targetType: 'user',
-                targetId: profileUserData.id,
-              })}
+            onclick={() => modal.show(Stepper, undefined, reportFlow('user', profileUserData.id))}
           >
             Report user
           </Button>

@@ -44,7 +44,7 @@
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
-  import ReportModal from '$lib/components/wave/report-modal/report-modal.svelte';
+  import reportFlow from '$lib/flows/wave/report/report-flow';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -513,10 +513,9 @@
         <div>
           <SidebarButton
             icon={Flag}
-            onclick={() =>
-              modal.show(ReportModal, undefined, { targetType: 'issue', targetId: issue.id })}
+            onclick={() => modal.show(Stepper, undefined, reportFlow('issue', issue.id))}
           >
-            Report issue
+            Report this issue
           </SidebarButton>
         </div>
       {/if}
