@@ -509,15 +509,17 @@
         </div>
       {/if}
 
-      <div>
-        <SidebarButton
-          icon={Flag}
-          onclick={() =>
-            modal.show(ReportModal, undefined, { targetType: 'issue', targetId: issue.id })}
-        >
-          Report issue
-        </SidebarButton>
-      </div>
+      {#if user && !allowAddingOrRemovingWave}
+        <div>
+          <SidebarButton
+            icon={Flag}
+            onclick={() =>
+              modal.show(ReportModal, undefined, { targetType: 'issue', targetId: issue.id })}
+          >
+            Report issue
+          </SidebarButton>
+        </div>
+      {/if}
     </Card>
 
     {#if showModerationSection}

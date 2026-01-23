@@ -18,7 +18,7 @@
   import { COMPLIMENT_TYPES } from '$lib/utils/wave/types/compliment.js';
 
   let { data } = $props();
-  let { profileUserData, pointsBalance, complimentCountSummary } = $derived(data);
+  let { profileUserData, pointsBalance, complimentCountSummary, user } = $derived(data);
   let { gitHubUsername } = $derived(profileUserData);
 
   const COMPLIMENTS = $derived(
@@ -57,17 +57,20 @@
           >View user on GitHub</Button
         >
 
-        <Button
-          icon={Flag}
-          variant="normal"
-          onclick={() =>
-            modal.show(ReportModal, undefined, {
-              targetType: 'user',
-              targetId: profileUserData.id,
-            })}
-        >
-          Report user
-        </Button>
+        {#if user}
+          <Button
+            icon={Flag}
+            variant="normal"
+            disabled={user.id === profileUserData.id}
+            onclick={() =>
+              modal.show(ReportModal, undefined, {
+                targetType: 'user',
+                targetId: profileUserData.id,
+              })}
+          >
+            Report user
+          </Button>
+        {/if}
 
         <div class="share">
           <ShareButton buttonVariant="normal" url={page.url.href} />
