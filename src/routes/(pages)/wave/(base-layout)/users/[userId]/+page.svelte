@@ -3,6 +3,7 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import Flag from '$lib/components/icons/Flag.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -12,6 +13,8 @@
   import ComplimentCard from '$lib/components/wave/compliment-card/compliment-card.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
+  import modal from '$lib/stores/modal';
+  import ReportModal from '$lib/components/wave/report-modal/report-modal.svelte';
   import { COMPLIMENT_TYPES } from '$lib/utils/wave/types/compliment.js';
 
   let { data } = $props();
@@ -53,6 +56,18 @@
         <Button icon={ArrowBoxUpRight} href="https://github.com/{gitHubUsername}" target="_blank"
           >View user on GitHub</Button
         >
+
+        <Button
+          icon={Flag}
+          variant="normal"
+          onclick={() =>
+            modal.show(ReportModal, undefined, {
+              targetType: 'user',
+              targetId: profileUserData.id,
+            })}
+        >
+          Report user
+        </Button>
 
         <div class="share">
           <ShareButton buttonVariant="normal" url={page.url.href} />
