@@ -3,6 +3,7 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import Flag from '$lib/components/icons/Flag.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
@@ -12,10 +13,13 @@
   import ComplimentCard from '$lib/components/wave/compliment-card/compliment-card.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import IssuePreviewCard from '$lib/components/wave/issue-preview-card/issue-preview-card.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import reportFlow from '$lib/flows/wave/report/report-flow';
   import { COMPLIMENT_TYPES } from '$lib/utils/wave/types/compliment.js';
 
   let { data } = $props();
-  let { profileUserData, pointsBalance, complimentCountSummary } = $derived(data);
+  let { profileUserData, pointsBalance, complimentCountSummary, user } = $derived(data);
   let { gitHubUsername } = $derived(profileUserData);
 
   const COMPLIMENTS = $derived(
@@ -53,6 +57,17 @@
         <Button icon={ArrowBoxUpRight} href="https://github.com/{gitHubUsername}" target="_blank"
           >View user on GitHub</Button
         >
+
+        {#if user}
+          <Button
+            icon={Flag}
+            variant="normal"
+            disabled={user.id === profileUserData.id}
+            onclick={() => modal.show(Stepper, undefined, reportFlow('user', profileUserData.id))}
+          >
+            Report user
+          </Button>
+        {/if}
 
         <div class="share">
           <ShareButton buttonVariant="normal" url={page.url.href} />

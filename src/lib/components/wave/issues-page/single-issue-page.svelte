@@ -11,6 +11,7 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
+  import Flag from '$lib/components/icons/Flag.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -43,6 +44,7 @@
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
+  import reportFlow from '$lib/flows/wave/report/report-flow';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -504,6 +506,17 @@
               Update complexity
             </SidebarButton>
           {/if}
+        </div>
+      {/if}
+
+      {#if user && !allowAddingOrRemovingWave}
+        <div>
+          <SidebarButton
+            icon={Flag}
+            onclick={() => modal.show(Stepper, undefined, reportFlow('issue', issue.id))}
+          >
+            Report this issue
+          </SidebarButton>
         </div>
       {/if}
     </Card>
