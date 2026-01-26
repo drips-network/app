@@ -66,8 +66,8 @@
     </AnnotationBox>
   {:else if reason === 'not-completed'}
     <AnnotationBox type="warning">
-      This issue has not been completed as part of a Wave, so a compliment cannot be made at this
-      time.
+      This issue is still open, so a compliment cannot be made at this time. Maintainers, please
+      first close the issue as completed before giving a compliment.
     </AnnotationBox>
   {:else if reason === 'deadline-passed'}
     <AnnotationBox type="warning">
