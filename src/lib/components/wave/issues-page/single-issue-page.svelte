@@ -73,7 +73,7 @@
     wavePrograms: WaveProgramDto[];
 
     /** Applications for the issue in the wave it's currently in. Not awaited, displayed async */
-    applicationsPromise: ReturnType<typeof getIssueApplications> | null;
+    applicationsPromise: Promise<Awaited<ReturnType<typeof getIssueApplications>>['data']> | null;
 
     /** Configuration for button link back to issues list on mobile  */
     backToConfig: { label: string; href: string };
