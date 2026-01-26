@@ -44,6 +44,8 @@ export const issueApplicationWithDetailsDtoSchema = z.object({
     verified: z.boolean(),
     currentWaveApplicationCount: z.number().int().min(0).nullable(),
     currentWaveAssignmentCount: z.number().int().min(0).nullable(),
+    currentWavePointsEarned: z.number().int().min(0).nullable(),
+    currentWaveIssuesResolved: z.number().int().min(0).nullable(),
   }),
   removedBy: waveUserDtoSchema.nullable(),
   reviewedBy: waveUserDtoSchema.nullable(),

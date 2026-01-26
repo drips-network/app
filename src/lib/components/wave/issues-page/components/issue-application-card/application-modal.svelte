@@ -22,6 +22,8 @@
     applicant: WaveUser & {
       currentWaveApplicationCount: number | null;
       currentWaveAssignmentCount: number | null;
+      currentWavePointsEarned: number | null;
+      currentWaveIssuesResolved: number | null;
     };
     applicationText: string;
     appliedAt: Date;
@@ -60,19 +62,31 @@
 
   {#if applicant.currentWaveApplicationCount != null || applicant.currentWaveAssignmentCount != null}
     <section>
-      <SectionHeader label="Wave activity" icon={Wave} />
+      <SectionHeader label="Current Wave activity" icon={Wave} />
 
       <ul class="statistics">
         {#if applicant.currentWaveApplicationCount != null}
           <li class="statistic typo-text-small">
-            <span class="label">Issues applied to in current Wave</span>
+            <span class="label">Issues applied to</span>
             <span class="value">{applicant.currentWaveApplicationCount}</span>
           </li>
         {/if}
         {#if applicant.currentWaveAssignmentCount != null}
           <li class="statistic typo-text-small">
-            <span class="label">Issues assigned to in current Wave</span>
+            <span class="label">Issues assigned to</span>
             <span class="value">{applicant.currentWaveAssignmentCount}</span>
+          </li>
+        {/if}
+        {#if applicant.currentWavePointsEarned != null}
+          <li class="statistic typo-text-small">
+            <span class="label">Points earned</span>
+            <span class="value">{applicant.currentWavePointsEarned}</span>
+          </li>
+        {/if}
+        {#if applicant.currentWaveIssuesResolved != null}
+          <li class="statistic typo-text-small">
+            <span class="label">Issues resolved</span>
+            <span class="value">{applicant.currentWaveIssuesResolved}</span>
           </li>
         {/if}
       </ul>

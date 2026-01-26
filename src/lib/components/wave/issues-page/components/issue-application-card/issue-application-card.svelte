@@ -164,6 +164,16 @@
           </div>
         </div>
       {/if}
+      {#if application.applicant.currentWavePointsEarned != null}
+        <div class="metric">
+          <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
+            Points earned this Wave
+          </div>
+          <div class="value typo-text-small-bold">
+            {application.applicant.currentWavePointsEarned}
+          </div>
+        </div>
+      {/if}
       {#each KEY_METRICS as { key, label } (key)}
         <div class="metric">
           <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
