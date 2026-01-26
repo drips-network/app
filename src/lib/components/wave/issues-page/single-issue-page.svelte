@@ -44,6 +44,8 @@
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
+  import ModeratorIssuePointsModal from './components/moderator-issue-points-modal.svelte';
+  import Coin from '$lib/components/icons/Coin.svelte';
   import reportFlow from '$lib/flows/wave/report/report-flow';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
@@ -221,6 +223,19 @@
       waveProgram: partOfWaveProgram,
     });
   }
+
+  function openModeratorIssuePointsModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorIssuePointsModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+    });
+  }
+
+  let canIssuePointsEarly = $derived(
+    showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,
+  );
 </script>
 
 <div class="back-to-issues-link">
@@ -409,7 +424,7 @@
         {@const basePoints = 100}
         {@const subtotal = basePoints + complexityBonus}
         {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
-        {@const showEarnedPoints = issue.state === 'closed' && issue.pointsEarned != null}
+        {@const showEarnedPoints = issue.pointsEarned != null}
         <div class="sidebar-section">
           <div class="content">
             <h5>Points</h5>
@@ -535,6 +550,12 @@
           <SidebarButton icon={Pen} onclick={openModeratorUpdateComplexityModal}>
             Adjust complexity
           </SidebarButton>
+
+          {#if canIssuePointsEarly}
+            <SidebarButton icon={Coin} onclick={openModeratorIssuePointsModal}>
+              Issue points early
+            </SidebarButton>
+          {/if}
 
           <div>
             <SidebarButton icon={Trash} onclick={openModeratorRemoveFromWaveModal}>
