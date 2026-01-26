@@ -233,7 +233,9 @@
     });
   }
 
-  let canIssuePointsEarly = $derived(showModerationSection && issue.assignedApplicant !== null);
+  let canIssuePointsEarly = $derived(
+    showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,
+  );
 </script>
 
 <div class="back-to-issues-link">

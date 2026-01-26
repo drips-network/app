@@ -44,12 +44,12 @@
       await doWithErrorModal(async () => {
         await moderatorIssuePoints(undefined, waveProgramId, issueId, reason);
 
+        await invalidate('wave:issues');
+
         const updatedIssue = await getIssue(undefined, issueId);
         if (updatedIssue) {
           notifyIssuesUpdated([updatedIssue]);
         }
-
-        await invalidate('wave:issues');
 
         modal.hide();
       });
