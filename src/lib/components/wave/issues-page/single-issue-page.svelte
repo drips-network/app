@@ -147,7 +147,7 @@
   $effect(() => {
     promisePending = true;
     issueApplicationsPromise?.then((apps) => {
-      applications = apps.data
+      applications = apps
         // accepted application first, then own application
         .sort((a, b) => {
           const ownUserId = user?.id || '';

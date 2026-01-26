@@ -1,4 +1,6 @@
+import unreachable from '$lib/utils/unreachable';
 import { getComplimentsForIssue } from '$lib/utils/wave/compliments';
+import { getAllPaginated } from '$lib/utils/wave/getAllPaginated';
 import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
 import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
@@ -61,9 +63,13 @@ export const issuePageLoad = async (
     throw error(block.errorCode, block.message);
   }
 
-  // todo(wave): what if more than 100 applications?
   const applicationsPromise = issue.waveProgramId
-    ? getIssueApplications(fetch, issue.waveProgramId, issue.id, { limit: 100 })
+    ? getAllPaginated((page, limit) =>
+        getIssueApplications(fetch, issue.waveProgramId ?? unreachable(), issue.id, {
+          page,
+          limit,
+        }),
+      )
     : null;
 
   const partOfWaveProgram = wavePrograms.find((wave) => wave.id === issue.waveProgramId) ?? null;
