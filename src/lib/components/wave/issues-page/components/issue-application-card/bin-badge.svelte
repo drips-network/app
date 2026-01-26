@@ -23,7 +23,10 @@
   const BAD_BINS = (lowerIsBetter: boolean) =>
     lowerIsBetter ? ['Extremely High', 'Very High', 'High'] : ['Low', 'Very Low'];
 
-  function getBinColors(bin: string | undefined, lowerIsBetter: boolean): readonly [string, string] {
+  function getBinColors(
+    bin: string | undefined,
+    lowerIsBetter: boolean,
+  ): readonly [string, string] {
     if (bin && GOOD_BINS(lowerIsBetter).includes(bin)) {
       return BIN_COLOR_MAP['good'];
     } else if (bin && MID_BINS.includes(bin)) {
@@ -66,7 +69,7 @@
         class="typo-text-small bin-badge"
         style="color: var(--color-foreground-level-6); background-color: var(--color-foreground-level-2);"
       >
-        Not enough data
+        No data
       </div>
     {:else if showUnknown}
       <div
