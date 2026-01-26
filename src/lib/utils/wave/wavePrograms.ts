@@ -219,3 +219,21 @@ export async function moderatorRemoveIssueFromWave(
     },
   );
 }
+
+export async function moderatorIssuePoints(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  reason: string,
+) {
+  return await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/issue-points`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        reason,
+      }),
+    },
+  );
+}
