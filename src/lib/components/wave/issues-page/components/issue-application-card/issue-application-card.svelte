@@ -122,9 +122,7 @@
   const isAcceptedApplication = $derived(application.status === 'accepted');
 
   const disabled = $derived(
-    application.status === 'rejected' ||
-      application.status === 'withdrawn' ||
-      application.status === 'unassigned',
+    application.status === 'rejected' || application.status === 'withdrawn',
   );
 
   const codeMetricsPromise = getUserCodeMetrics(undefined, application.applicant.id);
@@ -197,7 +195,7 @@
           })}>View details</Button
       >
       {#if isMaintainer}
-        {#if application.status === 'pending'}
+        {#if application.status === 'pending' || application.status === 'unassigned'}
           <Button variant="primary" icon={Check} onclick={handleAssignApplicant}
             >Accept & assign</Button
           >
@@ -226,7 +224,7 @@
 
       {#if application.status === 'unassigned'}
         <span class="disabled-text typo-text-small-bold"
-          >Applicant unassigned by repo maintainers</span
+          >Applicant previously unassigned by repo maintainers</span
         >
       {/if}
     </div>
