@@ -120,5 +120,4 @@ RUN npm run build:telemetry
 
 EXPOSE 8080
 
-# Run the app (this is not a build command, it runs /build/index.js)
-CMD ["node", "--require", "./build/telemetry.cjs", "build"]
+CMD ["./scripts/start-railway.sh"]
