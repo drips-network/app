@@ -120,4 +120,4 @@ RUN npm run build:telemetry
 
 EXPOSE 8080
 
-CMD ["./scripts/start-railway.sh"]
+CMD ["./scripts/railway-start.sh"]
