@@ -67,15 +67,19 @@
       </div>
     {/if}
   </div>
+
   {@render children?.()}
-  <div class="actions">
-    <div class="left">
-      {@render leftActions?.()}
+
+  {#if leftActions || actions}
+    <div class="actions">
+      <div class="left">
+        {@render leftActions?.()}
+      </div>
+      <div class="right">
+        {@render actions?.()}
+      </div>
     </div>
-    <div class="right">
-      {@render actions?.()}
-    </div>
-  </div>
+  {/if}
 </div>
 
 <style>

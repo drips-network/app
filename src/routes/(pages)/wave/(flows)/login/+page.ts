@@ -1,18 +1,13 @@
-import isSafePath from '$lib/utils/safe-path';
+import { safeParseBackToParam } from '$lib/utils/safe-path';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ url, parent }) => {
   const { user } = await parent();
 
-  const backTo = url.searchParams.get('backTo');
-  const decodedBackTo = decodeURIComponent(backTo || '');
-
-  // Validate to prevent open redirect attacks
-  const isSafe = isSafePath(decodedBackTo);
-  const safeBackTo = isSafe ? decodedBackTo : '';
+  const backTo = safeParseBackToParam(url);
 
   if (backTo && user) {
-    if (isSafe) redirect(301, decodedBackTo);
+    redirect(301, backTo);
   } else if (user) {
     redirect(301, '/wave');
   }
@@ -20,7 +15,7 @@ export const load = async ({ url, parent }) => {
   const skipWelcome = url.searchParams.get('skipWelcome') === 'true';
 
   return {
-    backTo: safeBackTo,
+    backTo,
     skipWelcome,
   };
 };

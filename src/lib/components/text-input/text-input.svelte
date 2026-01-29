@@ -11,7 +11,11 @@
   import Cross from '$lib/components/icons/Cross.svelte';
 
   interface Props {
-    variant?: { type: 'text' } | { type: 'password' } | { type: 'number'; min: number };
+    variant?:
+      | { type: 'text' }
+      | { type: 'password' }
+      | { type: 'number'; min: number }
+      | { type: 'tel' };
     spellcheck?: boolean;
     autocapitalize?: boolean;
     autocorrect?: boolean;
@@ -134,6 +138,7 @@
     class:concealed={variant.type === 'password'}
     class:tabular-nums={variant.type === 'number'}
     min={variant.type === 'number' ? variant.min : undefined}
+    type={variant.type}
     {placeholder}
     {disabled}
     {readonly}
@@ -148,7 +153,7 @@
     {onkeypress}
     {onpaste}
     {onblur}
-    autocomplete={autocomplete ? 'on' : 'off'}
+    autocomplete={autocomplete && variant.type === 'tel' ? 'tel' : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}
     autocorrect={autocorrect ? 'on' : 'off'}

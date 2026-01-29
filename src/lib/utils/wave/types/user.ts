@@ -106,3 +106,71 @@ export const CODE_METRICS = [
     description: 'Composite metric for overall OSS activity. Considers reviews, PRs, and issues.',
   },
 ] as const;
+
+// ===========================
+// Phone Verification
+// ===========================
+
+export const phoneVerificationStatusSchema = z.enum([
+  'pending', // Verification code sent, awaiting user input
+  'verified', // Phone number successfully verified
+  'expired', // Verification code expired
+  'failed', // Too many failed attempts
+]);
+export type PhoneVerificationStatus = z.infer<typeof phoneVerificationStatusSchema>;
+
+export const initiatePhoneVerificationDtoSchema = z.object({
+  phoneNumber: z
+    .string()
+    .min(8)
+    .max(20)
+    .regex(/^\+[1-9]\d{6,14}$/, {
+      message: 'Phone number must be in E.164 format (e.g., +14155552671)',
+    }),
+});
+export type InitiatePhoneVerificationDto = z.infer<typeof initiatePhoneVerificationDtoSchema>;
+
+export const confirmPhoneVerificationDtoSchema = z.object({
+  phoneNumber: z
+    .string()
+    .min(8)
+    .max(20)
+    .regex(/^\+[1-9]\d{6,14}$/, {
+      message: 'Phone number must be in E.164 format (e.g., +14155552671)',
+    }),
+  code: z
+    .string()
+    .length(6)
+    .regex(/^\d{6}$/, {
+      message: 'Code must be a 6-digit number',
+    }),
+});
+export type ConfirmPhoneVerificationDto = z.infer<typeof confirmPhoneVerificationDtoSchema>;
+
+export const phoneVerificationStatusResponseSchema = z.object({
+  hasPhoneVerification: z.boolean(),
+  status: phoneVerificationStatusSchema.nullable(),
+  isVerified: z.boolean(),
+  canRetry: z.boolean(),
+  attemptsRemaining: z.number().nullable(),
+});
+export type PhoneVerificationStatusResponse = z.infer<typeof phoneVerificationStatusResponseSchema>;
+
+export const initiatePhoneVerificationResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  expiresInSeconds: z.number(),
+});
+export type InitiatePhoneVerificationResponse = z.infer<
+  typeof initiatePhoneVerificationResponseSchema
+>;
+
+export const confirmPhoneVerificationResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  isVerified: z.boolean(),
+  attemptsRemaining: z.number().nullable(),
+});
+export type ConfirmPhoneVerificationResponse = z.infer<
+  typeof confirmPhoneVerificationResponseSchema
+>;

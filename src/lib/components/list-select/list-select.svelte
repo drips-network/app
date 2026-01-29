@@ -212,7 +212,7 @@
           : [itemSearchString];
 
         const startsWithSearchString = searchStrings.some((s) =>
-          s.toLowerCase().startsWith(searchString.toLowerCase()),
+          s.toLowerCase().includes(searchString.toLowerCase()),
         );
 
         return startsWithSearchString || item.type === 'action';
