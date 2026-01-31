@@ -6,6 +6,7 @@ import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { PaginatedResponse } from '$lib/utils/wave/types/pagination';
 import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+import { getWaves } from '$lib/utils/wave/wavePrograms';
 import { error } from '@sveltejs/kit';
 
 export const issuePageLoad = async (
@@ -75,6 +76,14 @@ export const issuePageLoad = async (
 
   const partOfWaveProgram = wavePrograms.find((wave) => wave.id === issue.waveProgramId) ?? null;
 
+  // If activeWaveExists wasn't provided by parent (e.g. in maintainer/contributor contexts),
+  // fetch the waves for this issue's wave program and check if any is active
+  let resolvedActiveWaveExists = activeWaveExists;
+  if (resolvedActiveWaveExists === undefined && issue.waveProgramId) {
+    const waves = await getWaves(fetch, issue.waveProgramId, { limit: 1 }, { status: 'active' });
+    resolvedActiveWaveExists = waves.data.some((wave) => wave.status === 'active');
+  }
+
   let givenCompliments: IssueComplimentDto[] = [];
 
   if (issue.state === 'closed' && issue.assignedApplicant && issue.waveProgramId) {
@@ -92,7 +101,7 @@ export const issuePageLoad = async (
     headMetaTitle: headMetaTitle,
     givenCompliments,
     isInWaveContext: isInWaveContext ?? false,
-    activeWaveExists: activeWaveExists ?? false,
+    activeWaveExists: resolvedActiveWaveExists ?? false,
 
     // streamed (not awaited)
     applicationsPromise,

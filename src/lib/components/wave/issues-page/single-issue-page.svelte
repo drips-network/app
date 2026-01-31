@@ -89,7 +89,7 @@
     isInWaveContext?: boolean;
 
     /** Whether there's an active wave for the wave program this issue belongs to. */
-    activeWaveExists?: boolean;
+    activeWaveExists: boolean;
   }
 
   let {
@@ -104,7 +104,7 @@
     headMetaTitle,
     givenCompliments,
     isInWaveContext = false,
-    activeWaveExists = false,
+    activeWaveExists,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
