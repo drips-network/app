@@ -6,6 +6,7 @@
   import Cross from '$lib/components/icons/Cross.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import GithubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import modal from '$lib/stores/modal';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
@@ -30,11 +31,13 @@
     isMaintainer,
     issue,
     user,
+    activeWaveExists,
   }: {
     application: IssueApplicationWithDetailsDto;
     isMaintainer: boolean;
     issue: IssueDetailsDto;
     user: WaveLoggedInUser | null;
+    activeWaveExists: boolean;
   } = $props();
 
   async function handleAssignApplicant() {
@@ -196,9 +199,21 @@
       >
       {#if isMaintainer}
         {#if application.status === 'pending' || application.status === 'unassigned'}
-          <Button variant="primary" icon={Check} onclick={handleAssignApplicant}
-            >Accept & assign</Button
-          >
+          <div style:width="100%;">
+            <Tooltip disabled={activeWaveExists}>
+              <div style:display="flex" style:flex-direction="column" style:width="100%">
+                <Button
+                  variant="primary"
+                  icon={Check}
+                  onclick={handleAssignApplicant}
+                  disabled={!activeWaveExists}>Accept & assign</Button
+                >
+              </div>
+              {#snippet tooltip_content()}
+                Assignment is only available during an active Wave.
+              {/snippet}
+            </Tooltip>
+          </div>
         {/if}
         {#if application.status === 'rejected'}
           <Button icon={Cross} disabled>Application rejected</Button>
