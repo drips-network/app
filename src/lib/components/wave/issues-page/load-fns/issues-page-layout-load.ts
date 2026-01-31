@@ -145,8 +145,6 @@ export const issuesPageLayoutLoad = async (
     emptyStateAnnotation,
 
     waveHeaderBackground: false,
-    activeWaveExists: waves
-      ? (waves?.data.some((wave) => wave.status === 'active') ?? false)
-      : undefined,
+    activeWaveExists: waves ? waves.data.some((wave) => wave.status === 'active') : undefined,
   };
 };

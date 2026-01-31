@@ -210,7 +210,7 @@
                 >
               </div>
               {#snippet tooltip_content()}
-                Assignment is only available during an active wave.
+                Assignment is only available during an active Wave.
               {/snippet}
             </Tooltip>
           </div>

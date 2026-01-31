@@ -104,7 +104,7 @@
     headMetaTitle,
     givenCompliments,
     isInWaveContext = false,
-    activeWaveExists,
+    activeWaveExists = false,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
