@@ -78,8 +78,8 @@
 
   {#if data.alreadyApplied}
     <AnnotationBox>
-      You already applied to this issue in the current Wave. First withdraw your previous
-      application if you want to re-apply.
+      You already applied to this issue. First withdraw your previous application if you want to
+      re-apply.
     </AnnotationBox>
   {:else if data.isOwnIssue}
     <AnnotationBox>
