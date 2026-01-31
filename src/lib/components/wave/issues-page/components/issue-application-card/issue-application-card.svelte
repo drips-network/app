@@ -30,11 +30,13 @@
     isMaintainer,
     issue,
     user,
+    activeWaveExists = false,
   }: {
     application: IssueApplicationWithDetailsDto;
     isMaintainer: boolean;
     issue: IssueDetailsDto;
     user: WaveLoggedInUser | null;
+    activeWaveExists?: boolean;
   } = $props();
 
   async function handleAssignApplicant() {
@@ -196,8 +198,11 @@
       >
       {#if isMaintainer}
         {#if application.status === 'pending' || application.status === 'unassigned'}
-          <Button variant="primary" icon={Check} onclick={handleAssignApplicant}
-            >Accept & assign</Button
+          <Button
+            variant="primary"
+            icon={Check}
+            onclick={handleAssignApplicant}
+            disabled={!activeWaveExists}>Accept & assign</Button
           >
         {/if}
         {#if application.status === 'rejected'}

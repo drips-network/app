@@ -25,6 +25,7 @@ export const issuesPageLayoutLoad = async (
     parent: () => Promise<{
       user: WaveLoggedInUser | null;
       waveProgram?: { id: string; slug: string };
+      waves?: { data: Array<{ status: 'upcoming' | 'active' | 'ended' }> };
     }>;
     params: { issueId?: string };
   },
@@ -46,7 +47,7 @@ export const issuesPageLayoutLoad = async (
 ) => {
   depends('wave:issues');
 
-  const { user, waveProgram } = await parent();
+  const { user, waveProgram, waves } = await parent();
 
   const {
     requireLogin,
@@ -144,5 +145,6 @@ export const issuesPageLayoutLoad = async (
     emptyStateAnnotation,
 
     waveHeaderBackground: false,
+    activeWaveExists: waves?.data.some((wave) => wave.status === 'active') ?? false,
   };
 };

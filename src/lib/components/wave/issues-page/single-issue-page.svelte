@@ -87,6 +87,9 @@
     /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
      * Used to determine if moderation actions should be shown. */
     isInWaveContext?: boolean;
+
+    /** Whether there's an active wave for the wave program this issue belongs to. */
+    activeWaveExists?: boolean;
   }
 
   let {
@@ -101,6 +104,7 @@
     headMetaTitle,
     givenCompliments,
     isInWaveContext = false,
+    activeWaveExists = false,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
@@ -304,7 +308,7 @@
       >
         <div class="applications-grid">
           {#each applications as application (application.id)}
-            <IssueApplicationCard {user} {issue} {isMaintainer} {application} />
+            <IssueApplicationCard {user} {issue} {isMaintainer} {application} {activeWaveExists} />
           {/each}
         </div>
       </Section>

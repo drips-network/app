@@ -18,6 +18,7 @@ export const issuePageLoad = async (
     parent: () => Promise<{
       issues: PaginatedResponse<IssueDetailsDto>;
       wavePrograms: WaveProgramDto[];
+      activeWaveExists?: boolean;
     }>;
     params: { issueId: string };
   },
@@ -40,7 +41,7 @@ export const issuePageLoad = async (
     } | null;
   },
 ) => {
-  const { issues, wavePrograms } = await parent();
+  const { issues, wavePrograms, activeWaveExists } = await parent();
 
   // issues is paginated so may not include the issue. in this case, fetch it directly
 
@@ -91,6 +92,7 @@ export const issuePageLoad = async (
     headMetaTitle: headMetaTitle,
     givenCompliments,
     isInWaveContext: isInWaveContext ?? false,
+    activeWaveExists: activeWaveExists ?? false,
 
     // streamed (not awaited)
     applicationsPromise,
