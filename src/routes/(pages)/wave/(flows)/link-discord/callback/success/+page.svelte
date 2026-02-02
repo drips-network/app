@@ -2,7 +2,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import FlowStepWrapper from '../../../shared/flow-step-wrapper.svelte';
 </script>
 
@@ -19,8 +19,8 @@
   </AnnotationBox>
 
   {#snippet actions()}
-    <Button variant="primary" icon={ArrowLeft} href="/wave/settings/identity-and-payments">
-      Back to settings
+    <Button variant="primary" icon={ArrowRight} href="/wave/settings/identity-and-payments">
+      Go to settings
     </Button>
   {/snippet}
 </FlowStepWrapper>
