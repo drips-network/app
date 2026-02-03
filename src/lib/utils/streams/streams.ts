@@ -438,6 +438,7 @@ export async function buildEditStreamBatch(
     startSeconds = BigInt(Math.floor(newData.actualStartDate.getTime() / 1000));
     const endDateSeconds = Math.floor(newData.newEndDate.getTime() / 1000);
     durationSeconds = endDateSeconds - Number(startSeconds);
+    assert(durationSeconds > 0, 'Duration must be positive');
   }
 
   if (newData.name || durationSeconds !== undefined) {

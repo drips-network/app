@@ -126,6 +126,9 @@
     if (endDateInFuture === false) {
       return { type: 'invalid' as const, message: 'End date must be in the future' };
     }
+    if (combinedEndDate && combinedEndDate.getTime() <= actualStartDate.getTime()) {
+      return { type: 'invalid' as const, message: 'End date must be after stream start' };
+    }
     return { type: 'valid' as const };
   });
 
