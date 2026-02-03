@@ -8,7 +8,6 @@ import type {
 } from './__generated__/gql.generated';
 import { pin } from '../ipfs';
 import { toBigInt, type ContractTransaction, type Signer } from 'ethers';
-import unreachable from '../unreachable';
 import assert from '$lib/utils/assert';
 import makeStreamId, { decodeStreamId } from './make-stream-id';
 import extractAddressFromAccountId from '../sdk/utils/extract-address-from-accountId';
@@ -412,6 +411,8 @@ export async function buildEditStreamBatch(
   newData: {
     name?: string;
     amountPerSecond?: bigint;
+    newEndDate?: Date;
+    actualStartDate?: Date;
   },
 ) {
   const ownAccountId = await getOwnAccountId();
@@ -430,7 +431,16 @@ export async function buildEditStreamBatch(
 
   let hash: string | undefined;
 
-  if (newData.name) {
+  // Calculate duration from the stream's actual start date
+  let durationSeconds: number | undefined;
+  let startSeconds: bigint | undefined;
+  if (newData.newEndDate && newData.actualStartDate) {
+    startSeconds = BigInt(Math.floor(newData.actualStartDate.getTime() / 1000));
+    const endDateSeconds = Math.floor(newData.newEndDate.getTime() / 1000);
+    durationSeconds = endDateSeconds - Number(startSeconds);
+  }
+
+  if (newData.name || durationSeconds !== undefined) {
     const metadata = _buildMetadata(currentStreams, ownAccountId);
 
     const assetConfigIndex = metadata.assetConfigs.findIndex(
@@ -446,7 +456,15 @@ export async function buildEditStreamBatch(
       `Stream ${streamId} not found in metadata`,
     );
 
-    metadata.assetConfigs[assetConfigIndex].streams[streamIndex].name = newData.name;
+    if (newData.name) {
+      metadata.assetConfigs[assetConfigIndex].streams[streamIndex].name = newData.name;
+    }
+
+    if (durationSeconds !== undefined) {
+      metadata.assetConfigs[assetConfigIndex].streams[
+        streamIndex
+      ].initialDripsConfig.durationSeconds = durationSeconds;
+    }
 
     hash = await pin(metadata);
 
@@ -458,7 +476,7 @@ export async function buildEditStreamBatch(
     );
   }
 
-  if (newData.amountPerSecond) {
+  if (newData.amountPerSecond || durationSeconds !== undefined) {
     const newReceivers = currentReceivers.map((r) => {
       const streamConfig = streamConfigFromUint256(r.config);
 
@@ -467,9 +485,10 @@ export async function buildEditStreamBatch(
           accountId: r.accountId,
           config: streamConfigToUint256({
             dripId: streamConfig.dripId,
-            start: streamConfig.start,
-            duration: streamConfig.duration,
-            amountPerSec: newData.amountPerSecond ?? unreachable(),
+            start: startSeconds ?? streamConfig.start,
+            duration:
+              durationSeconds !== undefined ? BigInt(durationSeconds) : streamConfig.duration,
+            amountPerSec: newData.amountPerSecond ?? streamConfig.amountPerSec,
           }),
         };
       }

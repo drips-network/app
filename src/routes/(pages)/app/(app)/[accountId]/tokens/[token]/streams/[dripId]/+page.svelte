@@ -309,7 +309,7 @@
             </div>
             <div class="rounded-drip-lg shadow-low pt-3 px-4 pb-4 relative overflow-hidden">
               <div
-                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-10"
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8 relative z-[1]"
               >
                 <div>
                   <div class="typo-header-5">

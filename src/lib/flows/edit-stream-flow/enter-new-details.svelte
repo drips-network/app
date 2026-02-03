@@ -6,6 +6,7 @@
       id
       name
       isPaused
+      createdAt
       config {
         dripId
         startDate
@@ -49,6 +50,10 @@
   import SafeAppDisclaimer from '$lib/components/safe-app-disclaimer/safe-app-disclaimer.svelte';
   import type { EditStreamFlowState } from './edit-stream-flow-state';
   import Wallet from '$lib/components/icons/Wallet.svelte';
+  import Toggleable from '$lib/components/toggleable/toggleable.svelte';
+  import parseDate from '$lib/flows/create-stream-flow/methods/parse-date';
+  import parseTime from '$lib/flows/create-stream-flow/methods/parse-time';
+  import combineDateAndTime from '$lib/flows/create-stream-flow/methods/combine-date-and-time';
   import type { EditStreamFlowStreamFragment } from './__generated__/gql.generated';
   import { buildEditStreamBatch } from '$lib/utils/streams/streams';
   import assert from '$lib/utils/assert';
@@ -72,6 +77,8 @@
 
   let amountLocked = $derived(stream.isPaused === true);
 
+  let actualStartDate = $derived(new Date(stream.config.startDate ?? stream.createdAt));
+
   let newAmountValueParsed = $derived(
     $context.newAmountValue
       ? parseTokenAmount(
@@ -89,15 +96,46 @@
 
   let amountValidationState = $derived(validateAmtPerSecInput(newAmountPerSecond));
 
-  let nameUpdated = $derived($context.newName !== stream.name);
+  let nameUpdated = $derived(($context.newName ?? null) !== (stream.name ?? null));
   let amountUpdated = $derived(
     newAmountPerSecond?.toString() !== stream.config.amountPerSecond.amount.toString(),
   );
+
+  // End date handling
+  let canAddEndDate = $derived(
+    !stream.isPaused && (!stream.config.durationSeconds || stream.config.durationSeconds === 0),
+  );
+
+  let endDateParsed = $derived(parseDate($context.endDateValue));
+  let endTimeParsed = $derived(parseTime($context.endTimeValue));
+
+  let combinedEndDate = $derived.by(() => {
+    if (!endDateParsed.date || !endTimeParsed.time) return undefined;
+    return combineDateAndTime(endDateParsed.date, endTimeParsed.time);
+  });
+
+  let endDateInFuture = $derived.by(() => {
+    if (!combinedEndDate) return undefined;
+    return combinedEndDate.getTime() > Date.now();
+  });
+
+  let endDateValidationState = $derived.by(() => {
+    if (!$context.addEndDate) return { type: 'unvalidated' as const };
+    if (endDateParsed.validationState.type !== 'valid') return endDateParsed.validationState;
+    if (endTimeParsed.validationState.type !== 'valid') return endTimeParsed.validationState;
+    if (endDateInFuture === false) {
+      return { type: 'invalid' as const, message: 'End date must be in the future' };
+    }
+    return { type: 'valid' as const };
+  });
+
+  let endDateUpdated = $derived($context.addEndDate && combinedEndDate !== undefined);
+
   let canUpdate = $derived(
     newAmountValueParsed &&
-      $context.newName &&
-      (nameUpdated || amountUpdated) &&
-      amountValidationState?.type === 'valid',
+      (nameUpdated || amountUpdated || endDateUpdated) &&
+      amountValidationState?.type === 'valid' &&
+      (!$context.addEndDate || endDateValidationState.type === 'valid'),
   );
 
   function updateStream() {
@@ -109,12 +147,14 @@
           const { newHash, batch } = await buildEditStreamBatch(stream.id, {
             name: nameUpdated ? $context.newName : undefined,
             amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
+            newEndDate: endDateUpdated ? combinedEndDate : undefined,
+            actualStartDate: endDateUpdated ? actualStartDate : undefined,
           });
 
           return {
             batch,
             newHash,
-            needGasBuffer: amountUpdated,
+            needGasBuffer: amountUpdated || endDateUpdated,
           };
         },
 
@@ -149,7 +189,7 @@
 
 <StepLayout>
   <StepHeader headline="Edit stream" description="Set a new name or edit the stream rate." />
-  <FormField title="New name*">
+  <FormField title="New name">
     <TextInput bind:value={$context.newName} />
   </FormField>
   <div class="form-row">
@@ -202,6 +242,29 @@
   </div>
   {#if amountLocked}
     <p class="typo-text">Currently, the stream rate can not be edited for paused streams.</p>
+  {/if}
+  {#if canAddEndDate}
+    <Toggleable bind:toggled={$context.addEndDate} label="Add end date">
+      <p class="typo-text">
+        Set an end date for this stream. The stream will stop at the specified time.
+      </p>
+      <div class="form-row" style="margin-top: 1rem">
+        <FormField title="End date*">
+          <TextInput
+            placeholder="YYYY-MM-DD"
+            bind:value={$context.endDateValue}
+            validationState={$context.addEndDate ? endDateParsed.validationState : undefined}
+          />
+        </FormField>
+        <FormField title="End time (UTC, 24-hour)*">
+          <TextInput
+            placeholder="HH:MM:SS"
+            bind:value={$context.endTimeValue}
+            validationState={$context.addEndDate ? endTimeParsed.validationState : undefined}
+          />
+        </FormField>
+      </div>
+    </Toggleable>
   {/if}
   <SafeAppDisclaimer disclaimerType="drips" />
   {#snippet actions()}
