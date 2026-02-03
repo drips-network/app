@@ -3,30 +3,35 @@
   import FormField from '$lib/components/form-field/form-field.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
   import modal from '$lib/stores/modal';
   import type { GrantDto } from '$lib/utils/wave/types/grant';
   import type { Writable } from 'svelte/store';
-  import type { State } from './withdrawal-flow';
+  import type { State, PrefillData } from './withdrawal-flow';
   import StellarAddressInput from '$lib/components/wave/rewards/stellar-address-input.svelte';
+  import TextInput from '$lib/components/text-input/text-input.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
   interface Props {
     grant: GrantDto;
     context: Writable<State>;
+    prefill?: PrefillData;
   }
 
-  let { grant, context }: Props = $props();
+  let { grant, context, prefill }: Props = $props();
 
-  let stellarAddress = $state('');
+  let stellarAddress = $state(prefill?.stellarAddress ?? '');
   let addressValid = $state(false);
+  let memo = $state(prefill?.memo ?? '');
 
   let canSubmit = $derived(addressValid);
 
   function handleSubmit() {
     $context.stellarAddress = stellarAddress;
+    $context.memo = memo || undefined;
     dispatch('goForward');
   }
 </script>
@@ -54,11 +59,24 @@
     >
       <StellarAddressInput bind:value={stellarAddress} bind:isValid={addressValid} />
     </FormField>
+
+    <FormField
+      title="Memo"
+      description="If the recipient address requires a memo, enter it here. If you have a memo and don't enter it, the transaction may be lost."
+      type="div"
+    >
+      <TextInput bind:value={memo} placeholder="Enter memo" />
+    </FormField>
   </div>
 
-  {#snippet actions()}
+  {#snippet left_actions()}
     <Button variant="normal" onclick={modal.hide}>Cancel</Button>
-    <Button variant="primary" disabled={!canSubmit} onclick={handleSubmit}>Continue</Button>
+  {/snippet}
+
+  {#snippet actions()}
+    <Button variant="primary" disabled={!canSubmit} onclick={handleSubmit} icon={ArrowRight}>
+      Continue
+    </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
 

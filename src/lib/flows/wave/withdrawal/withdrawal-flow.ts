@@ -7,11 +7,18 @@ import Success from './success.svelte';
 
 export interface State {
   stellarAddress: string;
+  memo?: string;
 }
 
-export default (grant: GrantDto) => {
+export interface PrefillData {
+  stellarAddress?: string;
+  memo?: string;
+}
+
+export default (grant: GrantDto, prefill?: PrefillData) => {
   const state = writable<State>({
-    stellarAddress: '',
+    stellarAddress: prefill?.stellarAddress ?? '',
+    memo: prefill?.memo,
   });
 
   return {
@@ -19,7 +26,7 @@ export default (grant: GrantDto) => {
     steps: [
       makeStep({
         component: EnterAddress,
-        props: { grant },
+        props: { grant, prefill },
       }),
       makeStep({
         component: Confirm,

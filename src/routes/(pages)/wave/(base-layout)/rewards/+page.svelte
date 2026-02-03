@@ -10,7 +10,8 @@
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
   import modal from '$lib/stores/modal';
-  import type { GrantDto, GrantStatus } from '$lib/utils/wave/types/grant.js';
+  import type { GrantDetailDto, GrantDto, GrantStatus } from '$lib/utils/wave/types/grant.js';
+  import { getGrant } from '$lib/utils/wave/grants.js';
 
   let { data } = $props();
 
@@ -21,12 +22,30 @@
 
   let kycApproved = $derived(kycStatus.reviewAnswer === 'GREEN');
 
+  let loadingWithdrawalGrantId = $state<string | null>(null);
+
   function openTestTransactionFlow(grant: GrantDto) {
     modal.show(Stepper, undefined, testTransactionFlow(grant));
   }
 
-  function openWithdrawalFlow(grant: GrantDto) {
-    modal.show(Stepper, undefined, withdrawalFlow(grant));
+  function getLastSuccessfulTestTransaction(g: GrantDetailDto) {
+    return g.transactions
+      .filter((tx) => tx.type === 'test' && tx.status === 'complete')
+      .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+  }
+
+  async function openWithdrawalFlow(grant: GrantDto) {
+    loadingWithdrawalGrantId = grant.id;
+    try {
+      const grantDetail = await getGrant(fetch, grant.id);
+      const lastTest = grantDetail ? getLastSuccessfulTestTransaction(grantDetail) : undefined;
+      const prefill = lastTest
+        ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
+        : undefined;
+      modal.show(Stepper, undefined, withdrawalFlow(grant, prefill));
+    } finally {
+      loadingWithdrawalGrantId = null;
+    }
   }
 
   function isExpired(grant: GrantDto): boolean {
@@ -34,7 +53,10 @@
   }
 
   function canRequestTest(grant: GrantDto): boolean {
-    return grant.status === 'withdrawable' && !isExpired(grant);
+    return (
+      (grant.status === 'withdrawable' || grant.status === 'test_transaction_sent') &&
+      !isExpired(grant)
+    );
   }
 
   function canWithdraw(grant: GrantDto): boolean {
@@ -111,6 +133,7 @@
                   variant={grant.status === 'test_transaction_sent' ? 'primary' : 'normal'}
                   onclick={() => openWithdrawalFlow(grant)}
                   disabled={!kycApproved}
+                  loading={loadingWithdrawalGrantId === grant.id}
                 >
                   Request full withdrawal
                 </Button>

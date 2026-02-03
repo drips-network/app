@@ -4,7 +4,7 @@ import {
   toPaginationParams,
   type PaginationInput,
 } from './types/pagination';
-import { grantDetailDtoSchema, grantDtoSchema } from './types/grant';
+import { grantDetailDtoSchema, grantDtoSchema, type StellarMemoType } from './types/grant';
 import parseRes from './utils/parse-res';
 
 export async function getGrants(f = fetch, pagination?: PaginationInput) {
@@ -20,16 +20,34 @@ export async function getGrant(f = fetch, grantId: string) {
   });
 }
 
-export async function requestTestTransaction(f = fetch, grantId: string, stellarAddress: string) {
+export async function requestTestTransaction(
+  f = fetch,
+  grantId: string,
+  stellarAddress: string,
+  memoType?: StellarMemoType,
+  memoValue?: string,
+) {
   return await authenticatedCall(f, `/api/grants/${grantId}/test-transaction`, {
     method: 'POST',
-    body: JSON.stringify({ stellarAddress }),
+    body: JSON.stringify({
+      stellarAddress,
+      ...(memoType && memoValue ? { memoType, memoValue } : {}),
+    }),
   });
 }
 
-export async function requestWithdrawal(f = fetch, grantId: string, stellarAddress: string) {
+export async function requestWithdrawal(
+  f = fetch,
+  grantId: string,
+  stellarAddress: string,
+  memoType?: StellarMemoType,
+  memoValue?: string,
+) {
   return await authenticatedCall(f, `/api/grants/${grantId}/withdraw`, {
     method: 'POST',
-    body: JSON.stringify({ stellarAddress }),
+    body: JSON.stringify({
+      stellarAddress,
+      ...(memoType && memoValue ? { memoType, memoValue } : {}),
+    }),
   });
 }

@@ -9,6 +9,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import GrantStatusBadge from '$lib/components/wave/rewards/grant-status-badge.svelte';
   import TransactionStatusCell from '$lib/components/wave/rewards/transaction-status-cell.svelte';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
   import modal from '$lib/stores/modal';
@@ -25,14 +26,27 @@
     modal.show(Stepper, undefined, testTransactionFlow(g));
   }
 
+  function getLastSuccessfulTestTransaction(g: GrantDetailDto) {
+    return g.transactions
+      .filter((tx) => tx.type === 'test' && tx.status === 'complete')
+      .sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime())[0];
+  }
+
   function openWithdrawalFlow(g: GrantDetailDto) {
-    modal.show(Stepper, undefined, withdrawalFlow(g));
+    const lastTest = getLastSuccessfulTestTransaction(g);
+    const prefill = lastTest
+      ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
+      : undefined;
+    modal.show(Stepper, undefined, withdrawalFlow(g, prefill));
   }
 
   let isExpired = $derived(new Date(grant.expiresAt) < new Date());
 
   function canRequestTest(g: GrantDetailDto): boolean {
-    return g.status === 'withdrawable' && new Date(g.expiresAt) >= new Date();
+    return (
+      (g.status === 'withdrawable' || g.status === 'test_transaction_sent') &&
+      new Date(g.expiresAt) >= new Date()
+    );
   }
 
   function canWithdraw(g: GrantDetailDto): boolean {
@@ -99,10 +113,8 @@
           </div>
         </div>
 
-        <div class="grant-actions">
-          {#if isExpired || isProcessing(grant.status) || grant.status === 'withdrawal_complete'}
-            <!-- No actions for expired, processing, or completed grants -->
-          {:else}
+        {#if !isExpired && !isProcessing(grant.status) && grant.status !== 'withdrawal_complete'}
+          <div class="grant-actions">
             {#if canRequestTest(grant)}
               <Button
                 variant="primary"
@@ -121,9 +133,16 @@
                 Request full withdrawal
               </Button>
             {/if}
-          {/if}
-        </div>
+          </div>
+        {/if}
       </Section>
+
+      {#if isProcessing(grant.status)}
+        <AnnotationBox type="info">
+          Your {grant.status === 'withdrawal_pending' ? 'withdrawal' : 'test transaction'} is being processed.
+          Transactions are usually completed within seven days. We'll send you an email when it's done.
+        </AnnotationBox>
+      {/if}
     </div>
 
     <div class="right-pane">
@@ -155,6 +174,23 @@
                 <div class="detail-row">
                   <span class="detail-label">Amount</span>
                   <span class="detail-value tnum">${tx.amountUSD.toLocaleString()}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Destination</span>
+                  <Tooltip text={tx.stellarAddress} copyable>
+                    <span class="detail-value typo-text-mono"
+                      >{tx.stellarAddress.slice(0, 4)}–{tx.stellarAddress.slice(-4)}</span
+                    >
+                    {#snippet tooltip_content()}
+                      <span class="typo-text-mono">{tx.stellarAddress}</span>
+                    {/snippet}
+                  </Tooltip>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Memo</span>
+                  <span class="detail-value" class:typo-text-mono={tx.memoValue}
+                    >{tx.memoValue || 'None'}</span
+                  >
                 </div>
                 <div class="detail-row">
                   <span class="detail-label">Requested</span>

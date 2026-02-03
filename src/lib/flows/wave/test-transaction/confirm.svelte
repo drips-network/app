@@ -8,10 +8,10 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import { requestWithdrawal } from '$lib/utils/wave/grants';
+  import { requestTestTransaction } from '$lib/utils/wave/grants';
   import type { GrantDto } from '$lib/utils/wave/types/grant';
   import type { Writable } from 'svelte/store';
-  import type { State } from './withdrawal-flow';
+  import type { State } from './test-transaction-flow';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -29,9 +29,9 @@
 
   function handleSubmit() {
     dispatch('await', {
-      message: 'Requesting withdrawal…',
+      message: 'Requesting test transaction...',
       promise: async () => {
-        await requestWithdrawal(
+        await requestTestTransaction(
           undefined,
           grant.id,
           $context.stellarAddress,
@@ -49,11 +49,12 @@
 </script>
 
 <StandaloneFlowStepLayout
-  headline="Confirm withdrawal"
+  headline="Confirm test transaction"
   description="Please review the details below and confirm."
 >
-  <AnnotationBox type="warning">
-    Once submitted, withdrawals cannot be cancelled or modified. Please double-check all details.
+  <AnnotationBox type="info">
+    We'll send $1 to verify your wallet can receive USDC on Stellar. Once requested, transfers will
+    be made within seven days.
   </AnnotationBox>
 
   <div class="fields">
@@ -63,9 +64,9 @@
       </div>
     </FormField>
 
-    <FormField title="Withdrawal amount" type="div">
+    <FormField title="Test amount" type="div">
       <div class="info-box">
-        <span class="typo-text-bold">${grant.currentAmountUSD.toLocaleString()} USD</span>
+        <span class="typo-text-bold">$1</span>
       </div>
     </FormField>
 
@@ -119,7 +120,7 @@
 
   {#snippet actions()}
     <Button variant="primary" disabled={!canSubmit} onclick={handleSubmit} icon={CheckCircle}>
-      Confirm & Request
+      Confirm
     </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
@@ -149,7 +150,6 @@
   }
 
   .confirmation {
-    margin-top: 1rem;
     display: flex;
     gap: 0.75rem;
     align-items: flex-start;
@@ -157,6 +157,7 @@
     background-color: var(--color-caution-level-1);
     border-radius: 0.75rem;
     text-align: left;
+    margin-top: 1rem;
   }
 
   .confirmation-text {

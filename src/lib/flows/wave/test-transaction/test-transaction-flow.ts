@@ -1,17 +1,36 @@
 import { makeStep } from '$lib/components/stepper/types';
 import type { GrantDto } from '$lib/utils/wave/types/grant';
+import { writable } from 'svelte/store';
 import EnterAddress from './enter-address.svelte';
+import Confirm from './confirm.svelte';
 import Success from './success.svelte';
 
-export default (grant: GrantDto) => ({
-  steps: [
-    makeStep({
-      component: EnterAddress,
-      props: { grant },
-    }),
-    makeStep({
-      component: Success,
-      props: {},
-    }),
-  ],
-});
+export interface State {
+  stellarAddress: string;
+  memo?: string;
+}
+
+export default (grant: GrantDto) => {
+  const state = writable<State>({
+    stellarAddress: '',
+    memo: undefined,
+  });
+
+  return {
+    context: () => state,
+    steps: [
+      makeStep({
+        component: EnterAddress,
+        props: { grant },
+      }),
+      makeStep({
+        component: Confirm,
+        props: { grant },
+      }),
+      makeStep({
+        component: Success,
+        props: {},
+      }),
+    ],
+  };
+};
