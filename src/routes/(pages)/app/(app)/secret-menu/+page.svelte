@@ -170,7 +170,7 @@
 
     if (!tokenInfo) return `${amount.toString()} wei`;
 
-    return `${formatTokenAmount(amount, tokenInfo.decimals)} ${tokenInfo.symbol}`;
+    return `${formatTokenAmount(amount, tokenInfo.decimals, 1n)} ${tokenInfo.symbol}`;
   }
 
   function formatTokenLabel(tokenAddress: string) {
