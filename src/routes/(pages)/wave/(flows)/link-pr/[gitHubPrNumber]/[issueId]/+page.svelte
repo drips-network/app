@@ -30,13 +30,16 @@
 
         window.location.href = `https://github.com/${data.issue.repo.gitHubRepoFullName}/pull/${data.gitHubPrNumber}`;
       });
-    } finally {
+    } catch {
       submitting = false;
     }
   }
 </script>
 
-<FlowStepWrapper headline="Link PR #{data.gitHubPrNumber} to Issue">
+<FlowStepWrapper
+  headline="Link PR #{data.gitHubPrNumber} to Issue"
+  description="Review the details below and confirm to link your pull request."
+>
   <FormField title="Issue" type="div">
     <IssuePreviewCard issue={data.issue} />
   </FormField>
