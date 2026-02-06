@@ -56,6 +56,14 @@
     </AnnotationBox>
   {/if}
 
+  {#snippet leftActions()}
+    <Button
+      href="https://github.com/{data.issue.repo.gitHubRepoFullName}/pull/{data.gitHubPrNumber}"
+    >
+      Back to PR
+    </Button>
+  {/snippet}
+
   {#snippet actions()}
     {#if isAssigned}
       <Button variant="primary" icon={CheckCircle} loading={submitting} onclick={handleConfirm}>
