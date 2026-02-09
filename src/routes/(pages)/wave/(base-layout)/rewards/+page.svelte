@@ -83,8 +83,9 @@
     loaded: true,
     empty: grants.length === 0,
     emptyStateEmoji: '💰',
-    emptyStateHeadline: 'No rewards yet',
-    emptyStateText: 'Complete issues in active Waves to earn rewards.',
+    emptyStateHeadline: 'No current Reward Grants available',
+    emptyStateText:
+      "Rewards are made available when Points for rewards have been frozen after each Wave. You'll receive an email notification when a grant is available.",
   }}
 >
   {#if !kycApproved}
