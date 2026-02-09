@@ -81,6 +81,12 @@
         items: [
           {
             type: 'target',
+            name: 'Reward Grants',
+            href: '/wave/rewards',
+            icon: Orgs,
+          },
+          {
+            type: 'target',
             name: 'Points history',
             href: '/wave/points',
             icon: Trophy,

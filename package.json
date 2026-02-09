@@ -104,6 +104,7 @@
     "@safe-global/safe-apps-sdk": "^9.1.0",
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
+    "@stellar/stellar-sdk": "^14.5.0",
     "@sumsub/websdk": "^2.5.0",
     "@sveltejs/adapter-node": "^5.4.0",
     "@tanstack/svelte-table": "npm:tanstack-table-8-svelte-5@^0.1",
