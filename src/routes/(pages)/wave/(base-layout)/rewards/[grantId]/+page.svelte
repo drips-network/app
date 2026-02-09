@@ -140,7 +140,10 @@
       {#if isProcessing(grant.status)}
         <AnnotationBox type="info">
           Your {grant.status === 'withdrawal_pending' ? 'withdrawal' : 'test transaction'} is being processed.
-          Transactions are usually completed within seven days. We'll send you an email when it's done.
+          {grant.status === 'withdrawal_pending'
+            ? 'Withdrawals are usually completed within 2–5 business days.'
+            : 'Test transactions are usually processed within a few minutes, but may take up to 7 days in rare cases.'}
+          We'll send you an email when it's done.
         </AnnotationBox>
       {/if}
     </div>

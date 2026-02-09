@@ -37,7 +37,7 @@
 
 <StandaloneFlowStepLayout
   headline="Request test transaction"
-  description="We'll send $1 to verify your wallet can receive USDC on Stellar. Once requested, transfers will be made within seven days."
+  description="We'll send $1 to verify your wallet can receive USDC on Stellar. Test transactions will usually be processed within a few minutes, but may take up to 7 days in rare cases."
 >
   <AnnotationBox type="info">
     Make sure your wallet supports USDC on the Stellar network and has the USDC trustline enabled
