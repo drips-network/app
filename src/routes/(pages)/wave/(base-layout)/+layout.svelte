@@ -14,6 +14,7 @@
   import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
 
   let {
     data,
@@ -83,7 +84,7 @@
             type: 'target',
             name: 'Reward Grants',
             href: '/wave/rewards',
-            icon: Orgs,
+            icon: Wallet,
           },
           {
             type: 'target',
