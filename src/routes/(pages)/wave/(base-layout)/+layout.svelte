@@ -80,19 +80,19 @@
       },
     ],
     bottom: [
-      ...(hasPermissions
-        ? [
-            {
-              type: 'target' as const,
-              name: 'Admin',
-              href: '/wave/admin',
-              icon: Shield,
-            },
-          ]
-        : []),
       {
         type: 'collection' as const,
         items: [
+          ...(hasPermissions
+            ? [
+                {
+                  type: 'target' as const,
+                  name: 'Admin',
+                  href: '/wave/admin',
+                  icon: Shield,
+                },
+              ]
+            : []),
           {
             type: 'target' as const,
             name: 'Reward Grants',
