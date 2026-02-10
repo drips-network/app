@@ -55,7 +55,8 @@
   function canRequestTest(grant: GrantDto): boolean {
     return (
       (grant.status === 'withdrawable' || grant.status === 'test_transaction_sent') &&
-      !isExpired(grant)
+      !isExpired(grant) &&
+      grant.currentAmountUSD > 1
     );
   }
 

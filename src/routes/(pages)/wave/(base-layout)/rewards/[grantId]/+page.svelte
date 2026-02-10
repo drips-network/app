@@ -45,7 +45,8 @@
   function canRequestTest(g: GrantDetailDto): boolean {
     return (
       (g.status === 'withdrawable' || g.status === 'test_transaction_sent') &&
-      new Date(g.expiresAt) >= new Date()
+      new Date(g.expiresAt) >= new Date() &&
+      g.currentAmountUSD > 1
     );
   }
 
