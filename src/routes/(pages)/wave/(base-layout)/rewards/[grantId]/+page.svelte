@@ -146,8 +146,8 @@
         <AnnotationBox type="info">
           Your {grant.status === 'withdrawal_pending' ? 'withdrawal' : 'test transaction'} is being processed.
           {grant.status === 'withdrawal_pending'
-            ? 'Withdrawals are usually completed within 2–5 business days.'
-            : 'Test transactions are usually processed within a few minutes, but may take up to 7 days in rare cases.'}
+            ? 'Withdrawals are usually completed within 1–3 business days.'
+            : 'Test transactions are usually processed within a few minutes, but may take up to 3 days in rare cases.'}
           We'll send you an email when it's done.
         </AnnotationBox>
       {/if}

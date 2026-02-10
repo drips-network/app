@@ -54,7 +54,7 @@
 >
   <AnnotationBox type="info">
     We'll send $1 to verify your wallet can receive USDC on Stellar. Once requested, transfers will
-    usually be processed within a few minutes, but may take up to 7 days in rare cases.
+    usually be processed within a few minutes, but may take up to 3 days in rare cases.
   </AnnotationBox>
 
   <div class="fields">

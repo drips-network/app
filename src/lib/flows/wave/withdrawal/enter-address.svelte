@@ -38,7 +38,7 @@
 
 <StandaloneFlowStepLayout
   headline="Request full withdrawal"
-  description="Withdraw your grant funds to your Stellar wallet as USDC. Once requested, transfers will be processed within 2–5 business days."
+  description="Withdraw your grant funds to your Stellar wallet as USDC. Once requested, transfers will be processed within 1–3 business days."
 >
   <AnnotationBox type="info">
     Make sure your wallet supports USDC on the Stellar network and has the USDC trustline enabled.

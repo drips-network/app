@@ -16,7 +16,7 @@
 
   <StepHeader
     headline="Withdrawal requested"
-    description="Your withdrawal has been submitted and will be processed within 2–5 business days. We'll send you a confirmation email once the funds have been sent to your wallet."
+    description="Your withdrawal has been submitted and will usually be processed within 1–3 business days. We'll send you a confirmation email once the funds have been sent to your wallet."
   />
 
   {#snippet actions()}

@@ -16,7 +16,7 @@
 
   <StepHeader
     headline="Test transaction requested"
-    description="Your test transaction has been submitted and will usually be processed within a few minutes, but up to 7 days in rare cases. We'll send you a confirmation email once the transaction has been sent."
+    description="Your test transaction has been submitted and will usually be processed within a few minutes, but up to 3 days in rare cases. We'll send you a confirmation email once the transaction has been sent."
   />
 
   {#snippet actions()}
