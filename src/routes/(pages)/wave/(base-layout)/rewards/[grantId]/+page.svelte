@@ -112,6 +112,10 @@
             <span class="label">Granted</span>
             <span class="value">{formatDate(grant.createdAt, 'dayAndYear')}</span>
           </div>
+          <div class="overview-row">
+            <span class="label">Expires on</span>
+            <span class="value">{formatDate(grant.expiresAt, 'dayAndYear')}</span>
+          </div>
         </div>
 
         {#if !isExpired && !isProcessing(grant.status) && grant.status !== 'withdrawal_complete'}
