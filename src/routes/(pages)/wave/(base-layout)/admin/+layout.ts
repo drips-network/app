@@ -7,5 +7,9 @@ export const load = async ({ parent }) => {
     throw redirect(302, '/wave/login?backTo=/wave/admin');
   }
 
+  if (!user.permissions?.length) {
+    throw redirect(302, '/wave');
+  }
+
   return { user };
 };
