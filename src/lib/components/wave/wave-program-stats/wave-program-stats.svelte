@@ -45,9 +45,9 @@
       href: `/wave/${waveProgram.slug}/repos`,
     },
     {
-      key: 'Maintainers',
+      key: 'Orgs',
       value: waveProgram.approvedOrgCount,
-      tooltip: 'Count of orgs and users approved to add their issues into the Wave Program.',
+      href: `/wave/${waveProgram.slug}/orgs`,
     },
     {
       key: 'Leaderboard',

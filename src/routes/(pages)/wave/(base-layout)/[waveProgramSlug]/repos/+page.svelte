@@ -7,15 +7,17 @@
   import convertGhLanguageListToLanguageProfile from '$lib/components/programming-language-breakdown/convert-gh-language-list-to-language-profile';
   import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
-  import Spinner from '$lib/components/spinner/spinner.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
+  import PaginatedCardGrid from '$lib/components/wave/paginated-card-grid/paginated-card-grid.svelte';
   import ReposFilterBar from '$lib/components/wave/repos-filter-bar/repos-filter-bar.svelte';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
-  import type { WaveProgramReposFilters } from '$lib/utils/wave/types/waveProgram';
+  import type {
+    WaveProgramReposFilters,
+    WaveProgramRepoWithDetailsDto,
+  } from '$lib/utils/wave/types/waveProgram';
+  import type { Pagination } from '$lib/utils/wave/types/pagination';
   import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
-  import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
   import type { Snapshot } from '../$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
@@ -23,7 +25,7 @@
   import Fork from '$lib/components/icons/Fork.svelte';
 
   let { data } = $props();
-  const { repos: initialRepos, waveProgram, filters } = $derived(data);
+  const { repos: initialRepos, waveProgram, filters, orgsPromise } = $derived(data);
 
   function getIssueFilterString(repoId: string) {
     const filters: IssueFilters = {
@@ -53,99 +55,38 @@
     });
   }
 
-  // pagination
   // svelte-ignore state_referenced_locally
-  let repos = $state(initialRepos.data);
+  let items = $state<WaveProgramRepoWithDetailsDto[]>(initialRepos.data);
   // svelte-ignore state_referenced_locally
-  let pagination = $state(initialRepos.pagination);
-  let isLoadingMore = $state(false);
+  let pagination = $state<Pagination>(initialRepos.pagination);
 
-  // when initialRepos changes, reset repos and pagination
-  $effect(() => {
-    repos = initialRepos.data;
-    pagination = initialRepos.pagination;
-  });
-
-  let fetchTriggerElem = $state<HTMLDivElement>();
-
-  function isTriggerInViewport(elem: HTMLDivElement) {
-    const rect = elem.getBoundingClientRect();
-    return rect.top >= 0 && rect.bottom <= window.innerHeight;
-  }
-
-  async function getMoreRepos() {
-    if (isLoadingMore || !pagination.hasNextPage) return;
-
-    isLoadingMore = true;
-
-    try {
-      const nextPage = pagination.page + 1;
-      const newRepos = await getWaveProgramRepos(
-        undefined,
-        waveProgram.id,
-        {
-          page: nextPage,
-          limit: 20,
-        },
-        filters,
-      );
-
-      repos = [...repos, ...newRepos.data];
-      pagination = newRepos.pagination;
-
-      // retrigger if still in viewport
-      if (fetchTriggerElem && isTriggerInViewport(fetchTriggerElem) && pagination.hasNextPage) {
-        setTimeout(() => {
-          getMoreRepos();
-        }, 200);
-      }
-    } finally {
-      isLoadingMore = false;
-    }
-  }
-
-  onMount(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            getMoreRepos();
-          }
-        });
-      },
+  async function fetchMore(nextPage: number) {
+    return getWaveProgramRepos(
+      undefined,
+      waveProgram.id,
       {
-        root: null,
-        rootMargin: '0px',
-        threshold: 1.0,
+        page: nextPage,
+        limit: 20,
       },
+      filters,
     );
-
-    if (fetchTriggerElem) {
-      observer.observe(fetchTriggerElem);
-    }
-
-    return () => {
-      if (fetchTriggerElem) {
-        observer.unobserve(fetchTriggerElem);
-      }
-    };
-  });
+  }
 
   // restore data on navigation back
   export const snapshot: Snapshot<{
-    repos: typeof repos;
+    items: typeof items;
     pagination: typeof pagination;
     scrollPos: number;
   }> = {
     capture: () => {
       return {
-        repos,
+        items,
         pagination,
         scrollPos: window.scrollY,
       };
     },
     restore: (data) => {
-      repos = data.repos;
+      items = data.items;
       pagination = data.pagination;
 
       setTimeout(() => {
@@ -194,7 +135,7 @@
       ]}
     />
 
-    <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} />
+    <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} {orgsPromise} />
   </div>
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
@@ -208,87 +149,80 @@
     {/if}
   </span>
 
-  <div class="repo-grid">
-    {#each repos as { repo, org, issueCount, pointsMultiplier } (repo.id)}
+  <PaginatedCardGrid initialData={initialRepos} {fetchMore} bind:items bind:pagination>
+    {#snippet card({ repo, org, issueCount, pointsMultiplier }: WaveProgramRepoWithDetailsDto)}
       {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
-      <div in:fade={{ duration: 200 }}>
-        <Card
-          style={isFeatured
-            ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
-            : undefined}
-        >
-          <div class="repo-item">
-            <div class="top" style:display="flex" style:flex-direction="column" style:gap="0.5rem">
-              <div class="owner-and-repo">
-                <UserAvatar size={24} src={org.gitHubOrgAvatarUrl ?? undefined} />
+      <Card
+        style={isFeatured
+          ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
+          : undefined}
+      >
+        <div class="repo-item">
+          <div class="top" style:display="flex" style:flex-direction="column" style:gap="0.5rem">
+            <div class="owner-and-repo">
+              <UserAvatar size={24} src={org.gitHubOrgAvatarUrl ?? undefined} />
 
-                <a
-                  class="repo-name typo-text line-clamp-2"
-                  href="https://github.com/{repo.gitHubRepoFullName}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span style:color="var(--color-foreground-level-5)">
-                    {repo.gitHubRepoFullName.split('/')[0]} /
-                  </span>
-                  {repo.gitHubRepoFullName.split('/')[1]}
-                </a>
+              <a
+                class="repo-name typo-text line-clamp-2"
+                href="https://github.com/{repo.gitHubRepoFullName}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span style:color="var(--color-foreground-level-5)">
+                  {repo.gitHubRepoFullName.split('/')[0]} /
+                </span>
+                {repo.gitHubRepoFullName.split('/')[1]}
+              </a>
 
-                {#if isFeatured}
-                  <span class="featured-badge">{pointsMultiplier}x Points</span>
-                {/if}
-              </div>
-
-              <span class="description typo-text-small line-clamp-2">
-                {#if repo.description}
-                  {repo.description}
-                {:else}
-                  <span style:color="var(--color-foreground-level-4)">No description</span>
-                {/if}
-              </span>
-
-              <div class="languages">
-                <ProgrammingLanguageBreakdown
-                  size="compact"
-                  languageProfile={convertGhLanguageListToLanguageProfile(repo.languages)}
-                />
-              </div>
+              {#if isFeatured}
+                <span class="featured-badge">{pointsMultiplier}x Points</span>
+              {/if}
             </div>
 
-            <div class="bottom-row">
-              <Button
-                size="small"
-                disabled={issueCount === 0}
-                href={`/wave/${data.waveProgram.slug}/issues?filters=${getIssueFilterString(repo.id)}`}
-              >
-                {#if issueCount === 0}
-                  No issues added
-                {:else}
-                  Browse {issueCount} issues
-                {/if}
-              </Button>
+            <span class="description typo-text-small line-clamp-2">
+              {#if repo.description}
+                {repo.description}
+              {:else}
+                <span style:color="var(--color-foreground-level-4)">No description</span>
+              {/if}
+            </span>
 
-              <div class="repo-stats">
-                <span class="stat">
-                  <Star style="width: 1rem; height: 1rem;" />
-                  {repo.stargazersCount?.toString() ?? '0'}
-                </span>
-                <span class="stat">
-                  <Fork style="width: 1rem; height: 1rem;" />
-                  {repo.forksCount?.toString() ?? '0'}
-                </span>
-              </div>
+            <div class="languages">
+              <ProgrammingLanguageBreakdown
+                size="compact"
+                languageProfile={convertGhLanguageListToLanguageProfile(repo.languages)}
+              />
             </div>
           </div>
-        </Card>
-      </div>
-    {/each}
-  </div>
-  <div bind:this={fetchTriggerElem} class="fetch-trigger">
-    {#if pagination.hasNextPage}
-      <Spinner />
-    {/if}
-  </div>
+
+          <div class="bottom-row">
+            <Button
+              size="small"
+              disabled={issueCount === 0}
+              href={`/wave/${data.waveProgram.slug}/issues?filters=${getIssueFilterString(repo.id)}`}
+            >
+              {#if issueCount === 0}
+                No issues added
+              {:else}
+                Browse {issueCount} issues
+              {/if}
+            </Button>
+
+            <div class="repo-stats">
+              <span class="stat">
+                <Star style="width: 1rem; height: 1rem;" />
+                {repo.stargazersCount?.toString() ?? '0'}
+              </span>
+              <span class="stat">
+                <Fork style="width: 1rem; height: 1rem;" />
+                {repo.forksCount?.toString() ?? '0'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Card>
+    {/snippet}
+  </PaginatedCardGrid>
 </div>
 
 <style>
@@ -303,12 +237,6 @@
 
   .intro {
     max-width: 36rem;
-  }
-
-  .repo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-    gap: 1rem;
   }
 
   .repo-item {
@@ -357,12 +285,6 @@
     gap: 0.25rem;
     color: var(--color-foreground-level-5);
     font-size: 0.875rem;
-  }
-
-  .fetch-trigger {
-    display: flex;
-    height: 2rem;
-    justify-content: center;
   }
 
   .featured-badge {

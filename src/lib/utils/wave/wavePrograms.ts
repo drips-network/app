@@ -10,10 +10,13 @@ import {
   waveFiltersSchema,
   waveProgramDtoSchema,
   waveProgramIssueWithDetailsDtoSchema,
+  waveProgramOrgDtoSchema,
+  waveProgramOrgsFiltersSchema,
   waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
   type Complexity,
   type WaveFilters,
+  type WaveProgramOrgsFilters,
   type WaveProgramReposFilters,
 } from './types/waveProgram';
 
@@ -73,6 +76,21 @@ export async function getWaveProgramRepos(
     await authenticatedCall(
       f,
       `/api/wave-programs/${waveProgramId}/repos?${toPaginationParams(pagination)}&${toFilterParams(waveProgramReposFiltersSchema, filters)}`,
+    ),
+  );
+}
+
+export async function getWaveProgramOrgs(
+  f = fetch,
+  waveProgramId: string,
+  pagination: PaginationInput = {},
+  filters: WaveProgramOrgsFilters = {},
+) {
+  return parseRes(
+    paginatedResponseSchema(waveProgramOrgDtoSchema),
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/orgs?${toPaginationParams(pagination)}&${toFilterParams(waveProgramOrgsFiltersSchema, filters)}`,
     ),
   );
 }
