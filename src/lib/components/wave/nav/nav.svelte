@@ -31,6 +31,8 @@
       top: readonly Item[];
       bottom?: readonly Item[];
     };
+    /** Route prefixes that participate in active-item matching but don't render in the nav. */
+    invisibleRoutes?: readonly string[];
     collapsed?: boolean;
     isCurrentlyExpanded?: boolean;
     mode?: 'side' | 'hamburger';
@@ -38,6 +40,7 @@
 
   let {
     items,
+    invisibleRoutes = [],
     collapsed = true,
     isCurrentlyExpanded = $bindable(false),
     mode = 'side',
@@ -100,9 +103,10 @@
     }
 
     let longestMatch = '';
-    for (const item of flattenedItems) {
-      if (item.href.length > longestMatch.length && currentPath.startsWith(item.href)) {
-        longestMatch = item.href;
+    const allPrefixes = [...flattenedItems.map((i) => i.href), ...invisibleRoutes];
+    for (const prefix of allPrefixes) {
+      if (prefix.length > longestMatch.length && currentPath.startsWith(prefix)) {
+        longestMatch = prefix;
       }
     }
 
@@ -208,7 +212,7 @@
   }}
   class:hamburgerMode={mode === 'hamburger'}
 >
-  {#if browser}
+  {#if browser && activeTargetEl}
     <div
       class="item-highlighter"
       bind:this={highlightEl}
