@@ -14,6 +14,8 @@
   import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
+  import Wallet from '$lib/components/icons/Wallet.svelte';
+  import Shield from '$lib/components/icons/Shield.svelte';
 
   let {
     data,
@@ -34,21 +36,23 @@
     return () => cupertinoPaneStore.detach();
   });
 
-  const NAV_ITEMS = {
+  const hasPermissions = $derived(Boolean(data.user?.permissions?.length));
+
+  const NAV_ITEMS = $derived({
     top: [
       {
-        type: 'target',
+        type: 'target' as const,
         name: 'Explore Waves',
         href: '/wave',
         icon: Wave,
         allowBacktrack: true,
       },
       {
-        type: 'collection',
+        type: 'collection' as const,
         name: 'Contributor',
         items: [
           {
-            type: 'target',
+            type: 'target' as const,
             name: 'Issues',
             href: '/wave/contributors/issues',
             icon: Issue,
@@ -57,17 +61,17 @@
         ],
       },
       {
-        type: 'collection',
+        type: 'collection' as const,
         name: 'Maintainer',
         items: [
           {
-            type: 'target',
+            type: 'target' as const,
             name: 'Issues',
             href: '/wave/maintainers/issues',
             icon: Issue,
           },
           {
-            type: 'target',
+            type: 'target' as const,
             name: 'Orgs & repos',
             href: '/wave/maintainers/repos',
             icon: Orgs,
@@ -77,22 +81,38 @@
     ],
     bottom: [
       {
-        type: 'collection',
+        type: 'collection' as const,
         items: [
+          ...(hasPermissions
+            ? [
+                {
+                  type: 'target' as const,
+                  name: 'Admin',
+                  href: '/wave/admin',
+                  icon: Shield,
+                },
+              ]
+            : []),
           {
-            type: 'target',
+            type: 'target' as const,
+            name: 'Reward Grants',
+            href: '/wave/rewards',
+            icon: Wallet,
+          },
+          {
+            type: 'target' as const,
             name: 'Points history',
             href: '/wave/points',
             icon: Trophy,
           },
           {
-            type: 'target',
+            type: 'target' as const,
             name: 'Settings',
             href: '/wave/settings',
             icon: Settings,
           },
           {
-            type: 'target',
+            type: 'target' as const,
             name: 'Docs',
             href: 'https://docs.drips.network/wave',
             newTab: true,
@@ -101,7 +121,7 @@
         ],
       },
     ],
-  } as const;
+  });
 </script>
 
 <ModalLayout />
