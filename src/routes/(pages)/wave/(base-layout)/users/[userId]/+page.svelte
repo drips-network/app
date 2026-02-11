@@ -3,6 +3,7 @@
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
+  import Discord from '$lib/components/icons/Discord.svelte';
   import Flag from '$lib/components/icons/Flag.svelte';
   import Heart from '$lib/components/icons/Heart.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
@@ -21,6 +22,10 @@
   let { data } = $props();
   let { profileUserData, pointsBalance, complimentCountSummary, user } = $derived(data);
   let { gitHubUsername } = $derived(profileUserData);
+
+  const discordAccounts = $derived(
+    profileUserData.linkedAccounts.filter((a) => a.provider === 'discord'),
+  );
 
   const COMPLIMENTS = $derived(
     complimentCountSummary.totals.map((c) => ({
@@ -72,6 +77,19 @@
         <div class="share">
           <ShareButton buttonVariant="normal" url={page.url.href} />
         </div>
+
+        {#if discordAccounts.length > 0}
+          <div class="divider"></div>
+          <div class="linked-accounts">
+            <h5>Linked accounts</h5>
+            {#each discordAccounts as account (account.providerUsername)}
+              <div class="linked-account">
+                <Discord style="flex-shrink: 0; fill: var(--color-foreground);" />
+                <span class="typo-text">{account.providerUsername}</span>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     </Card>
   </div>
@@ -117,17 +135,24 @@
 
 <style>
   .page {
+    display: grid;
+    grid-template-columns: 20rem 1fr;
+    grid-template-areas: 'profile-info content';
+    gap: 2rem;
     max-width: 90rem;
     width: 100%;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    grid-template-areas: 'profile-info content';
-    gap: 3rem;
+  }
+
+  .page > * {
+    min-width: 0;
   }
 
   .profile-info {
     grid-area: profile-info;
+    position: sticky;
+    top: 4.5rem;
+    align-self: start;
   }
 
   .profile-info-inner {
@@ -146,6 +171,8 @@
 
   .profile-info h1 {
     font-size: 1.75rem;
+    overflow-wrap: anywhere;
+    text-align: center;
   }
 
   .avatar-and-name {
@@ -155,11 +182,31 @@
     gap: 1rem;
   }
 
+  .divider {
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-foreground-level-2);
+  }
+
+  .linked-accounts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .linked-account {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-foreground);
+  }
+
   .content {
     grid-area: content;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 1rem;
   }
 
   .points {
@@ -194,6 +241,10 @@
       grid-template-areas:
         'profile-info'
         'content';
+    }
+
+    .profile-info {
+      position: static;
     }
   }
 </style>
