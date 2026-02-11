@@ -41,11 +41,23 @@
   const NAV_ITEMS = $derived({
     top: [
       {
-        type: 'target' as const,
-        name: 'Explore Waves',
-        href: '/wave',
-        icon: Wave,
-        allowBacktrack: true,
+        type: 'collection' as const,
+        items: [
+          {
+            type: 'target' as const,
+            name: 'Explore Waves',
+            href: '/wave',
+            icon: Wave,
+            allowBacktrack: true,
+          },
+          {
+            type: 'target' as const,
+            name: 'Explore Orgs',
+            href: '/wave/orgs',
+            icon: Orgs,
+            allowBacktrack: true,
+          },
+        ],
       },
       {
         type: 'collection' as const,
@@ -143,7 +155,11 @@
   </div>
 
   <div class="nav-wrapper">
-    <Nav bind:isCurrentlyExpanded={sidenavExpanded} items={NAV_ITEMS} />
+    <Nav
+      bind:isCurrentlyExpanded={sidenavExpanded}
+      items={NAV_ITEMS}
+      invisibleRoutes={['/wave/users']}
+    />
   </div>
 </div>
 
