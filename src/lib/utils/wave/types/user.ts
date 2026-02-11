@@ -1,10 +1,24 @@
 import z from 'zod';
 
+export const linkedAccountSchema = z.object({
+  provider: z.string(),
+  providerUsername: z.string(),
+  providerDisplayName: z.string(),
+  providerAvatarUrl: z.string().nullable(),
+  linkedAt: z.string(),
+});
+export type LinkedAccount = z.infer<typeof linkedAccountSchema>;
+
 export const waveUserDtoSchema = z.object({
   id: z.uuid(),
   gitHubUsername: z.string(),
   gitHubAvatarUrl: z.url(),
 });
+
+export const waveUserDetailDtoSchema = waveUserDtoSchema.extend({
+  linkedAccounts: z.array(linkedAccountSchema),
+});
+export type WaveUserDetail = z.infer<typeof waveUserDetailDtoSchema>;
 export type WaveUser = z.infer<typeof waveUserDtoSchema>;
 
 export const waveOwnProfileUserDataSchema = z.object({
