@@ -116,7 +116,8 @@
           target="_blank"
           rel="noopener noreferrer"
           class="typo-link">Drips Discord server</a
-        >, linking will automatically add you to it.
+        >, linking will automatically add you to it. Your linked Discord account will appear on your
+        public Wave profile.
       </AnnotationBox>
     </div>
 
