@@ -67,5 +67,7 @@
 
   .separator {
     color: var(--color-foreground-level-4);
+    font-size: 14px;
+    line-height: 18px;
   }
 </style>
