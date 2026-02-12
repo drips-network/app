@@ -29,6 +29,7 @@ export const issueFilters = filterSchema(
     hasApplications: booleanString.optional(),
     hasPr: booleanString.optional(),
     search: z.string().optional(),
+    repoLanguage: z.string().optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;

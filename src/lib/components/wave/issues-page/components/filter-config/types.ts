@@ -17,6 +17,14 @@ export type DropdownConfig<OT extends { label: string; value: string }[]> = {
   optionsPromise: Promise<OT>;
 };
 
+export type MultiSelectConfig<OT extends { label: string; value: string }[]> = {
+  type: 'multi-select';
+  label: string;
+  link?: LinkConfig;
+  optionsPromise: Promise<OT>;
+};
+
 export type FilterConfig =
   | SingleSelectConfig<{ label: string; value: string }[]>
-  | DropdownConfig<{ label: string; value: string }[]>;
+  | DropdownConfig<{ label: string; value: string }[]>
+  | MultiSelectConfig<{ label: string; value: string }[]>;
