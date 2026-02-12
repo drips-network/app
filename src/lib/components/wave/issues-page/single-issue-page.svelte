@@ -10,7 +10,7 @@
   import Pen from '$lib/components/icons/Pen.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Sharrow from '$lib/components/icons/Sharrow.svelte';
-  import Settings from '$lib/components/icons/Settings.svelte';
+  import Shield from '$lib/components/icons/Shield.svelte';
   import Flag from '$lib/components/icons/Flag.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
@@ -18,6 +18,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
+  import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import shareSteps from '$lib/flows/share/share-steps';
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
   import modal from '$lib/stores/modal';
@@ -240,6 +241,31 @@
   let canIssuePointsEarly = $derived(
     showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,
   );
+
+  let sidebarEl = $state<HTMLDivElement>();
+  let scrolledToTop = $state(true);
+  let scrolledToBottom = $state(true);
+
+  function handleSidebarScroll() {
+    if (!sidebarEl) return;
+    scrolledToTop = sidebarEl.scrollTop <= 1;
+    scrolledToBottom = sidebarEl.scrollTop + sidebarEl.clientHeight >= sidebarEl.scrollHeight - 1;
+  }
+
+  $effect(() => {
+    issue.id; // track issue changes
+    if (!sidebarEl) return;
+    sidebarEl.scrollTop = 0;
+    handleSidebarScroll();
+  });
+
+  $effect(() => {
+    if (!sidebarEl) return;
+    const observer = new ResizeObserver(() => handleSidebarScroll());
+    observer.observe(sidebarEl);
+    handleSidebarScroll();
+    return () => observer.disconnect();
+  });
 </script>
 
 <div class="back-to-issues-link">
@@ -268,6 +294,8 @@
             <RepoBadge
               repo={issue.repo}
               avatarUrl={issue.repo.org.gitHubOrgAvatarUrl ?? undefined}
+              href="https://github.com/{issue.repo.gitHubRepoFullName}"
+              size="small"
             />
           </div>
         </div>
@@ -315,260 +343,280 @@
     {/if}
   </div>
 
-  <div class="sidebar">
-    <Card style="height: fit-content; padding: 0; overflow: auto;">
-      {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
-        <div>
-          <SidebarButton icon={Check} variant="primary" onclick={handleMarkIssueCompleted}>
-            Mark completed
-          </SidebarButton>
-        </div>
-      {/if}
-
-      {#if issue.waveProgramId && !issue.assignedApplicant}
-        <div>
-          <SidebarButton
-            icon={Sharrow}
-            onclick={() =>
-              modal.show(
-                Stepper,
-                undefined,
-                shareSteps({
-                  url: `${BASE_URL}/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
-                  shareModalText: 'Share a link for applicants to apply for this issue.',
-                }),
-              )}
-          >
-            Share apply link
-          </SidebarButton>
-        </div>
-      {/if}
-
-      <SidebarButton
-        icon={ArrowBoxUpRight}
-        href={`https://github.com/${issue.repo.gitHubRepoFullName}/issues/${issue.gitHubIssueNumber}`}
-      >
-        View on GitHub
-      </SidebarButton>
-
-      <div class="sidebar-section">
-        <div class="content">
-          <h5>Assigned applicant</h5>
-
-          {#if issue.assignedApplicant}
-            <GithubUserBadge user={issue.assignedApplicant} />
-
-            <div class="section-headline-with-info" style:margin-top="1rem">
-              <h5>Due date</h5>
-
-              <Tooltip>
-                <InfoCircle style="height: 1.25rem;" />
-
-                {#snippet tooltip_content()}
-                  Issues assigned as part of a Wave are due on the end date of that Wave. If the
-                  issue is resolved after this date, the applicant may not receive points for
-                  completing it.
-                {/snippet}
-              </Tooltip>
-            </div>
-
-            <p>{formatDate(issue.assignedApplicant.dueDate)}</p>
-          {:else}
-            <p style:color="var(--color-foreground-level-5)">No applicant assigned.</p>
-          {/if}
-        </div>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="content">
-          <h5>Wave Program</h5>
-
-          {#if partOfWaveProgram}
-            <WaveBadge waveProgram={partOfWaveProgram} />
-
-            {#if issue.addedBy}
-              <h5 style:margin-top="1rem">Added by</h5>
-              <GithubUserBadge user={issue.addedBy} />
-            {/if}
-          {:else}
-            <p style:color="var(--color-foreground-level-5)">
-              Issue isn't part of a Wave Program yet.
-            </p>
-          {/if}
-        </div>
-
-        {#if allowAddingOrRemovingWave}
-          {#if partOfWaveProgram}
-            <SidebarButton icon={Minus} onclick={handleRemoveFromWave}>
-              Remove from Wave Program
+  <div
+    class="sidebar-wrapper"
+    class:fade-top={!scrolledToTop}
+    class:fade-bottom={!scrolledToBottom}
+  >
+    <div class="sidebar" bind:this={sidebarEl} onscroll={handleSidebarScroll}>
+      <Card style="height: fit-content; flex: none; padding: 0;">
+        {#if issue.assignedApplicant && issue.state === 'open' && isMaintainer}
+          <div>
+            <SidebarButton icon={Check} variant="primary" onclick={handleMarkIssueCompleted}>
+              Mark completed
             </SidebarButton>
-          {:else}
+          </div>
+        {/if}
+
+        {#if issue.waveProgramId && !issue.assignedApplicant}
+          <div>
             <SidebarButton
-              icon={Plus}
-              variant="primary"
-              disabled={!canBeAddedToAWave}
+              icon={Sharrow}
               onclick={() =>
                 modal.show(
                   Stepper,
                   undefined,
-                  addIssuesToWaveFlow(waveProgramRepos, [issue], wavePrograms),
+                  shareSteps({
+                    url: `${BASE_URL}/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
+                    shareModalText: 'Share a link for applicants to apply for this issue.',
+                  }),
                 )}
             >
-              Add to Wave Program
+              Share apply link
             </SidebarButton>
-          {/if}
+          </div>
         {/if}
-      </div>
 
-      {#if (issue.points && issue.state !== 'closed') || issue.pointsEarned}
-        {@const multiplier = issue.pointsMultiplier ?? 1}
-        {@const hasMultiplier = multiplier > 1}
-        {@const complexityBonus = issue.complexity ? getPointsForComplexity(issue.complexity) : 0}
-        {@const hasComplexityBonus = complexityBonus > 0}
-        {@const basePoints = 100}
-        {@const subtotal = basePoints + complexityBonus}
-        {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
-        {@const showEarnedPoints = issue.pointsEarned != null}
+        <SidebarButton
+          icon={ArrowBoxUpRight}
+          href={`https://github.com/${issue.repo.gitHubRepoFullName}/issues/${issue.gitHubIssueNumber}`}
+        >
+          View on GitHub
+        </SidebarButton>
+
         <div class="sidebar-section">
           <div class="content">
-            <h5>Points</h5>
+            <h5>Assigned applicant</h5>
 
-            {#if showEarnedPoints}
-              <div class="points-earned">
-                <span class="typo-text">Points earned</span>
-                <span class="typo-text-bold">{issue.pointsEarned}</span>
+            {#if issue.assignedApplicant}
+              <GithubUserBadge user={issue.assignedApplicant} />
+
+              <div class="section-headline-with-info" style:margin-top="0.5rem">
+                <h5>Due date</h5>
+
+                <Tooltip>
+                  <InfoCircle style="height: 1.25rem;" />
+
+                  {#snippet tooltip_content()}
+                    Issues assigned as part of a Wave are due on the end date of that Wave. If the
+                    issue is resolved after this date, the applicant may not receive points for
+                    completing it.
+                  {/snippet}
+                </Tooltip>
               </div>
+
+              <p>{formatDate(issue.assignedApplicant.dueDate)}</p>
             {:else}
-              <ul class="points-table">
-                <li class="points-row">
-                  <span class="typo-text">Base Points</span>
-                  <span class="typo-text">{basePoints}</span>
-                </li>
-
-                {#if hasComplexityBonus}
-                  <li class="points-row">
-                    <span class="typo-text">Complexity Bonus</span>
-                    <span class="typo-text">+{complexityBonus}</span>
-                  </li>
-                {/if}
-
-                {#if hasMultiplier}
-                  <li class="points-row featured-row">
-                    <span
-                      class="typo-text"
-                      style:display="flex"
-                      style:align-items="center"
-                      style:gap="0.25rem"
-                    >
-                      <Multiplier
-                        style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
-                      />
-                      Featured Repo
-                    </span>
-                    <span class="typo-text">{multiplier}x</span>
-                  </li>
-                {/if}
-
-                <li class="points-row total-row">
-                  <span class="typo-text-bold">Total</span>
-                  <span class="typo-text-bold" class:featured-points={hasMultiplier}
-                    >{totalPoints}</span
-                  >
-                </li>
-              </ul>
-            {/if}
-
-            {#if givenCompliments.length > 0}
-              <h5 style:margin-top="1rem">Compliments</h5>
-              <ul class="compliments-list">
-                {#each givenCompliments as compliment (compliment.complimentType)}
-                  <li class="compliment-list-item">
-                    <span class="typo-text compliment-label">
-                      {COMPLIMENT_TYPES[compliment.complimentType].label}
-                    </span>
-
-                    <span class="typo-text">
-                      +{compliment.points}
-                    </span>
-                  </li>
-                {/each}
-              </ul>
+              <p style:color="var(--color-foreground-level-5)">No applicant assigned.</p>
             {/if}
           </div>
-
-          {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
-            <SidebarButton
-              target=""
-              icon={Heart}
-              href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/compliments"
-            >
-              Give compliment
-            </SidebarButton>
-          {/if}
         </div>
-      {/if}
 
-      {#if issue.complexity || issue.waveProgramId}
         <div class="sidebar-section">
           <div class="content">
-            <h5>Complexity</h5>
+            <h5>Wave Program</h5>
 
-            {#if issue.complexity}
-              <p>{beComplexityToFriendlyLabel(issue.complexity)}</p>
+            {#if partOfWaveProgram}
+              <WaveBadge waveProgram={partOfWaveProgram} />
+
+              <h5 style:margin-top="0.5rem">Org</h5>
+              <a class="org-link" href="/wave/orgs/{issue.repo.org.id}">
+                <UserAvatar size={24} src={issue.repo.org.gitHubOrgAvatarUrl ?? undefined} />
+                <span class="typo-text">{issue.repo.org.gitHubOrgLogin}</span>
+              </a>
+
+              {#if issue.addedBy}
+                <h5 style:margin-top="0.5rem">Added by</h5>
+                <GithubUserBadge user={issue.addedBy} />
+              {/if}
             {:else}
-              <p style:color="var(--color-foreground-level-5)">Not set</p>
+              <p style:color="var(--color-foreground-level-5)">
+                Issue isn't part of a Wave Program yet.
+              </p>
             {/if}
           </div>
 
-          {#if canUpdateComplexity}
-            <SidebarButton icon={Pen} onclick={openUpdateComplexityModal}>
-              Update complexity
-            </SidebarButton>
+          {#if allowAddingOrRemovingWave}
+            {#if partOfWaveProgram}
+              <SidebarButton icon={Minus} onclick={handleRemoveFromWave}>
+                Remove from Wave Program
+              </SidebarButton>
+            {:else}
+              <SidebarButton
+                icon={Plus}
+                variant="primary"
+                disabled={!canBeAddedToAWave}
+                onclick={() =>
+                  modal.show(
+                    Stepper,
+                    undefined,
+                    addIssuesToWaveFlow(waveProgramRepos, [issue], wavePrograms),
+                  )}
+              >
+                Add to Wave Program
+              </SidebarButton>
+            {/if}
           {/if}
         </div>
-      {/if}
 
-      {#if user && !allowAddingOrRemovingWave}
-        <div>
-          <SidebarButton
-            icon={Flag}
-            onclick={() => modal.show(Stepper, undefined, reportFlow('issue', issue.id))}
-          >
-            Report this issue
-          </SidebarButton>
-        </div>
-      {/if}
-    </Card>
+        {#if (issue.points && issue.state !== 'closed') || issue.pointsEarned}
+          {@const multiplier = issue.pointsMultiplier ?? 1}
+          {@const hasMultiplier = multiplier > 1}
+          {@const complexityBonus = issue.complexity ? getPointsForComplexity(issue.complexity) : 0}
+          {@const hasComplexityBonus = complexityBonus > 0}
+          {@const basePoints = 100}
+          {@const subtotal = basePoints + complexityBonus}
+          {@const totalPoints = hasMultiplier ? subtotal * multiplier : subtotal}
+          {@const showEarnedPoints = issue.pointsEarned != null}
+          <div class="sidebar-section">
+            <div class="content">
+              <h5>Points</h5>
 
-    {#if showModerationSection}
-      <Card style="height: fit-content; padding: 0; overflow: auto;">
-        <div class="sidebar-section moderation-section">
-          <div class="content">
-            <div class="moderation-header">
-              <Settings style="width: 1rem; height: 1rem; fill: var(--color-foreground-level-5)" />
-              <h5>Moderation</h5>
+              {#if showEarnedPoints}
+                <div class="points-earned">
+                  <span class="typo-text">Points earned</span>
+                  <span class="typo-text-bold">{issue.pointsEarned}</span>
+                </div>
+              {:else}
+                <ul class="points-table">
+                  <li class="points-row">
+                    <span class="typo-text">Base Points</span>
+                    <span class="typo-text">{basePoints}</span>
+                  </li>
+
+                  {#if hasComplexityBonus}
+                    <li class="points-row">
+                      <span class="typo-text">Complexity Bonus</span>
+                      <span class="typo-text">+{complexityBonus}</span>
+                    </li>
+                  {/if}
+
+                  {#if hasMultiplier}
+                    <li class="points-row featured-row">
+                      <span
+                        class="typo-text"
+                        style:display="flex"
+                        style:align-items="center"
+                        style:gap="0.25rem"
+                      >
+                        <Multiplier
+                          style="width: 0.875rem; height: 0.875rem; fill: currentColor; vertical-align: -2px;"
+                        />
+                        Featured Repo
+                      </span>
+                      <span class="typo-text">{multiplier}x</span>
+                    </li>
+                  {/if}
+
+                  <li class="points-row total-row">
+                    <span class="typo-text-bold">Total</span>
+                    <span class="typo-text-bold" class:featured-points={hasMultiplier}
+                      >{totalPoints}</span
+                    >
+                  </li>
+                </ul>
+              {/if}
+
+              {#if givenCompliments.length > 0}
+                <h5 style:margin-top="1rem">Compliments</h5>
+                <ul class="compliments-list">
+                  {#each givenCompliments as compliment (compliment.complimentType)}
+                    <li class="compliment-list-item">
+                      <span class="typo-text compliment-label">
+                        {COMPLIMENT_TYPES[compliment.complimentType].label}
+                      </span>
+
+                      <span class="typo-text">
+                        +{compliment.points}
+                      </span>
+                    </li>
+                  {/each}
+                </ul>
+              {/if}
             </div>
-            <p class="moderation-description">Moderator actions for this issue.</p>
+
+            {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
+              <SidebarButton
+                target=""
+                icon={Heart}
+                href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/compliments"
+              >
+                Give compliment
+              </SidebarButton>
+            {/if}
           </div>
+        {/if}
 
-          <SidebarButton icon={Pen} onclick={openModeratorUpdateComplexityModal}>
-            Adjust complexity
-          </SidebarButton>
+        {#if issue.complexity || issue.waveProgramId}
+          <div class="sidebar-section">
+            <div class="content">
+              <h5>Complexity</h5>
 
-          {#if canIssuePointsEarly}
-            <SidebarButton icon={Coin} onclick={openModeratorIssuePointsModal}>
-              Issue points early
-            </SidebarButton>
-          {/if}
+              {#if issue.complexity}
+                <p>{beComplexityToFriendlyLabel(issue.complexity)}</p>
+              {:else}
+                <p style:color="var(--color-foreground-level-5)">Not set</p>
+              {/if}
+            </div>
 
+            {#if canUpdateComplexity}
+              <SidebarButton icon={Pen} onclick={openUpdateComplexityModal}>
+                Update complexity
+              </SidebarButton>
+            {/if}
+          </div>
+        {/if}
+
+        {#if user && !allowAddingOrRemovingWave}
           <div>
-            <SidebarButton icon={Trash} onclick={openModeratorRemoveFromWaveModal}>
-              Remove from Wave
+            <SidebarButton
+              icon={Flag}
+              onclick={() => modal.show(Stepper, undefined, reportFlow('issue', issue.id))}
+            >
+              Report this issue
             </SidebarButton>
           </div>
-        </div>
+        {/if}
       </Card>
-    {/if}
+
+      {#if showModerationSection}
+        <Card style="height: fit-content; flex: none; padding: 0;">
+          <div class="sidebar-section moderation-section">
+            <div class="content">
+              <div class="moderation-header">
+                <Shield style="width: 1rem; height: 1rem; fill: var(--color-foreground-level-5)" />
+                <h5>Moderation</h5>
+              </div>
+              <p class="moderation-description">Moderator actions for this issue.</p>
+            </div>
+
+            <div>
+              <SidebarButton
+                icon={Pen}
+                onclick={openModeratorUpdateComplexityModal}
+                disabled={issue.pointsEarned != null}
+              >
+                Adjust complexity
+              </SidebarButton>
+            </div>
+
+            {#if canIssuePointsEarly}
+              <div>
+                <SidebarButton icon={Coin} onclick={openModeratorIssuePointsModal}>
+                  Issue points early
+                </SidebarButton>
+              </div>
+            {/if}
+
+            <div>
+              <SidebarButton icon={Trash} onclick={openModeratorRemoveFromWaveModal}>
+                Remove from Wave
+              </SidebarButton>
+            </div>
+          </div>
+        </Card>
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -580,11 +628,42 @@
     grid-template-columns: 1fr 18rem;
   }
 
-  .sidebar {
+  .sidebar-wrapper {
     position: sticky;
-    top: 7.5rem;
-    height: fit-content;
-    max-height: calc(100dvh - 8.5rem);
+    top: 6.5rem;
+    align-self: start;
+    max-height: calc(100dvh - 5.5rem);
+    --fade-size: 1.5rem;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black var(--fade-size),
+      black calc(100% - var(--fade-size)),
+      transparent 100%
+    );
+    transition: mask-image 0.2s;
+  }
+
+  .sidebar-wrapper:not(.fade-top) {
+    mask-image: linear-gradient(
+      to bottom,
+      black 0,
+      black calc(100% - var(--fade-size)),
+      transparent 100%
+    );
+  }
+
+  .sidebar-wrapper:not(.fade-bottom) {
+    mask-image: linear-gradient(to bottom, transparent 0, black var(--fade-size), black 100%);
+  }
+
+  .sidebar-wrapper:not(.fade-top):not(.fade-bottom) {
+    mask-image: none;
+  }
+
+  .sidebar {
+    overflow-y: auto;
+    max-height: calc(100dvh - 7.5rem);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -606,6 +685,14 @@
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
+  }
+
+  .org-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    text-decoration: none;
   }
 
   .sidebar-section:not(:last-child) {
@@ -671,7 +758,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     gap: 1rem;
   }
 
@@ -690,6 +777,12 @@
     .wrapper {
       grid-template-columns: 1fr;
       gap: 2rem;
+    }
+
+    .sidebar-wrapper {
+      max-height: none;
+      mask-image: none;
+      padding-bottom: 1rem;
     }
 
     .sidebar {
@@ -712,6 +805,10 @@
   .moderation-description {
     font-size: 0.875rem;
     color: var(--color-foreground-level-5);
+  }
+
+  .moderation-section > * + * {
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 
   .featured-points {

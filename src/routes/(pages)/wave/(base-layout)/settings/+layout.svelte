@@ -30,8 +30,8 @@
           icon: Pen,
         },
         {
-          label: 'Identity & Payments',
-          href: `${settingsBaseUrl}/identity-and-payments`,
+          label: 'Profile',
+          href: `${settingsBaseUrl}/profile`,
           icon: User,
         },
         {

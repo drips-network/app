@@ -144,6 +144,21 @@
             },
           }
         : {}),
+
+      repoLanguage: {
+        type: 'multi-select',
+        label: 'Repo languages',
+        optionsPromise: new Promise<{ value: string; label: string }[]>((resolve) => {
+          import('$lib/components/programming-language-breakdown/colors.json').then((colors) => {
+            resolve(
+              Object.keys(colors).map((lang) => ({
+                label: lang,
+                value: lang,
+              })),
+            );
+          });
+        }),
+      },
     }) as const;
 </script>
 
@@ -156,6 +171,8 @@
   import { onMount } from 'svelte';
   import DropdownFilterItem from './components/dropdown-filter-item.svelte';
   import SingleSelectFilterItem from './components/single-select-filter-item.svelte';
+  import MultiSelectFilter from '$lib/components/wave/repos-filter-bar/multi-select-filter.svelte';
+  import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import type { FilterConfig } from './types';
 
   let {
@@ -235,6 +252,33 @@
             selectedOption={filters[filterKey as keyof IssueFilters] as string | undefined}
             onchange={(value) => handleSelectFilter(filterKey as keyof IssueFilters, value)}
           />
+        {:else if filterConfig.type === 'multi-select'}
+          {@const selectedValues = (
+            (filters[filterKey as keyof IssueFilters] as string | undefined)?.split(',') ?? []
+          ).filter(Boolean)}
+          <div class="multi-select-row">
+            <div class="multi-select-filter-wrapper">
+              <MultiSelectFilter
+                optionsPromise={filterConfig.optionsPromise}
+                {selectedValues}
+                onchange={(values) =>
+                  handleSelectFilter(
+                    filterKey as keyof IssueFilters,
+                    values.length > 0 ? values.join(',') : null,
+                  )}
+                placeholder="Any"
+              />
+            </div>
+            {#if selectedValues.length > 0}
+              <button
+                class="clear-multi-select"
+                aria-label="Clear selection"
+                onclick={() => handleSelectFilter(filterKey as keyof IssueFilters, null)}
+              >
+                <CrossCircle style="fill: var(--color-foreground-level-5)" />
+              </button>
+            {/if}
+          </div>
         {/if}
       </div>
     {/each}
@@ -275,6 +319,35 @@
   .filter-config-item .label-and-link a {
     text-decoration: underline;
     color: var(--color-foreground-level-6);
+  }
+
+  .multi-select-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .multi-select-filter-wrapper {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+  }
+
+  .clear-multi-select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .clear-multi-select:hover {
+    opacity: 1;
   }
 
   .actions {

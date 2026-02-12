@@ -12,6 +12,7 @@
     selectedValues: string[];
     onchange: (values: string[]) => void;
     placeholder?: string;
+    singleSelect?: boolean;
   }
 
   let {
@@ -19,6 +20,7 @@
     onchange,
     selectedValues = [],
     placeholder = 'Select...',
+    singleSelect = false,
   }: Props = $props();
 
   let triggerEl = $state<HTMLButtonElement>();
@@ -40,7 +42,9 @@
   }
 
   function handleToggle(value: string) {
-    if (selectedValues.includes(value)) {
+    if (singleSelect) {
+      onchange(selectedValues.includes(value) ? [] : [value]);
+    } else if (selectedValues.includes(value)) {
       onchange(selectedValues.filter((v) => v !== value));
     } else {
       onchange([...selectedValues, value]);
@@ -72,9 +76,17 @@
     positionPopover();
   });
 
+  let resolvedOptions = $state<OT | undefined>(undefined);
+  $effect(() => {
+    optionsPromise.then((opts) => (resolvedOptions = opts));
+  });
+
   let displayText = $derived.by(() => {
     if (selectedValues.length === 0) return placeholder;
-    if (selectedValues.length === 1) return selectedValues[0];
+    if (selectedValues.length === 1) {
+      const match = resolvedOptions?.find((o) => o.value === selectedValues[0]);
+      return match?.label ?? (resolvedOptions ? selectedValues[0] : 'Loading...');
+    }
     return `${selectedValues.length} selected`;
   });
 </script>
@@ -129,7 +141,10 @@
             onclick={() => handleToggle(value)}
           >
             <div class="check">
-              <SelectedDot type="check" selected={selectedValues.includes(value)} />
+              <SelectedDot
+                type={singleSelect ? 'radio' : 'check'}
+                selected={selectedValues.includes(value)}
+              />
             </div>
             <span>{label}</span>
           </button>

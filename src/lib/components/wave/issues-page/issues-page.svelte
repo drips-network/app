@@ -456,9 +456,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 6rem);
+    height: calc(100dvh - 5.5rem);
     position: sticky;
-    top: 5rem;
+    top: 4.5rem;
   }
 
   .issue-list-configuration {
@@ -524,7 +524,7 @@
     grid-area: content;
     min-width: 0;
     position: relative;
-    padding-top: 3rem;
+    padding-top: 2rem;
   }
 
   .filter-config {
