@@ -9,7 +9,7 @@
   import Discord from '$lib/components/icons/Discord.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
-  import SectionHeader from '$lib/components/section-header/section-header.svelte';
+  import Section from '$lib/components/section/section.svelte';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -29,6 +29,42 @@
 
   const isOwnProfile = $derived(user?.id === profileUserData.id);
 </script>
+
+{#snippet orgMembershipsSection()}
+  <Section
+    header={{ icon: Orgs, label: 'Org Memberships', count: data.orgs.length }}
+    skeleton={{
+      loaded: true,
+      empty: data.orgs.length === 0,
+      emptyStateEmoji: '🫗',
+      emptyStateHeadline: 'No org memberships',
+      emptyStateText: 'This user is not a member of any organizations on Drips Wave.',
+      horizontalScroll: false,
+    }}
+  >
+    <ul class="orgs-list">
+      {#each data.orgs as org (org.id)}
+        <li>
+          <a class="org-row" href="/wave/orgs/{org.id}">
+            <UserAvatar size={32} src={org.gitHubOrgAvatarUrl ?? undefined} />
+            <div class="org-info">
+              <span class="typo-text">{org.gitHubOrgLogin}</span>
+              {#if org.gitHubOrgName}
+                <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
+                  >{org.gitHubOrgName}</span
+                >
+              {/if}
+            </div>
+            {#if org.accountType === 'User'}
+              <span class="personal-chip typo-text-small">Personal org</span>
+            {/if}
+            <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
+          </a>
+        </li>
+      {/each}
+    </ul>
+  </Section>
+{/snippet}
 
 <HeadMeta
   title="{gitHubUsername} | Drips Wave"
@@ -111,50 +147,34 @@
 
   <div class="content">
     {#if data.orgs.length > 0}
-      <div class="section">
-        <SectionHeader icon={Orgs} label="Org Memberships" count={data.orgs.length} />
-        <ul class="orgs-list">
-          {#each data.orgs as org (org.id)}
-            <li>
-              <a class="org-row" href="/wave/orgs/{org.id}">
-                <UserAvatar size={32} src={org.gitHubOrgAvatarUrl ?? undefined} />
-                <div class="org-info">
-                  <span class="typo-text">{org.gitHubOrgLogin}</span>
-                  {#if org.gitHubOrgName}
-                    <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
-                      >{org.gitHubOrgName}</span
-                    >
-                  {/if}
-                </div>
-                {#if org.accountType === 'User'}
-                  <span class="personal-chip typo-text-small">Personal org</span>
-                {/if}
-                <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </div>
+      {@render orgMembershipsSection()}
     {/if}
 
-    <div class="section">
-      <SectionHeader
-        icon={Issue}
-        label="Resolved Issues"
-        count={data.resolvedIssues.pagination.total}
-      />
-      {#if data.resolvedIssues.data.length > 0}
-        <div class="issues-grid">
-          {#each data.resolvedIssues.data as issue (issue.id)}
-            <IssuePreviewCard {issue} />
-          {/each}
-        </div>
-      {:else}
-        <span class="typo-text" style:color="var(--color-foreground-level-4)"
-          >This user has not resolved any issues through Drips Wave yet.</span
-        >
-      {/if}
-    </div>
+    <Section
+      header={{
+        icon: Issue,
+        label: 'Resolved Issues',
+        count: data.resolvedIssues.pagination.total,
+      }}
+      skeleton={{
+        loaded: true,
+        empty: data.resolvedIssues.data.length === 0,
+        emptyStateEmoji: '🫗',
+        emptyStateHeadline: 'No resolved issues',
+        emptyStateText: 'This user has not resolved any issues through Drips Wave yet.',
+        horizontalScroll: false,
+      }}
+    >
+      <div class="issues-grid">
+        {#each data.resolvedIssues.data as issue (issue.id)}
+          <IssuePreviewCard {issue} />
+        {/each}
+      </div>
+    </Section>
+
+    {#if data.orgs.length === 0}
+      {@render orgMembershipsSection()}
+    {/if}
   </div>
 </div>
 
@@ -251,12 +271,6 @@
     display: flex;
     flex-direction: column;
     gap: 3rem;
-  }
-
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
   }
 
   .points {
