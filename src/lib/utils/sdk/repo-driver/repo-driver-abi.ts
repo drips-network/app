@@ -673,6 +673,20 @@ export const repoDriverAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [
+      { internalType: 'uint8', name: 'sourceId', type: 'uint8' },
+      { internalType: 'bytes', name: 'name', type: 'bytes' },
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'uint32', name: 'timestamp', type: 'uint32' },
+      { internalType: 'bytes32', name: 'r', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'vs', type: 'bytes32' },
+    ],
+    name: 'updateOwnerByLit',
+    outputs: [{ internalType: 'uint256', name: 'accountId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
   { stateMutability: 'payable', type: 'receive' },
 ] as const;
 

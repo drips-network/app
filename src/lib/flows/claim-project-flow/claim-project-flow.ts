@@ -61,6 +61,14 @@ export interface State {
   dependencySplits: ListEditorConfig;
   dependenciesAutoImported: boolean;
   gaslessOwnerUpdateTaskId: string | undefined;
+  litOwnerUpdateSignature?: {
+    sourceId: number;
+    name: string;
+    owner: string;
+    timestamp: number;
+    r: string;
+    vs: string;
+  };
   avatar:
     | {
         type: 'emoji';
@@ -97,6 +105,7 @@ export const flowState = () =>
     },
     dependenciesAutoImported: false,
     gaslessOwnerUpdateTaskId: undefined,
+    litOwnerUpdateSignature: undefined,
     avatar: {
       type: 'emoji',
       emoji: '💧',

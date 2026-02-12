@@ -27,6 +27,8 @@
   import GitHub from '$lib/utils/github/GitHub';
   import { gql } from 'graphql-request';
   import { Octokit } from '@octokit/rest';
+  import { env } from '$env/dynamic/public';
+  import getLitChainName from '$lib/utils/lit/get-lit-chain-name';
 
   const octokit = new Octokit();
   const github = new GitHub(octokit);
@@ -96,6 +98,25 @@
 
         if ($context.isPartiallyClaimed) {
           // If the project already has the right owner, we don't need to kick off a repo owner update again
+          return;
+        }
+
+        if (env.PUBLIC_USE_LIT_OWNER_UPDATE === 'true') {
+          // Use Lit Protocol to get a verifiable ownership signature
+          const res = await fetch('/api/lit/owner-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              repoName: `${ownerName}/${repoName}`,
+              chainName: getLitChainName($walletStore.network.name),
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to get ownership signature from Lit. Please try again later.');
+          }
+
+          $context.litOwnerUpdateSignature = await res.json();
           return;
         }
 

@@ -118,7 +118,7 @@ services:
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-igor-orcid}-${ARCH}'
+    image: 'j537/contracts:${CONTRACTS_TAG-igor-lit}-${ARCH}'
     pull_policy: always
     ports:
       - '8545:8545'
