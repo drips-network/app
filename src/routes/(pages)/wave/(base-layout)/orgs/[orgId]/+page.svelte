@@ -222,29 +222,31 @@
 
     <div class="content">
       {#if members.length > 0}
-        <SectionHeader icon={User} label="Members on Drips Wave" count={members.length} />
-        <ul class="members-list">
-          {#each members as member (member.id)}
-            <li>
-              <a class="member-row" href="/wave/users/{member.id}">
-                <UserAvatar size={32} src={member.gitHubAvatarUrl ?? undefined} />
-                <div class="member-info">
-                  <span class="typo-text">{member.gitHubUsername}</span>
-                  {#if member.gitHubName}
-                    <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
-                      >{member.gitHubName}</span
-                    >
-                  {/if}
-                </div>
-                <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
-              </a>
-            </li>
-          {/each}
-        </ul>
+        <div class="section">
+          <SectionHeader icon={User} label="Members on Drips Wave" count={members.length} />
+          <ul class="members-list">
+            {#each members as member (member.id)}
+              <li>
+                <a class="member-row" href="/wave/users/{member.id}">
+                  <UserAvatar size={32} src={member.gitHubAvatarUrl ?? undefined} />
+                  <div class="member-info">
+                    <span class="typo-text">{member.gitHubUsername}</span>
+                    {#if member.gitHubName}
+                      <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
+                        >{member.gitHubName}</span
+                      >
+                    {/if}
+                  </div>
+                  <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </div>
       {/if}
 
       {#if wavePrograms.length > 0}
-        <div class="repos-section">
+        <div class="section repos-section">
           <div class="repos-header">
             <SectionHeader
               icon={Folder}
@@ -328,7 +330,7 @@
                             : undefined}
                         >
                           {#if issueCount === 0}
-                            No issues added
+                            No open issues
                           {:else}
                             View {issueCount} issue{issueCount === 1 ? '' : 's'}
                           {/if}
@@ -448,6 +450,12 @@
     grid-area: content;
     display: flex;
     flex-direction: column;
+    gap: 3rem;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
   }
 
@@ -490,7 +498,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-top: 1rem;
   }
 
   .repos-header {

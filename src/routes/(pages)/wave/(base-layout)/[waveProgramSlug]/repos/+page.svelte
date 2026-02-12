@@ -202,7 +202,7 @@
               href={`/wave/${data.waveProgram.slug}/issues?filters=${getIssueFilterString(repo.id)}`}
             >
               {#if issueCount === 0}
-                No issues added
+                No open issues
               {:else}
                 Browse {issueCount} issues
               {/if}
