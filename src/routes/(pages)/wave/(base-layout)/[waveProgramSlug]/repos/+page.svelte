@@ -149,7 +149,13 @@
     {/if}
   </span>
 
-  <PaginatedCardGrid initialData={initialRepos} {fetchMore} bind:items bind:pagination>
+  <PaginatedCardGrid
+    initialData={initialRepos}
+    {fetchMore}
+    key={(item) => item.repo.id}
+    bind:items
+    bind:pagination
+  >
     {#snippet card({ repo, org, issueCount, pointsMultiplier }: WaveProgramRepoWithDetailsDto)}
       {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
       <Card

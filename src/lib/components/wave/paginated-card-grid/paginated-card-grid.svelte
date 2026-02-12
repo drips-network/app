@@ -8,6 +8,7 @@
     initialData: PaginatedResponse<T>;
     fetchMore: (page: number) => Promise<PaginatedResponse<T>>;
     card: Snippet<[item: T]>;
+    key: (item: T) => string | number;
     items: T[];
     pagination: Pagination;
   }
@@ -16,6 +17,7 @@
     initialData,
     fetchMore,
     card,
+    key,
     items = $bindable(initialData.data),
     pagination = $bindable(initialData.pagination),
   }: Props = $props();
@@ -86,7 +88,7 @@
 </script>
 
 <div class="card-grid">
-  {#each items as item (item)}
+  {#each items as item (key(item))}
     <div in:fade={{ duration: 200 }}>
       {@render card(item)}
     </div>
