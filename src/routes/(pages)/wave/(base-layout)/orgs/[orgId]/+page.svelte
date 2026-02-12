@@ -4,6 +4,7 @@
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
+  import buildExternalUrl from '$lib/utils/build-external-url';
   import Envelope from '$lib/components/icons/Envelope.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
   import Fork from '$lib/components/icons/Fork.svelte';
@@ -18,6 +19,8 @@
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
+  import Section from '$lib/components/section/section.svelte';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import User from '$lib/components/icons/User.svelte';
   import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
@@ -142,12 +145,7 @@
               {#if org.contactInfo.url}
                 <li class="contact-item">
                   <Link style="flex-shrink: 0;" />
-                  <a
-                    class="typo-text-small"
-                    href={org.contactInfo.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a class="typo-text-small" href={buildExternalUrl(org.contactInfo.url)}>
                     {org.contactInfo.url}
                   </a>
                 </li>
@@ -156,42 +154,18 @@
                 <li class="contact-item">
                   {#if social.provider === 'twitter'}
                     <Twitter style="flex-shrink: 0;" />
-                    <a
-                      class="typo-text-small"
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a class="typo-text-small" href={buildExternalUrl(social.url)}>
                       @{new URL(social.url).pathname.split('/').filter(Boolean).pop()}
                     </a>
                   {:else if social.url.includes('t.me') || social.url.includes('telegram.me')}
                     <Telegram style="flex-shrink: 0;" />
-                    <a
-                      class="typo-text-small"
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Telegram
-                    </a>
+                    <a class="typo-text-small" href={buildExternalUrl(social.url)}> Telegram </a>
                   {:else if social.url.includes('discord.gg') || social.url.includes('discord.com/invite')}
                     <Discord style="flex-shrink: 0;" />
-                    <a
-                      class="typo-text-small"
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Discord
-                    </a>
+                    <a class="typo-text-small" href={buildExternalUrl(social.url)}> Discord </a>
                   {:else}
                     <Globe style="flex-shrink: 0;" />
-                    <a
-                      class="typo-text-small"
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a class="typo-text-small" href={buildExternalUrl(social.url)}>
                       {social.provider}
                     </a>
                   {/if}
@@ -221,29 +195,36 @@
     </div>
 
     <div class="content">
-      {#if members.length > 0}
-        <div class="section">
-          <SectionHeader icon={User} label="Members on Drips Wave" count={members.length} />
-          <ul class="members-list">
-            {#each members as member (member.id)}
-              <li>
-                <a class="member-row" href="/wave/users/{member.id}">
-                  <UserAvatar size={32} src={member.gitHubAvatarUrl ?? undefined} />
-                  <div class="member-info">
-                    <span class="typo-text">{member.gitHubUsername}</span>
-                    {#if member.gitHubName}
-                      <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
-                        >{member.gitHubName}</span
-                      >
-                    {/if}
-                  </div>
-                  <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
-                </a>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
+      <Section
+        header={{ icon: User, label: 'Members on Drips Wave', count: members.length }}
+        skeleton={{
+          loaded: true,
+          empty: members.length === 0,
+          emptyStateEmoji: '🫗',
+          emptyStateHeadline: 'No members yet',
+          emptyStateText: 'No members of this organization have signed up for Drips Wave yet.',
+          horizontalScroll: false,
+        }}
+      >
+        <ul class="members-list">
+          {#each members as member (member.id)}
+            <li>
+              <a class="member-row" href="/wave/users/{member.id}">
+                <UserAvatar size={32} src={member.gitHubAvatarUrl ?? undefined} />
+                <div class="member-info">
+                  <span class="typo-text">{member.gitHubUsername}</span>
+                  {#if member.gitHubName}
+                    <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
+                      >{member.gitHubName}</span
+                    >
+                  {/if}
+                </div>
+                <ChevronRight style="margin-left: auto; flex-shrink: 0;" />
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </Section>
 
       {#if wavePrograms.length > 0}
         <div class="section repos-section">
@@ -263,13 +244,16 @@
             </div>
           </div>
 
-          <div class="repos-grid-wrapper" class:has-overflow={hasOverflow}>
-            <div class="repos-grid" class:loading={loadingRepos}>
-              {#if repos.length === 0}
-                <span class="typo-text" style:color="var(--color-foreground-level-5)">
-                  No repos approved for this wave program.
-                </span>
-              {:else}
+          <SectionSkeleton
+            loaded={!loadingRepos}
+            empty={repos.length === 0}
+            emptyStateEmoji="🫗"
+            emptyStateHeadline="No repos"
+            emptyStateText="This organization has no repos approved for the selected wave program."
+            horizontalScroll={false}
+          >
+            <div class="repos-grid-wrapper" class:has-overflow={hasOverflow}>
+              <div class="repos-grid">
                 {#each visibleRepos as { repo, org: repoOrg, issueCount, pointsMultiplier } (repo.id)}
                   {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
                   <Card
@@ -350,20 +334,20 @@
                     </div>
                   </Card>
                 {/each}
+              </div>
+
+              {#if hasOverflow && selectedWaveProgram}
+                <div class="overflow-action">
+                  <Button
+                    icon={ArrowRight}
+                    href={`/wave/${selectedWaveProgram.slug}/repos?filters=${getOrgReposFilterString()}`}
+                  >
+                    View all {reposTotalCount}
+                  </Button>
+                </div>
               {/if}
             </div>
-
-            {#if hasOverflow && selectedWaveProgram}
-              <div class="overflow-action">
-                <Button
-                  icon={ArrowRight}
-                  href={`/wave/${selectedWaveProgram.slug}/repos?filters=${getOrgReposFilterString()}`}
-                >
-                  View all {reposTotalCount}
-                </Button>
-              </div>
-            {/if}
-          </div>
+          </SectionSkeleton>
         </div>
       {/if}
     </div>
@@ -497,7 +481,7 @@
   .repos-section {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
   .repos-header {
@@ -530,12 +514,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     gap: 1rem;
-    transition: opacity 0.15s;
-  }
-
-  .repos-grid.loading {
-    opacity: 0.5;
-    pointer-events: none;
   }
 
   .overflow-action {

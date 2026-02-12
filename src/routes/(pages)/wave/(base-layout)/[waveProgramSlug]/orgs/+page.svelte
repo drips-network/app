@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import buildExternalUrl from '$lib/utils/build-external-url';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -142,13 +143,8 @@
 
           <div class="spacer"></div>
 
-          {#if org.contactInfo?.url}
-            <a
-              class="website typo-text-small"
-              href={org.contactInfo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          {#if org.contactInfo?.url && URL.canParse(org.contactInfo.url)}
+            <a class="website typo-text-small" href={buildExternalUrl(org.contactInfo.url)}>
               <Link style="width: 16px; height: 16px;" />
               {new URL(org.contactInfo.url).hostname}
             </a>
