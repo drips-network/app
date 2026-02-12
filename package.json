@@ -36,7 +36,7 @@
     "@graphql-codegen/typescript-operations": "^4.5.1",
     "@playwright/test": "^1.56.1",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
-    "@sveltejs/kit": "^2.48.4",
+    "@sveltejs/kit": "^2.50.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/svelte": "^5.1.0",
