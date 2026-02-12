@@ -7,13 +7,12 @@
   import buildExternalUrl from '$lib/utils/build-external-url';
   import Envelope from '$lib/components/icons/Envelope.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
-  import Fork from '$lib/components/icons/Fork.svelte';
   import Discord from '$lib/components/icons/Discord.svelte';
   import Globe from '$lib/components/icons/Globe.svelte';
   import Telegram from '$lib/components/icons/Telegram.svelte';
   import Twitter from '$lib/components/icons/Twitter.svelte';
   import Link from '$lib/components/icons/Link.svelte';
-  import Star from '$lib/components/icons/Star.svelte';
+  import RepoPreviewCard from '$lib/components/wave/repo-preview-card/repo-preview-card.svelte';
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
@@ -23,8 +22,6 @@
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import User from '$lib/components/icons/User.svelte';
-  import ProgrammingLanguageBreakdown from '$lib/components/programming-language-breakdown/programming-language-breakdown.svelte';
-  import convertGhLanguageListToLanguageProfile from '$lib/components/programming-language-breakdown/convert-gh-language-list-to-language-profile';
   import type { IssueFilters } from '$lib/utils/wave/types/issue';
   import type { WaveProgramRepoWithDetailsDto } from '$lib/utils/wave/types/waveProgram';
   import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms';
@@ -254,85 +251,26 @@
           >
             <div class="repos-grid-wrapper" class:has-overflow={hasOverflow}>
               <div class="repos-grid">
-                {#each visibleRepos as { repo, org: repoOrg, issueCount, pointsMultiplier } (repo.id)}
-                  {@const isFeatured = pointsMultiplier && pointsMultiplier > 1}
-                  <Card
-                    style={isFeatured
-                      ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
-                      : undefined}
-                  >
-                    <div class="repo-item">
-                      <div
-                        class="top"
-                        style:display="flex"
-                        style:flex-direction="column"
-                        style:gap="0.5rem"
+                {#each visibleRepos as repoWithDetails (repoWithDetails.repo.id)}
+                  <RepoPreviewCard {repoWithDetails}>
+                    {#snippet actions()}
+                      <Button
+                        size="small"
+                        disabled={repoWithDetails.issueCount === 0}
+                        href={selectedWaveProgram
+                          ? `/wave/${selectedWaveProgram.slug}/issues?filters=${getIssueFilterString(repoWithDetails.repo.id)}`
+                          : undefined}
                       >
-                        <div class="owner-and-repo">
-                          <UserAvatar size={24} src={repoOrg.gitHubOrgAvatarUrl ?? undefined} />
-
-                          <a
-                            class="repo-name typo-text line-clamp-2"
-                            href="https://github.com/{repo.gitHubRepoFullName}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <span style:color="var(--color-foreground-level-5)">
-                              {repo.gitHubRepoFullName.split('/')[0]} /
-                            </span>
-                            {repo.gitHubRepoFullName.split('/')[1]}
-                          </a>
-
-                          {#if isFeatured}
-                            <span class="featured-badge">{pointsMultiplier}x Points</span>
-                          {/if}
-                        </div>
-
-                        <span class="repo-description typo-text-small line-clamp-2">
-                          {#if repo.description}
-                            {repo.description}
-                          {:else}
-                            <span style:color="var(--color-foreground-level-4)">No description</span
-                            >
-                          {/if}
-                        </span>
-
-                        <div class="languages">
-                          <ProgrammingLanguageBreakdown
-                            size="compact"
-                            languageProfile={convertGhLanguageListToLanguageProfile(repo.languages)}
-                          />
-                        </div>
-                      </div>
-
-                      <div class="bottom-row">
-                        <Button
-                          size="small"
-                          disabled={issueCount === 0}
-                          href={selectedWaveProgram
-                            ? `/wave/${selectedWaveProgram.slug}/issues?filters=${getIssueFilterString(repo.id)}`
-                            : undefined}
-                        >
-                          {#if issueCount === 0}
-                            No open issues
-                          {:else}
-                            View {issueCount} issue{issueCount === 1 ? '' : 's'}
-                          {/if}
-                        </Button>
-
-                        <div class="repo-stats">
-                          <span class="stat">
-                            <Star style="width: 1rem; height: 1rem;" />
-                            {repo.stargazersCount?.toString() ?? '0'}
-                          </span>
-                          <span class="stat">
-                            <Fork style="width: 1rem; height: 1rem;" />
-                            {repo.forksCount?.toString() ?? '0'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
+                        {#if repoWithDetails.issueCount === 0}
+                          No open issues
+                        {:else}
+                          View {repoWithDetails.issueCount} issue{repoWithDetails.issueCount === 1
+                            ? ''
+                            : 's'}
+                        {/if}
+                      </Button>
+                    {/snippet}
+                  </RepoPreviewCard>
                 {/each}
               </div>
 
@@ -522,66 +460,6 @@
     position: relative;
     z-index: 1;
     margin-top: -2rem;
-  }
-
-  .repo-item {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 1.5rem;
-  }
-
-  .repo-name {
-    overflow-wrap: anywhere;
-  }
-
-  .owner-and-repo {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .repo-description {
-    min-height: 2lh;
-    color: var(--color-foreground-level-6);
-  }
-
-  .languages {
-    margin-top: 0.25rem;
-  }
-
-  .bottom-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .repo-stats {
-    display: flex;
-    gap: 0.75rem;
-  }
-
-  .stat {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--color-foreground-level-5);
-    font-size: 0.875rem;
-  }
-
-  .featured-badge {
-    background-color: var(--color-caution-level-1);
-    color: var(--color-caution-level-6);
-    padding: 0.125rem 0.5rem;
-    border-radius: 1rem 0 1rem 1rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    white-space: nowrap;
-    margin-left: auto;
-    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
