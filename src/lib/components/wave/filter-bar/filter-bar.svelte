@@ -25,7 +25,7 @@
     customFilters,
   }: Props = $props();
 
-  let internalSearchValue = $derived.by(() => searchValue);
+  let internalSearchValue = $derived(searchValue);
   let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
   function handleSearchInput() {
