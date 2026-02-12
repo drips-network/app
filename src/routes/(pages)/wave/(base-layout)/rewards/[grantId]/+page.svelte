@@ -1,15 +1,18 @@
 <script lang="ts">
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import List from '$lib/components/icons/List.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Section from '$lib/components/section/section.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import StatusBadge from '$lib/components/status-badge/status-badge.svelte';
   import GrantStatusBadge from '$lib/components/wave/rewards/grant-status-badge.svelte';
   import TransactionStatusCell from '$lib/components/wave/rewards/transaction-status-cell.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
+  import GitHubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
   import modal from '$lib/stores/modal';
@@ -84,6 +87,13 @@
           empty: false,
         }}
       >
+        {#if grant.description}
+          <div class="description-card">
+            <h4 class="typo-text-bold">Description</h4>
+            <p class="description-text typo-text">{grant.description}</p>
+          </div>
+        {/if}
+
         {#if !kycApproved}
           <div class="kyc-warning">
             <AnnotationBox type="warning">
@@ -97,50 +107,77 @@
 
         <div class="grant-overview">
           <div class="overview-row">
-            <span class="label">Amount</span>
-            <span class="value tnum">${grant.initialAmountUSD.toLocaleString()} USD</span>
+            <span class="label typo-text-small">Amount</span>
+            <span class="value typo-text-small tnum"
+              >${grant.initialAmountUSD.toLocaleString()} USD</span
+            >
           </div>
           <div class="overview-row">
-            <span class="label">Withdrawable amount</span>
-            <span class="value tnum">${grant.currentAmountUSD.toLocaleString()} USD</span>
+            <span class="label typo-text-small">Withdrawable amount</span>
+            <span class="value typo-text-small tnum"
+              >${grant.currentAmountUSD.toLocaleString()} USD</span
+            >
           </div>
           <div class="overview-row">
-            <span class="label">Status</span>
-            <GrantStatusBadge status={grant.status} expired={isExpired} />
+            <span class="label typo-text-small">Status</span>
+            <GrantStatusBadge status={grant.status} expired={isExpired} size="small" />
+          </div>
+          {#if grant.isOrgGrant}
+            <div class="overview-row">
+              <span class="label typo-text-small">Grant type</span>
+              <Tooltip>
+                <StatusBadge size="small" color="primary" icon={Orgs}>
+                  <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                    Org grant
+                    <InfoCircle
+                      style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
+                    />
+                  </span>
+                </StatusBadge>
+                {#snippet tooltip_content()}
+                  This grant is issued to your organization and can be withdrawn by anyone within
+                  the org.
+                {/snippet}
+              </Tooltip>
+            </div>
+            <div class="overview-row">
+              <span class="label typo-text-small">Recipient org</span>
+              <span class="value typo-text-small">{grant.orgName}</span>
+            </div>
+          {/if}
+          <div class="overview-row">
+            <span class="label typo-text-small">Granted</span>
+            <span class="value typo-text-small">{formatDate(grant.createdAt, 'dayAndYear')}</span>
           </div>
           <div class="overview-row">
-            <span class="label">Granted</span>
-            <span class="value">{formatDate(grant.createdAt, 'dayAndYear')}</span>
-          </div>
-          <div class="overview-row">
-            <span class="label">Expires on</span>
-            <span class="value">{formatDate(grant.expiresAt, 'dayAndYear')}</span>
+            <span class="label typo-text-small">Expires on</span>
+            <span class="value typo-text-small">{formatDate(grant.expiresAt, 'dayAndYear')}</span>
           </div>
         </div>
-
-        {#if !isExpired && !isProcessing(grant.status) && grant.status !== 'withdrawal_complete'}
-          <div class="grant-actions">
-            {#if canRequestTest(grant)}
-              <Button
-                variant="primary"
-                onclick={() => openTestTransactionFlow(grant)}
-                disabled={!kycApproved}
-              >
-                Request test transaction
-              </Button>
-            {/if}
-            {#if canWithdraw(grant)}
-              <Button
-                variant={grant.status === 'test_transaction_sent' ? 'primary' : 'normal'}
-                onclick={() => openWithdrawalFlow(grant)}
-                disabled={!kycApproved}
-              >
-                Request full withdrawal
-              </Button>
-            {/if}
-          </div>
-        {/if}
       </Section>
+
+      {#if !isExpired && !isProcessing(grant.status) && grant.status !== 'withdrawal_complete'}
+        <div class="grant-actions">
+          {#if canRequestTest(grant)}
+            <Button
+              variant="primary"
+              onclick={() => openTestTransactionFlow(grant)}
+              disabled={!kycApproved}
+            >
+              Request test transaction
+            </Button>
+          {/if}
+          {#if canWithdraw(grant)}
+            <Button
+              variant={grant.status === 'test_transaction_sent' ? 'primary' : 'normal'}
+              onclick={() => openWithdrawalFlow(grant)}
+              disabled={!kycApproved}
+            >
+              Request full withdrawal
+            </Button>
+          {/if}
+        </div>
+      {/if}
 
       {#if isProcessing(grant.status)}
         <AnnotationBox type="info">
@@ -180,13 +217,15 @@
 
               <div class="transaction-details">
                 <div class="detail-row">
-                  <span class="detail-label">Amount</span>
-                  <span class="detail-value tnum">${tx.amountUSD.toLocaleString()}</span>
+                  <span class="detail-label typo-text-small">Amount</span>
+                  <span class="detail-value typo-text-small tnum"
+                    >${tx.amountUSD.toLocaleString()}</span
+                  >
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">Destination</span>
+                  <span class="detail-label typo-text-small">Destination</span>
                   <Tooltip text={tx.stellarAddress} copyable>
-                    <span class="detail-value typo-text-mono"
+                    <span class="detail-value typo-text-small typo-text-mono"
                       >{tx.stellarAddress.slice(0, 4)}–{tx.stellarAddress.slice(-4)}</span
                     >
                     {#snippet tooltip_content()}
@@ -195,29 +234,42 @@
                   </Tooltip>
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">Memo</span>
-                  <span class="detail-value" class:typo-text-mono={tx.memoValue}
+                  <span class="detail-label typo-text-small">Memo</span>
+                  <span class="detail-value typo-text-small" class:typo-text-mono={tx.memoValue}
                     >{tx.memoValue || 'None'}</span
                   >
                 </div>
+                {#if grant.isOrgGrant && tx.requestedByGitHubUsername && tx.requestedByUserId}
+                  <div class="detail-row">
+                    <span class="detail-label typo-text-small">Requested by</span>
+                    <GitHubUserBadge
+                      size={24}
+                      user={{
+                        id: tx.requestedByUserId,
+                        gitHubUsername: tx.requestedByGitHubUsername,
+                        gitHubAvatarUrl: `https://avatars.githubusercontent.com/${tx.requestedByGitHubUsername}`,
+                      }}
+                    />
+                  </div>
+                {/if}
                 <div class="detail-row">
-                  <span class="detail-label">Requested</span>
-                  <span class="detail-value">{formatDate(tx.requestedAt)}</span>
+                  <span class="detail-label typo-text-small">Requested</span>
+                  <span class="detail-value typo-text-small">{formatDate(tx.requestedAt)}</span>
                 </div>
                 {#if tx.completedAt}
                   <div class="detail-row">
-                    <span class="detail-label">Completed</span>
-                    <span class="detail-value">{formatDate(tx.completedAt)}</span>
+                    <span class="detail-label typo-text-small">Completed</span>
+                    <span class="detail-value typo-text-small">{formatDate(tx.completedAt)}</span>
                   </div>
                 {/if}
                 {#if tx.transactionHash}
                   <div class="detail-row">
-                    <span class="detail-label">Transaction hash</span>
+                    <span class="detail-label typo-text-small">Transaction hash</span>
                     <a
                       href="https://stellar.expert/explorer/public/tx/{tx.transactionHash}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="tx-link"
+                      class="tx-link typo-text-small"
                     >
                       {tx.transactionHash.slice(0, 12)}...
                     </a>
@@ -254,7 +306,7 @@
     top: 5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.75rem;
   }
 
   .right-pane {
@@ -292,6 +344,20 @@
 
   .value {
     font-weight: 500;
+  }
+
+  .description-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--color-foreground-level-1);
+    border-radius: 1rem 0 1rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .description-text {
+    color: var(--color-foreground-level-5);
   }
 
   .grant-actions {
@@ -343,19 +409,16 @@
 
   .detail-label {
     color: var(--color-foreground-level-5);
-    font-size: 0.875rem;
   }
 
   .detail-value {
     color: var(--color-foreground);
-    font-size: 0.875rem;
   }
 
   .tx-link {
     color: var(--color-primary-level-6);
     text-decoration: none;
     font-family: monospace;
-    font-size: 0.875rem;
   }
 
   .tx-link:hover {
