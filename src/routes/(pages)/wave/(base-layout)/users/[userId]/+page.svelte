@@ -343,6 +343,7 @@
       grid-template-areas:
         'profile-info'
         'content';
+      overflow-x: hidden;
     }
 
     .profile-info {

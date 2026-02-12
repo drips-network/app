@@ -585,6 +585,10 @@
   }
 
   @media (max-width: 768px) {
+    .wrapper {
+      overflow-x: hidden;
+    }
+
     .page {
       grid-template-columns: 1fr;
       grid-template-areas:
