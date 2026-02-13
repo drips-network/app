@@ -1,8 +1,6 @@
 import unreachable from '$lib/utils/unreachable';
-import { getComplimentsForIssue } from '$lib/utils/wave/compliments';
 import { getAllPaginated } from '$lib/utils/wave/getAllPaginated';
 import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
-import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { PaginatedResponse } from '$lib/utils/wave/types/pagination';
 import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
@@ -84,14 +82,6 @@ export const issuePageLoad = async (
     resolvedActiveWaveExists = waves.data.some((wave) => wave.status === 'active');
   }
 
-  let givenCompliments: IssueComplimentDto[] = [];
-
-  if (issue.state === 'closed' && issue.assignedApplicant && issue.waveProgramId) {
-    const complimentsRes = await getComplimentsForIssue(fetch, issue.waveProgramId, issue.id);
-
-    givenCompliments = complimentsRes.compliments;
-  }
-
   return {
     issues,
     issue,
@@ -99,7 +89,6 @@ export const issuePageLoad = async (
     allowAddingOrRemovingWave: allowAddingOrRemovingWave,
     backToConfig: backToConfig,
     headMetaTitle: headMetaTitle,
-    givenCompliments,
     isInWaveContext: isInWaveContext ?? false,
     activeWaveExists: resolvedActiveWaveExists ?? false,
 

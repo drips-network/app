@@ -51,8 +51,7 @@
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
-  import Heart from '$lib/components/icons/Heart.svelte';
+  import Star from '$lib/components/icons/Star.svelte';
   import Multiplier from '$lib/components/icons/Multiplier.svelte';
   import formatDate from '$lib/utils/format-date';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
@@ -83,7 +82,6 @@
 
     user: WaveLoggedInUser | null;
     headMetaTitle: string;
-    givenCompliments: IssueComplimentDto[];
 
     /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
      * Used to determine if moderation actions should be shown. */
@@ -103,7 +101,6 @@
     user,
     backToConfig,
     headMetaTitle,
-    givenCompliments,
     isInWaveContext = false,
     activeWaveExists = false,
   }: Props = $props();
@@ -516,32 +513,15 @@
                   </li>
                 </ul>
               {/if}
-
-              {#if givenCompliments.length > 0}
-                <h5 style:margin-top="1rem">Compliments</h5>
-                <ul class="compliments-list">
-                  {#each givenCompliments as compliment (compliment.complimentType)}
-                    <li class="compliment-list-item">
-                      <span class="typo-text compliment-label">
-                        {COMPLIMENT_TYPES[compliment.complimentType].label}
-                      </span>
-
-                      <span class="typo-text">
-                        +{compliment.points}
-                      </span>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
             </div>
 
-            {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
+            {#if issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
               <SidebarButton
                 target=""
-                icon={Heart}
-                href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/compliments"
+                icon={Star}
+                href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/review"
               >
-                Give compliment
+                Leave a review
               </SidebarButton>
             {/if}
           </div>
@@ -697,27 +677,6 @@
 
   .sidebar-section:not(:last-child) {
     border-bottom: 1px solid var(--color-foreground-level-3);
-  }
-
-  .compliment-label {
-    min-width: 0;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .compliments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .compliment-list-item {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    align-items: space-between;
   }
 
   .issue {
