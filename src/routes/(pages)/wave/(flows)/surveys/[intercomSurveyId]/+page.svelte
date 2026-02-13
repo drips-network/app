@@ -11,6 +11,7 @@
   } from '$lib/components/intercom/intercom';
   import { startSurvey } from '@intercom/messenger-js-sdk';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import FlowStepWrapper from '../../shared/flow-step-wrapper.svelte';
   import BubbleEmoji from '$lib/components/icons/🫧.svelte';
 
@@ -42,6 +43,8 @@
     }
   }
 </script>
+
+<HeadMeta title="Survey | Wave" />
 
 <FlowStepWrapper
   headline="We'd love your feedback"
