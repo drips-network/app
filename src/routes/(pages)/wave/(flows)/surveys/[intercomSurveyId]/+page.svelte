@@ -4,8 +4,13 @@
   import cookieManager, {
     ConsentType,
   } from '$lib/components/wave/cookie-consent-banner/cookie-manager.svelte';
-  import { INTERCOM_APP_ID, ensureIntercom } from '$lib/components/intercom/intercom';
+  import {
+    INTERCOM_APP_ID,
+    ensureIntercom,
+    isIntercomInitialized,
+  } from '$lib/components/intercom/intercom';
   import { startSurvey } from '@intercom/messenger-js-sdk';
+  import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import FlowStepWrapper from '../../shared/flow-step-wrapper.svelte';
   import BubbleEmoji from '$lib/components/icons/🫧.svelte';
 
@@ -23,9 +28,15 @@
     loading = true;
 
     try {
-      await ensureIntercom(data.user);
+      await doWithErrorModal(async () => {
+        await ensureIntercom(data.user);
 
-      startSurvey(page.params.intercomSurveyId as string);
+        if (!isIntercomInitialized()) {
+          throw new Error('Unable to initialize Intercom');
+        }
+
+        startSurvey(page.params.intercomSurveyId as string);
+      });
     } finally {
       loading = false;
     }

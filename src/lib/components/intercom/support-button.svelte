@@ -45,10 +45,6 @@
 
     if (!isIntercomInitialized()) return;
 
-    onUnreadCountChange((newUnreadCount: number) => {
-      unreadCount = newUnreadCount;
-    });
-
     show();
   }
 </script>
