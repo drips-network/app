@@ -9,7 +9,6 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import StatusBadge from '$lib/components/status-badge/status-badge.svelte';
   import GrantStatusBadge from '$lib/components/wave/rewards/grant-status-badge.svelte';
-  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
   import modal from '$lib/stores/modal';
@@ -113,20 +112,17 @@
             >
             <GrantStatusBadge status={grant.status} expired={isExpired(grant)} size="small" />
             {#if grant.isOrgGrant}
-              <Tooltip>
-                <StatusBadge size="small" color="primary" icon={Orgs}>
-                  <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                    Org grant
-                    <InfoCircle
-                      style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
-                    />
-                  </span>
-                </StatusBadge>
-                {#snippet tooltip_content()}
-                  This grant is issued to your organization and can be withdrawn by anyone within
-                  the org.
-                {/snippet}
-              </Tooltip>
+              <StatusBadge size="small" color="primary" icon={Orgs}>
+                <span
+                  style="display: inline-flex; align-items: center; gap: 0.25rem;"
+                  title="This grant is issued to your organization and can be withdrawn by anyone within the org."
+                >
+                  Org grant
+                  <InfoCircle
+                    style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
+                  />
+                </span>
+              </StatusBadge>
             {/if}
           </div>
           {#if grant.description}

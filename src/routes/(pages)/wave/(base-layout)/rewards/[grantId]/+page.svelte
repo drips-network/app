@@ -125,20 +125,17 @@
           {#if grant.isOrgGrant}
             <div class="overview-row">
               <span class="label typo-text-small">Grant type</span>
-              <Tooltip>
-                <StatusBadge size="small" color="primary" icon={Orgs}>
-                  <span style="display: inline-flex; align-items: center; gap: 0.25rem;">
-                    Org grant
-                    <InfoCircle
-                      style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
-                    />
-                  </span>
-                </StatusBadge>
-                {#snippet tooltip_content()}
-                  This grant is issued to your organization and can be withdrawn by anyone within
-                  the org.
-                {/snippet}
-              </Tooltip>
+              <StatusBadge size="small" color="primary" icon={Orgs}>
+                <span
+                  style="display: inline-flex; align-items: center; gap: 0.25rem;"
+                  title="This grant is issued to your organization and can be withdrawn by anyone within the org."
+                >
+                  Org grant
+                  <InfoCircle
+                    style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
+                  />
+                </span>
+              </StatusBadge>
             </div>
             <div class="overview-row">
               <span class="label typo-text-small">Recipient org</span>
