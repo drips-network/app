@@ -65,10 +65,16 @@ export const issuePageLoad = async (
 
   const applicationsPromise = issue.waveProgramId
     ? getAllPaginated((page, limit) =>
-        getIssueApplications(fetch, issue.waveProgramId ?? unreachable(), issue.id, {
-          page,
-          limit,
-        }),
+        getIssueApplications(
+          fetch,
+          issue.waveProgramId ?? unreachable(),
+          issue.id,
+          {
+            page,
+            limit,
+          },
+          { waveId: 'current' },
+        ),
       )
     : null;
 
