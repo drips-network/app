@@ -15,6 +15,10 @@
   import GitHubUserBadge from '$lib/components/wave/github-user-badge/github-user-badge.svelte';
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
+  import { cancelWithdrawal } from '$lib/utils/wave/grants.js';
+  import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
+  import doWithErrorModal from '$lib/utils/do-with-error-modal';
+  import { invalidate } from '$app/navigation';
   import modal from '$lib/stores/modal';
   import formatDate from '$lib/utils/format-date.js';
   import type { GrantDetailDto, GrantStatus } from '$lib/utils/wave/types/grant.js';
@@ -41,6 +45,22 @@
       ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
       : undefined;
     modal.show(Stepper, undefined, withdrawalFlow(g, prefill));
+  }
+
+  let cancellingWithdrawal = $state(false);
+
+  async function handleCancelWithdrawal() {
+    await doWithConfirmationModal('Are you sure you want to cancel this pending withdrawal?', () =>
+      doWithErrorModal(async () => {
+        cancellingWithdrawal = true;
+        try {
+          await cancelWithdrawal(fetch, grant.id);
+          await invalidate('wave:rewards');
+        } finally {
+          cancellingWithdrawal = false;
+        }
+      }),
+    );
   }
 
   let isExpired = $derived(new Date(grant.expiresAt) < new Date());
@@ -184,6 +204,15 @@
             : 'Test transactions are usually processed within a few minutes, but may take up to 3 days in rare cases.'}
           We'll send you an email when it's done.
         </AnnotationBox>
+        {#if grant.status === 'withdrawal_pending'}
+          <Button
+            variant="destructive"
+            onclick={handleCancelWithdrawal}
+            loading={cancellingWithdrawal}
+          >
+            Cancel withdrawal
+          </Button>
+        {/if}
       {/if}
     </div>
 
