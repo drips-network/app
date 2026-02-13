@@ -205,7 +205,11 @@
           We'll send you an email when it's done.
         </AnnotationBox>
         {#if grant.status === 'withdrawal_pending'}
-          <Button variant="normal" onclick={handleCancelWithdrawal} loading={cancellingWithdrawal}>
+          <Button
+            variant="destructive"
+            onclick={handleCancelWithdrawal}
+            loading={cancellingWithdrawal}
+          >
             Cancel withdrawal
           </Button>
         {/if}
