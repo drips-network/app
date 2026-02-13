@@ -118,9 +118,11 @@
 
 <FlowStepWrapper
   headline="Review your experience"
-  description={data.canReview && data.reviewerRole === 'maintainer'
-    ? `Rate your experience working with the contributor on this issue in the ${data.waveProgram.name} Wave.`
-    : `Rate your experience working with the maintainer on this issue in the ${data.waveProgram.name} Wave.`}
+  description={data.canReview
+    ? data.reviewerRole === 'maintainer'
+      ? `Rate your experience working with the contributor on this issue in the ${data.waveProgram.name} Wave.`
+      : `Rate your experience working with the maintainer on this issue in the ${data.waveProgram.name} Wave.`
+    : undefined}
 >
   <FormField title="Issue" type="div">
     <IssuePreviewCard issue={data.issue} />
@@ -263,7 +265,7 @@
     </AnnotationBox>
   {:else if data.reason === 'not-authorized'}
     <AnnotationBox type="warning">
-      Only the maintainer of this issue or the assigned contributor can leave a review.
+      Only maintainer org members or the assigned contributor can leave a review.
     </AnnotationBox>
   {/if}
 

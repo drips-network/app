@@ -112,7 +112,26 @@
     ),
   );
 
+  const REVIEW_DEADLINE_DAYS = 7;
+
   let isMaintainer = $derived(matchingWaveProgramRepos.length > 0);
+  let isAssignedContributor = $derived(
+    Boolean(user && issue.assignedApplicant && user.id === issue.assignedApplicant.id),
+  );
+  let reviewDeadlineMs = $derived.by(() => {
+    const resolvedInWave = issue.resolvedInWave;
+    if (!resolvedInWave) return null;
+    return resolvedInWave.endDate.getTime() + REVIEW_DEADLINE_DAYS * 24 * 60 * 60 * 1000;
+  });
+
+  let canLeaveReview = $derived(
+    issue.state === 'closed' &&
+      !!issue.assignedApplicant &&
+      !!partOfWaveProgram &&
+      (isMaintainer || isAssignedContributor) &&
+      reviewDeadlineMs !== null &&
+      Date.now() <= reviewDeadlineMs,
+  );
   let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
   let canUpdateComplexity = $derived(
     Boolean(
@@ -381,6 +400,17 @@
           View on GitHub
         </SidebarButton>
 
+        {#if canLeaveReview && partOfWaveProgram}
+          <SidebarButton
+            target=""
+            icon={Star}
+            variant="primary"
+            href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/review"
+          >
+            Leave a review
+          </SidebarButton>
+        {/if}
+
         <div class="sidebar-section">
           <div class="content">
             <h5>Assigned applicant</h5>
@@ -514,16 +544,6 @@
                 </ul>
               {/if}
             </div>
-
-            {#if issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
-              <SidebarButton
-                target=""
-                icon={Star}
-                href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/review"
-              >
-                Leave a review
-              </SidebarButton>
-            {/if}
           </div>
         {/if}
 
