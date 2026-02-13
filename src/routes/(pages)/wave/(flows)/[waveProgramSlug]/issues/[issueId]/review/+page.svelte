@@ -144,8 +144,10 @@
   {#if data.canReview}
     <AnnotationBox type="info">
       Your review is anonymous. Maintainers and contributors will only receive an anonymous rating
-      summary after the Wave. Please be honest and truthful.{#if data.reviewerRole === 'maintainer'}
-        Members of {data.issue.repo.org.gitHubOrgLogin} will be able to view and re-submit this review.{/if}
+      summary after the Wave. Please be honest and truthful.
+      {#if data.reviewerRole === 'maintainer'}
+        Members of {data.issue.repo.org.gitHubOrgLogin} will be able to view and re-submit this review.
+      {/if}
     </AnnotationBox>
 
     <FormField
