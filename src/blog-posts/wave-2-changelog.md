@@ -4,7 +4,7 @@ date: '2026-02-16'
 coverImage: '/assets/blog-images/wave-cover.png'
 coverImageAlt: 'Illustration showing a Wave on Drips Wave'
 excerpt: 'Breaking down a number of key improvements to Drips Wave.'
-author: 'kat'
+author: 'jason'
 announcementBannerCopy: 'The Changelog: Key Improvements for Stellar Wave 2'
 ---
 
@@ -58,7 +58,11 @@ Everyone can now also link their Discord account to their Drips Wave profiles by
 
 In the first Wave, contributors sometimes forgot to link their PR to the issue they were assigned to, resulting in points not automatically being awarded upon merge.
 
-To make the Wave smoother for both maintainers and contributors, we're making our handy GitHub Bot **automatically remind contributors to link their PRs to issues** if it sees an unlinked PR from a Wave contributor. A single click from the contributor appends the necessary keyword to the PR description, ensuring points are issued quickly and accurately.
+To make the Wave smoother for both maintainers and contributors, we're making our handy GitHub Bot **automatically remind contributors to link their PRs to issues** if it sees an unlinked PR from a Wave contributor.
+
+![Screenshot of the new PR linking reminder comment](/assets/blog-images/wave-changelog/pr-link-reminder.png)
+
+A single click from the contributor appends the necessary keyword to the PR description, ensuring points are issued quickly and accurately.
 
 ## Enhanced Issue Application Table
 
@@ -77,3 +81,5 @@ We're also adding unintrusive captchas at key points in the user journey to prev
 We believe that these measures, especially when combined with the new application limits, will help dampen any spam or self-dealing.
 
 Lastly, later during the first Wave, we already added the ability to report bad actors and rule-breaking issues in the first Wave. We encourage everyone to continue flagging any suspicious or inappropriate behavior.
+
+todo: looking ahead
