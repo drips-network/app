@@ -29,7 +29,7 @@ This launch reflects what we’ve been building toward: a **comprehensive toolki
 - **Great UX**: Clear, focused flows for applicants and badgeholders
 - **Amplify the impact**: Winners can immediately choose to forward a percentage to other projects they depend on
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-home.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-home.png" alt="Screenshot of an RPGF round on Drips" />
 
 Altogether this streamlines round management and maximizes the positive impact of the rewards you distribute. What could be better?
 
