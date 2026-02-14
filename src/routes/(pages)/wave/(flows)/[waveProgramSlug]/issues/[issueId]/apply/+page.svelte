@@ -91,7 +91,48 @@
       This issue is already assigned to @{data.issue.assignedApplicant.gitHubUsername} in the current
       Wave. Please choose a different issue to apply to.
     </AnnotationBox>
+  {:else if waveProgramHasActiveWave && data.applicationQuota.remaining === 0}
+    <AnnotationBox>
+      You have used all {data.applicationQuota.limit} of your application {data.applicationQuota
+        .limit === 1
+        ? 'slot'
+        : 'slots'} in this Wave. Withdraw a pending application or wait for a decision before applying
+      to another issue.
+    </AnnotationBox>
+  {:else if waveProgramHasActiveWave && data.orgAssignmentQuota.remaining === 0}
+    <AnnotationBox>
+      <span class="typo-text-small-bold"
+        >You have already been assigned {data.orgAssignmentQuota.limit}
+        {data.orgAssignmentQuota.limit === 1 ? 'issue' : 'issues'} from {data.issue.repo.org
+          .gitHubOrgLogin} in this Wave, which is the maximum allowed.</span
+      >
+      You can withdraw from a pending application to this organization if you'd like to apply to a different
+      issue.
+
+      {#snippet actions()}
+        <Button
+          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
+          target="_blank">Learn more</Button
+        >
+      {/snippet}
+    </AnnotationBox>
   {:else if waveProgramHasActiveWave}
+    <AnnotationBox type="info">
+      <span class="typo-text-small-bold"
+        >You have {data.applicationQuota.remaining} of {data.applicationQuota.limit} application {data
+          .applicationQuota.limit === 1
+          ? 'slot'
+          : 'slots'} remaining in this Wave.</span
+      >
+      You can free up more slots by resolving assigned issues or withdrawing pending applications.
+
+      {#snippet actions()}
+        <Button
+          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
+          target="_blank">Learn more</Button
+        >
+      {/snippet}
+    </AnnotationBox>
     <FormField
       title="Application Text*"
       description="Explain why you'd like to work on this issue and list any relevant experience."
@@ -151,7 +192,7 @@
   {/snippet}
 
   {#snippet actions()}
-    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant}
+    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant && data.applicationQuota.remaining > 0 && data.orgAssignmentQuota.remaining > 0}
       <Button
         loading={submitting}
         variant="primary"

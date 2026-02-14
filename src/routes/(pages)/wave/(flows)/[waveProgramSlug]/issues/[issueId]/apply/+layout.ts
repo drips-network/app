@@ -1,12 +1,16 @@
-import { getIssueApplications } from '$lib/utils/wave/issues.js';
+import {
+  getApplicationQuota,
+  getIssueApplications,
+  getOrgAssignmentQuota,
+} from '$lib/utils/wave/issues.js';
 import { getWaves } from '$lib/utils/wave/wavePrograms.js';
 
 export const load = async ({ fetch, params, parent }) => {
-  const { user, waveProgram } = await parent();
+  const { user, waveProgram, issue } = await parent();
 
   const { issueId } = params;
 
-  const [waves, upcomingWaves] = await Promise.all([
+  const [waves, upcomingWaves, applicationQuota, orgAssignmentQuota] = await Promise.all([
     getWaves(
       fetch,
       waveProgram.id,
@@ -23,6 +27,8 @@ export const load = async ({ fetch, params, parent }) => {
         status: 'upcoming',
       },
     ),
+    getApplicationQuota(fetch, waveProgram.id),
+    getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id),
   ]);
 
   const previousApplication = await getIssueApplications(
@@ -40,5 +46,7 @@ export const load = async ({ fetch, params, parent }) => {
     waves,
     alreadyApplied,
     upcomingWave,
+    applicationQuota,
+    orgAssignmentQuota,
   };
 };
