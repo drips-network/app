@@ -10,7 +10,7 @@ announcementBannerCopy: 'Introducing Drips Wave: Fix, Merge, Earn.'
 
 We're excited to share that Drips Wave will launch soon, with the first full program running for the [Stellar](https://stellar.org/) ecosystem starting in January 2026. The Wave is built to help ecosystems attract developers, keep maintenance moving and grow their communities.
 
-![Illustration showing a Wave on Drips Wave](/assets/blog-images/wave-body.png)
+<img data-no-border src="/assets/blog-images/wave-body.png" alt="Illustration showing a Wave on Drips Wave" />
 
 ## What is a Wave?
 

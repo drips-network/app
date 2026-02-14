@@ -61,6 +61,11 @@
   border: 1px solid var(--color-foreground-level-2);
 }
 
+#blog-article-content
+  img[data-no-border]:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
+  border: none;
+}
+
 #blog-article-content code {
   font-family: var(--typeface-mono-regular);
   font-size: 14px;

@@ -8,11 +8,11 @@ author: 'jason'
 announcementBannerCopy: 'The Changelog: Key Improvements for Stellar Wave 2'
 ---
 
-Last month, [we launched Drips Wave](https://drips.network/blog/the-monthly-wave), a recurring bounty cycle that helps ecosystems attract open-source contributions. FOSS maintainers add issues, contributors resolve them, and earn Points that translate to on-chain rewards.
+Last month, [we launched Drips Wave](/blog/posts/the-monthly-wave), a recurring bounty cycle that helps ecosystems attract open-source contributions. FOSS maintainers add issues, contributors resolve them, and earn Points that translate to on-chain rewards.
 
 The first Wave for the Stellar ecosystem wrapped up only a few weeks ago, and we've been overwhelmed by the response. In just ten short days, almost 600 participants merged over 3.000 PRs across 200+ repositories. We've said it many times, but once again: THANK YOU to everyone who participated in the first Wave!
 
-The next Wave is already [scheduled to hit on February 19th](https://drips.network/wave/stellar), and we've been hard at work building several key improvements based on your feedback and our learnings. Without further ado – here's our first Changelog, breaking down key improvements for the second Wave.
+The next Wave is already [scheduled to hit on February 19th](/wave/stellar), and we've been hard at work building several key improvements based on your feedback and our learnings. Without further ado – here's our first Changelog, breaking down key improvements for the second Wave.
 
 ## Introducing Application Quotas
 

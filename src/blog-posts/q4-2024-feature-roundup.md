@@ -16,7 +16,7 @@ Q4 was a busy time for us at Drips — alongside our entire team [attending Devc
 
 We're immensely excited to partner with the Protocol Labs ecosystem as the distribution mechanism of choice for [FIL-RetroPGF-2](https://www.fil-retropgf.io/). In January, the rewards for the second round of Filecoin's Retroactive Public Goods Funding program will be distributed through Drips — directly on Filecoin Mainnet.
 
-![The Explore Page on Drips Filecoin](/assets/blog-images/drips-on-filecoin.png)
+<img data-no-border src="/assets/blog-images/drips-on-filecoin.png" alt="The Explore Page on Drips Filecoin" />
 
 For us, this marked a huge milestone: deploying our protocol and app on a new chain other than Ethereum for the first time. Behind the scenes, we reworked large parts of our infrastructure to natively support multi-network use cases. Now users can seamlessly switch between different networks on Drips through the new network picker. Going forward, we'll focus on improving the multi-chain experience even further, by aggregating information from multiple chains into a single view.
 
@@ -30,7 +30,7 @@ Initially exclusively on Filecoin, we've also made claiming projects, and collec
 
 We even added the ability to automatically un-wrap supported native token wrappers like wFIL. This means after claiming and collecting rewards, users will immediately have native FIL in their wallets, which they can use to pay the necessary gas for offramping to an exchange or other DeFi apps.
 
-![Gasless claiming on Drips on Filecoin](/assets/blog-images/gasless-claiming.png)
+<img data-no-border src="/assets/blog-images/gasless-claiming.png" alt="Gasless claiming on Drips on Filecoin" />
 
 Behind the scenes, we're using [Gelato Relay](https://www.gelato.network/relay) to _relay_ transactions and pay for their gas on behalf of our users. All the user needs to do is sign an [EIP-712](https://eips.ethereum.org/EIPS/eip-712) message with their wallet, and we'll take care of the rest.
 
@@ -42,7 +42,7 @@ Many of you have asked us to offer "Support me" buttons for GitHub READMEs. And 
 
 Our new embeddable support buttons are customizable, easy to set up, and can be added to any website or README on GitHub. Clicking them leads straight to your project's profile on Drips, where visitors can send one-time or continuous donations. You can choose between a classic GitHub-style badge, or a more prominent Drips-styled button. You can even display the number of dependencies you split to, or the total amount of donations received, and those values will update automatically.
 
-![Support button configurator](/assets/blog-images/support-button-configurator.png)
+<img data-no-border src="/assets/blog-images/support-button-configurator.png" alt="Support button configurator" />
 
 Shout-out to [Morgan](https://github.com/mhgbrown), who not only implemented the new support button feature, but also completely reworked our Share modal.
 
@@ -56,7 +56,7 @@ With our new [visibility controls](https://docs.drips.network/advanced/drip-list
 
 The same also applies for projects, which owners can now choose to similarly hide from their profiles. The Drips app also prevents others from sending any funds to hidden lists or projects.
 
-![Example of a hidden project](/assets/blog-images/hidden-project.png)
+<img data-no-border src="/assets/blog-images/hidden-project.png" alt="Example of a hidden project" />
 
 Thank you [Ioannis](https://github.com/jtourkos) for shipping this feature, which took quite some work across much of our codebase.
 

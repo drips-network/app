@@ -13,11 +13,11 @@ Our collaboration started with a simple question: What are your current initiati
 
 We learned that Scroll has been deeply involved in supporting the LatAm developer community, working closely with ETH LatAm and Ethereum Argentina to host local meetups, workshops and hackathons. The Level Up hackathon, co-organized with Ethereum Argentina, is a prime example of these efforts. It’s designed to help developers in the region hone their skills and connect with the Scroll ecosystem. The Scroll team wanted to involve their community to select the winners, but didn't have an easy way to do this, given that they wanted to be able to **allow up to 2500 community wallets to vote** on short notice.
 
-![Screenshot of Scroll's Collaborative Drip List in voting](/assets/blog-images/scroll-list.png)
+<img data-no-border src="/assets/blog-images/scroll-list.png" alt="Screenshot of Scroll's Collaborative Drip List in voting" />
 
 This is where Drips' **new Collaborative Drip Lists feature** comes in! Collaborative Drip Lists are a new way to engage your community to vote on a Drip List's recipients before it gets published on-chain. Voting is simple, entirely gasless, and only requires an Ethereum address. And all Scroll had to do is upload a list of voters and configure which open-source GitHub repos can be voted for. Check out [Scroll's Drip List](https://www.drips.network/app/drip-lists/0270e337-047d-46a0-a55a-99d6030c285e), and read more about Collaborative Drip Lists [here](https://docs.drips.network/support-your-dependencies/collaborative-drip-lists/creating-a-collaborative-drip-list).
 
-![Overview over collaborative Drip Lists](/assets/blog-images/collab-drip-list-hiw.png)
+<img data-no-border src="/assets/blog-images/collab-drip-list-hiw.png" alt="Overview over collaborative Drip Lists" />
 
 Integrating Collaborative Drip Lists into the hackathon means that participants and the broader community can vote on the best projects easily and fairly. Drips will also be used to **allocate the $20k USDC prize fund directly to the winning projects**. This ensures that the entire process, from voting to funding, is seamless, efficient, and transparent.
 

@@ -18,7 +18,7 @@ Let’s dive into what went down in Q2 at Drips.
 
 This quarter, we announced one of the biggest upgrades to the Drips protocol yet: **support for full retroactive public goods funding (RPGF) rounds, end-to-end**.
 
-![RPGF Home](/assets/blog-images/rpgf/rpgf-home.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-home.png" alt="RPGF Home" />
 
 Anyone, from DAOs to foundations to ecosystem teams, will soon be able to run RPGF rounds directly on Drips. That includes:
 
@@ -40,7 +40,7 @@ The guide featured the team’s top picks for the week’s most relevant events 
 
 Even though Blockchain Week is over, the site lives on\! If you’re ever in Berlin and in need of some excellent recommendations for drinks, coffee or clubbing you should start here: [berlin.drips.network](https://berlin.drips.network/)
 
-![Berlin basics on the Drips guide to Berlin](/assets/blog-images/drips-guide-to-berlin-basics.png)
+<img data-no-border src="/assets/blog-images/drips-guide-to-berlin-basics.png" alt="Berlin basics on the Drips guide to Berlin" />
 
 # 🗣️ IRL in Berlin: panels, meetups & conversations
 
@@ -48,7 +48,7 @@ Beyond the guide, the Drips team was on the ground throughout Berlin Blockchain 
 
 Whether it was speaking on panels, demoing new features, or just meeting fellow builders face to face, Berlin was a great reminder of why this work matters.
 
-![Jason speaks](/assets/blog-images/jason-speaks.jpg)
+<img data-no-border src="/assets/blog-images/jason-speaks.jpg" alt="Jason speaks" />
 
 Pro-tip: check out Warren’s talk at Protocol Berg for a sneak peak at what else we’ll be launching in Q3…
 
