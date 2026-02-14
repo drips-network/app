@@ -865,7 +865,7 @@
   }
 
   .applications-table {
-    --applications-table-columns: 14rem 14rem 7rem 6rem 10rem 9rem 8rem max-content;
+    --applications-table-columns: 14rem 14rem 7rem 6rem 10rem 9rem 9.5rem max-content;
     width: max-content;
     min-width: 100%;
     border: 1px solid var(--color-foreground-level-2);
