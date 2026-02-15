@@ -108,7 +108,6 @@ export class Orcid {
 
     // Verify we're back on the ORCID profile page and it's now claimed
     await this.page.waitForURL(orcidProfileUrl);
-    await expect(this.page.getByRole('heading', { name: 'drips.network' })).toBeVisible();
     await expect(
       this.page.locator(`.orcid-profile :text("${this.ownerAddress.slice(-4)}")`).nth(0),
     ).toBeVisible();

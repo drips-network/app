@@ -10,7 +10,7 @@ import { gqlClient } from './gqlClient';
 export const ADDRESS_TO_ORCID_MAP: Record<string, string> = {
   // drips.network in ORCID sandbox, has TEST_ADDRESSES[0] claiming
   // URL in links section.
-  [TEST_ADDRESSES[0]]: '0009-0007-1106-8413',
+  [TEST_ADDRESSES[0]]: '0009-0003-3033-0123',
 };
 
 const lockOptions = {
@@ -118,6 +118,8 @@ class OrcidClaimManager {
     const state = await this._readState();
     const currentState = state[orcidId];
 
+    console.log(`[Manager] Current state for ORCID ${orcidId}: ${currentState}`);
+
     switch (currentState) {
       case 'claimed':
         await release();
@@ -164,7 +166,7 @@ class OrcidClaimManager {
 
       default:
         await release();
-        throw new Error(`Unknown claim state for ORCID: ${orcidId}`);
+        throw new Error(`Unknown claim state for ORCID: ${orcidId}, state: ${currentState}`);
     }
   }
 }
