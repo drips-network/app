@@ -20,7 +20,7 @@ const ORCID_SANDBOX_PREFIX = 'sandbox-';
  *
  * @returns true if the ORCID API url is pointing to the sandbox, false otherwise.
  */
-function isSandboxOrcidEnv() {
+export function isSandboxOrcidEnv() {
   try {
     const url = new URL(PUBLIC_ORCID_API_URL);
     return url.host === 'pub.sandbox.orcid.org';

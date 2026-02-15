@@ -23,6 +23,9 @@
   import { gql } from 'graphql-request';
   import { CLAIMING_URL_NAME } from '$lib/utils/orcids/entities';
   import verifyOrcidClaim, { getNetworkLinkName } from '$lib/utils/orcids/verify-orcid';
+  import { env } from '$env/dynamic/public';
+  import getLitChainName from '$lib/utils/lit/get-lit-chain-name';
+  import { isSandboxOrcidEnv } from '$lib/utils/orcids/fetch-orcid';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -39,8 +42,11 @@
         : $walletStore.network.name
       : unreachable(),
   );
+  let useLit = $derived(env.PUBLIC_USE_LIT_OWNER_UPDATE === 'true');
   let link = $derived(
-    `http://0.0.0.0/?${getNetworkLinkName()}=${$walletStore.address}&orcid=${$context.claimableId}`,
+    useLit
+      ? `http://0.0.0.0/DRIPS_OWNERSHIP_CLAIM?${getLitChainName($walletStore.network.name)}=${$walletStore.address}`
+      : `http://0.0.0.0/?${getNetworkLinkName()}=${$walletStore.address}&orcid=${$context.claimableId}`,
   );
   let editing = $derived(!!$context.claimableProof);
   let description = $derived(
@@ -65,14 +71,36 @@
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 
+        if ($context.isPartiallyClaimed) {
+          $context.linkedToClaimable = true;
+          return;
+        }
+
+        if (useLit) {
+          const sourceKind = isSandboxOrcidEnv() ? 'orcidSandbox' : 'orcid';
+
+          const res = await fetch('/api/lit/owner-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sourceKind,
+              name: $context.claimableId,
+              chainName: getLitChainName($walletStore.network.name),
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to get ownership signature from Lit. Please try again later.');
+          }
+
+          $context.litOwnerUpdateSignature = await res.json();
+          $context.linkedToClaimable = true;
+          return;
+        }
+
         await verifyOrcidClaim($context.claimableId, address);
 
         $context.linkedToClaimable = true;
-
-        if ($context.isPartiallyClaimed) {
-          // If the project already has the right owner, we don't need to kick off a repo owner update again
-          return;
-        }
 
         if (!$walletStore.network.gelatoRelayAvailable) {
           // If Gelato Relay is not available for the gasless owner update in the background, the last step will
@@ -107,7 +135,9 @@
         }
       },
       message: 'Verifying...',
-      subtitle: `We’re scanning your ORCID profile for the link with your ${network} address`,
+      subtitle: useLit
+        ? `We're verifying your ORCID profile ownership claim`
+        : `We're scanning your ORCID profile for the link with your ${network} address`,
     });
   }
 
