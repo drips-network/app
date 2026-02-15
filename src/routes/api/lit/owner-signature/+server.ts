@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { Signature } from 'ethers';
@@ -17,6 +16,7 @@ import GitHub from '$lib/utils/github/GitHub';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 import { dev } from '$app/environment';
 import { redis } from '../../redis';
+import litActionCode from './oracle-code.txt?raw';
 
 const LIT_ETHEREUM_PRIVATE_KEY = getOptionalEnvVar(
   'LIT_ETHEREUM_PRIVATE_KEY',
@@ -94,7 +94,6 @@ function getLitNetwork() {
 // --- Module-level singletons (reused across requests) ---
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
-const litActionCode = readFileSync(join(currentDir, 'oracle-code.txt'), 'utf-8');
 
 let cachedIpfsCid: string | undefined;
 async function getLitActionIpfsCid(): Promise<string> {
