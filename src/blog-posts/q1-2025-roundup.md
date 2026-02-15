@@ -6,6 +6,8 @@ coverImageAlt: '[placeholder]'
 excerpt: 'Drips landed on Optimism & Metis, launched powerful universal search, and gives a glimpse into the future with Ecosystems.'
 author: 'jason'
 announcementBannerCopy: 'Drips expands to Optimism & Metis, adds Universal Search, and teases Ecosystems'
+categories:
+  - roundup
 ---
 
 Welcome back to the Drips quarterly update!

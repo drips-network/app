@@ -5,9 +5,11 @@ coverImage: '/assets/blog-images/radworks-announcement.jpeg'
 coverImageAlt: 'Radworks announcement image'
 excerpt: Radworks becomes the first project to utilize Drips to support open source builders at scale.
 author: 'becca'
+categories:
+  - ecosystem
 ---
 
-**We’re thrilled to announce that Radworks is now [streaming](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514) $1 million to 30 of its critical software dependencies.**
+**We're thrilled to announce that Radworks is now [streaming](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514) $1 million to 30 of its critical software dependencies.**
 
 This is a watershed moment for Radworks in its journey to build a freer internet. We believe that by actively supporting dependencies, we can enhance the resilience and sustainability of the free and open source ecosystem as a whole.
 

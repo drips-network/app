@@ -2,7 +2,11 @@
   import { page } from '$app/state';
   import ShareButton from '$lib/components/share-button/share-button.svelte';
   import type { z } from 'zod';
-  import type { authorSchema } from '../../../../routes/api/blog/posts/schema';
+  import {
+    BLOG_CATEGORY_LABELS,
+    type authorSchema,
+    type BLOG_CATEGORIES,
+  } from '../../../../routes/api/blog/posts/schema';
 
   interface Props {
     title: string;
@@ -11,6 +15,7 @@
     slug: string;
     coverImage: string;
     coverImageAlt: string;
+    categories?: (typeof BLOG_CATEGORIES)[number][] | undefined;
     imageUrl?: string | undefined;
     author?: z.infer<typeof authorSchema> | undefined;
     compact?: boolean;
@@ -27,6 +32,7 @@
     slug,
     coverImage,
     coverImageAlt,
+    categories = undefined,
     imageUrl = undefined,
     author = undefined,
     compact = false,
@@ -64,6 +70,12 @@
         <h1 class="pixelated">{title}</h1>
       {/if}
       <p class="metadata" style:color="var(--color-foreground-level-5)">
+        {#if categories?.length}
+          <a class="category-badge" href="/blog/{categories[0]}"
+            >{BLOG_CATEGORY_LABELS[categories[0]]}</a
+          >
+          <span>•</span>
+        {/if}
         {#if author}
           <img
             class="author-avatar"
@@ -111,7 +123,20 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    align-items: center;
+    align-items: baseline;
+  }
+
+  .post .metadata .category-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-foreground-level-6);
+    text-decoration: none;
+  }
+
+  .post .metadata .category-badge:hover {
+    color: var(--color-foreground);
   }
 
   .post .metadata .author-avatar {
@@ -120,6 +145,7 @@
     border-radius: 50%;
     display: inline-block;
     border: 1px solid var(--color-foreground-level-3);
+    align-self: center;
   }
 
   .post.link:hover,

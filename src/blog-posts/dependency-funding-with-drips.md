@@ -5,6 +5,8 @@ coverImage: '/assets/blog-images/drips-logo.png'
 coverImageAlt: 'Drips Logo'
 excerpt: 'In the vast realm of software development, one concept has always stood out as a testament to the interconnected nature of our modern society: the software dependency tree.'
 author: 'ele'
+categories:
+  - guide
 ---
 
 This intricate web of dependencies vividly illustrates how our collective progress relies on the collaborative efforts of countless individuals and projects. **It reveals a profound truth—that we are all interdependent, and our success hinges upon the success of others.**

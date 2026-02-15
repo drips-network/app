@@ -6,6 +6,8 @@ coverImageAlt: 'A Berlin metro train with Drips graffiti flies upwards through a
 excerpt: 'From major feature announcements to real-world conversations, Q2 was all about continuing to build and showing up IRL.'
 author: 'becca'
 announcementBannerCopy: 'Q2 highlights include new features and engaging with you IRL.'
+categories:
+  - roundup
 ---
 
 # Q2 2025 Roundup: RPGF on Drips and Berlin vibes

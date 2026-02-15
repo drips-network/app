@@ -6,6 +6,8 @@ coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: "Let's review some of the exciting new features we shipped last quarter."
 author: 'jason'
 announcementBannerCopy: 'Drips launches Gasless Claiming on Filecoin, embeddable support buttons, and more'
+categories:
+  - roundup
 ---
 
 Happy New Year from the Drips team! We’re kicking it off with a new tradition: quarterly blog updates to keep you in the loop about our latest features, achievements, and plans for the future.

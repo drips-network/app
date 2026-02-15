@@ -6,6 +6,8 @@ coverImageAlt: 'Diagram illustrating the complete RetroPGF round lifecycle manag
 excerpt: 'Coming soon: a full suite of tools to run RetroPGF rounds on Drips, from application intake and voting to direct-to-GitHub distribution and amplified impact through Drip Lists.'
 author: 'jason'
 announcementBannerCopy: 'Coming Soon: Run your entire RetroPGF round on Drips, from start to finish'
+categories:
+  - product
 ---
 
 # Taking RetroPGF to the next level: A seamless, end-to-end solution

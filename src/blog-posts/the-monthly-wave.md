@@ -6,6 +6,9 @@ coverImageAlt: 'Illustration showing a Wave on Drips Wave'
 excerpt: 'Introducing Drips Wave: a recurring bounty cycle to help ecosystems attract developers, keep maintenance moving, and grow their communities.'
 author: 'kat'
 announcementBannerCopy: 'Introducing Drips Wave: Fix, Merge, Earn.'
+categories:
+  - product
+  - wave
 ---
 
 We're excited to share that Drips Wave will launch soon, with the first full program running for the [Stellar](https://stellar.org/) ecosystem starting in January 2026. The Wave is built to help ecosystems attract developers, keep maintenance moving and grow their communities.

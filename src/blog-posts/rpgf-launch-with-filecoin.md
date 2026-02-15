@@ -6,6 +6,8 @@ coverImageAlt: 'An abstract illustration of the RetroPGF public goods funding me
 excerpt: Our new end-to-end tooling RetroPGF solution is going live with Filecoin's largest round to date.
 author: 'becca'
 announcementBannerCopy: Launching RetroPGF on Drips with Filecoin
+categories:
+  - ecosystem
 ---
 
 It’s here\! Your solution for **end-to-end RetroPGF on Drips**. It’s never been easier to run impact-based funding rounds: publish a round, collect and review applications, run badgeholder voting, export results, and **reward winners directly to GitHub repositories** all in one place.

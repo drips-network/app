@@ -2,6 +2,7 @@
   import PostCard from '$lib/components/blog/post-card/post-card.svelte';
   import BlogCategoryNav from '$lib/components/blog/blog-category-nav/blog-category-nav.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { BLOG_CATEGORY_LABELS } from '../../../../api/blog/posts/schema';
   import type { PageData } from './$types';
 
   interface Props {
@@ -12,12 +13,14 @@
 </script>
 
 <HeadMeta
-  title="Drips Blog"
-  description="Read the latest on FOSS & Dependency Funding from the Drips team."
+  title="Drips Blog — {BLOG_CATEGORY_LABELS[data.category]}"
+  description="Read the latest {BLOG_CATEGORY_LABELS[
+    data.category
+  ].toLowerCase()} posts from the Drips team."
 />
 
 <div class="category-picker">
-  <BlogCategoryNav active="all" />
+  <BlogCategoryNav active={data.category} />
 </div>
 
 <div class="posts-grid">

@@ -5,6 +5,9 @@ coverImage: '/assets/blog-images/good-issues.png'
 coverImageAlt: 'Illustration of a good issue with sparkles'
 excerpt: 'A practical framework for maintainers to write issues that attract the right contributors, reduce back-and-forth, and lead to better outcomes.'
 author: 'ugo-x'
+categories:
+  - guide
+  - wave
 ---
 
 Welcome to Drips Wave. Whether this is your first time setting issues or you are a seasoned maintainer, the quality of the issues you post will shape how successful your Wave is. Clear, well-scoped issues help contributors do their best work and help you get meaningful progress on your project.

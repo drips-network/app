@@ -3,9 +3,12 @@ title: 'The Changelog: Key Improvements for Stellar Wave 2'
 date: '2026-02-16'
 coverImage: '/assets/blog-images/wave-cover.png'
 coverImageAlt: 'Illustration showing a Wave on Drips Wave'
-excerpt: 'Breaking down a number of key improvements to Drips Wave.'
+excerpt: "The second Stellar Wave is launching on February 19th - here are some of the key improvements we're making based on your feedback and our learnings."
 author: 'jason'
 announcementBannerCopy: 'The Changelog: Key Improvements for Stellar Wave 2'
+categories:
+  - wave
+  - product
 ---
 
 Last month, [we launched Drips Wave](/blog/posts/the-monthly-wave), a recurring bounty cycle that helps ecosystems attract open-source contributions. FOSS maintainers add issues, contributors resolve them, and earn Points that translate to on-chain rewards.
@@ -82,4 +85,8 @@ We believe that these measures, especially when combined with the new applicatio
 
 Lastly, later during the first Wave, we already added the ability to report bad actors and rule-breaking issues in the first Wave. We encourage everyone to continue flagging any suspicious or inappropriate behavior.
 
-todo: looking ahead
+# Looking ahead
+
+These are just some of the many improvements we're making for the second Wave, and we already have a long list of additional improvements and ideas in the pipeline for the future. We can't wait to share more of these with you in the coming months, and as always, we welcome your feedback and ideas. Please share any ideas you have in our [Discord server](https://discord.gg/t8XBXZAEs5) in the "feature-requests" channel.
+
+The second Wave for the Stellar ecosystem **launches on February 19th**, and we're already gearing up for an even bigger and better Wave than the first. If you haven't already, be sure to [sign up for Drips Wave](/wave/stellar), opt in to the [newsletter](/wave/newsletter) and join us in building a more vibrant open-source ecosystem together!

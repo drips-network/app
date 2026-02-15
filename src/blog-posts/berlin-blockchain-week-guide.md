@@ -6,6 +6,8 @@ coverImageAlt: 'The logo of the Drips Guide to Berlin'
 excerpt: 'The Drips Guide to Berlin is here in time for Blockchain Week.'
 author: 'becca'
 announcementBannerCopy: 'Attending Berlin Blockchain Week? Explore Berlin like a local with The Drips Guide to Berlin'
+categories:
+  - ecosystem
 ---
 
 Berlin Blockchain Week is just around the corner, and we couldn’t be more excited. This city is a place the Drips team knows well and loves. We've spent a lot of time here, and **we wanted to share some of our favourite spots with everyone coming in from out of town.**

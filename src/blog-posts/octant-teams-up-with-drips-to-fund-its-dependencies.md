@@ -5,6 +5,8 @@ coverImage: '/assets/blog-images/octant-drips.jpeg'
 coverImageAlt: 'Octant and Drips illustration'
 excerpt: We are pleased to announce that Octant is the second organization to commit to fund its critical software dependencies with Drips.
 author: 'becca'
+categories:
+  - ecosystem
 ---
 
 Octant, a participatory public goods funding platform, has committed a total of 23.2 ETH from its first two public goods funding rounds (approximately $59k) to fund its critical software dependencies with Drips over the next 3 months.
