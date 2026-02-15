@@ -107,7 +107,8 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              repoName: `${ownerName}/${repoName}`,
+              sourceKind: 'gitHub',
+              name: `${ownerName}/${repoName}`,
               chainName: getLitChainName($walletStore.network.name),
             }),
           });
@@ -156,7 +157,7 @@
       },
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
+        'We’re scanning your repo’s main branch for a FUNDING.json file with your Ethereum address, and computing a cryptographic proof.',
     });
   }
 
