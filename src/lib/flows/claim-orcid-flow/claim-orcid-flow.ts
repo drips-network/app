@@ -41,6 +41,14 @@ export interface State {
 
   linkedToClaimable: boolean;
   gaslessOwnerUpdateTaskId: string | undefined;
+  litOwnerUpdateSignature?: {
+    sourceId: number;
+    name: string;
+    owner: string;
+    timestamp: number;
+    r: string;
+    vs: string;
+  };
   isPartiallyClaimed: boolean;
 }
 
@@ -54,6 +62,7 @@ export const state = () =>
     claimableContext: undefined,
     claimableProof: undefined,
     gaslessOwnerUpdateTaskId: undefined,
+    litOwnerUpdateSignature: undefined,
   });
 
 export function slotsTemplate(state: State, stepIndex: number): Slots {

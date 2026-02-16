@@ -27,3 +27,6 @@ schema.graphql
 !/test-data/.gitkeep
 
 /stats.html
+
+# lit account storage
+/src/routes/api/lit/owner-signature/*

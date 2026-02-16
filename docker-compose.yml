@@ -28,6 +28,8 @@ services:
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
       - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
+      - PUBLIC_USE_LIT_OWNER_UPDATE=true
+      - LIT_NETWORK=dev
       - PUBLIC_WAVE_API_URL=${PUBLIC_WAVE_API_URL-http://localhost:8000}
       - PUBLIC_INTERNAL_WAVE_API_URL=${PUBLIC_INTERNAL_WAVE_API_URL-http://wave:8000}
       - PUBLIC_WAVE_GITHUB_APP_NAME=${PUBLIC_WAVE_GITHUB_APP_NAME}
@@ -54,7 +56,7 @@ services:
       - 6379:6379
 
   dripfeed:
-    image: 'j537/dripfeed:${DRIPFEED_TAG-main}-localtestnet'
+    image: 'j537/dripfeed:${DRIPFEED_TAG-jason-support-lit}-localtestnet'
     pull_policy: always
     entrypoint: bash -c "npm run db:migrate && npm run start"
     environment:
@@ -89,7 +91,7 @@ services:
         condition: service_healthy
 
   graphql-api:
-    image: 'j537/graphql-api:${GRAPHQL_API_TAG-main}'
+    image: 'j537/graphql-api:${GRAPHQL_API_TAG-jason-support-lit-orcid}'
     pull_policy: always
     environment:
       - 'RPC_CONFIG={"LOCALTESTNET": { "url": "http://testnet:8545" }}'
@@ -119,7 +121,7 @@ services:
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-igor-orcid}-${ARCH}'
+    image: 'j537/contracts:${CONTRACTS_TAG-sha-eaa9dd7}-${ARCH}'
     pull_policy: always
     ports:
       - '8545:8545'

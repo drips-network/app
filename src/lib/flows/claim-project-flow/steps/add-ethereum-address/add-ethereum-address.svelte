@@ -27,6 +27,8 @@
   import GitHub from '$lib/utils/github/GitHub';
   import { gql } from 'graphql-request';
   import { Octokit } from '@octokit/rest';
+  import { env } from '$env/dynamic/public';
+  import getLitChainName from '$lib/utils/lit/get-lit-chain-name';
 
   const octokit = new Octokit();
   const github = new GitHub(octokit);
@@ -99,6 +101,26 @@
           return;
         }
 
+        if (env.PUBLIC_USE_LIT_OWNER_UPDATE === 'true') {
+          // Use Lit Protocol to get a verifiable ownership signature
+          const res = await fetch('/api/lit/owner-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sourceKind: 'gitHub',
+              name: `${ownerName}/${repoName}`,
+              chainName: getLitChainName($walletStore.network.name),
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error('Failed to get ownership signature from Lit. Please try again later.');
+          }
+
+          $context.litOwnerUpdateSignature = await res.json();
+          return;
+        }
+
         if (!$walletStore.network.gelatoRelayAvailable) {
           // If Gelato Relay is not available for the gasless owner update in the background, the last step will
           // instead include a transaction for manually updating the repo owner.
@@ -135,7 +157,7 @@
       },
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your git project’s main branch for a FUNDING.json file with your Ethereum address.',
+        'We’re scanning your repo’s main branch for a FUNDING.json file with your Ethereum address, and computing a cryptographic proof.',
     });
   }
 

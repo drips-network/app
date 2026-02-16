@@ -147,6 +147,7 @@
   async function generateOwnerUpdateTransactions(
     gasslessOwnerUpdateTaskId: string | undefined,
     gitUrl: string,
+    litOwnerUpdateSignature: State['litOwnerUpdateSignature'],
   ) {
     let transactions: TransactionWrapperOrExternalTransaction[] = [];
     let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
@@ -174,7 +175,35 @@
       }
     }
 
-    if (gasslessOwnerUpdateTaskId) {
+    if (litOwnerUpdateSignature) {
+      const { sourceId, name, owner, timestamp, r, vs } = litOwnerUpdateSignature;
+
+      const updateOwnerByLitTx = await populateRepoDriverWriteTx({
+        functionName: 'updateOwnerByLit',
+        args: [
+          sourceId,
+          name as `0x${string}`,
+          owner as `0x${string}`,
+          timestamp,
+          r as `0x${string}`,
+          vs as `0x${string}`,
+        ],
+      });
+
+      transactions.push(
+        {
+          title: 'Update repository owner',
+          transaction: updateOwnerByLitTx,
+          applyGasBuffer: false,
+        },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForRepoOwnerUpdate(false),
+        },
+      );
+    } else if (gasslessOwnerUpdateTaskId) {
       transactions.push({
         external: true,
         title: 'Finalizing verification...',
@@ -260,6 +289,7 @@
             : await generateOwnerUpdateTransactions(
                 $context.gaslessOwnerUpdateTaskId,
                 $context.gitUrl,
+                $context.litOwnerUpdateSignature,
               );
 
           const address = $walletStore.address;
