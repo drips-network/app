@@ -31,6 +31,7 @@ jobs:
           ECOSYSTEM_API_URL=https://ecosystems-api-mainnet.up.railway.app/
           ECOSYSTEM_API_ACCESS_TOKEN=123
           PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
+          PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
           EOF
 
       - name: Install dependencies

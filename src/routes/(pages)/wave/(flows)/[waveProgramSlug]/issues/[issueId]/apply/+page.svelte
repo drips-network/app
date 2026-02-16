@@ -15,12 +15,15 @@
   import formatDate from '$lib/utils/format-date';
   import Email from '$lib/components/icons/Email.svelte';
   import Discord from '$lib/components/icons/Discord.svelte';
+  import Turnstile from '$lib/components/turnstile/turnstile.svelte';
 
   let { data } = $props();
 
   let applicationText = $state('');
+  let turnstileToken = $state<string | undefined>(undefined);
 
-  let valid = $derived(applicationText.trim().length >= 10 && applicationText.length <= 2000);
+  let textValid = $derived(applicationText.trim().length >= 10 && applicationText.length <= 2000);
+  let valid = $derived(textValid && !!turnstileToken);
 
   let beenFocussed = $state(false);
 
@@ -33,27 +36,28 @@
 
   let submitting = $state(false);
   async function handleSubmit() {
-    submitting = true;
+    await doWithConfirmationModal(
+      'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
+      async () => {
+        submitting = true;
 
-    try {
-      await doWithConfirmationModal(
-        'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
-        async () => {
+        try {
           await doWithErrorModal(async () => {
             await applyToWorkOnIssue(
               undefined,
               data.waveProgram.id,
               data.issue.id,
               applicationText,
+              turnstileToken,
             );
 
             await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/apply/success`);
           });
-        },
-      );
-    } finally {
-      submitting = false;
-    }
+        } finally {
+          submitting = false;
+        }
+      },
+    );
   }
 
   export const snapshot: Snapshot<string> = {
@@ -137,7 +141,7 @@
       title="Application Text*"
       description="Explain why you'd like to work on this issue and list any relevant experience."
       type="div"
-      validationState={valid
+      validationState={textValid
         ? { type: 'valid' }
         : beenFocussed
           ? {
@@ -156,9 +160,18 @@
         onblur={() => (beenFocussed = true)}
       />
       <div class="char-count">
-        Markdown supported · <span class:too-long={tooLong} class="tnum"
+        Markdown supported · Min 10 chars · <span class:too-long={tooLong} class="tnum"
           >{applicationText.length} / 2.000</span
         >
+      </div>
+    </FormField>
+    <FormField
+      title="Verification*"
+      description="Confirm you're not a robot with a quick check."
+      type="div"
+    >
+      <div class="turnstile-wrapper">
+        <Turnstile ontoken={(t) => (turnstileToken = t)} />
       </div>
     </FormField>
   {:else}
@@ -214,5 +227,10 @@
 
   .char-count .too-long {
     color: var(--color-negative);
+  }
+
+  .turnstile-wrapper {
+    display: flex;
+    justify-content: flex-start;
   }
 </style>
