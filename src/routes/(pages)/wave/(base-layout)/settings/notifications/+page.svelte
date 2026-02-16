@@ -33,12 +33,7 @@
         'Your application to work on an issue in a Wave has been approved, and you may begin work on it.',
       category: 'contributor',
     },
-    [WORKFLOW_ID.COMPLIMENT_RECEIVED]: {
-      title: 'Compliment received',
-      description:
-        'You have received a compliment from a maintainer for your work on an issue in a Wave.',
-      category: 'contributor',
-    },
+    [WORKFLOW_ID.COMPLIMENT_RECEIVED]: null,
     [WORKFLOW_ID.ISSUE_POINTS_RECEIVED]: {
       title: 'Issue points received',
       description:

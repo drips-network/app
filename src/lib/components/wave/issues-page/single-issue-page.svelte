@@ -14,7 +14,8 @@
   import Flag from '$lib/components/icons/Flag.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import Markdown from '$lib/components/markdown/markdown.svelte';
-  import Section from '$lib/components/section/section.svelte';
+  import SectionHeader from '$lib/components/section-header/section-header.svelte';
+  import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
@@ -39,9 +40,19 @@
     removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
+  import { flip } from 'svelte/animate';
+  import { SvelteMap } from 'svelte/reactivity';
+  import { getUserCodeMetrics } from '$lib/utils/wave/users';
+  import type { UserCodeMetricsDto } from '$lib/utils/wave/types/user';
+  import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
   import WaveBadge from '../wave-program-badge/wave-program-badge.svelte';
+  import ApplicationsFilterBar, {
+    type SortOption,
+  } from './components/applications-filter-bar.svelte';
   import IssueApplicationCard from './components/issue-application-card/issue-application-card.svelte';
+  import IssueApplicationListItem from './components/issue-application-card/issue-application-list-item.svelte';
+  import { KEY_METRICS } from './components/issue-application-card/metrics';
   import UpdateComplexityModal from './components/update-complexity-modal.svelte';
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
@@ -51,8 +62,7 @@
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import { COMPLIMENT_TYPES, type IssueComplimentDto } from '$lib/utils/wave/types/compliment';
-  import Heart from '$lib/components/icons/Heart.svelte';
+  import Star from '$lib/components/icons/Star.svelte';
   import Multiplier from '$lib/components/icons/Multiplier.svelte';
   import formatDate from '$lib/utils/format-date';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
@@ -83,7 +93,6 @@
 
     user: WaveLoggedInUser | null;
     headMetaTitle: string;
-    givenCompliments: IssueComplimentDto[];
 
     /** Whether viewing in the context of a wave program (e.g. /wave/[slug]/issues/[id]).
      * Used to determine if moderation actions should be shown. */
@@ -103,7 +112,6 @@
     user,
     backToConfig,
     headMetaTitle,
-    givenCompliments,
     isInWaveContext = false,
     activeWaveExists = false,
   }: Props = $props();
@@ -115,7 +123,26 @@
     ),
   );
 
+  const REVIEW_DEADLINE_DAYS = 14;
+
   let isMaintainer = $derived(matchingWaveProgramRepos.length > 0);
+  let isAssignedContributor = $derived(
+    Boolean(user && issue.assignedApplicant && user.id === issue.assignedApplicant.id),
+  );
+  let reviewDeadlineMs = $derived.by(() => {
+    const closeDate = issue.gitHubClosedAt;
+    if (!closeDate) return null;
+    return closeDate.getTime() + REVIEW_DEADLINE_DAYS * 24 * 60 * 60 * 1000;
+  });
+
+  let canLeaveReview = $derived(
+    issue.state === 'closed' &&
+      !!issue.assignedApplicant &&
+      !!partOfWaveProgram &&
+      (isMaintainer || isAssignedContributor) &&
+      reviewDeadlineMs !== null &&
+      Date.now() <= reviewDeadlineMs,
+  );
   let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
   let canUpdateComplexity = $derived(
     Boolean(
@@ -149,32 +176,89 @@
     if (newIssue) notifyIssuesUpdated([newIssue]);
   }
 
+  let viewMode = $state<'card' | 'list'>('card');
+  let sortBy = $state<SortOption>({ key: 'appliedAt', direction: 'asc' });
+
   let applications = $state<IssueApplicationWithDetailsDto[] | null>(null);
   let promisePending = $state(true);
+
+  const codeMetricsMap = new SvelteMap<string, Promise<UserCodeMetricsDto | null>>();
+  const resolvedOssScores = new SvelteMap<string, number | null>();
+
   $effect(() => {
     promisePending = true;
+    codeMetricsMap.clear();
+    resolvedOssScores.clear();
+
     issueApplicationsPromise?.then((apps) => {
-      applications = apps
-        // accepted application first, then own application
-        .sort((a, b) => {
-          const ownUserId = user?.id || '';
-          const aIsAccepted = a.status === 'accepted';
-          const bIsAccepted = b.status === 'accepted';
-          const aIsOwn = a.applicant.id === ownUserId;
-          const bIsOwn = b.applicant.id === ownUserId;
+      applications = apps;
 
-          // Accepted applications come first
-          if (aIsAccepted && !bIsAccepted) return -1;
-          if (!aIsAccepted && bIsAccepted) return 1;
+      for (const app of apps) {
+        if (!codeMetricsMap.has(app.applicant.id)) {
+          const promise = getUserCodeMetrics(undefined, app.applicant.id);
+          codeMetricsMap.set(app.applicant.id, promise);
 
-          // Then own application
-          if (aIsOwn && !bIsOwn) return -1;
-          if (!aIsOwn && bIsOwn) return 1;
-
-          return 0;
-        });
+          // Eagerly resolve OSS scores so they're available for sorting
+          promise
+            .then((metrics) => {
+              resolvedOssScores.set(
+                app.applicant.id,
+                metrics?.metrics['oss_composite']?.value ?? null,
+              );
+            })
+            .catch(() => {
+              resolvedOssScores.set(app.applicant.id, null);
+            });
+        }
+      }
 
       promisePending = false;
+    });
+  });
+
+  let sortedApplications = $derived.by(() => {
+    if (!applications) return null;
+
+    const ownUserId = user?.id || '';
+    const dir = sortBy.direction === 'asc' ? 1 : -1;
+
+    return [...applications].sort((a, b) => {
+      // Priority: accepted applications always first, own application second
+      const aIsAccepted = a.status === 'accepted';
+      const bIsAccepted = b.status === 'accepted';
+      if (aIsAccepted && !bIsAccepted) return -1;
+      if (!aIsAccepted && bIsAccepted) return 1;
+
+      const aIsOwn = a.applicant.id === ownUserId;
+      const bIsOwn = b.applicant.id === ownUserId;
+      if (aIsOwn && !bIsOwn) return -1;
+      if (!aIsOwn && bIsOwn) return 1;
+
+      // Then sort by selected key
+      switch (sortBy.key) {
+        case 'appliedAt':
+          return dir * (a.appliedAt.getTime() - b.appliedAt.getTime());
+        case 'currentWaveAssignmentCount': {
+          const aVal = a.applicant.currentWaveAssignmentCount ?? 0;
+          const bVal = b.applicant.currentWaveAssignmentCount ?? 0;
+          return dir * (aVal - bVal);
+        }
+        case 'currentWavePointsEarned': {
+          const aVal = a.applicant.currentWavePointsEarned ?? 0;
+          const bVal = b.applicant.currentWavePointsEarned ?? 0;
+          return dir * (aVal - bVal);
+        }
+        case 'oss_composite': {
+          const aScore = resolvedOssScores.get(a.applicant.id) ?? null;
+          const bScore = resolvedOssScores.get(b.applicant.id) ?? null;
+          if (aScore === null && bScore === null) return 0;
+          if (aScore === null) return 1;
+          if (bScore === null) return -1;
+          return dir * (aScore - bScore);
+        }
+        default:
+          return 0;
+      }
     });
   });
 
@@ -311,11 +395,11 @@
     </Card>
 
     {#if issueApplicationsPromise && issue.state === 'open'}
-      <Section
-        header={{
-          label: 'Applications',
-          icon: Ledger,
-          actions: [
+      <section class="applications-section">
+        <SectionHeader
+          label="Applications"
+          icon={Ledger}
+          actions={[
             {
               label: 'Apply to work on this issue',
               icon: Ledger,
@@ -323,23 +407,66 @@
               disabled: !canApplyToIssue,
               href: `/wave/${partOfWaveProgram?.slug}/issues/${issue.id}/apply`,
             },
-          ],
-          infoTooltip: 'Contributors can start applying to work on this issue during active Waves.',
-        }}
-        skeleton={{
-          loaded: !promisePending,
-          empty: applications?.length === 0,
-          emptyStateEmoji: '🫙',
-          emptyStateHeadline: 'No applications yet',
-          emptyStateText: 'No one has applied to work on this issue in the Wave yet.',
-        }}
-      >
-        <div class="applications-grid">
-          {#each applications as application (application.id)}
-            <IssueApplicationCard {user} {issue} {isMaintainer} {application} {activeWaveExists} />
-          {/each}
-        </div>
-      </Section>
+          ]}
+          infoTooltip="Contributors can start applying to work on this issue during active Waves."
+        />
+
+        <ApplicationsFilterBar bind:viewMode bind:sortBy />
+
+        <SectionSkeleton
+          loaded={!promisePending}
+          empty={applications?.length === 0}
+          emptyStateEmoji="🫙"
+          emptyStateHeadline="No applications yet"
+          emptyStateText="No-one has applied to this issue in the current Wave."
+        >
+          {#if viewMode === 'card'}
+            <div class="applications-grid">
+              {#each sortedApplications ?? [] as application (application.id)}
+                <div animate:flip={{ duration: 300 }}>
+                  <IssueApplicationCard
+                    {user}
+                    {issue}
+                    {isMaintainer}
+                    {application}
+                    {activeWaveExists}
+                    codeMetricsPromise={codeMetricsMap.get(application.applicant.id) ??
+                      Promise.resolve(null)}
+                  />
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <PaddedHorizontalScroll>
+              <div class="applications-table">
+                <div class="table-header">
+                  <h5 class="th">Applicant</h5>
+                  <h5 class="th">Application</h5>
+                  <h5 class="th">Assignments</h5>
+                  <h5 class="th">Points</h5>
+                  {#each KEY_METRICS as { label } (label)}
+                    <h5 class="th">{label}</h5>
+                  {/each}
+                  <h5 class="th">Actions</h5>
+                </div>
+                {#each sortedApplications ?? [] as application (application.id)}
+                  <div animate:flip={{ duration: 300 }}>
+                    <IssueApplicationListItem
+                      {user}
+                      {issue}
+                      {isMaintainer}
+                      {application}
+                      {activeWaveExists}
+                      codeMetricsPromise={codeMetricsMap.get(application.applicant.id) ??
+                        Promise.resolve(null)}
+                    />
+                  </div>
+                {/each}
+              </div>
+            </PaddedHorizontalScroll>
+          {/if}
+        </SectionSkeleton>
+      </section>
     {/if}
   </div>
 
@@ -383,6 +510,17 @@
         >
           View on GitHub
         </SidebarButton>
+
+        {#if canLeaveReview && partOfWaveProgram}
+          <SidebarButton
+            target=""
+            icon={Star}
+            variant="primary"
+            href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/review"
+          >
+            Leave a review
+          </SidebarButton>
+        {/if}
 
         <div class="sidebar-section">
           <div class="content">
@@ -516,34 +654,7 @@
                   </li>
                 </ul>
               {/if}
-
-              {#if givenCompliments.length > 0}
-                <h5 style:margin-top="1rem">Compliments</h5>
-                <ul class="compliments-list">
-                  {#each givenCompliments as compliment (compliment.complimentType)}
-                    <li class="compliment-list-item">
-                      <span class="typo-text compliment-label">
-                        {COMPLIMENT_TYPES[compliment.complimentType].label}
-                      </span>
-
-                      <span class="typo-text">
-                        +{compliment.points}
-                      </span>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
             </div>
-
-            {#if isMaintainer && issue.state === 'closed' && issue.assignedApplicant && partOfWaveProgram}
-              <SidebarButton
-                target=""
-                icon={Heart}
-                href="/wave/{partOfWaveProgram.slug}/issues/{issue.id}/compliments"
-              >
-                Give compliment
-              </SidebarButton>
-            {/if}
           </div>
         {/if}
 
@@ -699,27 +810,6 @@
     border-bottom: 1px solid var(--color-foreground-level-3);
   }
 
-  .compliment-label {
-    min-width: 0;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .compliments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .compliment-list-item {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    align-items: space-between;
-  }
-
   .issue {
     display: flex;
     flex-direction: column;
@@ -762,10 +852,51 @@
     gap: 1rem;
   }
 
+  .applications-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .applications-grid {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+
+  .applications-table {
+    --applications-table-columns: 14rem 14rem 7rem 6rem 10rem 9rem 9.5rem max-content;
+    width: max-content;
+    min-width: 100%;
+    border: 1px solid var(--color-foreground-level-2);
+    border-radius: 1rem 0 1rem 1rem;
+    overflow: hidden;
+    min-height: 20rem;
+  }
+
+  .applications-table > :last-child :global(.list-row) {
+    border-bottom: none;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: var(--applications-table-columns);
+    border-bottom: 1px solid var(--color-foreground-level-2);
+    background-color: var(--color-foreground-level-1);
+  }
+
+  .th {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .th:first-child {
+    padding-left: 0.75rem;
+  }
+
+  .th:last-child {
+    padding-right: 0.75rem;
   }
 
   .back-to-issues-link {
