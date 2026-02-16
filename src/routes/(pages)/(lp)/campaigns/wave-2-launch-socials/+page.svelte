@@ -37,7 +37,7 @@ To qualify for the **100 bonus points**, you must complete **all** of the steps 
 ## Deadline
 
 * Entries are valid **until midnight February 19th 2026 EST**
-* Bonus points are awarded **only after you actively participate** in Stellar Wave 1
+* Bonus points are awarded **only after you actively participate** in Stellar Wave 2
 
 Now grab the GIF and share, build, earn!
 
