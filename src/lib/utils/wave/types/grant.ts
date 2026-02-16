@@ -31,12 +31,14 @@ export const grantTransactionDtoSchema = z.object({
   transactionHash: z.string().nullable(),
   requestedAt: z.coerce.date(),
   completedAt: z.coerce.date().nullable(),
+  requestedByUserId: z.uuid().nullable(),
+  requestedByGitHubUsername: z.string().nullable(),
 });
 export type GrantTransactionDto = z.infer<typeof grantTransactionDtoSchema>;
 
 export const grantDtoSchema = z.object({
   id: z.uuid(),
-  userId: z.uuid(),
+  userId: z.uuid().nullable(),
   waveProgramId: z.uuid(),
   waveProgramSlug: z.string(),
   waveProgramName: z.string(),
@@ -50,6 +52,9 @@ export const grantDtoSchema = z.object({
   expiresAt: z.coerce.date(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isOrgGrant: z.boolean(),
+  orgId: z.uuid().nullable(),
+  orgName: z.string().nullable(),
 });
 export type GrantDto = z.infer<typeof grantDtoSchema>;
 
