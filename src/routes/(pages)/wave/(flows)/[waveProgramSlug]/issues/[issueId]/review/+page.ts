@@ -1,21 +1,18 @@
 import { getReview } from '$lib/utils/wave/reviews.js';
 
-const REVIEW_DEADLINE_DAYS = 7;
+const REVIEW_DEADLINE_DAYS = 14;
 
 export const load = async ({ parent, fetch }) => {
   const { issue, isOwnIssue, user } = await parent();
 
-  const issueCompletedInWave = issue.resolvedInWave;
-
-  if (!issueCompletedInWave || !issue.waveProgramId) {
+  if (!issue.gitHubClosedAt || !issue.waveProgramId) {
     return {
       canReview: false as const,
       reason: 'not-completed' as const,
     };
   }
 
-  const waveEndDate = issueCompletedInWave.endDate;
-  const reviewDeadline = new Date(waveEndDate);
+  const reviewDeadline = new Date(issue.gitHubClosedAt);
   reviewDeadline.setDate(reviewDeadline.getDate() + REVIEW_DEADLINE_DAYS);
 
   const now = new Date();

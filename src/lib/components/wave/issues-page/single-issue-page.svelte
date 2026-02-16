@@ -123,16 +123,16 @@
     ),
   );
 
-  const REVIEW_DEADLINE_DAYS = 7;
+  const REVIEW_DEADLINE_DAYS = 14;
 
   let isMaintainer = $derived(matchingWaveProgramRepos.length > 0);
   let isAssignedContributor = $derived(
     Boolean(user && issue.assignedApplicant && user.id === issue.assignedApplicant.id),
   );
   let reviewDeadlineMs = $derived.by(() => {
-    const resolvedInWave = issue.resolvedInWave;
-    if (!resolvedInWave) return null;
-    return resolvedInWave.endDate.getTime() + REVIEW_DEADLINE_DAYS * 24 * 60 * 60 * 1000;
+    const closeDate = issue.gitHubClosedAt;
+    if (!closeDate) return null;
+    return closeDate.getTime() + REVIEW_DEADLINE_DAYS * 24 * 60 * 60 * 1000;
   });
 
   let canLeaveReview = $derived(
