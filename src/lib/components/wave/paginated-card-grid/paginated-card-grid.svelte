@@ -5,6 +5,7 @@
   import { fade } from 'svelte/transition';
 
   interface Props {
+    initialData: PaginatedResponse<T>;
     fetchMore: (page: number) => Promise<PaginatedResponse<T>>;
     card: Snippet<[item: T]>;
     key: (item: T) => string | number;
@@ -12,7 +13,20 @@
     pagination: Pagination;
   }
 
-  let { fetchMore, card, key, items = $bindable(), pagination = $bindable() }: Props = $props();
+  let {
+    initialData,
+    fetchMore,
+    card,
+    key,
+    items = $bindable(initialData.data),
+    pagination = $bindable(initialData.pagination),
+  }: Props = $props();
+
+  // Reset items/pagination when initialData changes
+  $effect(() => {
+    items = initialData.data;
+    pagination = initialData.pagination;
+  });
 
   let isLoadingMore = $state(false);
   let fetchTriggerElem = $state<HTMLDivElement>();
@@ -31,7 +45,8 @@
       const nextPage = pagination.page + 1;
       const result = await fetchMore(nextPage);
 
-      items = [...items, ...result.data];
+      const existingKeys = new Set(items.map(key));
+      items = [...items, ...result.data.filter((item) => !existingKeys.has(key(item)))];
       pagination = result.pagination;
 
       // Retrigger if still in viewport

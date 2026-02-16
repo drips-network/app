@@ -55,11 +55,6 @@
   // svelte-ignore state_referenced_locally
   let pagination = $state<Pagination>(initialRepos.pagination);
 
-  $effect(() => {
-    items = initialRepos.data;
-    pagination = initialRepos.pagination;
-  });
-
   async function fetchMore(nextPage: number) {
     return getWaveProgramRepos(
       undefined,
@@ -149,7 +144,13 @@
     {/if}
   </span>
 
-  <PaginatedCardGrid {fetchMore} key={(item) => item.repo.id} bind:items bind:pagination>
+  <PaginatedCardGrid
+    initialData={initialRepos}
+    {fetchMore}
+    key={(item) => item.repo.id}
+    bind:items
+    bind:pagination
+  >
     {#snippet card(repoWithDetails: WaveProgramRepoWithDetailsDto)}
       <RepoPreviewCard {repoWithDetails}>
         {#snippet actions()}
