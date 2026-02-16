@@ -256,7 +256,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 10;
+    z-index: 7;
     backdrop-filter: blur(4px);
   }
 
@@ -283,7 +283,7 @@
     position: fixed;
     width: calc(86rem - 3px);
     max-width: calc(100vw - 2rem);
-    z-index: 50;
+    z-index: 8;
     background-color: var(--color-background);
     transition:
       box-shadow 0.3s,
