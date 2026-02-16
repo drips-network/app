@@ -81,6 +81,7 @@ export async function applyToWorkOnIssue(
   waveProgramId: string,
   issueId: string,
   applicationText: string,
+  turnstileToken?: string,
 ) {
   return parseRes(
     issueApplicationWithDetailsDtoSchema,
@@ -92,6 +93,7 @@ export async function applyToWorkOnIssue(
         body: JSON.stringify({
           applicationText,
         }),
+        headers: turnstileToken ? { 'x-turnstile-token': turnstileToken } : {},
       },
     ),
   );
