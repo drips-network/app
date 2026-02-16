@@ -163,7 +163,7 @@
                   {:else}
                     <Globe style="flex-shrink: 0;" />
                     <a class="typo-text-small" href={buildExternalUrl(social.url)}>
-                      {social.provider}
+                      {new URL(social.url).hostname.replace('www.', '')}
                     </a>
                   {/if}
                 </li>
