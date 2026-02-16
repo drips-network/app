@@ -7,6 +7,7 @@ import {
   type IssueSortByOption,
 } from './types/issue';
 import {
+  applicationQuotaDtoSchema,
   issueApplicationFiltersSchema,
   issueApplicationWithDetailsDtoSchema,
   type IssueApplicationFilters,
@@ -54,6 +55,23 @@ export async function getIssueApplications(
     await authenticatedCall(
       f,
       `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications?${toPaginationParams(pagination)}&${toFilterParams(issueApplicationFiltersSchema, filters)}&sortBy=createdAt&sortOrder=asc`,
+    ),
+  );
+}
+
+export async function getApplicationQuota(f = fetch, waveProgramId: string) {
+  return parseRes(
+    applicationQuotaDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/quotas/applications`),
+  );
+}
+
+export async function getOrgAssignmentQuota(f = fetch, waveProgramId: string, orgId: string) {
+  return parseRes(
+    applicationQuotaDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/quotas/same-contributor/${orgId}`,
     ),
   );
 }

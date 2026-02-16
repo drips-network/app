@@ -199,18 +199,25 @@
       >
       {#if isMaintainer}
         {#if application.status === 'pending' || application.status === 'unassigned'}
+          {@const orgQuotaExhausted = application.applicant.currentWaveSameOrgQuotaRemaining === 0}
+          {@const assignDisabled = !activeWaveExists || orgQuotaExhausted}
           <div style:width="100%;">
-            <Tooltip disabled={activeWaveExists}>
+            <Tooltip disabled={!assignDisabled}>
               <div style:display="flex" style:flex-direction="column" style:width="100%">
                 <Button
                   variant="primary"
                   icon={Check}
                   onclick={handleAssignApplicant}
-                  disabled={!activeWaveExists}>Accept & assign</Button
+                  disabled={assignDisabled}>Accept & assign</Button
                 >
               </div>
               {#snippet tooltip_content()}
-                Assignment is only available during an active Wave.
+                {#if orgQuotaExhausted}
+                  This contributor has reached the maximum number of assignments from this
+                  organization in the current Wave.
+                {:else}
+                  Assignment is only available during an active Wave.
+                {/if}
               {/snippet}
             </Tooltip>
           </div>
