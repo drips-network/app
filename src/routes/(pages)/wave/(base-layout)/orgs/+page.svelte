@@ -37,6 +37,11 @@
   // svelte-ignore state_referenced_locally
   let pagination = $state<Pagination>(initialOrgs.pagination);
 
+  $effect(() => {
+    items = initialOrgs.data;
+    pagination = initialOrgs.pagination;
+  });
+
   async function fetchMore(nextPage: number) {
     return getPublicOrgs(
       undefined,
@@ -105,13 +110,7 @@
     {/if}
   </span>
 
-  <PaginatedCardGrid
-    initialData={initialOrgs}
-    {fetchMore}
-    key={(org) => org.id}
-    bind:items
-    bind:pagination
-  >
+  <PaginatedCardGrid {fetchMore} key={(org) => org.id} bind:items bind:pagination>
     {#snippet card(org: PublicOrgDto)}
       <OrgPreviewCard {org}>
         {#snippet actions()}

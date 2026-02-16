@@ -2,9 +2,9 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import type { PaginatedResponse, Pagination } from '$lib/utils/wave/types/pagination';
   import { onMount, type Snippet } from 'svelte';
+  import { fade } from 'svelte/transition';
 
   interface Props {
-    initialData: PaginatedResponse<T>;
     fetchMore: (page: number) => Promise<PaginatedResponse<T>>;
     card: Snippet<[item: T]>;
     key: (item: T) => string | number;
@@ -12,23 +12,10 @@
     pagination: Pagination;
   }
 
-  let {
-    initialData,
-    fetchMore,
-    card,
-    key,
-    items = $bindable(initialData.data),
-    pagination = $bindable(initialData.pagination),
-  }: Props = $props();
+  let { fetchMore, card, key, items = $bindable(), pagination = $bindable() }: Props = $props();
 
   let isLoadingMore = $state(false);
   let fetchTriggerElem = $state<HTMLDivElement>();
-
-  // Reset items/pagination when initialData changes
-  $effect(() => {
-    items = initialData.data;
-    pagination = initialData.pagination;
-  });
 
   function isTriggerInViewport(elem: HTMLDivElement) {
     const rect = elem.getBoundingClientRect();
@@ -88,7 +75,7 @@
 
 <div class="card-grid">
   {#each items as item (key(item))}
-    <div class="card-item">
+    <div in:fade={{ duration: 200 }}>
       {@render card(item)}
     </div>
   {/each}
@@ -104,19 +91,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     gap: 1rem;
-  }
-
-  .card-item {
-    animation: fadeIn 200ms ease-in;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
   }
 
   .fetch-trigger {
