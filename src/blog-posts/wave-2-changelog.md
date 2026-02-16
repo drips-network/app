@@ -23,9 +23,9 @@ In the first Wave, a few very eager contributors sent a large number of applicat
 
 For the second Wave, we're taking things one step further by introducing two new limits on applications and assignments:
 
-- **Pending application limit**: Contributors can only have 15 pending applications at a time. This encourages contributors to be more selective about the issues they apply for, and gives more contributors a chance to be assigned to issues. Of course, contributors can "free up a slot" by resolving an issue they've been assigned to, or by withdrawing an application.
+- **Pending application limit**: Contributors can only have 15 pending or assigned applications at a time. This encourages contributors to be more selective about the issues they apply for, and gives more contributors a chance to be assigned to issues. Of course, contributors can "free up a slot" by resolving an issue they've been assigned to, or by withdrawing an application.
 
-- **Contributor-per-org limit**: Each org can assign the same contributor to a maximum of 5 issues across their repos, throughout the entire Wave. This encourages maintainers to spread assignments across a wider, more diverse pool of contributors.
+- **Contributor-per-org limit**: Each org can assign the same contributor to a maximum of 7 issues across their repos, throughout the entire Wave. This encourages maintainers to spread assignments across a wider, more diverse pool of contributors.
 
 We believe that these limits will enhance the quality of applications as contributors more deliberately select issues to apply for, and give more contributors a chance to be assigned to issues.
 
