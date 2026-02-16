@@ -2,7 +2,6 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import type { PaginatedResponse, Pagination } from '$lib/utils/wave/types/pagination';
   import { onMount, type Snippet } from 'svelte';
-  import { fade } from 'svelte/transition';
 
   interface Props {
     initialData: PaginatedResponse<T>;
@@ -89,7 +88,7 @@
 
 <div class="card-grid">
   {#each items as item (key(item))}
-    <div in:fade={{ duration: 200 }}>
+    <div class="card-item">
       {@render card(item)}
     </div>
   {/each}
@@ -105,6 +104,19 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     gap: 1rem;
+  }
+
+  .card-item {
+    animation: fadeIn 200ms ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .fetch-trigger {
