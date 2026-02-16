@@ -387,13 +387,13 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--color-foreground-level-2);
+    border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;
     overflow: hidden;
   }
 
   .members-list li + li {
-    border-top: 1px solid var(--color-foreground-level-2);
+    border-top: 1px solid var(--color-foreground-level-3);
   }
 
   .member-row {

@@ -22,14 +22,14 @@
     pagination = $bindable(initialData.pagination),
   }: Props = $props();
 
-  let isLoadingMore = $state(false);
-  let fetchTriggerElem = $state<HTMLDivElement>();
-
   // Reset items/pagination when initialData changes
   $effect(() => {
     items = initialData.data;
     pagination = initialData.pagination;
   });
+
+  let isLoadingMore = $state(false);
+  let fetchTriggerElem = $state<HTMLDivElement>();
 
   function isTriggerInViewport(elem: HTMLDivElement) {
     const rect = elem.getBoundingClientRect();
@@ -45,7 +45,8 @@
       const nextPage = pagination.page + 1;
       const result = await fetchMore(nextPage);
 
-      items = [...items, ...result.data];
+      const existingKeys = new Set(items.map(key));
+      items = [...items, ...result.data.filter((item) => !existingKeys.has(key(item)))];
       pagination = result.pagination;
 
       // Retrigger if still in viewport

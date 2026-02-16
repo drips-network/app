@@ -15,7 +15,7 @@
   } from '$lib/utils/wave/types/waveProgram';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
-  import type { Snapshot } from '../$types.js';
+  import type { Snapshot } from './$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
 
