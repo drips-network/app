@@ -141,9 +141,47 @@ export const waveProgramReposFiltersSchema = filterSchema(
     primaryLanguages: z.string().optional(), // comma-separated list of languages
     search: z.string().optional(),
     sortBy: waveProgramReposSortBySchema.optional(),
+    orgId: z.uuid().optional(),
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;
+
+// ===========================
+// Wave Program Org Types
+// ===========================
+
+export const orgContactInfoSchema = z.object({
+  email: z.string().nullable(),
+  description: z.string().nullable(),
+  url: z.string().nullable(),
+  location: z.string().nullable(),
+  socialLinks: z.array(
+    z.object({
+      provider: z.string(),
+      url: z.string(),
+    }),
+  ),
+});
+
+export const waveProgramOrgDtoSchema = z.object({
+  id: z.uuid(),
+  gitHubOrgId: z.number(),
+  gitHubOrgLogin: z.string(),
+  gitHubOrgName: z.string().nullable(),
+  gitHubOrgAvatarUrl: z.string().nullable(),
+  accountType: z.string(),
+  approvedRepoCount: z.number().int(),
+  createdAt: z.coerce.date(),
+  contactInfo: orgContactInfoSchema.nullable(),
+});
+export type WaveProgramOrgDto = z.infer<typeof waveProgramOrgDtoSchema>;
+
+export const waveProgramOrgsFiltersSchema = filterSchema(
+  z.object({
+    search: z.string().optional(),
+  }),
+);
+export type WaveProgramOrgsFilters = z.infer<typeof waveProgramOrgsFiltersSchema>;
 
 // ===========================
 // Wave Program Issue Types

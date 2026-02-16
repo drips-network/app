@@ -1,6 +1,7 @@
 import type { WaveProgramReposFilters } from '$lib/utils/wave/types/waveProgram.js';
 import { waveProgramReposFiltersSchema } from '$lib/utils/wave/types/waveProgram.js';
-import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
+import { getAllPaginated } from '$lib/utils/wave/getAllPaginated.js';
+import { getWaveProgramOrgs, getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ parent, fetch, url }) => {
@@ -33,8 +34,14 @@ export const load = async ({ parent, fetch, url }) => {
     filters,
   );
 
+  // Streamed — not awaited so it doesn't block page load
+  const orgsPromise = getAllPaginated((page, limit) =>
+    getWaveProgramOrgs(fetch, waveProgram.id, { page, limit }),
+  );
+
   return {
     repos,
     filters,
+    orgsPromise,
   };
 };

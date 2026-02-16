@@ -17,6 +17,7 @@
     value: string | undefined;
     toggleValue?: boolean;
     noBorder?: boolean;
+    small?: boolean;
     options: Option[];
     dropdownWidth?: { pixels: number; align: 'left' | 'right' } | undefined;
     toggle?: { label: string } | undefined;
@@ -28,6 +29,7 @@
     value = $bindable(),
     toggleValue = $bindable(false),
     noBorder = false,
+    small = false,
     options,
     dropdownWidth = undefined,
     toggle = undefined,
@@ -104,7 +106,13 @@
 
 <svelte:window onkeydown={handleWindowKeydown} onclick={handleWindowClick} />
 
-<div class="wrapper typo-text" bind:this={wrapperElem}>
+<div
+  class="wrapper"
+  class:typo-text={!small}
+  class:typo-text-small={small}
+  class:small
+  bind:this={wrapperElem}
+>
   <div
     role="listbox"
     aria-multiselectable="false"
@@ -207,6 +215,25 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+  }
+
+  .small .dropdown {
+    height: 2rem;
+    padding: 0.25rem 2rem 0.25rem 0.75rem;
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .small .dropdown.expanded {
+    border-radius: 1rem 0 0.25rem 0.25rem;
+  }
+
+  .small .chevron {
+    top: 0.25rem;
+    right: 0.25rem;
+  }
+
+  .small .options {
+    top: 2.5rem;
   }
 
   .dropdown.disabled {
