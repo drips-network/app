@@ -438,6 +438,7 @@
           loaded={!promisePending}
           empty={applications?.length === 0}
           emptyStateEmoji="🫙"
+          horizontalScroll={false}
           emptyStateHeadline="No applications yet"
           emptyStateText="No-one has applied to this issue in the current Wave."
         >
