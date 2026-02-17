@@ -238,6 +238,38 @@ export async function moderatorRemoveIssueFromWave(
   );
 }
 
+export async function moderatorGetQuotaExclusion(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+): Promise<{ excluded: boolean }> {
+  const res = await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/quota-exclusion`,
+  );
+  return res.json();
+}
+
+export async function moderatorExcludeFromQuota(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  excluded: boolean,
+  reason: string,
+) {
+  return await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/quota-exclusion`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        excluded,
+        reason,
+      }),
+    },
+  );
+}
+
 export async function moderatorIssuePoints(
   f = fetch,
   waveProgramId: string,

@@ -37,6 +37,7 @@
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import {
     beComplexityToFriendlyLabel,
+    moderatorGetQuotaExclusion,
     removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
@@ -57,7 +58,10 @@
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
   import ModeratorIssuePointsModal from './components/moderator-issue-points-modal.svelte';
+  import ModeratorExcludeFromQuotaModal from './components/moderator-exclude-from-quota-modal.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
+  import Lock from '$lib/components/icons/Lock.svelte';
+  import Unlock from '$lib/components/icons/Unlock.svelte';
   import reportFlow from '$lib/flows/wave/report/report-flow';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
@@ -313,6 +317,18 @@
     });
   }
 
+  function openModeratorExcludeFromQuotaModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorExcludeFromQuotaModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+      onExcluded: () => {
+        isExcludedFromQuota = true;
+      },
+    });
+  }
+
   function openModeratorIssuePointsModal() {
     if (!partOfWaveProgram) return;
 
@@ -321,6 +337,36 @@
       waveProgram: partOfWaveProgram,
     });
   }
+
+  let canExcludeFromQuota = $derived(
+    showModerationSection && issue.state === 'open' && issue.assignedApplicant !== null,
+  );
+
+  let isExcludedFromQuota = $state<boolean | null>(null);
+
+  $effect(() => {
+    if (
+      !showModerationSection ||
+      issue.state !== 'open' ||
+      !issue.assignedApplicant ||
+      !partOfWaveProgram
+    ) {
+      isExcludedFromQuota = null;
+      return;
+    }
+
+    const waveProgramId = partOfWaveProgram.id;
+    const issueId = issue.id;
+
+    isExcludedFromQuota = null;
+    moderatorGetQuotaExclusion(undefined, waveProgramId, issueId)
+      .then((res) => {
+        isExcludedFromQuota = res.excluded;
+      })
+      .catch(() => {
+        isExcludedFromQuota = false;
+      });
+  });
 
   let canIssuePointsEarly = $derived(
     showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,
@@ -715,6 +761,18 @@
               <div>
                 <SidebarButton icon={Coin} onclick={openModeratorIssuePointsModal}>
                   Issue points early
+                </SidebarButton>
+              </div>
+            {/if}
+
+            {#if canExcludeFromQuota}
+              <div>
+                <SidebarButton
+                  icon={isExcludedFromQuota ? Lock : Unlock}
+                  onclick={openModeratorExcludeFromQuotaModal}
+                  disabled={isExcludedFromQuota !== false}
+                >
+                  {isExcludedFromQuota ? 'Excluded from quota' : 'Exclude from quota'}
                 </SidebarButton>
               </div>
             {/if}
