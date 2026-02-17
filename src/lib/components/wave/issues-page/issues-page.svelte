@@ -18,7 +18,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
@@ -396,6 +396,11 @@
     </TransitionedHeight>
 
     <Card style="padding: 0;" disabled={filtersOpen}>
+      <div transition:fly={{ y: -4, duration: 300 }} class="count-badge typo-text-small">
+        {issues.pagination.total}
+        {issues.pagination.total === 1 ? 'match' : 'matches'}
+      </div>
+
       {#if applyingFilters || applyingSorting}
         <div class="spinner">
           <Spinner />
@@ -426,6 +431,7 @@
           getMoreIssues={(currentPagination) =>
             getMoreIssues(currentPagination, appliedFilters, appliedSort)}
           onselectchange={(selected) => (selectedIssues = selected)}
+          ontotalchange={(total) => (currentTotal = total)}
         />
       {/if}
     </Card>
@@ -476,7 +482,6 @@
     align-items: center;
     margin-bottom: 1rem;
     height: 2.25rem;
-
     padding: 0 0 0 1rem;
     border-radius: 1.25rem 0 1.25rem 1.25rem;
     background-color: var(--color-primary-level-1);
@@ -487,6 +492,22 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+
+  .count-badge {
+    position: absolute;
+    bottom: -0.625rem;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    background-color: var(--color-foreground-level-1);
+    color: var(--color-foreground-level-5);
+    border-radius: 1rem 0 1rem 1rem;
+    z-index: 1;
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .search-bar {
