@@ -37,7 +37,6 @@
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import {
     beComplexityToFriendlyLabel,
-    moderatorGetQuotaExclusion,
     removeIssueFromWaveProgram,
   } from '$lib/utils/wave/wavePrograms';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
@@ -104,6 +103,10 @@
 
     /** Whether there's an active wave for the wave program this issue belongs to. */
     activeWaveExists: boolean;
+
+    /** Whether the assigned applicant's application is excluded from quota.
+     * null = not applicable or not checked. */
+    isExcludedFromQuota?: boolean | null;
   }
 
   let {
@@ -118,6 +121,7 @@
     headMetaTitle,
     isInWaveContext = false,
     activeWaveExists = false,
+    isExcludedFromQuota = null,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
@@ -323,9 +327,6 @@
     modal.show(ModeratorExcludeFromQuotaModal, undefined, {
       issue,
       waveProgram: partOfWaveProgram,
-      onExcluded: () => {
-        isExcludedFromQuota = true;
-      },
     });
   }
 
@@ -341,32 +342,6 @@
   let canExcludeFromQuota = $derived(
     showModerationSection && issue.state === 'open' && issue.assignedApplicant !== null,
   );
-
-  let isExcludedFromQuota = $state<boolean | null>(null);
-
-  $effect(() => {
-    if (
-      !showModerationSection ||
-      issue.state !== 'open' ||
-      !issue.assignedApplicant ||
-      !partOfWaveProgram
-    ) {
-      isExcludedFromQuota = null;
-      return;
-    }
-
-    const waveProgramId = partOfWaveProgram.id;
-    const issueId = issue.id;
-
-    isExcludedFromQuota = null;
-    moderatorGetQuotaExclusion(undefined, waveProgramId, issueId)
-      .then((res) => {
-        isExcludedFromQuota = res.excluded;
-      })
-      .catch(() => {
-        isExcludedFromQuota = false;
-      });
-  });
 
   let canIssuePointsEarly = $derived(
     showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,

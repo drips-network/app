@@ -17,10 +17,9 @@
   interface Props {
     issue: IssueDetailsDto;
     waveProgram: WaveProgramDto;
-    onExcluded?: () => void;
   }
 
-  let { issue, waveProgram, onExcluded }: Props = $props();
+  let { issue, waveProgram }: Props = $props();
 
   let reason = $state('');
   let loading = $state(false);
@@ -52,7 +51,6 @@
           notifyIssuesUpdated([updatedIssue]);
         }
 
-        onExcluded?.();
         modal.hide();
       });
     } finally {
