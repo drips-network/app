@@ -57,7 +57,10 @@
   import ModeratorUpdateComplexityModal from './components/moderator-update-complexity-modal.svelte';
   import ModeratorRemoveFromWaveModal from './components/moderator-remove-from-wave-modal.svelte';
   import ModeratorIssuePointsModal from './components/moderator-issue-points-modal.svelte';
+  import ModeratorExcludeFromQuotaModal from './components/moderator-exclude-from-quota-modal.svelte';
   import Coin from '$lib/components/icons/Coin.svelte';
+  import Lock from '$lib/components/icons/Lock.svelte';
+  import Unlock from '$lib/components/icons/Unlock.svelte';
   import reportFlow from '$lib/flows/wave/report/report-flow';
   import SidebarButton from './components/sidebar-button/sidebar-button.svelte';
   import { notifyIssuesUpdated } from './issue-update-coordinator';
@@ -100,6 +103,10 @@
 
     /** Whether there's an active wave for the wave program this issue belongs to. */
     activeWaveExists: boolean;
+
+    /** Whether the assigned applicant's application is excluded from quota.
+     * null = not applicable or not checked. */
+    isExcludedFromQuota?: boolean | null;
   }
 
   let {
@@ -114,6 +121,7 @@
     headMetaTitle,
     isInWaveContext = false,
     activeWaveExists = false,
+    isExcludedFromQuota = null,
   }: Props = $props();
 
   let matchingWaveProgramRepos = $derived(
@@ -313,6 +321,15 @@
     });
   }
 
+  function openModeratorExcludeFromQuotaModal() {
+    if (!partOfWaveProgram) return;
+
+    modal.show(ModeratorExcludeFromQuotaModal, undefined, {
+      issue,
+      waveProgram: partOfWaveProgram,
+    });
+  }
+
   function openModeratorIssuePointsModal() {
     if (!partOfWaveProgram) return;
 
@@ -321,6 +338,10 @@
       waveProgram: partOfWaveProgram,
     });
   }
+
+  let canExcludeFromQuota = $derived(
+    showModerationSection && issue.state === 'open' && issue.assignedApplicant !== null,
+  );
 
   let canIssuePointsEarly = $derived(
     showModerationSection && issue.assignedApplicant !== null && issue.pointsEarned === null,
@@ -715,6 +736,18 @@
               <div>
                 <SidebarButton icon={Coin} onclick={openModeratorIssuePointsModal}>
                   Issue points early
+                </SidebarButton>
+              </div>
+            {/if}
+
+            {#if canExcludeFromQuota}
+              <div>
+                <SidebarButton
+                  icon={isExcludedFromQuota ? Lock : Unlock}
+                  onclick={openModeratorExcludeFromQuotaModal}
+                  disabled={isExcludedFromQuota !== false}
+                >
+                  {isExcludedFromQuota ? 'Excluded from quota' : 'Exclude from quota'}
                 </SidebarButton>
               </div>
             {/if}
