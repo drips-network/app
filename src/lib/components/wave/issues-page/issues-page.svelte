@@ -18,7 +18,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
-  import { fade, fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   import modal from '$lib/stores/modal';
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
@@ -396,7 +396,7 @@
     </TransitionedHeight>
 
     <Card style="padding: 0;" disabled={filtersOpen}>
-      <div transition:fly={{ y: -4, duration: 300 }} class="count-badge typo-text-small">
+      <div class="count-badge typo-text-small">
         {issues.pagination.total}
         {issues.pagination.total === 1 ? 'match' : 'matches'}
       </div>
