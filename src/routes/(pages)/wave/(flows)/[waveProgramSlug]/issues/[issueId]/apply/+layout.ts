@@ -27,8 +27,8 @@ export const load = async ({ fetch, params, parent }) => {
         status: 'upcoming',
       },
     ),
-    getApplicationQuota(fetch, waveProgram.id),
-    getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id),
+    getApplicationQuota(fetch, waveProgram.id).catch(() => null),
+    getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id).catch(() => null),
   ]);
 
   const previousApplication = await getIssueApplications(
