@@ -431,7 +431,6 @@
           getMoreIssues={(currentPagination) =>
             getMoreIssues(currentPagination, appliedFilters, appliedSort)}
           onselectchange={(selected) => (selectedIssues = selected)}
-          ontotalchange={(total) => (currentTotal = total)}
         />
       {/if}
     </Card>
