@@ -64,9 +64,7 @@
     headline="Moderator: Exclude from quota"
     description="Exclude the assigned contributor's application from quota limits, allowing them to apply to other issues."
   >
-    <AnnotationBox type="info">
-      This action is logged for audit purposes. It can be reversed if needed.
-    </AnnotationBox>
+    <AnnotationBox type="info">This action is logged for audit purposes.</AnnotationBox>
 
     <div class="fields">
       <FormField title="Issue" type="div">
