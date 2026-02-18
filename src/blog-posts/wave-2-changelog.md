@@ -77,7 +77,7 @@ We look forward to enhancing the application review experience with additional m
 
 ## Battling Spam and Bad Actors
 
-Unfortunately, just like any public bounty platform, Drips Wave is not immune to spam and bad actors. We believe that the new application & applicant-per-org limits, together with a significant amount of tweaks behind the scenes, will go a long way in preventing spam and self-dealing on the platform going forward. We're also adding unintrusive captchas at key points in the user journey to prevent automated spam.
+Unfortunately, just like any public bounty platform, Drips Wave is not immune to spam and bad actors. We believe that the new application & applicant-per-org limits, together with a significant amount of tweaks behind the scenes, will go a long way in preventing spam and self-dealing on the platform going forward. We're also adding unobtrusive captchas at key points in the user journey to prevent automated spam.
 
 Lastly, toward the end of the first Wave, we added the ability to report bad actors and rule-breaking issues. We encourage everyone to continue flagging any suspicious or inappropriate behavior.
 
