@@ -28,6 +28,8 @@
 
   .content {
     max-width: 80rem;
+    width: 100%;
+    min-width: 0;
   }
 
   @media (max-width: 577px) {

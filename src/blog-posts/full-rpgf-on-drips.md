@@ -6,6 +6,8 @@ coverImageAlt: 'Diagram illustrating the complete RetroPGF round lifecycle manag
 excerpt: 'Coming soon: a full suite of tools to run RetroPGF rounds on Drips, from application intake and voting to direct-to-GitHub distribution and amplified impact through Drip Lists.'
 author: 'jason'
 announcementBannerCopy: 'Coming Soon: Run your entire RetroPGF round on Drips, from start to finish'
+categories:
+  - product
 ---
 
 # Taking RetroPGF to the next level: A seamless, end-to-end solution
@@ -28,7 +30,7 @@ First impressions matter. Drips will enable you to set up and launch your round 
   - Rich round descriptions with Markdown support.
   - Collaborate with multiple admins to manage and adjust round settings.
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-home.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-home.png" alt="Screenshot of an RPGF round on Drips" />
 
 ## 2. Application intake: simplified and secure
 
@@ -39,7 +41,7 @@ Attracting the right applicants is crucial. We're making the application process
   - Projects can easily apply by selecting an existing project claimed on Drips.
   - All applications are attested on-chain, ensuring transparency and security.
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-application-form.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-application-form.png" alt="Screenshot of an RPGF round on Drips" />
 
 ## 3. Application review: Efficient and transparent
 
@@ -49,7 +51,7 @@ Managing a high volume of applications can be daunting. Drips will provide intui
   - Easily approve or reject applications in bulk during the review period.
   - Approved applications are automatically made public on the round profile, keeping the community informed.
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-applications.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-applications.png" alt="Screenshot of an RPGF round on Drips" />
 
 ## 4. Voting: Empowering badgeholders
 
@@ -60,7 +62,7 @@ The heart of any RPGF round is the voting process. We're designing an **easy-to-
   - Intuitive interface for allocating votes.
   - Designed for a smooth and accessible voting experience.
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-voting.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-voting.png" alt="Screenshot of an RPGF round on Drips" />
 
 ## 5. Results: clear, comprehensive insights
 
@@ -83,7 +85,7 @@ The final step is getting funds to the deserving projects. Drips makes this uniq
 
 This new end-to-end RPGF tooling is built on the core Drips philosophy: **funding is a catalyst, not just an endpoint.** By enabling distributions directly to projects on Drips, recipients can effortlessly share a portion of their funding with their own dependencies. This creates a virtuous cycle, ensuring that support flows deeper into the ecosystem, strengthening the often-unsung foundations that all projects rely on.
 
-![Screenshot of an RPGF round on Drips](/assets/blog-images/rpgf/rpgf-splitting-graph.png)
+<img data-no-border src="/assets/blog-images/rpgf/rpgf-splitting-graph.png" alt="Screenshot of an RPGF round on Drips" />
 
 # Coming soon: Revolutionize your RetroPGF rounds
 

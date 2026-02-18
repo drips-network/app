@@ -6,6 +6,8 @@ coverImageAlt: 'Drips for Privacy illustration'
 excerpt: 'Supporting the future of privacy with Drips and Web3Privacy Now.'
 author: 'becca'
 announcementBannerCopy: 'Introducing Drips for Privacy: Supporting the future of privacy with Drips and Web3Privacy Now'
+categories:
+  - ecosystem
 ---
 
 Drips and [Web3Privacy Now](https://web3privacy.info/) are teaming up to launch [Drips for Privacy](https://drips.network/privacyproof24), a campaign dedicated to supporting the winners of the [2024 Privacy Proof Awards](https://awards.web3privacy.info/).
