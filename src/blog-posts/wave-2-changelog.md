@@ -77,9 +77,11 @@ We look forward to enhancing the application review experience with additional m
 
 ## Battling Spam and Bad Actors
 
-Unfortunately, just like any public bounty platform, Drips Wave is not immune to spam and bad actors. We believe that the new application & applicant-per-org limits, together with a significant amount of tweaks behind the scenes, will go a long way in preventing spam and self-dealing on the platform going forward. We're also adding unobtrusive captchas at key points in the user journey to prevent automated spam.
+Like any public bounty platform, Drips Wave isn't immune to bad actors - but we aren’t sitting idle. To protect the integrity of the ecosystem, we’re rolling out several safeguards for Stellar Wave 2.
 
-Lastly, toward the end of the first Wave, we added the ability to report bad actors and rule-breaking issues. We encourage everyone to continue flagging any suspicious or inappropriate behavior.
+Our new application and applicant-per-org limits, combined with significant under-the-hood measures, are designed to curb spam and prevent self-dealing. We’ve also integrated unobtrusive captchas at key points in the user journey to block automated bots without slowing down real contributors.
+
+Finally, we’re leaning on the reporting tools introduced during the tail end of the first Wave. If you see suspicious behavior or rule-breaking issues, flag them. We’re committed to keeping this competition fair and rewarding for those doing the real work.
 
 # Looking ahead
 
