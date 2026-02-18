@@ -85,6 +85,6 @@ Finally, we’re leaning on the reporting tools introduced during the tail end o
 
 # Looking ahead
 
-These are just some of the many improvements we're making for Stellar Wave 2, and we already have a long list of ideas in the pipeline for the future. We can't wait to share more of these with you in the coming months, and as always, we welcome your feedback and suggestions. You can always share your thoughts in our [Discord server](https://discord.gg/t8XBXZAEs5) in the "feature-requests" channel.
+These are just some of the many improvements we're making for Stellar Wave 2, and we already have a long list of ideas in the pipeline for the future. We can't wait to share more of these with you in the coming months, and as always, we welcome your feedback and suggestions. You can share your thoughts in our [Discord server](https://discord.gg/t8XBXZAEs5) in the "feature-requests" channel anytime.
 
 Stellar Wave 2 **launches on February 19th**. If you haven't already, be sure to opt in to the [newsletter](/wave/newsletter), check out our [Discord](https://discord.gg/t8XBXZAEs5), and join us in building a more vibrant open-source ecosystem together!
