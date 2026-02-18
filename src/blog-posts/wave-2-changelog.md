@@ -77,16 +77,12 @@ We look forward to enhancing the application review experience with additional m
 
 ## Battling Spam and Bad Actors
 
-Unfortunately, just like any public bounty platform, Drips Wave is not immune to spam and bad actors. In addition to a number of measures taken behind-the-scenes, you may see a quick phone verification checkpoint appear at critical points in the user journey. We're very mindful of privacy; we'll never store phone numbers, or use them for any purpose other than user verification.
-
-We're also adding unintrusive captchas at key points in the user journey to prevent automated spam.
-
-We believe that these measures, especially when combined with the new application limits, will help dampen any spam or self-dealing.
+Unfortunately, just like any public bounty platform, Drips Wave is not immune to spam and bad actors. We believe that the new application & applicant-per-org limits, together with a signifant amount of tweaks behind the scenes, will go a long way in preventing spam and self-dealing on the platform going forward We're also adding unintrusive captchas at key points in the user journey to prevent automated spam.
 
 Lastly, later during the first Wave, we already added the ability to report bad actors and rule-breaking issues in the first Wave. We encourage everyone to continue flagging any suspicious or inappropriate behavior.
 
 # Looking ahead
 
-These are just some of the many improvements we're making for the second Wave, and we already have a long list of additional improvements and ideas in the pipeline for the future. We can't wait to share more of these with you in the coming months, and as always, we welcome your feedback and ideas. Please share any ideas you have in our [Discord server](https://discord.gg/t8XBXZAEs5) in the "feature-requests" channel.
+These are just some of the many improvements we're making for the second Wave, and we already have a long list of ideas in the pipeline for the future. We can't wait to share more of these with you in the coming months, and as always, we welcome your feedback and suggestions. You can always share your thoughts in our [Discord server](https://discord.gg/t8XBXZAEs5) in the "feature-requests" channel.
 
-The second Wave for the Stellar ecosystem **launches on February 19th**, and we're already gearing up for an even bigger and better Wave than the first. If you haven't already, be sure to [sign up for Drips Wave](/wave/stellar), opt in to the [newsletter](/wave/newsletter) and join us in building a more vibrant open-source ecosystem together!
+The second Wave for the Stellar ecosystem **launches on February 19th**. If you haven't already, be sure to opt in to the [newsletter](/wave/newsletter), check out our [Discord](https://discord.gg/t8XBXZAEs5), and join us in building a more vibrant open-source ecosystem together!
