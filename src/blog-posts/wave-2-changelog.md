@@ -55,7 +55,9 @@ This is why we added new Org Profiles, which display contact information from th
 
 <video src="/assets/blog-videos/wave-2-changelog/org-browsing.mp4" autoplay loop muted playsinline></video>
 
-Everyone can now also link their Discord account to their Drips Wave profiles by typing `/link` anywhere on our [Discord server](https://discord.gg/t8XBXZAEs5) – and linked Discord handles appear directly on Wave profiles.
+Everyone can now also **link their Discord account to their Drips Wave profile**. Click [here](/wave/link-discord), or type `/link` anywhere on our [Discord server](https://discord.gg/t8XBXZAEs5), to get started.
+
+When you link your Discord account, you receive **automatic Maintainer and / or Contributor roles** based on your activity, and your Wave profile displays a badge with your Discord username. For project maintainers, our bot will also create a **private channel for your org** – your new direct line of contact with the Drips team.
 
 ## Easier PR-to-Issue Linking
 
