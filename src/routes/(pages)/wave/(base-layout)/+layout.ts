@@ -12,7 +12,12 @@ export const load = async ({ parent, fetch, depends }) => {
           await getIssues(
             fetch,
             { limit: 1 },
-            { isInWaveProgram: true, appliedToByUser: user.id, state: 'open' },
+            {
+              isInWaveProgram: true,
+              appliedToByUser: user.id,
+              appliedToByUserCurrentWave: true,
+              state: 'open',
+            },
           )
         ).pagination.total
       : null,
