@@ -14,27 +14,28 @@
         href="https://www.drips.network/app"
         target="_blank"
         rel="noopener noreferrer">https://www.drips.network/app</a
-      >, and other *.drips.network/app instances, hereinafter "<strong>Drips Web App</strong>") as
-      well as other Drips websites (such as
+      >,
+      <a href="https://www.drips.network/wave" target="_blank" rel="noopener noreferrer"
+        >https://www.drips.network/wave</a
+      >
+      and other *.drips.network/app instances, hereinafter "<strong>Drips Web App</strong>") as well
+      as other Drips websites (such as
       <a href="https://www.drips.network/" target="_blank" rel="noopener noreferrer"
         >https://www.drips.network/</a
       >, and any other *.drips.network domains, excluding the Drips Web App, hereinafter the "<strong
         >Drips Website</strong
-      >"; collectively with Drips Web App referred to as the "<strong>Drips Services</strong>"),
-      Public Goods Association (hereinafter the "Association" or "we") takes the protection of
-      personal data very seriously. We treat personal data confidentially, in accordance with the
-      statutory data protection regulations and on the basis of this privacy policy. The legal bases
-      can be found particularly in the General Data Protection Regulation (GDPR), the
-      Telecommunications Digital Services Data Protection Act (TDDDG) and the Federal Data
-      Protection Act (BDSG).
+      >"; collectively with Drips Web App referred to as the "<strong>Drips Services</strong>"), the
+      Public Goods Association (hereinafter the "<strong>Association</strong>" or "<strong
+        >we</strong
+      >") takes the protection of personal data very seriously. We treat personal data
+      confidentially, in accordance with the statutory data protection regulations and on the basis
+      of this privacy policy. This privacy policy is aligned with the EU General Data Protection
+      Regulation (GDPR), the Telecommunications Digital Services Data Protection Act (TDDDG) and the
+      Swiss Federal Data Protection Act (FDAP). However, the application of these laws depends on
+      each individual case. Where reference is made to provisions of the GDPR, the corresponding
+      provisions of the FADP shall apply analogously, if applicable. For the sake of readability,
+      separate references are omitted.
     </p>
-    <p>The following services are available:</p>
-    <ul>
-      <li>Visit of the Drips Services (Drips Website or Drips Web App)</li>
-      <li>Use of the 'Get In Touch form'</li>
-      <li>Use of the Drips Web App functions</li>
-      <li>Use of Drips Wave</li>
-    </ul>
     <p>
       When you use Drips Services, various personal data is processed depending on the type and
       scope of use. Personal data is information relating to an identified or identifiable natural
@@ -80,9 +81,9 @@
       For the purpose of the technical provision of the Drips Services, it is necessary for us to
       process certain information automatically transmitted by your browser so that the Drips
       Services can be displayed in your browser and you can use the Drips Services. This information
-      (the "Access Data") is automatically collected by our host (see below section 5.3), each time
-      you visit the Drips Services and automatically stored in so-called server log files. These
-      are:
+      (the "<strong>Access Data</strong>") is automatically collected by our host (see below section
+      6.3), each time you visit the Drips Services and automatically stored in so-called server log
+      files. These are:
     </p>
     <ul>
       <li>Browser type and browser version</li>
@@ -94,7 +95,7 @@
     </ul>
     <p>
       The processing of the aforementioned Access Data is necessary for technical reasons in order
-      to provide a functional website and to ensure system security. This also applies to the
+      to provide functional Drips Services and to ensure system security. This also applies to the
       processing of your IP address, which is necessary and, under further conditions, can at least
       theoretically enable an assignment to your person. In addition to the aforementioned purposes,
       we use server log files exclusively for the needs-based design and optimization of the Drips
@@ -105,69 +106,143 @@
       Art. 6 (1) sentence 1 lit. f GDPR serves as the legal basis for the temporary storage of
       Access Data. Where enabled, this includes routing traffic through Cloudflare (edge reverse
       proxy/CDN and web application firewall). In this context, and acting as our processor (see
-      section 5.3), Cloudflare necessarily processes Access Data (including your IP address and
-      request-related system and routing metadata) to deliver the Drips Services, mitigate attacks,
-      and ensure availability and performance. Our legitimate interest here is to be able to provide
-      you with a technically functioning and user-friendly website and to ensure the security of our
-      systems as well as optimizing our services.
+      below section 6.3), Cloudflare necessarily processes Access Data (including your IP address
+      and request-related system and routing metadata) to deliver the Drips Services, mitigate
+      attacks, and ensure availability and performance. Our legitimate interest here is to be able
+      to provide you with a technically functioning and user-friendly Drips Services and to ensure
+      the security of our systems as well as optimizing our Drips Services.
     </p>
     <p>
-      Your IP address will be stored on Railway’s server for a maximum of 30 days for IT security
+      Your IP address will be stored on Railway's server for a maximum of 30 days for IT security
       purposes. Additionally, pseudonymized usage statistics derived from access logs, such as hit
-      rates or visitor counts over time, are evaluated in Grafana dashboards. These statistics are
-      non-identifiable and do not permit any conclusions about individual users. As such, they are
-      not considered personal data and are retained only as long as necessary to improve and
+      rates or visitor counts over time, are evaluated in Grafana Faro dashboards. These statistics
+      are non-identifiable and do not permit any conclusions about individual users. As such, they
+      are not considered personal data and are retained only as long as necessary to improve and
       optimize the Drips Services.
     </p>
     <p>
-      The storage period and deletion of your Access Data are further governed by Section 7 of this
+      The storage period and deletion of your Access Data are further governed by section 8 of this
       privacy policy.
     </p>
 
     <h3>Use of cookies and similar functions/technologies</h3>
     <p>
-      We use cookies and similar technologies on the Drips Services. Our service providers Railway
-      and Cloudflare (see also below section 5.3) do not set cookies.
+      We do set our own so-called cookies and similar technologies (hereinafter "<strong
+        >cookies</strong
+      >") on the Drips Services.
     </p>
     <p>
-      <strong>Drips Wave App:</strong> Specifically when using the Drips Wave application, the following
-      categories of cookies and similar technologies are processed:
+      Cookies are small text files that are stored on your computer and saved by your browser. A
+      cookie contains a characteristic string of characters that enables your browser to be uniquely
+      identified when you browse on or return to the Drips Services. The cookies we use can be
+      categorized into different types based on their purpose and necessity. Strictly necessary
+      cookies are essential to operate the Drips Services and cannot be disabled. They enable basic
+      functions such as security, network management, and accessibility. Functional cookies enable
+      enhanced functionality and personalization, such as remembering your preferences or enabling
+      support features you have requested, and are strictly necessary to deliver these requested
+      features. Performance cookies help us understand how visitors interact with the Drips Services
+      by collecting and reporting information anonymously or in pseudonymized form.
     </p>
-    <ul>
-      <li>
-        <strong>Authentication:</strong> A strictly necessary cookie that enables user login and session
-        management. This cookie is set only on the Drips Wave website and is required to authenticate
-        your requests after a login.
-      </li>
-      <li>
-        <strong>Intercom Support Chat:</strong> This cookie enables the Intercom chat widget to
-        provide user support and assistance. It is used to identify you as a returning user and to
-        store your chat history with our support team. <em>Important:</em> Even if initially disabled
-        in your preferences, Intercom cookies will be set when you later explicitly open the chat widget.
-      </li>
-      <li>
-        <strong>In-App Notifications:</strong> This cookie enables the In-App Notifications system powered
-        by Noti-Fire Apps Ltd. ("Novu") to manage and display real-time notifications, an integral part
-        of the Drips Wave experience. Notification system cookies are set only when you log in with an
-        account.
-      </li>
-      <li>
-        <strong>Faro Monitoring (Grafana):</strong> Grafana Faro helps us track errors and performance
-        issues on the website to improve your experience. It collects data about how you interact with
-        our site, but does not collect personal information. It uses cookie-like technologies to understand
-        user sessions.
-      </li>
-    </ul>
     <p>
-      You can manage your preferences regarding these non-essential cookies directly within the
-      Drips Wave settings.
+      Our service provider Railway does not set cookies (see also below section 6.3). However, our
+      service providers Grafana Faro (see also below section 3.2 and 6.3) and Cloudflare (see also
+      below section 6.3) may set strictly necessary cookies required to provide security and
+      availability. These cookies are essential to operate the Drips Services, are based on our
+      legitimate interest in ensuring the former purposes (Art. 6 (1) sentence 1 lit. f GDPR in
+      conjunction with Section 25 (2) no. 2 TDDDG or an equivalent national implementation of Art.
+      5(3) of the ePrivacy Directive), and do not track users across sites (for storage period and
+      expiry see section 8).
     </p>
     <p>
       Please note that when using the embedded Get In Touch form via Notion (see below section 3.3),
-      that provider may set its own cookies under its sole responsibility. Cookies are small text
-      files that are stored on your computer and saved by your browser. A cookie contains a
-      characteristic string of characters that enables your browser to be uniquely identified when
-      you return to the Drips Services.
+      that provider may set its own cookies under its sole responsibility.
+    </p>
+
+    <p>
+      <strong>Additional cookies used on the Drips Website when using Drips Wave</strong>
+    </p>
+    <p>
+      When you use Drips Wave (see also below section 3.5), additional cookies may be set to enable
+      specific functionality related to the bounty cycle tool. These include:
+    </p>
+    <ul>
+      <li>
+        <strong>Authentication cookies</strong>: A set of strictly necessary cookies (refresh &amp;
+        access tokens), set and only read by Drips Wave system, that enable user login and session
+        management. Authentication cookies are set if and only when you actively log in to Drips
+        Wave. It is not set during your initial visit or while browsing Drips Wave without being
+        logged in. Once set, the cookies are read by our systems to authenticate all your requests
+        during your session, with the refresh token cookie specifically used to keep you logged in
+        for up to 30 days. These cookies are essential for you to perform any authenticated actions
+        on Drips Wave (such as submitting applications, managing funding flows, or participating in
+        bounty cycles) and cannot be disabled. Without these cookies, the application cannot
+        function after login.
+        <p>
+          The legal basis for the authentication cookie is Art. 6 (1) sentence 1 lit. f GDPR in
+          conjunction with Section 25 (2) no. 2 TDDDG (or an equivalent national implementation of
+          Art. 5(3) of the ePrivacy Directive). Our legitimate interest is to provide secure access
+          to Drips Wave and to ensure the integrity of user sessions.
+        </p>
+      </li>
+      <li>
+        <strong>Intercom cookies</strong>: These cookies enable the Intercom chat widget, and other
+        Intercom functionality such as User Research Surveys, on the Drips Wave website to provide
+        user support and assistance. They are used to identify you as a returning user, to store
+        your chat history with our support team, and to enable our support team to see your
+        navigation on the page leading up to a support request and to provide real-time messaging
+        (for example, if you previously contacted our support team and we respond while you are
+        using Drips Wave, the response appears on screen).
+        <p>
+          Intercom cookies are set when you express your wish to use the chat widget functionality,
+          which can occur in the following ways: (i) by selecting 'Accept all' in the cookie banner,
+          indicating your wish to use the chat widget across Drips Wave (ii) by explicitly enabling
+          the Intercom Support Chat Widget cookie in the 'Configure' settings and confirming your
+          choice by clicking 'Apply settings', or (iii) by actively opening the chat widget (or
+          explicitly requesting to open a User Research Survey) during your session, even if you
+          previously rejected this feature. In all three cases, Intercom Cookies are strictly
+          necessary to provide the functionality you have expressly requested at the time of
+          performing one of these actions and cannot function without it.
+        </p>
+        <p>
+          The legal basis for Intercom cookies is Art. 6 (1) sentence 1 lit. f GDPR in conjunction
+          with Section 25 (2) no. 2 TDDDG (or an equivalent national implementation of Art. 5(3) of
+          the ePrivacy Directive). Our legitimate interest is to provide the support chat
+          functionality you have expressly requested, and the cookie is strictly necessary to
+          deliver this service. You can revoke your service request at any time by adjusting your
+          cookie preferences in the settings. The revocation does not affect the lawfulness of
+          processing based on your service request before its revocation.
+        </p>
+      </li>
+      <li>
+        <strong>Grafana Faro Monitoring cookie</strong>: Grafana Faro helps us track errors and
+        performance issues on our website to improve your experience. It collects data about how you
+        interact with our website in anonymized or pseudonymized form. Grafana Faro uses cookie-like
+        technologies to understand user sessions and to enable us to optimize the performance,
+        stability and user experience of Drips Wave. The Grafana Faro Monitoring cookie is only set
+        if you select 'Accept all' in the cookie banner or if you explicitly enable Grafana Faro
+        Monitoring in the 'Configure' settings and confirm your choice by clicking 'Apply settings'.
+        If you reject or disable Grafana Faro Monitoring in the settings, this cookie will not be
+        set at all.
+        <p>
+          The legal basis for the Grafana Faro Monitoring cookie is Art. 6 (1) sentence 1 lit. a
+          GDPR in conjunction with Section 25 (1) TDDDG (or an equivalent national implementation of
+          Art. 5(3) of the ePrivacy Directive) (your consent). You can withdraw your consent at any
+          time by adjusting your cookie preferences in the settings. The withdrawal of consent does
+          not affect the lawfulness of processing based on consent before its withdrawal. Note:
+          After disabling this cookie, you may need to refresh the page to fully disable Grafana
+          Faro Monitoring.
+        </p>
+      </li>
+    </ul>
+    <p>
+      You can change your cookie preferences at any time through the 'Settings' option available on
+      the Drips Wave app. Please note that revoking your request for the support chat widget will
+      affect the respective functionality.
+    </p>
+    <p>
+      For storage period and expiry see section 8. For further information on cookies set by
+      third-party service providers Intercom and Grafana Faro, please refer to section 6.3
+      (recipients) and/or their respective privacy policies.
     </p>
 
     <h3>Get In Touch form</h3>
@@ -197,8 +272,8 @@
       tailor our response more effectively.
     </p>
     <p>
-      Please note that the processing of your data via Notion’s infrastructure is also subject to
-      Notion’s own Privacy Policy and Cookie Policy, which are available on their website. We only
+      Please note that the processing of your data via Notion's infrastructure is also subject to
+      Notion's own Privacy Policy and Cookie Policy, which are available on their website. We only
       have control and process the data you actively submit through the form. Any additional data
       processing performed by Notion (e.g. via cookies or usage analytics on their platform) is
       outside of our control.
@@ -213,7 +288,7 @@
       communication has been completed, unless statutory retention obligations apply, the data is
       required for the establishment, exercise or defense of legal claims, or further inquiries can
       reasonably be expected. The storage period and deletion of your provided data in this regard
-      are further governed by Section 7 of this privacy policy.
+      are further governed by section 8 of this privacy policy.
     </p>
 
     <h3>Use of specific Drips Web App functions</h3>
@@ -229,8 +304,8 @@
       On the Drips Web App, you may connect a Web3 wallet (e.g. MetaMask or another
       WalletConnect-compatible wallet) to access and use protocol features such as funding
       open-source projects, receiving donations, managing programmable funding flows, or
-      participating in Retroactive Public Goods Funding rounds ("RPGF"). Connecting a wallet is
-      technically comparable to identifying yourself via your blockchain address.
+      participating in Retroactive Public Goods Funding rounds ("<strong>RPGF</strong>"). Connecting
+      a wallet is technically comparable to identifying yourself via your blockchain address.
     </p>
     <p>
       When connecting your wallet and interacting with the Drips Protocol, the following data may be
@@ -245,19 +320,19 @@
         Transaction metadata such as token type used, transaction amounts, timestamp and recipients
       </li>
       <li>Indicator whether you make a continuous or one-time donation</li>
-    </ul>
-    <p>
-      Additional data may be processed depending on the role-specific features you use, such as:
-    </p>
-    <ul>
       <li>
-        In the case of creating or managing Drip Lists: a list of GitHub repositories, wallet
-        addresses, or other Drip Lists, each with assigned percentage allocations
-      </li>
-      <li>In the case of receiving funds: verification of GitHub repository ownership</li>
-      <li>
-        In the case of RPGF rounds: configuration data, application fields, or vote allocations (for
-        full details, see Section 3.4b) below).
+        Additional data may be processed depending on the role-specific features you use, such as:
+        <ul>
+          <li>
+            In the case of creating or managing Drip Lists: a list of GitHub repositories, wallet
+            addresses, or other Drip Lists, each with assigned percentage allocations
+          </li>
+          <li>In the case of receiving funds: verification of GitHub repository ownership</li>
+          <li>
+            In the case of RPGF rounds: configuration data, application fields, or vote allocations
+            (for full details, see section 3.4b) below).
+          </li>
+        </ul>
       </li>
     </ul>
     <p>
@@ -276,10 +351,10 @@
     </p>
     <p>
       To improve performance and ensure availability, publicly available protocol data may
-      additionally be indexed and mirrored by the Public Goods Association in a read-only database
-      (hosted by a third-party infrastructure provider) to enable faster retrieval in the Drips Web
-      App. This processing is carried out on the basis of our legitimate interest in providing a
-      performant service (Art. 6 (1) sentence 1 lit. f GDPR
+      additionally be indexed and mirrored by the Association in a read-only database (hosted by a
+      third-party infrastructure provider) to enable faster retrieval in the Drips Web App. This
+      processing is carried out on the basis of our legitimate interest in providing a performant
+      service (Art. 6 (1) sentence 1 lit. f GDPR
     </p>
     <p>
       We do not store or process any personal data beyond what is technically required to enable
@@ -326,7 +401,7 @@
       networks, proof of project ownership (e.g. by committing a verification file to the relevant
       GitHub repository), and application form data (as defined by the round admin). Fields marked
       'private' are stored off-chain, are visible only to round admins and designated platform
-      maintainers, and may be deleted once the round concludes (see Section 7). Fields not marked as
+      maintainers, and may be deleted once the round concludes (see section 8). Fields not marked as
       private are attested on-chain via the Ethereum Attestation Service and become publicly visible
       after approval; they are therefore immutable.
     </p>
@@ -338,7 +413,7 @@
       platform maintainers and is not made public.
     </p>
     <p>
-      Deletion of off-chain data follows Section 7; however, public on-chain or IPFS data is due to
+      Deletion of off-chain data follows section 8; however, public on-chain or IPFS data is due to
       its nature immutable.
     </p>
 
@@ -373,10 +448,25 @@
       right to object.
     </p>
 
+    <h3>Safety or Security Reasons / Risk Management</h3>
+    <p>
+      We process your data to protect our IT and other infrastructure. For example, we process data
+      for monitoring, analysis and testing of our networks and IT infrastructures including access
+      controls. Further, we process your data as part of our risk management and corporate
+      government in order to protect us from criminal or abusive activity.
+    </p>
+    <p>
+      We process your personal data to protect our legitimate interests in accordance with Art. 6
+      (1) sentence 1 lit. f GDPR. Our legitimate interest is to keep our IT and other infrastructure
+      safe and safe as well as to protect us and our infrastructure from criminal or abusive
+      activities.
+    </p>
+
     <h3>Compliance with legal regulations</h3>
     <p>
       We also process your personal data in order to fulfill legal obligations that may apply to us
-      in connection with our business activities. These include, in particular, retention periods
+      in connection with our business activities. These include, in particular, to combat money
+      laundering and terrorist financing (KYC), to fulfil tax obligations and retention periods
       under commercial, trade or tax law.
     </p>
     <p>
@@ -396,6 +486,24 @@
       (1) sentence 1 lit. f GDPR (legal basis), insofar as we assert legal claims or defend
       ourselves in legal disputes or we prevent or investigate criminal offenses (legitimate
       interest).
+    </p>
+  </section>
+
+  <section>
+    <h2>General Information regarding On-Chain Data</h2>
+    <p>
+      When you use blockchains, you acknowledge that your wallet address and other data/information
+      provided by your transactions, which are considered personal data if relating to an identified
+      or identifiable natural person, are permanently and publicly stored on-chain, which means such
+      data is publicly available to anyone. Neither we, nor any third party, has any power to delete
+      such data published by its users to the blockchain. If you want to ensure that your privacy
+      rights are not affected in any way, you should not transact on blockchains as certain rights
+      may not be available or exercisable by you or us due to the technological infrastructure of
+      the blockchain.
+    </p>
+    <p>
+      You hereby release and indemnify us of any liability associated with data that you transferred
+      to the blockchain.
     </p>
   </section>
 
@@ -442,7 +550,8 @@
       </li>
       <li>
         Raintank Inc., dba Grafana Labs, 165 Broadway, 23rd Floor, New York, NY 10006, USA,
-        certified under the Data Privacy Framework, for pseudonymised telemetry dashboards.
+        certified under the Data Privacy Framework, for pseudonymised telemetry dashboards and
+        performance monitoring (Grafana Faro).
       </li>
       <li>
         Notion Labs, Inc., 548 Market St 74567, San Francisco, CA 94104, USA, certified under the
@@ -481,15 +590,17 @@
     <h2>Data transfer to third countries</h2>
     <p>
       If necessary for our purposes, we may also transfer your data to recipients outside the
-      European Economic Area ("Third Countries"). This is particularly the case in the context of
-      contract processing or due to legal regulations.
+      European Economic Area or Switzerland ("<strong>Third Countries</strong>"). This is
+      particularly the case in the context of contract processing or due to legal regulations, or if
+      such transfer is based on your explicit consent or subject to safeguards that assure the
+      protection of your data.
     </p>
     <p>
       We only transfer your data to recipients in Third Countries in accordance with the provisions
       of Chapter 5 of the GDPR, i.e. if it is ensured that the European Commission has adopted an
-      adequacy decision pursuant to Art. 45 (1) GDPR, or appropriate safeguards within the meaning
-      of Art. 46 (2) and (3) GDPR have been implemented, or a derogation pursuant to Art. 49 GDPR
-      applies.
+      adequacy decision pursuant to Art. 45 (1) GDPR / the Federal Council has recognized a States'
+      adequate level of data protection, or appropriate safeguards within the meaning of Art. 46 (2)
+      and (3) GDPR have been implemented, or a derogation pursuant to Art. 49 GDPR applies.
     </p>
     <p>
       We use the EU Commission's standard contractual clauses for the transfer of personal data to
@@ -497,7 +608,8 @@
         href="https://ec.europa.eu/info/sites/default/files/1_de_annexe_acte_autonome_cp_part1_v3.pdf"
         target="_blank"
         rel="noopener noreferrer">SCC</a
-      >) to ensure an appropriate level of protection for the recipient of the data.
+      >) to ensure an appropriate level of protection for the recipient of the data (adjusted
+      according to Swiss law, if applicable and required).
     </p>
     <p>
       You have the option of accessing the SCC via the <a
@@ -529,7 +641,7 @@
       period includes the period until the processing purposes pursued are achieved. Where enabled,
       Cloudflare retains Access Data (as defined in section 3.1) and strictly-necessary cookies only
       for the periods necessary to provide the security, availability, and performance of the Drips
-      Services, as further described in Cloudflare’s
+      Services, as further described in Cloudflare's
       <a
         href="https://www.cloudflare.com/de-de/privacypolicy/"
         target="_blank"
@@ -540,7 +652,8 @@
         href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/"
         target="_blank"
         rel="noopener noreferrer">cookie documentation</a
-      >.
+      >. Within those interests, Drips Services may use Cloudflare Turnstile services to protect its
+      platforms against automated spam.
     </p>
     <p>
       If the processing is based on your consent, the processing period covers the period from the
@@ -564,6 +677,31 @@
         annual review to determine whether the purpose still exists.
       </li>
       <li>Preservation of evidence, taking into account the statute of limitations.</li>
+      <li>
+        Storage period for cookies used on Drips Wave: The cookies used on Drips Wave (as described
+        in section 3.2) are stored for the following periods:
+        <ul>
+          <li>
+            <strong>Authentication cookies</strong>: These cookies are stored for the duration of
+            your session and expire automatically when you log out or after at least 30 days of
+            inactivity.
+          </li>
+          <li>
+            <strong>Intercom Support Chat Widget cookie</strong>: This cookie is stored for the
+            duration of your session plus 30 days thereafter to maintain your chat history and
+            enable continuous support. You can revoke your service request at any time through the
+            cookie settings, after which any Intercom cookies will no longer be accessed.
+          </li>
+          <li>
+            <strong>Grafana Faro Monitoring cookie</strong>: Fully anonymous telemetry &amp; session
+            data collected via Grafana Faro is aggregated and the results stored for up to 6 months.
+            You can withdraw your consent at any time through the cookie settings, after which no
+            further data will be collected. You may need to refresh the page to fully stop
+            monitoring.
+          </li>
+        </ul>
+      </li>
+      <li>For cookies set by Cloudflare, see section 8.3.</li>
     </ul>
   </section>
 
@@ -628,6 +766,20 @@
 
   <section>
     <h2>Rights of data subjects</h2>
+    <p>
+      In connection with our processing of your data, you have various rights under applicable data
+      protection law. Please note that we reserve the right to enforce legal restrictions, if
+      necessary, e.g. if we are obliged to store or process certain data, have an overriding
+      interest (insofar as we can invoke such interests) or need the data to assert claims. If the
+      exercise of certain rights involves costs for you, we will inform you in advance. We have
+      already referred to the possibility of withdrawing consent above. It is important to note that
+      exercising these rights may conflict with your contractual obligations and could result in
+      consequences such as early termination of the contract or associated costs. Should this occur,
+      we will inform you in advance, unless this has already been contractually agreed. In addition,
+      please note that we may need to verify your identity in order to prevent misuse, e.g. by means
+      of a copy of your ID card or passport, unless identification is otherwise possible.
+    </p>
+
     <h3>Right to information</h3>
     <p>
       You have the right to obtain from us confirmation as to whether or not personal data
@@ -642,10 +794,10 @@
 
     <h3>Right to rectification</h3>
     <p>
-      Right to rectification: You have the right to obtain from us without undue delay the
-      rectification of personal data concerning you if it is inaccurate. Taking into account the
-      purposes of the processing, you have the right to have incomplete personal data concerning you
-      completed, including by means of providing a supplementary statement.
+      You have the right to obtain from us without undue delay the rectification of personal data
+      concerning you if it is inaccurate. Taking into account the purposes of the processing, you
+      have the right to have incomplete personal data concerning you completed, including by means
+      of providing a supplementary statement.
     </p>
 
     <h3>Right to erasure</h3>
@@ -685,7 +837,7 @@
       Without prejudice to any other administrative or judicial remedy, you have the right to lodge
       a complaint with a supervisory authority, in particular in the Member State of your habitual
       residence, place of work or place of the alleged infringement if you consider that the
-      processing of personal data relating to you infringes the GDPR.
+      processing of personal data relating to you infringes the applicable law.
     </p>
   </section>
 
