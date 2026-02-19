@@ -19,6 +19,9 @@
 
   let { data } = $props();
 
+  // TODO: Set to `false` to re-enable applications once the pause is lifted.
+  const APPLICATIONS_PAUSED = true;
+
   let applicationText = $state('');
   let turnstileToken = $state<string | undefined>(undefined);
 
@@ -80,7 +83,19 @@
     <IssuePreviewCard issue={data.issue} />
   </FormField>
 
-  {#if data.alreadyApplied}
+  {#if APPLICATIONS_PAUSED}
+    <AnnotationBox type="warning">
+      <span class="typo-text-small-bold">Applications are temporarily paused.</span>
+      Due to extremely high activity and GitHub API slowdowns, we've temporarily paused new applications.
+      Please check back soon — we're working on resolving this as quickly as possible.
+
+      {#snippet actions()}
+        <Button icon={Discord} href="https://discord.gg/t8XBXZAEs5" target="_blank"
+          >Join our Discord for updates</Button
+        >
+      {/snippet}
+    </AnnotationBox>
+  {:else if data.alreadyApplied}
     <AnnotationBox>
       You already applied to this issue. First withdraw your previous application if you want to
       re-apply.
@@ -205,7 +220,7 @@
   {/snippet}
 
   {#snippet actions()}
-    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
+    {#if !APPLICATIONS_PAUSED && waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
       <Button
         loading={submitting}
         variant="primary"
