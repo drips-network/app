@@ -24,6 +24,7 @@ export const issueFilters = filterSchema(
     isInWaveProgram: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
     appliedToByUser: z.uuid().optional(),
+    appliedToByUserCurrentWave: booleanString.optional(),
     resolvedByUserId: z.uuid().optional(),
     eligibleForWaveProgram: booleanString.optional(),
     hasApplications: booleanString.optional(),

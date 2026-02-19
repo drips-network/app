@@ -6,6 +6,7 @@ export const load = (context) =>
     preappliedFilters: {
       isInWaveProgram: true,
       appliedToByUser: user?.id,
+      appliedToByUserCurrentWave: true,
     },
     defaultFilters: {},
     pathPrefix: '/wave/contributors/issues/',
