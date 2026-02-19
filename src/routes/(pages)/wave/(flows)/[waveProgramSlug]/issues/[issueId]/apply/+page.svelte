@@ -81,10 +81,7 @@
   </FormField>
 
   {#if data.alreadyApplied}
-    <AnnotationBox>
-      You already applied to this issue. First withdraw your previous application if you want to
-      re-apply.
-    </AnnotationBox>
+    <AnnotationBox>You already previously applied to this issue.</AnnotationBox>
   {:else if data.isOwnIssue}
     <AnnotationBox>
       You cannot apply to work on an issue in a repository you maintain. Please choose issues from
