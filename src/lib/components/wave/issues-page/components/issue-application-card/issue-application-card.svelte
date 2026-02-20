@@ -72,7 +72,7 @@
       {#if application.applicant.currentWaveAssignmentCount != null}
         <div class="metric">
           <div class="label typo-text-small" style:color="var(--color-foreground-level-6)">
-            Current assignments
+            Assignments this Wave
           </div>
           <div class="value typo-text-small-bold">
             {application.applicant.currentWaveAssignmentCount}

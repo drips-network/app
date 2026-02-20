@@ -21,12 +21,12 @@
     { label: 'OSS Activity Score (highest first)', key: 'oss_composite', direction: 'desc' },
     { label: 'OSS Activity Score (lowest first)', key: 'oss_composite', direction: 'asc' },
     {
-      label: 'Current Assignments (fewest first)',
+      label: 'Assignments this Wave (fewest first)',
       key: 'currentWaveAssignmentCount',
       direction: 'asc',
     },
     {
-      label: 'Current Assignments (most first)',
+      label: 'Assignments this Wave (most first)',
       key: 'currentWaveAssignmentCount',
       direction: 'desc',
     },
