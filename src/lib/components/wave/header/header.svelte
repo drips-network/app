@@ -13,6 +13,7 @@
   import Nav from '../nav/nav.svelte';
   import UserMenu from './components/user-menu.svelte';
   import Hamburger from '$lib/components/icons/Hamburger.svelte';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import { page } from '$app/state';
   import Github from '$lib/components/icons/Github.svelte';
 
@@ -121,9 +122,16 @@
 
     {#if user}
       {#if !hidePoints}
-        <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
-          {pointsBalance ?? 0}
-        </Button>
+        <Tooltip>
+          <Button href="/wave/points" variant="caution" size="small" icon={Trophy}>
+            {pointsBalance ?? 0}
+          </Button>
+          {#snippet tooltip_content()}
+            <p class="typo-text-small">
+              Points earned in current waves. Resets when a new wave starts.
+            </p>
+          {/snippet}
+        </Tooltip>
       {/if}
 
       <Flyout

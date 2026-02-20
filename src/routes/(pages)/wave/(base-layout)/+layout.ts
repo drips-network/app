@@ -24,7 +24,7 @@ export const load = async ({ parent, fetch, depends }) => {
   ]);
 
   return {
-    pointsBalance: user ? await getOwnPointsBalance(fetch) : null,
+    pointsBalance: user ? await getOwnPointsBalance(fetch, { scope: 'current-waves' }) : null,
     counts: {
       contributorIssuesCount,
     },
