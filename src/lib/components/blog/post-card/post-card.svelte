@@ -71,8 +71,11 @@
       {/if}
       <p class="metadata" style:color="var(--color-foreground-level-5)">
         {#if categories?.length}
-          <a class="category-badge" href="/blog/{categories[0]}"
-            >{BLOG_CATEGORY_LABELS[categories[0]]}</a
+          <svelte:element
+            this={link ? 'span' : 'a'}
+            class="category-badge"
+            href={link ? undefined : `/blog/${categories[0]}`}
+            >{BLOG_CATEGORY_LABELS[categories[0]]}</svelte:element
           >
           <span>•</span>
         {/if}
