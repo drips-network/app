@@ -255,8 +255,7 @@
     </FormField>
   {:else if data.reason === 'not-completed'}
     <AnnotationBox type="warning">
-      This issue hasn't been completed yet, so a review cannot be submitted at this time. Please
-      wait until the issue is resolved.
+      This issue hasn't been closed as completed yet, so a review cannot be submitted at this time.
     </AnnotationBox>
   {:else if data.reason === 'deadline-passed'}
     <AnnotationBox type="warning">
