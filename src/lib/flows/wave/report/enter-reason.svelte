@@ -52,10 +52,8 @@
 </script>
 
 <StandaloneFlowStepLayout
-  headline="Report {targetType === 'user' ? 'user' : 'issue'}"
-  description="Why are you reporting this {targetType === 'user'
-    ? 'user'
-    : 'issue'}? Please explain in detail."
+  headline="Report {targetType}"
+  description="Why are you reporting this {targetType}? Please explain in detail."
 >
   <div class="fields">
     <FormField

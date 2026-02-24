@@ -5,8 +5,14 @@
   import Star from '$lib/components/icons/Star.svelte';
   import UserAvatar from '$lib/components/user-avatar/user-avatar.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
+  import Flag from '$lib/components/icons/Flag.svelte';
+  import Tooltip from '$lib/components/tooltip/tooltip.svelte';
+  import modal from '$lib/stores/modal';
+  import Stepper from '$lib/components/stepper/stepper.svelte';
+  import reportFlow from '$lib/flows/wave/report/report-flow';
   import type { WaveProgramRepoWithDetailsDto } from '$lib/utils/wave/types/waveProgram';
   import type { Snippet } from 'svelte';
+  import { page } from '$app/state';
 
   interface Props {
     repoWithDetails: WaveProgramRepoWithDetailsDto;
@@ -67,15 +73,30 @@
         {@render actions()}
       {/if}
 
-      <div class="repo-stats">
-        <span class="stat">
-          <Star style="width: 1rem; height: 1rem;" />
-          {repo.stargazersCount?.toString() ?? '0'}
-        </span>
-        <span class="stat">
-          <Fork style="width: 1rem; height: 1rem;" />
-          {repo.forksCount?.toString() ?? '0'}
-        </span>
+      <div class="right-side">
+        <div class="repo-stats">
+          <span class="stat">
+            <Star style="width: 1rem; height: 1rem;" />
+            {repo.stargazersCount?.toString() ?? '0'}
+          </span>
+          <span class="stat">
+            <Fork style="width: 1rem; height: 1rem;" />
+            {repo.forksCount?.toString() ?? '0'}
+          </span>
+        </div>
+        {#if page.data.user}
+          <Tooltip>
+            <button
+              class="report-button"
+              onclick={() => modal.show(Stepper, undefined, reportFlow('repo', repo.id))}
+            >
+              <Flag style="width: 1rem; height: 1rem;" />
+            </button>
+            {#snippet tooltip_content()}
+              <span class="typo-text-small">Report repo</span>
+            {/snippet}
+          </Tooltip>
+        {/if}
       </div>
     </div>
   </div>
@@ -123,9 +144,36 @@
     gap: 0.75rem;
   }
 
+  .right-side {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+  }
+
   .repo-stats {
     display: flex;
     gap: 0.75rem;
+  }
+
+  .report-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-foreground-level-1);
+    border: none;
+    border-radius: 50%;
+    padding: 0.375rem;
+    cursor: pointer;
+    color: var(--color-foreground-level-4);
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .report-button:hover {
+    color: var(--color-foreground-level-5);
+    background: var(--color-foreground-level-2);
   }
 
   .stat {
