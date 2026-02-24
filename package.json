@@ -28,6 +28,7 @@
     "build": "npm run gql:build && npm run build:app && npm run build:telemetry"
   },
   "devDependencies": {
+    "@gelatocloud/gasless": "^0.0.12",
     "@grafana/faro-rollup-plugin": "^0.5.1",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
@@ -87,7 +88,6 @@
     "@efstajas/svelte-stored-writable": "^1.0.0",
     "@efstajas/versioned-parser": "^0.1.4",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
-    "@gelatonetwork/relay-sdk": "^5.5.6",
     "@grafana/faro-web-sdk": "^1.18.1",
     "@grafana/faro-web-tracing": "^1.18.1",
     "@intercom/messenger-js-sdk": "^0.0.18",
