@@ -15,6 +15,15 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('managePoints')
+      ? [
+          {
+            name: 'Adjust Points',
+            description: 'Add or deduct points from user accounts.',
+            href: '/wave/admin/adjust-points',
+          },
+        ]
+      : []),
   ]);
 </script>
 

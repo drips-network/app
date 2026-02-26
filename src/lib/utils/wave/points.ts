@@ -21,6 +21,21 @@ export async function getPointsBalanceForUser(f = fetch, userId: string) {
   });
 }
 
+export async function adjustPoints(
+  f = fetch,
+  {
+    userId,
+    points,
+    reason,
+    waveId,
+  }: { userId: string; points: number; reason: string; waveId: string },
+) {
+  return authenticatedCall(f, '/api/points/adjust', {
+    method: 'POST',
+    body: JSON.stringify({ userId, points, reason, waveId }),
+  });
+}
+
 export async function getOwnPointsHistory(f = fetch, pagination?: PaginationInput) {
   return parseRes(
     paginatedResponseSchema(pointsLedgerEntryDtoSchema),
