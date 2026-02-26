@@ -5,7 +5,7 @@
 
   // Sort splits by highest percentage first, with groups at the bottom always.
   const sortList = (list: Splits) =>
-    list.sort((a, b) => {
+    [...list].sort((a, b) => {
       if (a.__typename === 'SplitGroup' && b.__typename === 'SplitGroup') return 0;
       if (a.__typename === 'SplitGroup') return 1;
       if (b.__typename === 'SplitGroup') return -1;
@@ -56,7 +56,7 @@
 </script>
 
 <ul class="splits-list" class:group={isGroup}>
-  {#each sortedList as listItem, index}
+  {#each sortedList as listItem, index (index)}
     <li class="split">
       <SplitComponent
         groupExpanded={startExpanded}
