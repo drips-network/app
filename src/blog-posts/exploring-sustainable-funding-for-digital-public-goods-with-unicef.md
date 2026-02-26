@@ -5,6 +5,7 @@ coverImage: '/assets/blog-images/unicef-drips.jpg'
 coverImageAlt: 'UNICEF and Drips exploring sustainable funding for digital public goods'
 excerpt: 'The UNICEF Office of Innovation is using Drips as part of a pilot focused on new sustainable funding solutions for digital public goods.'
 author: 'becca'
+announcementBannerCopy: 'UNICEF Partners with Drips to Explore Funding for Digital Public Goods'
 categories:
   - ecosystem
 ---
