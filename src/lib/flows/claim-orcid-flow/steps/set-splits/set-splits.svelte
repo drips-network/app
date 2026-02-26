@@ -76,18 +76,17 @@
           const res = await fetch(`/api/gasless/track/${$context.gaslessOwnerUpdateTaskId}`);
           if (!res.ok) throw new Error('Failed to track gasless owner update task');
 
-          const { task } = await res.json();
-          assert(typeof task === 'object', 'Invalid task');
-          const { taskState } = task;
-          assert(typeof taskState === 'string', 'Invalid task state');
+          const { status } = await res.json();
+          assert(typeof status === 'string', 'Invalid task status');
 
-          return taskState;
+          return status;
         },
-        (taskState) => {
-          switch (taskState) {
-            case 'ExecSuccess':
+        (status) => {
+          switch (status) {
+            case 'success':
               return true;
-            case 'Cancelled':
+            case 'rejected':
+            case 'reverted':
               throw new Error(
                 'Failed to gaslessly update the repository owner on-chain. There may be a temporary issue with our Transaction Relay provider. Please try again later.',
               );

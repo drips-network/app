@@ -74,7 +74,7 @@
     >
       <TextArea
         bind:value={reason}
-        placeholder="Please describe what you're reporting and why..."
+        placeholder="Please describe why you're reporting this..."
         onblur={() => (reasonFocussed = true)}
       />
       <div class="char-count">

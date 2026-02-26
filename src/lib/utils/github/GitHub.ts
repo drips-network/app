@@ -86,7 +86,9 @@ export default class GitHub {
         throw new Error('GitHub API rate limit exceeded. Please wait about an hour and try again.');
       }
 
-      throw new Error('FUNDING.json not found.');
+      throw new Error(
+        'FUNDING.json not found. If you just added it, please wait a little and try again.',
+      );
     }
 
     try {

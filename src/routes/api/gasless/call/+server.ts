@@ -3,19 +3,12 @@ import { ethers, verifyTypedData, type ContractTransaction } from 'ethers';
 import { z } from 'zod';
 import { callerAbi } from '$lib/utils/sdk/caller/caller-abi.js';
 import { Signature } from 'ethers';
-import { GelatoRelay, type SponsoredCallRequest } from '@gelatonetwork/relay-sdk';
 import { error } from '@sveltejs/kit';
-import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
 import { JsonRpcProvider } from 'ethers';
 import easAbi from '$lib/utils/rpgf/eas-abi.js';
 import assert from '$lib/utils/assert';
-
-const GELATO_API_KEY = getOptionalEnvVar(
-  'GELATO_API_KEY',
-  true,
-  "Gasless transactions won't work." +
-    "This means that claiming a project won't and collecting funds (on networks supporting gasless TXs and with gasless TXs enabled in settings) won't work.",
-);
+import { relayer } from '../gelato.js';
+import assert0xString from '$lib/utils/assert0x.js';
 
 const provider = new JsonRpcProvider(network.rpcUrl);
 const caller = new ethers.Contract(network.contracts.CALLER, callerAbi, provider);
@@ -23,8 +16,6 @@ const eas =
   network.retroFunding.enabled && network.retroFunding.attestationConfig.enabled
     ? new ethers.Contract(network.retroFunding.attestationConfig.easAddress, easAbi, provider)
     : null;
-
-const relay = new GelatoRelay();
 
 const callerPayloadSchema = z.object({
   sender: z.string(),
@@ -127,8 +118,8 @@ function verifyCallerSignature(
 }
 
 export const POST = async ({ request }) => {
-  if (!GELATO_API_KEY) {
-    return error(500, '{ "error": "GELATO_API_KEY is required for gasless transactions" }');
+  if (!relayer) {
+    return error(503, 'Gelato Relayer client not initialized');
   }
   if (!network.gaslessTransactions) {
     return error(400, '{ "error": "Gasless actions are not supported on this network" }');
@@ -214,19 +205,20 @@ export const POST = async ({ request }) => {
       return error(400, `{ "error": "Unsupported contract: ${contractName}" }`);
   }
 
-  const relayRequest: SponsoredCallRequest = {
-    chainId: BigInt(network.chainId),
-    target: tx.to,
-    data: tx.data,
-  };
+  assert0xString(tx.to);
+  assert0xString(tx.data);
 
   try {
-    const relayResponse = await relay.sponsoredCall(relayRequest, GELATO_API_KEY);
+    const taskId = await relayer.sendTransaction({
+      chainId: network.chainId,
+      to: tx.to,
+      data: tx.data,
+    });
 
     // eslint-disable-next-line no-console
-    console.log('GASLESS_ACTION_RELAY_RESPONSE', payload, relayResponse);
+    console.log('GASLESS_ACTION_RELAY_RESPONSE', payload, taskId);
 
-    return new Response(JSON.stringify(relayResponse));
+    return new Response(JSON.stringify({ taskId }));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
