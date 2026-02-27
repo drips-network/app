@@ -26,6 +26,34 @@ const STREAMS: {
     endsAt: 1743724802000,
     amtPerSec: '24459452160493827160493827',
   },
+  // 3rd Filecoin RPGF-2 donation https://filecoin.drips.network/app/86382911892378321897623368375970699842258681527/tokens/0x60e1773636cf5e4a227d9ac24f20feca034ee25a/streams/3533042676
+  {
+    token: { address: '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A' },
+    started: 1748354040000,
+    endsAt: 1750946155000,
+    amtPerSec: '3665088734567901234567901',
+  },
+  // 4th Filecoin RPGF-2 donation https://filecoin.drips.network/app/86382911892378321897623368375970699842258681527/tokens/0x60e1773636cf5e4a227d9ac24f20feca034ee25a/streams/3533042676
+  {
+    token: { address: '0x60E1773636CF5E4A227d9AC24F20fEca034ee25A' },
+    started: 1741981710000,
+    endsAt: 1744586340000,
+    amtPerSec: '9497827932098765432098765',
+  },
+  // 1st Filecoin RPGF-3 donation  https://filecoin.drips.network/app/1158658559599233597766518707654552688696677954357/tokens/0x60e1773636cf5e4a227d9ac24f20feca034ee25a/streams/2567101526
+  {
+    token: { address: '0x60e1773636cf5e4a227d9ac24f20feca034ee25a' },
+    started: 1767805140000,
+    endsAt: 1770397140000,
+    amtPerSec: '131954582947530864000000000',
+  },
+  // 2nd Filecoin RPGF-3 donation https://filecoin.drips.network/app/1158658559599233597766518707654552688696677954357/tokens/0x60e1773636cf5e4a227d9ac24f20feca034ee25a/streams/47657516
+  {
+    token: { address: '0x60e1773636cf5e4a227d9ac24f20feca034ee25a' },
+    started: 1770408000000,
+    endsAt: 1773000000000,
+    amtPerSec: '60806349498456790123456790',
+  },
 ];
 
 const GIVES = [
