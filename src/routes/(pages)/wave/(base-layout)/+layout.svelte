@@ -16,6 +16,7 @@
   import Wave from '$lib/components/icons/Wave.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import Shield from '$lib/components/icons/Shield.svelte';
+  import ChartBar from '$lib/components/icons/ChartBar.svelte';
 
   let {
     data,
@@ -110,6 +111,12 @@
             name: 'Reward Grants',
             href: '/wave/rewards',
             icon: Wallet,
+          },
+          {
+            type: 'target' as const,
+            name: 'My Stats',
+            href: '/wave/stats/me',
+            icon: ChartBar,
           },
           {
             type: 'target' as const,
