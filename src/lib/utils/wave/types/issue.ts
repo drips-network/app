@@ -60,6 +60,7 @@ export const issueDetailsDtoSchema = z.object({
   points: z.number().int().nullable(),
   pointsMultiplier: z.number().int().optional(),
   pointsEarned: z.number().int().nullable().optional(),
+  completedAt: z.coerce.date().nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
   resolvedInWave: waveDtoSchema.nullable(),

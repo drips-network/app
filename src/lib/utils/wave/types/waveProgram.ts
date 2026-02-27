@@ -194,6 +194,7 @@ export const waveProgramIssueWithDetailsDtoSchema = z.object({
   id: z.uuid(),
   addedAt: z.coerce.date(),
   removedAt: z.coerce.date().nullable(),
+  completedAt: z.coerce.date().nullable(),
   pointsMultiplier: z.number().int().optional(),
   issue: z.object({
     id: z.uuid(),

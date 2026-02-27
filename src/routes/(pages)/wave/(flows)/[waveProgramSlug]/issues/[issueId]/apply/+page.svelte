@@ -87,6 +87,10 @@
       You cannot apply to work on an issue in a repository you maintain. Please choose issues from
       other repositories.
     </AnnotationBox>
+  {:else if data.issue.completedAt}
+    <AnnotationBox>
+      This issue has already been marked as completed and cannot currently be applied to.
+    </AnnotationBox>
   {:else if data.issue.assignedApplicant}
     <AnnotationBox>
       This issue is already assigned to @{data.issue.assignedApplicant.gitHubUsername} in the current
@@ -202,7 +206,7 @@
   {/snippet}
 
   {#snippet actions()}
-    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
+    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.completedAt && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
       <Button
         loading={submitting}
         variant="primary"
