@@ -67,7 +67,7 @@
 
   .tabs {
     position: sticky;
-    top: 3.5rem;
+    top: 2.5rem;
     width: 100%;
     background-color: var(--color-background);
     z-index: 2;
