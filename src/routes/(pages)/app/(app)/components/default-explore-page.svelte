@@ -130,7 +130,7 @@
       {#if typeof tlv === 'number'}
         <div class="value-wrapper">
           <div class="header">
-            <h5>Total value on Drips</h5>
+            <h5>Current value on Drips</h5>
             <div class="explorer-icons">
               {#each enabledNetworks as network (network.id)}
                 <a
