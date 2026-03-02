@@ -3,7 +3,7 @@ import z from 'zod';
 export const linkedAccountSchema = z.object({
   provider: z.string(),
   providerUsername: z.string(),
-  providerDisplayName: z.string(),
+  providerDisplayName: z.string().nullable(),
   providerAvatarUrl: z.string().nullable(),
   linkedAt: z.string(),
 });
