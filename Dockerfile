@@ -105,8 +105,8 @@ RUN npm ci --ignore-scripts --include=dev;
 # Copy the rest of the application's code into the container
 COPY . .
 
-# Make ./scripts/install-twemoji-assets.sh executable
-RUN chmod +x ./scripts/install-twemoji-assets.sh
+# Make entire ./scripts folder executable
+RUN chmod +x ./scripts/*
 
 RUN npm run postinstall
 
