@@ -10,10 +10,13 @@ import {
   waveFiltersSchema,
   waveProgramDtoSchema,
   waveProgramIssueWithDetailsDtoSchema,
+  waveProgramOrgDtoSchema,
+  waveProgramOrgsFiltersSchema,
   waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
   type Complexity,
   type WaveFilters,
+  type WaveProgramOrgsFilters,
   type WaveProgramReposFilters,
 } from './types/waveProgram';
 
@@ -73,6 +76,21 @@ export async function getWaveProgramRepos(
     await authenticatedCall(
       f,
       `/api/wave-programs/${waveProgramId}/repos?${toPaginationParams(pagination)}&${toFilterParams(waveProgramReposFiltersSchema, filters)}`,
+    ),
+  );
+}
+
+export async function getWaveProgramOrgs(
+  f = fetch,
+  waveProgramId: string,
+  pagination: PaginationInput = {},
+  filters: WaveProgramOrgsFilters = {},
+) {
+  return parseRes(
+    paginatedResponseSchema(waveProgramOrgDtoSchema),
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/orgs?${toPaginationParams(pagination)}&${toFilterParams(waveProgramOrgsFiltersSchema, filters)}`,
     ),
   );
 }
@@ -214,6 +232,38 @@ export async function moderatorRemoveIssueFromWave(
     {
       method: 'DELETE',
       body: JSON.stringify({
+        reason,
+      }),
+    },
+  );
+}
+
+export async function moderatorGetQuotaExclusion(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+): Promise<{ excluded: boolean }> {
+  const res = await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/quota-exclusion`,
+  );
+  return res.json();
+}
+
+export async function moderatorExcludeFromQuota(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  excluded: boolean,
+  reason: string,
+) {
+  return await authenticatedCall(
+    f,
+    `/api/moderation/wave-programs/${waveProgramId}/issues/${issueId}/quota-exclusion`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        excluded,
         reason,
       }),
     },

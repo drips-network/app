@@ -7,6 +7,7 @@ import {
   type IssueSortByOption,
 } from './types/issue';
 import {
+  applicationQuotaDtoSchema,
   issueApplicationFiltersSchema,
   issueApplicationWithDetailsDtoSchema,
   type IssueApplicationFilters,
@@ -58,11 +59,29 @@ export async function getIssueApplications(
   );
 }
 
+export async function getApplicationQuota(f = fetch, waveProgramId: string) {
+  return parseRes(
+    applicationQuotaDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/quotas/applications`),
+  );
+}
+
+export async function getOrgAssignmentQuota(f = fetch, waveProgramId: string, orgId: string) {
+  return parseRes(
+    applicationQuotaDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/quotas/same-contributor/${orgId}`,
+    ),
+  );
+}
+
 export async function applyToWorkOnIssue(
   f = fetch,
   waveProgramId: string,
   issueId: string,
   applicationText: string,
+  turnstileToken?: string,
 ) {
   return parseRes(
     issueApplicationWithDetailsDtoSchema,
@@ -74,6 +93,7 @@ export async function applyToWorkOnIssue(
         body: JSON.stringify({
           applicationText,
         }),
+        headers: turnstileToken ? { 'x-turnstile-token': turnstileToken } : {},
       },
     ),
   );

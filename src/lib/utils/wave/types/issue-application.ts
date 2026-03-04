@@ -46,11 +46,19 @@ export const issueApplicationWithDetailsDtoSchema = z.object({
     currentWaveAssignmentCount: z.number().int().min(0).nullable(),
     currentWavePointsEarned: z.number().int().min(0).nullable(),
     currentWaveIssuesResolved: z.number().int().min(0).nullable(),
+    currentWaveSameOrgQuotaRemaining: z.number().int().min(0).nullable(),
   }),
   removedBy: waveUserDtoSchema.nullable(),
   reviewedBy: waveUserDtoSchema.nullable(),
 });
 export type IssueApplicationWithDetailsDto = z.infer<typeof issueApplicationWithDetailsDtoSchema>;
+
+export const applicationQuotaDtoSchema = z.object({
+  used: z.number().int().min(0),
+  limit: z.number().int().min(0),
+  remaining: z.number().int().min(0),
+});
+export type ApplicationQuotaDto = z.infer<typeof applicationQuotaDtoSchema>;
 
 export const issueApplicationFiltersSchema = filterSchema(
   z.object({

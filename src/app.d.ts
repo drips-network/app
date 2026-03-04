@@ -1,3 +1,20 @@
+interface TurnstileOptions {
+  sitekey: string;
+  callback?: (token: string) => void;
+  'expired-callback'?: () => void;
+  'error-callback'?: () => void;
+}
+
+interface Turnstile {
+  render: (container: HTMLElement, options: TurnstileOptions) => string;
+  reset: (widgetId: string) => void;
+  remove: (widgetId: string) => void;
+}
+
+declare interface Window {
+  turnstile: Turnstile;
+}
+
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 // and what to do when importing types

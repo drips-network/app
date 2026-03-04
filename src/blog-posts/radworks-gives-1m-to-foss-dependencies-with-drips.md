@@ -5,9 +5,11 @@ coverImage: '/assets/blog-images/radworks-announcement.jpeg'
 coverImageAlt: 'Radworks announcement image'
 excerpt: Radworks becomes the first project to utilize Drips to support open source builders at scale.
 author: 'becca'
+categories:
+  - ecosystem
 ---
 
-**We’re thrilled to announce that Radworks is now [streaming](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514) $1 million to 30 of its critical software dependencies.**
+**We're thrilled to announce that Radworks is now [streaming](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514) $1 million to 30 of its critical software dependencies.**
 
 This is a watershed moment for Radworks in its journey to build a freer internet. We believe that by actively supporting dependencies, we can enhance the resilience and sustainability of the free and open source ecosystem as a whole.
 
@@ -21,13 +23,13 @@ In September 2023, the Radworks community voted to stream $1 million from the tr
 
 These funds went directly to support Radworks' dependencies - the critical software packages, tools, and infrastructure that its products are dependent on.
 
-![xkcd.com/2347 compared to Drips' splitting graph](/assets/blog-images/dependency-comic.png)
+<img data-no-border src="/assets/blog-images/dependency-comic.png" alt="xkcd.com/2347 compared to Drips' splitting graph" />
 
 For those less familiar, dependencies are the libraries, frameworks, packages, etc. that all modern software relies on to function. Virtually all developers lean heavily on free & open source components that are created by other people on the Internet. And they’re often maintained by under-funded skeleton crews or builders burning the midnight oil. That is, until Drips.
 
 Radworks set up four Drip Lists - a [master list](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514), and 3 nested lists - one for each of its constituent orgs - Radicle, Drips and Grants. They split the $1 million in total funds between those three lists, with 45% going to [Radicle’s list](https://www.drips.network/app/drip-lists/34625983682950977210847096367816372822461201185275535522726531049130), 45% to [Drips’ list](https://www.drips.network/app/drip-lists/48495160997488293670723292622742268320163565037397170198477469637178) and 10% to [Grants’ list](https://www.drips.network/app/drip-lists/32993835193273751671076155179370862074156612583830856606728028834762). In total, there are 30 individual software dependencies, of which 15 are from Drips, 11 are Radicle dependencies, and 4 are from Grants.
 
-![Radworks', Drips', Radicle's and Grant's Drip Lists](/assets/blog-images/radworks-lists.png)
+<img data-no-border src="/assets/blog-images/radworks-lists.png" alt="Radworks', Drips', Radicle's and Grant's Drip Lists" />
 
 We’d love to highlight a couple of the amazing projects Radworks is proud to support: **ethers.js**, **Protocol Guild**, and **libgit2**.
 
@@ -59,7 +61,7 @@ As we see it, software developers are hugely dependent on each other — or _int
 
 A million years ago (in March 2017) we wrote the [oscoin manifesto](http://oscoin.io/), where we highlighted a core problem with the internet that, tbh, hasn’t improved much:
 
-![The original oscoin manifesto](/assets/blog-images/oscoin-manifesto.png)
+<img data-no-border src="/assets/blog-images/oscoin-manifesto.png" alt="The original oscoin manifesto" />
 
 It was clear to us then -- and it’s very clear to us now -- that the mainstream view does not acknowledge the _interdependency_ of all software, and that new structures & new technologies are needed to directly support the communities and open source we rely on for our success.
 

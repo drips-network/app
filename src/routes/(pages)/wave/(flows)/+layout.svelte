@@ -129,6 +129,7 @@
     .content {
       border-radius: none;
       box-shadow: none;
+      padding: 0.5rem;
     }
   }
 </style>

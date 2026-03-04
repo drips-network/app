@@ -36,6 +36,12 @@ export async function requestTestTransaction(
   });
 }
 
+export async function cancelWithdrawal(f = fetch, grantId: string) {
+  return await authenticatedCall(f, `/api/grants/${grantId}/cancel-withdrawal`, {
+    method: 'POST',
+  });
+}
+
 export async function requestWithdrawal(
   f = fetch,
   grantId: string,

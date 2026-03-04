@@ -1,11 +1,13 @@
 <script lang="ts">
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Orgs from '$lib/components/icons/Orgs.svelte';
+  import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
   import Section from '$lib/components/section/section.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import Stepper from '$lib/components/stepper/stepper.svelte';
+  import StatusBadge from '$lib/components/status-badge/status-badge.svelte';
   import GrantStatusBadge from '$lib/components/wave/rewards/grant-status-badge.svelte';
   import testTransactionFlow from '$lib/flows/wave/test-transaction/test-transaction-flow';
   import withdrawalFlow from '$lib/flows/wave/withdrawal/withdrawal-flow';
@@ -109,7 +111,23 @@
               >{grant.waveProgramName} Wave {grant.waveNumber}</span
             >
             <GrantStatusBadge status={grant.status} expired={isExpired(grant)} size="small" />
+            {#if grant.isOrgGrant}
+              <StatusBadge size="small" color="primary" icon={Orgs}>
+                <span
+                  style="display: inline-flex; align-items: center; gap: 0.25rem;"
+                  title="This grant is issued to your organization and can be withdrawn by anyone within the org."
+                >
+                  Org grant
+                  <InfoCircle
+                    style="width: 1rem; height: 1rem; fill: currentColor; cursor: help;"
+                  />
+                </span>
+              </StatusBadge>
+            {/if}
           </div>
+          {#if grant.description}
+            <p class="grant-description typo-text-small">{grant.description}</p>
+          {/if}
           <div class="grant-amount">
             <span class="amount tnum">${grant.initialAmountUSD.toLocaleString()}</span>
             <span class="currency">USD</span>
@@ -200,11 +218,15 @@
   .grant-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .program-name {
     color: var(--color-foreground);
+  }
+
+  .grant-description {
+    color: var(--color-foreground-level-5);
   }
 
   .grant-amount {

@@ -37,9 +37,7 @@
   }
 </script>
 
-<HeadMeta title="Identity & Payments | Settings | Wave" />
-
-<h5>Payments and rewards</h5>
+<HeadMeta title="Profile | Settings | Wave" />
 
 <Setting
   title="Identity Verification"
@@ -98,9 +96,6 @@
   {/if}
 </Setting>
 
-<Divider />
-<h5>Profile</h5>
-
 <Setting
   title="Email address"
   subtitle="To change this, update your primary email address on GitHub, then log out and back into Drips Wave."
@@ -109,7 +104,7 @@
 </Setting>
 
 <Divider />
-<h5>Connected Accounts</h5>
+<h5>Linked accounts</h5>
 
 <Setting
   title="Discord"

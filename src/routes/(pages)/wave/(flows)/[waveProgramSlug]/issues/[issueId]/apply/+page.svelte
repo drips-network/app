@@ -15,12 +15,15 @@
   import formatDate from '$lib/utils/format-date';
   import Email from '$lib/components/icons/Email.svelte';
   import Discord from '$lib/components/icons/Discord.svelte';
+  import Turnstile from '$lib/components/turnstile/turnstile.svelte';
 
   let { data } = $props();
 
   let applicationText = $state('');
+  let turnstileToken = $state<string | undefined>(undefined);
 
-  let valid = $derived(applicationText.trim().length >= 10 && applicationText.length <= 2000);
+  let textValid = $derived(applicationText.trim().length >= 10 && applicationText.length <= 2000);
+  let valid = $derived(textValid && !!turnstileToken);
 
   let beenFocussed = $state(false);
 
@@ -33,27 +36,28 @@
 
   let submitting = $state(false);
   async function handleSubmit() {
-    submitting = true;
+    await doWithConfirmationModal(
+      'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
+      async () => {
+        submitting = true;
 
-    try {
-      await doWithConfirmationModal(
-        'Are you sure you want to submit this application? This will leave a comment on the GitHub issue in your name.',
-        async () => {
+        try {
           await doWithErrorModal(async () => {
             await applyToWorkOnIssue(
               undefined,
               data.waveProgram.id,
               data.issue.id,
               applicationText,
+              turnstileToken,
             );
 
             await goto(`/wave/${data.waveProgram.slug}/issues/${data.issue.id}/apply/success`);
           });
-        },
-      );
-    } finally {
-      submitting = false;
-    }
+        } finally {
+          submitting = false;
+        }
+      },
+    );
   }
 
   export const snapshot: Snapshot<string> = {
@@ -77,26 +81,68 @@
   </FormField>
 
   {#if data.alreadyApplied}
-    <AnnotationBox>
-      You already applied to this issue. First withdraw your previous application if you want to
-      re-apply.
-    </AnnotationBox>
+    <AnnotationBox>You already previously applied to this issue.</AnnotationBox>
   {:else if data.isOwnIssue}
     <AnnotationBox>
       You cannot apply to work on an issue in a repository you maintain. Please choose issues from
       other repositories.
+    </AnnotationBox>
+  {:else if data.issue.completedAt}
+    <AnnotationBox>
+      This issue has already been marked as completed and cannot currently be applied to.
     </AnnotationBox>
   {:else if data.issue.assignedApplicant}
     <AnnotationBox>
       This issue is already assigned to @{data.issue.assignedApplicant.gitHubUsername} in the current
       Wave. Please choose a different issue to apply to.
     </AnnotationBox>
+  {:else if waveProgramHasActiveWave && data.applicationQuota?.remaining === 0}
+    <AnnotationBox>
+      You have used all {data.applicationQuota?.limit} of your application {data.applicationQuota
+        ?.limit === 1
+        ? 'slot'
+        : 'slots'} in this Wave. Withdraw a pending application or wait for a decision before applying
+      to another issue.
+    </AnnotationBox>
+  {:else if waveProgramHasActiveWave && data.orgAssignmentQuota?.remaining === 0}
+    <AnnotationBox>
+      <span class="typo-text-small-bold"
+        >You have already been assigned {data.orgAssignmentQuota?.limit}
+        {data.orgAssignmentQuota?.limit === 1 ? 'issue' : 'issues'} from {data.issue.repo.org
+          .gitHubOrgLogin} in this Wave, which is the maximum allowed.</span
+      >
+      You can withdraw from a pending application to this organization if you'd like to apply to a different
+      issue.
+
+      {#snippet actions()}
+        <Button
+          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
+          target="_blank">Learn more</Button
+        >
+      {/snippet}
+    </AnnotationBox>
   {:else if waveProgramHasActiveWave}
+    <AnnotationBox type="info">
+      <span class="typo-text-small-bold"
+        >You have {data.applicationQuota?.remaining} of {data.applicationQuota?.limit} application {data
+          .applicationQuota?.limit === 1
+          ? 'slot'
+          : 'slots'} remaining in this Wave.</span
+      >
+      You can free up more slots by resolving assigned issues or withdrawing pending applications.
+
+      {#snippet actions()}
+        <Button
+          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
+          target="_blank">Learn more</Button
+        >
+      {/snippet}
+    </AnnotationBox>
     <FormField
       title="Application Text*"
       description="Explain why you'd like to work on this issue and list any relevant experience."
       type="div"
-      validationState={valid
+      validationState={textValid
         ? { type: 'valid' }
         : beenFocussed
           ? {
@@ -115,9 +161,18 @@
         onblur={() => (beenFocussed = true)}
       />
       <div class="char-count">
-        Markdown supported · <span class:too-long={tooLong} class="tnum"
+        Markdown supported · Min 10 chars · <span class:too-long={tooLong} class="tnum"
           >{applicationText.length} / 2.000</span
         >
+      </div>
+    </FormField>
+    <FormField
+      title="Verification*"
+      description="Confirm you're not a robot with a quick check."
+      type="div"
+    >
+      <div class="turnstile-wrapper">
+        <Turnstile ontoken={(t) => (turnstileToken = t)} />
       </div>
     </FormField>
   {:else}
@@ -151,7 +206,7 @@
   {/snippet}
 
   {#snippet actions()}
-    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.assignedApplicant}
+    {#if waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.completedAt && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
       <Button
         loading={submitting}
         variant="primary"
@@ -173,5 +228,10 @@
 
   .char-count .too-long {
     color: var(--color-negative);
+  }
+
+  .turnstile-wrapper {
+    display: flex;
+    justify-content: flex-start;
   }
 </style>

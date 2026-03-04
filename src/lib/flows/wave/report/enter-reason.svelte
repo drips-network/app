@@ -52,10 +52,8 @@
 </script>
 
 <StandaloneFlowStepLayout
-  headline="Report {targetType === 'user' ? 'user' : 'issue'}"
-  description="Why are you reporting this {targetType === 'user'
-    ? 'user'
-    : 'issue'}? Please explain in detail."
+  headline="Report {targetType}"
+  description="Why are you reporting this {targetType}? Please explain in detail."
 >
   <div class="fields">
     <FormField
@@ -76,7 +74,7 @@
     >
       <TextArea
         bind:value={reason}
-        placeholder="Please describe what you're reporting and why..."
+        placeholder="Please describe why you're reporting this..."
         onblur={() => (reasonFocussed = true)}
       />
       <div class="char-count">
