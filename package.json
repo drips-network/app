@@ -34,6 +34,9 @@
     "@graphql-codegen/schema-ast": "^4.1.0",
     "@graphql-codegen/typescript": "^4.0.7",
     "@graphql-codegen/typescript-operations": "^4.5.1",
+    "@lit-protocol/auth": "^8.2.3",
+    "@lit-protocol/lit-client": "^8.3.1",
+    "@lit-protocol/networks": "^8.4.1",
     "@playwright/test": "^1.56.1",
     "@rsksmart/mock-web3-provider": "^1.0.2-beta1",
     "@sveltejs/kit": "^2.48.4",
@@ -77,6 +80,7 @@
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.48.1",
     "typescript-svelte-plugin": "^0.3.50",
+    "viem": "^2.38.3",
     "vite": "^7.1.12",
     "vite-plugin-devtools-json": "^1.0.0",
     "vitest": "^4.0.6"
