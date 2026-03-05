@@ -69,7 +69,10 @@
     }
   });
 
+  let newLinkIsDuplicate = $derived(supportingLinks.includes(newLink.trim()));
+
   let newLinkIsValid = $derived.by(() => {
+    if (newLinkIsDuplicate) return false;
     try {
       const url = new URL(newLink.trim());
       return url.protocol === 'http:' || url.protocol === 'https:';
