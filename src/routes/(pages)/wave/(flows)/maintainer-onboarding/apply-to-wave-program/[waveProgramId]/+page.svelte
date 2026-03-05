@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
-  import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
+  import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
   import Card from '$lib/components/wave/card/card.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
-  import doBatchWithErrorModal from '$lib/utils/make-batch-call-with-error-modal';
-  import { applyRepoToWaveProgram } from '$lib/utils/wave/wavePrograms';
   import FlowStepWrapper from '../../../shared/flow-step-wrapper.svelte';
 
   let { data } = $props();
@@ -47,48 +45,26 @@
   );
 
   let selected = $state<string[]>([]);
-  let applying = $state(false);
 
-  async function handleApply() {
-    applying = true;
+  const STORAGE_KEY = `wave-apply-repos-${data.waveProgram.id}`;
 
-    const result = await doBatchWithErrorModal(
-      selected.map((repoId) => async () => {
-        try {
-          await applyRepoToWaveProgram(undefined, data.waveProgram.id, repoId);
-        } catch (e) {
-          return {
-            success: false,
-            errorMessage: `Failed to apply repo ID ${repoId} to wave: ${(e as Error).message}`,
-            error: e,
-          };
-        }
-
-        return {
-          success: true,
-        };
-      }),
-    );
-
-    applying = false;
-    selected = [];
-
-    if (result.some((res) => !res.success)) {
-      await invalidate('wave:maintainer-onboarding-apply-to-wave');
-      return;
-    } else {
-      goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}/success`);
-    }
+  function handleContinue() {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
+    goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}/form`);
   }
 </script>
 
 <FlowStepWrapper
   headline="Pick repos to apply"
-  description="Choose which repos you’d like to apply to the {data.waveProgram
-    .name} Wave Program. They must match the criteria set for the Wave Program in order to be eligible."
+  description="Choose which repos you'd like to apply to the {data.waveProgram.name} Wave Program."
 >
+  <AnnotationBox>
+    Please apply related repos (e.g. backend, frontend, contracts for the same product) together.
+    You'll answer a few questions about them in the next step.
+  </AnnotationBox>
+
   <Card style="padding: 0; text-align: left; width: 100%;">
-    <ListSelect multiselect {items} bind:selected />
+    <ListSelect multiselect maxSelected={10} {items} bind:selected />
   </Card>
 
   {#snippet leftActions()}
@@ -97,19 +73,12 @@
     >
   {/snippet}
 
-  <AnnotationBox type="info">
-    After you apply, we'll email you when your repos have been accepted into the {data.waveProgram
-      .name} Wave Program. You can always check on the status of your applications on the maintainer
-    dashboard.
-  </AnnotationBox>
-
   {#snippet actions()}
     <Button
       variant="primary"
       disabled={selected.length === 0}
-      icon={CheckCircle}
-      loading={applying}
-      onclick={handleApply}>Apply selected repos</Button
+      icon={ArrowRight}
+      onclick={handleContinue}>Continue</Button
     >
   {/snippet}
 </FlowStepWrapper>

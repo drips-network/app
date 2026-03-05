@@ -133,6 +133,48 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
+// ===========================
+// Batch Apply Types
+// ===========================
+
+export const previousParticipationSchema = z.enum([
+  'previous_wave',
+  'onlydust_stellar_missions',
+  'stellar_community_fund',
+  'stellar_hackathon',
+  'other_stellar_ecosystem_program',
+]);
+export type PreviousParticipation = z.infer<typeof previousParticipationSchema>;
+
+export const batchApplyFormDataSchema = z.object({
+  previousParticipation: z.array(previousParticipationSchema),
+  plannedIssuesDescription: z.string().min(1).max(5000),
+  repoRelationshipDescription: z.string().min(1).max(5000).optional(),
+  upstreamRelationshipDescription: z.string().min(1).max(5000).optional(),
+  forkJustification: z.string().min(1).max(5000).optional(),
+  supportingLinks: z.array(z.string()).optional(),
+});
+export type BatchApplyFormData = z.infer<typeof batchApplyFormDataSchema>;
+
+export const batchApplyRequestSchema = z.object({
+  orgRepoIds: z.array(z.uuid()).min(1).max(50),
+  formData: batchApplyFormDataSchema,
+});
+export type BatchApplyRequest = z.infer<typeof batchApplyRequestSchema>;
+
+export const batchApplyResponseSchema = z.object({
+  formAnswers: z.object({
+    id: z.uuid(),
+    waveProgramId: z.uuid(),
+    userId: z.uuid(),
+    formData: batchApplyFormDataSchema,
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+  }),
+  results: z.array(waveProgramRepoWithDetailsDtoSchema),
+});
+export type BatchApplyResponse = z.infer<typeof batchApplyResponseSchema>;
+
 export const waveProgramReposSortBySchema = z.enum(['stargazersCount', 'forksCount', 'issueCount']);
 export type WaveProgramReposSortBy = z.infer<typeof waveProgramReposSortBySchema>;
 
