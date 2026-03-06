@@ -121,8 +121,8 @@
 
     // Handle Enter/Space to select the currently focused item
     if (e.key === 'Enter' || e.key === ' ') {
-      // Ignore these if focus is on search bar
-      if (searchBarElem === focussedElem) {
+      // Only handle if focus is actually on an item within this component
+      if (!itemElemInFocus) {
         return;
       }
 
