@@ -24,7 +24,7 @@
   const STORAGE_KEY = `wave-apply-repos-${data.waveProgram.id}`;
 
   let repoIds = $state<string[]>([]);
-  let selectedRepos = $derived(data.ownRepos.data.filter((r) => repoIds.includes(r.id)));
+  let selectedRepos = $derived(data.ownRepos.filter((r) => repoIds.includes(r.id)));
 
   onMount(() => {
     const stored = sessionStorage.getItem(STORAGE_KEY);

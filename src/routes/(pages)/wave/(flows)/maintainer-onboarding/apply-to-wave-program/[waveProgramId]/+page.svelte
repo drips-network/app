@@ -22,7 +22,7 @@
 
   let items = $derived<Items>(
     Object.fromEntries(
-      data.ownRepos.data
+      data.ownRepos
         .sort((a, b) => a.gitHubRepoFullName.localeCompare(b.gitHubRepoFullName))
         .map((repo) => [
           repo.id,
