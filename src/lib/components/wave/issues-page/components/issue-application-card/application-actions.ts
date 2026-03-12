@@ -1,6 +1,7 @@
 import { invalidate } from '$app/navigation';
 import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
 import doWithErrorModal from '$lib/utils/do-with-error-modal';
+import modal from '$lib/stores/modal';
 import {
   acceptIssueApplication,
   getIssue,
@@ -10,6 +11,7 @@ import {
 import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
 import { notifyIssuesUpdated } from '../../issue-update-coordinator';
+import EditApplicationModal from './edit-application-modal.svelte';
 
 async function refetchIssue(issueId: string) {
   try {
@@ -63,6 +65,13 @@ export async function handleWithdrawApplication(
         await refetchIssue(issue.id);
       }),
   );
+}
+
+export function handleEditApplication(
+  issue: IssueDetailsDto,
+  application: IssueApplicationWithDetailsDto,
+) {
+  modal.show(EditApplicationModal, undefined, { issue, application });
 }
 
 export async function handleUnassignContributor(
