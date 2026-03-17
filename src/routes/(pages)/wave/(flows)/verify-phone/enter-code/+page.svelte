@@ -54,7 +54,7 @@
 
 <FlowStepWrapper
   headline="Enter verification code"
-  description="Please enter the verification code sent to {phoneNumber.formatInternational()}."
+  description="Please enter the verification code sent to {phoneNumber.formatInternational()} via SMS, Telegram, or WhatsApp."
 >
   <div class="pin-and-state">
     <div class="code-input" class:shake={wrongPin} class:disabled={verifying}>

@@ -111,7 +111,7 @@
 
     {#snippet actions()}
       <Button
-        href="https://docs.drips.network/wave/faq#why-do-i-need-to-verify-my-phone-number"
+        href="https://docs.drips.network/wave/contributors/faq#why-do-i-need-to-verify-my-phone-number"
         target="_blank"
         icon={ArrowBoxUpRight}
       >
@@ -172,7 +172,7 @@
 
   <FormField
     title="Mobile phone number*"
-    description="Please enter your mobile phone number, capable of receiving SMS messages."
+    description="Please enter your mobile phone number. The verification code may be sent via SMS, Telegram, or WhatsApp."
     disabled={selectedCountryCode === null}
   >
     <div class="tel-input">

@@ -200,3 +200,11 @@ export const confirmPhoneVerificationResponseSchema = z.object({
 export type ConfirmPhoneVerificationResponse = z.infer<
   typeof confirmPhoneVerificationResponseSchema
 >;
+
+export const phoneVerificationRequiredResponseSchema = z.object({
+  required: z.boolean(),
+  isVerified: z.boolean(),
+});
+export type PhoneVerificationRequiredResponse = z.infer<
+  typeof phoneVerificationRequiredResponseSchema
+>;

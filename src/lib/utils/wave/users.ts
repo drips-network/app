@@ -5,6 +5,9 @@ import {
   userCodeMetricsDtoSchema,
   userPublicOrgDtoSchema,
   phoneVerificationStatusResponseSchema,
+  phoneVerificationRequiredResponseSchema,
+  initiatePhoneVerificationResponseSchema,
+  confirmPhoneVerificationResponseSchema,
 } from './types/user';
 import { getAllPaginated } from './getAllPaginated';
 import parseRes from './utils/parse-res';
@@ -38,6 +41,13 @@ export async function getUserCodeMetrics(f = fetch, userId: string) {
     {
       expect404: true,
     },
+  );
+}
+
+export async function getPhoneVerificationRequired(f = fetch) {
+  return parseRes(
+    phoneVerificationRequiredResponseSchema,
+    await authenticatedCall(f, `/api/phone/verification-required`),
   );
 }
 
