@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
@@ -45,6 +46,12 @@
     description="Reject this application from {application.applicant
       .gitHubUsername}. The applicant will be notified, and their application quota will be freed up."
   >
+    <AnnotationBox type="info">
+      Applications usually don't need to be explicitly rejected. Once someone is assigned to an
+      issue, the application quota automatically frees up for all other applicants. Rejecting is
+      only useful if you want to avoid making contributors wait while their quota is blocked.
+    </AnnotationBox>
+
     {#snippet actions()}
       <Button variant="normal" disabled={loading} onclick={modal.hide}>Cancel</Button>
       <Button variant="destructive" icon={Cross} {loading} onclick={handleSubmit}>
