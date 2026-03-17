@@ -106,8 +106,7 @@
 >
   <AnnotationBox type="info">
     Verifying a phone number helps us prevent cheating and abuse on the Wave platform. Phone numbers
-    are used solely for account verification purposes, and we do not store them once successfully
-    processed.
+    are used solely for account verification purposes.
 
     {#snippet actions()}
       <Button
