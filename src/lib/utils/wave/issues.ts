@@ -168,6 +168,7 @@ export async function rejectIssueApplication(
       `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/reject`,
       {
         method: 'POST',
+        body: JSON.stringify({}),
       },
     ),
   );
