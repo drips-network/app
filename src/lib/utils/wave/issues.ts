@@ -160,7 +160,6 @@ export async function rejectIssueApplication(
   waveProgramId: string,
   issueId: string,
   applicationId: string,
-  reason?: string,
 ) {
   return parseRes(
     issueApplicationWithDetailsDtoSchema,
@@ -169,7 +168,6 @@ export async function rejectIssueApplication(
       `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/reject`,
       {
         method: 'POST',
-        body: JSON.stringify({ rejectionReason: reason }),
       },
     ),
   );
