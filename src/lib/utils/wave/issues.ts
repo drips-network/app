@@ -155,6 +155,26 @@ export async function editIssueApplication(
   );
 }
 
+export async function rejectIssueApplication(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  applicationId: string,
+  reason?: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/reject`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ rejectionReason: reason }),
+      },
+    ),
+  );
+}
+
 export async function unassignContributorFromIssue(
   f = fetch,
   waveProgramId: string,

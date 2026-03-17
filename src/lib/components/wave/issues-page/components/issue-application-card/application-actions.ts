@@ -12,6 +12,7 @@ import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
 import { notifyIssuesUpdated } from '../../issue-update-coordinator';
 import EditApplicationModal from './edit-application-modal.svelte';
+import RejectApplicationModal from './reject-application-modal.svelte';
 
 async function refetchIssue(issueId: string) {
   try {
@@ -72,6 +73,13 @@ export function handleEditApplication(
   application: IssueApplicationWithDetailsDto,
 ) {
   modal.show(EditApplicationModal, undefined, { issue, application });
+}
+
+export function handleRejectApplication(
+  issue: IssueDetailsDto,
+  application: IssueApplicationWithDetailsDto,
+) {
+  modal.show(RejectApplicationModal, undefined, { issue, application });
 }
 
 export async function handleUnassignContributor(

@@ -16,6 +16,7 @@
   import {
     handleAssignApplicant,
     handleEditApplication,
+    handleRejectApplication,
     handleUnassignContributor,
     handleWithdrawApplication,
   } from './application-actions';
@@ -137,6 +138,13 @@
               {/snippet}
             </Tooltip>
           </div>
+          {#if activeWaveExists}
+            <Button
+              icon={Cross}
+              variant="destructive"
+              onclick={() => handleRejectApplication(issue, application)}>Reject</Button
+            >
+          {/if}
         {/if}
         {#if application.status === 'rejected'}
           <Button icon={Cross} disabled>Application rejected</Button>
