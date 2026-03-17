@@ -396,6 +396,11 @@
     </TransitionedHeight>
 
     <Card style="padding: 0;" disabled={filtersOpen}>
+      <div class="count-badge typo-text-small">
+        {issues.pagination.total}
+        {issues.pagination.total === 1 ? 'match' : 'matches'}
+      </div>
+
       {#if applyingFilters || applyingSorting}
         <div class="spinner">
           <Spinner />
@@ -456,9 +461,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 6rem);
+    height: calc(100dvh - 5.5rem);
     position: sticky;
-    top: 5rem;
+    top: 4.5rem;
   }
 
   .issue-list-configuration {
@@ -476,7 +481,6 @@
     align-items: center;
     margin-bottom: 1rem;
     height: 2.25rem;
-
     padding: 0 0 0 1rem;
     border-radius: 1.25rem 0 1.25rem 1.25rem;
     background-color: var(--color-primary-level-1);
@@ -487,6 +491,22 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+
+  .count-badge {
+    position: absolute;
+    bottom: -0.625rem;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    background-color: var(--color-foreground-level-1);
+    color: var(--color-foreground-level-5);
+    border-radius: 1rem 0 1rem 1rem;
+    z-index: 1;
+    border: 1px solid var(--color-foreground-level-3);
   }
 
   .search-bar {
@@ -524,7 +544,7 @@
     grid-area: content;
     min-width: 0;
     position: relative;
-    padding-top: 3rem;
+    padding-top: 2rem;
   }
 
   .filter-config {

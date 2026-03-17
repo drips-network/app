@@ -1,32 +1,39 @@
-import { getIssueApplications } from '$lib/utils/wave/issues.js';
 import { getPhoneVerificationStatus } from '$lib/utils/wave/users.js';
+import {
+  getApplicationQuota,
+  getIssueApplications,
+  getOrgAssignmentQuota,
+} from '$lib/utils/wave/issues.js';
 import { getWaves } from '$lib/utils/wave/wavePrograms.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, params, parent }) => {
-  const { user, waveProgram } = await parent();
+  const { user, waveProgram, issue } = await parent();
 
   const { issueId } = params;
 
-  const [waves, upcomingWaves, phoneVerificationStatus] = await Promise.all([
-    getWaves(
-      fetch,
-      waveProgram.id,
-      {},
-      {
-        status: 'active',
-      },
-    ),
-    getWaves(
-      fetch,
-      waveProgram.id,
-      { limit: 1 },
-      {
-        status: 'upcoming',
-      },
-    ),
-    getPhoneVerificationStatus(fetch),
-  ]);
+  const [waves, upcomingWaves, applicationQuota, orgAssignmentQuota, phoneVerificationStatus] =
+    await Promise.all([
+      getWaves(
+        fetch,
+        waveProgram.id,
+        {},
+        {
+          status: 'active',
+        },
+      ),
+      getWaves(
+        fetch,
+        waveProgram.id,
+        { limit: 1 },
+        {
+          status: 'upcoming',
+        },
+      ),
+      getApplicationQuota(fetch, waveProgram.id).catch(() => null),
+      getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id).catch(() => null),
+      getPhoneVerificationStatus(fetch),
+    ]);
 
   if (phoneVerificationStatus.status !== 'verified') {
     throw redirect(
@@ -50,5 +57,7 @@ export const load = async ({ fetch, params, parent }) => {
     waves,
     alreadyApplied,
     upcomingWave,
+    applicationQuota,
+    orgAssignmentQuota,
   };
 };

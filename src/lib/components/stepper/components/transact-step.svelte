@@ -373,10 +373,9 @@
               const res = await fetch(`/api/gasless/track/${taskId}`);
               if (!res.ok) throw new Error('Failed to track Gelato Relay task');
 
-              const { task } = await res.json();
-              assert(typeof task === 'object', 'Invalid task');
-              const { taskState, transactionHash } = task;
-              assert(typeof taskState === 'string', 'Invalid task state');
+              const result = await res.json();
+              const { status, transactionHash, message } = result;
+              assert(typeof status === 'string', 'Invalid task status');
 
               if (transactionHash) {
                 gaslessTransactionHash = transactionHash;
@@ -387,14 +386,15 @@
                 });
               }
 
-              return { taskState, task };
+              return { status, message };
             },
-            ({ taskState, task }) => {
-              switch (taskState) {
-                case 'ExecSuccess':
+            ({ status, message }) => {
+              switch (status) {
+                case 'success':
                   return true;
-                case 'Cancelled':
-                  throw new Error(`Gasless transaction failed: ${JSON.stringify(task)}`);
+                case 'rejected':
+                case 'reverted':
+                  throw new Error(`Gasless transaction failed: ${message ?? 'Unknown error'}`);
                 default:
                   return false;
               }

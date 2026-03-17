@@ -1,11 +1,10 @@
 import unreachable from '$lib/utils/unreachable';
-import { getComplimentsForIssue } from '$lib/utils/wave/compliments';
 import { getAllPaginated } from '$lib/utils/wave/getAllPaginated';
 import { getIssue, getIssueApplications } from '$lib/utils/wave/issues';
-import type { IssueComplimentDto } from '$lib/utils/wave/types/compliment';
 import { type IssueDetailsDto } from '$lib/utils/wave/types/issue';
 import type { PaginatedResponse } from '$lib/utils/wave/types/pagination';
 import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+import { getWaves } from '$lib/utils/wave/wavePrograms';
 import { error } from '@sveltejs/kit';
 
 export const issuePageLoad = async (
@@ -18,6 +17,7 @@ export const issuePageLoad = async (
     parent: () => Promise<{
       issues: PaginatedResponse<IssueDetailsDto>;
       wavePrograms: WaveProgramDto[];
+      activeWaveExists?: boolean;
     }>;
     params: { issueId: string };
   },
@@ -40,7 +40,7 @@ export const issuePageLoad = async (
     } | null;
   },
 ) => {
-  const { issues, wavePrograms } = await parent();
+  const { issues, wavePrograms, activeWaveExists } = await parent();
 
   // issues is paginated so may not include the issue. in this case, fetch it directly
 
@@ -65,21 +65,27 @@ export const issuePageLoad = async (
 
   const applicationsPromise = issue.waveProgramId
     ? getAllPaginated((page, limit) =>
-        getIssueApplications(fetch, issue.waveProgramId ?? unreachable(), issue.id, {
-          page,
-          limit,
-        }),
+        getIssueApplications(
+          fetch,
+          issue.waveProgramId ?? unreachable(),
+          issue.id,
+          {
+            page,
+            limit,
+          },
+          { waveId: 'current' },
+        ),
       )
     : null;
 
   const partOfWaveProgram = wavePrograms.find((wave) => wave.id === issue.waveProgramId) ?? null;
 
-  let givenCompliments: IssueComplimentDto[] = [];
-
-  if (issue.state === 'closed' && issue.assignedApplicant && issue.waveProgramId) {
-    const complimentsRes = await getComplimentsForIssue(fetch, issue.waveProgramId, issue.id);
-
-    givenCompliments = complimentsRes.compliments;
+  // If activeWaveExists wasn't provided by parent (e.g. in maintainer/contributor contexts),
+  // fetch the waves for this issue's wave program and check if any is active
+  let resolvedActiveWaveExists = activeWaveExists;
+  if (resolvedActiveWaveExists === undefined && issue.waveProgramId) {
+    const waves = await getWaves(fetch, issue.waveProgramId, { limit: 1 }, { status: 'active' });
+    resolvedActiveWaveExists = waves.data.some((wave) => wave.status === 'active');
   }
 
   return {
@@ -89,8 +95,8 @@ export const issuePageLoad = async (
     allowAddingOrRemovingWave: allowAddingOrRemovingWave,
     backToConfig: backToConfig,
     headMetaTitle: headMetaTitle,
-    givenCompliments,
     isInWaveContext: isInWaveContext ?? false,
+    activeWaveExists: resolvedActiveWaveExists ?? false,
 
     // streamed (not awaited)
     applicationsPromise,

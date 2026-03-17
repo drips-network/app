@@ -133,6 +133,48 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
+// ===========================
+// Batch Apply Types
+// ===========================
+
+export const previousParticipationSchema = z.enum([
+  'previous_wave',
+  'onlydust_stellar_missions',
+  'stellar_community_fund',
+  'stellar_hackathon',
+  'other_stellar_ecosystem_program',
+]);
+export type PreviousParticipation = z.infer<typeof previousParticipationSchema>;
+
+export const batchApplyFormDataSchema = z.object({
+  previousParticipation: z.array(previousParticipationSchema),
+  plannedIssuesDescription: z.string().min(1).max(5000),
+  repoRelationshipDescription: z.string().min(1).max(5000).optional(),
+  upstreamRelationshipDescription: z.string().min(1).max(5000).optional(),
+  forkJustification: z.string().min(1).max(5000).optional(),
+  supportingLinks: z.array(z.string()).optional(),
+});
+export type BatchApplyFormData = z.infer<typeof batchApplyFormDataSchema>;
+
+export const batchApplyRequestSchema = z.object({
+  orgRepoIds: z.array(z.uuid()).min(1).max(50),
+  formData: batchApplyFormDataSchema,
+});
+export type BatchApplyRequest = z.infer<typeof batchApplyRequestSchema>;
+
+export const batchApplyResponseSchema = z.object({
+  formAnswers: z.object({
+    id: z.uuid(),
+    waveProgramId: z.uuid(),
+    userId: z.uuid(),
+    formData: batchApplyFormDataSchema,
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+  }),
+  results: z.array(waveProgramRepoWithDetailsDtoSchema),
+});
+export type BatchApplyResponse = z.infer<typeof batchApplyResponseSchema>;
+
 export const waveProgramReposSortBySchema = z.enum(['stargazersCount', 'forksCount', 'issueCount']);
 export type WaveProgramReposSortBy = z.infer<typeof waveProgramReposSortBySchema>;
 
@@ -141,9 +183,47 @@ export const waveProgramReposFiltersSchema = filterSchema(
     primaryLanguages: z.string().optional(), // comma-separated list of languages
     search: z.string().optional(),
     sortBy: waveProgramReposSortBySchema.optional(),
+    orgId: z.uuid().optional(),
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;
+
+// ===========================
+// Wave Program Org Types
+// ===========================
+
+export const orgContactInfoSchema = z.object({
+  email: z.string().nullable(),
+  description: z.string().nullable(),
+  url: z.string().nullable(),
+  location: z.string().nullable(),
+  socialLinks: z.array(
+    z.object({
+      provider: z.string(),
+      url: z.string(),
+    }),
+  ),
+});
+
+export const waveProgramOrgDtoSchema = z.object({
+  id: z.uuid(),
+  gitHubOrgId: z.number(),
+  gitHubOrgLogin: z.string(),
+  gitHubOrgName: z.string().nullable(),
+  gitHubOrgAvatarUrl: z.string().nullable(),
+  accountType: z.string(),
+  approvedRepoCount: z.number().int(),
+  createdAt: z.coerce.date(),
+  contactInfo: orgContactInfoSchema.nullable(),
+});
+export type WaveProgramOrgDto = z.infer<typeof waveProgramOrgDtoSchema>;
+
+export const waveProgramOrgsFiltersSchema = filterSchema(
+  z.object({
+    search: z.string().optional(),
+  }),
+);
+export type WaveProgramOrgsFilters = z.infer<typeof waveProgramOrgsFiltersSchema>;
 
 // ===========================
 // Wave Program Issue Types
@@ -156,6 +236,7 @@ export const waveProgramIssueWithDetailsDtoSchema = z.object({
   id: z.uuid(),
   addedAt: z.coerce.date(),
   removedAt: z.coerce.date().nullable(),
+  completedAt: z.coerce.date().nullable(),
   pointsMultiplier: z.number().int().optional(),
   issue: z.object({
     id: z.uuid(),

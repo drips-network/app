@@ -6,6 +6,7 @@
     size = 'normal',
     clamp = true,
     avatarUrl,
+    href,
   }: {
     repo: {
       gitHubRepoFullName: string;
@@ -13,6 +14,7 @@
     avatarUrl?: string;
     size?: 'normal' | 'small';
     clamp?: boolean;
+    href?: string;
   } = $props();
 
   const IMAGE_SIZES = {
@@ -36,7 +38,17 @@
   });
 </script>
 
-<div class="repo-badge">
+{#if href}
+  <a class="repo-badge" {href} target="_blank" rel="noopener noreferrer">
+    {@render content()}
+  </a>
+{:else}
+  <div class="repo-badge">
+    {@render content()}
+  </div>
+{/if}
+
+{#snippet content()}
   {#if resolvedAvatarUrl}
     <img
       class="repo-avatar"
@@ -56,7 +68,7 @@
   <span class={size === 'small' ? 'typo-text-small' : 'typo-text'} class:line-clamp-1={clamp}
     >{repo.gitHubRepoFullName}</span
   >
-</div>
+{/snippet}
 
 <style>
   .repo-badge {
@@ -64,6 +76,8 @@
     align-items: center;
     gap: 0.25rem;
     white-space: nowrap;
+    color: inherit;
+    text-decoration: none;
   }
 
   .repo-avatar {

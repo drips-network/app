@@ -6,6 +6,8 @@ coverImageAlt: 'Illustration showing funds flowing and branching out' # Slightly
 excerpt: 'Turn grants and donations into ongoing ecosystem support. Discover how Drips helps you amplify funding impact by easily sharing with the dependencies that make your work possible, creating a virtuous cycle of sustainability.'
 author: 'becca'
 announcementBannerCopy: 'Amplify your funding impact: Easily split funds with your dependencies using Drips'
+categories:
+  - guide
 ---
 
 # Funding is not an endpoint, It's a catalyst

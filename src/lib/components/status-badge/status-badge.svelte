@@ -17,7 +17,7 @@
   };
 </script>
 
-<div class="status-badge {size}" style:background-color={`var(--color-${color}-level-1`}>
+<div class="status-badge {size}" style:background-color={`var(--color-${color}-level-1)`}>
   {#if icon}
     {@const SvelteComponent = icon}
     <SvelteComponent style="fill: var(--color-{color}-level-6); width:18px; height:18px" />

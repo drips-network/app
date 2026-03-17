@@ -5,6 +5,8 @@ coverImage: '/assets/blog-images/octant-drips.jpeg'
 coverImageAlt: 'Octant and Drips illustration'
 excerpt: We are pleased to announce that Octant is the second organization to commit to fund its critical software dependencies with Drips.
 author: 'becca'
+categories:
+  - ecosystem
 ---
 
 Octant, a participatory public goods funding platform, has committed a total of 23.2 ETH from its first two public goods funding rounds (approximately $59k) to fund its critical software dependencies with Drips over the next 3 months.
@@ -19,7 +21,7 @@ In 2023, Octant has already completed two public goods funding rounds, distribut
 
 Funds from Octant’s Epoch Zero and Epoch One will be streamed to the four dependencies on their [Drip List](https://www.drips.network/app/drip-lists/30178668158349445547603108732480118476541651095408979232800331391215): Web3.py, Flask, Wagmi, and Nimbus.
 
-![Octant's Drip List](/assets/blog-images/octant-dl.png)
+<img data-no-border src="/assets/blog-images/octant-dl.png" alt="Octant's Drip List" />
 
 [Web3.py](https://github.com/ethereum/web3.py) is a Python library that allows developers to interact with the Ethereum blockchain easily. [Flask](https://www.drips.network/external/https%3A%2F%2Fgithub.com%2Fpallets%2Fflask) is a micro web framework for Python, popular for its simplicity and flexibility in developing web applications. [Wagmi](https://www.drips.network/external/https%3A%2F%2Fgithub.com%2Fwagmi-dev%2Fwagmi) is a collection of React Hooks that make it easier to connect a frontend to the Ethereum blockchain, and [Nimbus](https://nimbus.team/) is an Ethereum 2.0 client optimized for resource-restricted devices, which plays a crucial role in the network's sustainability.
 
@@ -35,7 +37,7 @@ Drips enables any organisation to continuously and transparently fund their crit
 
 When you use Drips to stream funds to your dependencies, you're ensuring the sustainable development, stability, and ongoing improvement of essential software. With each contribution, we’re a step closer to making the 'lone maintainer' meme a thing of the past.
 
-![Drips Splitting Graph compared to XKCD 2347](/assets/blog-images/dependency-comic.png)
+<img data-no-border src="/assets/blog-images/dependency-comic.png" alt="Drips Splitting Graph compared to XKCD 2347" />
 
 # “Fostering a Community of Support”
 

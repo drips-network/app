@@ -6,6 +6,8 @@ coverImageAlt: 'Drippy on stage at Devcon presenting supported dependencies.'
 excerpt: 'The Ethereum Foundation team behind Devcon and Devconnect is using Drips to fund the open-source software dependencies that enable their work.'
 author: 'becca'
 announcementBannerCopy: 'Devcon & Devconnect support open-source dependencies on Drips'
+categories:
+  - ecosystem
 ---
 
 <script>

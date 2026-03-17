@@ -2,7 +2,8 @@
   import Ens from './svgs/partner-logos/ens.svelte';
   import EthereumFoundation from './svgs/partner-logos/ethereum-foundation.svelte';
   import FilecoinFoundation from './svgs/partner-logos/filecoin-foundation.svelte';
-  import FundingTheCommons from './svgs/partner-logos/funding-the-commons.svelte';
+  import Stellar from './svgs/partner-logos/stellar.svelte';
+  import Unicef from './svgs/partner-logos/unicef.svelte';
   import Octant from './svgs/partner-logos/octant.svelte';
   import Radworks from './svgs/partner-logos/radworks.svelte';
   import Scroll from './svgs/partner-logos/scroll.svelte';
@@ -18,11 +19,12 @@
   <h5>{headline}</h5>
   <div class="logos">
     <div class="image"><Ens /></div>
+    <div class="image"><Stellar /></div>
     <div class="image"><FilecoinFoundation /></div>
     <div class="image"><Scroll /></div>
     <div class="image"><Octant /></div>
-    <div class="image"><FundingTheCommons /></div>
     <div class="image"><Radworks /></div>
+    <div class="image"><Unicef /></div>
     <div class="image"><EthereumFoundation /></div>
   </div>
 </div>

@@ -24,11 +24,13 @@ export const issueFilters = filterSchema(
     isInWaveProgram: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
     appliedToByUser: z.uuid().optional(),
+    appliedToByUserCurrentWave: booleanString.optional(),
     resolvedByUserId: z.uuid().optional(),
     eligibleForWaveProgram: booleanString.optional(),
     hasApplications: booleanString.optional(),
     hasPr: booleanString.optional(),
     search: z.string().optional(),
+    repoLanguage: z.string().optional(),
   }),
 );
 export type IssueFilters = z.infer<typeof issueFilters>;
@@ -58,6 +60,7 @@ export const issueDetailsDtoSchema = z.object({
   points: z.number().int().nullable(),
   pointsMultiplier: z.number().int().optional(),
   pointsEarned: z.number().int().nullable().optional(),
+  completedAt: z.coerce.date().nullable(),
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
   resolvedInWave: waveDtoSchema.nullable(),

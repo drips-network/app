@@ -9,6 +9,9 @@ export interface EditStreamFlowState {
   newAmountValue: string | undefined;
   newName: string | undefined;
   newSelectedMultiplier: string;
+  addEndDate: boolean;
+  endDateValue: string | undefined;
+  endTimeValue: string | undefined;
 }
 
 export default (stream: EditStreamFlowStreamFragment) => {
@@ -23,5 +26,8 @@ export default (stream: EditStreamFlowStreamFragment) => {
     ),
     newName: stream.name ?? undefined,
     newSelectedMultiplier: '1',
+    addEndDate: false,
+    endDateValue: undefined,
+    endTimeValue: undefined,
   });
 };

@@ -49,6 +49,8 @@ export default (() => {
   }
 
   function closeSheet() {
+    if (!get(store).component) return;
+
     const p = get(pane);
 
     p.destroy({ animate: true });
