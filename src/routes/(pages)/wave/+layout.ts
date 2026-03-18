@@ -3,6 +3,7 @@ import { getAccessTokenCookieClientSide, getUserData } from '$lib/utils/wave/aut
 
 export const load = async ({ depends, data }) => {
   depends('wave:user');
+  depends('wave:phone-verification-required');
 
   let accessTokenCookieValue: string | null = null;
 
