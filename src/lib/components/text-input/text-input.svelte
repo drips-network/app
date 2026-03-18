@@ -153,7 +153,7 @@
     {onkeypress}
     {onpaste}
     {onblur}
-    autocomplete={autocomplete && variant.type === 'tel' ? 'tel' : 'off'}
+    autocomplete={autocomplete ? (variant.type === 'tel' ? 'tel' : 'on') : 'off'}
     {spellcheck}
     autocapitalize={autocapitalize ? 'on' : 'off'}
     autocorrect={autocorrect ? 'on' : 'off'}
