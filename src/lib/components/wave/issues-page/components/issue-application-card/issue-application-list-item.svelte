@@ -13,6 +13,7 @@
   import {
     handleAssignApplicant,
     handleEditApplication,
+    handleRejectApplication,
     handleUnassignContributor,
     handleWithdrawApplication,
   } from './application-actions';
@@ -97,6 +98,14 @@
             Assignment is only available during an active Wave.
           {/snippet}
         </Tooltip>
+        {#if activeWaveExists}
+          <Button
+            size="small"
+            icon={Cross}
+            variant="destructive"
+            onclick={() => handleRejectApplication(issue, application)}>Reject</Button
+          >
+        {/if}
       {/if}
       {#if application.status === 'accepted'}
         <Button
