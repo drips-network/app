@@ -6,10 +6,19 @@
   import Button from '$lib/components/button/button.svelte';
   import { fly } from 'svelte/transition';
   import { confirmPhoneVerification } from '$lib/utils/wave/users';
-  import { invalidate } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
+  import phoneVerificationState from '../phone-verification-state.svelte';
 
   let { data } = $props();
-  let { phoneVerificationStatus, phoneNumber, backTo } = $derived(data);
+  let { phoneVerificationStatus, backTo } = $derived(data);
+
+  let phoneNumber = $derived(phoneVerificationState.phoneNumber);
+
+  onMount(() => {
+    if (!phoneNumber) {
+      goto(`/wave/verify-phone?backTo=${encodeURIComponent(backTo || '')}`);
+    }
+  });
 
   type CellProps = PinInputRootSnippetProps['cells'][0];
 
@@ -32,6 +41,7 @@
 
   let verifying = $state(false);
   let wrongPin = $state(false);
+  let errorMessage = $state<string | null>(null);
 
   async function shake() {
     wrongPin = true;
@@ -39,22 +49,32 @@
   }
 
   async function verifyCode() {
-    verifying = true;
-    const result = await confirmPhoneVerification(undefined, phoneNumber.number, value);
-    verifying = false;
+    if (!phoneNumber) return;
 
-    if (result.success) {
-      await invalidate('wave:phone-verification-status');
-      return;
-    } else {
-      await shake();
+    errorMessage = null;
+    verifying = true;
+
+    try {
+      const result = await confirmPhoneVerification(undefined, phoneNumber.number, value);
+      verifying = false;
+
+      if (result.success) {
+        await invalidate('wave:phone-verification-status');
+        return;
+      } else {
+        await shake();
+      }
+    } catch (e) {
+      verifying = false;
+      errorMessage = e instanceof Error ? e.message : 'Something went wrong. Please try again.';
     }
   }
 </script>
 
 <FlowStepWrapper
   headline="Enter verification code"
-  description="Please enter the verification code sent to {phoneNumber.formatInternational()} via SMS, Telegram, or WhatsApp."
+  description="Please enter the verification code sent to {phoneNumber?.formatInternational() ??
+    'your phone'} via SMS, Telegram, or WhatsApp."
 >
   <div class="pin-and-state">
     <div class="code-input" class:shake={wrongPin} class:disabled={verifying}>
@@ -113,6 +133,12 @@
           in:fly={{ duration: 300, y: 10 }}
           out:fly={{ duration: 300, y: -10 }}
           class="typo-text-small">Verifying...</span
+        >
+      {:else if errorMessage}
+        <span
+          in:fly={{ duration: 300, y: 10 }}
+          out:fly={{ duration: 300, y: -10 }}
+          class="typo-text-small text-red-500">{errorMessage}</span
         >
       {:else if wrongPin}
         <span

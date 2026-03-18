@@ -21,13 +21,34 @@
   import mapFilterUndefined from '$lib/utils/map-filter-undefined';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import LockAndKeyEmoji from '$lib/components/icons/🔐.svelte';
+  import phoneVerificationState from './phone-verification-state.svelte';
+  import { onMount } from 'svelte';
 
   let { data } = $props();
-  let { backTo } = $derived(data);
+  let { backTo, phoneVerificationStatus } = $derived(data);
 
   let phoneNumber = $state('');
   let submitting = $state(false);
   let selectedCountryCode = $state<CountryCode | null>(null);
+
+  let needsCooldown = $derived(
+    phoneVerificationStatus.status === 'pending' &&
+      !phoneVerificationStatus.canRetry &&
+      (phoneVerificationStatus.attemptsRemaining ?? 1) > 0,
+  );
+
+  // svelte-ignore state_referenced_locally
+  let secondsLeft = $state(needsCooldown ? 30 : 0);
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      if (secondsLeft > 0) {
+        secondsLeft -= 1;
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  });
 
   async function submit() {
     submitting = true;
@@ -46,11 +67,11 @@
 
         await requestPhoneVerification(undefined, parsedNumber.number.number);
 
+        phoneVerificationState.phoneNumber = parsedNumber.number;
+
         await invalidate('wave:phone-verification-status');
 
-        await goto(
-          `/wave/verify-phone/enter-code?number=${encodeURIComponent(parsedNumber.number.number)}&backTo=${encodeURIComponent(backTo || '')}`,
-        );
+        await goto(`/wave/verify-phone/enter-code?backTo=${encodeURIComponent(backTo || '')}`);
       },
       () => {
         submitting = false;
@@ -192,9 +213,18 @@
     </div>
   </FormField>
 
+  {#if needsCooldown && secondsLeft > 0}
+    <AnnotationBox type="warning">
+      A verification code was recently sent. You can request a new code in {secondsLeft} seconds.
+    </AnnotationBox>
+  {/if}
+
   {#snippet actions()}
     <Button
-      disabled={submitting || selectedCountryCode === null || phoneNumber.trim() === ''}
+      disabled={submitting ||
+        selectedCountryCode === null ||
+        phoneNumber.trim() === '' ||
+        (needsCooldown && secondsLeft > 0)}
       loading={submitting}
       variant="primary"
       onclick={submit}
