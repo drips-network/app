@@ -1,8 +1,7 @@
 import { browser } from '$app/environment';
 import { getAccessTokenCookieClientSide, getUserData } from '$lib/utils/wave/auth.js';
-import { getPhoneVerificationRequired } from '$lib/utils/wave/users.js';
 
-export const load = async ({ depends, data, fetch }) => {
+export const load = async ({ depends, data }) => {
   depends('wave:user');
   depends('wave:phone-verification-required');
 
@@ -21,10 +20,7 @@ export const load = async ({ depends, data, fetch }) => {
 
   const userData = getUserData(accessToken);
 
-  const phoneVerificationRequired = userData ? await getPhoneVerificationRequired(fetch) : null;
-
   return {
     user: userData,
-    phoneVerificationRequired,
   };
 };

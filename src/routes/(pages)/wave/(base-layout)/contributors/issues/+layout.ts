@@ -1,8 +1,11 @@
 import { issuesPageLayoutLoad } from '$lib/components/wave/issues-page/load-fns/issues-page-layout-load.js';
+import { getPhoneVerificationRequired } from '$lib/utils/wave/users.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async (context) => {
-  const { phoneVerificationRequired } = await context.parent();
+  const phoneVerificationRequired = await getPhoneVerificationRequired(context.fetch).catch(
+    () => null,
+  );
 
   if (phoneVerificationRequired?.required && !phoneVerificationRequired.isVerified) {
     throw redirect(
