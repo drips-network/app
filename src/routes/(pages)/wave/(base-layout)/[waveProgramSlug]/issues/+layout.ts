@@ -1,16 +1,8 @@
 import { issuesPageLayoutLoad } from '$lib/components/wave/issues-page/load-fns/issues-page-layout-load.js';
-import { redirect } from '@sveltejs/kit';
 
 export const load = async (context) => {
   const { parent } = context;
-  const { waveProgram, phoneVerificationRequired } = await parent();
-
-  if (phoneVerificationRequired?.required && !phoneVerificationRequired.isVerified) {
-    throw redirect(
-      302,
-      `/wave/verify-phone?backTo=${encodeURIComponent(context.url.pathname + context.url.search)}`,
-    );
-  }
+  const { waveProgram } = await parent();
 
   return issuesPageLayoutLoad(context, () => ({
     preappliedFilters: {
