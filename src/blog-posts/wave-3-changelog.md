@@ -11,7 +11,7 @@ categories:
   - product
 ---
 
-The 2nd Stellar Wave wrapped up last month, and it was bigger and better than the first. Thanks to your feedback and insights, the [many improvements](/blog/posts/wave-2-changelog) we made had a significant impact, resulting in a fairer and bigger Wave for everyone. In this post, we'll review the impact of some of the changes, and share what's coming in the 3rd Wave, which is [scheduled to hit on March 23rd](/wave/stellar).
+The 2nd Stellar Wave wrapped up last month, and it was bigger and better than the first. Thanks to your feedback and insights, the [many improvements](/blog/posts/wave-2-changelog) we made had a significant impact. In this post, we'll review the impact of some of the changes, and share what's coming in the 3rd Wave, which is [scheduled to hit on March 23rd](/wave/stellar).
 
 ## Reflecting and Doubling Down on Application Limits
 
@@ -20,7 +20,7 @@ By popular demand, we introduced two limits on issue applications in the last Wa
 - Contributors could have a maximum of 15 "pending" applications at any given time, encouraging applicants to more carefully consider what issues to apply to, and limiting the impact of spam.
 - Each contributor could resolve a maximum of 7 issues from any given org, ensuring more applicants get a chance to participate, and dampening the dominance of any single contributor.
 
-**The impact of these limits was great**. Compared to Wave 1, we saw a much more diverse set of contributors resolving more issues, spread across more orgs, and a significant reduction in spam applications.
+**The impact of these limits was great**. Compared to Wave 1, we saw a much more diverse set of contributors resolving more issues, spread across more orgs, and a significant reduction in spammy applications.
 
 ![Graphs showing the distribution of points earned and number of repos active in for Wave 1 and 2. In Wave 2, outliers on points earned have been mitigated, and more contributors are earning points across more repos.](/assets/blog-images/wave-changelog/wave-point-curves.png)
 
@@ -60,11 +60,11 @@ We hope that this reduces the burden on maintainers reviewing PRs quickly, as co
 
 ### Automatic Issue Points Appeal
 
-In past Waves, contributors would sometimes forget to link their PRs to issues, or maintainers would require some time to properly review PRs, resulting in delays in point allocation.
+In past Waves, contributors would sometimes forget to link their PRs to issues, or maintainers would require some time to properly review PRs, resulting in delays in point allocation and frustration for contributors.
 
 To address this, we're introducing an **automatic issue points appeal** process. If your contribution was accepted by a maintainer, but you didn't receive points, or a maintainer is being unresponsive for over 24 hours, you can now trigger an automated review directly from the **Tickets channel** on our Discord.
 
-Simply click the **"I didn't receive Points for an Issue"** button, select the issue in question, and submit a link to your PR. If the system determines that the PR has already been accepted, or is very likely to be accepted if it were reviewed, it will automatically issue Points for the contribution. In unclear cases, an automatic ticket will be created, and a moderator will review it.
+Simply click the **"I didn't receive Points for an Issue"** button, select the issue in question, and submit a link to your PR. If the system determines that the PR has already been accepted, or is very likely to be accepted if it were reviewed, it will automatically issue Points for the contribution. In unclear cases, a ticket will be created, and a moderator will review it.
 
 <br/>
 
