@@ -13,14 +13,18 @@ categories:
 
 The 2nd Stellar Wave wrapped up last month, and it was bigger and better than the first. Thanks to your feedback and insights, the [many improvements](/blog/posts/wave-2-changelog) we made had a significant impact, resulting in a fairer and bigger Wave for everyone. In this post, we'll review the impact of some of the changes, and share what's coming in the 3rd Wave, which is [scheduled to hit on March 23rd](/wave/stellar).
 
-## Reflecting and doubling down on Application Limits
+## Reflecting and Doubling Down on Application Limits
 
 By popular demand, we introduced two limits on issue applications in the last Wave:
 
-- Contributors could have a maximum of 15 "pending" applications at any given time, encouring applicants to more carefully consider what issues to apply to, and limiting the impact of spam.
+- Contributors could have a maximum of 15 "pending" applications at any given time, encouraging applicants to more carefully consider what issues to apply to, and limiting the impact of spam.
 - Each contributor could resolve a maximum of 7 issues from any given org, ensuring more applicants get a chance to participate, and dampening the dominance of any single contributor.
 
-**The impact of these limits was great**. We saw a much more diverse set of contributors resolving more issues, spread across more orgs, and a significant reduction in spam applications. Combined, the limits resulted in a **significantly flatter final reward distribution**, and helped prevent a small group of contributors from monopolizing rewards.
+**The impact of these limits was great**. Compared to Wave 1, we saw a much more diverse set of contributors resolving more issues, spread across more orgs, and a significant reduction in spam applications.
+
+![Graphs showing the distribution of points earned and number of repos active in for Wave 1 and 2. In Wave 2, outliers on points earned have been mitigated, and more contributors are earning points across more repos.](/assets/blog-images/wave-changelog/wave-point-curves.png)
+
+As you can see in the graphs, the new limits resulted in a **significantly flatter points distribution**, with most contributors earning close to the median amount of points. Additionally, the average participant contributed to **vastly more unique repositories**, rather than concentrating on a few.
 
 For this reason, we're doubling down by **lowering the limit of issues being resolved by the same contributor in any given org from 7 to 4**.
 
@@ -32,13 +36,13 @@ Given the positive community reaction, we'll **continue with quadratic reward sc
 
 ## Defending Against Sybil Attacks in Real-Time
 
-While quadratic reward scaling is great, it comes with an increased risk of **Sybil attacks**, in which a single user creates multiple accounts to game the system and capture a broader share of the reward pool.
+While quadratic reward scaling is great, it comes with an increased risk of **Sybil attacks**, in which a single user creates multiple accounts to capture a broader share of the reward pool.
 
-Drips Wave already leverages one of the strongest possible sybil defenses: **KYC identity verification being required for withdrawing rewards**. However, due to KYC processes sometimes being complex and lengthy, we want to avoid requiring upfront KYC verification for all participants.
+Drips Wave already leverages one of the strongest possible Sybil defenses: **KYC identity verification being required for withdrawing rewards**. However, due to KYC processes sometimes being complex and lengthy, we want to avoid requiring upfront KYC verification for all participants.
 
-That's why, with Wave 3, we're rolling out more in-depth, **real-time sybil defense mechanisms** designed to detect and mitigate Sybil attempts _during_ the Wave. The system will analyze a broad set of factors as users participate, and autonomously raise certain challenges when deemed necessary. These challenges range from a **quick captcha** to **phone number verification**, and in extreme cases, even an **upfront KYC requirement**.
+That's why, with Wave 3, we're rolling out more in-depth, **real-time Sybil defense mechanisms** designed to detect and mitigate Sybil attempts _during_ the Wave. The system will analyze a broad set of factors as users participate, and autonomously raise certain challenges when deemed necessary. These challenges range from a **quick CAPTCHA** to **phone number verification**, and in extreme cases, even an **upfront KYC requirement**.
 
-As the new Wave hits, we'll monitor the performance of this system closely and make frequent tweaks under-the-hood.
+As the new Wave hits, we'll monitor the performance of this system closely and make frequent tweaks under the hood.
 
 ## AI-Assisted Workflows for Increased Momentum
 
@@ -68,7 +72,7 @@ Simply click the **"I didn't receive Points for an Issue"** button, select the i
 
 <br/>
 
-These new AI-assisted workflows are **experimental**. We'll continously monitor performance, and review whether the AI decisions retroactively align with human maintainer decisions. As always, we **welcome your feedback** on these changes.
+These new AI-assisted workflows are **experimental**. We'll continuously monitor performance, and review whether the AI decisions retroactively align with human maintainer decisions. As always, we **welcome your feedback** on these changes.
 
 ## Issue Application Process Tweaks
 
