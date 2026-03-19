@@ -40,6 +40,14 @@
   margin-bottom: 1.5rem;
 }
 
+#blog-article-content li:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
+  font-family: var(--typeface-regular);
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: 0.5rem;
+}
+
 #blog-article-content
   blockquote:not([data-custom-blog-component] *):not([data-custom-blog-component]) {
   margin: 1.5rem 0;
