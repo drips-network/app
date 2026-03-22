@@ -42,6 +42,8 @@ export function getAccessTokenCookieClientSide(): string | null {
 
 const EXPIRY_BUFFER_SECONDS = 30; // Refresh if expiring within 30 seconds
 
+let loggingOut = false;
+
 export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   if (!jwt) {
     return null;
@@ -76,6 +78,8 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
 }
 
 export async function getRefreshedAuthToken(manualCookie?: string) {
+  if (loggingOut) return null;
+
   try {
     const res = await call('/api/auth/token/refresh', {
       method: 'POST',
@@ -122,10 +126,15 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
 }
 
 export async function logOut() {
-  await call('/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include',
-  });
+  loggingOut = true;
+  try {
+    await call('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } finally {
+    loggingOut = false;
+  }
 }
 
 export async function getIntercomJwt() {
