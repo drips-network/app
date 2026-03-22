@@ -64,7 +64,9 @@ export const issueDetailsDtoSchema = z.object({
   pendingApplicationsCount: z.number().int().min(0),
   assignedApplicant: assignedApplicantDtoSchema.nullable(),
   resolvedInWave: waveDtoSchema.nullable(),
-  hasPr: z.boolean(),
+  hasPr: z.boolean().optional(),
+  prLink: z.string().nullable().optional(),
+  excludedFromPendingApplicationLimit: z.boolean().optional(),
   addedBy: waveUserDtoSchema.nullable(),
 });
 export type IssueDetailsDto = z.infer<typeof issueDetailsDtoSchema>;
