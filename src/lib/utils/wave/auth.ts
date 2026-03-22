@@ -93,6 +93,8 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
       })
       .parse(res);
 
+    // Defensive: if loggingOut were true we'd have returned early above,
+    // but reset it here as a safeguard against future refactors.
     if (browser) loggingOut = false;
 
     return data.accessToken;
@@ -124,7 +126,7 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
     })
     .parse(res);
 
-  loggingOut = false;
+  if (browser) loggingOut = false; // Defensive: ensure flag is cleared after successful login
 
   return data;
 }
