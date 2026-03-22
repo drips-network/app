@@ -93,6 +93,8 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
       })
       .parse(res);
 
+    if (browser) loggingOut = false;
+
     return data.accessToken;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -129,10 +131,14 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
 
 export async function logOut() {
   if (browser) loggingOut = true;
-  await call('/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include',
-  });
+  try {
+    await call('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    if (browser) loggingOut = false;
+  }
 }
 
 export async function getIntercomJwt() {
