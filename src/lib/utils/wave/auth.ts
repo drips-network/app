@@ -78,7 +78,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
 }
 
 export async function getRefreshedAuthToken(manualCookie?: string) {
-  if (loggingOut) return null;
+  if (browser && loggingOut) return null;
 
   try {
     const res = await call('/api/auth/token/refresh', {
@@ -122,19 +122,17 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
     })
     .parse(res);
 
+  loggingOut = false;
+
   return data;
 }
 
 export async function logOut() {
-  loggingOut = true;
-  try {
-    await call('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
-  } finally {
-    loggingOut = false;
-  }
+  if (browser) loggingOut = true;
+  await call('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+  });
 }
 
 export async function getIntercomJwt() {
