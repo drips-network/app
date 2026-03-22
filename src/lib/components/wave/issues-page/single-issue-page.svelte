@@ -593,7 +593,8 @@
                       size="small"
                       icon={ArrowBoxUpRight}
                       href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#automated-limit-release"
-                      >Learn more</Button
+                      target="_blank"
+                      rel="noopener noreferrer">Learn more</Button
                     >
                   {/snippet}
                 </AnnotationBox>
