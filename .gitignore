@@ -29,4 +29,4 @@ schema.graphql
 /stats.html
 
 # lit account storage
-/src/routes/api/lit/owner-signature/*
+/src/routes/api/lit/owner-signature/.lit-auth-storage/*
