@@ -12,8 +12,11 @@
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
   import type { IssueApplicationWithDetailsDto } from '$lib/utils/wave/types/issue-application';
   import type { UserCodeMetricsDto } from '$lib/utils/wave/types/user';
+  import Pen from '$lib/components/icons/Pen.svelte';
   import {
     handleAssignApplicant,
+    handleEditApplication,
+    handleRejectApplication,
     handleUnassignContributor,
     handleWithdrawApplication,
   } from './application-actions';
@@ -135,6 +138,13 @@
               {/snippet}
             </Tooltip>
           </div>
+          {#if activeWaveExists}
+            <Button
+              icon={Cross}
+              variant="destructive"
+              onclick={() => handleRejectApplication(issue, application)}>Reject</Button
+            >
+          {/if}
         {/if}
         {#if application.status === 'rejected'}
           <Button icon={Cross} disabled>Application rejected</Button>
@@ -148,6 +158,9 @@
           >
         {/if}
       {:else if isOwnApplication}
+        {#if application.status === 'pending'}
+          <Button icon={Pen} onclick={() => handleEditApplication(issue, application)}>Edit</Button>
+        {/if}
         {#if application.status === 'pending' || application.status === 'accepted'}
           <Button icon={Cross} onclick={() => handleWithdrawApplication(issue, application)}
             >Withdraw</Button

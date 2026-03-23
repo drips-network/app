@@ -76,6 +76,7 @@ export const orgRepoDtoSchema = z.object({
   description: z.string().nullable(),
   defaultBranch: z.string().nullable(),
   isArchived: z.boolean(),
+  isFork: z.boolean().nullable().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });

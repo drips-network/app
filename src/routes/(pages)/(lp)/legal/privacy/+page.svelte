@@ -428,15 +428,25 @@
       When you use Drips Wave, we process GitHub account information (including contributor and
       maintainer profile data, repository and issue data), data generated through your use of the
       service (such as issue applications and approvals, point allocations, and funding distribution
-      data), as well as identity verification data collected via our KYC provider. This data is
-      processed to provide, operate and improve the Drips Wave service, which includes facilitating
-      connections between maintainers and contributors, managing submissions and applications,
-      tracking contributions and point allocations, managing GitHub issue statuses, labels and
-      assignments, facilitating communication via GitHub comments, distributing funding, user
-      sign-up and sign-in via GitHub, and analyzing user engagement. We may, subject to applicable
-      legal requirements, also process GitHub data for marketing purposes. Further, we process this
-      data to ensure service security, prevent fraudulent activity, and to comply with legal
-      obligations including KYC verification.
+      data), as well as identity verification data collected via our KYC and phone verification
+      providers.
+    </p>
+    <p>
+      In certain scenarios (e.g., to prevent sybil attacks or ensure account security), we may
+      require you to verify your account via phone number. This verification is performed through
+      our service provider Prelude (see section 6.3). Any phone number provided is used <strong
+        >exclusively for identity verification and account security purposes</strong
+      > and will not be used for marketing or any other secondary purposes.
+    </p>
+    <p>
+      This data is processed to provide, operate and improve the Drips Wave service, which includes
+      facilitating connections between maintainers and contributors, managing submissions and
+      applications, tracking contributions and point allocations, managing GitHub issue statuses,
+      labels and assignments, facilitating communication via GitHub comments, distributing funding,
+      user sign-up and sign-in via GitHub, and analyzing user engagement. We may, subject to
+      applicable legal requirements, also process GitHub data for marketing purposes. Further, we
+      process this data to ensure service security, prevent fraudulent activity, and to comply with
+      legal obligations including KYC and identity verification.
     </p>
     <p>
       The legal basis for this processing is your contractual relationship with us or another party
@@ -577,6 +587,10 @@
         Sum and Substance Ltd (Sumsub), 30 St. Mary Axe, London, England, for Know Your Customer
         (KYC) verification services in connection with Drips Wave.
       </li>
+      <li>
+        Prelude SAS, 82 rue Dutot, 75015 Paris, France, for phone verification and fraud prevention
+        services in connection with Wave accounts.
+      </li>
     </ul>
 
     <p>
@@ -654,6 +668,12 @@
         rel="noopener noreferrer">cookie documentation</a
       >. Within those interests, Drips Services may use Cloudflare Turnstile services to protect its
       platforms against automated spam.
+    </p>
+    <p>
+      Phone numbers processed via Prelude for verification purposes are retained only for as long as
+      necessary to fulfill the identity verification and security purposes described in section 3.5.
+      Upon account deletion, phone numbers will be removed or anonymized unless statutory retention
+      obligations apply.
     </p>
     <p>
       If the processing is based on your consent, the processing period covers the period from the
@@ -883,7 +903,7 @@
 
   <section>
     <h2>Validity and amendment of this privacy policy</h2>
-    <p>This privacy policy is currently valid and effective as of July 5, 2025.</p>
+    <p>This privacy policy is currently valid and effective as of March 18, 2026.</p>
     <p>
       Due to the further development of the Drips Services or due to changes in legal or regulatory
       requirements, it may become necessary to amend this privacy policy. In this case, we will

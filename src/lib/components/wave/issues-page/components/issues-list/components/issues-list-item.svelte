@@ -55,7 +55,9 @@
       });
     }
 
-    if (issue.assignedApplicant && !issue.hasPr && !issue.pointsEarned) {
+    const hasPr = issue.hasPr || !!issue.prLink;
+
+    if (issue.assignedApplicant && !hasPr && !issue.pointsEarned) {
       const isOverdue = issue.assignedApplicant.dueDate < new Date();
 
       badges.push(
@@ -75,7 +77,7 @@
       );
     }
 
-    if (issue.hasPr && !issue.pointsEarned) {
+    if (hasPr && !issue.pointsEarned) {
       badges.push({
         text: 'PR submitted',
         color: 'var(--color-caution-level-6)',

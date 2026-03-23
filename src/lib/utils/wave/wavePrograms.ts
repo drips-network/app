@@ -6,6 +6,7 @@ import {
   type PaginationInput,
 } from './types/pagination';
 import {
+  batchApplyResponseSchema,
   waveDtoSchema,
   waveFiltersSchema,
   waveProgramDtoSchema,
@@ -14,6 +15,7 @@ import {
   waveProgramOrgsFiltersSchema,
   waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
+  type BatchApplyFormData,
   type Complexity,
   type WaveFilters,
   type WaveProgramOrgsFilters,
@@ -54,6 +56,24 @@ export async function applyRepoToWaveProgram(f = fetch, waveProgramId: string, o
     waveProgramRepoWithDetailsDtoSchema,
     await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/apply`, {
       method: 'POST',
+    }),
+  );
+}
+
+export async function batchApplyRepos(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoIds: string[],
+  formData: BatchApplyFormData,
+) {
+  return parseRes(
+    batchApplyResponseSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/apply`, {
+      method: 'POST',
+      body: JSON.stringify({
+        orgRepoIds,
+        formData,
+      }),
     }),
   );
 }

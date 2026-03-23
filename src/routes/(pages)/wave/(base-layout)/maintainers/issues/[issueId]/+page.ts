@@ -9,7 +9,7 @@ export const load = async (context) => {
     headMetaTitle: `${issue.title} | Maintainer Dashboard`,
 
     // on this view, we don't want to allow viewing issues that are not part of the user's orgs
-    block: !userOrgs.data.some((userOrg) => userOrg.orgId === issue.repo.org.id)
+    block: !userOrgs.some((userOrg) => userOrg.orgId === issue.repo.org.id)
       ? {
           errorCode: 401,
           message: 'This issue is not part of your organizations.',

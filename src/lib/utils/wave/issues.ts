@@ -135,6 +135,45 @@ export async function withdrawIssueApplication(
   );
 }
 
+export async function editIssueApplication(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  applicationId: string,
+  applicationText: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ applicationText }),
+      },
+    ),
+  );
+}
+
+export async function rejectIssueApplication(
+  f = fetch,
+  waveProgramId: string,
+  issueId: string,
+  applicationId: string,
+) {
+  return parseRes(
+    issueApplicationWithDetailsDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/issues/${issueId}/applications/${applicationId}/reject`,
+      {
+        method: 'POST',
+        body: JSON.stringify({}),
+      },
+    ),
+  );
+}
+
 export async function unassignContributorFromIssue(
   f = fetch,
   waveProgramId: string,

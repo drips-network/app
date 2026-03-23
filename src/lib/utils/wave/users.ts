@@ -4,6 +4,10 @@ import {
   waveUserDetailDtoSchema,
   userCodeMetricsDtoSchema,
   userPublicOrgDtoSchema,
+  phoneVerificationStatusResponseSchema,
+  phoneVerificationRequiredResponseSchema,
+  initiatePhoneVerificationResponseSchema,
+  confirmPhoneVerificationResponseSchema,
 } from './types/user';
 import { getAllPaginated } from './getAllPaginated';
 import parseRes from './utils/parse-res';
@@ -38,4 +42,54 @@ export async function getUserCodeMetrics(f = fetch, userId: string) {
       expect404: true,
     },
   );
+}
+
+export async function getPhoneVerificationRequired(f = fetch) {
+  return parseRes(
+    phoneVerificationRequiredResponseSchema,
+    await authenticatedCall(f, `/api/phone/verification-required`),
+  );
+}
+
+export async function getPhoneVerificationStatus(f = fetch) {
+  return parseRes(
+    phoneVerificationStatusResponseSchema,
+    await authenticatedCall(f, `/api/phone/status`),
+  );
+}
+
+export async function requestPhoneVerification(f = fetch, phoneNumber: string) {
+  const res = await authenticatedCall(f, `/api/phone/initiate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ phoneNumber }),
+  });
+
+  if (!res.ok && res.status === 409) {
+    throw new Error('This phone number is already in use on another account.');
+  }
+
+  if (!res.ok && res.status === 429) {
+    throw new Error("You're doing this too much. Please try again later.");
+  }
+
+  return parseRes(initiatePhoneVerificationResponseSchema, res);
+}
+
+export async function confirmPhoneVerification(f = fetch, phoneNumber: string, code: string) {
+  const res = await authenticatedCall(f, `/api/phone/confirm`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ phoneNumber, code }),
+  });
+
+  if (!res.ok && res.status === 429) {
+    throw new Error("You're doing this too much. Please try again later.");
+  }
+
+  return parseRes(confirmPhoneVerificationResponseSchema, res);
 }

@@ -42,6 +42,8 @@ export function getAccessTokenCookieClientSide(): string | null {
 
 const EXPIRY_BUFFER_SECONDS = 30; // Refresh if expiring within 30 seconds
 
+let loggingOut = false;
+
 export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   if (!jwt) {
     return null;
@@ -76,6 +78,8 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
 }
 
 export async function getRefreshedAuthToken(manualCookie?: string) {
+  if (browser && loggingOut) return null;
+
   try {
     const res = await call('/api/auth/token/refresh', {
       method: 'POST',
@@ -88,6 +92,10 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
         accessToken: z.string(),
       })
       .parse(res);
+
+    // Defensive: if loggingOut were true we'd have returned early above,
+    // but reset it here as a safeguard against future refactors.
+    if (browser) loggingOut = false;
 
     return data.accessToken;
   } catch (e) {
@@ -118,14 +126,21 @@ export async function redeemGitHubOAuthCode(code: string, state: string) {
     })
     .parse(res);
 
+  if (browser) loggingOut = false; // Defensive: ensure flag is cleared after successful login
+
   return data;
 }
 
 export async function logOut() {
-  await call('/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include',
-  });
+  if (browser) loggingOut = true;
+  try {
+    await call('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    if (browser) loggingOut = false;
+  }
 }
 
 export async function getIntercomJwt() {
