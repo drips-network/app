@@ -80,7 +80,24 @@
     <IssuePreviewCard issue={data.issue} />
   </FormField>
 
-  {#if data.alreadyApplied}
+  <!-- TODO: Remove this temporary block once GitHub rate limit issues are resolved -->
+  {#if true}
+    <AnnotationBox>
+      Due to a large activity spike, we are being rate-limited by GitHub, so applying to issues is
+      temporarily paused. Please check our <a
+        class="typo-link"
+        href="https://discord.gg/t8XBXZAEs5"
+        target="_blank">Discord</a
+      >
+      for updates and try again later.
+
+      {#snippet actions()}
+        <Button icon={Discord} href="https://discord.gg/t8XBXZAEs5" target="_blank"
+          >Join our Discord</Button
+        >
+      {/snippet}
+    </AnnotationBox>
+  {:else if data.alreadyApplied}
     <AnnotationBox>You already previously applied to this issue.</AnnotationBox>
   {:else if data.isOwnIssue}
     <AnnotationBox>
