@@ -31,7 +31,7 @@ To fully utilize the Wave service locally, you must create a GitHub App.
         - **Option B (Static URL)**:
             - Set `WAVE_PUBLIC_URL` in your `.env` (e.g. `https://my-tunnel.example.com`).
             - Use your configured domain: `https://<your-domain>/api/webhooks/github`
-            - Use your configured domain: `https://<your-domain>/api/webhooks/github`
+
         - *Active*: Check this box.
 
 3.  **Permissions and Events**:
@@ -165,7 +165,7 @@ The default setup uses a Cloudflare Quick Tunnel, which generates a random URL e
     ```bash
     docker compose logs cloudflared | grep "URL captured"
     ```
-6.  On Github, update the GitHub App Webhook URL with this new URL.
+6.  On GitHub, update the GitHub App Webhook URL with this new URL.
 
 ### Option 3: Static URL (Custom Tunnel / Deployment)
 For a persistent URL (e.g., `https://my-drips-dev.example.com`), you can use your own tunneling solution (like ngrok, a manually managed Cloudflare Tunnel, or a VPS).
