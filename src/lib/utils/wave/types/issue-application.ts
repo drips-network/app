@@ -60,6 +60,29 @@ export const applicationQuotaDtoSchema = z.object({
 });
 export type ApplicationQuotaDto = z.infer<typeof applicationQuotaDtoSchema>;
 
+export const quotaApplicationDetailDtoSchema = z.object({
+  id: z.uuid(),
+  status: z.enum(['pending', 'accepted']),
+  appliedAt: z.coerce.date(),
+  countsTowardQuota: z.boolean(),
+  issue: z.object({
+    id: z.uuid(),
+    gitHubIssueNumber: z.number().int(),
+    title: z.string(),
+    state: z.string(),
+    repo: z.object({
+      gitHubRepoFullName: z.string(),
+      gitHubOrgAvatarUrl: z.string().nullable(),
+    }),
+  }),
+});
+export type QuotaApplicationDetailDto = z.infer<typeof quotaApplicationDetailDtoSchema>;
+
+export const quotaDetailsDtoSchema = applicationQuotaDtoSchema.extend({
+  applications: z.array(quotaApplicationDetailDtoSchema),
+});
+export type QuotaDetailsDto = z.infer<typeof quotaDetailsDtoSchema>;
+
 export const issueApplicationFiltersSchema = filterSchema(
   z.object({
     includeRemoved: z.boolean().optional(),
