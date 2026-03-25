@@ -3,6 +3,17 @@ import { error } from '@sveltejs/kit';
 import getOptionalEnvVarPublic from '../get-optional-env-var/public';
 import { getRefreshedAuthToken } from './auth';
 
+export class AccountSuspendedError extends Error {
+  constructor() {
+    super('Account suspended');
+    this.name = 'AccountSuspendedError';
+  }
+}
+
+function isAccountSuspendedResponse(status: number, body: string): boolean {
+  return status === 403 && body.includes('suspended');
+}
+
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_DELAY_MS = 500;
 
@@ -46,6 +57,11 @@ export async function call(path: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorText = await response.text();
+
+    if (isAccountSuspendedResponse(response.status, errorText)) {
+      throw new AccountSuspendedError();
+    }
+
     throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
   }
   return response.json();
@@ -108,6 +124,10 @@ export async function authenticatedCall(
       return authenticatedCall(f, path, options, false);
     } else if ((!res.ok && res.status !== 404) || res.status === 403) {
       const errorText = await res.text();
+
+      if (isAccountSuspendedResponse(res.status, errorText)) {
+        throw new AccountSuspendedError();
+      }
 
       if (res.status === 401) {
         throw error(401, 'Unauthorized');
