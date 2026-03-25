@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Component } from 'svelte';
+  import type { Component, Snippet } from 'svelte';
   import Button from '../button/button.svelte';
   import Tooltip from '../tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
@@ -22,6 +22,7 @@
     actionsDisabled?: boolean;
     anchorTarget?: string | undefined;
     infoTooltip?: string | undefined;
+    infoTooltipContent?: Snippet | undefined;
     collapsed?: boolean;
     collapsable?: boolean;
   }
@@ -34,6 +35,7 @@
     actionsDisabled = false,
     anchorTarget = undefined,
     infoTooltip = undefined,
+    infoTooltipContent = undefined,
     collapsed = $bindable(true),
     collapsable = $bindable(false),
   }: Props = $props();
@@ -67,11 +69,15 @@
       </div>
     {/if}
 
-    {#if infoTooltip}
+    {#if infoTooltip || infoTooltipContent}
       <Tooltip>
         <InfoCircle style="height: 1.5rem; width: 1.5rem;" />
         {#snippet tooltip_content()}
-          {infoTooltip}
+          {#if infoTooltipContent}
+            {@render infoTooltipContent()}
+          {:else}
+            {infoTooltip}
+          {/if}
         {/snippet}
       </Tooltip>
     {/if}

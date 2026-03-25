@@ -12,12 +12,13 @@
       gitHubRepoFullName: string;
     };
     avatarUrl?: string;
-    size?: 'normal' | 'small';
+    size?: 'normal' | 'small' | 'tiny';
     clamp?: boolean;
     href?: string;
   } = $props();
 
   const IMAGE_SIZES = {
+    tiny: 16,
     small: 24,
     normal: 32,
   };
@@ -65,7 +66,7 @@
       <GithubIcon style="width: 75%; height: 75%;" />
     </div>
   {/if}
-  <span class={size === 'small' ? 'typo-text-small' : 'typo-text'} class:line-clamp-1={clamp}
+  <span class={size === 'normal' ? 'typo-text' : 'typo-text-small'} class:line-clamp-1={clamp}
     >{repo.gitHubRepoFullName}</span
   >
 {/snippet}

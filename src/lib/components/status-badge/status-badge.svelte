@@ -2,7 +2,7 @@
   import type { Component } from 'svelte';
 
   interface Props {
-    size?: 'small' | 'normal' | 'large';
+    size?: 'tiny' | 'small' | 'normal' | 'large';
     color?: 'caution' | 'positive' | 'foreground' | 'negative' | 'primary';
     icon?: Component | undefined;
     children?: import('svelte').Snippet;
@@ -11,6 +11,7 @@
   let { size = 'normal', color = 'foreground', icon = undefined, children }: Props = $props();
 
   const textClasses = {
+    tiny: 'typo-text-small',
     small: 'typo-text-small',
     normal: 'typo-text',
     large: 'typo-header-3',
@@ -42,6 +43,12 @@
     white-space: nowrap;
   }
 
+  .status-badge.tiny {
+    height: 1.25rem;
+    padding: 0 0.4rem;
+    gap: 0.25rem;
+  }
+
   .status-badge.small {
     height: 1.5rem;
     padding: 0 0.5rem;
@@ -58,6 +65,11 @@
     height: 0.5rem;
     width: 0.5rem;
     border-radius: 0.25rem;
+  }
+
+  .tiny .dot {
+    height: 0.3rem;
+    width: 0.3rem;
   }
 
   .small .dot {
