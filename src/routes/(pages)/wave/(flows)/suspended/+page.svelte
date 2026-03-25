@@ -4,7 +4,7 @@
 
 <LargeEmptyState
   emoji="🚫"
-  headline="Your account has been suspended"
+  headline="Your Wave account has been suspended"
   description="Please contact support at support@drips.network for more information."
   button={{
     label: 'Go to drips.network',
