@@ -72,7 +72,7 @@ export const quotaApplicationDetailDtoSchema = z.object({
     state: z.string(),
     repo: z.object({
       gitHubRepoFullName: z.string(),
-      orgAvatarUrl: z.string().nullable(),
+      gitHubOrgAvatarUrl: z.string().nullable(),
     }),
   }),
 });

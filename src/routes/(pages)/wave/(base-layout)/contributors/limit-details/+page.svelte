@@ -74,7 +74,7 @@
           ><RepoBadge
             size="tiny"
             repo={app.issue.repo}
-            avatarUrl={app.issue.repo.orgAvatarUrl ?? undefined}
+            avatarUrl={app.issue.repo.gitHubOrgAvatarUrl ?? undefined}
           /></span
         >
         <StatusBadge size="tiny" color={app.status === 'accepted' ? 'positive' : 'caution'}>
