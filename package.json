@@ -23,7 +23,7 @@
     "gql:build-types": "./scripts/build-gql-types.sh",
     "gql:build": "npm run gql:generate-schema && npm run gql:build-types",
     "analyze-unused-code": "knip",
-    "build:app": "vite build",
+    "build:app": "NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     "build:telemetry": "vite build --config vite.telemetry.config.js",
     "build": "npm run gql:build && npm run build:app && npm run build:telemetry"
   },

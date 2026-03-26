@@ -15,7 +15,7 @@ const config = defineConfig(({ mode }) => ({
     // Prevent Vite from externalizing ethers — @lit-protocol packages depend on ethers v5
     // (nested in their node_modules), but the top-level ethers is v6. If externalized,
     // Node resolves to v6 which doesn't export 'ethers/lib/utils'.
-    noExternal: ['ethers'],
+    noExternal: [/^ethers/],
   },
   plugins: [
     devtoolsJson(),
