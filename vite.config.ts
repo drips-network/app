@@ -11,6 +11,17 @@ if (process.env.FARO_UPLOAD_SOURCE_MAPS_KEY) {
 }
 
 const config = defineConfig(({ mode }) => ({
+  ssr: {
+    // Lit Protocol packages are ~845MB and only used server-side.
+    // Externalizing them avoids Vite trying to bundle/analyze them, which causes OOM on CI.
+    external: [
+      '@lit-protocol/lit-client',
+      '@lit-protocol/auth',
+      '@lit-protocol/networks',
+      '@lit-protocol/auth-helpers',
+      '@lit-protocol/constants',
+    ],
+  },
   plugins: [
     devtoolsJson(),
     sveltekit(),
