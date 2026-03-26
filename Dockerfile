@@ -119,7 +119,7 @@ RUN npm run gql:generate-schema
 RUN npm run gql:build-types
 
 # While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
-RUN npm run build:app
+RUN NODE_OPTIONS="--max-old-space-size=8192" npm run build:app
 
 RUN npm run build:telemetry
 
