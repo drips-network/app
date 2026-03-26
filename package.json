@@ -23,7 +23,7 @@
     "gql:build-types": "./scripts/build-gql-types.sh",
     "gql:build": "npm run gql:generate-schema && npm run gql:build-types",
     "analyze-unused-code": "knip",
-    "build:app": "NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
+    "build:app": "vite build",
     "build:telemetry": "vite build --config vite.telemetry.config.js",
     "build": "npm run gql:build && npm run build:app && npm run build:telemetry"
   },
@@ -84,9 +84,6 @@
   },
   "dependencies": {
     "@gelatocloud/gasless": "^0.0.12",
-    "@lit-protocol/auth": "^8.2.3",
-    "@lit-protocol/lit-client": "^8.3.1",
-    "@lit-protocol/networks": "^8.4.1",
     "@apollo/client": "^3.11.8",
     "@drips-network/sdk": "0.1.0-alpha.15",
     "@efstajas/svelte-stored-writable": "^1.0.0",
