@@ -11,6 +11,12 @@ if (process.env.FARO_UPLOAD_SOURCE_MAPS_KEY) {
 }
 
 const config = defineConfig(({ mode }) => ({
+  ssr: {
+    // Prevent Vite from externalizing ethers — @lit-protocol packages depend on ethers v5
+    // (nested in their node_modules), but the top-level ethers is v6. If externalized,
+    // Node resolves to v6 which doesn't export 'ethers/lib/utils'.
+    noExternal: ['ethers'],
+  },
   plugins: [
     devtoolsJson(),
     sveltekit(),
