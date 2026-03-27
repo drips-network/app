@@ -58,13 +58,13 @@ export async function getPhoneVerificationStatus(f = fetch) {
   );
 }
 
-export async function requestPhoneVerification(f = fetch, phoneNumber: string) {
+export async function requestPhoneVerification(f = fetch, phoneNumber: string, dispatchId: string) {
   const res = await authenticatedCall(f, `/api/phone/initiate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ phoneNumber }),
+    body: JSON.stringify({ phoneNumber, dispatchId }),
   });
 
   if (!res.ok && res.status === 409) {

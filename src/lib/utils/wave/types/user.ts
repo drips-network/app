@@ -153,6 +153,7 @@ export const initiatePhoneVerificationDtoSchema = z.object({
     .regex(/^\+[1-9]\d{6,14}$/, {
       message: 'Phone number must be in E.164 format (e.g., +14155552671)',
     }),
+  dispatchId: z.string(),
 });
 export type InitiatePhoneVerificationDto = z.infer<typeof initiatePhoneVerificationDtoSchema>;
 

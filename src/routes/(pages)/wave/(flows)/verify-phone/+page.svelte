@@ -7,6 +7,8 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { requestPhoneVerification } from '$lib/utils/wave/users.js';
+  import { dispatchSignals } from '@prelude.so/js-sdk';
+  import getOptionalEnvVarPublic from '$lib/utils/get-optional-env-var/public';
   import FlowStepWrapper from '../shared/flow-step-wrapper.svelte';
   import COUNTRIES from './countries';
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
@@ -26,6 +28,12 @@
 
   let { data } = $props();
   let { backTo, phoneVerificationStatus } = $derived(data);
+
+  const PRELUDE_SDK_KEY = getOptionalEnvVarPublic(
+    'PUBLIC_PRELUDE_SDK_KEY',
+    true,
+    'Prelude signals will not be dispatched.',
+  );
 
   let phoneNumber = $state('');
   let submitting = $state(false);
@@ -65,7 +73,9 @@
           throw new Error('Invalid phone number');
         }
 
-        await requestPhoneVerification(undefined, parsedNumber.number.number);
+        const dispatchId = await dispatchSignals(PRELUDE_SDK_KEY!);
+
+        await requestPhoneVerification(undefined, parsedNumber.number.number, dispatchId);
 
         phoneVerificationState.phoneNumber = parsedNumber.number;
 
