@@ -1,9 +1,9 @@
 import z from 'zod';
-import { authenticatedCall, call } from './call';
+import { authenticatedCall, call, AccountSuspendedError } from './call';
 import { jwtDecode } from 'jwt-decode';
 import type { WaveUser } from './types/user';
 import parseRes from './utils/parse-res';
-import { invalidateAll } from '$app/navigation';
+import { goto, invalidateAll } from '$app/navigation';
 import { browser } from '$app/environment';
 
 const accessClaimJwtSchema = z.object({
@@ -103,6 +103,12 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
     console.error('Failed to refresh auth token:', e);
 
     await logOut();
+
+    if (e instanceof AccountSuspendedError) {
+      await goto('/wave/suspended');
+      return null;
+    }
+
     await invalidateAll();
 
     return null;
