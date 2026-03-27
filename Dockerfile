@@ -86,6 +86,8 @@ ARG INTERCOM_ACCESS_TOKEN
 
 ARG PUBLIC_TURNSTILE_SITE_KEY
 
+ARG PUBLIC_PRELUDE_SDK_KEY
+
 RUN apt-get update \
     && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
