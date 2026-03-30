@@ -10,6 +10,7 @@ import {
   applicationQuotaDtoSchema,
   issueApplicationFiltersSchema,
   issueApplicationWithDetailsDtoSchema,
+  quotaDetailsDtoSchema,
   type IssueApplicationFilters,
 } from './types/issue-application';
 import {
@@ -63,6 +64,13 @@ export async function getApplicationQuota(f = fetch, waveProgramId: string) {
   return parseRes(
     applicationQuotaDtoSchema,
     await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/quotas/applications`),
+  );
+}
+
+export async function getApplicationQuotaDetails(f = fetch, waveProgramId: string) {
+  return parseRes(
+    quotaDetailsDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/quotas/applications/details`),
   );
 }
 

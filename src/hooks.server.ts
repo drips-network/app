@@ -3,7 +3,7 @@ import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
-import { error } from '@sveltejs/kit';
+import { error, isRedirect, redirect } from '@sveltejs/kit';
 import { getUserData } from '$lib/utils/wave/auth';
 
 PuppeteerManager.launch({
@@ -42,6 +42,14 @@ export const handle = async ({ event, resolve }) => {
           });
 
           if (!res.ok) {
+            if (res.status === 403) {
+              const body = await res.text();
+              if (body.includes('suspended')) {
+                event.cookies.delete('wave_refresh_token', { path: '/' });
+                event.cookies.delete('wave_access_token', { path: '/' });
+                throw redirect(302, '/wave/suspended');
+              }
+            }
             throw new Error('Failed to refresh token');
           }
 
@@ -69,7 +77,9 @@ export const handle = async ({ event, resolve }) => {
               });
             }
           }
-        } catch {
+        } catch (e) {
+          if (isRedirect(e)) throw e;
+
           // Refresh failed, clear auth state
           event.cookies.delete('wave_refresh_token', { path: '/' });
           event.cookies.delete('wave_access_token', { path: '/' });

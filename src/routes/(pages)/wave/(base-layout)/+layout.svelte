@@ -16,6 +16,7 @@
   import Wave from '$lib/components/icons/Wave.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import Shield from '$lib/components/icons/Shield.svelte';
+  import Speedometer from '$lib/components/icons/Speedometer.svelte';
 
   let {
     data,
@@ -69,6 +70,12 @@
             href: '/wave/contributors/issues',
             icon: Issue,
             count: data.counts.contributorIssuesCount,
+          },
+          {
+            type: 'target' as const,
+            name: 'Application Limits',
+            href: '/wave/contributors/limit-details',
+            icon: Speedometer,
           },
         ],
       },

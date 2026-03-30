@@ -5,6 +5,7 @@
   import { goto, invalidateAll } from '$app/navigation';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Button from '$lib/components/button/button.svelte';
+  import { AccountSuspendedError } from '$lib/utils/wave/call';
 
   let { data } = $props();
   let { backTo, skipWelcome } = $derived(data);
@@ -22,6 +23,10 @@
 
       return goto(backTo || '/wave');
     } catch (err) {
+      if (err instanceof AccountSuspendedError) {
+        return goto('/wave/suspended');
+      }
+
       // eslint-disable-next-line no-console
       console.error('Login callback error:', err);
       error = true;

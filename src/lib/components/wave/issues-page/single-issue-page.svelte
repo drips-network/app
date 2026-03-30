@@ -573,37 +573,39 @@
           </div>
         </div>
 
-        <div class="sidebar-section">
-          <div class="content">
-            <h5>Pull request</h5>
+        {#if issue.state === 'open' || issue.prLink}
+          <div class="sidebar-section">
+            <div class="content">
+              <h5>Pull request</h5>
 
-            {#if issue.prLink}
-              {@const prNumber = issue.prLink.match(/\/pull\/(\d+)/)?.[1]}
-              <a class="typo-link" href={issue.prLink} target="_blank" rel="noopener noreferrer"
-                >#{prNumber ?? issue.prLink}</a
-              >
+              {#if issue.prLink}
+                {@const prNumber = issue.prLink.match(/\/pull\/(\d+)/)?.[1]}
+                <a class="typo-link" href={issue.prLink} target="_blank" rel="noopener noreferrer"
+                  >#{prNumber ?? issue.prLink}</a
+                >
 
-              {#if issue.excludedFromPendingApplicationLimit && issue.state === 'open'}
-                <AnnotationBox type="info" size="small">
-                  This issue's PR was found to be substantial enough, so it no longer counts against
-                  the pending application limit.
+                {#if issue.excludedFromPendingApplicationLimit && issue.state === 'open'}
+                  <AnnotationBox type="info" size="small">
+                    This issue's PR was found to be substantial enough, so it no longer counts
+                    against the pending application limit.
 
-                  {#snippet actions()}
-                    <Button
-                      size="small"
-                      icon={ArrowBoxUpRight}
-                      href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#automated-limit-release"
-                      target="_blank"
-                      rel="noopener noreferrer">Learn more</Button
-                    >
-                  {/snippet}
-                </AnnotationBox>
+                    {#snippet actions()}
+                      <Button
+                        size="small"
+                        icon={ArrowBoxUpRight}
+                        href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#automated-limit-release"
+                        target="_blank"
+                        rel="noopener noreferrer">Learn more</Button
+                      >
+                    {/snippet}
+                  </AnnotationBox>
+                {/if}
+              {:else}
+                <p style:color="var(--color-foreground-level-5)">No PR linked.</p>
               {/if}
-            {:else}
-              <p style:color="var(--color-foreground-level-5)">No PR linked.</p>
-            {/if}
+            </div>
           </div>
-        </div>
+        {/if}
 
         <div class="sidebar-section">
           <div class="content">
