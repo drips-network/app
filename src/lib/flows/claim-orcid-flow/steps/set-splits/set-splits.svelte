@@ -30,6 +30,12 @@
   } from '$lib/utils/sdk/caller/caller';
   import gaslessStore from '$lib/stores/gasless/gasless.store';
   import { orcidIdToSandoxOrcidId } from '$lib/utils/orcids/fetch-orcid';
+  import {
+    populateRepoDriverWriteTx,
+    executeRepoDriverReadMethod,
+  } from '$lib/utils/sdk/repo-driver/repo-driver';
+  import getOwnAccountId from '$lib/utils/sdk/utils/get-own-account-id';
+  import { hexlify, toUtf8Bytes } from 'ethers';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -124,6 +130,7 @@
     sdk: NonNullable<typeof sdkManager.sdk>,
     gasslessOwnerUpdateTaskId: string | undefined,
     orcid: string,
+    litOwnerUpdateSignature: State['litOwnerUpdateSignature'],
   ) {
     let transactions: TransactionWrapperOrExternalTransaction[] = [];
     let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
@@ -151,7 +158,64 @@
       }
     }
 
-    if (gasslessOwnerUpdateTaskId) {
+    if (litOwnerUpdateSignature) {
+      const { sourceId, name, owner, timestamp, r, vs } = litOwnerUpdateSignature;
+
+      const updateOwnerByLitTx = await populateRepoDriverWriteTx({
+        functionName: 'updateOwnerByLit',
+        args: [
+          sourceId,
+          name as `0x${string}`,
+          owner as `0x${string}`,
+          timestamp,
+          r as `0x${string}`,
+          vs as `0x${string}`,
+        ],
+      });
+
+      // On networks without gasless support, the Lit signature timestamp may be
+      // ahead of the chain's latest block. Simulate the tx in a retry loop to
+      // wait for the chain to catch up before proposing it to the wallet.
+      const { provider } = $walletStore;
+
+      const simulationResult = await expect(
+        async () => {
+          try {
+            await provider.call({
+              to: updateOwnerByLitTx.to,
+              data: updateOwnerByLitTx.data,
+            });
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        (result) => result === true,
+        30000,
+        3000,
+      );
+
+      if (simulationResult.failed) {
+        throw new Error(
+          'The owner update transaction simulation failed after multiple attempts. ' +
+            'The chain may not have caught up with the signature timestamp yet. Please try again.',
+        );
+      }
+
+      transactions.push(
+        {
+          title: 'Update ORCID iD owner',
+          transaction: updateOwnerByLitTx,
+          applyGasBuffer: false,
+        },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForOrcidOwnerUpdate(false),
+        },
+      );
+    } else if (gasslessOwnerUpdateTaskId) {
       transactions.push({
         external: true,
         title: 'Finalizing verification...',
@@ -221,11 +285,35 @@
             sdk,
             $context.gaslessOwnerUpdateTaskId,
             $context.claimableId,
+            $context.litOwnerUpdateSignature,
           );
 
-          const { setSplitsTx } = await sdk.linkedIdentities.prepareClaimOrcid({
-            orcidId: orcidIdToSandoxOrcidId($context.claimableId),
-          });
+          let setSplitsTx;
+
+          if ($context.litOwnerUpdateSignature) {
+            // When Lit is enabled, the account ID is computed with the Lit sourceId
+            // (e.g. 4 for orcidSandbox) and the plain ORCID name. The SDK's
+            // prepareClaimOrcid always uses sourceId=2 with "sandbox-" prefix,
+            // which produces a different account ID.
+            const { sourceId } = $context.litOwnerUpdateSignature;
+            const nameHex = hexlify(toUtf8Bytes($context.claimableId)) as `0x${string}`;
+
+            const litAccountId = await executeRepoDriverReadMethod({
+              functionName: 'calcAccountId',
+              args: [sourceId, nameHex],
+            });
+
+            const ownAccountId = await getOwnAccountId();
+
+            setSplitsTx = await populateRepoDriverWriteTx({
+              functionName: 'setSplits',
+              args: [litAccountId, [{ accountId: BigInt(ownAccountId), weight: 1_000_000 }]],
+            });
+          } else {
+            ({ setSplitsTx } = await sdk.linkedIdentities.prepareClaimOrcid({
+              orcidId: orcidIdToSandoxOrcidId($context.claimableId),
+            }));
+          }
 
           txs.push({
             title: 'Set ORCID iD splits',

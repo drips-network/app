@@ -28,6 +28,8 @@ services:
       - PUBLIC_DRIPS_RPGF_URL=http://localhost:5293
       - PUBLIC_INTERNAL_DRIPS_RPGF_URL=http://rpgf:5000
       - PUBLIC_ORCID_API_URL=https://pub.sandbox.orcid.org
+      - PUBLIC_USE_LIT_OWNER_UPDATE=true
+      - PROJECT_CLAIM_API_URL=http://project-claim-api:3100
       - PUBLIC_WAVE_API_URL=${PUBLIC_WAVE_API_URL-http://localhost:8000}
       - PUBLIC_INTERNAL_WAVE_API_URL=${PUBLIC_INTERNAL_WAVE_API_URL-http://wave:8000}
       - PUBLIC_WAVE_GITHUB_APP_NAME=${PUBLIC_WAVE_GITHUB_APP_NAME}
@@ -41,6 +43,26 @@ services:
       - redis
       - graphql-api
       - fake-pinata
+      - project-claim-api
+
+  project-claim-api:
+    image: 'j537/project-claim-api:${PROJECT_CLAIM_API_TAG-main}'
+    pull_policy: always
+    environment:
+      - LIT_NETWORK=dev
+      - CACHE_REDIS_CONNECTION_STRING=redis://redis:6379
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      - PORT=3100
+    ports:
+      - 3100:3100
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3100/health']
+      interval: 1s
+      timeout: 30s
+      retries: 5
 
   redis:
     image: redis:latest
@@ -54,7 +76,7 @@ services:
       - 6379:6379
 
   dripfeed:
-    image: 'j537/dripfeed:${DRIPFEED_TAG-main}-localtestnet'
+    image: 'j537/dripfeed:${DRIPFEED_TAG-jason-support-lit}-localtestnet'
     pull_policy: always
     entrypoint: bash -c "npm run db:migrate && npm run start"
     environment:
@@ -89,7 +111,7 @@ services:
         condition: service_healthy
 
   graphql-api:
-    image: 'j537/graphql-api:${GRAPHQL_API_TAG-main}'
+    image: 'j537/graphql-api:${GRAPHQL_API_TAG-jason-support-lit-orcid}'
     pull_policy: always
     environment:
       - 'RPC_CONFIG={"LOCALTESTNET": { "url": "http://testnet:8545" }}'
@@ -119,7 +141,7 @@ services:
       retries: 5
 
   testnet:
-    image: 'j537/contracts:${CONTRACTS_TAG-igor-orcid}-${ARCH}'
+    image: 'j537/contracts:${CONTRACTS_TAG-igor-lit}-${ARCH}'
     pull_policy: always
     ports:
       - '8545:8545'

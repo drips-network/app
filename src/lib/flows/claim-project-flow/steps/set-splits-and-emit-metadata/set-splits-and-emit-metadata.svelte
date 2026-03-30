@@ -146,6 +146,7 @@
   async function generateOwnerUpdateTransactions(
     gasslessOwnerUpdateTaskId: string | undefined,
     gitUrl: string,
+    litOwnerUpdateSignature: State['litOwnerUpdateSignature'],
   ) {
     let transactions: TransactionWrapperOrExternalTransaction[] = [];
     let fakeProgressBarConfig: { expectedDurationMs: number; expectedDurationText: string };
@@ -173,7 +174,64 @@
       }
     }
 
-    if (gasslessOwnerUpdateTaskId) {
+    if (litOwnerUpdateSignature) {
+      const { sourceId, name, owner, timestamp, r, vs } = litOwnerUpdateSignature;
+
+      const updateOwnerByLitTx = await populateRepoDriverWriteTx({
+        functionName: 'updateOwnerByLit',
+        args: [
+          sourceId,
+          name as `0x${string}`,
+          owner as `0x${string}`,
+          timestamp,
+          r as `0x${string}`,
+          vs as `0x${string}`,
+        ],
+      });
+
+      // On networks without gasless support, the Lit signature timestamp may be
+      // ahead of the chain's latest block. Simulate the tx in a retry loop to
+      // wait for the chain to catch up before proposing it to the wallet.
+      const { provider } = $walletStore;
+
+      const simulationResult = await expect(
+        async () => {
+          try {
+            await provider.call({
+              to: updateOwnerByLitTx.to,
+              data: updateOwnerByLitTx.data,
+            });
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        (result) => result === true,
+        30000,
+        3000,
+      );
+
+      if (simulationResult.failed) {
+        throw new Error(
+          'The owner update transaction simulation failed after multiple attempts. ' +
+            'The chain may not have caught up with the signature timestamp yet. Please try again.',
+        );
+      }
+
+      transactions.push(
+        {
+          title: 'Update repository owner',
+          transaction: updateOwnerByLitTx,
+          applyGasBuffer: false,
+        },
+        {
+          external: true,
+          title: 'Finalizing verification...',
+          ...fakeProgressBarConfig,
+          promise: () => waitForRepoOwnerUpdate(false),
+        },
+      );
+    } else if (gasslessOwnerUpdateTaskId) {
       transactions.push({
         external: true,
         title: 'Finalizing verification...',
@@ -259,6 +317,7 @@
             : await generateOwnerUpdateTransactions(
                 $context.gaslessOwnerUpdateTaskId,
                 $context.gitUrl,
+                $context.litOwnerUpdateSignature,
               );
 
           const address = $walletStore.address;
