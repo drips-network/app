@@ -240,9 +240,10 @@ export const steps = (
   makeStep({
     component: SuccessStep,
     props: {
-      message: get(state).isReclaiming
-        ? 'Your project has been successfully re-claimed.'
-        : 'Your project has been successfully claimed.',
+      message: () =>
+        get(state).isReclaiming
+          ? 'Your project has been successfully re-claimed.'
+          : 'Your project has been successfully claimed.',
       action: linkToProjectPageOnSuccess ? 'link' : 'close',
       href() {
         const context = get(state);
