@@ -7,6 +7,7 @@ import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi';
 import assert from '$lib/utils/assert';
 import assert0xString from '$lib/utils/assert0x';
 import { relayer } from '../../gelato';
+import { StatusCode } from '@gelatocloud/gasless';
 import { redis } from '../../../redis';
 
 const payloadSchema = z.object({
@@ -60,7 +61,13 @@ export const POST: RequestHandler = async ({ request }) => {
   const existingTaskId = await redis.get(blockKey);
 
   if (existingTaskId) {
-    return new Response(JSON.stringify({ taskId: existingTaskId }));
+    const { status } = await relayer.getStatus({ id: existingTaskId });
+
+    if ([StatusCode.Pending, StatusCode.Submitted].includes(status)) {
+      return new Response(JSON.stringify({ taskId: existingTaskId }));
+    } else {
+      await redis.del(blockKey);
+    }
   }
 
   try {
