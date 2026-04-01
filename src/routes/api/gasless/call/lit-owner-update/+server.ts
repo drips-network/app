@@ -21,6 +21,10 @@ const payloadSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request }) => {
+  if (!network.gaslessTransactions) {
+    return error(404, 'Gasless transactions are not enabled on this network');
+  }
+
   if (!relayer) {
     return error(503, 'Gelato Relayer client not initialized');
   }
