@@ -10,7 +10,7 @@ To run a local dev environment, simply run `npm run dev:docker`. This will start
 
 If you're having trouble with `sudo` being required for interacting with Docker on Linux systems, please follow [Docker's instructions for allowing non-sudo access to the Docker daemon](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user). 
 
-No values in `.env` should be required for running the local dev stack, however setting `GITHUB_PERSONAL_ACCESS_TOKEN` is strongly recommended. Without it, the app will be heavily rate-limited by the GitHub API, and loading project data may fail.
+No values in `.env` should be required for running the local dev stack; however, setting `GITHUB_PERSONAL_ACCESS_TOKEN` is strongly recommended. Without it, the app will be heavily rate-limited by the GitHub API, and loading project data may fail.
 
 ### 🪟 Running on Windows
 
@@ -34,7 +34,7 @@ Head to Settings within the app and enable "Developer mode" to display helpful "
 
 ### 🌳 Running the staging branch of services
 
-If you need to develop with unreleased features of one more other services, you can set the tag to use for a particular service by passing an environment variable to the `dev:docker` command. Most services will build images for `main` and `staging` branches, by default the `main` tag is used.
+If you need to develop with unreleased features of one or more other services, you can set the tag to use for a particular service by passing an environment variable to the `dev:docker` command. Most services will build images for `main` and `staging` branches, by default the `main` tag is used.
 
 To switch to staging images, pass one or more of the following env vars:
 - `MULTIPLAYER_TAG=staging`
@@ -58,7 +58,7 @@ To claim a project during local dev mode:
 
 ### 💦 Triggering a settlement event
 
-On production networks, funds on Drips donated to projects and Drip Lists are automatically `split` with recipients using (Sprinkler)[https://github.com/drips-network/sprinkler]. You can manually trigger settlement on your local environment by running `npm run dev:docker:sprinkle`. It will automatically detect TEST sitting Drip Lists or projects, and split them to recipients.
+On production networks, funds on Drips donated to projects and Drip Lists are automatically `split` with recipients using [Sprinkler](https://github.com/drips-network/sprinkler). You can manually trigger settlement on your local environment by running `npm run dev:docker:sprinkle`. It will automatically detect TEST sitting Drip Lists or projects, and split them to recipients.
 
 ## 🥸 Inspecting databases with PGAdmin
 
@@ -105,4 +105,3 @@ Tip: Run `npx playwright codegen http://localhost:5173` after starting the local
 ### Limitations
 
 Tests all run against the same local dev stack, which is created before tests are triggered, and destroyed afterwards. This means that separate tests need to be designed such that state changes they trigger on the local dev stack (e.g. projects being claimed, tokens being topped up, drip lists being created etc.) do not interfere with any other test.
-
