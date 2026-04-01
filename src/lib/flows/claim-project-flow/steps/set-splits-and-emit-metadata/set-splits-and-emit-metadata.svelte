@@ -207,7 +207,7 @@
           }
         },
         (result) => result === true,
-        60000,
+        30000,
         3000,
       );
 
@@ -218,10 +218,35 @@
         );
       }
 
+      const callerTx = await populateCallerWriteTx({
+        functionName: 'callBatched',
+        args: [[txToCallerCall(updateOwnerByLitTx)]],
+      });
+
+      const { address } = $walletStore;
+      assert(address, 'Wallet address is not defined');
+
       transactions.push(
         {
           title: 'Update repository owner',
-          transaction: updateOwnerByLitTx,
+          transaction: callerTx,
+          gasless: $gaslessStore
+            ? {
+                nonceGetter: () => getCallerNonce(address),
+                ERC2771Data: (nonce) => ({
+                  domain: CallerERC2771Domain,
+                  types: CallSignedERC2771Types,
+                  payload: {
+                    sender: $walletStore.address,
+                    target: callerTx.to,
+                    data: callerTx.data,
+                    value: '0',
+                    nonce,
+                    deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+                  },
+                }),
+              }
+            : undefined,
           applyGasBuffer: false,
         },
         {
