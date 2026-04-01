@@ -29,6 +29,8 @@
   import { Octokit } from '@octokit/rest';
   import { env } from '$env/dynamic/public';
   import getLitChainName from '$lib/utils/lit/get-lit-chain-name';
+  import expect from '$lib/utils/expect';
+  import { populateRepoDriverWriteTx } from '$lib/utils/sdk/repo-driver/repo-driver';
 
   const octokit = new Octokit();
   const github = new GitHub(octokit);
@@ -103,7 +105,7 @@
 
         if (env.PUBLIC_USE_LIT_OWNER_UPDATE === 'true') {
           // Use Lit Protocol to get a verifiable ownership signature
-          const res = await fetch('/api/lit/owner-signature', {
+          const litRes = await fetch('/api/lit/owner-signature', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -113,11 +115,68 @@
             }),
           });
 
-          if (!res.ok) {
+          if (!litRes.ok) {
             throw new Error('Failed to get ownership signature from Lit. Please try again later.');
           }
 
-          $context.litOwnerUpdateSignature = await res.json();
+          const litSignature = await litRes.json();
+
+          // Build the tx to simulate against the chain before relaying,
+          // since the Lit signature timestamp may be ahead of the chain's latest block.
+          const updateOwnerByLitTx = await populateRepoDriverWriteTx({
+            functionName: 'updateOwnerByLit',
+            args: [
+              litSignature.sourceId,
+              litSignature.name as `0x${string}`,
+              litSignature.owner as `0x${string}`,
+              litSignature.timestamp,
+              litSignature.r as `0x${string}`,
+              litSignature.vs as `0x${string}`,
+            ],
+          });
+
+          const simulationResult = await expect(
+            async () => {
+              try {
+                await $walletStore.provider.call({
+                  to: updateOwnerByLitTx.to,
+                  data: updateOwnerByLitTx.data,
+                });
+                return true;
+              } catch {
+                return false;
+              }
+            },
+            (result) => result === true,
+            30000,
+            3000,
+          );
+
+          if (simulationResult.failed) {
+            throw new Error(
+              'The owner update transaction simulation failed after multiple attempts. ' +
+                'The chain may not have caught up with the signature timestamp yet. Please try again.',
+            );
+          }
+
+          // Submit the Lit owner update gaslessly in the background via Gelato
+          const relayRes = await fetch('/api/gasless/call/lit-owner-update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...litSignature,
+              chainId: $walletStore.network.chainId,
+            }),
+          });
+
+          if (relayRes.ok) {
+            const { taskId } = await relayRes.json();
+            $context.gaslessOwnerUpdateTaskId = taskId === null ? undefined : taskId;
+          } else {
+            // If gasless relay fails, fall back to having the user submit via their wallet
+            $context.litOwnerUpdateSignature = litSignature;
+          }
+
           return;
         }
 
@@ -157,7 +216,7 @@
       },
       message: 'Verifying...',
       subtitle:
-        'We’re scanning your repo’s main branch for a FUNDING.json file with your Ethereum address, and computing a cryptographic proof.',
+        'We’re scanning your repo’s main branch for a FUNDING.json file with your Ethereum address and computing a cryptographic proof of its contents. This may take up to a minute.',
     });
   }
 

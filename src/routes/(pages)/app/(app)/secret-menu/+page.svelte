@@ -4,14 +4,10 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
-  import Wallet from '$lib/components/icons/Wallet.svelte';
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import tokensStore from '$lib/stores/tokens/tokens.store';
-  import network from '$lib/stores/wallet/network';
-  import walletStore from '$lib/stores/wallet/wallet.store';
   import formatTokenAmount from '$lib/utils/format-token-amount';
-  import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi';
   import { callerAbi } from '$lib/utils/sdk/caller/caller-abi';
   import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
@@ -19,49 +15,7 @@
   import makeStreamId from '$lib/utils/streams/make-stream-id';
   import { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import { fetchIpfs } from '$lib/utils/ipfs';
-  import {
-    Interface,
-    decodeBytes32String,
-    ethers,
-    isHexString,
-    toBigInt,
-    toUtf8String,
-  } from 'ethers';
-  import assert from '$lib/utils/assert';
-
-  // Update owner
-
-  let projectGitHubUrl = $state('');
-
-  // must be a valid URL on host github.com and path /<owner>/<repo>
-  let projectGitHubUrlValid = $derived(
-    projectGitHubUrl.match(/^https:\/\/github\.com\/[^/]+\/[^/]+$/),
-  );
-
-  let txInProgress = false;
-  async function requestUpdateOwner(gitHubUrl: string) {
-    if (txInProgress) return;
-
-    const { signer } = $walletStore;
-    assert(signer);
-
-    const contract = new ethers.Contract(network.contracts.REPO_DRIVER, repoDriverAbi, signer);
-
-    // Format is `ownerName/repoName`
-    const repoName = gitHubUrl.split('/').slice(-2).join('/');
-
-    txInProgress = true;
-
-    try {
-      const tx = await contract.requestUpdateOwner(0, ethers.hexlify(ethers.toUtf8Bytes(repoName)));
-      await tx.wait();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-    } finally {
-      txInProgress = false;
-    }
-  }
+  import { Interface, decodeBytes32String, isHexString, toBigInt, toUtf8String } from 'ethers';
 
   // Stream config decoder
 
@@ -439,37 +393,6 @@
   <div>
     <h1>Drips Secret Menu</h1>
     <p>A collection of various advanced utilities and functions for Drips.</p>
-  </div>
-  <div class="section">
-    <h3>Request project owner update</h3>
-    <p>
-      Initiate a transaction that calls requestUpdateOwner on Drips' RepoDriver contract. This will
-      result in the project's owner on-chain being updated to the address set for the current chain
-      in the GitHub repo's FUNDING.json file. <a
-        class="typo-link"
-        href="https://docs.drips.network/get-support/advanced/updating-project-owner"
-        target="_blank">Learn more</a
-      >
-    </p>
-    <AnnotationBox type="warning">
-      Before requesting an owner update, ensure a valid Ethereum address is set on the repo's
-      FUNDING.json file for the "{network.name === 'homestead' ? 'ethereum' : network.name}" chain.
-      You'll need to connect a wallet before proceeding.
-    </AnnotationBox>
-    <FormField
-      title="Project GitHub URL"
-      description="Important: Case-sensitive, and must match the casing on GitHub. Navigate to the repo on GitHub and copy the URL 1:1."
-    >
-      <TextInput bind:value={projectGitHubUrl} placeholder="GitHub repo URL" />
-    </FormField>
-    <div>
-      <Button
-        onclick={() => requestUpdateOwner(projectGitHubUrl)}
-        disabled={!projectGitHubUrlValid || !$walletStore.connected}
-        icon={Wallet}
-        variant="primary">Request owner update</Button
-      >
-    </div>
   </div>
   <div class="section">
     <h3>Decode stream config</h3>

@@ -311,7 +311,7 @@
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Claim your project',
+        headline: $context.isReclaiming ? 'Re-claim your project' : 'Claim your project',
 
         before: async () => {
           const gitProjectService = await GitProjectService.new();

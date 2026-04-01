@@ -47,6 +47,7 @@ export interface State {
   linkedToRepo: boolean;
   gitUrl: string;
   isPartiallyClaimed: boolean;
+  isReclaiming: boolean;
   project: ClaimProjectFlowProjectFragment | undefined;
   projectMetadata:
     | {
@@ -90,6 +91,7 @@ export interface State {
 export const flowState = () =>
   writable<State>({
     isPartiallyClaimed: false,
+    isReclaiming: false,
     linkedToRepo: false,
     gitUrl: '',
     project: undefined,
@@ -238,7 +240,9 @@ export const steps = (
   makeStep({
     component: SuccessStep,
     props: {
-      message: 'Your project has been successfully claimed.',
+      message: get(state).isReclaiming
+        ? 'Your project has been successfully re-claimed.'
+        : 'Your project has been successfully claimed.',
       action: linkToProjectPageOnSuccess ? 'link' : 'close',
       href() {
         const context = get(state);
