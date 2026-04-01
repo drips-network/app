@@ -206,6 +206,10 @@
       const projectChainData = filterCurrentChainData(project.chainData);
 
       if (projectChainData.__typename === 'ClaimedProjectData') {
+        if (projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()) {
+          throw new InvalidUrlError('Project already claimed by your connected wallet');
+        }
+
         $context.isReclaiming = true;
       }
 
