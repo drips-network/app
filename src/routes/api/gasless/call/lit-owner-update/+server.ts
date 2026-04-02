@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import network from '$lib/stores/wallet/network';
-import { ethers, JsonRpcProvider } from 'ethers';
+import { ethers, JsonRpcProvider, type ContractTransaction } from 'ethers';
 import { repoDriverAbi } from '$lib/utils/sdk/repo-driver/repo-driver-abi';
 import assert from '$lib/utils/assert';
 import assert0xString from '$lib/utils/assert0x';
@@ -47,14 +47,20 @@ export const POST: RequestHandler = async ({ request }) => {
   const provider = new JsonRpcProvider(network.rpcUrl);
   const contract = new ethers.Contract(network.contracts.REPO_DRIVER, repoDriverAbi, provider);
 
-  const tx = await contract.updateOwnerByLit.populateTransaction(
-    sourceId,
-    name,
-    owner,
-    timestamp,
-    r,
-    vs,
-  );
+  let tx: ContractTransaction;
+
+  try {
+    tx = await contract.updateOwnerByLit.populateTransaction(
+      sourceId,
+      name,
+      owner,
+      timestamp,
+      r,
+      vs,
+    );
+  } catch {
+    throw error(400, 'Invalid parameters');
+  }
 
   assert0xString(tx.to);
   assert0xString(tx.data);
