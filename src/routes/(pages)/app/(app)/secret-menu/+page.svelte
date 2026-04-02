@@ -15,7 +15,10 @@
   import { callerAbi } from '$lib/utils/sdk/caller/caller-abi';
   import { addressDriverAbi } from '$lib/utils/sdk/address-driver/address-driver-abi';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
-  import { streamConfigFromUint256 } from '$lib/utils/sdk/utils/stream-config-utils';
+  import {
+    streamConfigFromUint256,
+    streamConfigToUint256,
+  } from '$lib/utils/sdk/utils/stream-config-utils';
   import makeStreamId from '$lib/utils/streams/make-stream-id';
   import { addressDriverAccountMetadataParser } from '$lib/utils/metadata/schemas';
   import { fetchIpfs } from '$lib/utils/ipfs';
@@ -82,6 +85,39 @@
     }
   });
 
+  // Stream config encoder
+
+  let encodeDripId = $state('');
+  let encodeAmountPerSec = $state('');
+  let encodeStart = $state('');
+  let encodeDuration = $state('');
+
+  let encoded: string | undefined = $state();
+  let encodeError: string | undefined = $state();
+
+  run(() => {
+    try {
+      if (!encodeDripId && !encodeAmountPerSec && !encodeStart && !encodeDuration) {
+        encoded = undefined;
+        encodeError = undefined;
+        return;
+      }
+
+      const config = streamConfigToUint256({
+        dripId: BigInt(encodeDripId || '0'),
+        amountPerSec: BigInt(encodeAmountPerSec || '0'),
+        start: BigInt(encodeStart || '0'),
+        duration: BigInt(encodeDuration || '0'),
+      });
+
+      encoded = config.toString();
+      encodeError = undefined;
+    } catch (e) {
+      encoded = undefined;
+      encodeError = e instanceof Error ? e.message : 'Failed to encode';
+    }
+  });
+
   // Calldata decoder
 
   type StreamChange = {
@@ -114,7 +150,45 @@
     deletedStreams: StreamChange[];
   };
 
-  type DecodeResult = TopUpResult | StreamEditResult;
+  type RawSetStreamsResult = {
+    type: 'rawSetStreams';
+    tokenAddress: string;
+    balanceDelta: bigint;
+    currentReceivers: {
+      accountId: string;
+      dripId: string;
+      amountPerSec: bigint;
+      start: number;
+      duration: number;
+      raw: bigint;
+    }[];
+    newReceivers: {
+      accountId: string;
+      dripId: string;
+      amountPerSec: bigint;
+      start: number;
+      duration: number;
+      raw: bigint;
+    }[];
+    addedReceivers: {
+      accountId: string;
+      dripId: string;
+      amountPerSec: bigint;
+      start: number;
+      duration: number;
+      raw: bigint;
+    }[];
+    removedReceivers: {
+      accountId: string;
+      dripId: string;
+      amountPerSec: bigint;
+      start: number;
+      duration: number;
+      raw: bigint;
+    }[];
+  };
+
+  type DecodeResult = TopUpResult | StreamEditResult | RawSetStreamsResult;
 
   let calldataValue = $state('');
   let decoding = $state(false);
@@ -258,6 +332,13 @@
         return;
       }
 
+      // Fallback: arbitrary direct setStreams (with receiver changes, no metadata).
+      const rawSetStreams = decodeRawSetStreams(raw);
+      if (rawSetStreams) {
+        decodeResult = rawSetStreams;
+        return;
+      }
+
       decodeError = 'Unsupported or unrecognized calldata for this decoder.';
     } catch (err) {
       decodeError = err instanceof Error ? err.message : 'Failed to decode calldata';
@@ -283,6 +364,53 @@
         type: 'topUp',
         tokenAddress,
         balanceDelta,
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  function decodeRawSetStreams(data: string): RawSetStreamsResult | undefined {
+    try {
+      const [tokenAddress, currReceivers, balanceDelta, newReceivers] =
+        addressDriverInterface.decodeFunctionData('setStreams', data) as unknown as [
+          string,
+          { accountId: bigint; config: bigint }[],
+          bigint,
+          { accountId: bigint; config: bigint }[],
+        ];
+
+      function mapReceivers(receivers: { accountId: bigint; config: bigint }[]) {
+        return receivers.map((r) => {
+          const cfg = streamConfigFromUint256(r.config);
+          return {
+            accountId: r.accountId.toString(),
+            dripId: cfg.dripId.toString(),
+            amountPerSec: cfg.amountPerSec,
+            start: Number(cfg.start),
+            duration: Number(cfg.duration),
+            raw: r.config,
+          };
+        });
+      }
+
+      const current = mapReceivers(currReceivers);
+      const next = mapReceivers(newReceivers);
+
+      const currentKeys = new Set(current.map((r) => `${r.accountId}-${r.dripId}`));
+      const nextKeys = new Set(next.map((r) => `${r.accountId}-${r.dripId}`));
+
+      const added = next.filter((r) => !currentKeys.has(`${r.accountId}-${r.dripId}`));
+      const removed = current.filter((r) => !nextKeys.has(`${r.accountId}-${r.dripId}`));
+
+      return {
+        type: 'rawSetStreams',
+        tokenAddress,
+        balanceDelta,
+        currentReceivers: current,
+        newReceivers: next,
+        addedReceivers: added,
+        removedReceivers: removed,
       };
     } catch {
       return undefined;
@@ -515,12 +643,51 @@
     {/if}
   </div>
   <div class="section">
+    <h3>Encode stream config</h3>
+    <p>
+      Enter the individual parts of a stream config to encode them into the uint256 value used in
+      setStreams transactions.
+    </p>
+    <FormField title="Drip ID" description="An arbitrary number used to identify the stream.">
+      <TextInput placeholder="e.g. 1" bind:value={encodeDripId} />
+    </FormField>
+    <FormField
+      title="Amount per second (wei)"
+      description="The amount per second in the smallest unit, multiplied by 10^9 for extra precision."
+    >
+      <TextInput placeholder="e.g. 1000000000000000000" bind:value={encodeAmountPerSec} />
+    </FormField>
+    <FormField
+      title="Start (UNIX timestamp)"
+      description="When dripping should start. Use 0 to start when the config is applied."
+    >
+      <TextInput placeholder="0" bind:value={encodeStart} />
+    </FormField>
+    <FormField
+      title="Duration (seconds)"
+      description="How long to drip. Use 0 to drip until the balance runs out."
+    >
+      <TextInput placeholder="0" bind:value={encodeDuration} />
+    </FormField>
+    {#if encoded}
+      <div class="result">
+        <h4>Result</h4>
+        <p>
+          Stream config (uint256): <span class="typo-text tabular-nums">{encoded}</span>
+        </p>
+      </div>
+    {/if}
+    {#if encodeError}
+      <AnnotationBox type="warning">{encodeError}</AnnotationBox>
+    {/if}
+  </div>
+  <div class="section">
     <h3>Decode transaction calldata</h3>
     <p>
       Paste the calldata from a transaction created by this app to see a human-friendly breakdown.
-      Supported: (1) top ups via <code>setStreams</code> (no receiver changes) and (2) stream edits
-      submitted through <code>callBatched</code> that pair a <code>setStreams</code> call with an accompanying
-      metadata update.
+      Supported: (1) top ups via <code>setStreams</code> (no receiver changes), (2) stream edits
+      submitted through <code>callBatched</code> that pair a <code>setStreams</code> call with an
+      accompanying metadata update, and (3) arbitrary direct <code>setStreams</code> calls (without metadata).
     </p>
 
     <AnnotationBox type="warning">
@@ -637,6 +804,115 @@
             {/if}
           </div>
         {/each}
+      </div>
+    {:else if decodeResult?.type === 'rawSetStreams'}
+      <div class="result">
+        <h4>Transaction type: Direct setStreams</h4>
+        <p>
+          Token: <span class="typo-text">{formatTokenLabel(decodeResult.tokenAddress)}</span>
+        </p>
+        {#if decodeResult.balanceDelta !== 0n}
+          <p>
+            Balance delta: <span class="typo-text tabular-nums"
+              >{formatTokenAmountFriendly(
+                decodeResult.balanceDelta,
+                decodeResult.tokenAddress,
+              )}</span
+            >
+          </p>
+          <p class="muted">
+            Raw balance delta (wei): <span class="typo-text tabular-nums"
+              >{decodeResult.balanceDelta.toString()}</span
+            >
+          </p>
+        {/if}
+
+        {#each [{ title: 'Current receivers', items: decodeResult.currentReceivers }, { title: 'New receivers', items: decodeResult.newReceivers }] as group (group.title)}
+          <div class="stream-section">
+            <div class="stream-section-header">
+              <h5>{group.title}</h5>
+              <span class="muted"
+                >{group.items.length} item{group.items.length === 1 ? '' : 's'}</span
+              >
+            </div>
+
+            {#if group.items.length === 0}
+              <div class="empty-box">No receivers.</div>
+            {:else}
+              <div class="stream-list">
+                {#each group.items as receiver (`${receiver.accountId}-${receiver.dripId}`)}
+                  <div class="stream-card">
+                    <div class="stream-heading">
+                      <div class="typo-text tabular-nums label-pill">
+                        Drip #{receiver.dripId}
+                      </div>
+                      <div class="typo-text">
+                        {formatAmountPerSecond(receiver.amountPerSec, decodeResult.tokenAddress)}
+                      </div>
+                    </div>
+                    <div class="stream-meta">
+                      <span class="muted">Receiver account ID:</span>
+                      <span>{receiver.accountId}</span>
+                    </div>
+                    <div class="stream-meta">
+                      <span class="muted">Start:</span>
+                      <span
+                        >{receiver.start
+                          ? new Date(receiver.start * 1000).toLocaleString()
+                          : 'Immediate'}</span
+                      >
+                      <span class="muted">Duration:</span>
+                      <span>{receiver.duration ? `${receiver.duration} sec` : 'Indefinite'}</span>
+                    </div>
+                    <div class="stream-meta">
+                      <span class="muted">Raw config:</span>
+                      <span class="typo-text tabular-nums">{receiver.raw.toString()}</span>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {/each}
+
+        {#if decodeResult.addedReceivers.length > 0 || decodeResult.removedReceivers.length > 0}
+          <div class="stream-section">
+            <h5>Diff</h5>
+          </div>
+          {#each [{ title: '➕ Added', items: decodeResult.addedReceivers, emptyText: 'None added.' }, { title: '🗑️ Removed', items: decodeResult.removedReceivers, emptyText: 'None removed.' }] as group (group.title)}
+            <div class="stream-section">
+              <div class="stream-section-header">
+                <h5>{group.title}</h5>
+                <span class="muted"
+                  >{group.items.length} item{group.items.length === 1 ? '' : 's'}</span
+                >
+              </div>
+
+              {#if group.items.length === 0}
+                <div class="empty-box">{group.emptyText}</div>
+              {:else}
+                <div class="stream-list">
+                  {#each group.items as receiver (`${receiver.accountId}-${receiver.dripId}`)}
+                    <div class="stream-card">
+                      <div class="stream-heading">
+                        <div class="typo-text tabular-nums label-pill">
+                          Drip #{receiver.dripId}
+                        </div>
+                        <div class="typo-text">
+                          {formatAmountPerSecond(receiver.amountPerSec, decodeResult.tokenAddress)}
+                        </div>
+                      </div>
+                      <div class="stream-meta">
+                        <span class="muted">Receiver account ID:</span>
+                        <span>{receiver.accountId}</span>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+            </div>
+          {/each}
+        {/if}
       </div>
     {/if}
   </div>
