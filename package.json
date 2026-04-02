@@ -7,6 +7,7 @@
     "dev:docker": "./docker/start-dev.sh",
     "dev:docker:clear": "docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v",
     "dev:docker:update-repo-owner": "./docker/update-repo-owner.sh",
+    "dev:docker:mine-block": "./docker/mine-block.sh",
     "dev:docker:sprinkle": "./docker/sprinkle.sh",
     "preview": "vite preview",
     "test:unit": "PUBLIC_NETWORK=1 PUBLIC_JUNCTION_URL=http://dummy.org PUBLIC_INTERNAL_JUNCTION_URL=http://dummy.org vitest run unit --mode=unit-test",

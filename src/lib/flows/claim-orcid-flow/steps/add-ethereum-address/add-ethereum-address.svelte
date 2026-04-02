@@ -90,7 +90,9 @@
           });
 
           if (!res.ok) {
-            throw new Error('Failed to get ownership signature from Lit. Please try again later.');
+            throw new Error(
+              'Failed to get an ownership signature from Lit Protocol. There may be a temporary outage – Please try again later, and reach out to Drips if the issue persists.',
+            );
           }
 
           $context.litOwnerUpdateSignature = await res.json();

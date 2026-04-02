@@ -171,6 +171,8 @@
   }
 
   async function fetchProject() {
+    $context.isReclaiming = false;
+    $context.isPartiallyClaimed = false;
     $context.linkedToRepo = false;
 
     try {

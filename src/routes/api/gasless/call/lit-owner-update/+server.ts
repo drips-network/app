@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   assert(redis, 'Redis client not initialized');
 
-  const blockKey = `${network.name}-litOwnerUpdate-${name}`;
+  const blockKey = `${network.name}-litOwnerUpdate-${name}-${owner}`;
   const existingTaskId = await redis.get(blockKey);
 
   if (existingTaskId) {
