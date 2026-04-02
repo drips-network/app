@@ -113,8 +113,16 @@
             }),
           });
 
+          if (res.status === 429) {
+            throw new Error(
+              'An ownership signature was recently requested for this repository. Please wait some time and try again.',
+            );
+          }
+
           if (!res.ok) {
-            throw new Error('Failed to get ownership signature from Lit. Please try again later.');
+            throw new Error(
+              'There was an error fetching an ownership signature from Lit Protocol. There may be a temporary outage or network congestion. Please try again later, and contact Drips if the error persists.',
+            );
           }
 
           $context.litOwnerUpdateSignature = await res.json();
