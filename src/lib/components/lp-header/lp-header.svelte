@@ -17,6 +17,8 @@
   import HeaderNavItem from './header-nav-item.svelte';
   import Hamburger from '../icons/Hamburger.svelte';
   import DripsLogo from '../header/drips-logo.svelte';
+  import Wave from '../icons/Wave.svelte';
+  import { getWavePrograms, getWaves } from '$lib/utils/wave/wavePrograms';
 
   let scrolledDown = $derived($scrollStore.pos > 10);
 
@@ -28,9 +30,25 @@
 
   let wrapper: Element;
 
+  let activeWaveProgramName: string | null = $state(null);
+
   let firstRender = $state(true);
-  onMount(() => {
+  onMount(async () => {
     firstRender = false;
+
+    try {
+      const wavePrograms = await getWavePrograms(fetch, { limit: 100 });
+
+      for (const program of wavePrograms.data) {
+        const waves = await getWaves(fetch, program.id, { limit: 5 }, { status: 'active' });
+        if (waves.data.length > 0) {
+          activeWaveProgramName = program.name;
+          break;
+        }
+      }
+    } catch {
+      // Silently fail — the button simply won't appear
+    }
   });
 
   let dismissableKey = $derived(`announcementBanner-${announcementBanner?.title}`);
@@ -175,7 +193,19 @@
         {/each}
       </nav>
     </div>
-    <div data-sveltekit-preload-code="eager" data-sveltekit-reload>
+    <div class="header-actions" data-sveltekit-preload-code="eager" data-sveltekit-reload>
+      {#if activeWaveProgramName}
+        <div class="wave-button-wrapper" transition:fade={{ duration: 300 }}>
+          <div class="wave-button-glow"></div>
+          <Button
+            variant="normal"
+            icon={Wave}
+            href="/wave"
+            onmouseenter={() => (openMenu = null)}
+            reloadOnLinkClick>Live now: {activeWaveProgramName} Wave</Button
+          >
+        </div>
+      {/if}
       <Button variant="primary" href="/app" onmouseenter={() => (openMenu = null)} reloadOnLinkClick
         >Open app</Button
       >
@@ -337,6 +367,66 @@
 
   header.raised {
     box-shadow: var(--elevation-medium);
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .wave-button-wrapper {
+    position: relative;
+    border-radius: 1rem 0 1rem 1rem;
+    isolation: isolate;
+    overflow: visible;
+    display: none;
+  }
+
+  @media (min-width: 1025px) {
+    .wave-button-wrapper {
+      display: block;
+    }
+  }
+
+  .wave-button-glow {
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--glow-angle, 0deg),
+      var(--color-primary),
+      var(--color-primary-level-2),
+      var(--color-primary-level-1),
+      var(--color-primary-level-2),
+      var(--color-primary)
+    );
+    animation: glow-spin 4s linear infinite;
+    z-index: -1;
+    filter: blur(6px);
+    opacity: 1;
+  }
+
+  .wave-button-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    filter: blur(12px);
+    opacity: 0.6;
+  }
+
+  @keyframes glow-spin {
+    to {
+      --glow-angle: 360deg;
+    }
+  }
+
+  @property --glow-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
   }
 
   .left {
