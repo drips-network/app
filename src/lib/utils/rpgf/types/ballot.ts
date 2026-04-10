@@ -18,3 +18,10 @@ export const wrappedBallotSchema = z.object({
   createdAt: z.string().pipe(z.coerce.date()),
 });
 export type WrappedBallot = z.infer<typeof wrappedBallotSchema>;
+
+export const externalVoteResultSchema = z.object({
+  categoryId: z.string(),
+  voterAddress: z.string(),
+  votes: z.record(z.string(), z.number().int().min(0)),
+});
+export type ExternalVoteResult = z.infer<typeof externalVoteResultSchema>;

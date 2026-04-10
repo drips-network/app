@@ -33,8 +33,10 @@ import {
 } from './types/application';
 import {
   ballotSchema,
+  externalVoteResultSchema,
   wrappedBallotSchema,
   type Ballot,
+  type ExternalVoteResult,
   type SubmitBallotDto,
   type WrappedBallot,
 } from './types/ballot';
@@ -677,6 +679,21 @@ export async function setRoundVoters(
   );
 
   return userSchema.array().parse(await res.json());
+}
+
+export async function getExternalVoteResult(
+  f = fetch,
+  roundId: string,
+  externalVoteResultId: string,
+): Promise<ExternalVoteResult> {
+  const res = await authenticatedRpgfServerCall(
+    `/rounds/${roundId}/external-vote-results/${externalVoteResultId}`,
+    'GET',
+    undefined,
+    f,
+  );
+
+  return externalVoteResultSchema.parse(await res.json());
 }
 
 export async function getApplicationCategories(

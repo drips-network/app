@@ -325,6 +325,15 @@ export const applicationCategorySchema = z.object({
   id: z.string().min(1).max(255),
   name: z.string().min(1).max(255),
   description: z.string().max(1000).nullable(),
+  minVotePercentage: z.number().int().min(0).max(100).nullable().optional().default(null),
+  externalVotingTool: z
+    .object({
+      name: z.string(),
+      url: z.string(),
+    })
+    .nullable()
+    .optional()
+    .default(null),
   applicationForm: z.object({
     id: z.string().min(1).max(255),
     name: z.string().min(1).max(255),
