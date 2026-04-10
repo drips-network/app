@@ -12,7 +12,12 @@
 
 <LogInButton primary wordy backTo={data.backTo || '/wave'} skipWelcome={data.skipWelcome} />
 
-<p class="typo-text-small" style:margin-top="1.5rem" style:color="var(--color-foreground-level-6)">
+<p
+  class="typo-text-small"
+  style:margin-top="1.5rem"
+  style:max-width="32rem"
+  style:color="var(--color-foreground-level-6)"
+>
   By logging into Drips Wave, <span class="typo-text-small-bold"
     >you confirm to be over 18 years of age</span
   >, and agree to the
