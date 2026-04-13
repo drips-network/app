@@ -35,6 +35,10 @@
     return kycApproved;
   }
 
+  let hasAnyGrantRequiringKyc = $derived(
+    grants.length === 0 || grants.some((g) => !getKybForGrant(g)?.hasKyb),
+  );
+
   let loadingWithdrawalGrantId = $state<string | null>(null);
 
   function getKybDataForGrant(grant: GrantDto) {
@@ -117,7 +121,7 @@
         "Rewards are made available when Points for rewards have been frozen after each Wave. You'll receive an email notification when a grant is available.",
     }}
   >
-    {#if !kycApproved}
+    {#if !kycApproved && hasAnyGrantRequiringKyc}
       <div class="kyc-warning">
         <AnnotationBox type="warning">
           <span>
