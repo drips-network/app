@@ -21,7 +21,14 @@ export const load = async ({ parent, url, fetch, params, depends }) => {
     throw error(404, 'Grant not found');
   }
 
-  const kybStatus = grant.isOrgGrant && grant.orgId ? await getKybStatus(fetch, grant.orgId) : null;
+  let kybStatus = null;
+  if (grant.isOrgGrant && grant.orgId) {
+    try {
+      kybStatus = await getKybStatus(fetch, grant.orgId);
+    } catch {
+      // Fall back to no KYB — user will see the default KYC flow
+    }
+  }
 
   return {
     user,

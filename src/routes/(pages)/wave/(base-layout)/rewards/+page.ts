@@ -22,9 +22,17 @@ export const load = async ({ parent, url, fetch, depends }) => {
     ...new Set(grants.data.filter((g) => g.isOrgGrant && g.orgId).map((g) => g.orgId!)),
   ];
   const kybEntries = await Promise.all(
-    orgIds.map(async (orgId) => [orgId, await getKybStatus(fetch, orgId)] as const),
+    orgIds.map(async (orgId) => {
+      try {
+        return [orgId, await getKybStatus(fetch, orgId)] as const;
+      } catch {
+        return null;
+      }
+    }),
   );
-  const kybByOrg: Record<string, KybStatus> = Object.fromEntries(kybEntries);
+  const kybByOrg: Record<string, KybStatus> = Object.fromEntries(
+    kybEntries.filter((e) => e !== null),
+  );
 
   return {
     user,
