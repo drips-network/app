@@ -25,12 +25,31 @@
 
   let { data } = $props();
 
-  let { grant, kycStatus } = $derived(data);
+  let { grant, kycStatus, kybStatus } = $derived(data);
 
   let kycApproved = $derived(kycStatus.reviewAnswer === 'GREEN');
 
+  // KYB state: if the org has KYB, it overrides KYC requirements
+  let hasKyb = $derived(kybStatus?.hasKyb ?? false);
+  let kybAuthorized = $derived(kybStatus?.authorized ?? false);
+
+  // Can the user take withdrawal actions?
+  // KYB authorized users bypass KYC. Non-KYB users need KYC approval.
+  let canAct = $derived(hasKyb ? kybAuthorized : kycApproved);
+
+  // KYB data to pass to flows when authorized
+  let kybData = $derived(
+    hasKyb && kybAuthorized && kybStatus?.stellarAddress
+      ? {
+          stellarAddress: kybStatus.stellarAddress,
+          memoType: kybStatus.memoType,
+          memoValue: kybStatus.memoValue,
+        }
+      : undefined,
+  );
+
   function openTestTransactionFlow(g: GrantDetailDto) {
-    modal.show(Stepper, undefined, testTransactionFlow(g));
+    modal.show(Stepper, undefined, testTransactionFlow(g, kybData));
   }
 
   function getLastSuccessfulTestTransaction(g: GrantDetailDto) {
@@ -41,10 +60,11 @@
 
   function openWithdrawalFlow(g: GrantDetailDto) {
     const lastTest = getLastSuccessfulTestTransaction(g);
-    const prefill = lastTest
-      ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
-      : undefined;
-    modal.show(Stepper, undefined, withdrawalFlow(g, prefill));
+    const prefill =
+      !kybData && lastTest
+        ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
+        : undefined;
+    modal.show(Stepper, undefined, withdrawalFlow(g, prefill, kybData));
   }
 
   let cancellingWithdrawal = $state(false);
@@ -114,12 +134,34 @@
           </div>
         {/if}
 
-        {#if !kycApproved}
+        {#if hasKyb && !kybAuthorized}
+          <!-- Hard block: user is not on the KYB allowlist -->
           <div class="kyc-warning">
             <AnnotationBox type="warning">
               <span>
-                You need to complete identity verification before you can withdraw funds.
+                This organization uses entity-level verification (KYB) for withdrawals. Your account
+                is not on the authorized withdrawal list. Please contact your organization
+                administrator for access.
+              </span>
+            </AnnotationBox>
+          </div>
+        {:else if !hasKyb && !kycApproved}
+          <!-- No KYB, personal KYC required -->
+          <div class="kyc-warning">
+            <AnnotationBox type="warning">
+              <span>
+                You need to complete identity verification before you can withdraw grants.
                 <a href="/wave/settings/identity-and-payments">Verify your identity</a>
+              </span>
+            </AnnotationBox>
+          </div>
+        {:else if hasKyb && kybAuthorized && !kycApproved}
+          <!-- KYB authorized but no personal KYC — show informational notice -->
+          <div class="kyc-warning">
+            <AnnotationBox type="info">
+              <span>
+                You are authorized to withdraw on behalf of your organization via entity
+                verification (KYB). Personal identity verification is not required.
               </span>
             </AnnotationBox>
           </div>
@@ -148,7 +190,9 @@
               <StatusBadge size="small" color="primary" icon={Orgs}>
                 <span
                   style="display: inline-flex; align-items: center; gap: 0.25rem;"
-                  title="This grant is issued to your organization and can be withdrawn by anyone within the org."
+                  title={hasKyb
+                    ? 'This grant is issued to your organization. Withdrawals are managed through entity verification (KYB) and restricted to authorized accounts.'
+                    : 'This grant is issued to your organization and can be withdrawn by anyone within the org.'}
                 >
                   Org grant
                   <InfoCircle
@@ -179,7 +223,7 @@
             <Button
               variant="primary"
               onclick={() => openTestTransactionFlow(grant)}
-              disabled={!kycApproved}
+              disabled={!canAct}
             >
               Request test transaction
             </Button>
@@ -188,7 +232,7 @@
             <Button
               variant={grant.status === 'test_transaction_sent' ? 'primary' : 'normal'}
               onclick={() => openWithdrawalFlow(grant)}
-              disabled={!kycApproved}
+              disabled={!canAct}
             >
               Request full withdrawal
             </Button>

@@ -11,7 +11,7 @@
   import { requestWithdrawal } from '$lib/utils/wave/grants';
   import type { GrantDto } from '$lib/utils/wave/types/grant';
   import type { Writable } from 'svelte/store';
-  import type { State } from './withdrawal-flow';
+  import type { State, KybData } from './withdrawal-flow';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -19,9 +19,10 @@
   interface Props {
     grant: GrantDto;
     context: Writable<State>;
+    kyb?: KybData;
   }
 
-  let { grant, context }: Props = $props();
+  let { grant, context, kyb }: Props = $props();
 
   let confirmed = $state(false);
 
@@ -35,7 +36,7 @@
           undefined,
           grant.id,
           $context.stellarAddress,
-          $context.memo ? 'text' : undefined,
+          $context.memoType ?? ($context.memo ? 'text' : undefined),
           $context.memo,
         );
         await invalidate('wave:rewards');
@@ -52,8 +53,14 @@
   headline="Confirm withdrawal"
   description="Please review the details below and confirm."
 >
+  {#if kyb}
+    <AnnotationBox type="info">
+      You are withdrawing on behalf of your organization to a designated wallet address.
+    </AnnotationBox>
+  {/if}
+
   <AnnotationBox type="warning">
-    Once submitted, withdrawals cannot be cancelled or modified. Please double-check all details.
+    Once submitted, withdrawals cannot be modified. Please double-check all details.
   </AnnotationBox>
 
   <div class="fields">

@@ -1,5 +1,6 @@
 import { getGrant } from '$lib/utils/wave/grants.js';
 import { getKycStatus } from '$lib/utils/wave/kyc.js';
+import { getKybStatus } from '$lib/utils/wave/kyb.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = async ({ parent, url, fetch, params, depends }) => {
@@ -20,9 +21,12 @@ export const load = async ({ parent, url, fetch, params, depends }) => {
     throw error(404, 'Grant not found');
   }
 
+  const kybStatus = grant.isOrgGrant && grant.orgId ? await getKybStatus(fetch, grant.orgId) : null;
+
   return {
     user,
     grant,
     kycStatus,
+    kybStatus,
   };
 };

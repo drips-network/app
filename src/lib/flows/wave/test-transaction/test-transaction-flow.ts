@@ -1,5 +1,5 @@
 import { makeStep } from '$lib/components/stepper/types';
-import type { GrantDto } from '$lib/utils/wave/types/grant';
+import type { GrantDto, StellarMemoType } from '$lib/utils/wave/types/grant';
 import { writable } from 'svelte/store';
 import EnterAddress from './enter-address.svelte';
 import Confirm from './confirm.svelte';
@@ -8,12 +8,20 @@ import Success from './success.svelte';
 export interface State {
   stellarAddress: string;
   memo?: string;
+  memoType?: StellarMemoType;
 }
 
-export default (grant: GrantDto) => {
+export interface KybData {
+  stellarAddress: string;
+  memoType: StellarMemoType | null;
+  memoValue: string | null;
+}
+
+export default (grant: GrantDto, kyb?: KybData) => {
   const state = writable<State>({
-    stellarAddress: '',
-    memo: undefined,
+    stellarAddress: kyb?.stellarAddress ?? '',
+    memo: kyb?.memoValue ?? undefined,
+    memoType: kyb?.memoType ?? undefined,
   });
 
   return {
@@ -21,11 +29,11 @@ export default (grant: GrantDto) => {
     steps: [
       makeStep({
         component: EnterAddress,
-        props: { grant },
+        props: { grant, kyb },
       }),
       makeStep({
         component: Confirm,
-        props: { grant },
+        props: { grant, kyb },
       }),
       makeStep({
         component: Success,
