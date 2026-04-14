@@ -14,13 +14,29 @@
     WaveProgramRepoWithDetailsDto,
   } from '$lib/utils/wave/types/waveProgram';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
-  import { getWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
+  import { getWaveProgramRepos, getWaveProgramOrgs } from '$lib/utils/wave/wavePrograms.js';
+  import { getTags } from '$lib/utils/wave/tags.js';
+  import { getAllPaginated } from '$lib/utils/wave/getAllPaginated.js';
   import type { Snapshot } from './$types.js';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Folder from '$lib/components/icons/Folder.svelte';
 
   let { data } = $props();
-  const { repos: initialRepos, waveProgram, filters, orgsPromise } = $derived(data);
+  const { repos: initialRepos, waveProgram, filters } = $derived(data);
+
+  const loadOrgs = () =>
+    getAllPaginated((page, limit) => getWaveProgramOrgs(fetch, waveProgram.id, { page, limit }));
+
+  const loadTags = () =>
+    getAllPaginated((page, limit) => getTags(fetch, { page, pageSize: limit }));
+
+  function getTagFilterHref(tagId: string): string {
+    const newFilters = { ...filters, tagId };
+    const encoded = btoa(JSON.stringify(newFilters));
+    const currentUrl = new URL(page.url);
+    currentUrl.searchParams.set('filters', encoded);
+    return currentUrl.toString();
+  }
 
   function getIssueFilterString(repoId: string) {
     const filters: IssueFilters = {
@@ -101,11 +117,9 @@
 
 <div class="page">
   <div
+    class="header-section"
     style:view-transition-name="repos-page-content"
     style:view-transition-class="element-handover"
-    style:display="flex"
-    style:flex-direction="column"
-    style:gap="1.5rem"
   >
     <Breadcrumbs
       crumbs={[
@@ -130,7 +144,9 @@
       ]}
     />
 
-    <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} {orgsPromise} />
+    {#key filters}
+      <ReposFilterBar {filters} onFiltersChange={handleApplyFilters} {loadOrgs} {loadTags} />
+    {/key}
   </div>
 
   <span class="typo-text intro" style:color="var(--color-foreground-level-5)">
@@ -152,7 +168,7 @@
     bind:pagination
   >
     {#snippet card(repoWithDetails: WaveProgramRepoWithDetailsDto)}
-      <RepoPreviewCard {repoWithDetails}>
+      <RepoPreviewCard {repoWithDetails} tagHref={getTagFilterHref}>
         {#snippet actions()}
           <Button
             size="small"
@@ -179,6 +195,14 @@
     width: 100%;
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
   }
 
   .intro {

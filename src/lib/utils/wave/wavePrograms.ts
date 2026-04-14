@@ -155,6 +155,28 @@ export async function rejectWaveProgramRepo(
   );
 }
 
+export async function featureWaveProgramRepo(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+  pointsMultiplier: number,
+) {
+  await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/feature`, {
+    method: 'POST',
+    body: JSON.stringify({ pointsMultiplier }),
+  });
+}
+
+export async function unfeatureWaveProgramRepo(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+) {
+  await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/feature`, {
+    method: 'DELETE',
+  });
+}
+
 export async function addIssueToWaveProgram(
   f = fetch,
   waveProgramId: string,
