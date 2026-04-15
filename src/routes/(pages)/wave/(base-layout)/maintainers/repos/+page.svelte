@@ -32,7 +32,7 @@
     } else {
       url.searchParams.delete('status');
     }
-    goto(url.pathname + url.search, { invalidateAll: true, replaceState: true });
+    goto(url.pathname + url.search, { replaceState: true });
   }
 </script>
 
