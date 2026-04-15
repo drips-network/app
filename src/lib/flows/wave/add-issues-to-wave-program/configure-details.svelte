@@ -20,6 +20,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
+  import { SvelteMap } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -56,6 +57,7 @@
 
   // Budget check: group eligible issues by repo and check against budget for selected wave program
   interface RepoBudgetInfo {
+    repoId: string;
     repoName: string;
     issueCount: number;
     pointsNeeded: number;
@@ -97,6 +99,7 @@
           : Math.max(0, Math.floor(remaining / pointsPerIssue));
 
       infos.push({
+        repoId,
         repoName: waveProgramRepo.repo.gitHubRepoFullName,
         issueCount: repoIssues.length,
         pointsNeeded: needed,
@@ -109,16 +112,35 @@
     return infos;
   });
 
+  // Issues that will actually be submitted, respecting per-repo budget limits
+  let submittableIssues = $derived.by(() => {
+    const canFitByRepo = new SvelteMap<string, number>();
+    for (const info of repoBudgetInfos) {
+      canFitByRepo.set(info.repoId, info.canFit);
+    }
+
+    const result: IssueDetailsDto[] = [];
+    const countByRepo = new SvelteMap<string, number>();
+
+    for (const issue of eligibleIssues) {
+      const repoId = issue.repo.id;
+      const maxForRepo = canFitByRepo.get(repoId) ?? eligibleIssues.length;
+      const usedSoFar = countByRepo.get(repoId) ?? 0;
+
+      if (usedSoFar < maxForRepo) {
+        result.push(issue);
+        countByRepo.set(repoId, usedSoFar + 1);
+      }
+    }
+
+    return result;
+  });
+
   let budgetExceededRepos = $derived(
     repoBudgetInfos.filter((r) => r.pointsRemaining !== null && r.pointsNeeded > r.pointsRemaining),
   );
 
-  let allBlocked = $derived(
-    repoBudgetInfos.length > 0 &&
-      repoBudgetInfos.every(
-        (r) => r.pointsRemaining !== null && r.pointsRemaining < pointsPerIssue,
-      ),
-  );
+  let allBlocked = $derived(submittableIssues.length === 0 && eligibleIssues.length > 0);
 
   async function handleSubmit() {
     dispatch('await', {
@@ -127,7 +149,7 @@
         const selectedWaveId = selectedWaveIds[0];
 
         const results = await Promise.allSettled(
-          eligibleIssues.map((issue) =>
+          submittableIssues.map((issue) =>
             addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
           ),
         );
@@ -140,7 +162,7 @@
         }
 
         const updatedIssues = (
-          await Promise.all(eligibleIssues.map((issue) => getIssue(undefined, issue.id)))
+          await Promise.all(submittableIssues.map((issue) => getIssue(undefined, issue.id)))
         ).filter((issue): issue is IssueDetailsDto => issue !== null);
 
         notifyIssuesUpdated(updatedIssues);
@@ -257,18 +279,20 @@
       {/if}
     </AnnotationBox>
   {:else if budgetExceededRepos.length > 0}
-    <AnnotationBox>
+    {@const skippedCount = eligibleIssues.length - submittableIssues.length}
+    <AnnotationBox type="warning">
       {#each budgetExceededRepos as repo (repo.repoName)}
         <div class="budget-warning-row">
           <strong>{repo.repoName}</strong>: {repo.issueCount} issue{repo.issueCount > 1 ? 's' : ''} selected
           ({repo.pointsNeeded} points) but only {repo.pointsRemaining} of {repo.pointsBudget}
           points remaining. {#if repo.canFit > 0}Only {repo.canFit} issue{repo.canFit > 1
               ? 's'
-              : ''} can be added at this complexity.{:else}No issues can be added at this
-            complexity.{/if}
+              : ''} will be added at this complexity.{:else}No issues from this repo will be added
+            at this complexity.{/if}
         </div>
       {/each}
-      Review the remaining budget for your repos on the
+      {skippedCount} issue{skippedCount > 1 ? 's' : ''} will be skipped. Review the remaining budget
+      for your repos on the
       <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
         >Orgs & Repos</a
       >
@@ -283,7 +307,13 @@
 
   {#snippet actions()}
     <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}>
-      Add issue{pluralS} to Wave
+      {#if submittableIssues.length < eligibleIssues.length && submittableIssues.length > 0}
+        Add {submittableIssues.length} of {eligibleIssues.length} issue{eligibleIssues.length > 1
+          ? 's'
+          : ''} to Wave
+      {:else}
+        Add issue{pluralS} to Wave
+      {/if}
     </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
