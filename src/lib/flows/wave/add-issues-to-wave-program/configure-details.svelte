@@ -255,25 +255,33 @@
         <strong>{repo.repoName}</strong> has no remaining points budget for this wave ({repo.pointsRemaining}
         of {repo.pointsBudget} points remaining). You cannot add more issues until the current Wave ends.
         Review the remaining budget for your repos on the
-        <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
-          >Orgs & Repos</a
+        <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
         >
         screen.
         <a
           href="https://docs.drips.network/wave/maintainers/points-budgets"
           target="_blank"
+          rel="noopener noreferrer"
           class="typo-link">Learn more</a
         >
       {:else}
         None of the selected repos have enough remaining points budget to add issues at this
         complexity. Wait until the current Wave ends. Review the remaining budget for your repos on
-        the <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
-          >Orgs & Repos</a
+        the <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
         >
         screen.
         <a
           href="https://docs.drips.network/wave/maintainers/points-budgets"
           target="_blank"
+          rel="noopener noreferrer"
           class="typo-link">Learn more</a
         >
       {/if}
@@ -293,13 +301,17 @@
       {/each}
       {skippedCount} issue{skippedCount > 1 ? 's' : ''} will be skipped. Review the remaining budget
       for your repos on the
-      <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
-        >Orgs & Repos</a
+      <a
+        href="/wave/maintainers/repos?status=approved"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="typo-link">Orgs & Repos</a
       >
       screen.
       <a
         href="https://docs.drips.network/wave/maintainers/points-budgets"
         target="_blank"
+        rel="noopener noreferrer"
         class="typo-link">Learn more</a
       >
     </AnnotationBox>

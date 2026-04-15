@@ -147,13 +147,17 @@
         of {waveProgramRepo.pointsBudget} points used, with {waveProgramRepo.pointsRemaining} remaining
         — but this change would require
         {pointsDelta} additional points. Review the remaining budget for your repos on the
-        <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
-          >Orgs & Repos</a
+        <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
         >
         screen.
         <a
           href="https://docs.drips.network/wave/maintainers/points-budgets"
           target="_blank"
+          rel="noopener noreferrer"
           class="typo-link">Learn more</a
         >
       </AnnotationBox>

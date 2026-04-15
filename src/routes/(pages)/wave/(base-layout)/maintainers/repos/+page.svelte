@@ -153,6 +153,7 @@
                     >Each approved repo can use up to the program's per-repo points budget per wave. <a
                       href="https://docs.drips.network/wave/maintainers/points-budgets"
                       target="_blank"
+                      rel="noopener noreferrer"
                       class="typo-link">Learn more</a
                     ></span
                   >
