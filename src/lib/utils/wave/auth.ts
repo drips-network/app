@@ -100,10 +100,6 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
         })
         .parse(res);
 
-      // Defensive: if loggingOut were true we'd have returned early above,
-      // but reset it here as a safeguard against future refactors.
-      if (browser) loggingOut = false;
-
       return data.accessToken;
     } catch (e) {
       // eslint-disable-next-line no-console
