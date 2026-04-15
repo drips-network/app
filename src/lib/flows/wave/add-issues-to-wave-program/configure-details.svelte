@@ -50,6 +50,73 @@
   );
   let hasIneligibleIssues = $derived(eligibleIssues.length < issues.length);
 
+  let activeComplexity: 'small' | 'medium' | 'large' = $state('small');
+
+  let pointsPerIssue = $derived(100 + getPointsForComplexity(activeComplexity));
+
+  // Budget check: group eligible issues by repo and check against budget for selected wave program
+  interface RepoBudgetInfo {
+    repoName: string;
+    issueCount: number;
+    pointsNeeded: number;
+    pointsRemaining: number | null;
+    pointsBudget: number | null;
+    canFit: number; // how many issues can fit within remaining budget
+  }
+
+  let selectedWaveIds = $state<string[]>([]);
+
+  let repoBudgetInfos = $derived.by((): RepoBudgetInfo[] => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    // Group eligible issues by repo
+    const issuesByRepo: Record<string, IssueDetailsDto[]> = {};
+    for (const issue of eligibleIssues) {
+      const repoId = issue.repo.id;
+      if (!issuesByRepo[repoId]) issuesByRepo[repoId] = [];
+      issuesByRepo[repoId].push(issue);
+    }
+
+    const infos: RepoBudgetInfo[] = [];
+    for (const [repoId, repoIssues] of Object.entries(issuesByRepo)) {
+      const waveProgramRepo = waveProgramRepos.find(
+        (wpr) => wpr.repo.id === repoId && wpr.waveProgramId === selectedWaveId,
+      );
+      if (!waveProgramRepo) continue;
+
+      const remaining = waveProgramRepo.pointsRemaining;
+      const budget = waveProgramRepo.pointsBudget;
+      const needed = repoIssues.length * pointsPerIssue;
+      const canFit =
+        remaining === null
+          ? repoIssues.length
+          : Math.max(0, Math.floor(remaining / pointsPerIssue));
+
+      infos.push({
+        repoName: waveProgramRepo.repo.gitHubRepoFullName,
+        issueCount: repoIssues.length,
+        pointsNeeded: needed,
+        pointsRemaining: remaining,
+        pointsBudget: budget,
+        canFit,
+      });
+    }
+
+    return infos;
+  });
+
+  let budgetExceededRepos = $derived(
+    repoBudgetInfos.filter((r) => r.pointsRemaining !== null && r.pointsNeeded > r.pointsRemaining),
+  );
+
+  let allBlocked = $derived(
+    repoBudgetInfos.length > 0 &&
+      repoBudgetInfos.every(
+        (r) => r.pointsRemaining !== null && r.pointsRemaining < pointsPerIssue,
+      ),
+  );
+
   async function handleSubmit() {
     dispatch('await', {
       message: `Adding issue${pluralS} to Wave Program…`,
@@ -81,8 +148,6 @@
     });
   }
 
-  let activeComplexity: 'small' | 'medium' | 'large' = $state('small');
-
   let items = $derived<Items>(
     Object.fromEntries(
       waveProgramRepos.map((waveProgramRepo) => {
@@ -100,9 +165,7 @@
     ),
   );
 
-  let selectedWaveIds = $state<string[]>([]);
-
-  let valid = $derived(selectedWaveIds.length > 0);
+  let valid = $derived(selectedWaveIds.length > 0 && !allBlocked);
 </script>
 
 <StandaloneFlowStepLayout
@@ -139,7 +202,7 @@
           activeComplexity,
         )} <span class="typo-text-bold">Complexity Bonus</span> =
       </span>
-      <span class="typo-text-bold">{100 + getPointsForComplexity(activeComplexity)} Points</span>
+      <span class="typo-text-bold">{pointsPerIssue} Points</span>
     </span>
   </FormField>
 
@@ -160,10 +223,65 @@
     </AnnotationBox>
   {/if}
 
+  {#if allBlocked}
+    <AnnotationBox type="error">
+      {#if repoBudgetInfos.length === 1}
+        {@const repo = repoBudgetInfos[0]}
+        <strong>{repo.repoName}</strong> has no remaining points budget for this wave ({repo.pointsRemaining}
+        of {repo.pointsBudget} points remaining). You cannot add more issues until the current Wave ends.
+        Review the remaining budget for your repos on the
+        <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
+          >Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          class="typo-link">Learn more</a
+        >
+      {:else}
+        None of the selected repos have enough remaining points budget to add issues at this
+        complexity. Wait until the current Wave ends. Review the remaining budget for your repos on
+        the <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
+          >Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          class="typo-link">Learn more</a
+        >
+      {/if}
+    </AnnotationBox>
+  {:else if budgetExceededRepos.length > 0}
+    <AnnotationBox>
+      {#each budgetExceededRepos as repo (repo.repoName)}
+        <div class="budget-warning-row">
+          <strong>{repo.repoName}</strong>: {repo.issueCount} issue{repo.issueCount > 1 ? 's' : ''} selected
+          ({repo.pointsNeeded} points) but only {repo.pointsRemaining} of {repo.pointsBudget}
+          points remaining. {#if repo.canFit > 0}Only {repo.canFit} issue{repo.canFit > 1
+              ? 's'
+              : ''} can be added at this complexity.{:else}No issues can be added at this
+            complexity.{/if}
+        </div>
+      {/each}
+      Review the remaining budget for your repos on the
+      <a href="/wave/maintainers/repos?status=approved" target="_blank" class="typo-link"
+        >Orgs & Repos</a
+      >
+      screen.
+      <a
+        href="https://docs.drips.network/wave/maintainers/points-budgets"
+        target="_blank"
+        class="typo-link">Learn more</a
+      >
+    </AnnotationBox>
+  {/if}
+
   {#snippet actions()}
-    <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}
-      >Add issue{pluralS} to Wave</Button
-    >
+    <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}>
+      Add issue{pluralS} to Wave
+    </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
 
@@ -176,5 +294,13 @@
     width: fit-content;
     padding: 0.5rem 1rem;
     border-radius: 2rem 0 2rem 2rem;
+  }
+
+  .budget-warning-row {
+    margin-bottom: 0.25rem;
+  }
+
+  .budget-warning-row:last-child {
+    margin-bottom: 0;
   }
 </style>
