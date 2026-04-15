@@ -20,7 +20,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
-  import { SvelteMap } from 'svelte/reactivity';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -112,8 +112,32 @@
     return infos;
   });
 
+  // Repos that are not approved for the selected wave program
+  let unapprovedRepoIssues = $derived.by(() => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    const approvedRepoIds = new SvelteSet(
+      waveProgramRepos
+        .filter((wpr) => wpr.waveProgramId === selectedWaveId && wpr.status === 'approved')
+        .map((wpr) => wpr.repo.id),
+    );
+
+    return eligibleIssues.filter((issue) => !approvedRepoIds.has(issue.repo.id));
+  });
+
   // Issues that will actually be submitted, respecting per-repo budget limits
+  // and excluding issues from repos not approved for the selected wave
   let submittableIssues = $derived.by(() => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    const approvedRepoIds = new SvelteSet(
+      waveProgramRepos
+        .filter((wpr) => wpr.waveProgramId === selectedWaveId && wpr.status === 'approved')
+        .map((wpr) => wpr.repo.id),
+    );
+
     const canFitByRepo = new SvelteMap<string, number>();
     for (const info of repoBudgetInfos) {
       canFitByRepo.set(info.repoId, info.canFit);
@@ -124,7 +148,11 @@
 
     for (const issue of eligibleIssues) {
       const repoId = issue.repo.id;
-      const maxForRepo = canFitByRepo.get(repoId) ?? eligibleIssues.length;
+
+      // Skip issues from repos not approved for the selected wave
+      if (!approvedRepoIds.has(repoId)) continue;
+
+      const maxForRepo = canFitByRepo.get(repoId) ?? Infinity;
       const usedSoFar = countByRepo.get(repoId) ?? 0;
 
       if (usedSoFar < maxForRepo) {
@@ -245,6 +273,20 @@
     <AnnotationBox>
       Some selected issues are already part of a Wave, or are not currently open. To add an issue to
       a different Wave, please remove it from its current Wave first.
+    </AnnotationBox>
+  {/if}
+
+  {#if unapprovedRepoIssues.length > 0}
+    {@const repoNames = [...new Set(unapprovedRepoIssues.map((i) => i.repo.gitHubRepoFullName))]}
+    <AnnotationBox type="warning">
+      {unapprovedRepoIssues.length} issue{unapprovedRepoIssues.length > 1 ? 's' : ''} from
+      {#if repoNames.length === 1}
+        <strong>{repoNames[0]}</strong>
+      {:else}
+        {repoNames.length} repos
+      {/if}
+      will be skipped because {repoNames.length === 1 ? 'this repo is' : 'these repos are'} not approved
+      for the selected Wave Program.
     </AnnotationBox>
   {/if}
 
