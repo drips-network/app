@@ -64,7 +64,10 @@
     canFit: number; // how many issues can fit within remaining budget
   }
 
-  let selectedWaveIds = $state<string[]>([]);
+  const firstWaveId = wavePrograms.find((w) =>
+    waveProgramRepos.some((wpr) => wpr.waveProgramId === w.id),
+  )?.id;
+  let selectedWaveIds = $state<string[]>(firstWaveId ? [firstWaveId] : []);
 
   let repoBudgetInfos = $derived.by((): RepoBudgetInfo[] => {
     const selectedWaveId = selectedWaveIds[0];
