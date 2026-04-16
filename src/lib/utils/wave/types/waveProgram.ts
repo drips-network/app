@@ -46,6 +46,7 @@ export const waveProgramDtoSchema = z.object({
   waveDayOfMonth: z.number().int(),
   waveDurationDays: z.number().int(),
   presetBudgetUSD: z.string(),
+  repoPointsBudget: z.number().int().nullable(),
   avatarUrl: z.url().nullable(),
   slug: z.string(),
   longDescription: z.string().nullable(),
@@ -133,6 +134,9 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   reviewedAt: z.coerce.date().nullable(),
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
+  pointsUsed: z.number().int(),
+  pointsBudget: z.number().int().nullable(),
+  pointsRemaining: z.number().int().nullable(),
   pointsMultiplier: z.number().int().optional(),
   repo: z.object({
     stargazersCount: z.number().int().nullable().optional(),

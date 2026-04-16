@@ -20,6 +20,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
+  import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
@@ -50,6 +51,125 @@
   );
   let hasIneligibleIssues = $derived(eligibleIssues.length < issues.length);
 
+  let activeComplexity: 'small' | 'medium' | 'large' = $state('small');
+
+  let pointsPerIssue = $derived(100 + getPointsForComplexity(activeComplexity));
+
+  // Budget check: group eligible issues by repo and check against budget for selected wave program
+  interface RepoBudgetInfo {
+    repoId: string;
+    repoName: string;
+    issueCount: number;
+    pointsNeeded: number;
+    pointsRemaining: number | null;
+    pointsBudget: number | null;
+    canFit: number; // how many issues can fit within remaining budget
+  }
+
+  const firstWaveId = wavePrograms.find((w) =>
+    waveProgramRepos.some((wpr) => wpr.waveProgramId === w.id),
+  )?.id;
+  let selectedWaveIds = $state<string[]>(firstWaveId ? [firstWaveId] : []);
+
+  let repoBudgetInfos = $derived.by((): RepoBudgetInfo[] => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    // Group eligible issues by repo
+    const issuesByRepo: Record<string, IssueDetailsDto[]> = {};
+    for (const issue of eligibleIssues) {
+      const repoId = issue.repo.id;
+      if (!issuesByRepo[repoId]) issuesByRepo[repoId] = [];
+      issuesByRepo[repoId].push(issue);
+    }
+
+    const infos: RepoBudgetInfo[] = [];
+    for (const [repoId, repoIssues] of Object.entries(issuesByRepo)) {
+      const waveProgramRepo = waveProgramRepos.find(
+        (wpr) => wpr.repo.id === repoId && wpr.waveProgramId === selectedWaveId,
+      );
+      if (!waveProgramRepo) continue;
+
+      const remaining = waveProgramRepo.pointsRemaining;
+      const budget = waveProgramRepo.pointsBudget;
+      const needed = repoIssues.length * pointsPerIssue;
+      const canFit =
+        remaining === null
+          ? repoIssues.length
+          : Math.max(0, Math.floor(remaining / pointsPerIssue));
+
+      infos.push({
+        repoId,
+        repoName: waveProgramRepo.repo.gitHubRepoFullName,
+        issueCount: repoIssues.length,
+        pointsNeeded: needed,
+        pointsRemaining: remaining,
+        pointsBudget: budget,
+        canFit,
+      });
+    }
+
+    return infos;
+  });
+
+  // Repos that are not approved for the selected wave program
+  let unapprovedRepoIssues = $derived.by(() => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    const approvedRepoIds = new SvelteSet(
+      waveProgramRepos
+        .filter((wpr) => wpr.waveProgramId === selectedWaveId && wpr.status === 'approved')
+        .map((wpr) => wpr.repo.id),
+    );
+
+    return eligibleIssues.filter((issue) => !approvedRepoIds.has(issue.repo.id));
+  });
+
+  // Issues that will actually be submitted, respecting per-repo budget limits
+  // and excluding issues from repos not approved for the selected wave
+  let submittableIssues = $derived.by(() => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    const approvedRepoIds = new SvelteSet(
+      waveProgramRepos
+        .filter((wpr) => wpr.waveProgramId === selectedWaveId && wpr.status === 'approved')
+        .map((wpr) => wpr.repo.id),
+    );
+
+    const canFitByRepo = new SvelteMap<string, number>();
+    for (const info of repoBudgetInfos) {
+      canFitByRepo.set(info.repoId, info.canFit);
+    }
+
+    const result: IssueDetailsDto[] = [];
+    const countByRepo = new SvelteMap<string, number>();
+
+    for (const issue of eligibleIssues) {
+      const repoId = issue.repo.id;
+
+      // Skip issues from repos not approved for the selected wave
+      if (!approvedRepoIds.has(repoId)) continue;
+
+      const maxForRepo = canFitByRepo.get(repoId) ?? Infinity;
+      const usedSoFar = countByRepo.get(repoId) ?? 0;
+
+      if (usedSoFar < maxForRepo) {
+        result.push(issue);
+        countByRepo.set(repoId, usedSoFar + 1);
+      }
+    }
+
+    return result;
+  });
+
+  let budgetExceededRepos = $derived(
+    repoBudgetInfos.filter((r) => r.pointsRemaining !== null && r.pointsNeeded > r.pointsRemaining),
+  );
+
+  let allBlocked = $derived(submittableIssues.length === 0 && eligibleIssues.length > 0);
+
   async function handleSubmit() {
     dispatch('await', {
       message: `Adding issue${pluralS} to Wave Program…`,
@@ -57,7 +177,7 @@
         const selectedWaveId = selectedWaveIds[0];
 
         const results = await Promise.allSettled(
-          eligibleIssues.map((issue) =>
+          submittableIssues.map((issue) =>
             addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
           ),
         );
@@ -70,7 +190,7 @@
         }
 
         const updatedIssues = (
-          await Promise.all(eligibleIssues.map((issue) => getIssue(undefined, issue.id)))
+          await Promise.all(submittableIssues.map((issue) => getIssue(undefined, issue.id)))
         ).filter((issue): issue is IssueDetailsDto => issue !== null);
 
         notifyIssuesUpdated(updatedIssues);
@@ -80,8 +200,6 @@
       },
     });
   }
-
-  let activeComplexity: 'small' | 'medium' | 'large' = $state('small');
 
   let items = $derived<Items>(
     Object.fromEntries(
@@ -100,9 +218,7 @@
     ),
   );
 
-  let selectedWaveIds = $state<string[]>([]);
-
-  let valid = $derived(selectedWaveIds.length > 0);
+  let valid = $derived(selectedWaveIds.length > 0 && !allBlocked);
 </script>
 
 <StandaloneFlowStepLayout
@@ -139,7 +255,7 @@
           activeComplexity,
         )} <span class="typo-text-bold">Complexity Bonus</span> =
       </span>
-      <span class="typo-text-bold">{100 + getPointsForComplexity(activeComplexity)} Points</span>
+      <span class="typo-text-bold">{pointsPerIssue} Points</span>
     </span>
   </FormField>
 
@@ -160,10 +276,99 @@
     </AnnotationBox>
   {/if}
 
+  {#if unapprovedRepoIssues.length > 0}
+    {@const repoNames = [...new Set(unapprovedRepoIssues.map((i) => i.repo.gitHubRepoFullName))]}
+    <AnnotationBox type="warning">
+      {unapprovedRepoIssues.length} issue{unapprovedRepoIssues.length > 1 ? 's' : ''} from
+      {#if repoNames.length === 1}
+        <strong>{repoNames[0]}</strong>
+      {:else}
+        {repoNames.length} repos
+      {/if}
+      will be skipped because {repoNames.length === 1 ? 'this repo is' : 'these repos are'} not approved
+      for the selected Wave Program.
+    </AnnotationBox>
+  {/if}
+
+  {#if allBlocked}
+    <AnnotationBox type="error">
+      {#if repoBudgetInfos.length === 1}
+        {@const repo = repoBudgetInfos[0]}
+        <strong>{repo.repoName}</strong> has no remaining points budget for this wave ({repo.pointsRemaining}
+        of {repo.pointsBudget} points remaining). You cannot add more issues until the current Wave ends.
+        Review the remaining budget for your repos on the
+        <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Learn more</a
+        >
+      {:else}
+        None of the selected repos have enough remaining points budget to add issues at this
+        complexity. Wait until the current Wave ends. Review the remaining budget for your repos on
+        the <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Learn more</a
+        >
+      {/if}
+    </AnnotationBox>
+  {:else if budgetExceededRepos.length > 0}
+    {@const skippedCount = eligibleIssues.length - submittableIssues.length}
+    <AnnotationBox type="warning">
+      {#each budgetExceededRepos as repo (repo.repoName)}
+        <div class="budget-warning-row">
+          <strong>{repo.repoName}</strong>: {repo.issueCount} issue{repo.issueCount > 1 ? 's' : ''} selected
+          ({repo.pointsNeeded} points) but only {repo.pointsRemaining} of {repo.pointsBudget}
+          points remaining. {#if repo.canFit > 0}Only {repo.canFit} issue{repo.canFit > 1
+              ? 's'
+              : ''} will be added at this complexity.{:else}No issues from this repo will be added
+            at this complexity.{/if}
+        </div>
+      {/each}
+      {skippedCount} issue{skippedCount > 1 ? 's' : ''} will be skipped. Review the remaining budget
+      for your repos on the
+      <a
+        href="/wave/maintainers/repos?status=approved"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="typo-link">Orgs & Repos</a
+      >
+      screen.
+      <a
+        href="https://docs.drips.network/wave/maintainers/points-budgets"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="typo-link">Learn more</a
+      >
+    </AnnotationBox>
+  {/if}
+
   {#snippet actions()}
-    <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}
-      >Add issue{pluralS} to Wave</Button
-    >
+    <Button variant="primary" disabled={!valid} icon={CheckCircle} onclick={handleSubmit}>
+      {#if submittableIssues.length < eligibleIssues.length && submittableIssues.length > 0}
+        Add {submittableIssues.length} of {eligibleIssues.length} issue{eligibleIssues.length > 1
+          ? 's'
+          : ''} to Wave
+      {:else}
+        Add issue{pluralS} to Wave
+      {/if}
+    </Button>
   {/snippet}
 </StandaloneFlowStepLayout>
 
@@ -176,5 +381,13 @@
     width: fit-content;
     padding: 0.5rem 1rem;
     border-radius: 2rem 0 2rem 2rem;
+  }
+
+  .budget-warning-row {
+    margin-bottom: 0.25rem;
+  }
+
+  .budget-warning-row:last-child {
+    margin-bottom: 0;
   }
 </style>
