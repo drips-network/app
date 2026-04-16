@@ -70,7 +70,7 @@
       <div class="wave-stats">
         <Card style="height: 100%;">
           <div class="wave-stats-inner">
-            <WaveProgramStats leaderboard={data.leaderboard} {waveProgram} />
+            <WaveProgramStats {waveProgram} />
 
             {#if (waveProgram.metadata?.length ?? 0) > 0}
               <div class="metadata">
