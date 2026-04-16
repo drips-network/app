@@ -4,7 +4,6 @@
   import Git from '$lib/components/icons/Git.svelte';
   import Github from '$lib/components/icons/Github.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
-  import Trophy from '$lib/components/icons/Trophy.svelte';
   import User from '$lib/components/icons/User.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
   import SolutionsWavesWhoItsFor from '$lib/components/illustrations/solutions-waves-who-its-for.svelte';
@@ -55,10 +54,6 @@
     <SolutionLineItem icon={Git}>
       Contributors earn points for merged PRs, and every point translates into a share of the
       reward.
-    </SolutionLineItem>
-    <SolutionLineItem icon={Trophy}>
-      Live leaderboard displays contributor activity, repositories, and merged pull-requests in real
-      time.
     </SolutionLineItem>
     <SolutionLineItem icon={TokenStreams}>
       At the end of each cycle funds are distributed to contributors on-chain.
