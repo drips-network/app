@@ -214,13 +214,15 @@
             <div class="filter-item">
               <span class="filter-label">Org</span>
               <div class="filter-dropdown">
-                <MultiSelectFilter
-                  optionsPromise={orgOptionsPromise}
-                  selectedValues={selectedOrgs}
-                  onchange={handleOrgsChange}
-                  placeholder="Any"
-                  singleSelect
-                />
+                {#if orgOptionsPromise}
+                  <MultiSelectFilter
+                    optionsPromise={orgOptionsPromise}
+                    selectedValues={selectedOrgs}
+                    onchange={handleOrgsChange}
+                    placeholder="Any"
+                    singleSelect
+                  />
+                {/if}
               </div>
               <button
                 class="remove-filter"
@@ -234,12 +236,14 @@
             <div class="filter-item">
               <span class="filter-label">Tag</span>
               <div class="filter-dropdown">
-                <MultiSelectFilter
-                  optionsPromise={tagOptionsPromise}
-                  selectedValues={selectedTags}
-                  onchange={handleTagsChange}
-                  placeholder="Any"
-                />
+                {#if tagOptionsPromise}
+                  <MultiSelectFilter
+                    optionsPromise={tagOptionsPromise}
+                    selectedValues={selectedTags}
+                    onchange={handleTagsChange}
+                    placeholder="Any"
+                  />
+                {/if}
               </div>
               <button
                 class="remove-filter"
