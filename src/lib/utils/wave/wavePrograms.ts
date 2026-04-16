@@ -19,6 +19,7 @@ import {
   type Complexity,
   type WaveFilters,
   type WaveProgramOrgsFilters,
+  type WaveProgramRepoStatus,
   type WaveProgramReposFilters,
 } from './types/waveProgram';
 
@@ -78,10 +79,16 @@ export async function batchApplyRepos(
   );
 }
 
-export async function getOwnWaveProgramRepos(f = fetch, pagination?: PaginationInput) {
+export async function getOwnWaveProgramRepos(
+  f = fetch,
+  pagination?: PaginationInput,
+  filters?: { status?: WaveProgramRepoStatus },
+) {
+  const params = new URLSearchParams(toPaginationParams(pagination));
+  if (filters?.status) params.set('status', filters.status);
   return parseRes(
     paginatedResponseSchema(waveProgramRepoWithDetailsDtoSchema),
-    await authenticatedCall(f, `/api/wave-program-repos?${toPaginationParams(pagination)}`),
+    await authenticatedCall(f, `/api/wave-program-repos?${params.toString()}`),
   );
 }
 

@@ -295,9 +295,14 @@
   function openUpdateComplexityModal() {
     if (!partOfWaveProgram) return;
 
+    const waveProgramRepo = waveProgramRepos.find(
+      (wpr) => wpr.repo.id === issue.repo.id && wpr.waveProgramId === partOfWaveProgram.id,
+    );
+
     modal.show(UpdateComplexityModal, undefined, {
       issue,
       waveProgram: partOfWaveProgram,
+      waveProgramRepo,
       onIssueUpdated: handleIssueUpdated,
     });
   }
