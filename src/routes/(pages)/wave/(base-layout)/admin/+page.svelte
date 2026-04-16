@@ -24,6 +24,17 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('manageTags') ||
+    data.user.permissions?.includes('featureWaveRepos')
+      ? [
+          {
+            name: 'Repos & Tags',
+            description:
+              'Manage tags, assign them to repos, and feature repos across Wave Programs.',
+            href: '/wave/admin/repos',
+          },
+        ]
+      : []),
   ]);
 </script>
 
