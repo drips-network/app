@@ -86,91 +86,91 @@
 
 <HeadMeta title="Orgs & Repos | Maintainer Dashboard" />
 
-<div class="page">
-  <div style:view-transition-name="repos-breadcrumbs">
-    <Breadcrumbs crumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Orgs & Repos' }]} />
-  </div>
-  <div style:view-transition-name="repos-section">
-    <Section
-      header={{
-        label: 'Repo Applications',
-        icon: Ledger,
-        actions: [
-          {
-            label: 'Add repos',
-            icon: Plus,
-            variant: 'primary',
-            disabled: false,
-            href: `/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/maintainers/repos`,
-          },
-        ],
-        infoTooltip:
-          "Before you can add issues to a Wave, the source repo must be accepted by the Wave's organizers. This list shows the status of your repo applications.",
-      }}
-      skeleton={{
-        loaded: true,
-        empty: waveProgramRepos.pagination.total === 0 && !statusFilter,
-        emptyStateEmoji: '🫙',
-        emptyStateHeadline: 'No repo applications yet',
-        emptyStateText: 'Add a repo and apply it to a Wave Program to get started.',
-        horizontalScroll: true,
-      }}
-    >
-      <div class="filter-row" style:view-transition-name="repos-filter">
-        <div class="filter-item">
-          <span class="filter-label typo-text-small">Status</span>
-          <div class="filter-dropdown">
-            <MultiSelectFilter
-              optionsPromise={statusOptions}
-              selectedValues={selectedStatus}
-              onchange={handleStatusChange}
-              placeholder="All"
-              singleSelect
-            />
-          </div>
+<div
+  class="page"
+  style:view-transition-name="maintainers-repos-page-content"
+  style:view-transition-class="element-handover"
+>
+  <Breadcrumbs crumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Orgs & Repos' }]} />
+  <Section
+    header={{
+      label: 'Repo Applications',
+      icon: Ledger,
+      actions: [
+        {
+          label: 'Add repos',
+          icon: Plus,
+          variant: 'primary',
+          disabled: false,
+          href: `/wave/maintainer-onboarding/install-app?onCancelGoto=/wave/maintainers/repos`,
+        },
+      ],
+      infoTooltip:
+        "Before you can add issues to a Wave, the source repo must be accepted by the Wave's organizers. This list shows the status of your repo applications.",
+    }}
+    skeleton={{
+      loaded: true,
+      empty: waveProgramRepos.pagination.total === 0 && !statusFilter,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No repo applications yet',
+      emptyStateText: 'Add a repo and apply it to a Wave Program to get started.',
+      horizontalScroll: true,
+    }}
+  >
+    <div class="filter-row">
+      <div class="filter-item">
+        <span class="filter-label typo-text-small">Status</span>
+        <div class="filter-dropdown">
+          <MultiSelectFilter
+            optionsPromise={statusOptions}
+            selectedValues={selectedStatus}
+            onchange={handleStatusChange}
+            placeholder="All"
+            singleSelect
+          />
         </div>
       </div>
+    </div>
 
-      {#if waveProgramRepos.data.length === 0 && statusFilter}
-        <div class="filtered-empty-state">
-          <p class="typo-text-small-bold">No {statusFilter} repos</p>
-          <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
-            None of your repos have this status.
-          </p>
-        </div>
-      {:else if waveProgramRepos.data.length > 0}
-        <div class="list-header typo-header-5">
-          <span></span>
-          <div class="header-right">
-            <div class="header-budget">
-              <span>Points budget</span>
-              <Tooltip>
-                <InfoCircle
-                  style="height: 1rem; width: 1rem; fill: var(--color-foreground-level-5);"
-                />
-                {#snippet tooltip_content()}
-                  <span class="typo-text-small"
-                    >Each approved repo can use up to the program's per-repo points budget per wave. <a
-                      href="https://docs.drips.network/wave/maintainers/points-budgets"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="typo-link">Learn more</a
-                    ></span
-                  >
-                {/snippet}
-              </Tooltip>
-            </div>
-            <span class="header-status">Status</span>
+    {#if waveProgramRepos.data.length === 0 && statusFilter}
+      <div class="filtered-empty-state">
+        <p class="typo-text-small-bold">No {statusFilter} repos</p>
+        <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
+          None of your repos have this status.
+        </p>
+      </div>
+    {:else if waveProgramRepos.data.length > 0}
+      <div class="list-header typo-header-5">
+        <span></span>
+        <div class="header-right">
+          <div class="header-budget">
+            <span>Points budget</span>
+            <Tooltip>
+              <InfoCircle
+                style="height: 1rem; width: 1rem; fill: var(--color-foreground-level-5);"
+              />
+              {#snippet tooltip_content()}
+                <span class="typo-text-small"
+                  >Each approved repo can use up to the program's per-repo points budget per wave. <a
+                    href="https://docs.drips.network/wave/maintainers/points-budgets"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="typo-link">Learn more</a
+                  ></span
+                >
+              {/snippet}
+            </Tooltip>
           </div>
+          <span class="header-status">Status</span>
         </div>
-        <div class="repo-applications-list">
-          {#each waveProgramRepos.data as repoApplication (repoApplication.id)}
-            {@render waveProgramRepo(repoApplication)}
-          {/each}
-        </div>
-      {/if}
-    </Section>
-  </div>
+      </div>
+      <div class="repo-applications-list">
+        {#each waveProgramRepos.data as repoApplication (repoApplication.id)}
+          {@render waveProgramRepo(repoApplication)}
+        {/each}
+      </div>
+    {/if}
+  </Section>
 </div>
 
 <style>
