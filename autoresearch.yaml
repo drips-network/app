@@ -1,0 +1,35 @@
+# Autoresearch config for drips/app — optimizing `npm run build:app` wall time.
+#
+# Run the bench directly (it also handles worktree provisioning on first call).
+# `build_cmd` is a cheap pre-flight that rad-experiment runs once; the real
+# work happens inside bench_cmd.
+
+build_cmd: "true"
+bench_cmd: "./bench/benchmark.sh"
+bench_dir: "bench"
+test_cmd: "true"
+
+metrics:
+  - name: "build_time_ms"
+    unit: "ms"
+    regex: 'build_time_ms\s*:\s*([\d.]+)\s*ms'
+    criteria: "lower_is_better"
+
+forbidden_paths:
+  - "autoresearch.yaml"
+  - "bench/"
+  - ".github/"
+  - ".community-computer/"
+  - ".gitignore"
+
+language: "typescript"
+hot_files:
+  - "vite.config.ts"
+  - "svelte.config.js"
+  - "package.json"
+  - "src/hooks.server.ts"
+  - "src/hooks.client.ts"
+  - "src/app.html"
+
+max_diff_lines: 500
+timeout_secs: 600
