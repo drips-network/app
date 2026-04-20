@@ -1,7 +1,7 @@
 import { compile } from 'mdsvex';
 import assert from '$lib/utils/assert';
-import { authorSchema, metadataSchema } from '../../routes/api/blog/posts/schema';
-import type { z } from 'zod';
+import { metadataSchema } from '../../routes/api/blog/posts/schema';
+import { resolveAuthors } from '$lib/utils/blog-authors';
 
 export const getSlug = (path: string): string => {
   const slug = path.split('/').pop()?.slice(0, -3);
@@ -21,11 +21,16 @@ export const fetchRawBlogPosts = async () => {
         const slug = getSlug(path);
 
         // Get the frontmatter
-        const fm = metadataSchema.parse(
+        const { author, ...fm } = metadataSchema.parse(
           compiled?.data && 'fm' in compiled.data && compiled.data.fm,
         );
 
-        return { ...fm, slug };
+        const authors = await resolveAuthors(
+          author,
+          (id) => import(`../../blog-posts/authors/${id}.json`),
+        );
+
+        return { ...fm, authors, slug };
       },
     ),
   );
@@ -38,23 +43,17 @@ export const fetchBlogPosts = async () => {
 
       assert(typeof resolved === 'object' && resolved && 'metadata' in resolved);
 
-      const metadata = metadataSchema.parse(resolved.metadata);
+      const { author, ...metadata } = metadataSchema.parse(resolved.metadata);
 
-      let author: z.infer<typeof authorSchema> | undefined;
-      if (metadata.author) {
-        const authorDesc = await import(`../../blog-posts/authors/${metadata.author}.json`);
-        assert(
-          authorDesc,
-          `Unable to locate blog author with ID ${metadata.author}. Make sure the ID is present in /src/blog-posts/authors/`,
-        );
-
-        author = authorSchema.parse(authorDesc);
-      }
+      const authors = await resolveAuthors(
+        author,
+        (id) => import(`../../blog-posts/authors/${id}.json`),
+      );
 
       // Get and assert slug
       const slug = getSlug(path);
 
-      return { ...metadata, author, slug };
+      return { ...metadata, authors, slug };
     }),
   );
 };

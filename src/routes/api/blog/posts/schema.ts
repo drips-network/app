@@ -17,7 +17,7 @@ export const metadataSchema = z.object({
   coverImage: z.string(),
   coverImageAlt: z.string(),
   announcementBannerCopy: z.string().optional(),
-  author: z.string().optional(),
+  author: z.union([z.string(), z.array(z.string())]).optional(),
   categories: z.array(z.enum(BLOG_CATEGORIES)).min(1),
 });
 
@@ -27,8 +27,8 @@ export const authorSchema = z.object({
 });
 
 export const postsListingSchema = z.array(
-  metadataSchema.extend({
+  metadataSchema.omit({ author: true }).extend({
     slug: z.string(),
-    author: authorSchema.optional(),
+    authors: z.array(authorSchema),
   }),
 );

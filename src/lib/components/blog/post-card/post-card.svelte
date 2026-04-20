@@ -17,7 +17,7 @@
     coverImageAlt: string;
     categories?: (typeof BLOG_CATEGORIES)[number][] | undefined;
     imageUrl?: string | undefined;
-    author?: z.infer<typeof authorSchema> | undefined;
+    authors?: z.infer<typeof authorSchema>[] | undefined;
     compact?: boolean;
     newTab?: boolean;
     first?: boolean;
@@ -34,7 +34,7 @@
     coverImageAlt,
     categories = undefined,
     imageUrl = undefined,
-    author = undefined,
+    authors = undefined,
     compact = false,
     newTab = false,
     first = false,
@@ -49,6 +49,8 @@
       day: 'numeric',
     }),
   );
+
+  let authorNames = $derived(authors?.map((a) => a.name.split(' ')[0]).join(' & '));
 </script>
 
 <svelte:element
@@ -79,14 +81,13 @@
           >
           <span>•</span>
         {/if}
-        {#if author}
-          <img
-            class="author-avatar"
-            src={author.avatarUrl}
-            alt={author.name}
-            style="width: 1.5rem; height: 1.5rem; border-radius: 50%"
-          />
-          <span>{author.name}</span>
+        {#if authors?.length}
+          <span class="author-pile">
+            {#each authors as author (author.name)}
+              <img class="author-avatar" src={author.avatarUrl} alt={author.name} />
+            {/each}
+          </span>
+          <span>{authorNames}</span>
           <span>•</span>
         {/if}
         <span>{formattedDate}</span>
@@ -142,6 +143,16 @@
     color: var(--color-foreground);
   }
 
+  .post .metadata .author-pile {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+  }
+
+  .post .metadata .author-pile .author-avatar + .author-avatar {
+    margin-left: -0.5rem;
+  }
+
   .post .metadata .author-avatar {
     height: 1.5rem;
     width: 1.5rem;
@@ -149,6 +160,8 @@
     display: inline-block;
     border: 1px solid var(--color-foreground-level-3);
     align-self: center;
+    background-color: var(--color-background);
+    object-fit: cover;
   }
 
   .post.link:hover,
