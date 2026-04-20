@@ -3,22 +3,14 @@
 
   import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
-  import Pile from '$lib/components/pile/pile.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
-  import type { LeaderboardEntryDto } from '$lib/utils/wave/types/leaderboard';
   import type { WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
   import type { Component, ComponentProps } from 'svelte';
-  import GithubUserBadge from '../github-user-badge/github-user-badge.svelte';
 
   let {
     waveProgram,
-    leaderboard,
   }: {
     waveProgram: WaveProgramDto;
-    leaderboard: {
-      totalCount: number;
-      firstThreeEntries: LeaderboardEntryDto[];
-    };
   } = $props();
 
   type ComponentAndProps<C extends Component<any>> = {
@@ -48,28 +40,6 @@
       key: 'Orgs',
       value: waveProgram.approvedOrgCount,
       href: `/wave/${waveProgram.slug}/orgs`,
-    },
-    {
-      key: 'Leaderboard',
-      value:
-        leaderboard.totalCount === 0
-          ? 'Empty'
-          : {
-              component: Pile,
-              props: {
-                maxItems: 3,
-                countOverride: leaderboard.totalCount,
-                components: leaderboard.firstThreeEntries.map(({ user }) => ({
-                  component: GithubUserBadge,
-                  props: {
-                    user,
-                    link: false,
-                    hideName: true,
-                  },
-                })),
-              },
-            },
-      href: `/wave/${waveProgram.slug}/leaderboard?filter=current-wave`,
     },
     {
       key: 'Waves',
