@@ -1,8 +1,7 @@
 import network from '$lib/stores/wallet/network';
 import { error, redirect } from '@sveltejs/kit';
-import assert from '$lib/utils/assert';
-import { authorSchema, metadataSchema } from '../../../../../api/blog/posts/schema';
-import type { z } from 'zod';
+import { metadataSchema } from '../../../../../api/blog/posts/schema';
+import { resolveAuthors } from '$lib/utils/blog-authors';
 
 export const load = async ({ url, params }) => {
   if (network.alternativeChainMode) {
@@ -12,24 +11,16 @@ export const load = async ({ url, params }) => {
 
   try {
     const post = await import(`../../../../../../blog-posts/${params.slug}.md`);
-    const metadata = metadataSchema.parse(post.metadata);
+    const { author, ...metadata } = metadataSchema.parse(post.metadata);
 
-    let author: z.infer<typeof authorSchema> | undefined;
-    if (post.metadata.author) {
-      const authorDesc = await import(
-        `../../../../../../blog-posts/authors/${metadata.author}.json`
-      );
-      assert(
-        authorDesc,
-        `Unable to locate blog author with ID ${metadata.author}. Make sure the ID is present in /src/blog-posts/authors/`,
-      );
-
-      author = authorSchema.parse(authorDesc);
-    }
+    const authors = await resolveAuthors(
+      author,
+      (id) => import(`../../../../../../blog-posts/authors/${id}.json`),
+    );
 
     return {
       PostContent: post.default,
-      meta: { ...metadata, author, slug: params.slug },
+      meta: { ...metadata, authors, slug: params.slug },
     };
   } catch (e) {
     // eslint-disable-next-line no-console
