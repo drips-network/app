@@ -9,8 +9,9 @@ export const load = async ({ parent, fetch, depends }) => {
 
   const canManageTags = user.permissions?.includes('manageTags');
   const canFeatureRepos = user.permissions?.includes('featureWaveRepos');
+  const canManagePoints = user.permissions?.includes('managePoints');
 
-  if (!canManageTags && !canFeatureRepos) {
+  if (!canManageTags && !canFeatureRepos && !canManagePoints) {
     throw redirect(302, '/wave/admin');
   }
 
@@ -24,5 +25,6 @@ export const load = async ({ parent, fetch, depends }) => {
     tags,
     canManageTags: !!canManageTags,
     canFeatureRepos: !!canFeatureRepos,
+    canManagePoints: !!canManagePoints,
   };
 };
