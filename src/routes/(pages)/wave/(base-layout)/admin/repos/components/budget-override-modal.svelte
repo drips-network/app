@@ -17,16 +17,16 @@
 
   let { repo, waveProgramId, onChanged }: Props = $props();
 
-  let hasExistingOverride = $derived(
-    repo.pointsBudgetOverride != null && repo.pointsBudgetOverride > 0,
-  );
+  let hasExistingOverride = $derived(repo.pointsBudgetOverride != null);
 
-  let budget = $state(hasExistingOverride ? String(repo.pointsBudgetOverride) : '');
+  let budget = $state(repo.pointsBudgetOverride != null ? String(repo.pointsBudgetOverride) : '');
   let submitting = $state(false);
   let error = $state<string | null>(null);
 
-  let budgetNum = $derived(parseInt(budget, 10));
-  let canSubmit = $derived(!isNaN(budgetNum) && budgetNum >= 1 && !submitting);
+  let budgetNum = $derived(Number(budget));
+  let canSubmit = $derived(
+    Number.isFinite(budgetNum) && Number.isInteger(budgetNum) && budgetNum >= 1 && !submitting,
+  );
 
   async function handleSubmit() {
     if (!canSubmit) return;
