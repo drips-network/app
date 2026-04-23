@@ -20,17 +20,17 @@ export const pointsIssueDtoSchema = z.object({
 
 export const pointsComplimentDtoSchema = z.object({
   type: complimentTypeSchema,
-  issue: pointsIssueDtoSchema,
+  issue: pointsIssueDtoSchema.nullable(),
 });
 
 export const pointsSourceSchema = z.union([
   z.object({
     type: z.literal('issue'),
-    data: pointsIssueDtoSchema,
+    data: pointsIssueDtoSchema.nullable(),
   }),
   z.object({
     type: z.literal('compliment'),
-    data: pointsComplimentDtoSchema,
+    data: pointsComplimentDtoSchema.nullable(),
   }),
   z.object({
     type: z.literal('adjustment'),
