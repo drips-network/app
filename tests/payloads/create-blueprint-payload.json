@@ -1,0 +1,26 @@
+{
+  "listName": "Test Blueprint",
+  "listDescription": "This is a test blueprint",
+  "splits": [
+    {
+      "type": "orcid-id",
+      "orcidId": "0009-0007-1106-8413",
+      "weight": 333333
+    },
+    {
+      "type": "project",
+      "repoName": "mhgbrown/drips.test",
+      "weight": 333333
+    },
+    {
+      "type": "address",
+      "ethAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "weight": 333333
+    },
+    {
+      "type": "project",
+      "repoName": "drips-network/drips-network",
+      "weight": 333333
+    }
+  ]
+}
