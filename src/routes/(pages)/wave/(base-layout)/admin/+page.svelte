@@ -35,6 +35,15 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('managePhoneVerifications')
+      ? [
+          {
+            name: 'Unlink Phone',
+            description: "Remove a user's phone verification so they can re-verify.",
+            href: '/wave/admin/unlink-phone',
+          },
+        ]
+      : []),
   ]);
 </script>
 
