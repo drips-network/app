@@ -18,7 +18,10 @@
 
   const typeOptions = [
     { value: 'ban', title: 'Ban — block login entirely, revoke existing sessions' },
-    { value: 'restriction', title: 'Restriction — login allowed, blocks specific actions' },
+    {
+      value: 'restriction',
+      title: 'Restriction — login allowed, blocks applying to issues / applying repos',
+    },
   ];
 
   let username = $state('');
