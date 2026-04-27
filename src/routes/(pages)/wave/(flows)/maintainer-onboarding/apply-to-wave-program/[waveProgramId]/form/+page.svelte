@@ -204,187 +204,181 @@
     ? 'repo'
     : `${repoIds.length} repos`} you're applying to the {data.waveProgram.name} Wave Program."
 >
-  {#if data.user?.restricted}
-    <AnnotationBox type="error">
-      Sorry, but your Drips Wave account has been restricted from applying repos.
-    </AnnotationBox>
-  {:else}
-    <FormField
-      title="Previous participation"
-      description="Have you previously participated in any of the following programs? Select all that apply."
-      type="div"
-    >
-      <Card style="padding: 0; text-align: left; width: 100%;">
-        <ListSelect
-          multiselect
-          searchable={false}
-          items={previousParticipationItems}
-          bind:selected={previousParticipation}
-        />
-      </Card>
-    </FormField>
+  <FormField
+    title="Previous participation"
+    description="Have you previously participated in any of the following programs? Select all that apply."
+    type="div"
+  >
+    <Card style="padding: 0; text-align: left; width: 100%;">
+      <ListSelect
+        multiselect
+        searchable={false}
+        items={previousParticipationItems}
+        bind:selected={previousParticipation}
+      />
+    </Card>
+  </FormField>
 
-    <FormField
-      title="Planned issues*"
-      descriptionMd={`The Wave Program works by having maintainers create scoped issues that contributors pick up during sprint cycles. 
+  <FormField
+    title="Planned issues*"
+    descriptionMd={`The Wave Program works by having maintainers create scoped issues that contributors pick up during sprint cycles. 
 
 Describe the types of work you'd post — bug fixes, new features, documentation, testing, etc.`}
+    type="div"
+    validationState={touched['plannedIssues'] && !plannedIssuesValid
+      ? {
+          type: 'invalid',
+          message:
+            plannedIssuesDescription.length > 5000
+              ? 'Must not exceed 5,000 characters.'
+              : 'This field is required.',
+        }
+      : { type: 'valid' }}
+  >
+    <TextArea
+      bind:value={plannedIssuesDescription}
+      placeholder="We plan to add issues related to..."
+      onblur={() => touch('plannedIssues')}
+    />
+    <div class="char-count">
+      <span class:too-long={plannedIssuesDescription.length > 5000} class="tnum"
+        >{plannedIssuesDescription.length} / 5,000</span
+      >
+    </div>
+  </FormField>
+
+  {#if multipleReposSelected}
+    <FormField
+      title="Repo relationship*"
+      description="You selected multiple repos. Please describe how they are related to each other."
       type="div"
-      validationState={touched['plannedIssues'] && !plannedIssuesValid
+      validationState={touched['repoRelationship'] && !repoRelationshipValid
         ? {
             type: 'invalid',
             message:
-              plannedIssuesDescription.length > 5000
+              repoRelationshipDescription.length > 5000
                 ? 'Must not exceed 5,000 characters.'
-                : 'This field is required.',
+                : 'This field is required when applying multiple repos.',
           }
         : { type: 'valid' }}
     >
       <TextArea
-        bind:value={plannedIssuesDescription}
-        placeholder="We plan to add issues related to..."
-        onblur={() => touch('plannedIssues')}
+        bind:value={repoRelationshipDescription}
+        placeholder="These repos are related because..."
+        onblur={() => touch('repoRelationship')}
       />
       <div class="char-count">
-        <span class:too-long={plannedIssuesDescription.length > 5000} class="tnum"
-          >{plannedIssuesDescription.length} / 5,000</span
+        <span class:too-long={repoRelationshipDescription.length > 5000} class="tnum"
+          >{repoRelationshipDescription.length} / 5,000</span
+        >
+      </div>
+    </FormField>
+  {/if}
+
+  {#if anySelectedRepoIsFork}
+    <AnnotationBox type="info">
+      One or more of your selected repos is a fork. Please answer the following additional
+      questions.
+    </AnnotationBox>
+
+    <FormField
+      title="Upstream relationship*"
+      description="Describe the relationship between your fork(s) and the upstream repo(s)."
+      type="div"
+      validationState={touched['upstreamRelationship'] && !upstreamRelationshipValid
+        ? {
+            type: 'invalid',
+            message:
+              upstreamRelationshipDescription.length > 5000
+                ? 'Must not exceed 5,000 characters.'
+                : 'This field is required for forked repos.',
+          }
+        : { type: 'valid' }}
+    >
+      <TextArea
+        bind:value={upstreamRelationshipDescription}
+        placeholder="The relationship to the upstream repo is..."
+        onblur={() => touch('upstreamRelationship')}
+      />
+      <div class="char-count">
+        <span class:too-long={upstreamRelationshipDescription.length > 5000} class="tnum"
+          >{upstreamRelationshipDescription.length} / 5,000</span
         >
       </div>
     </FormField>
 
-    {#if multipleReposSelected}
-      <FormField
-        title="Repo relationship*"
-        description="You selected multiple repos. Please describe how they are related to each other."
-        type="div"
-        validationState={touched['repoRelationship'] && !repoRelationshipValid
-          ? {
-              type: 'invalid',
-              message:
-                repoRelationshipDescription.length > 5000
-                  ? 'Must not exceed 5,000 characters.'
-                  : 'This field is required when applying multiple repos.',
-            }
-          : { type: 'valid' }}
-      >
-        <TextArea
-          bind:value={repoRelationshipDescription}
-          placeholder="These repos are related because..."
-          onblur={() => touch('repoRelationship')}
-        />
-        <div class="char-count">
-          <span class:too-long={repoRelationshipDescription.length > 5000} class="tnum"
-            >{repoRelationshipDescription.length} / 5,000</span
-          >
-        </div>
-      </FormField>
-    {/if}
-
-    {#if anySelectedRepoIsFork}
-      <AnnotationBox type="info">
-        One or more of your selected repos is a fork. Please answer the following additional
-        questions.
-      </AnnotationBox>
-
-      <FormField
-        title="Upstream relationship*"
-        description="Describe the relationship between your fork(s) and the upstream repo(s)."
-        type="div"
-        validationState={touched['upstreamRelationship'] && !upstreamRelationshipValid
-          ? {
-              type: 'invalid',
-              message:
-                upstreamRelationshipDescription.length > 5000
-                  ? 'Must not exceed 5,000 characters.'
-                  : 'This field is required for forked repos.',
-            }
-          : { type: 'valid' }}
-      >
-        <TextArea
-          bind:value={upstreamRelationshipDescription}
-          placeholder="The relationship to the upstream repo is..."
-          onblur={() => touch('upstreamRelationship')}
-        />
-        <div class="char-count">
-          <span class:too-long={upstreamRelationshipDescription.length > 5000} class="tnum"
-            >{upstreamRelationshipDescription.length} / 5,000</span
-          >
-        </div>
-      </FormField>
-
-      <FormField
-        title="Fork justification*"
-        descriptionMd={`Help us understand the context of why you're submitting a fork.
+    <FormField
+      title="Fork justification*"
+      descriptionMd={`Help us understand the context of why you're submitting a fork.
       
 **Example:** "The original project went inactive 6 months ago; I'm continuing development independently".
 
 There's no wrong answer. We need this context to review forks accurately.`}
-        type="div"
-        validationState={touched['forkJustification'] && !forkJustificationValid
-          ? {
-              type: 'invalid',
-              message:
-                forkJustification.length > 5000
-                  ? 'Must not exceed 5,000 characters.'
-                  : 'This field is required for forked repos.',
-            }
-          : { type: 'valid' }}
-      >
-        <TextArea
-          bind:value={forkJustification}
-          placeholder="We are applying with this fork because..."
-          onblur={() => touch('forkJustification')}
-        />
-        <div class="char-count">
-          <span class:too-long={forkJustification.length > 5000} class="tnum"
-            >{forkJustification.length} / 5,000</span
-          >
-        </div>
-      </FormField>
-    {/if}
-
-    <FormField
-      title="Supporting links"
-      description="Provide links to resources relevant to your project (e.g. website, documentation, social media, deployed contracts). Up to 10 links."
       type="div"
+      validationState={touched['forkJustification'] && !forkJustificationValid
+        ? {
+            type: 'invalid',
+            message:
+              forkJustification.length > 5000
+                ? 'Must not exceed 5,000 characters.'
+                : 'This field is required for forked repos.',
+          }
+        : { type: 'valid' }}
     >
-      {#if supportingLinks.length > 0}
-        <ul class="links-list">
-          {#each supportingLinks as link, i (link)}
-            <li>
-              <span class="typo-text link-url">{link}</span>
-              <Button size="small" icon={Trash} onclick={() => removeLink(i)}>Remove</Button>
-            </li>
-          {/each}
-        </ul>
-      {/if}
-      <div class="add-link-row">
-        <TextInput
-          bind:value={newLink}
-          placeholder={supportingLinks.length >= 10 ? 'Link limit reached' : 'https://...'}
-          disabled={supportingLinks.length >= 10}
-          onkeydown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              addLink();
-            }
-          }}
-        />
-        <Button
-          size="large"
-          icon={Plus}
-          disabled={!newLinkIsValid || supportingLinks.length >= 10}
-          onclick={addLink}>Add link</Button
+      <TextArea
+        bind:value={forkJustification}
+        placeholder="We are applying with this fork because..."
+        onblur={() => touch('forkJustification')}
+      />
+      <div class="char-count">
+        <span class:too-long={forkJustification.length > 5000} class="tnum"
+          >{forkJustification.length} / 5,000</span
         >
       </div>
     </FormField>
-
-    <AnnotationBox>
-      By submitting this application, you confirm that all provided information is accurate.
-      Inaccurate information may result in your application being rejected and could lead to
-      disqualification from the Drips Wave Program.
-    </AnnotationBox>
   {/if}
+
+  <FormField
+    title="Supporting links"
+    description="Provide links to resources relevant to your project (e.g. website, documentation, social media, deployed contracts). Up to 10 links."
+    type="div"
+  >
+    {#if supportingLinks.length > 0}
+      <ul class="links-list">
+        {#each supportingLinks as link, i (link)}
+          <li>
+            <span class="typo-text link-url">{link}</span>
+            <Button size="small" icon={Trash} onclick={() => removeLink(i)}>Remove</Button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    <div class="add-link-row">
+      <TextInput
+        bind:value={newLink}
+        placeholder={supportingLinks.length >= 10 ? 'Link limit reached' : 'https://...'}
+        disabled={supportingLinks.length >= 10}
+        onkeydown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addLink();
+          }
+        }}
+      />
+      <Button
+        size="large"
+        icon={Plus}
+        disabled={!newLinkIsValid || supportingLinks.length >= 10}
+        onclick={addLink}>Add link</Button
+      >
+    </div>
+  </FormField>
+
+  <AnnotationBox>
+    By submitting this application, you confirm that all provided information is accurate.
+    Inaccurate information may result in your application being rejected and could lead to
+    disqualification from the Drips Wave Program.
+  </AnnotationBox>
 
   {#snippet leftActions()}
     <Button
@@ -395,15 +389,13 @@ There's no wrong answer. We need this context to review forks accurately.`}
   {/snippet}
 
   {#snippet actions()}
-    {#if !data.user?.restricted}
-      <Button
-        variant="primary"
-        disabled={!formValid}
-        icon={CheckCircle}
-        loading={applying}
-        onclick={handleApply}>Apply selected repos</Button
-      >
-    {/if}
+    <Button
+      variant="primary"
+      disabled={!formValid}
+      icon={CheckCircle}
+      loading={applying}
+      onclick={handleApply}>Apply selected repos</Button
+    >
   {/snippet}
 </FlowStepWrapper>
 

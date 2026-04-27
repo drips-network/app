@@ -10,24 +10,8 @@ export class AccountSuspendedError extends Error {
   }
 }
 
-/**
- * Thrown for 403 responses where the backend signals that the account is in a
- * "restricted" state (lighter than a full ban — login still works, but
- * specific actions like applying to issues / repos are blocked).
- */
-export class AccountRestrictedError extends Error {
-  constructor() {
-    super('Your account is currently restricted from this action.');
-    this.name = 'AccountRestrictedError';
-  }
-}
-
 function isAccountSuspendedResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('suspended');
-}
-
-function isAccountRestrictedResponse(status: number, body: string): boolean {
-  return status === 403 && body.includes('restricted');
 }
 
 const MAX_RETRIES = 3;
@@ -76,10 +60,6 @@ export async function call(path: string, options: RequestInit = {}) {
 
     if (isAccountSuspendedResponse(response.status, errorText)) {
       throw new AccountSuspendedError();
-    }
-
-    if (isAccountRestrictedResponse(response.status, errorText)) {
-      throw new AccountRestrictedError();
     }
 
     throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
@@ -147,10 +127,6 @@ export async function authenticatedCall(
 
       if (isAccountSuspendedResponse(res.status, errorText)) {
         throw new AccountSuspendedError();
-      }
-
-      if (isAccountRestrictedResponse(res.status, errorText)) {
-        throw new AccountRestrictedError();
       }
 
       if (res.status === 401) {
