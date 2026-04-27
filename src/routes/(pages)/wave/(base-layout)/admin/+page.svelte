@@ -44,6 +44,16 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('manageBans')
+      ? [
+          {
+            name: 'Bans & Restrictions',
+            description:
+              'Ban or restrict a GitHub user, and review existing bans and restrictions.',
+            href: '/wave/admin/bans',
+          },
+        ]
+      : []),
   ]);
 </script>
 
