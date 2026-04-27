@@ -1,4 +1,5 @@
 import { listBans, type RestrictionType } from '$lib/utils/wave/bans.js';
+import { getAllPaginated } from '$lib/utils/wave/getAllPaginated.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ parent, fetch, depends, url }) => {
@@ -14,7 +15,9 @@ export const load = async ({ parent, fetch, depends, url }) => {
   const type: RestrictionType | undefined =
     typeParam === 'ban' || typeParam === 'restriction' ? typeParam : undefined;
 
-  const bans = await listBans(fetch, { pagination: { limit: 100 }, type });
+  const bans = await getAllPaginated((page, limit) =>
+    listBans(fetch, { pagination: { page, limit }, type }),
+  );
 
   return {
     bans,

@@ -98,7 +98,7 @@
     }}
     skeleton={{
       loaded: true,
-      empty: bans.pagination.total === 0,
+      empty: bans.length === 0,
       emptyStateEmoji: '🛡️',
       emptyStateHeadline:
         typeFilter === 'all'
@@ -115,9 +115,9 @@
       </FormField>
     </div>
 
-    {#if bans.pagination.total > 0}
+    {#if bans.length > 0}
       <div class="list">
-        {#each bans.data as ban (ban.id)}
+        {#each bans as ban (ban.id)}
           <div class="row">
             <div class="left">
               <GitHubUserById gitHubUserId={ban.gitHubUserId} gitHubUsername={ban.gitHubUsername} />
@@ -149,12 +149,6 @@
           </div>
         {/each}
       </div>
-
-      {#if bans.pagination.total > bans.data.length}
-        <p class="footer typo-text-small">
-          Showing {bans.data.length} of {bans.pagination.total}.
-        </p>
-      {/if}
     {/if}
   </Section>
 </div>
@@ -243,11 +237,5 @@
     display: flex;
     gap: 0.5rem;
     flex-shrink: 0;
-  }
-
-  .footer {
-    color: var(--color-foreground-level-5);
-    margin-top: 0.75rem;
-    text-align: center;
   }
 </style>
