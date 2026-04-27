@@ -206,8 +206,8 @@
 >
   {#if data.user?.restricted}
     <AnnotationBox type="error">
-      Sorry, but your Drips Wave account has been restricted from applying repos. You can reach out
-      to support@drips.network for more details.
+      Sorry, but your Drips Wave account has been restricted from applying repos to wave programs.
+      You can reach out to support@drips.network for more details.
 
       {#snippet actions()}
         <Button href="mailto:support@drips.network">Contact support</Button>
