@@ -21,6 +21,10 @@ const accessClaimJwtSchema = z.object({
     })
     .optional(),
   permissions: z.array(z.string()).optional(),
+  // Backend embeds this claim only when the account is actively restricted
+  // (a lighter moderation level than a full ban — login still works, but
+  // certain actions like applying to issues / repos are blocked).
+  restricted: z.literal(true).optional(),
 });
 
 export type WaveLoggedInUser = WaveUser & {
@@ -32,6 +36,7 @@ export type WaveLoggedInUser = WaveUser & {
   };
   signUpDate: Date;
   permissions?: string[];
+  restricted?: boolean;
 };
 
 export function getAccessTokenCookieClientSide(): string | null {
@@ -78,6 +83,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
     signUpDate: content.signUpDate,
     payoutAddresses: content.payoutAddresses,
     permissions: content.permissions,
+    restricted: content.restricted,
   };
 }
 
