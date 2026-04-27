@@ -82,7 +82,12 @@
 
   {#if data.user?.restricted}
     <AnnotationBox type="error">
-      Sorry, but your Drips Wave account has been restricted from applying to issues.
+      Sorry, but your Drips Wave account has been restricted from applying to issues. You can reach
+      out to support@drips.network for more details.
+
+      {#snippet actions()}
+        <Button href="mailto:support@drips.network">Contact support</Button>
+      {/snippet}
     </AnnotationBox>
   {:else if data.alreadyApplied}
     <AnnotationBox>You already previously applied to this issue.</AnnotationBox>
