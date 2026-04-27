@@ -3,14 +3,27 @@
 
   interface Props {
     gitHubUserId: number;
+    /**
+     * Pre-resolved GitHub username, when wave already knew it (i.e. the
+     * banned user has a Wave account). When provided, no GitHub API
+     * lookup happens. Null means wave looked but found no Wave user
+     * (pre-emptive ban) — fall back to the unauthenticated GitHub API.
+     */
+    gitHubUsername?: string | null;
   }
 
-  let { gitHubUserId }: Props = $props();
+  let { gitHubUserId, gitHubUsername = null }: Props = $props();
 
   let user = $state<GitHubUser | null | undefined>(undefined);
   let error = $state<string | null>(null);
 
   $effect(() => {
+    if (gitHubUsername) {
+      user = null;
+      error = null;
+      return;
+    }
+
     let cancelled = false;
     user = undefined;
     error = null;
@@ -32,22 +45,30 @@
   const avatarUrl = $derived(
     user?.avatarUrl ?? `https://avatars.githubusercontent.com/u/${gitHubUserId}?s=64`,
   );
+  const profileUrl = $derived(
+    user?.htmlUrl ?? (gitHubUsername ? `https://github.com/${gitHubUsername}` : null),
+  );
+  const displayLogin = $derived(gitHubUsername ?? user?.login ?? null);
 </script>
 
 <div class="user">
   <img class="avatar" src={avatarUrl} alt="" referrerpolicy="no-referrer" />
   <div class="info">
-    {#if user === undefined}
+    {#if displayLogin}
+      {#if profileUrl}
+        <a class="login typo-text-bold" href={profileUrl} target="_blank" rel="noreferrer">
+          {displayLogin}
+        </a>
+      {:else}
+        <span class="login typo-text-bold">{displayLogin}</span>
+      {/if}
+      <span class="id typo-text-small dim">#{gitHubUserId}</span>
+    {:else if user === undefined}
       <span class="login typo-text-bold">…</span>
       <span class="id typo-text-small dim">#{gitHubUserId}</span>
-    {:else if user === null}
+    {:else}
       <span class="login typo-text-bold">Unknown</span>
       <span class="id typo-text-small dim" title={error ?? undefined}>#{gitHubUserId}</span>
-    {:else}
-      <a class="login typo-text-bold" href={user.htmlUrl} target="_blank" rel="noreferrer">
-        {user.login}
-      </a>
-      <span class="id typo-text-small dim">#{gitHubUserId}</span>
     {/if}
   </div>
 </div>

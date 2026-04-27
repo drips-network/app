@@ -13,6 +13,7 @@ export type RestrictionType = z.infer<typeof restrictionTypeSchema>;
 export const bannedUserSchema = z.object({
   id: z.uuid(),
   gitHubUserId: z.number().int(),
+  gitHubUsername: z.string().nullable(),
   type: restrictionTypeSchema,
   reason: z.string().nullable(),
   bannedAt: z.coerce.date(),

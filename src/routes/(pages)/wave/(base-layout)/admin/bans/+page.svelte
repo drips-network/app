@@ -120,7 +120,7 @@
         {#each bans.data as ban (ban.id)}
           <div class="row">
             <div class="left">
-              <GitHubUserById gitHubUserId={ban.gitHubUserId} />
+              <GitHubUserById gitHubUserId={ban.gitHubUserId} gitHubUsername={ban.gitHubUsername} />
               <div class="meta typo-text-small">
                 <span
                   class="badge"
