@@ -7,13 +7,14 @@
   import File from '$lib/components/icons/File.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
-  import OrDivider from '$lib/components/rpgf-results-card/components/or-divider.svelte';
+  import SectionHeader from '$lib/components/section-header/section-header.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
   import WaveAvatar from '$lib/components/wave/wave-program-avatar/wave-program-avatar.svelte';
   import { INBOUND_LEAD_FORM_URL } from '$lib/constants';
   import formatDate from '$lib/utils/format-date';
   import type { WaveDto } from '$lib/utils/wave/types/waveProgram';
   import FeatureCard from '../../app/(app)/components/feature-card.svelte';
+  import LatestNewsSection from '../../app/(app)/components/latest-news-section.svelte';
 
   let { data } = $props();
 
@@ -42,46 +43,65 @@
     {/snippet}
   </FeatureCard>
 
-  <OrDivider text="Wave programs" />
+  <div class="section">
+    <SectionHeader icon={Wave} label="Wave programs" />
 
-  {#each data.wavePrograms.data as waveProgram (waveProgram.id)}
-    {@const upcomingWave: WaveDto | null = data.upcomingWaves[waveProgram.id]}
-    <a href="/wave/{waveProgram.slug}" class="wave-program-item">
-      <WaveAvatar {waveProgram} size={128} />
+    <div class="wave-program-list">
+      {#each data.wavePrograms.data as waveProgram (waveProgram.id)}
+        {@const upcomingWave: WaveDto | null = data.upcomingWaves[waveProgram.id]}
+        <a href="/wave/{waveProgram.slug}" class="wave-program-item">
+          <div class="bg"></div>
+          <WaveAvatar {waveProgram} size={128} />
 
-      <div class="details">
-        {#if upcomingWave}
-          <div class="next-wave-badge">
-            {#if upcomingWave.startDate > now}
-              Next Wave starts {formatDate(upcomingWave.startDate, 'onlyDay')}
-            {:else if upcomingWave.endDate > now}
-              <PulsatingCircle />
-              Active Wave until {formatDate(upcomingWave.endDate, 'onlyDay')}
+          <div class="details">
+            {#if upcomingWave}
+              <div class="next-wave-badge">
+                {#if upcomingWave.startDate > now}
+                  Next Wave starts {formatDate(upcomingWave.startDate, 'onlyDay')}
+                {:else if upcomingWave.endDate > now}
+                  <PulsatingCircle />
+                  Active Wave until {formatDate(upcomingWave.endDate, 'onlyDay')}
+                {/if}
+              </div>
             {/if}
+            <h1>{waveProgram.name}</h1>
+            <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
           </div>
-        {/if}
-        <h1>{waveProgram.name}</h1>
-        <p style:color="var(--color-foreground-level-6)">{waveProgram.description}</p>
-      </div>
 
-      <ChevronRight />
-    </a>
-  {/each}
+          <ChevronRight />
+        </a>
+      {/each}
+    </div>
 
-  {#if data.wavePrograms.data.length === 0}
-    <Card>
-      <div class="empty typo-text">
-        There are no active Wave Programs at the moment. Consider subscribing to our email
-        newsletter and joining our Discord for announcements.
+    {#if data.wavePrograms.data.length === 0}
+      <Card>
+        <div class="empty typo-text">
+          There are no active Wave Programs at the moment. Consider subscribing to our email
+          newsletter and joining our Discord for announcements.
 
-        <div class="actions">
-          <Button icon={Email} href="/wave/newsletter">Subscribe to newsletter</Button>
-          <Button icon={Discord} href="https://discord.gg/drips" target="_blank"
-            >Join our Discord</Button
-          >
+          <div class="actions">
+            <Button icon={Email} href="/wave/newsletter">Subscribe to newsletter</Button>
+            <Button icon={Discord} href="https://discord.gg/drips" target="_blank"
+              >Join our Discord</Button
+            >
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    {/if}
+  </div>
+
+  {#if data.blogPosts.length > 0}
+    <LatestNewsSection
+      blogPosts={data.blogPosts}
+      title="Latest News & Resources"
+      compact
+      hideCategory
+      maxPosts={8}
+      actionLabel="View all"
+      actionHref="/blog/wave"
+      actionNewTab={false}
+      cardsNewTab={false}
+    />
   {/if}
 </div>
 
@@ -89,10 +109,22 @@
   .page {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 3rem;
     max-width: 90rem;
     margin: 0 auto;
     width: 100%;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .wave-program-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .empty {
@@ -124,6 +156,27 @@
       transform 0.2s,
       box-shadow 0.2s;
     flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wave-program-item .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 8rem;
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-primary-level-1) 60%, transparent),
+      transparent
+    );
+    z-index: 0;
+  }
+
+  .wave-program-item > :global(*:not(.bg)) {
+    position: relative;
+    z-index: 1;
   }
 
   .details {
