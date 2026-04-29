@@ -74,6 +74,11 @@
   function verify() {
     dispatch('await', {
       promise: async () => {
+        // Clear any state from prior verify attempts in this session, so the next
+        // step doesn't pick up a stale signature / taskId from an earlier attempt.
+        $context.litOwnerUpdateSignature = undefined;
+        $context.gaslessOwnerUpdateTaskId = undefined;
+
         const { address, dripsAccountId } = $walletStore;
         assert(address && dripsAccountId);
 

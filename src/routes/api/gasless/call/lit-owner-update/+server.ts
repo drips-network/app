@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
   if (existingTaskId) {
     const { status } = await relayer.getStatus({ id: existingTaskId });
 
-    if ([StatusCode.Pending, StatusCode.Submitted].includes(status)) {
+    if ([StatusCode.Pending, StatusCode.Submitted, StatusCode.Success].includes(status)) {
       return new Response(JSON.stringify({ taskId: existingTaskId }));
     } else {
       await redis.del(blockKey);
