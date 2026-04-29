@@ -23,6 +23,7 @@
     first?: boolean;
     link?: boolean;
     shareButton?: boolean;
+    hideCategory?: boolean;
   }
 
   let {
@@ -40,6 +41,7 @@
     first = false,
     link = true,
     shareButton = false,
+    hideCategory = false,
   }: Props = $props();
 
   let formattedDate = $derived(
@@ -68,11 +70,13 @@
     <div>
       {#if first}
         <h1>{title}</h1>
+      {:else if compact}
+        <h2 class="pixelated line-clamp-2">{title}</h2>
       {:else}
         <h1 class="pixelated">{title}</h1>
       {/if}
       <p class="metadata" style:color="var(--color-foreground-level-5)">
-        {#if categories?.length}
+        {#if categories?.length && !hideCategory}
           <svelte:element
             this={link ? 'span' : 'a'}
             class="category-badge"
@@ -92,7 +96,7 @@
         {/if}
         <span>{formattedDate}</span>
       </p>
-      <p>{excerpt}</p>
+      <p class="excerpt" class:line-clamp-3={compact}>{excerpt}</p>
     </div>
     {#if shareButton}
       <div style:width="fit-content">
@@ -206,6 +210,10 @@
 
   .post.first .cover-image {
     height: auto;
+  }
+
+  .post.compact {
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   .post.compact .cover-image {
