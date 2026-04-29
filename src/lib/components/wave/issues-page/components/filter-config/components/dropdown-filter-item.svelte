@@ -4,6 +4,7 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import scrollStore from '$lib/stores/scroll/scroll.store';
   import type { DropdownConfig } from '../types';
+  import { onDestroy } from 'svelte';
 
   const uid = crypto.randomUUID();
 
@@ -69,6 +70,10 @@
       positionPopover();
     }
   }
+
+  onDestroy(() => {
+    if (popoverOpen) scrollStore.unlock();
+  });
 </script>
 
 <svelte:window on:resize={handleWindowResize} />

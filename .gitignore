@@ -30,3 +30,6 @@ schema.graphql
 
 # lit account storage
 /src/routes/api/lit/owner-signature/.lit-auth-storage/*
+
+# autoresearch session state
+/.community-computer/

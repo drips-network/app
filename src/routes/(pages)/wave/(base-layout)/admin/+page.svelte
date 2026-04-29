@@ -24,6 +24,36 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('manageTags') ||
+    data.user.permissions?.includes('featureWaveRepos')
+      ? [
+          {
+            name: 'Repos & Tags',
+            description:
+              'Manage tags, assign them to repos, and feature repos across Wave Programs.',
+            href: '/wave/admin/repos',
+          },
+        ]
+      : []),
+    ...(data.user.permissions?.includes('managePhoneVerifications')
+      ? [
+          {
+            name: 'Unlink Phone',
+            description: "Remove a user's phone verification so they can re-verify.",
+            href: '/wave/admin/unlink-phone',
+          },
+        ]
+      : []),
+    ...(data.user.permissions?.includes('manageBans')
+      ? [
+          {
+            name: 'Bans & Restrictions',
+            description:
+              'Ban or restrict a GitHub user, and review existing bans and restrictions.',
+            href: '/wave/admin/bans',
+          },
+        ]
+      : []),
   ]);
 </script>
 

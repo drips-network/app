@@ -9,15 +9,31 @@
   interface Props {
     blogPosts: z.infer<typeof postsListingSchema>;
     title?: string;
+    compact?: boolean;
+    maxPosts?: number;
+    hideCategory?: boolean;
+    actionLabel?: string;
+    actionHref?: string;
+    actionNewTab?: boolean;
+    cardsNewTab?: boolean;
   }
 
-  let { blogPosts, title = 'Latest news' }: Props = $props();
+  let {
+    blogPosts,
+    title = 'Latest news',
+    compact = false,
+    maxPosts = 2,
+    hideCategory = false,
+    actionLabel = 'Read the blog',
+    actionHref = '/blog',
+    actionNewTab = true,
+    cardsNewTab = true,
+  }: Props = $props();
 
-  // 2 latest posts. Sort by date
   let sortedPosts = $derived(
     blogPosts
       .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 2),
+      .slice(0, maxPosts),
   );
 </script>
 
@@ -27,18 +43,18 @@
     label: title,
     actions: [
       {
-        label: 'Read the blog',
-        href: '/blog',
-        target: '_blank',
+        label: actionLabel,
+        href: actionHref,
+        target: actionNewTab ? '_blank' : undefined,
         icon: EyeOpenIcon,
       },
     ],
   }}
   skeleton={{ loaded: true, horizontalScroll: false }}
 >
-  <div class="posts-grid">
-    {#each sortedPosts as post}
-      <PostCard newTab {...post} />
+  <div class="posts-grid" class:compact>
+    {#each sortedPosts as post (post.slug)}
+      <PostCard newTab={cardsNewTab} {compact} {hideCategory} {...post} />
     {/each}
   </div>
 </Section>
@@ -49,6 +65,10 @@
     grid-template-columns: auto auto;
     gap: 1rem;
     padding: 4px 2px;
+  }
+
+  .posts-grid.compact {
+    grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
   }
 
   @media (max-width: 767px) {

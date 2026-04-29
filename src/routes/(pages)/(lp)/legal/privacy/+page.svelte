@@ -567,6 +567,17 @@
         Notion Labs, Inc., 548 Market St 74567, San Francisco, CA 94104, USA, certified under the
         Data Privacy Framework, for hosting the Get In Touch form and possessing respective data.
       </li>
+      <li>
+        Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA, certified under the
+        Data Privacy Framework, for (i) storage of daily database backups (retained for up to 30
+        days) for disaster-recovery purposes; and (ii) hosting a virtual machine used to co-sign
+        transactions issued from our multisig for the automated grant payout feature on Drips Wave.
+        In the context of (ii), the virtual machine only processes the parameters of transactions
+        that are subsequently broadcast on-chain (such as recipient addresses on supported networks
+        and amounts) and does not receive any further user-specific identifiers. Both the backups
+        and the virtual machine are hosted in a Google Cloud region located within the European
+        Union.
+      </li>
     </ul>
 
     <h4>Customer Support and Communication</h4>
@@ -644,6 +655,13 @@
       required by law, processing is necessary to establish, exercise, or defend legal claims, or
       required to complete ongoing transactions. We may delete data associated with inactive
       accounts after a reasonable period of inactivity.
+    </p>
+    <p>
+      Please note that, for disaster-recovery purposes, personal data may continue to exist in our
+      daily database backups (see section 9) for up to 30 days after deletion from the live system,
+      after which it is overwritten in the normal backup rotation. Within this window, backed-up
+      data is not used for any other purpose and would only be accessed in the event of an incident
+      affecting the live system.
     </p>
     <p>
       Insofar as the processing is carried out for the performance of a contract, the processing
@@ -768,6 +786,16 @@
       order to ensure an appropriate level of protection and to safeguard your personal rights. The
       measures taken serve, among other things, to prevent unauthorized access to the technical
       equipment used by us and to protect personal data from unauthorized access by third parties.
+    </p>
+    <p>
+      To ensure service availability and the integrity of our data, we take daily backups of our
+      application database. These backups are stored with our processor Google LLC (see section 6.3)
+      in a Google Cloud region located within the European Union and are retained for up to 30 days,
+      after which they are overwritten in the normal backup rotation. Backups are encrypted in
+      transit and at rest under the processor's standard controls, and access is restricted to
+      authorized personnel for disaster-recovery purposes only. The legal basis for this processing
+      is our legitimate interest in maintaining a resilient and reliable service in accordance with
+      Art. 6 (1) sentence 1 lit. f GDPR.
     </p>
     <p>
       In particular, the Drips Services uses SSL or TLS encryption for security reasons and to
@@ -903,7 +931,7 @@
 
   <section>
     <h2>Validity and amendment of this privacy policy</h2>
-    <p>This privacy policy is currently valid and effective as of March 18, 2026.</p>
+    <p>This privacy policy is currently valid and effective as of April 29, 2026.</p>
     <p>
       Due to the further development of the Drips Services or due to changes in legal or regulatory
       requirements, it may become necessary to amend this privacy policy. In this case, we will

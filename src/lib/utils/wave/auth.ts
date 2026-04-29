@@ -21,6 +21,10 @@ const accessClaimJwtSchema = z.object({
     })
     .optional(),
   permissions: z.array(z.string()).optional(),
+  // Backend embeds this claim only when the account is actively restricted
+  // (a lighter moderation level than a full ban — login still works, but
+  // certain actions like applying to issues / repos are blocked).
+  restricted: z.literal(true).optional(),
 });
 
 export type WaveLoggedInUser = WaveUser & {
@@ -32,6 +36,7 @@ export type WaveLoggedInUser = WaveUser & {
   };
   signUpDate: Date;
   permissions?: string[];
+  restricted?: boolean;
 };
 
 export function getAccessTokenCookieClientSide(): string | null {
@@ -43,6 +48,10 @@ export function getAccessTokenCookieClientSide(): string | null {
 const EXPIRY_BUFFER_SECONDS = 30; // Refresh if expiring within 30 seconds
 
 let loggingOut = false;
+
+// Dedupes concurrent refresh attempts. Backend rotates refresh tokens, so
+// parallel calls would otherwise race and the losers would trigger logout.
+let refreshInFlight: Promise<string | null> | null = null;
 
 export function getUserData(jwt: string | null): WaveLoggedInUser | null {
   if (!jwt) {
@@ -74,45 +83,55 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
     signUpDate: content.signUpDate,
     payoutAddresses: content.payoutAddresses,
     permissions: content.permissions,
+    restricted: content.restricted,
   };
 }
 
 export async function getRefreshedAuthToken(manualCookie?: string) {
   if (browser && loggingOut) return null;
 
-  try {
-    const res = await call('/api/auth/token/refresh', {
-      method: 'POST',
-      credentials: 'include',
-      headers: manualCookie ? { Cookie: manualCookie } : {},
-    });
+  if (browser && refreshInFlight) return refreshInFlight;
 
-    const data = z
-      .object({
-        accessToken: z.string(),
-      })
-      .parse(res);
+  const promise = (async () => {
+    try {
+      const res = await call('/api/auth/token/refresh', {
+        method: 'POST',
+        credentials: 'include',
+        headers: manualCookie ? { Cookie: manualCookie } : {},
+      });
 
-    // Defensive: if loggingOut were true we'd have returned early above,
-    // but reset it here as a safeguard against future refactors.
-    if (browser) loggingOut = false;
+      const data = z
+        .object({
+          accessToken: z.string(),
+        })
+        .parse(res);
 
-    return data.accessToken;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to refresh auth token:', e);
+      return data.accessToken;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to refresh auth token:', e);
 
-    await logOut();
+      await logOut();
 
-    if (e instanceof AccountSuspendedError) {
-      await goto('/wave/suspended');
+      if (e instanceof AccountSuspendedError) {
+        await goto('/wave/suspended');
+        return null;
+      }
+
+      await invalidateAll();
+
       return null;
     }
+  })();
 
-    await invalidateAll();
-
-    return null;
+  if (browser) {
+    refreshInFlight = promise;
+    promise.finally(() => {
+      if (refreshInFlight === promise) refreshInFlight = null;
+    });
   }
+
+  return promise;
 }
 
 export async function redeemGitHubOAuthCode(code: string, state: string) {

@@ -15,11 +15,19 @@
 {#if source.type === 'issue'}
   {@const issueInfo = source.data}
 
-  <span>Resolved "{issueInfo.title}"</span>
+  {#if issueInfo}
+    <span>Resolved "{issueInfo.title}"</span>
+  {:else}
+    <span>Resolved a deleted issue</span>
+  {/if}
 {:else if source.type === 'compliment'}
   {@const complimentInfo = source.data}
 
-  <span>Complimented for "{COMPLIMENT_FRIENDLY_NAMES[complimentInfo.type]}"</span>
+  {#if complimentInfo}
+    <span>Complimented for "{COMPLIMENT_FRIENDLY_NAMES[complimentInfo.type]}"</span>
+  {:else}
+    <span>Received a compliment</span>
+  {/if}
 {:else if source.type === 'adjustment'}
   <span>Manual points adjustment</span>
 {/if}

@@ -46,6 +46,7 @@ export const waveProgramDtoSchema = z.object({
   waveDayOfMonth: z.number().int(),
   waveDurationDays: z.number().int(),
   presetBudgetUSD: z.string(),
+  repoPointsBudget: z.number().int().nullable(),
   avatarUrl: z.url().nullable(),
   slug: z.string(),
   longDescription: z.string().nullable(),
@@ -75,6 +76,28 @@ export const waveProgramFiltersSchema = filterSchema(
   }),
 );
 export type WaveProgramFilters = z.infer<typeof waveProgramFiltersSchema>;
+
+// ===========================
+// Repo Tag Types
+// ===========================
+
+export const repoTagSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  imageUrl: z.string().nullable().optional(),
+});
+export type RepoTag = z.infer<typeof repoTagSchema>;
+
+export const tagSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type Tag = z.infer<typeof tagSchema>;
 
 // ===========================
 // Wave Program Repo Types
@@ -111,6 +134,9 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   reviewedAt: z.coerce.date().nullable(),
   rejectionReason: z.string().nullable(),
   issueCount: z.number().int(),
+  pointsUsed: z.number().int(),
+  pointsBudget: z.number().int().nullable(),
+  pointsRemaining: z.number().int().nullable(),
   pointsMultiplier: z.number().int().optional(),
   repo: z.object({
     stargazersCount: z.number().int().nullable().optional(),
@@ -121,6 +147,7 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
     gitHubRepoUrl: z.string(),
     description: z.string().nullable(),
     languages: z.record(z.string(), z.number()).nullable(),
+    tags: z.array(repoTagSchema).optional(),
   }),
   org: z.object({
     id: z.uuid(),
@@ -184,6 +211,7 @@ export const waveProgramReposFiltersSchema = filterSchema(
     search: z.string().optional(),
     sortBy: waveProgramReposSortBySchema.optional(),
     orgId: z.uuid().optional(),
+    tagId: z.string().optional(), // comma-separated list of tag UUIDs
   }),
 );
 export type WaveProgramReposFilters = z.infer<typeof waveProgramReposFiltersSchema>;

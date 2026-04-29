@@ -2,6 +2,7 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Cross from '$lib/components/icons/Cross.svelte';
   import type {
+    Tag,
     WaveProgramOrgDto,
     WaveProgramReposFilters,
     WaveProgramReposSortBy,
@@ -19,15 +20,17 @@
   const AVAILABLE_FILTERS: FilterType[] = [
     { key: 'primaryLanguages', label: 'Primary language' },
     { key: 'orgId', label: 'Org' },
+    { key: 'tagId', label: 'Tag' },
   ];
 
   interface Props {
     filters: WaveProgramReposFilters;
     onFiltersChange: (filters: WaveProgramReposFilters) => void;
-    orgsPromise?: Promise<WaveProgramOrgDto[]>;
+    loadOrgs?: () => Promise<WaveProgramOrgDto[]>;
+    loadTags?: () => Promise<Tag[]>;
   }
 
-  let { filters, onFiltersChange, orgsPromise }: Props = $props();
+  let { filters, onFiltersChange, loadOrgs, loadTags }: Props = $props();
 
   // Track which filters are currently visible (shown in UI)
   // Initialize with filters that already have values
@@ -63,18 +66,17 @@
     });
   });
 
-  // Org options promise
-  let orgOptionsPromise = $derived(
-    orgsPromise?.then((orgs) =>
-      orgs.map((o) => ({
-        label: o.gitHubOrgLogin,
-        value: o.id,
-      })),
-    ),
+  // Org options — loaded lazily when the filter is first shown
+  let orgOptionsPromise = $state<Promise<{ label: string; value: string }[]> | undefined>(
+    undefined,
   );
-
-  // Get selected org as array (MultiSelectFilter expects array)
   let selectedOrgs = $derived(filters.orgId ? [filters.orgId] : []);
+
+  // Tag options — loaded lazily when the filter is first shown
+  let tagOptionsPromise = $state<Promise<{ label: string; value: string }[]> | undefined>(
+    undefined,
+  );
+  let selectedTags = $derived(filters.tagId ? filters.tagId.split(',') : []);
 
   // Sort options
   const SORT_OPTIONS: { value: WaveProgramReposSortBy; label: string }[] = [
@@ -113,10 +115,36 @@
     });
   }
 
+  function handleTagsChange(tags: string[]) {
+    onFiltersChange({
+      ...filters,
+      tagId: tags.length > 0 ? tags.join(',') : undefined,
+    });
+  }
+
+  function ensureFilterDataLoaded(filterKey: keyof WaveProgramReposFilters) {
+    if (filterKey === 'orgId' && !orgOptionsPromise && loadOrgs) {
+      orgOptionsPromise = loadOrgs().then((orgs) =>
+        orgs.map((o) => ({ label: o.gitHubOrgLogin, value: o.id })),
+      );
+    }
+    if (filterKey === 'tagId' && !tagOptionsPromise && loadTags) {
+      tagOptionsPromise = loadTags().then((tags) =>
+        tags.map((t) => ({ label: t.name, value: t.id })),
+      );
+    }
+  }
+
+  // Load data for filters that are already visible on init
+  for (const key of visibleFilterKeys) {
+    ensureFilterDataLoaded(key);
+  }
+
   function addFilter(filterKey: keyof WaveProgramReposFilters) {
     if (!visibleFilterKeys.includes(filterKey)) {
       visibleFilterKeys = [...visibleFilterKeys, filterKey];
     }
+    ensureFilterDataLoaded(filterKey);
     showAddFilterDropdown = false;
   }
 
@@ -182,22 +210,45 @@
                 <Cross style="fill: var(--color-foreground-level-5)" />
               </button>
             </div>
-          {:else if key === 'orgId' && orgOptionsPromise}
+          {:else if key === 'orgId' && (orgOptionsPromise || loadOrgs)}
             <div class="filter-item">
               <span class="filter-label">Org</span>
               <div class="filter-dropdown">
-                <MultiSelectFilter
-                  optionsPromise={orgOptionsPromise}
-                  selectedValues={selectedOrgs}
-                  onchange={handleOrgsChange}
-                  placeholder="Any"
-                  singleSelect
-                />
+                {#if orgOptionsPromise}
+                  <MultiSelectFilter
+                    optionsPromise={orgOptionsPromise}
+                    selectedValues={selectedOrgs}
+                    onchange={handleOrgsChange}
+                    placeholder="Any"
+                    singleSelect
+                  />
+                {/if}
               </div>
               <button
                 class="remove-filter"
                 aria-label="Remove org filter"
                 onclick={() => removeFilter('orgId')}
+              >
+                <Cross style="fill: var(--color-foreground-level-5)" />
+              </button>
+            </div>
+          {:else if key === 'tagId' && (tagOptionsPromise || loadTags)}
+            <div class="filter-item">
+              <span class="filter-label">Tag</span>
+              <div class="filter-dropdown">
+                {#if tagOptionsPromise}
+                  <MultiSelectFilter
+                    optionsPromise={tagOptionsPromise}
+                    selectedValues={selectedTags}
+                    onchange={handleTagsChange}
+                    placeholder="Any"
+                  />
+                {/if}
+              </div>
+              <button
+                class="remove-filter"
+                aria-label="Remove tag filter"
+                onclick={() => removeFilter('tagId')}
               >
                 <Cross style="fill: var(--color-foreground-level-5)" />
               </button>
@@ -287,6 +338,7 @@
 
   .add-filter-wrapper {
     position: relative;
+    z-index: 10;
   }
 
   .add-filter-button {

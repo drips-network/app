@@ -20,6 +20,10 @@
       allowedAttributes: {},
     });
 
+  const authorNames = data.meta.authors?.length
+    ? data.meta.authors.map((a) => a.name)
+    : ['Drips Team'];
+
   // Structured meta for SEO
   const ldJsonMetadata = `{
     "@context": "https://schema.org",
@@ -29,10 +33,14 @@
       "${BASE_URL}${safeSanitize(data.meta.coverImage)}"
       ],
     "datePublished": "${new Date(data.meta.date).toISOString()}",
-    "author": [{
+    "author": [${authorNames
+      .map(
+        (name) => `{
         "@type": "Person",
-        "name": "${safeSanitize(data.meta.author?.name ?? 'Drips Team')}"
-      }]
+        "name": "${safeSanitize(name)}"
+      }`,
+      )
+      .join(',')}]
   }`;
 </script>
 

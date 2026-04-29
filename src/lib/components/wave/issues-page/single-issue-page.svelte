@@ -24,6 +24,7 @@
   import addIssuesToWaveFlow from '$lib/flows/wave/add-issues-to-wave-program/add-issues-to-wave-program-flow';
   import modal from '$lib/stores/modal';
   import { BASE_URL } from '$lib/utils/base-url';
+  import buildExternalUrl from '$lib/utils/build-external-url';
   import doWithConfirmationModal from '$lib/utils/do-with-confirmation-modal';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
@@ -133,6 +134,16 @@
   );
 
   const REVIEW_DEADLINE_DAYS = 14;
+
+  function labelTextColor(hex: string) {
+    const clean = hex.replace(/^#/, '');
+    if (clean.length !== 6) return '#000';
+    const r = parseInt(clean.slice(0, 2), 16);
+    const g = parseInt(clean.slice(2, 4), 16);
+    const b = parseInt(clean.slice(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? '#000' : '#fff';
+  }
 
   let isMaintainer = $derived(matchingWaveProgramRepos.length > 0);
   let isAssignedContributor = $derived(
@@ -295,9 +306,14 @@
   function openUpdateComplexityModal() {
     if (!partOfWaveProgram) return;
 
+    const waveProgramRepo = waveProgramRepos.find(
+      (wpr) => wpr.repo.id === issue.repo.id && wpr.waveProgramId === partOfWaveProgram.id,
+    );
+
     modal.show(UpdateComplexityModal, undefined, {
       issue,
       waveProgram: partOfWaveProgram,
+      waveProgramRepo,
       onIssueUpdated: handleIssueUpdated,
     });
   }
@@ -572,6 +588,30 @@
             {/if}
           </div>
         </div>
+
+        {#if issue.labels.length > 0}
+          <div class="sidebar-section">
+            <div class="content">
+              <h5>Labels</h5>
+              <div class="labels">
+                {#each issue.labels as label (label.id)}
+                  <a
+                    class="label typo-text-small"
+                    style:background-color="#{label.color}"
+                    style:color={labelTextColor(label.color)}
+                    href={buildExternalUrl(
+                      `${issue.repo.gitHubRepoUrl}/labels/${encodeURIComponent(label.name)}`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {label.name}
+                  </a>
+                {/each}
+              </div>
+            </div>
+          </div>
+        {/if}
 
         {#if issue.state === 'open' || issue.prLink}
           <div class="sidebar-section">
@@ -873,6 +913,19 @@
     gap: 0.5rem;
     color: inherit;
     text-decoration: none;
+  }
+
+  .labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .label {
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px 0 999px 999px;
+    line-height: 1.25;
+    white-space: nowrap;
   }
 
   .sidebar-section:not(:last-child) {

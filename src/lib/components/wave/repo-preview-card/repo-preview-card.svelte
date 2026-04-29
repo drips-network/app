@@ -17,19 +17,30 @@
   interface Props {
     repoWithDetails: WaveProgramRepoWithDetailsDto;
     actions?: Snippet;
+    tagHref?: (tagId: string) => string;
   }
 
-  let { repoWithDetails, actions }: Props = $props();
+  let { repoWithDetails, actions, tagHref }: Props = $props();
 
   const { repo, org, pointsMultiplier } = $derived(repoWithDetails);
   const isFeatured = $derived(pointsMultiplier && pointsMultiplier > 1);
+  const tagWithImage = $derived(repo.tags?.find((t) => t.imageUrl));
+  const tagImageUrl = $derived(tagWithImage?.imageUrl);
+  const tagColor = $derived(tagWithImage?.color);
+
+  const cardStyle = $derived.by(() => {
+    if (tagColor)
+      return `position: relative; background: linear-gradient(135deg, ${tagColor}15 0%, transparent 60%); border-color: ${tagColor}30;`;
+    if (isFeatured)
+      return 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);';
+    return undefined;
+  });
 </script>
 
-<Card
-  style={isFeatured
-    ? 'background: linear-gradient(135deg, var(--color-caution-level-1) 0%, transparent 50%);'
-    : undefined}
->
+<Card style={cardStyle}>
+  {#if tagImageUrl}
+    <img src={tagImageUrl} alt="" class="card-bg-image" />
+  {/if}
   <div class="repo-item">
     <div class="top">
       <div class="owner-and-repo">
@@ -59,6 +70,33 @@
           <span style:color="var(--color-foreground-level-4)">No description</span>
         {/if}
       </span>
+
+      {#if repo.tags && repo.tags.length > 0}
+        <div class="tags">
+          {#each repo.tags as tag (tag.id)}
+            {#if tagHref}
+              <a
+                class="tag-badge clickable"
+                style:background-color="{tag.color}20"
+                style:color={tag.color}
+                style:border-color="{tag.color}40"
+                href={tagHref(tag.id)}
+              >
+                {tag.name}
+              </a>
+            {:else}
+              <span
+                class="tag-badge"
+                style:background-color="{tag.color}20"
+                style:color={tag.color}
+                style:border-color="{tag.color}40"
+              >
+                {tag.name}
+              </span>
+            {/if}
+          {/each}
+        </div>
+      {/if}
 
       <div class="languages">
         <ProgrammingLanguageBreakdown
@@ -109,6 +147,23 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right;
+    opacity: 0.15;
+    filter: blur(2px);
+    scale: 1.05;
+    pointer-events: none;
+    mask-image: linear-gradient(to right, transparent 20%, black);
+    -webkit-mask-image: linear-gradient(to right, transparent 20%, black);
   }
 
   .top {
@@ -131,6 +186,33 @@
   .description {
     min-height: 2lh;
     color: var(--color-foreground-level-6);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.0625rem 0.5rem;
+    border-radius: 1rem 0 1rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid;
+    background: none;
+  }
+
+  .tag-badge.clickable {
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .tag-badge.clickable:hover {
+    opacity: 0.7;
   }
 
   .languages {

@@ -38,6 +38,13 @@ export type IssueFilters = z.infer<typeof issueFilters>;
 export const issueSortByOptionsSchema = z.enum(['createdAt', 'updatedAt', 'points']);
 export type IssueSortByOption = z.infer<typeof issueSortByOptionsSchema>;
 
+export const issueLabelDtoSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  color: z.string(),
+});
+export type IssueLabelDto = z.infer<typeof issueLabelDtoSchema>;
+
 export const issueDetailsDtoSchema = z.object({
   id: z.uuid(),
   gitHubIssueId: z.number(),
@@ -48,7 +55,7 @@ export const issueDetailsDtoSchema = z.object({
   gitHubAuthorId: z.number().nullable(),
   gitHubAuthorLogin: z.string().nullable(),
   assignees: z.array(z.any()),
-  labels: z.array(z.any()),
+  labels: z.array(issueLabelDtoSchema),
   gitHubCreatedAt: z.coerce.date(),
   gitHubUpdatedAt: z.coerce.date(),
   gitHubClosedAt: z.coerce.date().nullable(),

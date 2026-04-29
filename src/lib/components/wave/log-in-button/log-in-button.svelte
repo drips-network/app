@@ -9,7 +9,14 @@
     wordy = false,
     primary = false,
     skipWelcome = false,
-  }: { backTo?: string; wordy?: boolean; primary?: boolean; skipWelcome?: boolean } = $props();
+    disabled = false,
+  }: {
+    backTo?: string;
+    wordy?: boolean;
+    primary?: boolean;
+    skipWelcome?: boolean;
+    disabled?: boolean;
+  } = $props();
 
   const WAVE_API_URL = getOptionalEnvVar(
     'PUBLIC_WAVE_API_URL',
@@ -27,6 +34,7 @@
 
 <Button
   icon={Github}
+  {disabled}
   variant={primary ? 'primary' : undefined}
   href="{WAVE_API_URL}/api/auth/oauth/github/login{backTo
     ? `?backTo=${encodeURIComponent(backTo)}&skipWelcome=${skipWelcome}${attributionRefParam ? `&ref=${encodeURIComponent(attributionRefParam)}` : ''}`

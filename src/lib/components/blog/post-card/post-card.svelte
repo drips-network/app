@@ -17,12 +17,13 @@
     coverImageAlt: string;
     categories?: (typeof BLOG_CATEGORIES)[number][] | undefined;
     imageUrl?: string | undefined;
-    author?: z.infer<typeof authorSchema> | undefined;
+    authors?: z.infer<typeof authorSchema>[] | undefined;
     compact?: boolean;
     newTab?: boolean;
     first?: boolean;
     link?: boolean;
     shareButton?: boolean;
+    hideCategory?: boolean;
   }
 
   let {
@@ -34,12 +35,13 @@
     coverImageAlt,
     categories = undefined,
     imageUrl = undefined,
-    author = undefined,
+    authors = undefined,
     compact = false,
     newTab = false,
     first = false,
     link = true,
     shareButton = false,
+    hideCategory = false,
   }: Props = $props();
 
   let formattedDate = $derived(
@@ -49,6 +51,8 @@
       day: 'numeric',
     }),
   );
+
+  let authorNames = $derived(authors?.map((a) => a.name.split(' ')[0]).join(' & '));
 </script>
 
 <svelte:element
@@ -66,11 +70,13 @@
     <div>
       {#if first}
         <h1>{title}</h1>
+      {:else if compact}
+        <h2 class="pixelated line-clamp-2">{title}</h2>
       {:else}
         <h1 class="pixelated">{title}</h1>
       {/if}
       <p class="metadata" style:color="var(--color-foreground-level-5)">
-        {#if categories?.length}
+        {#if categories?.length && !hideCategory}
           <svelte:element
             this={link ? 'span' : 'a'}
             class="category-badge"
@@ -79,19 +85,18 @@
           >
           <span>•</span>
         {/if}
-        {#if author}
-          <img
-            class="author-avatar"
-            src={author.avatarUrl}
-            alt={author.name}
-            style="width: 1.5rem; height: 1.5rem; border-radius: 50%"
-          />
-          <span>{author.name}</span>
+        {#if authors?.length}
+          <span class="author-pile">
+            {#each authors as author (author.name)}
+              <img class="author-avatar" src={author.avatarUrl} alt={author.name} />
+            {/each}
+          </span>
+          <span>{authorNames}</span>
           <span>•</span>
         {/if}
         <span>{formattedDate}</span>
       </p>
-      <p>{excerpt}</p>
+      <p class="excerpt" class:line-clamp-3={compact}>{excerpt}</p>
     </div>
     {#if shareButton}
       <div style:width="fit-content">
@@ -142,6 +147,16 @@
     color: var(--color-foreground);
   }
 
+  .post .metadata .author-pile {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+  }
+
+  .post .metadata .author-pile .author-avatar + .author-avatar {
+    margin-left: -0.5rem;
+  }
+
   .post .metadata .author-avatar {
     height: 1.5rem;
     width: 1.5rem;
@@ -149,6 +164,8 @@
     display: inline-block;
     border: 1px solid var(--color-foreground-level-3);
     align-self: center;
+    background-color: var(--color-background);
+    object-fit: cover;
   }
 
   .post.link:hover,
@@ -193,6 +210,10 @@
 
   .post.first .cover-image {
     height: auto;
+  }
+
+  .post.compact {
+    border-radius: 1rem 0 1rem 1rem;
   }
 
   .post.compact .cover-image {

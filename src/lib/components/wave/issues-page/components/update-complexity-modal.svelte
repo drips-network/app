@@ -9,7 +9,11 @@
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import { getIssue } from '$lib/utils/wave/issues';
   import type { IssueDetailsDto } from '$lib/utils/wave/types/issue';
-  import type { Complexity, WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+  import type {
+    Complexity,
+    WaveProgramDto,
+    WaveProgramRepoWithDetailsDto,
+  } from '$lib/utils/wave/types/waveProgram';
   import { updateWaveProgramIssueComplexity } from '$lib/utils/wave/wavePrograms';
   import { notifyIssuesUpdated } from '../issue-update-coordinator';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
@@ -18,17 +22,32 @@
   interface Props {
     issue: IssueDetailsDto;
     waveProgram: WaveProgramDto;
+    waveProgramRepo?: WaveProgramRepoWithDetailsDto;
     onIssueUpdated?: (issue: IssueDetailsDto) => void;
   }
 
-  let { issue, waveProgram, onIssueUpdated }: Props = $props();
+  let { issue, waveProgram, waveProgramRepo, onIssueUpdated }: Props = $props();
 
   const initialComplexity: Complexity | null = issue.complexity ?? null;
 
   let activeComplexity: Complexity = $state(initialComplexity ?? 'small');
   let loading = $state(false);
 
-  let canSubmit = $derived(initialComplexity ? activeComplexity !== initialComplexity : true);
+  let currentPoints = $derived(100 + getPointsForComplexity(initialComplexity ?? 'small'));
+  let newPoints = $derived(100 + getPointsForComplexity(activeComplexity));
+  let pointsDelta = $derived(newPoints - currentPoints);
+
+  // Budget check
+  let budgetExceeded = $derived.by(() => {
+    if (!waveProgramRepo) return false;
+    if (waveProgramRepo.pointsRemaining === null) return false;
+    if (pointsDelta <= 0) return false;
+    return pointsDelta > waveProgramRepo.pointsRemaining;
+  });
+
+  let canSubmit = $derived(
+    (initialComplexity ? activeComplexity !== initialComplexity : true) && !budgetExceeded,
+  );
 
   async function handleSubmit() {
     loading = true;
@@ -116,11 +135,33 @@
             <span class="typo-text-bold">Complexity Bonus</span> =
           </span>
           <span class="typo-text-bold">
-            {100 + getPointsForComplexity(activeComplexity)} Points
+            {newPoints} Points
           </span>
         </span>
       </FormField>
     </div>
+
+    {#if budgetExceeded && waveProgramRepo}
+      <AnnotationBox type="error">
+        Increasing complexity to this level would exceed the per-repo points budget. Currently {waveProgramRepo.pointsUsed}
+        of {waveProgramRepo.pointsBudget} points used, with {waveProgramRepo.pointsRemaining} remaining
+        — but this change would require
+        {pointsDelta} additional points. Review the remaining budget for your repos on the
+        <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Learn more</a
+        >
+      </AnnotationBox>
+    {/if}
 
     {#snippet actions()}
       <Button variant="normal" disabled={loading} onclick={modal.hide}>Cancel</Button>

@@ -67,9 +67,15 @@
 
   .tabs {
     position: sticky;
-    top: 2.5rem;
+    top: 3.5rem;
     width: 100%;
     background-color: var(--color-background);
     z-index: 2;
+  }
+
+  @media (max-width: 1024px) {
+    .tabs {
+      top: 2.5rem;
+    }
   }
 </style>

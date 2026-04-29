@@ -3,7 +3,7 @@
   import CrossCircle from '$lib/components/icons/CrossCircle.svelte';
   import scrollStore from '$lib/stores/scroll/scroll.store';
   import SelectedDot from '$lib/components/selected-dot/selected-dot.svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   const uid = crypto.randomUUID();
 
@@ -74,6 +74,10 @@
 
   onMount(() => {
     positionPopover();
+  });
+
+  onDestroy(() => {
+    if (popoverOpen) scrollStore.unlock();
   });
 
   let resolvedOptions = $state<OT | undefined>(undefined);
