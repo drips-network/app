@@ -91,7 +91,7 @@
 
           if (!res.ok) {
             throw new Error(
-              'Failed to get an ownership signature from Lit Protocol. There may be a temporary outage – Please try again later, and reach out to Drips if the issue persists.',
+              'Failed to get an ownership signature from Lit Protocol. There may be a temporary outage. Please try again later, and reach out to Drips if the issue persists.',
             );
           }
 
