@@ -19,6 +19,12 @@
             tokenAddress
           }
         }
+        ... on ClaimedProjectData {
+          owner {
+            address
+          }
+          verificationStatus
+        }
       }
     }
   `;
@@ -165,6 +171,8 @@
   }
 
   async function fetchProject() {
+    $context.isReclaiming = false;
+    $context.isPartiallyClaimed = false;
     $context.linkedToRepo = false;
 
     try {
@@ -200,7 +208,17 @@
       const projectChainData = filterCurrentChainData(project.chainData);
 
       if (projectChainData.__typename === 'ClaimedProjectData') {
-        throw new InvalidUrlError('Project already claimed');
+        if (!$walletStore.connected) {
+          throw new InvalidUrlError(
+            'Project already claimed. To re-claim with a new wallet address, please first connect that wallet and try again.',
+          );
+        }
+
+        if (projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()) {
+          throw new InvalidUrlError('Project already claimed by your connected wallet');
+        }
+
+        $context.isReclaiming = true;
       }
 
       if (
@@ -239,6 +257,7 @@
     $context.project = undefined;
     $context.linkedToRepo = false;
     $context.isPartiallyClaimed = false;
+    $context.isReclaiming = false;
     $context.projectMetadata = undefined;
 
     claimingRenamedRepoOriginalName = undefined;
@@ -281,8 +300,10 @@
 </script>
 
 <StandaloneFlowStepLayout
-  headline="Claim your project"
-  description="Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public."
+  headline={$context.isReclaiming ? 'Re-claim your project' : 'Claim your project'}
+  description={$context.isReclaiming
+    ? 'This project has already been claimed on Drips. You can re-claim it to update the owner to your currently-connected wallet.'
+    : 'Enter your project’s GitHub URL to see if it has claimable funds and start the registration. Your repository must be public.'}
 >
   <TextInput
     bind:value={$context.gitUrl}
@@ -296,20 +317,27 @@
     onpaste={onPaste}
   />
   {#if $context.project && validationState.type === 'valid'}
-    <UnclaimedProjectCard
-      project={$context.project}
-      projectMetadata={$context.projectMetadata}
-      claimableTokensKey="Claimable tokens"
-    />
-    {#if claimingRenamedRepoOriginalName}
-      <AnnotationBox>
-        You're claiming a project that has been renamed to {claimingRenamedRepoOriginalName.replace(
-          'https://github.com/',
-          '',
-        )} on GitHub. Please ensure that the repository URL you entered matches the old name of your
-        repo exactly (including casing), and validate that any funds you're expecting to claim are displayed
-        above.
+    {#if $context.isReclaiming}
+      <AnnotationBox type="info">
+        This project has already been claimed on Drips. You can re-claim it from your
+        currently-connected account by updating the FUNDING.json file in the repository.
       </AnnotationBox>
+    {:else}
+      <UnclaimedProjectCard
+        project={$context.project}
+        projectMetadata={$context.projectMetadata}
+        claimableTokensKey="Claimable tokens"
+      />
+      {#if claimingRenamedRepoOriginalName}
+        <AnnotationBox>
+          You're claiming a project that has been renamed to {claimingRenamedRepoOriginalName.replace(
+            'https://github.com/',
+            '',
+          )} on GitHub. Please ensure that the repository URL you entered matches the old name of your
+          repo exactly (including casing), and validate that any funds you're expecting to claim are
+          displayed above.
+        </AnnotationBox>
+      {/if}
     {/if}
   {/if}
   {#snippet actions()}

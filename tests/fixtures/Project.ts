@@ -72,6 +72,11 @@ export class Project {
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click();
     await this.page.getByText('I edited the FUNDING.json file').click();
     await this.page.getByRole('button', { name: 'Verify now' }).click();
+
+    // Mine a block so the chain timestamp is current, preventing the Lit signature
+    // from being ahead of block.timestamp.
+    await execa`npm run dev:docker:mine-block`;
+
     await this.page.getByRole('textbox').first().fill('100');
     await this.page.getByRole('textbox').first().press('Enter');
     await this.page.getByRole('button', { name: 'Continue' }).nth(0).click();
@@ -81,11 +86,6 @@ export class Project {
     await expect(this.page.getByTestId('current-tx')).toContainText('Finalizing verification', {
       timeout: 60_000,
     });
-
-    const accountId = await this._populateAccountId(repoUrl);
-
-    // The critical execa call is now protected by the singleton's logic.
-    await execa`npm run dev:docker:update-repo-owner -- --accountId ${accountId} --ownerAddress ${this.ownerAddress}`;
 
     await expect(this.page.getByText('Set project splits and metadata')).toBeVisible({
       timeout: 60_000,
