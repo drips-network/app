@@ -184,6 +184,36 @@ export async function unfeatureWaveProgramRepo(
   });
 }
 
+export async function setRepoBudgetOverride(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+  pointsBudget: number,
+) {
+  await authenticatedCall(
+    f,
+    `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/budget-override`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({ pointsBudget }),
+    },
+  );
+}
+
+export async function removeRepoBudgetOverride(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+) {
+  await authenticatedCall(
+    f,
+    `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/budget-override`,
+    {
+      method: 'DELETE',
+    },
+  );
+}
+
 export async function addIssueToWaveProgram(
   f = fetch,
   waveProgramId: string,
