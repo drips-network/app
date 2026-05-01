@@ -200,9 +200,13 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 5rem;
+    height: 8rem;
     border-radius: 1rem 0 0 0;
-    background-color: var(--color-primary-level-1);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-primary-level-1) 60%, transparent),
+      transparent
+    );
     z-index: 0;
   }
 

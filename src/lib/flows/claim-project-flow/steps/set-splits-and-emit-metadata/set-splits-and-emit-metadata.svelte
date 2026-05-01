@@ -83,10 +83,18 @@
     if (!res.projectByUrl?.chainData) return false;
     const projectChainData = filterCurrentChainData(res.projectByUrl.chainData);
 
-    return (
-      projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata &&
-      projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase()
-    );
+    const isCorrectOwner =
+      projectChainData.owner.address.toLowerCase() === $walletStore.address?.toLowerCase();
+
+    // For fresh claims, the project transitions to PendingMetadata after the owner update.
+    // For re-claims of already-claimed projects, the project stays Claimed (since metadata
+    // already exists), but with the new owner.
+    const isExpectedStatus =
+      projectChainData.verificationStatus === ProjectVerificationStatus.PendingMetadata ||
+      ($context.isReclaiming &&
+        projectChainData.verificationStatus === ProjectVerificationStatus.Claimed);
+
+    return isCorrectOwner && isExpectedStatus;
   }
 
   async function waitForRepoOwnerUpdate(gasless: boolean) {
@@ -207,7 +215,7 @@
           }
         },
         (result) => result === true,
-        60000,
+        120000,
         3000,
       );
 
@@ -218,10 +226,35 @@
         );
       }
 
+      const callerTx = await populateCallerWriteTx({
+        functionName: 'callBatched',
+        args: [[txToCallerCall(updateOwnerByLitTx)]],
+      });
+
+      const { address } = $walletStore;
+      assert(address, 'Wallet address is not defined');
+
       transactions.push(
         {
           title: 'Update repository owner',
-          transaction: updateOwnerByLitTx,
+          transaction: callerTx,
+          gasless: $gaslessStore
+            ? {
+                nonceGetter: () => getCallerNonce(address),
+                ERC2771Data: (nonce) => ({
+                  domain: CallerERC2771Domain,
+                  types: CallSignedERC2771Types,
+                  payload: {
+                    sender: $walletStore.address,
+                    target: callerTx.to,
+                    data: callerTx.data,
+                    value: '0',
+                    nonce,
+                    deadline: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+                  },
+                }),
+              }
+            : undefined,
           applyGasBuffer: false,
         },
         {
@@ -286,7 +319,7 @@
     dispatch(
       'transact',
       makeTransactPayload({
-        headline: 'Claim your project',
+        headline: $context.isReclaiming ? 'Re-claim your project' : 'Claim your project',
 
         before: async () => {
           const gitProjectService = await GitProjectService.new();

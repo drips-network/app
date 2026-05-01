@@ -54,7 +54,7 @@ For the integrity of the system, we don't share specifics on how we detect or ha
 
 ## Welcoming the Codigo Alebrije Cohort
 
-We're excited to welcome the projects joining us from the **Codigo Alebrije hackathon** into Wave 4. It's a fantastic cohort, and we can't wait to see how your contributions build out their projects over the course of the Wave.
+We're excited to welcome the [projects joining us from the **Codigo Alebrije hackathon**](https://www.drips.network/wave/stellar/repos?filters=eyJzb3J0QnkiOiJzdGFyZ2F6ZXJzQ291bnQiLCJ0YWdJZCI6ImI1ODI4OTAyLWNhNDItNDcyNS1hMDA5LWMzNWEwOWVhNDE4OSJ9) into Wave 4. It's a fantastic cohort, and we can't wait to see how your contributions build out their projects over the course of the Wave.
 
 A big welcome from the whole Wave community — we're glad to have you here.
 

@@ -473,8 +473,8 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
         'Funds from projects, streams and Drip Lists on Filecoin settle and become collectable once per day.',
     },
     alternativeChainMode: true,
-    gelatoRelayAvailable: true,
-    gaslessTransactions: true,
+    gelatoRelayAvailable: false,
+    gaslessTransactions: false,
     addToWalletConfig: {
       blockExplorerUrls: ['https://filecoin.blockscout.com/'],
       nativeCurrency: {

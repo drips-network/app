@@ -79,7 +79,7 @@
       title: 'Solutions',
       type: 'dropdown',
       entries: [
-        { title: 'Contribution bounties', href: '/solutions/wave' },
+        { title: 'Drips Wave', href: '/solutions/wave' },
         { title: 'RetroPGF voting & distribution', href: '/solutions/retro-pgf' },
         { title: 'Proactive grants', href: '/solutions/pro-pgf' },
         { title: 'Dependency Funding', href: '/solutions/dependency-funding' },

@@ -7,6 +7,7 @@
     size?: 'normal' | 'small';
     overlay?: boolean;
     icon?: Component | undefined;
+    hideIcon?: boolean;
     children?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
     centered?: boolean;
@@ -17,6 +18,7 @@
     size = 'normal',
     overlay = false,
     icon = undefined,
+    hideIcon = false,
     children,
     actions,
     centered = false,
@@ -25,18 +27,24 @@
 
 <div class="annotation-box typo-text-small {type} {size}" class:centered class:overlay>
   <div class="content-wrapper">
-    <div class="icon-container">
-      {#if icon}
-        {@const SvelteComponent = icon}
-        <SvelteComponent style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
-      {:else if type === 'warning'}
-        <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)" />
-      {:else if type === 'info'}
-        <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
-      {:else}
-        <WarningIcon style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)" />
-      {/if}
-    </div>
+    {#if !hideIcon}
+      <div class="icon-container">
+        {#if icon}
+          {@const SvelteComponent = icon}
+          <SvelteComponent style="height: 1.25rem; width: 1.25rem; fill: currentColor" />
+        {:else if type === 'warning'}
+          <WarningIcon
+            style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6)"
+          />
+        {:else if type === 'info'}
+          <InfoCircle style="height: 1.25rem; width: 1.25rem; fill: var(--color-primary-level-6)" />
+        {:else}
+          <WarningIcon
+            style="height: 1.25rem; width: 1.25rem; fill: var(--color-negative-level-6)"
+          />
+        {/if}
+      </div>
+    {/if}
 
     <div class="text-wrapper">
       {@render children?.()}

@@ -35,6 +35,25 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('managePhoneVerifications')
+      ? [
+          {
+            name: 'Unlink Phone',
+            description: "Remove a user's phone verification so they can re-verify.",
+            href: '/wave/admin/unlink-phone',
+          },
+        ]
+      : []),
+    ...(data.user.permissions?.includes('manageBans')
+      ? [
+          {
+            name: 'Bans & Restrictions',
+            description:
+              'Ban or restrict a GitHub user, and review existing bans and restrictions.',
+            href: '/wave/admin/bans',
+          },
+        ]
+      : []),
   ]);
 </script>
 

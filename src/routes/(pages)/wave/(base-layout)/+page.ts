@@ -1,7 +1,7 @@
 import type { WaveDto } from '$lib/utils/wave/types/waveProgram.js';
 import { getWavePrograms, getWaves } from '$lib/utils/wave/wavePrograms';
 
-export const load = async ({ fetch }) => {
+export const load = async ({ fetch, data }) => {
   // todo(wave): pagination
   const wavePrograms = await getWavePrograms(fetch, { limit: 100 });
 
@@ -21,6 +21,7 @@ export const load = async ({ fetch }) => {
   );
 
   return {
+    ...data,
     wavePrograms,
     upcomingWaves,
   };

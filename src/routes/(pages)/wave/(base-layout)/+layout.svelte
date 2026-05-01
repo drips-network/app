@@ -196,6 +196,14 @@
     min-width: 0;
   }
 
+  .content :global(.section-skeleton) {
+    margin: 0 -1rem;
+  }
+
+  .content :global(.section-skeleton .inner-wrapper) {
+    padding: 0 1rem;
+  }
+
   .content.sidenavExpanded {
     transform: translateX(6rem);
     filter: blur(2px);
