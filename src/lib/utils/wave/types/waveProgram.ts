@@ -114,7 +114,6 @@ export const waveProgramRepoDtoSchema = z.object({
   appliedAt: z.coerce.date(),
   appliedByUserId: z.uuid(),
   reviewedAt: z.coerce.date().nullable(),
-  reviewedByUserId: z.uuid().nullable(),
   rejectionReason: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -156,7 +155,6 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
     accountType: z.enum(['User', 'Organization']),
   }),
   appliedBy: waveUserDtoSchema,
-  reviewedBy: waveUserDtoSchema.nullable(),
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
