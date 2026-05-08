@@ -1,5 +1,15 @@
 <script>
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import { PRIVACY_POLICY_VERSION } from '$lib/utils/wave/legal-versions';
+
+  // Format the YYYY-MM-DD constant as a human-readable date in the
+  // effective-date line below. Co-locating the display string with the
+  // constant guarantees that what the user sees and what we record on
+  // login consent come from the same source.
+  const effectiveDate = new Date(`${PRIVACY_POLICY_VERSION}T00:00:00Z`).toLocaleDateString(
+    'en-US',
+    { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' },
+  );
 </script>
 
 <HeadMeta title="Data & Privacy Policy" />
@@ -931,7 +941,7 @@
 
   <section>
     <h2>Validity and amendment of this privacy policy</h2>
-    <p>This privacy policy is currently valid and effective as of April 29, 2026.</p>
+    <p>This privacy policy is currently valid and effective as of {effectiveDate}.</p>
     <p>
       Due to the further development of the Drips Services or due to changes in legal or regulatory
       requirements, it may become necessary to amend this privacy policy. In this case, we will
