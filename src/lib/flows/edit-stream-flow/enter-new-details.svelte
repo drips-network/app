@@ -142,22 +142,33 @@
   );
 
   function updateStream() {
+    // Snapshot derived values now — once we dispatch, this component unmounts
+    // and Svelte 5 returns an inert sentinel for `$derived` reads.
+    const snap = {
+      nameUpdated,
+      amountUpdated,
+      endDateUpdated,
+      newAmountPerSecond,
+      combinedEndDate,
+      actualStartDate,
+    };
+
     dispatch(
       'transact',
       makeTransactPayload({
         headline: 'Edit stream',
         before: async () => {
           const { newHash, batch } = await buildEditStreamBatch(stream.id, {
-            name: nameUpdated ? $context.newName : undefined,
-            amountPerSecond: amountUpdated ? newAmountPerSecond : undefined,
-            newEndDate: endDateUpdated ? combinedEndDate : undefined,
-            actualStartDate: endDateUpdated ? actualStartDate : undefined,
+            name: snap.nameUpdated ? $context.newName : undefined,
+            amountPerSecond: snap.amountUpdated ? snap.newAmountPerSecond : undefined,
+            newEndDate: snap.endDateUpdated ? snap.combinedEndDate : undefined,
+            actualStartDate: snap.endDateUpdated ? snap.actualStartDate : undefined,
           });
 
           return {
             batch,
             newHash,
-            needGasBuffer: amountUpdated || endDateUpdated,
+            needGasBuffer: snap.amountUpdated || snap.endDateUpdated,
           };
         },
 

@@ -139,7 +139,7 @@
   let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
 
-  let firstStepElementMount = true;
+  let lastStepElement: HTMLDivElement | undefined;
   $effect(() => {
     if (!resizeObserver) return;
 
@@ -149,9 +149,10 @@
       // Svelte 5 mounts the new {#key} block element and re-runs this effect
       // before the old element's outro fires `onoutrostart`. Without this,
       // updateContainerHeight() would run with transitioning=false and snap
-      // wrapperHeight instantly. Flip transitioning ourselves on rebind.
-      if (!firstStepElementMount) transitioning = true;
-      firstStepElementMount = false;
+      // wrapperHeight instantly. Flip transitioning ourselves on rebind only —
+      // effect re-runs from any other reactive dep change must not touch it.
+      if (lastStepElement && lastStepElement !== stepElement) transitioning = true;
+      lastStepElement = stepElement;
 
       observedElement = stepElement;
       resizeObserver.observe(observedElement);
