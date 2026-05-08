@@ -85,7 +85,7 @@
           <span class="typo-text-small" style:color="var(--color-foreground-level-5)"
             >Image preview:</span
           >
-          <img src={imageUrl.trim()} alt="Tag image preview" class="preview-img" />
+          <img src={imageUrl.trim()} alt="Tag preview" class="preview-img" />
         </div>
       {/if}
 

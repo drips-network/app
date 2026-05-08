@@ -48,6 +48,7 @@
   class:hovering={isHovering}
   class:has-value={value > 0}
   role="radiogroup"
+  tabindex="-1"
   aria-label="Rating"
   onmouseleave={clearHover}
 >
