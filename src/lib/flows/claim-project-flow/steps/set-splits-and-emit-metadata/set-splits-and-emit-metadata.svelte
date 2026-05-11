@@ -46,7 +46,6 @@
   }
 
   let { context }: Props = $props();
-  let projectSource = $derived($context.project?.source ?? unreachable());
 
   async function checkProjectInExpectedStateForClaiming() {
     const checkProjectVerificationStatusQuery = gql`
@@ -76,7 +75,7 @@
       CheckProjectVerificationStatusQuery,
       CheckProjectVerificationStatusQueryVariables
     >(checkProjectVerificationStatusQuery, {
-      projectUrl: projectSource.url,
+      projectUrl: $context.project?.source.url ?? unreachable(),
       chains: [network.gqlName],
     });
 

@@ -140,6 +140,7 @@
 
 <svelte:window onkeydown={(event) => stopKeyScroll(event)} />
 <div class="ecosystem-card-wrapper" class:expanded>
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="ecosystem-card"
     bind:this={ecosystemCardElement}

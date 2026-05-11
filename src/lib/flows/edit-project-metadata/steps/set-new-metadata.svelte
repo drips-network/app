@@ -69,6 +69,10 @@
   function submit() {
     const metadataManager = new RepoDriverMetadataManager();
 
+    // Snapshot derived values now — once we dispatch, this component unmounts
+    // and `$projectDataWritable` (a $derived) returns Svelte's inert sentinel.
+    const projectDataSnapshot = $projectDataWritable;
+
     dispatch(
       'transact',
       makeTransactPayload({
@@ -84,17 +88,17 @@
           const newMetadata: LatestVersion<typeof repoDriverAccountMetadataParser> = {
             ...upgraded,
             avatar:
-              $projectDataWritable.avatar.__typename === 'EmojiAvatar'
+              projectDataSnapshot.avatar.__typename === 'EmojiAvatar'
                 ? {
                     type: 'emoji',
-                    emoji: $projectDataWritable.avatar.emoji,
+                    emoji: projectDataSnapshot.avatar.emoji,
                   }
                 : {
                     type: 'image',
-                    cid: $projectDataWritable.avatar.cid,
+                    cid: projectDataSnapshot.avatar.cid,
                   },
-            color: $projectDataWritable.color,
-            isVisible: $projectDataWritable.isProjectVisible,
+            color: projectDataSnapshot.color,
+            isVisible: projectDataSnapshot.isProjectVisible,
           };
 
           const ipfsHash = await metadataManager.pinAccountMetadata(newMetadata);

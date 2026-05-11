@@ -12,7 +12,7 @@
   import { cubicInOut } from 'svelte/easing';
   import AwaitStep, { type Result } from './components/await-step.svelte';
   import AwaitErrorStep from './components/await-error-step.svelte';
-  import type { derived, Writable } from 'svelte/store';
+  import type { Writable } from 'svelte/store';
   import modal from '$lib/stores/modal';
   import { browser } from '$app/environment';
   import TransactStep from './components/transact-step.svelte';
@@ -46,6 +46,7 @@
   let resolvedSteps = $derived(internalSteps.map((someStep) => someStep((i) => i)));
   let currentStep = $derived(resolvedSteps[currentStepIndex]);
 
+  // eslint-disable-next-line svelte/prefer-writable-derived
   let prevStepIndex = $state(0);
 
   let direction = $derived.by(() => {
@@ -138,12 +139,21 @@
   let resizeObserver = browser ? new ResizeObserver(() => updateContainerHeight()) : undefined;
   let observedElement: HTMLDivElement | undefined;
 
+  let lastStepElement: HTMLDivElement | undefined;
   $effect(() => {
     if (!resizeObserver) return;
 
     resizeObserver.disconnect();
 
     if (stepElement) {
+      // Svelte 5 mounts the new {#key} block element and re-runs this effect
+      // before the old element's outro fires `onoutrostart`. Without this,
+      // updateContainerHeight() would run with transitioning=false and snap
+      // wrapperHeight instantly. Flip transitioning ourselves on rebind only —
+      // effect re-runs from any other reactive dep change must not touch it.
+      if (lastStepElement && lastStepElement !== stepElement) transitioning = true;
+      lastStepElement = stepElement;
+
       observedElement = stepElement;
       resizeObserver.observe(observedElement);
       updateContainerHeight();

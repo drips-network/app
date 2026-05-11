@@ -66,7 +66,9 @@ export const handle = async ({ event, resolve }) => {
           for (const str of setCookieParser.splitCookiesString(
             res.headers.get('set-cookie') ?? '',
           )) {
-            const { name, value, ...options } = setCookieParser.parseString(str);
+            const parsed = setCookieParser.parseString(str);
+            if (!parsed) continue;
+            const { name, value, ...options } = parsed;
 
             if (name === 'wave_refresh_token' || name === 'wave_access_token') {
               event.cookies.set(name, value, {

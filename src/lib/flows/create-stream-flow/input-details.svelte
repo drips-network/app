@@ -234,6 +234,14 @@
   );
 
   function submit() {
+    // Snapshot derived values now — once we dispatch, this component unmounts
+    // and Svelte 5 returns an inert sentinel for `$derived` reads.
+    const snap = {
+      amountPerSecond,
+      combinedStartDate,
+      combinedEndDate,
+    };
+
     dispatch(
       'transact',
       makeTransactPayload({
@@ -265,13 +273,15 @@
 
           const { batch, newHash } = await buildStreamCreateBatchTx(signer, {
             tokenAddress: $context.selectedTokenAddress?.[0] ?? unreachable(),
-            amountPerSecond: amountPerSecond ?? unreachable(),
+            amountPerSecond: snap.amountPerSecond ?? unreachable(),
             recipientAccountId,
             name: $context.streamNameValue,
-            startAt: shouldSchedule ? combinedStartDate : undefined,
+            startAt: shouldSchedule ? snap.combinedStartDate : undefined,
             durationSeconds:
-              shouldSchedule && combinedEndDate && combinedStartDate
-                ? Math.floor((combinedEndDate.getTime() - combinedStartDate.getTime()) / 1000)
+              shouldSchedule && snap.combinedEndDate && snap.combinedStartDate
+                ? Math.floor(
+                    (snap.combinedEndDate.getTime() - snap.combinedStartDate.getTime()) / 1000,
+                  )
                 : undefined,
           });
 
