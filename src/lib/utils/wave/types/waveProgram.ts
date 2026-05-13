@@ -136,6 +136,7 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   pointsUsed: z.number().int(),
   pointsBudget: z.number().int().nullable(),
   pointsRemaining: z.number().int().nullable(),
+  pointsBudgetOverride: z.number().int().nullable().optional(),
   pointsMultiplier: z.number().int().optional(),
   repo: z.object({
     stargazersCount: z.number().int().nullable().optional(),

@@ -19,6 +19,8 @@
   import type { Pagination } from '$lib/utils/wave/types/pagination';
   import ManageRepoTagsModal from '../components/manage-repo-tags-modal.svelte';
   import FeatureRepoModal from '../components/feature-repo-modal.svelte';
+  import BudgetOverrideModal from '../components/budget-override-modal.svelte';
+  import Coin from '$lib/components/icons/Coin.svelte';
 
   let { data } = $props();
 
@@ -26,6 +28,7 @@
   let wavePrograms = $derived(data.wavePrograms);
   let canManageTags = $derived(data.canManageTags);
   let canFeatureRepos = $derived(data.canFeatureRepos);
+  let canManagePoints = $derived(data.canManagePoints);
 
   let waveProgramId = $derived(data.waveProgramId);
   let repos = $derived(data.repos);
@@ -123,6 +126,14 @@
     });
   }
 
+  function openBudgetOverrideModal(repo: WaveProgramRepoWithDetailsDto) {
+    modal.show(BudgetOverrideModal, undefined, {
+      repo,
+      waveProgramId: waveProgramId!,
+      onChanged: reloadPage,
+    });
+  }
+
   async function handleUnfeature(repo: WaveProgramRepoWithDetailsDto) {
     await doWithConfirmationModal(
       `Remove featured status from ${repo.repo.gitHubRepoFullName}?`,
@@ -195,6 +206,18 @@
                     onclick={() => openFeatureModal(repoWithDetails)}>Feature</Button
                   >
                 {/if}
+              {/if}
+
+              {#if canManagePoints}
+                <Button
+                  size="small"
+                  variant={repoWithDetails.pointsBudgetOverride != null ? 'caution' : 'normal'}
+                  icon={Coin}
+                  onclick={() => openBudgetOverrideModal(repoWithDetails)}
+                  >{repoWithDetails.pointsBudgetOverride != null
+                    ? `Budget: ${repoWithDetails.pointsBudgetOverride}`
+                    : 'Budget'}</Button
+                >
               {/if}
             </div>
           {/snippet}
