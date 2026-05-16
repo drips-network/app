@@ -87,14 +87,14 @@
   <FeatureCard imageUrl="/assets/wave/wave-hp.png">
     <div class="highlight-badge typo-header-5">
       <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
-      NEW
+      CONTRIBUTOR REWARDS
     </div>
 
     <div>
-      <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
+      <h2 style:margin-bottom="0.25rem">Drips Wave</h2>
       <p>
-        With Drips Wave, open-source ecosystems run recurring one-week contribution sprints. During
-        these Waves, contributors receive Points, for which they earn rewards.
+        Open-source ecosystems use Drips Wave to run recurring contribution sprints. During these
+        Waves, contributors receive Points, for which they earn rewards.
       </p>
     </div>
 
@@ -176,14 +176,14 @@
   <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
     <div class="highlight-badge typo-header-5">
       <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
-      LIVE NOW
+      RETROPGF ROUND
     </div>
 
     <div>
       <h2 style:margin-bottom="0.25rem">Filecoin RetroPGF-3 on Drips</h2>
       <p>
-        Filecoin's largest RetroPGF round to date is now live on Drips' new end-to-end RetroPGF
-        platform.
+        Filecoin's largest RetroPGF round to date used Drips' end-to-end RetroPGF platform for
+        applications, voting, and distribution.
       </p>
     </div>
 
@@ -192,7 +192,7 @@
         variant="primary"
         icon={ArrowBoxUpRight}
         href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
-        target="_blank">Check it out</Button
+        target="_blank">View the round</Button
       >
       <Button
         icon={ArrowCounterClockwiseHeart}
