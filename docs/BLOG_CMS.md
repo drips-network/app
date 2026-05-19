@@ -2,6 +2,8 @@
 
 Marketing edits blog posts at `/keystatic` using [Keystatic](https://keystatic.com/), a git-based CMS. Saves open a pull request against `main`; a maintainer reviews and merges to publish.
 
+The CMS is only served on the **mainnet** deployment (`alternativeChainMode === false`). On alt-chain deployments the `/keystatic` and `/api/keystatic/*` routes return 404 — same convention as the blog itself, which redirects alt-chain visitors to `drips.network/blog`.
+
 - Posts live in `src/blog-posts/*.md` (markdown + YAML frontmatter)
 - Authors live in `src/blog-posts/authors/*.json`
 - Cover images live in `static/assets/blog-images/`

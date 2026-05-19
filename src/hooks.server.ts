@@ -7,6 +7,7 @@ import { error, isRedirect, redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { handleKeystatic } from 'keystatic-sveltekit';
 import { getUserData } from '$lib/utils/wave/auth';
+import network from '$lib/stores/wallet/network';
 import keystaticConfig from '../keystatic.config';
 
 PuppeteerManager.launch({
@@ -110,7 +111,22 @@ const waveHandle: Handle = async ({ event, resolve }) => {
   }
 };
 
-export const handle = sequence(await handleKeystatic({ config: keystaticConfig }), waveHandle);
+// The blog (and therefore the CMS) only lives on the mainnet deployment.
+// On alt-chain deployments, refuse the CMS routes and skip the handler so
+// the bundle is never invoked.
+const keystaticHandle = await handleKeystatic({ config: keystaticConfig });
+const guardedKeystaticHandle: Handle = async ({ event, resolve }) => {
+  if (network.alternativeChainMode) {
+    const path = event.url.pathname;
+    if (path.startsWith('/keystatic') || path.startsWith('/api/keystatic')) {
+      throw error(404, 'Not found');
+    }
+    return resolve(event);
+  }
+  return keystaticHandle({ event, resolve });
+};
+
+export const handle = sequence(guardedKeystaticHandle, waveHandle);
 
 export const handleFetch = async ({ event, request, fetch }) => {
   // If the request is going to Wave API, attach auth credentials
