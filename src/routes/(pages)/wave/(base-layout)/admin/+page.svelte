@@ -54,6 +54,15 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('generateWithdrawalMagicLinks')
+      ? [
+          {
+            name: 'Withdrawal magic links',
+            description: "Issue one-time withdrawal links for users who can't sign in via GitHub.",
+            href: '/wave/admin/withdrawal-magic-links',
+          },
+        ]
+      : []),
   ]);
 </script>
 

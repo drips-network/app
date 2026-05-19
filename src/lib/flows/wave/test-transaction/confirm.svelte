@@ -8,10 +8,11 @@
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
   import type { StepComponentEvents } from '$lib/components/stepper/types';
   import { createEventDispatcher } from 'svelte';
-  import { requestTestTransaction } from '$lib/utils/wave/grants';
   import type { GrantDto } from '$lib/utils/wave/types/grant';
   import type { Writable } from 'svelte/store';
   import type { State, KybData } from './test-transaction-flow';
+  import type { GrantActionContext } from '$lib/utils/wave/grants/action-context';
+  import { authenticatedGrantActionContext } from '$lib/utils/wave/grants/action-context';
   import CheckCircle from '$lib/components/icons/CheckCircle.svelte';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -20,26 +21,26 @@
     grant: GrantDto;
     context: Writable<State>;
     kyb?: KybData;
+    actionContext?: GrantActionContext;
   }
 
-  let { grant, context, kyb }: Props = $props();
+  let { grant, context, kyb, actionContext }: Props = $props();
 
   let confirmed = $state(false);
 
   let canSubmit = $derived(confirmed);
 
   function handleSubmit() {
+    const ctx = actionContext ?? authenticatedGrantActionContext(grant.id);
     dispatch('await', {
       message: 'Requesting test transaction...',
       promise: async () => {
-        await requestTestTransaction(
-          undefined,
-          grant.id,
+        await ctx.requestTestTransaction(
           $context.stellarAddress,
           $context.memoType ?? ($context.memo ? 'text' : undefined),
           $context.memo,
         );
-        await invalidate('wave:rewards');
+        await invalidate(ctx.invalidateKey);
       },
     });
   }
