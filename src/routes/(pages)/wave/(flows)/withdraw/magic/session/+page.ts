@@ -31,8 +31,8 @@ const sessionGrantSchema = z.object({
     .string()
     .nullable()
     .transform((v) => v ?? ''),
-  initialAmountUSD: z.number().int(),
-  currentAmountUSD: z.number().int(),
+  initialAmountUSD: z.number(),
+  currentAmountUSD: z.number(),
   status: grantStatusEnum,
   expiresAt: z.coerce.date(),
   createdAt: z.coerce.date(),
@@ -43,7 +43,7 @@ const sessionGrantSchema = z.object({
       id: z.uuid(),
       grantId: z.uuid(),
       type: z.enum(['test', 'withdrawal']),
-      amountUSD: z.number().int(),
+      amountUSD: z.number(),
       stellarAddress: z.string(),
       memoType: memoTypeEnum.nullable(),
       memoValue: z.string().nullable(),
