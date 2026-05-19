@@ -38,9 +38,12 @@ const slugifyFilename = (name: string): string => {
 //      browser. rolldown hardcodes `process.env.NODE_ENV` to "production" for
 //      React, and does NOT inject `import.meta.env.DEV` — so in the browser
 //      the only reliable signal is the page's actual hostname.
+// Add to this list if you run the dev server under a hostname not yet covered.
+const DEV_HOSTNAMES = new Set(['localhost', '127.0.0.1', '0.0.0.0', 'app']);
+const isDevHostname = (h: string) => DEV_HOSTNAMES.has(h) || h.endsWith('.local');
 const isDev =
   typeof window !== 'undefined'
-    ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? isDevHostname(window.location.hostname)
     : process.env.NODE_ENV !== 'production';
 
 export default config({
