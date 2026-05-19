@@ -29,7 +29,7 @@ In production, Keystatic uses GitHub storage. Each save creates a branch prefixe
 Visit `https://drips.network/keystatic` (or wherever the app is deployed) while logged in to GitHub as a repo admin. Click **Set up Keystatic with GitHub** and follow the prompts — Keystatic will create the app for you with the right permissions and write the env vars to your clipboard.
 
 If you'd rather create the app manually, it needs:
-- **Repository permissions**: Contents `read & write`, Metadata `read`, Pull requests `read & write`, Workflows `read & write`
+- **Repository permissions**: Contents `read & write`, Metadata `read`, Pull requests `read & write`
 - **Callback URL**: `https://<your-domain>/api/keystatic/github/oauth/callback`
 - **Setup URL**: `https://<your-domain>/keystatic/setup`
 - **Webhook**: not required
