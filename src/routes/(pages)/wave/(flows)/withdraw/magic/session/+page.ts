@@ -24,7 +24,13 @@ const sessionGrantSchema = z.object({
   waveId: z.uuid(),
   waveNumber: z.number().int(),
   type: z.string(),
-  description: z.string().nullable(),
+  // GrantDetailDto in the frontend declares description as non-nullable
+  // (the existing rewards page consumes the same shared component), so
+  // coerce server-returned null into an empty string here.
+  description: z
+    .string()
+    .nullable()
+    .transform((v) => v ?? ''),
   initialAmountUSD: z.number().int(),
   currentAmountUSD: z.number().int(),
   status: grantStatusEnum,

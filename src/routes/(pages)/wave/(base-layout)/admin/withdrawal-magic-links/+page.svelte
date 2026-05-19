@@ -106,7 +106,7 @@
         <TextInput
           bind:value={gitHubUsername}
           placeholder="e.g. octocat"
-          on:keydown={(e) => {
+          onkeydown={(e) => {
             if (e.key === 'Enter') handleLookup();
           }}
         />
