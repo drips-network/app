@@ -24,7 +24,7 @@ const slugifyFilename = (name: string): string => {
       .toLowerCase()
       .replace(/[^a-z0-9.-]+/g, '-')
       .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '') || 'file';
+      .replace(/^-+|-+$/g, '') || 'file';
   return slug + ext.toLowerCase();
 };
 
