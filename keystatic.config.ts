@@ -113,11 +113,23 @@ export default config({
             itemLabel: (props) => props.value ?? 'Pick an author',
           },
         ),
-        categories: fields.multiselect({
-          label: 'Categories',
-          description: 'Pick at least one. Drives which category page(s) the post appears on.',
-          options: BLOG_CATEGORY_OPTIONS,
-        }),
+        // fields.multiselect has no validation support, so use array(select) to
+        // enforce min-1. The reader-side zod schema (.min(1)) would otherwise
+        // reject any post saved with zero categories.
+        categories: fields.array(
+          fields.select({
+            label: 'Category',
+            options: BLOG_CATEGORY_OPTIONS,
+            defaultValue: BLOG_CATEGORY_OPTIONS[0].value,
+          }),
+          {
+            label: 'Categories',
+            description: 'Pick at least one. Drives which category page(s) the post appears on.',
+            itemLabel: (props) =>
+              BLOG_CATEGORY_OPTIONS.find((o) => o.value === props.value)?.label ?? props.value,
+            validation: { length: { min: 1 } },
+          },
+        ),
         announcementBannerCopy: fields.text({
           label: 'Announcement banner copy',
           description:
