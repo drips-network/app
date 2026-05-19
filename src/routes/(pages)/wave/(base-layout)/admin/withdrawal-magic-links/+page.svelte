@@ -44,7 +44,12 @@
 
   async function refreshLookup() {
     if (!lookupResult) return;
-    lookupResult = await getWithdrawableGrantsForUser(fetch, lookupResult.user.gitHubUsername);
+    // Surface refresh failures (e.g. a network blip after a successful
+    // generate/revoke) instead of silently desyncing the UI.
+    const refreshed = await doWithErrorModal(() =>
+      getWithdrawableGrantsForUser(fetch, lookupResult!.user.gitHubUsername),
+    );
+    if (refreshed) lookupResult = refreshed;
   }
 
   async function handleGenerate(grantId: string, hasActiveLink: boolean) {
