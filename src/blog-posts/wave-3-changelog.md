@@ -1,10 +1,11 @@
 ---
 title: "The Changelog: What's New in Stellar Wave 3"
 date: '2026-03-19'
-coverImage: '/assets/blog-images/wave-cover.png'
+coverImage: '/assets/blog-images/wave-3-changelog/coverImage.png'
 coverImageAlt: 'Illustration showing a Wave on Drips Wave'
 excerpt: "The third Stellar Wave is launching on March 23rd - here are some of the key improvements we're making based on your feedback and our learnings."
-author: jason
+author:
+  - jason
 announcementBannerCopy: 'The Changelog: Key Improvements for Stellar Wave 3'
 categories:
   - wave
@@ -22,7 +23,7 @@ By popular demand, we introduced two limits on issue applications in the last Wa
 
 **The impact of these limits was great**. Compared to Wave 1, we saw a much more diverse set of contributors resolving more issues, spread across more orgs, and a significant reduction in spammy applications.
 
-![Graphs showing the distribution of points earned and number of repos active in for Wave 1 and 2. In Wave 2, outliers on points earned have been mitigated, and more contributors are earning points across more repos.](/assets/blog-images/wave-changelog/wave-point-curves.png)
+![Graphs showing the distribution of points earned and number of repos active in for Wave 1 and 2. In Wave 2, outliers on points earned have been mitigated, and more contributors are earning points across more repos.](/assets/blog-images/wave-3-changelog/wave-point-curves.png)
 
 As you can see in the graphs, the new limits resulted in a **significantly flatter points distribution**, with most contributors earning close to the median amount of points. Additionally, the average participant contributed to **vastly more unique repositories**, rather than concentrating on a few.
 

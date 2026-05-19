@@ -1,10 +1,11 @@
 ---
 title: 'Creating Meaningful Issues: A Guide for Maintainers'
 date: '2026-01-14'
-coverImage: '/assets/blog-images/good-issues.png'
+coverImage: '/assets/blog-images/creating-meaningful-issues/coverImage.png'
 coverImageAlt: 'Illustration of a good issue with sparkles'
 excerpt: 'A practical framework for maintainers to write issues that attract the right contributors, reduce back-and-forth, and lead to better outcomes.'
-author: 'ugo-x'
+author:
+  - ugo-x
 categories:
   - guide
   - wave

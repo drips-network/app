@@ -1,10 +1,11 @@
 ---
 title: 'Dependency Funding with Drips'
 date: '2023-07-26'
-coverImage: '/assets/blog-images/drips-logo.png'
+coverImage: '/assets/blog-images/dependency-funding-with-drips/coverImage.png'
 coverImageAlt: 'Drips Logo'
 excerpt: 'In the vast realm of software development, one concept has always stood out as a testament to the interconnected nature of our modern society: the software dependency tree.'
-author: 'ele'
+author:
+  - ele
 categories:
   - guide
 ---
@@ -49,11 +50,11 @@ Finally [RetroPGF](https://app.optimism.io/retropgf), proposed by Vitalik Buteri
 2. a simple, streamlined process tailored to software projects and
 3. the option to use a continuous payout.
 
-<img data-no-border src="/assets/blog-images/splitting-graph.png" alt="The Drips Splitting Graph" />
+<img data-no-border src="/assets/blog-images/dependency-funding-with-drips/splitting-graph.png" alt="The Drips Splitting Graph" />
 
 **At the core of the Drips user experience is the idea of a Drip List.** This is a collection of Ethereum addresses, ENS names and Git repositories curated by an individual user or organisation and packaged together under one title. This list is accompanied by a percentage (of funds to be received) allocated to each item on the list. These lists are publicly available, shareable on the web and open for anyone to support, **effectively forming a graph of software projects and contributors**. This allows anyone to curate a list of recipients and provide context about them, effectively signalling to other supporters by setting an example. All of this makes it simpler to discover projects and people in need in your ecosystem and transparently support them by flowing funds through the graph.
 
-<img data-no-border src="/assets/blog-images/drip-list.png" alt="An example Drip List" />
+<img data-no-border src="/assets/blog-images/dependency-funding-with-drips/drip-list.png" alt="An example Drip List" />
 
 **In addition, Drips allow anyone to support the recipients on the lists with any ERC-20 tokens, either as a one-off transaction or as a continuous stream settled by the second.** By enabling users to stream funds on a per-second basis, Drips provides a level of granularity and flexibility that was previously unseen in similar platforms. Streaming is a powerful way for organisations to align incentives with recipients over a long period of time. Supporters now have the ability to cancel the remaining stream at any time, providing them with complete control and the freedom to adapt their support based on evolving circumstances.
 
@@ -61,7 +62,7 @@ Finally [RetroPGF](https://app.optimism.io/retropgf), proposed by Vitalik Buteri
 
 In fact, Drips goes a step further by offering an optional, oracle-based identity solution, powered by Chainlink. This feature enables users to directly send funds to the owners of public software repositories on Github, even if its owners don't have an Ethereum address or prior experience with the Ethereum ecosystem. They can simply send their support, confident that it will reach its intended destination. On the other side, project owners can effortlessly claim the funds sent to them by adding a FUNDING.json file on the default branch of their public repository with their preferred Ethereum address. This feature facilitates frictionless support for FOSS projects worldwide. It also democratises access to the network effects that were traditionally available only to established platforms, now making them accessible to everyone.
 
-<img data-no-border src="/assets/blog-images/how-drip-lists-work.png" alt="How Drip Lists work" />
+<img data-no-border src="/assets/blog-images/dependency-funding-with-drips/how-drip-lists-work.png" alt="How Drip Lists work" />
 
 In essence, Drips serves as an off-the-shelf solution for direct and recurring financial support, allowing organisations to effortlessly allocate ongoing ERC-20 tokens to the projects they consider essential and to link their success to the success of their dependents.
 

@@ -1,10 +1,11 @@
 ---
 title: 'Introducing Drips for Privacy'
 date: '2025-03-12'
-coverImage: '/assets/blog-images/drips-for-privacy.png'
+coverImage: '/assets/blog-images/drips-web3privacynow/coverImage.png'
 coverImageAlt: 'Drips for Privacy illustration'
 excerpt: 'Supporting the future of privacy with Drips and Web3Privacy Now.'
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: 'Introducing Drips for Privacy: Supporting the future of privacy with Drips and Web3Privacy Now'
 categories:
   - ecosystem

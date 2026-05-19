@@ -1,10 +1,11 @@
 ---
 title: 'Q1 2025 Roundup: Optimism & Metis Launches, Universal Search, and Ecosystems Sneak Peek'
 date: '2025-04-07'
-coverImage: '/assets/blog-images/q1-2025-roundup.png'
+coverImage: '/assets/blog-images/q1-2025-roundup/coverImage.png'
 coverImageAlt: '[placeholder]'
 excerpt: 'Drips landed on Optimism & Metis, launched powerful universal search, and gives a glimpse into the future with Ecosystems.'
-author: 'jason'
+author:
+  - jason
 announcementBannerCopy: 'Drips expands to Optimism & Metis, adds Universal Search, and teases Ecosystems'
 categories:
   - roundup
@@ -18,7 +19,7 @@ Q1 2025 was another period of significant growth and building. We expanded the r
 
 Following our Filecoin launch last quarter, we continued our multichain journey by deploying Drips on two more exciting networks: Optimism and Metis!
 
-<img data-no-border src="/assets/blog-images/metis-op-launch.png" alt="Screenshots of Drips on Optimism and Metis, with the logos of both chains highlighted." />
+<img data-no-border src="/assets/blog-images/q1-2025-roundup/metis-op-launch.png" alt="Screenshots of Drips on Optimism and Metis, with the logos of both chains highlighted." />
 
 **Optimism:** We're thrilled to launch on Optimism with [**"Drips for Privacy"**](https://optimism.drips.network/app/drip-lists/46441013481627019632859175771245733399752255312769848791334977723541), a collaborative campaign alongside [web3privacy](https://web3privacy.info/) now. This initiative allows anyone to easily support a curated collection of privacy-focused projects that were nominated for a [Privacy Proof award in 2024](https://awards.web3privacy.info/). To celebrate, we've also introduced a vibrant new "Optimistic Red" theme for the Drips app! Head over to Settings → Primary Color in the app to try it out.
 
@@ -32,7 +33,7 @@ Shout out to [Igor](https://github.com/codesandwich), [Giannis](https://github.c
 
 Navigating Drips just got a whole lot easier! We've launched a powerful new search engine directly within the Drips app.
 
-<img data-no-border src="/assets/blog-images/search.png" alt="New Drips search engine in action, searching for the word 'Ether'. Several results including this word are visible." />
+<img data-no-border src="/assets/blog-images/q1-2025-roundup/search.png" alt="New Drips search engine in action, searching for the word 'Ether'. Several results including this word are visible." />
 
 Now you can instantly search Projects, Drip Lists, addresses, and more on Drips. Simply click the search icon in the app header. This was a highly requested feature, and we believe it significantly improves the usability of the platform, especially as more projects and users join.
 
@@ -50,7 +51,7 @@ We're constantly thinking about the future of sustainable funding for open sourc
 
 Imagine Drip Lists, but supercharged. Ecosystems on Drips will represent vast networks of projects and their dependencies as an interconnected graph. This structure will enable funding flows to potentially tens of thousands of GitHub repositories simultaneously, mapping out and supporting entire software ecosystems.
 
-<img data-no-border src="/assets/blog-images/ecosystems-teaser.png" alt="Drips UI showing an Ecosystem graph view" />
+<img data-no-border src="/assets/blog-images/q1-2025-roundup/ecosystems-teaser.png" alt="Drips UI showing an Ecosystem graph view" />
 
 The first major application for Ecosystems is already lined up: we're collaborating on **Deep Funding**, Vitalik Buterin's latest experiment exploring novel approaches to public goods funding.
 

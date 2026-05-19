@@ -1,16 +1,18 @@
 ---
 title: "The Changelog: What's New in Stellar Wave 4"
-date: '2026-04-20'
-coverImage: '/assets/blog-images/wave-cover.png'
-coverImageAlt: 'Illustration showing a Wave on Drips Wave'
-excerpt: "The fourth Stellar Wave is launching on April 22nd - here are the most significant changes we're shipping based on your feedback and our learnings."
+excerpt: >-
+  The fourth Stellar Wave is launching on April 22nd - here are the most
+  significant changes we're shipping based on your feedback and our learnings.
+date: 2026-04-20
+coverImage: '/assets/blog-images/wave-4-changelog/coverImage.png'
+coverImageAlt: Illustration showing a Wave on Drips Wave
 author:
   - kat
   - jason
-announcementBannerCopy: "The Changelog: What's New in Stellar Wave 4"
 categories:
   - wave
   - product
+announcementBannerCopy: "The Changelog: What's New in Stellar Wave 4"
 ---
 
 The 3rd Stellar Wave wrapped up last month, and it was another step forward for the program. Thanks to your feedback and the lessons we picked up along the way, we're shipping some of the **most significant changes** we've made so far. In this post, we'll share what's coming in the 4th Wave, which is [scheduled to hit on 22 April](/wave/stellar).

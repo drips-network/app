@@ -1,10 +1,11 @@
 ---
 title: 'Devcon & Devconnect Support their Dependencies with Drips'
 date: '2025-10-21'
-coverImage: '/assets/blog-images/devcon-devconnect-support-their-dependencies-with-drips.jpg'
+coverImage: '/assets/blog-images/devcon-devconnect-support-their-dependencies-with-drips/coverImage.jpg'
 coverImageAlt: 'Drippy on stage at Devcon presenting supported dependencies.'
 excerpt: 'The Ethereum Foundation team behind Devcon and Devconnect is using Drips to fund the open-source software dependencies that enable their work.'
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: 'Devcon & Devconnect support open-source dependencies on Drips'
 categories:
   - ecosystem

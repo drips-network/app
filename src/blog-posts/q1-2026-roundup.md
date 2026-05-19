@@ -1,10 +1,11 @@
 ---
 title: 'Q1 2026 Roundup: From Wave to new partnerships, a packed first quarter'
 date: '2026-05-07'
-coverImage: '/assets/blog-images/q1-2026-roundup.jpg'
+coverImage: '/assets/blog-images/q1-2026-roundup/coverImage.jpg'
 coverImageAlt: 'Q1 2026 Roundup'
 excerpt: 'A few months into 2026 and it has been a whirlwind — Drips Wave is live, we kicked off a pilot with the UNICEF Office of Innovation, shipped protocol updates, and spent time with builders in Mexico City.'
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: 'Q1 2026 Roundup: From Wave to new partnerships, a packed first quarter'
 categories:
   - roundup
