@@ -13,7 +13,10 @@ export const BLOG_CATEGORY_LABELS: Record<(typeof BLOG_CATEGORIES)[number], stri
 export const metadataSchema = z.object({
   title: z.string(),
   excerpt: z.string(),
-  date: z.string(),
+  // Accept both string and Date: hand-authored posts quote the date so YAML
+  // parses it as a string, while CMS-authored posts write it unquoted and
+  // YAML 1.1 auto-parses YYYY-MM-DD as a Date.
+  date: z.preprocess((v) => (v instanceof Date ? v.toISOString().slice(0, 10) : v), z.string()),
   coverImage: z.string(),
   coverImageAlt: z.string(),
   announcementBannerCopy: z.string().optional(),

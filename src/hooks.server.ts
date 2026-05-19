@@ -3,8 +3,11 @@ import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { PuppeteerManager } from '$lib/utils/puppeteer';
 import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
-import { error, isRedirect, redirect } from '@sveltejs/kit';
+import { error, isRedirect, redirect, type Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
+import { handleKeystatic } from 'keystatic-sveltekit';
 import { getUserData } from '$lib/utils/wave/auth';
+import keystaticConfig from '../keystatic.config';
 
 PuppeteerManager.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -16,7 +19,7 @@ const WAVE_API_URL = getOptionalEnvVar(
   'Wave functionality will not work.',
 );
 
-export const handle = async ({ event, resolve }) => {
+const waveHandle: Handle = async ({ event, resolve }) => {
   // If we're under /wave path, handle Wave authentication.
   // This allows the initial page render to be SSR even for logged-in-only views.
 
@@ -106,6 +109,8 @@ export const handle = async ({ event, resolve }) => {
     throw error(500, 'Internal Server Error');
   }
 };
+
+export const handle = sequence(await handleKeystatic({ config: keystaticConfig }), waveHandle);
 
 export const handleFetch = async ({ event, request, fetch }) => {
   // If the request is going to Wave API, attach auth credentials

@@ -22,6 +22,10 @@ Drips 💧 is a protocol (and app), built on Ethereum, that enables organization
 
 Find instructions for running the app locally in the [Development Guide](/docs/DEVELOPMENT.md).
 
+## ✍️ Blog CMS
+
+Blog posts are edited via [Keystatic](https://keystatic.com/) at `/keystatic`. See the [Blog CMS Guide](/docs/BLOG_CMS.md) for setup and workflow.
+
 ## 📝 Submitting feedback
 
 Please first search this repo if your issue already exists. If so, feel free to comment. If not, create an issue with your feedback and tag it `bug` (for things that aren’t working right) or `enhancement` (for feature ideas, or improvements for existing features).
