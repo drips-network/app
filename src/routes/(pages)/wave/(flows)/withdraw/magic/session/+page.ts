@@ -82,6 +82,7 @@ export const load = async ({ fetch, depends }) => {
         grant: null,
         sessionExpiresAt: null,
       } satisfies MagicLinkSessionState,
+      waveFullscreenFlow: true,
     };
   }
 
@@ -96,6 +97,7 @@ export const load = async ({ fetch, depends }) => {
         grant: null,
         sessionExpiresAt: null,
       } satisfies MagicLinkSessionState,
+      waveFullscreenFlow: true,
     };
   }
 
@@ -104,5 +106,8 @@ export const load = async ({ fetch, depends }) => {
   }
 
   const json = await res.json();
-  return { state: sessionStateSchema.parse(json) };
+  return {
+    state: sessionStateSchema.parse(json),
+    waveFullscreenFlow: true,
+  };
 };

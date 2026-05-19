@@ -148,7 +148,7 @@
           <UserMenu {user} />
         {/snippet}
       </Flyout>
-    {:else if !page.route.id?.startsWith('/(pages)/wave/(flows)/login')}
+    {:else if !page.route.id?.startsWith('/(pages)/wave/(flows)/login') && !page.route.id?.startsWith('/(pages)/wave/(flows)/withdraw/magic')}
       <Button href="/wave/login?backTo={page.url.pathname + page.url.search}" icon={Github}>
         Log in
       </Button>

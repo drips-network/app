@@ -45,9 +45,10 @@
   </header>
 
   {#if state.state === 'active' && state.grant}
-    <AnnotationBox type="info">
+    <AnnotationBox type="warning">
       You are using a one-time withdrawal link issued by a Drips admin. This session does not
-      require a GitHub login. When you're done, click "End session" above.
+      require a GitHub login. When you're done, click "End session" above. You can come back to this
+      page by re-opening the secret link at any point within 7 days of when it was issued.
     </AnnotationBox>
 
     <GrantDetail
@@ -90,14 +91,16 @@
 </div>
 
 <style>
+  /* The (flows) layout already provides the outer width constraint and
+     centers the content area; we only handle vertical rhythm + internal
+     padding here. */
   .page {
-    max-width: 90rem;
     width: 100%;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    text-align: left;
   }
 
   .header {
