@@ -112,7 +112,11 @@
           bind:value={gitHubUsername}
           placeholder="e.g. octocat"
           onkeydown={(e) => {
-            if (e.key === 'Enter') handleLookup();
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (!gitHubUsername.trim() || loadingLookup) return;
+              handleLookup();
+            }
           }}
         />
       </FormField>
