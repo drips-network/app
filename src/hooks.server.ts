@@ -5,10 +5,8 @@ import z from 'zod';
 import setCookieParser from 'set-cookie-parser';
 import { error, isRedirect, redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { handleKeystatic } from 'keystatic-sveltekit';
 import { getUserData } from '$lib/utils/wave/auth';
 import network from '$lib/stores/wallet/network';
-import keystaticConfig from '../keystatic.config';
 
 PuppeteerManager.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -112,18 +110,29 @@ const waveHandle: Handle = async ({ event, resolve }) => {
 };
 
 // The blog (and therefore the CMS) only lives on the mainnet deployment.
-// On alt-chain deployments, refuse the CMS routes and skip the handler so
-// the bundle is never invoked.
-const keystaticHandle = await handleKeystatic({ config: keystaticConfig });
+// On alt-chain deployments the CMS routes 404 and neither keystatic-sveltekit
+// nor the config is ever imported — the dynamic imports below only fire the
+// first time a CMS request lands on the mainnet deployment.
+const isKeystaticPath = (path: string) =>
+  path.startsWith('/keystatic') || path.startsWith('/api/keystatic');
+
+let keystaticHandlePromise: Promise<Handle> | undefined;
+const getKeystaticHandle = () => {
+  keystaticHandlePromise ??= (async () => {
+    const [{ handleKeystatic }, { default: keystaticConfig }] = await Promise.all([
+      import('keystatic-sveltekit'),
+      import('../keystatic.config'),
+    ]);
+    return handleKeystatic({ config: keystaticConfig });
+  })();
+  return keystaticHandlePromise;
+};
+
 const guardedKeystaticHandle: Handle = async ({ event, resolve }) => {
-  if (network.alternativeChainMode) {
-    const path = event.url.pathname;
-    if (path.startsWith('/keystatic') || path.startsWith('/api/keystatic')) {
-      throw error(404, 'Not found');
-    }
-    return resolve(event);
-  }
-  return keystaticHandle({ event, resolve });
+  if (!isKeystaticPath(event.url.pathname)) return resolve(event);
+  if (network.alternativeChainMode) throw error(404, 'Not found');
+  const handler = await getKeystaticHandle();
+  return handler({ event, resolve });
 };
 
 export const handle = sequence(guardedKeystaticHandle, waveHandle);
