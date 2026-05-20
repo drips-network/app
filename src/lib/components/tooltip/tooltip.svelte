@@ -33,7 +33,7 @@
     top: 0,
   });
 
-  const TOOLTIP_MARGIN = 0;
+  const TOOLTIP_MARGIN = 8;
 
   async function show() {
     tooltipPos = {
