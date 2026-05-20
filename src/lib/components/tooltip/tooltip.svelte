@@ -62,7 +62,11 @@
     if (hovering) {
       hoverTimeout = setTimeout(show, 400);
     } else {
-      hide();
+      // Grace period before hiding lets the cursor cross the gap from the
+      // trigger to the portaled tooltip body (which is no longer a DOM
+      // descendant of the trigger, so its hover doesn't keep us open
+      // automatically — see the portal action below).
+      hoverTimeout = setTimeout(hide, 150);
     }
   }
 
@@ -167,6 +171,10 @@
       style:left={`${tooltipPos.left}px`}
       style:right={`${tooltipPos.right}px`}
       style:top={`${tooltipPos.top}px`}
+      onpointerover={(e) => {
+        if (!disabled && e.pointerType !== 'touch') handleHover(true);
+      }}
+      onpointerleave={() => !disabled && handleHover(false)}
       onclick={stopPropagation(bubble('click'))}
       onkeydown={stopPropagation(bubble('keydown'))}
     >
