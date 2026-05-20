@@ -1,5 +1,7 @@
 import { makeStep } from '$lib/components/stepper/types';
 import type { GrantDto, StellarMemoType } from '$lib/utils/wave/types/grant';
+import type { GrantActionContext } from '$lib/utils/wave/grants/action-context';
+import { authenticatedGrantActionContext } from '$lib/utils/wave/grants/action-context';
 import { writable } from 'svelte/store';
 import EnterAddress from './enter-address.svelte';
 import Confirm from './confirm.svelte';
@@ -22,7 +24,12 @@ export interface KybData {
   memoValue: string | null;
 }
 
-export default (grant: GrantDto, prefill?: PrefillData, kyb?: KybData) => {
+export default (
+  grant: GrantDto,
+  prefill?: PrefillData,
+  kyb?: KybData,
+  actionContext: GrantActionContext = authenticatedGrantActionContext(grant.id),
+) => {
   const state = writable<State>({
     stellarAddress: kyb?.stellarAddress ?? prefill?.stellarAddress ?? '',
     memo: kyb?.memoValue ?? prefill?.memo,
@@ -38,7 +45,7 @@ export default (grant: GrantDto, prefill?: PrefillData, kyb?: KybData) => {
       }),
       makeStep({
         component: Confirm,
-        props: { grant, kyb },
+        props: { grant, kyb, actionContext },
       }),
       makeStep({
         component: Success,
