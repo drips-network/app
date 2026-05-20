@@ -178,7 +178,7 @@
         },
       ],
       infoTooltip:
-        "All orgs on Drips Wave you're a member of, alongside their points limit for the selected Wave Program.",
+        "Orgs you're a member of that have at least one repo approved in the selected Wave Program, alongside each org's points limit for that Wave.",
     }}
     skeleton={{
       loaded: true,
