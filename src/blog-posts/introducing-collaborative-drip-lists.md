@@ -1,10 +1,11 @@
 ---
 title: 'Introducing Collaborative Drip Lists'
 date: '2024-09-19'
-coverImage: '/assets/blog-images/collaborative-drip-lists.png'
+coverImage: '/assets/blog-images/introducing-collaborative-drip-lists/coverImage.png'
 coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: 'We’re excited to introduce a powerful new feature to streamline and simplify the way communities manage funding and voting initiatives: Collaborative Drip Lists.'
-author: 'jason'
+author:
+  - jason
 categories:
   - product
 ---
@@ -22,7 +23,7 @@ Enter [Collaborative Drip Lists](https://docs.drips.network/support-your-depende
 
 Collaborative Drip Lists function just like regular Drip Lists, except instead of one person curating the list, the projects that get funded and the amounts of funding are chosen collaboratively through voting.
 
-<img data-no-border src="/assets/blog-images/collaborative-drip-lists-creation.png" alt="Creation dialog for a collaborative Drip List" />
+<img data-no-border src="/assets/blog-images/introducing-collaborative-drip-lists/collaborative-drip-lists-creation.png" alt="Creation dialog for a collaborative Drip List" />
 
 The process starts by creating a Drip List, which you can customize to fit your needs: after choosing “Collaborate”, you can then decide whether voting should be public or private, depending on the desired level of transparency. By default, collaborators can vote for any Ethereum address, GitHub repository, or other Drip List to receive a percentage of funds, but you can also choose to restrict the vote to certain recipients upfront.
 

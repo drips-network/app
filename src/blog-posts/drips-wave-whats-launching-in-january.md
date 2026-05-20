@@ -1,10 +1,11 @@
 ---
 title: 'Drips Wave: What’s Launching in January'
 date: '2025-12-23'
-coverImage: '/assets/blog-images/waves-blog-post-2.png'
+coverImage: '/assets/blog-images/drips-wave-whats-launching-in-january/coverImage.png'
 coverImageAlt: 'Illustration showing a Wave cycle on Drips Wave'
 excerpt: 'Why we built Wave, what it enables for developers and maintainers, and what to expect from the first Wave.'
-author: 'kat'
+author:
+  - kat
 announcementBannerCopy: "Drips Wave: What's Launching in January"
 categories:
   - product

@@ -1,10 +1,11 @@
 ---
 title: 'Exploring Sustainable Funding for Digital Public Goods with UNICEF'
 date: '2026-02-26'
-coverImage: '/assets/blog-images/unicef-drips.jpg'
+coverImage: '/assets/blog-images/exploring-sustainable-funding-for-digital-public-goods-with-unicef/coverImage.jpg'
 coverImageAlt: 'UNICEF and Drips exploring sustainable funding for digital public goods'
 excerpt: 'The UNICEF Office of Innovation is using Drips as part of a pilot focused on new sustainable funding solutions for digital public goods.'
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: 'UNICEF Partners with Drips to Explore Funding for Digital Public Goods'
 categories:
   - ecosystem

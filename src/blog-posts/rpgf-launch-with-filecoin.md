@@ -1,10 +1,11 @@
 ---
 title: 'Launching RetroPGF on Drips with Filecoin'
 date: '2025-08-25'
-coverImage: '/assets/blog-images/rpgf/rpgf-filecoin-launch.png'
+coverImage: '/assets/blog-images/rpgf-launch-with-filecoin/coverImage.png'
 coverImageAlt: 'An abstract illustration of the RetroPGF public goods funding mechanism.'
 excerpt: Our new end-to-end tooling RetroPGF solution is going live with Filecoin's largest round to date.
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: Launching RetroPGF on Drips with Filecoin
 categories:
   - ecosystem
@@ -31,7 +32,7 @@ This launch reflects what we’ve been building toward: a **comprehensive toolki
 - **Great UX**: Clear, focused flows for applicants and badgeholders
 - **Amplify the impact**: Winners can immediately choose to forward a percentage to other projects they depend on
 
-<img data-no-border src="/assets/blog-images/rpgf/rpgf-home.png" alt="Screenshot of an RPGF round on Drips" />
+<img data-no-border src="/assets/blog-images/rpgf-launch-with-filecoin/rpgf-home.png" alt="Screenshot of an RPGF round on Drips" />
 
 Altogether this streamlines round management and maximizes the positive impact of the rewards you distribute. What could be better?
 

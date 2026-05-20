@@ -1,10 +1,11 @@
 ---
 title: 'Open Source Collective and Drips'
 date: '2024-09-30'
-coverImage: '/assets/blog-images/open-source-collective.png'
+coverImage: '/assets/blog-images/open-source-collective/coverImage.png'
 coverImageAlt: 'Collaborative Drip List illustration'
 excerpt: 'Bridging the gap between Web3 and traditional OSS communities.'
-author: 'becca'
+author:
+  - becca
 categories:
   - ecosystem
 ---

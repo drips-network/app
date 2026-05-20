@@ -1,10 +1,11 @@
 ---
 title: 'The Changelog: Key Improvements for Stellar Wave 2'
 date: '2026-02-16'
-coverImage: '/assets/blog-images/wave-cover.png'
+coverImage: '/assets/blog-images/wave-2-changelog/coverImage.png'
 coverImageAlt: 'Illustration showing a Wave on Drips Wave'
 excerpt: "The second Stellar Wave is launching on February 19th - here are some of the key improvements we're making based on your feedback and our learnings."
-author: 'jason'
+author:
+  - jason
 announcementBannerCopy: 'The Changelog: Key Improvements for Stellar Wave 2'
 categories:
   - wave
@@ -43,7 +44,7 @@ Once we've collected enough data, we'll begin delivering **personalized, private
 
 Applying this new filter allows drilling down to issues from repos that have a significant portion of code written in the selected language(s), helping contributors find tasks that match their skillset and interests more quickly.
 
-![Screenshot of the new language filter on the issues page](/assets/blog-images/wave-changelog/issue-language-filter.png)
+![Screenshot of the new language filter on the issues page](/assets/blog-images/wave-2-changelog/issue-language-filter.png)
 
 As we continue to collect valuable data from everyone's contributions and preferences, we're planning to ship further enhancements to the issue discovery process.
 
@@ -65,7 +66,7 @@ In the first Wave, contributors sometimes forgot to link their PR to the issue t
 
 To make the Wave smoother for both maintainers and contributors, we're making our handy GitHub Bot **automatically remind contributors to link their PRs to issues** if it sees an unlinked PR from a Wave contributor.
 
-![Screenshot of the new PR linking reminder comment](/assets/blog-images/wave-changelog/pr-link-reminder.png)
+![Screenshot of the new PR linking reminder comment](/assets/blog-images/wave-2-changelog/pr-link-reminder.png)
 
 A single click from the contributor appends the necessary keyword to the PR description, ensuring points are issued quickly and accurately.
 

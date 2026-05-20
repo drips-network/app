@@ -1,10 +1,11 @@
 ---
 title: 'The Monthly Wave: Fix, Merge, Earn.'
 date: '2025-11-20'
-coverImage: '/assets/blog-images/wave-cover.png'
+coverImage: '/assets/blog-images/the-monthly-wave/coverImage.png'
 coverImageAlt: 'Illustration showing a Wave on Drips Wave'
 excerpt: 'Introducing Drips Wave: a recurring bounty cycle to help ecosystems attract developers, keep maintenance moving, and grow their communities.'
-author: 'kat'
+author:
+  - kat
 announcementBannerCopy: 'Introducing Drips Wave: Fix, Merge, Earn.'
 categories:
   - product
@@ -13,7 +14,7 @@ categories:
 
 We're excited to share that Drips Wave will launch soon, with the first full program running for the [Stellar](https://stellar.org/) ecosystem starting in January 2026. The Wave is built to help ecosystems attract developers, keep maintenance moving and grow their communities.
 
-<img data-no-border src="/assets/blog-images/wave-body.png" alt="Illustration showing a Wave on Drips Wave" />
+<img data-no-border src="/assets/blog-images/the-monthly-wave/wave-body.png" alt="Illustration showing a Wave on Drips Wave" />
 
 ## What is a Wave?
 

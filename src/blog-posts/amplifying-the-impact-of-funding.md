@@ -1,10 +1,11 @@
 ---
 title: 'Amplifying the Impact of Funding: Beyond the Milestone'
 date: '2025-04-30' # Consider updating if publishing date changes
-coverImage: '/assets/blog-images/amplifying-funding.png'
+coverImage: '/assets/blog-images/amplifying-the-impact-of-funding/coverImage.png'
 coverImageAlt: 'Illustration showing funds flowing and branching out' # Slightly more descriptive alt text
 excerpt: 'Turn grants and donations into ongoing ecosystem support. Discover how Drips helps you amplify funding impact by easily sharing with the dependencies that make your work possible, creating a virtuous cycle of sustainability.'
-author: 'becca'
+author:
+  - becca
 announcementBannerCopy: 'Amplify your funding impact: Easily split funds with your dependencies using Drips'
 categories:
   - guide
