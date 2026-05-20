@@ -111,6 +111,7 @@ export default config({
           {
             label: 'Authors',
             itemLabel: (props) => props.value ?? 'Pick an author',
+            validation: { length: { min: 1 } },
           },
         ),
         // fields.multiselect has no validation support, so use array(select) to
