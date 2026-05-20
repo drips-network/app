@@ -126,6 +126,24 @@
       window.removeEventListener('resize', updatePosIfExpanded);
     };
   });
+
+  // Portal the expanded tooltip to <body> so its z-index isn't trapped inside
+  // a stacking context created by an ancestor (e.g. `view-transition-name`).
+  function portal(node: HTMLElement) {
+    const original = node.parentNode;
+    document.body.appendChild(node);
+    return {
+      destroy() {
+        if (original && node.parentNode === document.body) {
+          try {
+            original.appendChild(node);
+          } catch {
+            node.remove();
+          }
+        }
+      },
+    };
+  }
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -142,6 +160,7 @@
   {#if expanded}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
+      use:portal
       transition:fade={{ duration: 200 }}
       bind:this={contentElem}
       class="expanded-tooltip"
@@ -186,7 +205,7 @@
   }
 
   .tooltip-content {
-    z-index: 10;
+    z-index: 1000;
     box-shadow: var(--elevation-medium);
     background-color: var(--color-background);
     border-radius: 1rem 0 1rem 1rem;

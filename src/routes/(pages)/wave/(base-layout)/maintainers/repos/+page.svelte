@@ -1,10 +1,13 @@
 <script lang="ts">
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
+  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Ledger from '$lib/components/icons/Ledger.svelte';
+  import Orgs from '$lib/components/icons/Orgs.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Section from '$lib/components/section/section.svelte';
   import RepoBadge from '$lib/components/wave/repo-badge/repo-badge.svelte';
+  import OrgPreviewCard from '$lib/components/wave/org-preview-card/org-preview-card.svelte';
   import WaveBadge from '$lib/components/wave/wave-program-badge/wave-program-badge.svelte';
   import MultiSelectFilter from '$lib/components/wave/repos-filter-bar/multi-select-filter.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
@@ -15,7 +18,75 @@
 
   let { data } = $props();
 
-  let { wavePrograms, waveProgramRepos, statusFilter } = $derived(data);
+  let { wavePrograms, waveProgramRepos, approvedWaveProgramRepos, statusFilter } = $derived(data);
+
+  type OrgEntry = {
+    org: WaveProgramRepoWithDetailsDto['org'];
+    waveProgramId: string;
+    orgPointsBudget: number | null;
+    orgPointsUsed: number;
+    orgPointsRemaining: number | null;
+  };
+
+  // One entry per (waveProgramId, orgId) from the user's approved repos.
+  // Each approved repo carries the org's per-wave-program budget, so picking one
+  // repo per (waveProgramId, orgId) is enough to drive the gauge.
+  let orgEntries: OrgEntry[] = $derived.by(() => {
+    const seen: Record<string, true> = {};
+    const entries: OrgEntry[] = [];
+    for (const r of approvedWaveProgramRepos.data) {
+      const key = `${r.waveProgramId}:${r.org.id}`;
+      if (seen[key]) continue;
+      seen[key] = true;
+      entries.push({
+        org: r.org,
+        waveProgramId: r.waveProgramId,
+        orgPointsBudget: r.orgPointsBudget ?? null,
+        orgPointsUsed: r.orgPointsUsed ?? 0,
+        orgPointsRemaining: r.orgPointsRemaining ?? null,
+      });
+    }
+    return entries;
+  });
+
+  // Distinct wave programs the user has any approved repo in. Drives the
+  // wave-program dropdown in the Orgs section.
+  let orgsWavePrograms = $derived(
+    wavePrograms.data.filter((wp) => orgEntries.some((e) => e.waveProgramId === wp.id)),
+  );
+
+  let selectedOrgsWaveProgramId = $state<string | null>(null);
+
+  // Default the selection to the first available wave program. Reset if the
+  // current selection is no longer in the list.
+  $effect(() => {
+    if (orgsWavePrograms.length === 0) {
+      selectedOrgsWaveProgramId = null;
+      return;
+    }
+    if (
+      selectedOrgsWaveProgramId === null ||
+      !orgsWavePrograms.some((wp) => wp.id === selectedOrgsWaveProgramId)
+    ) {
+      selectedOrgsWaveProgramId = orgsWavePrograms[0].id;
+    }
+  });
+
+  let orgsWaveProgramOptions = $derived(
+    Promise.resolve(orgsWavePrograms.map((wp) => ({ value: wp.id, label: wp.name }))),
+  );
+
+  let orgsForSelectedWave = $derived(
+    selectedOrgsWaveProgramId
+      ? orgEntries
+          .filter((e) => e.waveProgramId === selectedOrgsWaveProgramId)
+          .sort((a, b) => a.org.gitHubOrgLogin.localeCompare(b.org.gitHubOrgLogin))
+      : [],
+  );
+
+  function handleOrgsWaveProgramChange(values: string[]) {
+    if (values.length > 0) selectedOrgsWaveProgramId = values[0];
+  }
 
   const statusOptions = Promise.resolve([
     { value: 'approved', label: 'Approved' },
@@ -92,13 +163,14 @@
   style:view-transition-class="element-handover"
 >
   <Breadcrumbs crumbs={[{ label: 'Maintainer Dashboard' }, { label: 'Orgs & Repos' }]} />
+
   <Section
     header={{
-      label: 'Repo Applications',
-      icon: Ledger,
+      label: 'Orgs',
+      icon: Orgs,
       actions: [
         {
-          label: 'Add repos',
+          label: 'Add org',
           icon: Plus,
           variant: 'primary',
           disabled: false,
@@ -106,71 +178,175 @@
         },
       ],
       infoTooltip:
-        "Before you can add issues to a Wave, the source repo must be accepted by the Wave's organizers. This list shows the status of your repo applications.",
+        "All orgs on Drips Wave you're a member of, alongside their points limit for the selected Wave Program.",
     }}
     skeleton={{
       loaded: true,
-      empty: waveProgramRepos.pagination.total === 0 && !statusFilter,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No repo applications yet',
-      emptyStateText: 'Add a repo and apply it to a Wave Program to get started.',
+      empty: orgEntries.length === 0,
+      emptyStateEmoji: '🏢',
+      emptyStateHeadline: 'No orgs yet',
+      emptyStateText: "Once one of your org's repos is approved for a Wave, it'll show up here.",
       horizontalScroll: true,
     }}
   >
-    <div class="filter-row">
-      <div class="filter-item">
-        <span class="filter-label typo-text-small">Status</span>
-        <div class="filter-dropdown">
-          <MultiSelectFilter
-            optionsPromise={statusOptions}
-            selectedValues={selectedStatus}
-            onchange={handleStatusChange}
-            placeholder="All"
-            singleSelect
-          />
-        </div>
-      </div>
-    </div>
-
-    {#if waveProgramRepos.data.length === 0 && statusFilter}
-      <div class="filtered-empty-state">
-        <p class="typo-text-small-bold">No {statusFilter} repos</p>
-        <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
-          None of your repos have this status.
-        </p>
-      </div>
-    {:else if waveProgramRepos.data.length > 0}
-      <div class="list-header typo-header-5">
-        <span></span>
-        <div class="header-right">
-          <div class="header-budget">
-            <span>Points budget</span>
-            <Tooltip>
-              <InfoCircle
-                style="height: 1rem; width: 1rem; fill: var(--color-foreground-level-5);"
-              />
-              {#snippet tooltip_content()}
-                <span class="typo-text-small"
-                  >Each approved repo can use up to the program's per-repo points budget per wave. <a
-                    href="https://docs.drips.network/wave/maintainers/points-budgets"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="typo-link">Learn more</a
-                  ></span
-                >
-              {/snippet}
-            </Tooltip>
+    {#if orgEntries.length > 0}
+      <div class="filter-row">
+        <div class="filter-item">
+          <span class="filter-label typo-text-small">Wave Program</span>
+          <div class="filter-dropdown">
+            <MultiSelectFilter
+              optionsPromise={orgsWaveProgramOptions}
+              selectedValues={selectedOrgsWaveProgramId ? [selectedOrgsWaveProgramId] : []}
+              onchange={handleOrgsWaveProgramChange}
+              placeholder="Select wave"
+              singleSelect
+            />
           </div>
-          <span class="header-status">Status</span>
         </div>
       </div>
-      <div class="repo-applications-list">
-        {#each waveProgramRepos.data as repoApplication (repoApplication.id)}
-          {@render waveProgramRepo(repoApplication)}
+
+      <div class="orgs-grid">
+        {#each orgsForSelectedWave as entry (entry.org.id)}
+          {@const budgetSet = entry.orgPointsBudget !== null}
+          {@const overBudget =
+            budgetSet && entry.orgPointsRemaining !== null && entry.orgPointsRemaining <= 0}
+          {@const lowBudget =
+            budgetSet &&
+            entry.orgPointsRemaining !== null &&
+            entry.orgPointsRemaining > 0 &&
+            entry.orgPointsRemaining <= (entry.orgPointsBudget ?? 0) * 0.2}
+          <OrgPreviewCard
+            org={{
+              id: entry.org.id,
+              gitHubOrgLogin: entry.org.gitHubOrgLogin,
+              gitHubOrgAvatarUrl: entry.org.gitHubOrgAvatarUrl,
+              contactInfo: null,
+            }}
+          >
+            {#snippet actions()}
+              <div class="org-card-footer">
+                <div class="org-card-budget">
+                  <span class="org-card-budget-label typo-text-small">
+                    <span style:color="var(--color-foreground-level-5)">Points budget</span>
+                    <Tooltip>
+                      <InfoCircle
+                        style="height: 0.875rem; width: 0.875rem; fill: var(--color-foreground-level-5);"
+                      />
+                      {#snippet tooltip_content()}
+                        <span class="typo-text-small"
+                          >Each org has a points budget per Wave, shared across all of the org's
+                          approved repos. <a
+                            href="https://docs.drips.network/wave/maintainers/points-budgets"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="typo-link">Learn more</a
+                          ></span
+                        >
+                      {/snippet}
+                    </Tooltip>
+                  </span>
+                  {#if budgetSet}
+                    <span
+                      class="budget typo-text-small"
+                      class:over-budget={overBudget}
+                      class:low-budget={lowBudget}
+                    >
+                      {entry.orgPointsUsed} / {entry.orgPointsBudget}
+                    </span>
+                  {:else}
+                    <span class="budget typo-text-small">&mdash;</span>
+                  {/if}
+                </div>
+                <Button size="small" href={`/wave/orgs/${entry.org.id}`}>View org</Button>
+              </div>
+            {/snippet}
+          </OrgPreviewCard>
         {/each}
       </div>
     {/if}
   </Section>
+
+  <div style:margin-top="2rem">
+    <Section
+      header={{
+        label: 'Repo Applications',
+        icon: Ledger,
+        actions: [
+          {
+            label: 'Apply repo',
+            icon: Plus,
+            variant: 'primary',
+            disabled: false,
+            href: `/wave/maintainer-onboarding/review-repos`,
+          },
+        ],
+        infoTooltip:
+          "Before you can add issues to a Wave, the source repo must be accepted by the Wave's organizers. This list shows the status of your repo applications.",
+      }}
+      skeleton={{
+        loaded: true,
+        empty: waveProgramRepos.pagination.total === 0 && !statusFilter,
+        emptyStateEmoji: '🫙',
+        emptyStateHeadline: 'No repo applications yet',
+        emptyStateText: 'Add a repo and apply it to a Wave Program to get started.',
+        horizontalScroll: true,
+      }}
+    >
+      <div class="filter-row">
+        <div class="filter-item">
+          <span class="filter-label typo-text-small">Status</span>
+          <div class="filter-dropdown">
+            <MultiSelectFilter
+              optionsPromise={statusOptions}
+              selectedValues={selectedStatus}
+              onchange={handleStatusChange}
+              placeholder="All"
+              singleSelect
+            />
+          </div>
+        </div>
+      </div>
+
+      {#if waveProgramRepos.data.length === 0 && statusFilter}
+        <div class="filtered-empty-state">
+          <p class="typo-text-small-bold">No {statusFilter} repos</p>
+          <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
+            None of your repos have this status.
+          </p>
+        </div>
+      {:else if waveProgramRepos.data.length > 0}
+        <div class="list-header typo-header-5">
+          <span></span>
+          <div class="header-right">
+            <div class="header-budget">
+              <span>Points budget</span>
+              <Tooltip>
+                <InfoCircle
+                  style="height: 1rem; width: 1rem; fill: var(--color-foreground-level-5);"
+                />
+                {#snippet tooltip_content()}
+                  <span class="typo-text-small"
+                    >Each approved repo can use up to the program's per-repo points budget per Wave. <a
+                      href="https://docs.drips.network/wave/maintainers/points-budgets"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="typo-link">Learn more</a
+                    ></span
+                  >
+                {/snippet}
+              </Tooltip>
+            </div>
+            <span class="header-status">Status</span>
+          </div>
+        </div>
+        <div class="repo-applications-list">
+          {#each waveProgramRepos.data as repoApplication (repoApplication.id)}
+            {@render waveProgramRepo(repoApplication)}
+          {/each}
+        </div>
+      {/if}
+    </Section>
+  </div>
 </div>
 
 <style>
@@ -298,7 +474,7 @@
   .budget {
     width: 6rem;
     text-align: right;
-    color: var(--color-foreground-level-5);
+    color: var(--color-foreground);
   }
 
   .budget.over-budget {
@@ -313,5 +489,38 @@
     width: 6rem;
     text-align: right;
     white-space: nowrap;
+  }
+
+  .orgs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 1rem;
+    isolation: isolate;
+  }
+
+  .org-card-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .org-card-budget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .org-card-budget .budget {
+    width: auto;
+    text-align: left;
+  }
+
+  .org-card-budget-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 </style>
