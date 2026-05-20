@@ -90,6 +90,11 @@ ARG PROJECT_CLAIM_API_URL
 
 ARG PUBLIC_PRELUDE_SDK_KEY
 
+ARG KEYSTATIC_GITHUB_CLIENT_ID
+ARG KEYSTATIC_GITHUB_CLIENT_SECRET
+ARG KEYSTATIC_SECRET
+ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
+
 RUN apt-get update \
     && apt-get install -y chromium \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
