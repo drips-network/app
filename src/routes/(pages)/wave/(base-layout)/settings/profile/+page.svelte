@@ -79,7 +79,7 @@
     >
       <div class="description">
         <ExclamationCircle style="fill: var(--color-caution-level-6);" />
-        Verify your identity now to be eligible for Wave rewards.
+        Verify your identity now to participate in a Wave.
       </div>
       <Button icon={ArrowRight} href="/wave/kyc" variant="primary">Verify identity</Button>
     </div>
