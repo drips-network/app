@@ -183,7 +183,7 @@
     skeleton={{
       loaded: true,
       empty: orgEntries.length === 0,
-      emptyStateEmoji: '🏢',
+      emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No orgs yet',
       emptyStateText: "Once one of your org's repos is approved for a Wave, it'll show up here.",
       horizontalScroll: true,
