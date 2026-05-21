@@ -25,7 +25,7 @@ Before you apply to your first issue, take a few minutes to read the [Drips Wave
 
 Many common questions are already answered there. A little bit of upfront context can save a lot of confusion later.
 
-Simple rule: if you’re unsure about something, check the docs first. If it’s still unclear, then ask.
+**Simple rule:** if you’re unsure about something, check the docs first. If it’s still unclear, then ask.
 
 ## 2. Apply with intent
 
