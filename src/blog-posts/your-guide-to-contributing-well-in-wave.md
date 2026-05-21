@@ -57,7 +57,7 @@ One thing that really matters in Wave: **link your PR to the issue clearly**. If
 
 When you get feedback, take it seriously. Don’t ignore it, improve the work and move it forward.
 
-And we all know AI can help when solving issues but it shouldn’t be doing all the thinking for you. If you can’t explain what you’ve submitted that usually becomes obvious pretty quickly and this may affect if maintainers want to work with you in the future.
+Lastly: We all know that AI can help solve issues, but it shouldn’t be doing all the thinking for you. If you can’t explain what you’ve submitted, it becomes obvious pretty quickly, and this may affect whether maintainers want to work with you in the future.
 
 ## 5. Use the right channels
 
