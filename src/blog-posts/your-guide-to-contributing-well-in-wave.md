@@ -61,7 +61,7 @@ Lastly: We all know that AI can help solve issues, but it shouldn’t be doing a
 
 ## 5. Use the right channels
 
-Not everything belongs in general chat.
+Not everything belongs into `#general`.
 
 - For Wave questions or contribution-related issues → use 🎫 tickets
 - For KYC, wallets, rewards or feedback → use the [Support Hub](https://www.drips.network/wave/support)
