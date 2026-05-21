@@ -40,7 +40,7 @@ export const load = async ({ fetch, params, parent, url }) => {
     getApplicationQuota(fetch, waveProgram.id).catch(() => null),
     getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id).catch(() => null),
     getPhoneVerificationRequired(fetch).catch(() => null),
-    getKycStatus(fetch).catch(() => null),
+    getKycStatus(fetch),
   ]);
 
   const previousApplication = await getIssueApplications(
@@ -60,7 +60,7 @@ export const load = async ({ fetch, params, parent, url }) => {
   }
 
   const isKycVerified =
-    kycStatus && kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
+    kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
 
   const upcomingWave = upcomingWaves.data[0] ?? null;
 
