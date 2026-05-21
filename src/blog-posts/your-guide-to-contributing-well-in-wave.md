@@ -41,11 +41,11 @@ Wave isn’t a lottery, so don’t treat it like one.
 
 Once you’re assigned, stay in the loop 🔁
 
-Keep communication on the GitHub issue or PR as much as possible. That’s where the work lives, and it helps everyone stay aligned. Ask questions there, share progress there and respond to feedback there.
+**Keep communication on the GitHub issue or PR** as much as possible. That’s where the work lives, and it helps everyone stay aligned. Ask questions there, share progress there and respond to feedback there.
 
-If you get stuck or can’t continue, say so. Don’t go quiet! Issues may be reassigned if there’s no activity, a quick update is always better than silence.
+**If you get stuck or can’t continue, say so.** Don’t go quiet! Issues may be reassigned if there’s no activity, a quick update is always better than silence.
 
-Also worth saying: be patient. Maintainers are juggling a lot and reviews can take time. Follow up if you need to but don’t spam or demand instant replies. We recommend waiting 24 - 48 hours, pinging after 3 hours is unlikely to get a positive response.
+Also worth saying: **Be patient.** Maintainers are juggling a lot and reviews can take time. Follow up if you need to but don’t spam or demand instant replies. We recommend waiting 24 - 48 hours, pinging after 3 hours is unlikely to get a positive response.
 
 ## 4. Execute properly
 
