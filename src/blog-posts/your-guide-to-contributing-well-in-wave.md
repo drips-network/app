@@ -86,10 +86,10 @@ Let’s make some waves 🌊
 
 ## TL;DR
 
-- Read the docs before asking questions
-- Apply intentionally and where you’re a real fit
-- Stay in the loop once assigned - don’t disappear
-- Keep communication on GitHub and follow up respectfully
-- Link your PR to the issue clearly
+- **Read the docs** before asking questions
+- **Apply intentionally** and where you’re a real fit
+- **Stay in the loop** once assigned - don’t disappear
+- **Keep communication** on GitHub and follow up respectfully
+- **Link your PR** to the issue clearly
 - Use tickets and the Support Hub for the right things
 - Be constructive, respectful, and easy to work with
