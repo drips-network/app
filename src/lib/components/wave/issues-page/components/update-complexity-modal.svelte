@@ -45,8 +45,18 @@
     return pointsDelta > waveProgramRepo.pointsRemaining;
   });
 
+  let orgBudgetExceeded = $derived.by(() => {
+    if (!waveProgramRepo) return false;
+    if (pointsDelta <= 0) return false;
+    const remaining = waveProgramRepo.orgPointsRemaining;
+    if (remaining === null || remaining === undefined) return false;
+    return pointsDelta > remaining;
+  });
+
   let canSubmit = $derived(
-    (initialComplexity ? activeComplexity !== initialComplexity : true) && !budgetExceeded,
+    (initialComplexity ? activeComplexity !== initialComplexity : true) &&
+      !budgetExceeded &&
+      !orgBudgetExceeded,
   );
 
   async function handleSubmit() {
@@ -147,6 +157,30 @@
         of {waveProgramRepo.pointsBudget} points used, with {waveProgramRepo.pointsRemaining} remaining
         — but this change would require
         {pointsDelta} additional points. Review the remaining budget for your repos on the
+        <a
+          href="/wave/maintainers/repos?status=approved"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Orgs & Repos</a
+        >
+        screen.
+        <a
+          href="https://docs.drips.network/wave/maintainers/points-budgets"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="typo-link">Learn more</a
+        >
+      </AnnotationBox>
+    {/if}
+
+    {#if orgBudgetExceeded && waveProgramRepo}
+      <AnnotationBox type="error">
+        Increasing complexity to this level would exceed
+        <strong>{waveProgramRepo.org.gitHubOrgLogin}</strong>'s points budget for this Wave (shared
+        across all of the org's approved repos). Currently {waveProgramRepo.orgPointsUsed} of
+        {waveProgramRepo.orgPointsBudget} points used, with {waveProgramRepo.orgPointsRemaining}
+        remaining — but this change would require {pointsDelta} additional points. Review the remaining
+        budget for your orgs on the
         <a
           href="/wave/maintainers/repos?status=approved"
           target="_blank"
