@@ -11,8 +11,11 @@ export const load = async ({ url, fetch }) => {
     const kycStatus = await getKycStatus(fetch);
     const isKycVerified =
       kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
+    // RED users have already attempted KYC; the "please verify" pitch on this
+    // page is misleading for them. Mirror the login callback's behavior.
+    const isKycRejected = kycStatus.reviewAnswer === 'RED';
 
-    if (isKycVerified) {
+    if (isKycVerified || isKycRejected) {
       throw redirect(302, safeBackTo);
     }
   } catch (err) {
