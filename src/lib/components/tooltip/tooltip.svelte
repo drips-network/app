@@ -60,6 +60,7 @@
     clearTimeout(hoverTimeout);
 
     if (hovering) {
+      if (expanded) return;
       hoverTimeout = setTimeout(show, 400);
     } else {
       // Grace period before hiding lets the cursor cross the gap from the
