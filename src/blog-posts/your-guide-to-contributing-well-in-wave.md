@@ -63,7 +63,7 @@ Lastly: We all know that AI can help solve issues, but it shouldn’t be doing a
 
 Not everything belongs into `#general`.
 
-- For Wave questions or contribution-related issues → use 🎫 tickets
+- For Wave questions or contribution-related issues → use the `🎫 tickets` channel on the [Drips Discord server](https://discord.gg/t8XBXZAEs5)
 - For KYC, wallets, rewards or feedback → use the [Support Hub](https://www.drips.network/wave/support)
 
 Using the right channel helps your issue get resolved faster and keeps shared spaces useful for everyone.
