@@ -23,7 +23,7 @@ This guide is here to help you do exactly that ✨
 
 Before you apply to your first issue, take a few minutes to read the [Drips Wave docs](https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards)!
 
-Most of the common questions are already answered there. A bit of upfront context can save a lot of confusion later. [You can find the Docs here.](https://docs.drips.network/wave/)
+Many common questions are already answered there. A little bit of upfront context can save a lot of confusion later.
 
 Simple rule: if you’re unsure about something, check the docs first. If it’s still unclear, then ask.
 
