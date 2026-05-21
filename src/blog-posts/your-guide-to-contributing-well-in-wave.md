@@ -17,7 +17,7 @@ If you’re here to contribute, you’re in the right place.
 
 But contributing well isn’t just about writing code. It’s how you apply, how you communicate, how you handle feedback and how you follow through. The contributors who get the most out of Wave (and the ones maintainers want to work with again) tend to get these basics right.
 
-This guide is here to help you do exactly that.
+This guide is here to help you do exactly that ✨
 
 ## 1. Start with the docs
 
