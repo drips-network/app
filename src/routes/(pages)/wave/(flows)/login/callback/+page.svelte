@@ -18,20 +18,31 @@
       const { newUser: isNewUser } = await performLogin(page.url);
       await invalidateAll();
 
-      const kycStatus = await getKycStatus();
-      const isKycVerified =
-        kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
-      const isKycRejected = kycStatus.reviewAnswer === 'RED';
+      // KYC status is best-effort during login — if the call fails, skip the
+      // kyc-required nudge rather than breaking the entire login flow.
+      let kycStatus: Awaited<ReturnType<typeof getKycStatus>> | undefined;
+      try {
+        kycStatus = await getKycStatus();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to fetch KYC status during login callback:', err);
+      }
 
-      // Only nudge users who haven't been through verification yet. If KYC was
-      // rejected, the "please verify your identity" pitch is misleading — they
-      // already tried.
-      if (!isKycVerified && !isKycRejected) {
-        const kycRequiredBackTo = `/wave/kyc-required?backTo=${encodeURIComponent(backTo || '')}`;
-        if (isNewUser && !skipWelcome) {
-          return goto(`/wave/welcome?backTo=${encodeURIComponent(kycRequiredBackTo)}`);
+      if (kycStatus) {
+        const isKycVerified =
+          kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
+        const isKycRejected = kycStatus.reviewAnswer === 'RED';
+
+        // Only nudge users who haven't been through verification yet. If KYC was
+        // rejected, the "please verify your identity" pitch is misleading — they
+        // already tried.
+        if (!isKycVerified && !isKycRejected) {
+          const kycRequiredBackTo = `/wave/kyc-required?backTo=${encodeURIComponent(backTo || '')}`;
+          if (isNewUser && !skipWelcome) {
+            return goto(`/wave/welcome?backTo=${encodeURIComponent(kycRequiredBackTo)}`);
+          }
+          return goto(kycRequiredBackTo);
         }
-        return goto(kycRequiredBackTo);
       }
 
       if (isNewUser && !skipWelcome) {
