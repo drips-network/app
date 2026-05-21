@@ -17,11 +17,17 @@ export const load = async ({ url, fetch }) => {
       throw redirect(302, safeBackTo);
     }
   } catch (err) {
+    // Preserve our own 302 redirect above.
     if (err && typeof err === 'object' && 'status' in err && err.status === 302) {
       throw err;
     }
-    // If not authenticated or other error, redirect to login
-    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
+    // Only auth failures send the user to login. Real outages (5xx, network,
+    // parsing) should bubble up so we don't mask them behind a login screen
+    // or create redirect loops for already-authenticated users.
+    if (err && typeof err === 'object' && 'status' in err && err.status === 401) {
+      throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
+    }
+    throw err;
   }
 
   return {
