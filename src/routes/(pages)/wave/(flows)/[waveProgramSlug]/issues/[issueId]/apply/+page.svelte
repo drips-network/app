@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
@@ -131,26 +132,41 @@
       {/snippet}
     </AnnotationBox>
   {:else if waveProgramHasActiveWave}
-    <AnnotationBox type="info">
-      <span class="typo-text-small-bold"
-        >You have {data.applicationQuota?.remaining} of {data.applicationQuota?.limit} application {data
-          .applicationQuota?.limit === 1
-          ? 'slot'
-          : 'slots'} remaining in this Wave.</span
-      >
-      You can free up more slots by resolving assigned issues or withdrawing pending applications.
-
-      {#snippet actions()}
-        <Button
-          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
-          target="_blank">Learn more</Button
+    {#if !data.isKycVerified}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">Identity verification (KYC) required</span><br />
+        To withdraw the rewards you'll earn from completing this issue, you need a verified identity.
+        We ask for it before you apply so there are no delays when it's time to cash out.
+        {#snippet actions()}
+          <Button
+            href={`/wave/kyc?backTo=${encodeURIComponent(page.url.pathname + page.url.search)}`}
+          >
+            Verify identity
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
+    {#if data.isKycVerified}
+      <AnnotationBox type="info">
+        <span class="typo-text-small-bold"
+          >You have {data.applicationQuota?.remaining} of {data.applicationQuota?.limit} application
+          {data.applicationQuota?.limit === 1 ? 'slot' : 'slots'} remaining in this Wave.</span
         >
-      {/snippet}
-    </AnnotationBox>
+        You can free up more slots by resolving assigned issues or withdrawing pending applications.
+
+        {#snippet actions()}
+          <Button
+            href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#application-limits"
+            target="_blank">Learn more</Button
+          >
+        {/snippet}
+      </AnnotationBox>
+    {/if}
     <FormField
       title="Application Text*"
       description="Explain why you'd like to work on this issue and list any relevant experience."
       type="div"
+      disabled={!data.isKycVerified}
       validationState={textValid
         ? { type: 'valid' }
         : beenFocussed
@@ -167,6 +183,7 @@
       <TextArea
         bind:value={applicationText}
         placeholder="I would like to work on this issue because..."
+        disabled={!data.isKycVerified}
         onblur={() => (beenFocussed = true)}
       />
       <div class="char-count">
@@ -179,12 +196,29 @@
       title="Verification*"
       description="Confirm you're not a robot with a quick check."
       type="div"
+      disabled={!data.isKycVerified}
     >
-      <div class="turnstile-wrapper">
-        <Turnstile ontoken={(t) => (turnstileToken = t)} />
-      </div>
+      {#if data.isKycVerified}
+        <div class="turnstile-wrapper">
+          <Turnstile ontoken={(t) => (turnstileToken = t)} />
+        </div>
+      {/if}
     </FormField>
   {:else}
+    {#if !data.isKycVerified}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">Identity verification (KYC) required</span><br />
+        Get identity verification out of the way now so you're ready to apply as soon as the next Wave
+        goes live — and so there are no delays when it's time to withdraw any rewards you earn.
+        {#snippet actions()}
+          <Button
+            href={`/wave/kyc?backTo=${encodeURIComponent(page.url.pathname + page.url.search)}`}
+          >
+            Verify identity
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
     <AnnotationBox>
       {data.waveProgram.name} does not have an active Wave at the moment, so applications cannot be submitted.<br
       />
@@ -216,13 +250,25 @@
 
   {#snippet actions()}
     {#if !data.user?.restricted && waveProgramHasActiveWave && !data.alreadyApplied && !data.isOwnIssue && !data.issue.completedAt && !data.issue.assignedApplicant && (data.applicationQuota?.remaining ?? 0) > 0 && (data.orgAssignmentQuota?.remaining ?? 0) > 0}
-      <Button
-        loading={submitting}
-        variant="primary"
-        disabled={!valid}
-        icon={Proposals}
-        onclick={handleSubmit}>Apply to issue</Button
+      <div
+        style:display="flex"
+        style:flex-direction="column"
+        style:align-items="flex-end"
+        style:gap="0.5rem"
       >
+        <Button
+          loading={submitting}
+          variant="primary"
+          disabled={!valid || !data.isKycVerified}
+          icon={Proposals}
+          onclick={handleSubmit}>Apply to issue</Button
+        >
+        {#if !data.isKycVerified}
+          <span class="typo-text-small" style:color="var(--color-negative-level-6)">
+            You must complete identity verification (KYC) before applying.
+          </span>
+        {/if}
+      </div>
     {/if}
   {/snippet}
 </FlowStepWrapper>

@@ -5,6 +5,7 @@ import {
 } from '$lib/utils/wave/issues.js';
 import { getPhoneVerificationRequired } from '$lib/utils/wave/users.js';
 import { getWaves } from '$lib/utils/wave/wavePrograms.js';
+import { getKycStatus } from '$lib/utils/wave/kyc.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ fetch, params, parent, url }) => {
@@ -12,28 +13,35 @@ export const load = async ({ fetch, params, parent, url }) => {
 
   const { issueId } = params;
 
-  const [waves, upcomingWaves, applicationQuota, orgAssignmentQuota, phoneVerificationRequired] =
-    await Promise.all([
-      getWaves(
-        fetch,
-        waveProgram.id,
-        {},
-        {
-          status: 'active',
-        },
-      ),
-      getWaves(
-        fetch,
-        waveProgram.id,
-        { limit: 1 },
-        {
-          status: 'upcoming',
-        },
-      ),
-      getApplicationQuota(fetch, waveProgram.id).catch(() => null),
-      getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id).catch(() => null),
-      getPhoneVerificationRequired(fetch).catch(() => null),
-    ]);
+  const [
+    waves,
+    upcomingWaves,
+    applicationQuota,
+    orgAssignmentQuota,
+    phoneVerificationRequired,
+    kycStatus,
+  ] = await Promise.all([
+    getWaves(
+      fetch,
+      waveProgram.id,
+      {},
+      {
+        status: 'active',
+      },
+    ),
+    getWaves(
+      fetch,
+      waveProgram.id,
+      { limit: 1 },
+      {
+        status: 'upcoming',
+      },
+    ),
+    getApplicationQuota(fetch, waveProgram.id).catch(() => null),
+    getOrgAssignmentQuota(fetch, waveProgram.id, issue.repo.org.id).catch(() => null),
+    getPhoneVerificationRequired(fetch).catch(() => null),
+    getKycStatus(fetch),
+  ]);
 
   const previousApplication = await getIssueApplications(
     fetch,
@@ -51,6 +59,9 @@ export const load = async ({ fetch, params, parent, url }) => {
     );
   }
 
+  const isKycVerified =
+    kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN';
+
   const upcomingWave = upcomingWaves.data[0] ?? null;
 
   return {
@@ -59,5 +70,6 @@ export const load = async ({ fetch, params, parent, url }) => {
     upcomingWave,
     applicationQuota,
     orgAssignmentQuota,
+    isKycVerified,
   };
 };

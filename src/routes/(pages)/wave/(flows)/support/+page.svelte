@@ -25,7 +25,7 @@
     <AnnotationBox type="info" centered>
       <span class="typo-text-small-bold"
         >We do our best to respond to all requests as quickly as possible.</span
-      > Nevertheless, please allow up to two business days for a response.
+      > Nevertheless, please allow a few business days for a response in complex cases.
     </AnnotationBox>
   </div>
 
