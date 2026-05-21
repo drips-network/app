@@ -31,11 +31,11 @@ Simple rule: if you’re unsure about something, check the docs first. If it’s
 
 Wave isn’t a lottery, so don’t treat it like one.
 
-Be selective. Read the issue properly, understand the scope, and check the repo before applying. Make sure it’s something you can realistically deliver well.
+**Be selective.** Read the issue properly, understand the scope, and check the repo before applying. Make sure it’s something you can realistically deliver well.
 
-A strong application doesn’t need to be long, but it should be specific. A couple of sentences explaining how you’d approach the task or why you’re a good fit is usually enough.
+**A strong application doesn’t need to be long**, but it should be specific. A couple of sentences explaining how you’d approach the task or why you’re a good fit is usually enough.
 
-Generic applications (or obvious AI copy-paste jobs) are easy to spot and rarely get picked. A bit of effort here can make you immediately stand out.
+**Generic applications** (or obvious AI copy-paste jobs) **are easy to spot** and rarely get picked. A bit of effort here can make you immediately stand out.
 
 ## 3. Communicate clearly (and don’t disappear)
 
