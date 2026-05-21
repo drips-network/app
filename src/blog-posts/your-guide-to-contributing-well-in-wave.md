@@ -68,7 +68,13 @@ Not everything belongs into `#general`.
 
 Using the right channel helps your issue get resolved faster and keeps shared spaces useful for everyone.
 
-## 6. Be a good person to work with
+## 6. Link your Discord account to Drips Wave
+
+Linking your Wave account with your Discord helps us to support you faster when you reach out to us, and you'll automatically receive the Contributor role when you resolve your first issue.
+
+[Click here](https://www.drips.network/wave/link-discord) to get started!
+
+## 7. Be a good person to work with
 
 Wave is more than a points system.
 
