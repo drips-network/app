@@ -53,7 +53,7 @@ Before you start, read the repo’s contribution guidelines. Every project is a 
 
 When you submit work, make it easy to review. Keep things clean, follow existing patterns, and test where needed.
 
-One thing that really matters in Wave: **link your PR to the issue clearly**. If that connection isn’t obvious, your work may not be tracked properly. Not sure how? [More on that here](https://docs.drips.network/wave/contributors/faq#my-pr-got-merged-but-i-didnt-receive-points-why).
+One thing that really matters in Wave: **link your PR to the issue clearly**. If that connection isn’t obvious, your work may not be tracked properly. Not sure how? [More on that here.](https://docs.drips.network/wave/contributors/faq#my-pr-got-merged-but-i-didnt-receive-points-why).
 
 When you get feedback, take it seriously. Don’t ignore it, improve the work and move it forward.
 
