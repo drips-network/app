@@ -1,10 +1,9 @@
-import isSafePath from '$lib/utils/safe-path';
+import { safeParseBackToParam } from '$lib/utils/safe-path';
 import { getKycStatus } from '$lib/utils/wave/kyc.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ url, fetch }) => {
-  const backTo = url.searchParams.get('backTo') || '/wave';
-  const safeBackTo = isSafePath(backTo) ? backTo : '/wave';
+  const safeBackTo = safeParseBackToParam(url) || '/wave';
 
   try {
     const kycStatus = await getKycStatus(fetch);
