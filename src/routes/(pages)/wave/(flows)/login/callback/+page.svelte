@@ -13,6 +13,23 @@
 
   let error = $state<boolean>(false);
 
+  // If backTo already points at /wave/kyc-required (e.g. the user was bounced
+  // through login from that page), unwrap the inner backTo so we don't nest
+  // kyc-required inside itself. Loop with a small cap as defense against
+  // pathological deep nesting left over from earlier bugs.
+  function unwrapKycRequiredBackTo(rawBackTo: string): string {
+    let current = rawBackTo;
+    for (let i = 0; i < 5 && current.startsWith('/wave/kyc-required'); i++) {
+      try {
+        const u = new URL(current, page.url.origin);
+        current = u.searchParams.get('backTo') || '/wave';
+      } catch {
+        return '/wave';
+      }
+    }
+    return current;
+  }
+
   onMount(async () => {
     try {
       const { newUser: isNewUser } = await performLogin(page.url);
@@ -37,7 +54,8 @@
         // rejected, the "please verify your identity" pitch is misleading — they
         // already tried.
         if (!isKycVerified && !isKycRejected) {
-          const kycRequiredBackTo = `/wave/kyc-required?backTo=${encodeURIComponent(backTo || '')}`;
+          const target = unwrapKycRequiredBackTo(backTo || '');
+          const kycRequiredBackTo = `/wave/kyc-required?backTo=${encodeURIComponent(target)}`;
           if (isNewUser && !skipWelcome) {
             return goto(`/wave/welcome?backTo=${encodeURIComponent(kycRequiredBackTo)}`);
           }
