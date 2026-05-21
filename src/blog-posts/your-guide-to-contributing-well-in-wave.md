@@ -39,7 +39,7 @@ Wave isn’t a lottery, so don’t treat it like one.
 
 ## 3. Communicate clearly (and don’t disappear)
 
-Once you’re assigned, stay in the loop.
+Once you’re assigned, stay in the loop 🔁
 
 Keep communication on the GitHub issue or PR as much as possible. That’s where the work lives, and it helps everyone stay aligned. Ask questions there, share progress there and respond to feedback there.
 
