@@ -4,6 +4,7 @@
   import TextArea from '$lib/components/text-area/text-area.svelte';
   import Dropdown from '$lib/components/dropdown/dropdown.svelte';
   import FormField from '$lib/components/form-field/form-field.svelte';
+  import Checkbox from '$lib/components/checkbox/checkbox.svelte';
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import modal from '$lib/stores/modal';
@@ -27,6 +28,7 @@
   let username = $state('');
   let type = $state<string>('ban');
   let reason = $state('');
+  let skipNotification = $state(false);
 
   let resolvedUser = $state<GitHubUser | null | undefined>(undefined);
   let lookupError = $state<string | null>(null);
@@ -91,6 +93,7 @@
         gitHubUserId: resolvedUser.id,
         type: type as RestrictionType,
         reason: reason.trim() ? reason.trim() : undefined,
+        skipNotification,
       });
       onCreated();
       modal.hide();
@@ -150,6 +153,13 @@
 
       <FormField title="Reason" description="Optional. Up to 500 characters.">
         <TextArea bind:value={reason} placeholder="Why is this user being banned or restricted?" />
+      </FormField>
+
+      <FormField
+        title="Notification"
+        description="Use for non-punitive restrictions, e.g. locking down an old account during a support-led account migration."
+      >
+        <Checkbox bind:checked={skipNotification} label="Don't notify the user via email" />
       </FormField>
     </div>
 
