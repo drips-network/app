@@ -12,6 +12,7 @@
     textareaStyle?: string | undefined;
     value?: string | undefined | null;
     placeholder?: string | undefined;
+    disabled?: boolean;
     validationState?: TextInputValidationState;
     onchange?: (event: Event) => void;
     onclick?: (event: Event) => void;
@@ -26,6 +27,7 @@
     textareaStyle = undefined,
     value = $bindable(),
     placeholder = undefined,
+    disabled = false,
     validationState = {
       type: 'unvalidated',
     },
@@ -70,6 +72,7 @@
     class="typo-text"
     class:resizable
     {placeholder}
+    {disabled}
     {onchange}
     {onclick}
     {oninput}

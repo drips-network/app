@@ -183,6 +183,7 @@
       <TextArea
         bind:value={applicationText}
         placeholder="I would like to work on this issue because..."
+        disabled={!data.isKycVerified}
         onblur={() => (beenFocussed = true)}
       />
       <div class="char-count">
@@ -197,9 +198,11 @@
       type="div"
       disabled={!data.isKycVerified}
     >
-      <div class="turnstile-wrapper">
-        <Turnstile ontoken={(t) => (turnstileToken = t)} />
-      </div>
+      {#if data.isKycVerified}
+        <div class="turnstile-wrapper">
+          <Turnstile ontoken={(t) => (turnstileToken = t)} />
+        </div>
+      {/if}
     </FormField>
   {:else}
     {#if !data.isKycVerified}
