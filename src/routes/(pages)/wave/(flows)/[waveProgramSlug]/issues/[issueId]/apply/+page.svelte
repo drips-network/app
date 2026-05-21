@@ -202,6 +202,20 @@
       </div>
     </FormField>
   {:else}
+    {#if !data.isKycVerified}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">Identity verification (KYC) required</span><br />
+        Get identity verification out of the way now so you're ready to apply as soon as the next Wave
+        goes live — and so there are no delays when it's time to withdraw any rewards you earn.
+        {#snippet actions()}
+          <Button
+            href={`/wave/kyc?backTo=${encodeURIComponent(page.url.pathname + page.url.search)}`}
+          >
+            Verify identity
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
     <AnnotationBox>
       {data.waveProgram.name} does not have an active Wave at the moment, so applications cannot be submitted.<br
       />
