@@ -4,8 +4,7 @@ import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ url, fetch }) => {
   const backTo = url.searchParams.get('backTo') || '/wave';
-  const decoded = decodeURIComponent(backTo || '');
-  const safeBackTo = isSafePath(decoded) ? decoded : '/wave';
+  const safeBackTo = isSafePath(backTo) ? backTo : '/wave';
 
   try {
     const kycStatus = await getKycStatus(fetch);
