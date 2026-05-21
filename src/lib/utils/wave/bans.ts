@@ -50,7 +50,12 @@ export async function listBans(
 
 export async function banGitHubUser(
   f = fetch,
-  data: { gitHubUserId: number; type: RestrictionType; reason?: string },
+  data: {
+    gitHubUserId: number;
+    type: RestrictionType;
+    reason?: string;
+    skipNotification?: boolean;
+  },
 ) {
   const res = await authenticatedCall(f, '/api/admin/bans', {
     method: 'POST',

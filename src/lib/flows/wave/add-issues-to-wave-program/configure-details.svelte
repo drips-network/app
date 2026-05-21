@@ -66,6 +66,15 @@
     canFit: number; // how many issues can fit within remaining budget
   }
 
+  interface OrgBudgetInfo {
+    orgId: string;
+    orgLogin: string;
+    issueCount: number;
+    pointsNeeded: number;
+    pointsRemaining: number | null;
+    pointsBudget: number | null;
+  }
+
   const firstWaveId = wavePrograms.find((w) =>
     waveProgramRepos.some((wpr) => wpr.waveProgramId === w.id),
   )?.id;
@@ -112,6 +121,61 @@
     return infos;
   });
 
+  // Group eligible issues by org (only counting issues from repos approved for the
+  // selected wave), so we can compare against each org's shared per-wave budget.
+  let orgBudgetInfos = $derived.by((): OrgBudgetInfo[] => {
+    const selectedWaveId = selectedWaveIds[0];
+    if (!selectedWaveId) return [];
+
+    const repoInfoByRepoId = new SvelteMap<
+      string,
+      {
+        orgId: string;
+        orgLogin: string;
+        orgRemaining: number | null;
+        orgBudget: number | null;
+      }
+    >();
+    for (const wpr of waveProgramRepos) {
+      if (wpr.waveProgramId !== selectedWaveId || wpr.status !== 'approved') continue;
+      repoInfoByRepoId.set(wpr.repo.id, {
+        orgId: wpr.org.id,
+        orgLogin: wpr.org.gitHubOrgLogin,
+        orgRemaining: wpr.orgPointsRemaining ?? null,
+        orgBudget: wpr.orgPointsBudget ?? null,
+      });
+    }
+
+    const byOrg = new SvelteMap<
+      string,
+      { orgLogin: string; count: number; remaining: number | null; budget: number | null }
+    >();
+    for (const issue of eligibleIssues) {
+      const info = repoInfoByRepoId.get(issue.repo.id);
+      if (!info) continue;
+      const existing = byOrg.get(info.orgId);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        byOrg.set(info.orgId, {
+          orgLogin: info.orgLogin,
+          count: 1,
+          remaining: info.orgRemaining,
+          budget: info.orgBudget,
+        });
+      }
+    }
+
+    return [...byOrg.entries()].map(([orgId, v]) => ({
+      orgId,
+      orgLogin: v.orgLogin,
+      issueCount: v.count,
+      pointsNeeded: v.count * pointsPerIssue,
+      pointsRemaining: v.remaining,
+      pointsBudget: v.budget,
+    }));
+  });
+
   // Repos that are not approved for the selected wave program
   let unapprovedRepoIssues = $derived.by(() => {
     const selectedWaveId = selectedWaveIds[0];
@@ -126,38 +190,50 @@
     return eligibleIssues.filter((issue) => !approvedRepoIds.has(issue.repo.id));
   });
 
-  // Issues that will actually be submitted, respecting per-repo budget limits
-  // and excluding issues from repos not approved for the selected wave
+  // Issues that will actually be submitted, respecting both per-repo and per-org budget
+  // limits, and excluding issues from repos not approved for the selected wave
   let submittableIssues = $derived.by(() => {
     const selectedWaveId = selectedWaveIds[0];
     if (!selectedWaveId) return [];
 
-    const approvedRepoIds = new SvelteSet(
-      waveProgramRepos
-        .filter((wpr) => wpr.waveProgramId === selectedWaveId && wpr.status === 'approved')
-        .map((wpr) => wpr.repo.id),
-    );
+    const wprByRepoId = new SvelteMap<string, WaveProgramRepoWithDetailsDto>();
+    for (const wpr of waveProgramRepos) {
+      if (wpr.waveProgramId !== selectedWaveId || wpr.status !== 'approved') continue;
+      wprByRepoId.set(wpr.repo.id, wpr);
+    }
 
     const canFitByRepo = new SvelteMap<string, number>();
-    for (const info of repoBudgetInfos) {
-      canFitByRepo.set(info.repoId, info.canFit);
+    for (const info of repoBudgetInfos) canFitByRepo.set(info.repoId, info.canFit);
+
+    // Running per-org remaining points across the loop; null means unbounded.
+    const orgRemainingByOrgId = new SvelteMap<string, number | null>();
+    for (const wpr of wprByRepoId.values()) {
+      if (!orgRemainingByOrgId.has(wpr.org.id)) {
+        orgRemainingByOrgId.set(wpr.org.id, wpr.orgPointsRemaining ?? null);
+      }
     }
 
     const result: IssueDetailsDto[] = [];
     const countByRepo = new SvelteMap<string, number>();
 
     for (const issue of eligibleIssues) {
+      const wpr = wprByRepoId.get(issue.repo.id);
+      if (!wpr) continue;
+
       const repoId = issue.repo.id;
-
-      // Skip issues from repos not approved for the selected wave
-      if (!approvedRepoIds.has(repoId)) continue;
-
       const maxForRepo = canFitByRepo.get(repoId) ?? Infinity;
       const usedSoFar = countByRepo.get(repoId) ?? 0;
+      if (usedSoFar >= maxForRepo) continue;
 
-      if (usedSoFar < maxForRepo) {
-        result.push(issue);
-        countByRepo.set(repoId, usedSoFar + 1);
+      const orgRemaining = orgRemainingByOrgId.get(wpr.org.id);
+      if (orgRemaining !== null && orgRemaining !== undefined && orgRemaining < pointsPerIssue) {
+        continue;
+      }
+
+      result.push(issue);
+      countByRepo.set(repoId, usedSoFar + 1);
+      if (orgRemaining !== null && orgRemaining !== undefined) {
+        orgRemainingByOrgId.set(wpr.org.id, orgRemaining - pointsPerIssue);
       }
     }
 
@@ -166,6 +242,10 @@
 
   let budgetExceededRepos = $derived(
     repoBudgetInfos.filter((r) => r.pointsRemaining !== null && r.pointsNeeded > r.pointsRemaining),
+  );
+
+  let budgetExceededOrgs = $derived(
+    orgBudgetInfos.filter((o) => o.pointsRemaining !== null && o.pointsNeeded > o.pointsRemaining),
   );
 
   let allBlocked = $derived(submittableIssues.length === 0 && eligibleIssues.length > 0);
@@ -292,9 +372,46 @@
 
   {#if allBlocked}
     <AnnotationBox type="error">
-      {#if repoBudgetInfos.length === 1}
+      {#if budgetExceededOrgs.length > 0 && budgetExceededRepos.length === 0}
+        {#if budgetExceededOrgs.length === 1}
+          {@const org = budgetExceededOrgs[0]}
+          <strong>{org.orgLogin}</strong> has no remaining points budget for this Wave ({org.pointsRemaining}
+          of {org.pointsBudget} points remaining, shared across all the org's approved repos). You cannot
+          add more issues until the current Wave ends. Review the remaining budget for your orgs on the
+          <a
+            href="/wave/maintainers/repos?status=approved"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="typo-link">Orgs & Repos</a
+          >
+          screen.
+          <a
+            href="https://docs.drips.network/wave/maintainers/points-budgets"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="typo-link">Learn more</a
+          >
+        {:else}
+          None of the selected orgs have enough remaining points budget to add issues at this
+          complexity. Wait until the current Wave ends. Review the remaining budget for your orgs on
+          the
+          <a
+            href="/wave/maintainers/repos?status=approved"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="typo-link">Orgs & Repos</a
+          >
+          screen.
+          <a
+            href="https://docs.drips.network/wave/maintainers/points-budgets"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="typo-link">Learn more</a
+          >
+        {/if}
+      {:else if repoBudgetInfos.length === 1}
         {@const repo = repoBudgetInfos[0]}
-        <strong>{repo.repoName}</strong> has no remaining points budget for this wave ({repo.pointsRemaining}
+        <strong>{repo.repoName}</strong> has no remaining points budget for this Wave ({repo.pointsRemaining}
         of {repo.pointsBudget} points remaining). You cannot add more issues until the current Wave ends.
         Review the remaining budget for your repos on the
         <a
@@ -328,7 +445,7 @@
         >
       {/if}
     </AnnotationBox>
-  {:else if budgetExceededRepos.length > 0}
+  {:else if budgetExceededRepos.length > 0 || budgetExceededOrgs.length > 0}
     {@const skippedCount = eligibleIssues.length - submittableIssues.length}
     <AnnotationBox type="warning">
       {#each budgetExceededRepos as repo (repo.repoName)}
@@ -341,8 +458,16 @@
             at this complexity.{/if}
         </div>
       {/each}
+      {#each budgetExceededOrgs as org (org.orgId)}
+        <div class="budget-warning-row">
+          <strong>{org.orgLogin}</strong> (org): {org.issueCount} issue{org.issueCount > 1
+            ? 's'
+            : ''} selected ({org.pointsNeeded} points) but only {org.pointsRemaining} of {org.pointsBudget}
+          points remaining across the org's approved repos. Some issues will be skipped at this complexity.
+        </div>
+      {/each}
       {skippedCount} issue{skippedCount > 1 ? 's' : ''} will be skipped. Review the remaining budget
-      for your repos on the
+      for your repos and orgs on the
       <a
         href="/wave/maintainers/repos?status=approved"
         target="_blank"

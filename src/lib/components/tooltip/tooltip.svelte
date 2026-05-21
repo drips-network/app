@@ -33,7 +33,7 @@
     top: 0,
   });
 
-  const TOOLTIP_MARGIN = 0;
+  const TOOLTIP_MARGIN = 8;
 
   async function show() {
     tooltipPos = {
@@ -60,9 +60,14 @@
     clearTimeout(hoverTimeout);
 
     if (hovering) {
+      if (expanded) return;
       hoverTimeout = setTimeout(show, 400);
     } else {
-      hide();
+      // Grace period before hiding lets the cursor cross the gap from the
+      // trigger to the portaled tooltip body (which is no longer a DOM
+      // descendant of the trigger, so its hover doesn't keep us open
+      // automatically — see the portal action below).
+      hoverTimeout = setTimeout(hide, 150);
     }
   }
 
@@ -126,6 +131,24 @@
       window.removeEventListener('resize', updatePosIfExpanded);
     };
   });
+
+  // Portal the expanded tooltip to <body> so its z-index isn't trapped inside
+  // a stacking context created by an ancestor (e.g. `view-transition-name`).
+  function portal(node: HTMLElement) {
+    const original = node.parentNode;
+    document.body.appendChild(node);
+    return {
+      destroy() {
+        if (original && node.parentNode === document.body) {
+          try {
+            original.appendChild(node);
+          } catch {
+            node.remove();
+          }
+        }
+      },
+    };
+  }
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -142,12 +165,17 @@
   {#if expanded}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
+      use:portal
       transition:fade={{ duration: 200 }}
       bind:this={contentElem}
       class="expanded-tooltip"
       style:left={`${tooltipPos.left}px`}
       style:right={`${tooltipPos.right}px`}
       style:top={`${tooltipPos.top}px`}
+      onpointerover={(e) => {
+        if (!disabled && e.pointerType !== 'touch') handleHover(true);
+      }}
+      onpointerleave={() => !disabled && handleHover(false)}
       onclick={stopPropagation(bubble('click'))}
       onkeydown={stopPropagation(bubble('keydown'))}
     >
@@ -186,7 +214,7 @@
   }
 
   .tooltip-content {
-    z-index: 10;
+    z-index: 1000;
     box-shadow: var(--elevation-medium);
     background-color: var(--color-background);
     border-radius: 1rem 0 1rem 1rem;
