@@ -3,7 +3,7 @@ title: 'The Changelog: Key Changes for the Fifth Stellar Wave'
 excerpt: Here's what's new for Stellar Wave 5
 date: 2026-05-22
 coverImage: >-
-  /assets/blog-images/the-changelog-key-changes-for-the-fifth-stellar-wave/coverImage.png
+  /assets/blog-images/the-changelog-key-changes-for-the-fifth-stellar-wave/coverImage.jpg
 coverImageAlt: >-
   Abstract Illustration of a developer at a laptop, surrounded by Wave-related
   imagery
@@ -13,8 +13,9 @@ author:
 categories:
   - wave
   - product
-announcementBannerCopy: 'The Changelog: What''s New For Stellar Wave 5'
+announcementBannerCopy: "The Changelog: What's New For Stellar Wave 5"
 ---
+
 The fifth Stellar Wave is [launching on **May 26th**](https://www.drips.network/wave/stellar) — and we're dedicating this cycle to strengthening our foundation, improving fairness, and optimizing the backend systems that keep the program running smoothly.
 
 With Stellar Wave 4 wrapped up, we’ve taken your feedback and our data to heart. While a lot of the work for Wave 5 has happened under the hood, we are also shipping a few highly requested user-facing updates to make the experience fairer and more seamless for everyone. Here is what's coming.
@@ -31,7 +32,7 @@ For Wave 5, we are introducing an additional, secondary limit on the total numbe
 
 As a project maintainer, you can always check on your per-repo and per-org points budgets on the [**Orgs & Repos dashboard**](https://www.drips.network/wave/maintainers/repos).
 
-We recognize that a one-size-fits-all cap won't fit every single ecosystem perfectly. If your organization maintains an unusually large number of active, distinct projects, we are open to reviewing and individually tweaking these limits. If you believe your setup warrants an exception, please reach out to us with a  detailed breakdown of your projects, and we will evaluate adjustments on a case-by-case basis.
+We recognize that a one-size-fits-all cap won't fit every single ecosystem perfectly. If your organization maintains an unusually large number of active, distinct projects, we are open to reviewing and individually tweaking these limits. If you believe your setup warrants an exception, please reach out to us with a detailed breakdown of your projects, and we will evaluate adjustments on a case-by-case basis.
 
 [Learn more about the new org limits in our docs](https://docs.drips.network/wave/maintainers/points-budgets).
 
@@ -64,7 +65,7 @@ As always, we welcome your feedback and hands-on observations on how the AI beha
 
 Flashy features are great, but platform health is what keeps the ecosystem thriving. For Wave 5, our engineering team heavily prioritized stability improvements, optimization, and bug fixes to make the core platform experience faster and more reliable.
 
-Crucially, we have invested deeply in building advanced internal systems to monitor and **identify rule-breaking and adverse behavior**. These tools allow us to spot  exploitative actions much quicker than before, giving us the telemetry needed to take fast, informed actions.
+Crucially, we have invested deeply in building advanced internal systems to monitor and **identify rule-breaking and adverse behavior**. These tools allow us to spot exploitative actions much quicker than before, giving us the telemetry needed to take fast, informed actions.
 
 As we mentioned last month, keeping the details of our detection methods under wraps is vital for system integrity. Rest assured, these background adjustments are designed to help protect the rewards pool for the real, hard-working contributors who deserve it.
 

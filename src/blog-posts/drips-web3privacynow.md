@@ -1,7 +1,7 @@
 ---
 title: 'Introducing Drips for Privacy'
 date: '2025-03-12'
-coverImage: '/assets/blog-images/drips-web3privacynow/coverImage.png'
+coverImage: '/assets/blog-images/drips-web3privacynow/coverImage.jpg'
 coverImageAlt: 'Drips for Privacy illustration'
 excerpt: 'Supporting the future of privacy with Drips and Web3Privacy Now.'
 author:

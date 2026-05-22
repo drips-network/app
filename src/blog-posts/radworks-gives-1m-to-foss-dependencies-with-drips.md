@@ -30,7 +30,7 @@ For those less familiar, dependencies are the libraries, frameworks, packages, e
 
 Radworks set up four Drip Lists - a [master list](https://www.drips.network/app/drip-lists/50330452048867519181028275890986093327647919805766323166158196453514), and 3 nested lists - one for each of its constituent orgs - Radicle, Drips and Grants. They split the $1 million in total funds between those three lists, with 45% going to [Radicle’s list](https://www.drips.network/app/drip-lists/34625983682950977210847096367816372822461201185275535522726531049130), 45% to [Drips’ list](https://www.drips.network/app/drip-lists/48495160997488293670723292622742268320163565037397170198477469637178) and 10% to [Grants’ list](https://www.drips.network/app/drip-lists/32993835193273751671076155179370862074156612583830856606728028834762). In total, there are 30 individual software dependencies, of which 15 are from Drips, 11 are Radicle dependencies, and 4 are from Grants.
 
-<img data-no-border src="/assets/blog-images/radworks-gives-1m-to-foss-dependencies-with-drips/radworks-lists.png" alt="Radworks', Drips', Radicle's and Grant's Drip Lists" />
+<img data-no-border src="/assets/blog-images/radworks-gives-1m-to-foss-dependencies-with-drips/radworks-lists.jpg" alt="Radworks', Drips', Radicle's and Grant's Drip Lists" />
 
 We’d love to highlight a couple of the amazing projects Radworks is proud to support: **ethers.js**, **Protocol Guild**, and **libgit2**.
 

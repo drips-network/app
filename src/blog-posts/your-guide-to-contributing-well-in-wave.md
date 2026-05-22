@@ -3,7 +3,7 @@ title: Your Guide to Contributing Well in Wave
 excerpt: |
   A simple guide to contributing well in Wave
 date: 2026-05-20
-coverImage: /assets/blog-images/your-guide-to-contributing-well-in-wave/coverImage.png
+coverImage: /assets/blog-images/your-guide-to-contributing-well-in-wave/coverImage.jpg
 coverImageAlt: Abstract image of tick lists, waves and nodes
 author:
   - ugo-x
@@ -11,6 +11,7 @@ categories:
   - wave
   - guide
 ---
+
 ## Top Tips for Drips Wave Contributors
 
 If you’re here to contribute, you’re in the right place.
