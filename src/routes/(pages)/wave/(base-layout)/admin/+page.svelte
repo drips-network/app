@@ -63,6 +63,16 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('pushIntercomSegments')
+      ? [
+          {
+            name: 'Intercom Wave Segments',
+            description:
+              "Tag a wave's contributors and repo maintainers on Intercom for segmentation.",
+            href: '/wave/admin/intercom-wave-segments',
+          },
+        ]
+      : []),
   ]);
 </script>
 
