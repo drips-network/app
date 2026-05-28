@@ -231,7 +231,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) rotate(-2deg);
     display: grid;
     grid-template-columns: repeat(6, 180px);
     grid-template-rows: repeat(4, auto);

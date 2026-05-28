@@ -266,7 +266,7 @@
       transform-origin: top left;
     }
     .scene-reward :global(.grid) {
-      transform: translate(-50%, -50%) scale(0.65);
+      transform: translate(-50%, -50%) scale(0.65) rotate(-2deg);
     }
     .scene-reward :global(.pool.visible) {
       transform: translate(-50%, -50%) scale(0.85);
