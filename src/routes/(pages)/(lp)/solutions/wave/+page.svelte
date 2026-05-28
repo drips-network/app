@@ -1,106 +1,573 @@
-<script>
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
+  import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
-  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
-  import Git from '$lib/components/icons/Git.svelte';
-  import Github from '$lib/components/icons/Github.svelte';
-  import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
-  import User from '$lib/components/icons/User.svelte';
-  import Wave from '$lib/components/icons/Wave.svelte';
-  import SolutionsWavesWhoItsFor from '$lib/components/illustrations/solutions-waves-who-its-for.svelte';
-  import SolutionsWavesWhyItMatters from '$lib/components/illustrations/solutions-waves-why-it-matters.svelte';
-  import SolutionCard from '$lib/components/solutions/solution-card.svelte';
-  import SolutionHeader from '$lib/components/solutions/solution-header.svelte';
-  import SolutionInterstitial from '$lib/components/solutions/solution-interstitial.svelte';
-  import SolutionLineItem from '$lib/components/solutions/solution-line-item.svelte';
-  import ThemedRasterImage from '$lib/components/themed-raster-image/themed-raster-image.svelte';
+  import File from '$lib/components/icons/File.svelte';
+  import Ledger from '$lib/components/icons/Ledger.svelte';
+  import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
+  import formatDate from '$lib/utils/format-date';
+  import type { WaveDto, WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
+  import { getWavePrograms, getWaves } from '$lib/utils/wave/wavePrograms';
+  import WaveAudienceFunnel from './components/wave-audience-funnel.svelte';
+  import WaveFlowExplainer from './components/wave-flow-explainer.svelte';
+  import WaveHeroVisual from './components/wave-hero-visual.svelte';
+
+  type LiveWave = { program: WaveProgramDto; wave: WaveDto };
+
+  let liveWave = $state<LiveWave | null>(null);
+  let loadingLive = $state(true);
+
+  onMount(async () => {
+    if (!browser) return;
+    try {
+      const programs = await getWavePrograms(fetch, { limit: 10 });
+      for (const program of programs.data) {
+        const waves = await getWaves(fetch, program.id, { limit: 5 });
+        const wave =
+          waves.data.find((w) => w.status === 'active' || w.status === 'upcoming') ?? null;
+        if (wave) {
+          liveWave = { program, wave };
+          break;
+        }
+      }
+    } catch {
+      // Silently fail — the live strip is non-essential; the rest of the page is fine without it.
+    } finally {
+      loadingLive = false;
+    }
+  });
+
+  const faqItems = [
+    {
+      q: 'Who runs a Wave Program?',
+      a: 'An ecosystem foundation or organization commits a recurring reward budget and works with us to launch a program. Stellar Development Foundation runs the first Wave Program; we partner with one or two ecosystems at a time.',
+    },
+    {
+      q: 'How long is a Wave?',
+      a: 'A typical Wave runs for one week, on a monthly cadence — long enough for substantial work, short enough to keep contributors focused. The exact cycle can be tuned per program.',
+    },
+    {
+      q: 'How are contributors rewarded?',
+      a: "Each issue is worth Points based on complexity (100 / 150 / 200). At the end of a Wave, the pool is divided proportionally by each contributor's Points share. Payouts are sent on-chain.",
+    },
+    {
+      q: 'What does it cost?',
+      a: "For maintainers and contributors, participation is free. Ecosystems running a Wave Program pay for the platform — get in touch and we'll walk you through commercials.",
+    },
+  ];
 </script>
 
 <HeadMeta
-  title="Wave"
-  description="Waves turn open-source sprints into on-chain funding cycles. Ecosystems launch recurring Waves to reward measurable impact — all tracked from issue to fund distribution."
+  title="Wave — recurring contribution sprints for open source"
+  description="Drips Wave turns ecosystem budgets into a monthly rhythm of merged PRs. Maintainers clear backlog, contributors earn on-chain rewards, ecosystems get measurable progress."
 />
 
-<SolutionHeader>
-  {#snippet usecase_badge()}
-    Wave
-  {/snippet}
-  {#snippet headline()}
-    Reward open-source contributions fairly and transparently
-  {/snippet}
-  {#snippet description()}
-    Waves turn open-source sprints into on-chain funding cycles. Ecosystems launch recurring Waves
-    to reward measurable impact — all tracked from issue to fund distribution.
-  {/snippet}
-</SolutionHeader>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="kicker">
+      <span class="kicker-dot"></span>
+      Drips Wave
+    </div>
+    <h1 class="pixelated">Fix. Merge. Earn — every month.</h1>
+    <p class="lead">
+      Wave turns an ecosystem's funding into a recurring sprint of merged pull requests. Maintainers
+      clear their backlog. Contributors get paid for shipping. Ecosystems get measurable progress,
+      not promises.
+    </p>
+    <div class="hero-actions">
+      <Button variant="primary" size="large" icon={Ledger} href="/wave">Browse active Waves</Button>
+      <Button size="large" icon={File} href="https://docs.drips.network/wave" target="_blank"
+        >Read the docs</Button
+      >
+    </div>
+  </div>
 
-<SolutionCard illustrationScale="1.1">
-  {#snippet illustration()}
-    <ThemedRasterImage
-      srcLight="/assets/solutions/wave/what-it-enables/light.png"
-      srcDark="/assets/solutions/wave/what-it-enables/dark.png"
-      alt="Wave solution illustration"
-    />
-  {/snippet}
-  {#snippet headline()}
-    What It Enables
-  {/snippet}
-  {#snippet line_items()}
-    <SolutionLineItem icon={Wave}>
-      Launch monthly “Waves” with a USD-denominated reward pool tied to approved repositories.
-    </SolutionLineItem>
-    <SolutionLineItem icon={Github}>
-      Vet and sync GitHub projects through transparent onboarding.
-    </SolutionLineItem>
-    <SolutionLineItem icon={Git}>
-      Contributors earn points for merged PRs, and every point translates into a share of the
-      reward.
-    </SolutionLineItem>
-    <SolutionLineItem icon={TokenStreams}>
-      At the end of each cycle funds are distributed to contributors on-chain.
-    </SolutionLineItem>
-  {/snippet}
-</SolutionCard>
+  <div class="hero-visual-wrap">
+    <WaveHeroVisual />
+  </div>
+</section>
 
-<SolutionInterstitial>
-  {#snippet headline()}
-    Want fair, on-chain rewards for your community?
-  {/snippet}
-  {#snippet description()}
-    Our team can walk you through how Drips fits into your workflow, help you design repeatable
-    funding cycles, and show you how to reward meaningful work with full on-chain accountability.
-  {/snippet}
-</SolutionInterstitial>
+<!-- LIVE STRIP -->
+<section class="live-strip" aria-live="polite">
+  <div class="live-strip-inner" class:loading={loadingLive && !liveWave}>
+    {#if liveWave}
+      <div class="live-left">
+        {#if liveWave.wave.status === 'active'}
+          <PulsatingCircle />
+          <span class="typo-text-bold"
+            >{liveWave.program.name} Wave {liveWave.wave.waveNumber} is live</span
+          >
+          <span class="typo-text" style:color="var(--color-foreground-level-6)">
+            until {formatDate(liveWave.wave.endDate, 'standardWithoutYear')}
+          </span>
+        {:else}
+          <span class="dot" aria-hidden="true"></span>
+          <span class="typo-text-bold"
+            >{liveWave.program.name} Wave {liveWave.wave.waveNumber} starts {formatDate(
+              liveWave.wave.startDate,
+              'standardWithoutYear',
+            )}</span
+          >
+        {/if}
+      </div>
+      <div class="live-right">
+        <div class="stat">
+          <span class="stat-label typo-all-caps">Reward pool</span>
+          <span class="stat-value tnum"
+            >${liveWave.wave.budgetUSD?.toLocaleString?.() ?? liveWave.wave.budgetUSD}</span
+          >
+        </div>
+        <Button variant="primary" href="/wave/{liveWave.program.slug}">View Wave</Button>
+      </div>
+    {:else if loadingLive}
+      <!-- Skeleton: keep the strip height steady so the page doesn't jump on hydration -->
+      <div class="live-left">
+        <div class="skel skel-dot"></div>
+        <div class="skel skel-line" style:width="320px"></div>
+      </div>
+      <div class="live-right">
+        <div class="skel skel-line" style:width="120px"></div>
+      </div>
+    {:else}
+      <!-- No active or upcoming Wave at the moment (rare) -->
+      <div class="live-left">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="typo-text" style:color="var(--color-foreground-level-6)"
+          >No active Waves right now — check back soon.</span
+        >
+      </div>
+      <div class="live-right">
+        <Button href="/wave">Browse Wave Programs</Button>
+      </div>
+    {/if}
+  </div>
+</section>
 
-<SolutionCard reverse illustrationScale="1.1">
-  {#snippet illustration()}
-    <SolutionsWavesWhoItsFor />
-  {/snippet}
-  {#snippet headline()}
-    Who It's For
-  {/snippet}
+<!-- ANATOMY / FLOW -->
+<section class="anatomy">
+  <div class="section-header">
+    <span class="kicker-pill">How it works</span>
+    <h2 class="pixelated">The anatomy of a Wave</h2>
+    <p>
+      One predictable rhythm. Three roles, each with their own job to do. Most Waves run on a
+      monthly cycle.
+    </p>
+  </div>
 
-  {#snippet line_items()}
-    <SolutionLineItem icon={Ecosystem}>
-      Ecosystems: Drive developer activity, launch recurring funding cycles, manage applicants and
-      distributions in a unified flow.
-    </SolutionLineItem>
-    <SolutionLineItem icon={User}>
-      Maintainers: Attract high-quality contributors, grow the community, set issue priorities, sync
-      repos, and track contribution transparently.
-    </SolutionLineItem>
-  {/snippet}
-</SolutionCard>
+  <WaveFlowExplainer />
+</section>
 
-<SolutionCard illustrationScale="1.1">
-  {#snippet illustration()}
-    <SolutionsWavesWhyItMatters />
-  {/snippet}
-  {#snippet headline()}
-    Why It Matters
-  {/snippet}
-  {#snippet description()}
-    Drips Wave captures the entire funding lifecycle. From proposal to contribution, verification,
-    and fund allocation. Built on the Drips protocol, it’s engineered for open ecosystems committed
-    to fair, transparent rewarding of public goods.
-  {/snippet}
-</SolutionCard>
+<!-- AUDIENCE FUNNEL -->
+<section class="audience">
+  <WaveAudienceFunnel
+    title="Three ways to get involved"
+    description="Whether you're funding a Wave, running a repo in one, or shipping PRs to earn — start here."
+  />
+</section>
+
+<!-- PROOF / STELLAR WAVE -->
+<section class="proof">
+  <div class="proof-inner">
+    <div class="proof-header">
+      <span class="kicker-pill">Live on Stellar</span>
+      <h2 class="pixelated">The first Wave Program runs on Stellar</h2>
+      <p>
+        Stellar Development Foundation runs a monthly Wave across the Stellar open-source ecosystem.
+        Maintainers across the network apply their repos, contributors ship issues, and the pool
+        pays out at the end of each cycle.
+      </p>
+    </div>
+
+    <div class="proof-stats">
+      <div class="proof-stat">
+        <span class="proof-value pixelated">$250k+</span>
+        <span class="proof-label">Distributed to contributors</span>
+      </div>
+      <div class="proof-stat">
+        <span class="proof-value pixelated">50k+</span>
+        <span class="proof-label">Issues resolved across Waves</span>
+      </div>
+      <div class="proof-stat">
+        <span class="proof-value pixelated">200+</span>
+        <span class="proof-label">Repos in the program</span>
+      </div>
+    </div>
+
+    <div class="proof-cta">
+      <Button variant="primary" size="large" href="/wave/stellar">Explore the Stellar Wave</Button>
+    </div>
+  </div>
+</section>
+
+<!-- MINI FAQ -->
+<section class="faq">
+  <div class="section-header">
+    <span class="kicker-pill">FAQ</span>
+    <h2 class="pixelated">Common questions</h2>
+  </div>
+
+  <div class="faq-list">
+    {#each faqItems as item (item.q)}
+      <details class="faq-item">
+        <summary>
+          <span class="typo-text-bold">{item.q}</span>
+          <span class="chev" aria-hidden="true">+</span>
+        </summary>
+        <p>{item.a}</p>
+      </details>
+    {/each}
+  </div>
+
+  <div class="faq-cta">
+    <Button href="https://docs.drips.network/wave" target="_blank" icon={File}
+      >Read the full docs</Button
+    >
+  </div>
+</section>
+
+<style>
+  /* ---------- shared section primitives ---------- */
+  .section-header {
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  .section-header p {
+    color: var(--color-foreground-level-6);
+  }
+
+  .kicker-pill {
+    background: var(--color-primary-level-1);
+    color: var(--color-primary);
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem 0 2rem 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: -2rem;
+  }
+
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 560px;
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    background: var(--color-primary-level-1);
+    color: var(--color-primary);
+    border-radius: 2rem 0 2rem 2rem;
+    width: fit-content;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .kicker-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    color: var(--color-foreground-level-6);
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  .hero-visual-wrap {
+    width: 100%;
+    height: 540px;
+  }
+
+  /* ---------- LIVE STRIP ---------- */
+  .live-strip {
+    width: 100%;
+  }
+
+  .live-strip-inner {
+    background: var(--color-background);
+    border: 1px solid var(--color-foreground-level-2);
+    border-radius: 1.5rem 0 1.5rem 1.5rem;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    min-height: 4.5rem;
+    box-sizing: border-box;
+  }
+
+  .live-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .live-left .dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--color-primary-level-3);
+  }
+
+  .live-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    align-items: flex-end;
+  }
+
+  .stat-label {
+    color: var(--color-foreground-level-6);
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  /* Skeleton placeholders for client-hydrated content */
+  .skel {
+    background: linear-gradient(
+      90deg,
+      var(--color-foreground-level-2) 0%,
+      var(--color-foreground-level-1) 50%,
+      var(--color-foreground-level-2) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 0.5rem;
+  }
+  .skel-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+  }
+  .skel-line {
+    height: 1rem;
+    max-width: 100%;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  /* ---------- ANATOMY ---------- */
+  .anatomy {
+    width: 100%;
+    padding-top: 2rem;
+  }
+
+  /* ---------- AUDIENCE ---------- */
+  .audience {
+    width: 100%;
+  }
+
+  /* ---------- PROOF ---------- */
+  .proof {
+    width: 100%;
+  }
+
+  .proof-inner {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-level-1) 0%,
+      var(--color-foreground-level-1) 100%
+    );
+    border-radius: 2rem 0 2rem 2rem;
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .proof-header {
+    text-align: center;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .proof-header h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.1;
+  }
+
+  .proof-header p {
+    color: var(--color-foreground-level-6);
+  }
+
+  .proof-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 0.5rem 0;
+  }
+
+  .proof-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .proof-value {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    color: var(--color-primary);
+  }
+
+  .proof-label {
+    color: var(--color-foreground-level-6);
+    font-size: 0.875rem;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .faq-item {
+    background: var(--color-background);
+    border: 1px solid var(--color-foreground-level-2);
+    border-radius: 1rem 0 1rem 1rem;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item .chev {
+    color: var(--color-foreground-level-5);
+    font-size: 1.25rem;
+    transition: transform 0.2s;
+    line-height: 1;
+  }
+
+  .faq-item[open] .chev {
+    transform: rotate(45deg);
+  }
+
+  .faq-item p {
+    padding: 0 1.25rem 1.25rem;
+    color: var(--color-foreground-level-6);
+  }
+
+  .faq-cta {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 882px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-top: 0;
+    }
+    .hero-visual-wrap {
+      height: 420px;
+    }
+    .proof-inner {
+      padding: 2rem 1.25rem;
+    }
+    .proof-stats {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .live-strip-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .live-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+</style>
