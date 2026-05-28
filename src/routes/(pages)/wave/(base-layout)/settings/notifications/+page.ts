@@ -13,7 +13,7 @@ export const load = async ({ fetch, parent, url, depends }) => {
 
   const [preferences, newsletterStatus] = await Promise.all([
     (await getNotificationPreferences(fetch)).preferences,
-    getNewsletterSubscriptionStatus(fetch),
+    getNewsletterSubscriptionStatus(fetch).catch(() => null),
   ]);
 
   return {
