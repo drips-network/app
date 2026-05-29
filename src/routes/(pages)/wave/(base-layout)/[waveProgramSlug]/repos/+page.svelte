@@ -14,7 +14,10 @@
     WaveProgramRepoWithDetailsDto,
   } from '$lib/utils/wave/types/waveProgram';
   import type { Pagination } from '$lib/utils/wave/types/pagination';
-  import { getWaveProgramRepos, getWaveProgramOrgs } from '$lib/utils/wave/wavePrograms.js';
+  import {
+    getWaveProgramRepos,
+    getWaveProgramOrgFilterOptions,
+  } from '$lib/utils/wave/wavePrograms.js';
   import { getTags } from '$lib/utils/wave/tags.js';
   import { getAllPaginated } from '$lib/utils/wave/getAllPaginated.js';
   import type { Snapshot } from './$types.js';
@@ -24,8 +27,7 @@
   let { data } = $props();
   const { repos: initialRepos, waveProgram, filters } = $derived(data);
 
-  const loadOrgs = () =>
-    getAllPaginated((page, limit) => getWaveProgramOrgs(fetch, waveProgram.id, { page, limit }));
+  const loadOrgs = async () => (await getWaveProgramOrgFilterOptions(fetch, waveProgram.id)).data;
 
   const loadTags = () =>
     getAllPaginated((page, limit) => getTags(fetch, { page, pageSize: limit }));

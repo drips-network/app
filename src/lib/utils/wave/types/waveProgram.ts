@@ -249,6 +249,19 @@ export const waveProgramOrgDtoSchema = z.object({
 });
 export type WaveProgramOrgDto = z.infer<typeof waveProgramOrgDtoSchema>;
 
+export const waveProgramOrgFilterOptionDtoSchema = z.object({
+  id: z.uuid(),
+  gitHubOrgLogin: z.string(),
+  gitHubOrgName: z.string().nullable(),
+  gitHubOrgAvatarUrl: z.string().nullable(),
+  approvedRepoCount: z.number().int(),
+});
+export type WaveProgramOrgFilterOptionDto = z.infer<typeof waveProgramOrgFilterOptionDtoSchema>;
+
+export const waveProgramOrgFilterOptionsResponseDtoSchema = z.object({
+  data: z.array(waveProgramOrgFilterOptionDtoSchema),
+});
+
 export const waveProgramOrgsFiltersSchema = filterSchema(
   z.object({
     search: z.string().optional(),
