@@ -3,7 +3,7 @@
   import Cross from '$lib/components/icons/Cross.svelte';
   import type {
     Tag,
-    WaveProgramOrgDto,
+    WaveProgramOrgFilterOptionDto,
     WaveProgramReposFilters,
     WaveProgramReposSortBy,
   } from '$lib/utils/wave/types/waveProgram';
@@ -26,7 +26,7 @@
   interface Props {
     filters: WaveProgramReposFilters;
     onFiltersChange: (filters: WaveProgramReposFilters) => void;
-    loadOrgs?: () => Promise<WaveProgramOrgDto[]>;
+    loadOrgs?: () => Promise<WaveProgramOrgFilterOptionDto[]>;
     loadTags?: () => Promise<Tag[]>;
   }
 
