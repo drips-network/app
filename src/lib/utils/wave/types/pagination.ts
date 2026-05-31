@@ -7,6 +7,10 @@ export const paginationSchema = z.object({
   totalPages: z.number().int(),
   hasNextPage: z.boolean(),
   hasPreviousPage: z.boolean(),
+  // Opaque keyset cursor for the next page, or null when there is none. Only
+  // present on endpoints that support cursor pagination (e.g. /api/issues for
+  // createdAt/updatedAt sorts). Absent on offset-only responses.
+  nextCursor: z.string().nullable().optional(),
 });
 export type Pagination = z.infer<typeof paginationSchema>;
 
@@ -24,6 +28,8 @@ export type PaginationInput =
   | {
       page?: number;
       limit?: number;
+      /** Keyset cursor from a prior response's `pagination.nextCursor`. */
+      cursor?: string;
     }
   | undefined;
 
@@ -36,6 +42,10 @@ export function toPaginationParams(pagination?: PaginationInput): string {
 
   if (pagination?.limit !== undefined) {
     params.append('limit', pagination.limit.toString());
+  }
+
+  if (pagination?.cursor !== undefined) {
+    params.append('cursor', pagination.cursor);
   }
 
   return params.toString();

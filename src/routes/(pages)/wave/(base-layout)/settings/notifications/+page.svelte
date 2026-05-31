@@ -180,9 +180,16 @@
 <div class="newsletter">
   <Setting
     title="Drips Wave Newsletter"
-    subtitle="Receive occasional updates on new Waves, features, and more."
+    subtitle={newsletterStatus
+      ? 'Receive occasional updates on new Waves, features, and more.'
+      : 'Unable to check newsletter status, please try again later.'}
+    disabled={!newsletterStatus}
   >
-    <Toggle checked={newsletterStatus.isSubscribed} onchange={(v) => handleNewsletterToggle(v)} />
+    <Toggle
+      disabled={!newsletterStatus}
+      checked={newsletterStatus?.isSubscribed ?? false}
+      onchange={(v) => handleNewsletterToggle(v)}
+    />
   </Setting>
 </div>
 
