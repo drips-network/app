@@ -192,7 +192,7 @@
 
   <svelte:element
     this={selectable ? 'a' : 'div'}
-    href="/wave/maintainers/issues/{issue.id}?{page.url.searchParams}"
+    href="{pathPrefix}{issue.id}?{page.url.searchParams}"
     class="details"
   >
     {#if badges.length > 0}

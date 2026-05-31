@@ -55,7 +55,6 @@
     noOfPreappliedFilters,
     filtersMode,
     availableSortByOptions,
-    isViewingIssue,
     headMetaTitle,
     currentWaveProgram,
     emptyStateAnnotation,
@@ -91,7 +90,6 @@
     filtersMode: 'maintainer' | 'contributor' | 'wave';
 
     availableSortByOptions: IssueSortByOption[];
-    isViewingIssue: boolean;
 
     headMetaTitle: string;
 
@@ -101,6 +99,11 @@
     /** Annotation to show when there are no issues */
     emptyStateAnnotation?: string;
   } = $props();
+
+  // Derived from the route rather than passed through the layout load — otherwise the load
+  // function would track the issueId param and refetch the whole issues list on every
+  // navigation to (or hover-preload of) a single issue.
+  let isViewingIssue = $derived(page.params.issueId !== undefined);
 
   async function getMoreIssues(
     pagination: Pagination,
