@@ -107,11 +107,25 @@
     filters: IssueFilters,
     sort: IssueSortByOption,
   ) {
-    const nextPage = pagination.page + 1;
+    // Prefer keyset/cursor pagination when the backend provides a cursor —
+    // it's O(limit) regardless of depth and stable across inserts. Fall back to
+    // page-based for sorts the backend doesn't cursor-paginate (e.g. points)
+    // and for older backends that don't return nextCursor.
+    if (pagination.nextCursor) {
+      return await getIssues(
+        undefined,
+        { cursor: pagination.nextCursor, limit: pagination.limit },
+        filters,
+        sort,
+      );
+    }
 
-    if (!nextPage) return null;
-
-    return await getIssues(undefined, { page: nextPage, limit: pagination.limit }, filters, sort);
+    return await getIssues(
+      undefined,
+      { page: pagination.page + 1, limit: pagination.limit },
+      filters,
+      sort,
+    );
   }
 
   let filtersOpen = $state<boolean>(false);
