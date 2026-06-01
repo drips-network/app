@@ -131,6 +131,13 @@
     );
   }
 
+  // Identity of the current issues query. When it changes (sort or filters,
+  // including via browser back/forward), IssuesList must be recreated so it
+  // drops its accumulated pages and the cursor minted for the previous sort —
+  // otherwise infinite-scroll sends a stale cursor and the backend 400s with
+  // "Pagination cursor does not match the requested sort".
+  let listKey = $derived(`${appliedSort}|${JSON.stringify(appliedFilters)}`);
+
   let filtersOpen = $state<boolean>(false);
 
   // svelte-ignore non_reactive_update
@@ -437,18 +444,20 @@
           {/if}
         </div>
       {:else}
-        <IssuesList
-          {ownUserId}
-          {pathPrefix}
-          {showNewApplicationsBadge}
-          {wavePrograms}
-          bind:this={listInstance}
-          multiselectMode={allowAddToWaveProgram}
-          issuesWithPagination={issues}
-          getMoreIssues={(currentPagination) =>
-            getMoreIssues(currentPagination, appliedFilters, appliedSort)}
-          onselectchange={(selected) => (selectedIssues = selected)}
-        />
+        {#key listKey}
+          <IssuesList
+            {ownUserId}
+            {pathPrefix}
+            {showNewApplicationsBadge}
+            {wavePrograms}
+            bind:this={listInstance}
+            multiselectMode={allowAddToWaveProgram}
+            issuesWithPagination={issues}
+            getMoreIssues={(currentPagination) =>
+              getMoreIssues(currentPagination, appliedFilters, appliedSort)}
+            onselectchange={(selected) => (selectedIssues = selected)}
+          />
+        {/key}
       {/if}
     </Card>
   </div>
