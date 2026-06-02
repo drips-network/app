@@ -16,7 +16,7 @@ const mockCommonFollowers: EfpCommonFollower[] = [
   },
 ];
 
-function commonFollowersKey(target: string, leader: string) {
+export function commonFollowersKey(target: string, leader: string) {
   return `${target.toLowerCase()}:${leader.toLowerCase()}`;
 }
 

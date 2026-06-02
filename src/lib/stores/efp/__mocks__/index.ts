@@ -1,1 +1,1 @@
-export { default, TEST_ADDRESS, TEST_VIEWER } from './efp.store';
+export { default, TEST_ADDRESS, TEST_VIEWER, commonFollowersKey } from './efp.store';
