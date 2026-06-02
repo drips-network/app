@@ -18,8 +18,28 @@
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import LinkedIdentitiesCard from './components/linked-identities-card.svelte';
   import network from '$lib/stores/wallet/network';
+  import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
+  import efpStore from '$lib/stores/efp';
+  import type { EfpCommonFollower } from '$lib/utils/efp';
 
   export let data;
+
+  let commonFollowers: EfpCommonFollower[] = [];
+
+  $: profileAddress = data.profileData?.account.address;
+
+  $: if (network.enableEfp && profileAddress && $walletStore.address) {
+    const viewer = $walletStore.address;
+    if (viewer.toLowerCase() !== profileAddress.toLowerCase()) {
+      void efpStore.lookupCommonFollowers(profileAddress, viewer).then((result) => {
+        commonFollowers = result ?? [];
+      });
+    } else {
+      commonFollowers = [];
+    }
+  } else {
+    commonFollowers = [];
+  }
 
   $: socialLinkValues = {
     'com.twitter': data.ensData?.records['com.twitter'],
@@ -85,6 +105,14 @@
                 {/each}
               </ul>
               {#if description}<p in:fade>{description}</p>{/if}
+              <div in:fade>
+                <EfpStats
+                  address={data.profileData.account.address}
+                  stats={data.efp}
+                  {commonFollowers}
+                  showCommonFollowers={commonFollowers.length > 0}
+                />
+              </div>
             </div>
           </div>
         </header>
