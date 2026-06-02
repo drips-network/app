@@ -235,6 +235,49 @@ export async function getWaves(
   );
 }
 
+export async function manualCreateWave(
+  f = fetch,
+  waveProgramId: string,
+  data: { startDate: Date; endDate: Date; budgetUSD?: string },
+) {
+  return parseRes(
+    waveDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/waves/manual-create`, {
+      method: 'POST',
+      body: JSON.stringify({
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString(),
+        ...(data.budgetUSD !== undefined ? { budgetUSD: data.budgetUSD } : {}),
+      }),
+    }),
+  );
+}
+
+export async function deleteWave(f = fetch, waveProgramId: string, waveId: string) {
+  await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/waves/${waveId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function updateWave(
+  f = fetch,
+  waveProgramId: string,
+  waveId: string,
+  data: { startDate?: Date; endDate?: Date; budgetUSD?: string },
+) {
+  return parseRes(
+    waveDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/waves/${waveId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...(data.startDate ? { startDate: data.startDate.toISOString() } : {}),
+        ...(data.endDate ? { endDate: data.endDate.toISOString() } : {}),
+        ...(data.budgetUSD !== undefined ? { budgetUSD: data.budgetUSD } : {}),
+      }),
+    }),
+  );
+}
+
 export async function updateWaveProgramIssueComplexity(
   f = fetch,
   waveProgramId: string,
