@@ -22,7 +22,6 @@
   import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
   import efpStore, { commonFollowersKey } from '$lib/stores/efp';
   import type { EfpCommonFollower } from '$lib/utils/efp';
-  import { createAsyncRequestGuard } from '$lib/utils/async-request-guard';
 
   export let data;
 
@@ -31,8 +30,6 @@
     commonFollowersCache = state;
   });
   onDestroy(unsubscribeCommonFollowers);
-
-  const commonFollowersLookupGuard = createAsyncRequestGuard();
 
   $: profileAddress = data.profileData?.account.address;
 
@@ -57,21 +54,12 @@
   })();
 
   function refreshCommonFollowers(params: { profile: string; viewer: string } | null) {
-    if (!params) {
-      commonFollowersLookupGuard.invalidate();
-      return;
-    }
+    if (!params) return;
 
     const { profile, viewer } = params;
-    if (viewer.toLowerCase() === profile.toLowerCase()) {
-      commonFollowersLookupGuard.invalidate();
-      return;
-    }
+    if (viewer.toLowerCase() === profile.toLowerCase()) return;
 
-    const requestVersion = commonFollowersLookupGuard.beginRequest();
-    void efpStore.lookupCommonFollowers(profile, viewer).then(() => {
-      if (!commonFollowersLookupGuard.isCurrent(requestVersion)) return;
-    });
+    void efpStore.lookupCommonFollowers(profile, viewer);
   }
 
   $: refreshCommonFollowers(commonFollowersLookupParams);
