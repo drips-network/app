@@ -21,7 +21,7 @@
     maxCommonFollowers = 5,
   }: Props = $props();
 
-  const profileUrl = $derived(`https://efp.app/${address}`);
+  const profileUrl = $derived(`https://efp.app/${encodeURIComponent(address)}`);
 
   const hasStats = $derived(
     !!stats && (stats.followers > 0 || stats.following > 0),
