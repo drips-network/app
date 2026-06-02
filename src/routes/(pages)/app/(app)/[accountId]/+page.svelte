@@ -18,44 +18,63 @@
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import LinkedIdentitiesCard from './components/linked-identities-card.svelte';
   import network from '$lib/stores/wallet/network';
+  import { onDestroy } from 'svelte';
   import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
-  import efpStore from '$lib/stores/efp';
+  import efpStore, { commonFollowersKey } from '$lib/stores/efp';
   import type { EfpCommonFollower } from '$lib/utils/efp';
   import { createAsyncRequestGuard } from '$lib/utils/async-request-guard';
 
   export let data;
 
-  let commonFollowers: EfpCommonFollower[] = [];
+  let commonFollowersCache: Record<string, EfpCommonFollower[] | undefined> = {};
+  const unsubscribeCommonFollowers = efpStore.subscribeCommonFollowers((state) => {
+    commonFollowersCache = state;
+  });
+  onDestroy(unsubscribeCommonFollowers);
+
   const commonFollowersLookupGuard = createAsyncRequestGuard();
 
   $: profileAddress = data.profileData?.account.address;
 
+  $: if (profileAddress && data.efp) {
+    efpStore.hydrateStats(profileAddress, data.efp);
+  }
+
+  $: profileEfpStats = profileAddress
+    ? ($efpStore[profileAddress.toLowerCase()]?.stats ?? data.efp)
+    : data.efp;
+
+  $: commonFollowersLookupParams =
+    network.enableEfp && profileAddress && $walletStore.address
+      ? { profile: profileAddress, viewer: $walletStore.address }
+      : null;
+
+  $: commonFollowers = (() => {
+    if (!commonFollowersLookupParams) return [];
+    const { profile, viewer } = commonFollowersLookupParams;
+    if (viewer.toLowerCase() === profile.toLowerCase()) return [];
+    return commonFollowersCache[commonFollowersKey(profile, viewer)] ?? [];
+  })();
+
   function refreshCommonFollowers(params: { profile: string; viewer: string } | null) {
     if (!params) {
       commonFollowersLookupGuard.invalidate();
-      commonFollowers = [];
       return;
     }
 
     const { profile, viewer } = params;
     if (viewer.toLowerCase() === profile.toLowerCase()) {
       commonFollowersLookupGuard.invalidate();
-      commonFollowers = [];
       return;
     }
 
     const requestVersion = commonFollowersLookupGuard.beginRequest();
-    void efpStore.lookupCommonFollowers(profile, viewer).then((result) => {
+    void efpStore.lookupCommonFollowers(profile, viewer).then(() => {
       if (!commonFollowersLookupGuard.isCurrent(requestVersion)) return;
-      commonFollowers = result ?? [];
     });
   }
 
-  $: refreshCommonFollowers(
-    network.enableEfp && profileAddress && $walletStore.address
-      ? { profile: profileAddress, viewer: $walletStore.address }
-      : null,
-  );
+  $: refreshCommonFollowers(commonFollowersLookupParams);
 
   $: socialLinkValues = {
     'com.twitter': data.ensData?.records['com.twitter'],
@@ -121,14 +140,16 @@
                 {/each}
               </ul>
               {#if description}<p in:fade>{description}</p>{/if}
-              <div in:fade>
-                <EfpStats
-                  address={data.profileData.account.address}
-                  stats={data.efp}
-                  {commonFollowers}
-                  showCommonFollowers={commonFollowers.length > 0}
-                />
-              </div>
+              {#if network.enableEfp}
+                <div in:fade>
+                  <EfpStats
+                    address={data.profileData.account.address}
+                    stats={profileEfpStats}
+                    {commonFollowers}
+                    showCommonFollowers={commonFollowers.length > 0}
+                  />
+                </div>
+              {/if}
             </div>
           </div>
         </header>
