@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getEfpStats, getFollowerState, getCommonFollowers } from './index';
+import { getEfpStats, getFollowerState, getCommonFollowers, getSupportersYouFollow } from './index';
 
 describe('efp api client', () => {
   it('parses stats counts from string fields', async () => {
@@ -51,5 +51,28 @@ describe('efp api client', () => {
     expect(results).toEqual([
       { address: '0x1', name: 'alice.eth', avatar: undefined, mutualsRank: 3 },
     ]);
+  });
+
+  it('returns supporters the viewer follows', async () => {
+    const fetchFn = vi.fn(async (url: string) => {
+      const normalizedUrl = url.toLowerCase();
+      const follows =
+        normalizedUrl.includes('0xsupporter1') && normalizedUrl.includes('0xviewer');
+      return {
+        ok: true,
+        json: async () => ({
+          state: { follow: follows, block: false, mute: false },
+        }),
+      };
+    });
+
+    const followed = await getSupportersYouFollow(
+      '0xViewer',
+      ['0xSupporter1', '0xSupporter2', '0xviewer'],
+      fetchFn,
+    );
+
+    expect(followed).toEqual(new Set(['0xsupporter1']));
+    expect(fetchFn).toHaveBeenCalledTimes(2);
   });
 });
