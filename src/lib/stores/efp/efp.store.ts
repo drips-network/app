@@ -20,7 +20,7 @@ type CommonFollowersState = {
   [key: string]: EfpCommonFollower[] | undefined;
 };
 
-function commonFollowersKey(target: string, leader: string) {
+export function commonFollowersKey(target: string, leader: string) {
   return `${target.toLowerCase()}:${leader.toLowerCase()}`;
 }
 

@@ -1,1 +1,1 @@
-export { default } from './efp.store';
+export { default, commonFollowersKey } from './efp.store';
