@@ -5,8 +5,12 @@ vi.mock('$lib/stores/wallet/network', () => ({
   default: { enableEfp: true },
 }));
 
-vi.mock('$lib/components/identity-badge/identity-badge.svelte', () => ({
-  default: true,
+vi.mock('$lib/components/identity-badge/identity-badge.svelte', async () => ({
+  default: (await import('./identity-badge-stub.svelte')).default,
+}));
+
+vi.mock('$lib/components/pile/pile.svelte', async () => ({
+  default: (await import('./pile-stub.svelte')).default,
 }));
 
 describe('efp-stats.svelte', () => {
