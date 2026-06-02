@@ -81,6 +81,13 @@ export default (() => {
     return undefined;
   }
 
+  function hydrateStats(address: string, stats: EfpStats) {
+    if (!browser || !network.enableEfp) return;
+
+    const key = address.toLowerCase();
+    statsState.update((s) => ({ ...s, [key]: { stats } }));
+  }
+
   function getStats(address: string): EfpStats | undefined {
     return get(statsState)[address.toLowerCase()]?.stats;
   }
@@ -103,6 +110,7 @@ export default (() => {
     subscribe: statsState.subscribe,
     subscribeCommonFollowers: commonFollowersState.subscribe,
     lookupStats,
+    hydrateStats,
     lookupCommonFollowers,
     getStats,
     getCommonFollowersFor,

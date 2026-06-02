@@ -24,6 +24,10 @@ export default (() => {
   const statsState = writable<Record<string, { stats?: EfpStats }>>({});
   const commonFollowersState = writable<Record<string, EfpCommonFollower[]>>({});
 
+  function hydrateStats(address: string, stats: EfpStats) {
+    statsState.update((s) => ({ ...s, [address.toLowerCase()]: { stats } }));
+  }
+
   async function lookupStats(address: string) {
     if (address.toLowerCase() === TEST_ADDRESS) {
       statsState.set({ [TEST_ADDRESS]: { stats: mockStats } });
@@ -48,6 +52,7 @@ export default (() => {
     subscribe: statsState.subscribe,
     subscribeCommonFollowers: commonFollowersState.subscribe,
     lookupStats,
+    hydrateStats,
     lookupCommonFollowers,
     getStats: (address: string) =>
       address.toLowerCase() === TEST_ADDRESS ? mockStats : undefined,

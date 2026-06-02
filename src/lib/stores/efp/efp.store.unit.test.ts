@@ -56,6 +56,19 @@ describe('efp store', () => {
     expect(get(efpStore)['0x2222222222222222222222222222222222222222']).toEqual({});
   });
 
+  it('hydrates stats from SSR without fetching', () => {
+    efpStore.hydrateStats('0x7777777777777777777777777777777777777777', {
+      followers: 99,
+      following: 11,
+    });
+
+    expect(getEfpStats).not.toHaveBeenCalled();
+    expect(get(efpStore)['0x7777777777777777777777777777777777777777']?.stats).toEqual({
+      followers: 99,
+      following: 11,
+    });
+  });
+
   it('clears cached state', async () => {
     getEfpStats.mockResolvedValue({ followers: 5, following: 1 });
     await efpStore.lookupStats('0x3333333333333333333333333333333333333333');
