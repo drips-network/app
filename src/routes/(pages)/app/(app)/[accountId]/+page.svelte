@@ -21,25 +21,41 @@
   import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
   import efpStore from '$lib/stores/efp';
   import type { EfpCommonFollower } from '$lib/utils/efp';
+  import { createAsyncRequestGuard } from '$lib/utils/async-request-guard';
 
   export let data;
 
   let commonFollowers: EfpCommonFollower[] = [];
+  const commonFollowersLookupGuard = createAsyncRequestGuard();
 
   $: profileAddress = data.profileData?.account.address;
 
-  $: if (network.enableEfp && profileAddress && $walletStore.address) {
-    const viewer = $walletStore.address;
-    if (viewer.toLowerCase() !== profileAddress.toLowerCase()) {
-      void efpStore.lookupCommonFollowers(profileAddress, viewer).then((result) => {
-        commonFollowers = result ?? [];
-      });
-    } else {
+  function refreshCommonFollowers(params: { profile: string; viewer: string } | null) {
+    if (!params) {
+      commonFollowersLookupGuard.invalidate();
       commonFollowers = [];
+      return;
     }
-  } else {
-    commonFollowers = [];
+
+    const { profile, viewer } = params;
+    if (viewer.toLowerCase() === profile.toLowerCase()) {
+      commonFollowersLookupGuard.invalidate();
+      commonFollowers = [];
+      return;
+    }
+
+    const requestVersion = commonFollowersLookupGuard.beginRequest();
+    void efpStore.lookupCommonFollowers(profile, viewer).then((result) => {
+      if (!commonFollowersLookupGuard.isCurrent(requestVersion)) return;
+      commonFollowers = result ?? [];
+    });
   }
+
+  $: refreshCommonFollowers(
+    network.enableEfp && profileAddress && $walletStore.address
+      ? { profile: profileAddress, viewer: $walletStore.address }
+      : null,
+  );
 
   $: socialLinkValues = {
     'com.twitter': data.ensData?.records['com.twitter'],
@@ -98,7 +114,7 @@
                 <div in:fade>
                   <SocialLink network="ethereum" value={data.profileData.account.address} />
                 </div>
-                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value] (network)}
                   {#if value}<li in:fade>
                       <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                     </li>{/if}

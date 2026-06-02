@@ -378,7 +378,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: [`${BASE_URL}/api/rpc/anvil/localtestnet`],
     },
     enableEns: false,
-    enableEfp: true,
+    enableEfp: false,
     ecosystems: true,
     retroFunding: {
       enabled: true,
