@@ -129,9 +129,7 @@
         disableTooltip
       />
       <IdentityBadge disableLink={true} size="huge" {address} showAvatar={false} disableTooltip />
-      {#if network.enableEfp}
-        <EfpStats {address} stats={efpStats} />
-      {/if}
+      <EfpStats {address} stats={efpStats} />
     </div>
   {:else if dripList}
     <div class="content-container" in:fade>
