@@ -23,6 +23,12 @@ function parseCount(value: string | number | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function parseOptionalCount(value: string | number | undefined): number | undefined {
+  if (value === undefined || value === null || value === '') return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 function encodeUserId(id: string): string {
   return encodeURIComponent(id);
 }
@@ -79,7 +85,7 @@ export async function getCommonFollowers(
       address: row.address,
       name: row.name,
       avatar: row.avatar,
-      mutualsRank: row.mutuals_rank ? Number(row.mutuals_rank) : undefined,
+      mutualsRank: parseOptionalCount(row.mutuals_rank),
     }));
   } catch {
     return null;

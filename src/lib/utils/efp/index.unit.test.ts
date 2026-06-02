@@ -53,6 +53,19 @@ describe('efp api client', () => {
     ]);
   });
 
+  it('omits mutualsRank when the API returns a non-numeric value', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [{ address: '0x1', mutuals_rank: 'n/a' }],
+      }),
+    });
+
+    const results = await getCommonFollowers('0xtarget', '0xleader', fetchFn);
+
+    expect(results).toEqual([{ address: '0x1', name: undefined, avatar: undefined }]);
+  });
+
   it('returns supporters the viewer follows', async () => {
     const fetchFn = vi.fn(async (url: string) => {
       const normalizedUrl = url.toLowerCase();
