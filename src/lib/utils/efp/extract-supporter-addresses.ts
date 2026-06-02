@@ -1,13 +1,4 @@
-type SupportersSectionSupportItemFragment =
-  | {
-      __typename: 'OneTimeDonationSupport';
-      account: { address: string };
-    }
-  | {
-      __typename: 'StreamSupport';
-      stream: { sender: { account: { address: string } } };
-    }
-  | { __typename: string };
+import type { SupportersSectionSupportItemFragment } from '$lib/components/supporters-section/__generated__/gql.generated';
 
 export default function extractSupporterAddresses(
   supportItems: SupportersSectionSupportItemFragment[],
