@@ -234,6 +234,7 @@
           type="button"
           class="typo-text-small"
           disabled={loadingFollowedSupporters}
+          aria-pressed={highlightSupportersYouFollow}
           onclick={toggleSupportersYouFollow}
         >
           {#if loadingFollowedSupporters}
