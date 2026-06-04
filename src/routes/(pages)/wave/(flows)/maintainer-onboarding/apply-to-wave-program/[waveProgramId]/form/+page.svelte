@@ -1,5 +1,6 @@
 <script lang="ts">
   import { beforeNavigate, goto } from '$app/navigation';
+  import { page } from '$app/state';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -246,15 +247,31 @@
       {/snippet}
     </AnnotationBox>
   {:else}
+    {#if !data.isKycVerified}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">Identity verification (KYC) required</span><br />
+        A verified identity is required to apply repositories to a Wave Program to protect program integrity.
+        After your identity has been verified, return here to continue.
+        {#snippet actions()}
+          <Button
+            href={`/wave/kyc?backTo=${encodeURIComponent(page.url.pathname + page.url.search)}`}
+          >
+            Verify identity
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
     <FormField
       title="Previous participation"
       description="Have you previously participated in any of the following programs? Select all that apply."
       type="div"
+      disabled={!data.isKycVerified}
     >
       <Card style="padding: 0; text-align: left; width: 100%;">
         <ListSelect
           multiselect
           searchable={false}
+          blockInteraction={!data.isKycVerified}
           items={previousParticipationItems}
           bind:selected={previousParticipation}
         />
@@ -267,6 +284,7 @@
 
 Describe the types of work you'd post — bug fixes, new features, documentation, testing, etc.`}
       type="div"
+      disabled={!data.isKycVerified}
       validationState={touched['plannedIssues'] && !plannedIssuesValid
         ? {
             type: 'invalid',
@@ -294,6 +312,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         title="Repo relationship*"
         description="You selected multiple repos. Please describe how they are related to each other."
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['repoRelationship'] && !repoRelationshipValid
           ? {
               type: 'invalid',
@@ -327,6 +346,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         title="Upstream relationship*"
         description="Describe the relationship between your fork(s) and the upstream repo(s)."
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['upstreamRelationship'] && !upstreamRelationshipValid
           ? {
               type: 'invalid',
@@ -357,6 +377,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
 
 There's no wrong answer. We need this context to review forks accurately.`}
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['forkJustification'] && !forkJustificationValid
           ? {
               type: 'invalid',
@@ -384,6 +405,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
       title="Supporting links"
       description="Provide links to resources relevant to your project (e.g. website, documentation, social media, deployed contracts). Up to 10 links."
       type="div"
+      disabled={!data.isKycVerified}
     >
       {#if supportingLinks.length > 0}
         <ul class="links-list">
@@ -439,13 +461,25 @@ There's no wrong answer. We need this context to review forks accurately.`}
 
   {#snippet actions()}
     {#if !data.user?.restricted}
-      <Button
-        variant="primary"
-        disabled={!formValid}
-        icon={CheckCircle}
-        loading={applying}
-        onclick={handleApply}>Apply selected repos</Button
+      <div
+        style:display="flex"
+        style:flex-direction="column"
+        style:align-items="flex-end"
+        style:gap="0.5rem"
       >
+        <Button
+          variant="primary"
+          disabled={!formValid || !data.isKycVerified}
+          icon={CheckCircle}
+          loading={applying}
+          onclick={handleApply}>Apply selected repos</Button
+        >
+        {#if !data.isKycVerified}
+          <span class="typo-text-small" style:color="var(--color-negative-level-6)">
+            You must complete identity verification (KYC) before applying.
+          </span>
+        {/if}
+      </div>
     {/if}
   {/snippet}
 </FlowStepWrapper>
