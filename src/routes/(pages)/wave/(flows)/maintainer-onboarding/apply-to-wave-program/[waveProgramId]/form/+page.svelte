@@ -298,6 +298,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
       <TextArea
         bind:value={plannedIssuesDescription}
         placeholder="We plan to add issues related to..."
+        disabled={!data.isKycVerified}
         onblur={() => touch('plannedIssues')}
       />
       <div class="char-count">
@@ -326,6 +327,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         <TextArea
           bind:value={repoRelationshipDescription}
           placeholder="These repos are related because..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('repoRelationship')}
         />
         <div class="char-count">
@@ -360,6 +362,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         <TextArea
           bind:value={upstreamRelationshipDescription}
           placeholder="The relationship to the upstream repo is..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('upstreamRelationship')}
         />
         <div class="char-count">
@@ -391,6 +394,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <TextArea
           bind:value={forkJustification}
           placeholder="We are applying with this fork because..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('forkJustification')}
         />
         <div class="char-count">
@@ -412,7 +416,12 @@ There's no wrong answer. We need this context to review forks accurately.`}
           {#each supportingLinks as link, i (link)}
             <li>
               <span class="typo-text link-url">{link}</span>
-              <Button size="small" icon={Trash} onclick={() => removeLink(i)}>Remove</Button>
+              <Button
+                size="small"
+                icon={Trash}
+                disabled={!data.isKycVerified}
+                onclick={() => removeLink(i)}>Remove</Button
+              >
             </li>
           {/each}
         </ul>
@@ -421,7 +430,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <TextInput
           bind:value={newLink}
           placeholder={supportingLinks.length >= 10 ? 'Link limit reached' : 'https://...'}
-          disabled={supportingLinks.length >= 10}
+          disabled={supportingLinks.length >= 10 || !data.isKycVerified}
           onkeydown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -432,7 +441,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <Button
           size="large"
           icon={Plus}
-          disabled={!newLinkIsValid || supportingLinks.length >= 10}
+          disabled={!newLinkIsValid || supportingLinks.length >= 10 || !data.isKycVerified}
           onclick={addLink}>Add link</Button
         >
       </div>
