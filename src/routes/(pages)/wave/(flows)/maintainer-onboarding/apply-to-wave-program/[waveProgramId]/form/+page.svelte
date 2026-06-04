@@ -37,7 +37,7 @@
     }
 
     if (repoIds.length === 0) {
-      goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}`);
+      goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}/select`);
     }
   });
 
@@ -120,11 +120,43 @@
       (forkJustification.trim().length >= 1 && forkJustification.length <= 5000),
   );
 
+  // Defense-in-depth: selection is already capped on the previous step, but
+  // re-check the configured application limits here so a stale/tampered
+  // sessionStorage selection surfaces a clear message instead of a raw 400.
+  let limitViolation = $derived.by<string | null>(() => {
+    const { perUser, perOrg } = data.applicationLimits;
+
+    if (perUser.limit !== null && (perUser.remaining ?? 0) < repoIds.length) {
+      return `You can only apply ${Math.max(perUser.remaining ?? 0, 0)} more ${
+        (perUser.remaining ?? 0) === 1 ? 'repo' : 'repos'
+      } this Wave cycle. Remove some repos to continue.`;
+    }
+
+    const countByOrg: Record<string, number> = {};
+    for (const repo of selectedRepos) {
+      countByOrg[repo.orgId] = (countByOrg[repo.orgId] ?? 0) + 1;
+    }
+    for (const [orgId, count] of Object.entries(countByOrg)) {
+      const status = perOrg.find((o) => o.orgId === orgId);
+      if (status && status.limit !== null && (status.remaining ?? 0) < count) {
+        return `One of your organizations has only ${Math.max(
+          status.remaining ?? 0,
+          0,
+        )} application ${
+          (status.remaining ?? 0) === 1 ? 'slot' : 'slots'
+        } left this Wave cycle. Remove some of its repos to continue.`;
+      }
+    }
+
+    return null;
+  });
+
   let formValid = $derived(
     plannedIssuesValid &&
       repoRelationshipValid &&
       upstreamRelationshipValid &&
-      forkJustificationValid,
+      forkJustificationValid &&
+      !limitViolation,
   );
 
   let previousParticipationItems: Items = {
@@ -384,6 +416,12 @@ There's no wrong answer. We need this context to review forks accurately.`}
       </div>
     </FormField>
 
+    {#if limitViolation}
+      <AnnotationBox type="error">
+        {limitViolation}
+      </AnnotationBox>
+    {/if}
+
     <AnnotationBox>
       By submitting this application, you confirm that all provided information is accurate.
       Inaccurate information may result in your application being rejected and could lead to
@@ -394,7 +432,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
   {#snippet leftActions()}
     <Button
       icon={ArrowLeft}
-      href="/wave/maintainer-onboarding/apply-to-wave-program/{data.waveProgram.id}"
+      href="/wave/maintainer-onboarding/apply-to-wave-program/{data.waveProgram.id}/select"
       >Back to repo selection</Button
     >
   {/snippet}

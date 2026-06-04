@@ -1,24 +1,25 @@
-import { getOrgs, getOwnRepos } from '$lib/utils/wave/orgs';
-import { getAllPaginated } from '$lib/utils/wave/getAllPaginated';
-import { getOwnWaveProgramRepos } from '$lib/utils/wave/wavePrograms.js';
+import { getOrgs } from '$lib/utils/wave/orgs';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch, depends }) => {
-  depends('wave:maintainer-onboarding-apply-to-wave');
+export const load = async ({ fetch, params, parent }) => {
+  const { applicationLimits } = await parent();
 
-  const [ownRepos, ownOrgs, ownWaveProgramRepos] = await Promise.all([
-    getAllPaginated((page, limit) => getOwnRepos(fetch, { page, limit })),
-    getOrgs(fetch, { limit: 100 }),
-    getOwnWaveProgramRepos(fetch, { limit: 100 }),
-  ]);
+  // When the program imposes no limits at all, the limits step adds nothing —
+  // skip straight to repo selection.
+  const hasAnyLimit =
+    applicationLimits.perUser.limit !== null ||
+    applicationLimits.perOrg.some((org) => org.limit !== null);
 
-  if (ownRepos.length === 0) {
-    throw redirect(302, '/wave/maintainer-onboarding/install-app');
+  if (!hasAnyLimit) {
+    throw redirect(
+      302,
+      `/wave/maintainer-onboarding/apply-to-wave-program/${params.waveProgramId}/select`,
+    );
   }
 
+  const ownOrgs = await getOrgs(fetch, { limit: 100 });
+
   return {
-    ownRepos,
     ownOrgs,
-    ownWaveProgramRepos,
   };
 };
