@@ -7,6 +7,7 @@ import {
 } from './types/pagination';
 import {
   batchApplyResponseSchema,
+  waveProgramApplicationLimitsDtoSchema,
   waveDtoSchema,
   waveFiltersSchema,
   waveProgramDtoSchema,
@@ -77,6 +78,13 @@ export async function batchApplyRepos(
         formData,
       }),
     }),
+  );
+}
+
+export async function getWaveProgramApplicationLimits(f = fetch, waveProgramId: string) {
+  return parseRes(
+    waveProgramApplicationLimitsDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/apply/limits`),
   );
 }
 
