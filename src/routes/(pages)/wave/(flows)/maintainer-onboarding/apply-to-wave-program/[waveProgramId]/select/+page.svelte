@@ -31,13 +31,15 @@
     perUser.remaining === null ? HARD_MAX : Math.min(HARD_MAX, Math.max(perUser.remaining, 0)),
   );
 
-  function checkAlreadyApplied(repoId: string) {
-    return data.ownWaveProgramRepos.data.some(
-      (ownWaveProgramRepo) =>
-        ownWaveProgramRepo.repo.id === repoId &&
-        ownWaveProgramRepo.waveProgramId === data.waveProgram.id,
-    );
-  }
+  // Repo IDs already applied to this program, for O(1) lookups while building
+  // the list.
+  let appliedRepoIds = $derived(
+    new Set(
+      data.ownWaveProgramRepos.data
+        .filter((r) => r.waveProgramId === data.waveProgram.id)
+        .map((r) => r.repo.id),
+    ),
+  );
 
   let selected = $state<string[]>([]);
 
@@ -61,10 +63,10 @@
 
   let items = $derived<Items>(
     Object.fromEntries(
-      data.ownRepos
+      [...data.ownRepos]
         .sort((a, b) => a.gitHubRepoFullName.localeCompare(b.gitHubRepoFullName))
         .map((repo) => {
-          const alreadyApplied = checkAlreadyApplied(repo.id);
+          const alreadyApplied = appliedRepoIds.has(repo.id);
           const slotsLeft = orgSlotsLeft(repo.orgId);
           const isSelected = selected.includes(repo.id);
           // Block selecting more repos from an org than it has slots left.
