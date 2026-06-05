@@ -223,8 +223,10 @@
         {/each}
       </div>
     </Section>
+  {:else if selectedWaveProgramId}
+    <p class="typo-text">This Wave Program doesn't have an active Wave right now.</p>
   {:else}
-    <p class="typo-text">No wave programs available.</p>
+    <p class="typo-text">No Wave Programs available.</p>
   {/if}
 </div>
 

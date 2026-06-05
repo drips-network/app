@@ -14,8 +14,8 @@ export const load = async ({ parent, url, fetch }) => {
   const selectedWaveProgramId = url.searchParams.get('waveProgramId') ?? wavePrograms.data[0]?.id;
 
   const quotaDetails = selectedWaveProgramId
-    ? await getApplicationQuotaDetails(fetch, selectedWaveProgramId)
-    : undefined;
+    ? await getApplicationQuotaDetails(fetch, selectedWaveProgramId).catch(() => null)
+    : null;
 
   return {
     user,

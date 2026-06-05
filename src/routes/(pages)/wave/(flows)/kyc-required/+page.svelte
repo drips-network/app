@@ -19,7 +19,7 @@
   <div class="container">
     <AnnotationBox type="warning">
       <span class="typo-text-small-bold"
-        >A verified identity is required for applying to issues</span
+        >A verified identity is required for applying to issues and applying repos to a Wave Program</span
       >
       to avoid problems during reward withdrawals later.
       {#snippet actions()}
