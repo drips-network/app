@@ -26,28 +26,11 @@ export const bannedUserSchema = z.object({
 });
 export type BannedUser = z.infer<typeof bannedUserSchema>;
 
-export const discordBanResultSchema = z.enum(['banned', 'no_linked_account', 'failed']);
-export type DiscordBanResult = z.infer<typeof discordBanResultSchema>;
-
 export const banGitHubUserResponseSchema = z.object({
   success: z.boolean(),
   revokedTokenCount: z.number().int().nonnegative(),
-  discordBanResult: discordBanResultSchema.nullable().optional(),
 });
 export type BanGitHubUserResponse = z.infer<typeof banGitHubUserResponseSchema>;
-
-export const banTargetDiscordAccountResponseSchema = z.object({
-  discordAccount: z
-    .object({
-      providerUsername: z.string(),
-      providerDisplayName: z.string().nullable(),
-      providerAvatarUrl: z.string().nullable(),
-    })
-    .nullable(),
-});
-export type BanTargetDiscordAccount = z.infer<
-  typeof banTargetDiscordAccountResponseSchema
->['discordAccount'];
 
 export async function listBans(
   f = fetch,
@@ -72,7 +55,6 @@ export async function banGitHubUser(
     type: RestrictionType;
     reason?: string;
     skipNotification?: boolean;
-    banFromDiscord?: boolean;
   },
 ) {
   const res = await authenticatedCall(f, '/api/admin/bans', {
@@ -80,11 +62,6 @@ export async function banGitHubUser(
     body: JSON.stringify(data),
   });
   return parseRes(banGitHubUserResponseSchema, res);
-}
-
-export async function getBanTargetDiscordAccount(f = fetch, gitHubUserId: number) {
-  const res = await authenticatedCall(f, `/api/admin/bans/discord-account/${gitHubUserId}`);
-  return parseRes(banTargetDiscordAccountResponseSchema, res);
 }
 
 export async function unbanGitHubUser(f = fetch, gitHubUserId: number) {
