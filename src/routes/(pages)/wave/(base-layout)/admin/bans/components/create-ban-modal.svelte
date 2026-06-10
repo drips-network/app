@@ -9,7 +9,12 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import modal from '$lib/stores/modal';
   import { lookupGitHubUserByLogin, type GitHubUser } from '$lib/utils/github/lookup-user';
-  import { banGitHubUser, type RestrictionType } from '$lib/utils/wave/bans';
+  import {
+    banGitHubUser,
+    getBanTargetDiscordAccount,
+    type BanTargetDiscordAccount,
+    type RestrictionType,
+  } from '$lib/utils/wave/bans';
 
   interface Props {
     onCreated: () => void;
@@ -35,8 +40,12 @@
   let lookingUp = $state(false);
   let lookupToken = 0;
 
+  let discordAccount = $state<BanTargetDiscordAccount>(null);
+  let banFromDiscord = $state(true);
+
   let submitting = $state(false);
   let submitError = $state<string | null>(null);
+  let discordBanWarning = $state<string | null>(null);
 
   const trimmedUsername = $derived(username.trim());
   const canSubmit = $derived(!!resolvedUser && !submitting && !lookingUp && reason.length <= 500);
@@ -66,6 +75,7 @@
         resolvedUser = null;
       } else {
         resolvedUser = user;
+        await lookupDiscordAccount(user.id, token);
       }
     } catch (e) {
       if (token !== lookupToken) return;
@@ -76,10 +86,23 @@
     }
   }
 
+  async function lookupDiscordAccount(gitHubUserId: number, token: number) {
+    try {
+      const { discordAccount: account } = await getBanTargetDiscordAccount(fetch, gitHubUserId);
+      if (token !== lookupToken) return;
+      discordAccount = account;
+      banFromDiscord = true;
+    } catch {
+      // Non-fatal — the admin just won't see the Discord ban option.
+      if (token === lookupToken) discordAccount = null;
+    }
+  }
+
   function onUsernameInput() {
     // Invalidate any previous resolution as the user edits.
     resolvedUser = undefined;
     lookupError = null;
+    discordAccount = null;
   }
 
   async function handleSubmit() {
@@ -89,13 +112,25 @@
     submitError = null;
 
     try {
-      await banGitHubUser(fetch, {
+      const result = await banGitHubUser(fetch, {
         gitHubUserId: resolvedUser.id,
         type: type as RestrictionType,
         reason: reason.trim() ? reason.trim() : undefined,
         skipNotification,
+        banFromDiscord: discordAccount ? banFromDiscord : undefined,
       });
+
       onCreated();
+
+      if (result.discordBanResult === 'failed') {
+        // The Wave restriction was applied, but the Discord ban didn't go
+        // through — keep the modal open so the admin knows to ban manually.
+        discordBanWarning = `${resolvedUser.login} was ${
+          type === 'ban' ? 'banned' : 'restricted'
+        }, but banning their Discord account failed. Please ban them from the Discord server manually.`;
+        return;
+      }
+
       modal.hide();
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'An unexpected error occurred.';
@@ -161,20 +196,60 @@
       >
         <Checkbox bind:checked={skipNotification} label="Don't notify the user via email" />
       </FormField>
+
+      {#if discordAccount}
+        <FormField
+          title="Discord"
+          description="This user has a linked Discord account. You can ban it from the Discord server at the same time."
+        >
+          <div class="discord-section">
+            <div class="preview">
+              {#if discordAccount.providerAvatarUrl}
+                <img
+                  class="avatar"
+                  src={discordAccount.providerAvatarUrl}
+                  alt=""
+                  referrerpolicy="no-referrer"
+                />
+              {/if}
+              <div class="info">
+                <span class="login typo-text-bold">{discordAccount.providerUsername}</span>
+                {#if discordAccount.providerDisplayName}
+                  <span class="name typo-text-small dim">{discordAccount.providerDisplayName}</span>
+                {/if}
+              </div>
+            </div>
+            <Checkbox bind:checked={banFromDiscord} label="Also ban from the Discord server" />
+          </div>
+        </FormField>
+      {/if}
     </div>
 
     {#if submitError}
       <AnnotationBox type="error">{submitError}</AnnotationBox>
     {/if}
 
+    {#if discordBanWarning}
+      <AnnotationBox type="warning">{discordBanWarning}</AnnotationBox>
+    {/if}
+
     {#snippet actions()}
-      <Button variant="normal" disabled={submitting} onclick={modal.hide}>Cancel</Button>
-      {#if !resolvedUser && trimmedUsername.length > 0 && !lookingUp}
-        <Button variant="primary" loading={lookingUp} onclick={lookup}>Look up</Button>
+      {#if discordBanWarning}
+        <Button variant="primary" onclick={modal.hide}>Close</Button>
       {:else}
-        <Button variant="primary" loading={submitting} disabled={!canSubmit} onclick={handleSubmit}>
-          {type === 'ban' ? 'Ban user' : 'Restrict user'}
-        </Button>
+        <Button variant="normal" disabled={submitting} onclick={modal.hide}>Cancel</Button>
+        {#if !resolvedUser && trimmedUsername.length > 0 && !lookingUp}
+          <Button variant="primary" loading={lookingUp} onclick={lookup}>Look up</Button>
+        {:else}
+          <Button
+            variant="primary"
+            loading={submitting}
+            disabled={!canSubmit}
+            onclick={handleSubmit}
+          >
+            {type === 'ban' ? 'Ban user' : 'Restrict user'}
+          </Button>
+        {/if}
       {/if}
     {/snippet}
   </StandaloneFlowStepLayout>
@@ -221,5 +296,11 @@
 
   .dim {
     color: var(--color-foreground-level-5);
+  }
+
+  .discord-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 </style>
