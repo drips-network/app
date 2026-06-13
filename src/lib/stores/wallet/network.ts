@@ -80,6 +80,7 @@ export type Network = {
       }
     | undefined;
   enableEns: boolean;
+  enableEfp: boolean;
   ecosystems: boolean;
   retroFunding: DripsRetroFundingConfig;
   orcids: boolean;
@@ -168,6 +169,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    enableEfp: true,
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
@@ -214,6 +216,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    enableEfp: true,
     ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
@@ -260,6 +263,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    enableEfp: true,
     ecosystems: true,
     retroFunding: { enabled: false },
     orcids: false,
@@ -307,6 +311,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    enableEfp: true,
     ecosystems: true,
     retroFunding: {
       enabled: true,
@@ -373,6 +378,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: [`${BASE_URL}/api/rpc/anvil/localtestnet`],
     },
     enableEns: false,
+    enableEfp: false,
     ecosystems: true,
     retroFunding: {
       enabled: true,
@@ -424,6 +430,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
+    enableEfp: true,
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
@@ -489,6 +496,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       ],
     },
     enableEns: true,
+    enableEfp: true,
     retroFunding: {
       enabled: true,
       attestationConfig: {
@@ -554,6 +562,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://andromeda.metis.io/?owner=1088'],
     },
     enableEns: true,
+    enableEfp: true,
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,
@@ -608,6 +617,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: ['https://mainnet.optimism.io'],
     },
     enableEns: true,
+    enableEfp: true,
     retroFunding: { enabled: false },
     ecosystems: false,
     orcids: false,

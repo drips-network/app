@@ -68,6 +68,9 @@
   import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidIcon from '$lib/components/icons/Orcid.svelte';
+  import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
+  import efpStore from '$lib/stores/efp';
+  import network from '$lib/stores/wallet/network';
 
   // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
@@ -82,6 +85,7 @@
   let avatarImgElem: HTMLImageElement | undefined;
 
   let link: string | undefined;
+
   $: {
     switch (true) {
       case disableLink:
@@ -100,6 +104,12 @@
         link = buildOrcidUrl(orcid.orcid);
     }
   }
+
+  $: if (address && network.enableEfp) {
+    void efpStore.lookupStats(address);
+  }
+
+  $: efpStats = address ? $efpStore[address.toLowerCase()]?.stats : undefined;
 </script>
 
 <svelte:element
@@ -119,6 +129,7 @@
         disableTooltip
       />
       <IdentityBadge disableLink={true} size="huge" {address} showAvatar={false} disableTooltip />
+      <EfpStats {address} stats={efpStats} />
     </div>
   {:else if dripList}
     <div class="content-container" in:fade>

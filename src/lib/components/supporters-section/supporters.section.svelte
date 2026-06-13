@@ -122,6 +122,9 @@
   import Section from '../section/section.svelte';
   import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
+  import network from '$lib/stores/wallet/network';
+  import extractSupporterAddresses from '$lib/utils/efp/extract-supporter-addresses';
+  import { getSupportersYouFollow } from '$lib/utils/efp';
 
   let emptyStateText: string | undefined = $state();
 
@@ -138,6 +141,43 @@
     sectionSkeleton?: SectionSkeleton | undefined;
   }
 
+  let followedSupporters = $state(new Set<string>());
+  let highlightSupportersYouFollow = $state(false);
+  let loadingFollowedSupporters = $state(false);
+
+  function supporterTag(
+    address: string,
+    existingTag: string | undefined,
+  ): string | undefined {
+    if (existingTag) return existingTag;
+    if (
+      highlightSupportersYouFollow &&
+      followedSupporters.has(address.toLowerCase())
+    ) {
+      return 'Following';
+    }
+    return undefined;
+  }
+
+  async function toggleSupportersYouFollow() {
+    if (highlightSupportersYouFollow) {
+      highlightSupportersYouFollow = false;
+      followedSupporters = new Set();
+      return;
+    }
+
+    const viewer = $walletStore.address;
+    if (!viewer || supporterAddresses.length === 0) return;
+
+    loadingFollowedSupporters = true;
+    try {
+      followedSupporters = await getSupportersYouFollow(viewer, supporterAddresses);
+      highlightSupportersYouFollow = true;
+    } finally {
+      loadingFollowedSupporters = false;
+    }
+  }
+
   let {
     supportItems,
     ownerAccountId = undefined,
@@ -149,6 +189,9 @@
     infoTooltip = undefined,
     sectionSkeleton = $bindable(),
   }: Props = $props();
+
+  const supporterAddresses = $derived(extractSupporterAddresses(supportItems));
+
   run(() => {
     switch (type) {
       case 'project':
@@ -185,6 +228,25 @@
     }}
     bind:skeletonInstance={sectionSkeleton}
   >
+    {#if network.enableEfp && type === 'address' && $walletStore.address && supporterAddresses.length > 0}
+      <div class="supporters-you-follow">
+        <button
+          type="button"
+          class="typo-text-small"
+          disabled={loadingFollowedSupporters}
+          aria-pressed={highlightSupportersYouFollow}
+          onclick={toggleSupportersYouFollow}
+        >
+          {#if loadingFollowedSupporters}
+            Loading…
+          {:else if highlightSupportersYouFollow}
+            Hide supporters you follow
+          {:else}
+            Show supporters you follow
+          {/if}
+        </button>
+      </div>
+    {/if}
     <div class="items">
       {#each supportItems as item}
         {#if item.__typename === 'OneTimeDonationSupport'}
@@ -192,12 +254,14 @@
             title={{
               component: IdentityBadge,
               props: {
-                tag:
+                tag: supporterTag(
+                  item.account.address,
                   item.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
                     : item.account.accountId === ownerAccountId
                       ? 'Owner'
                       : undefined,
+                ),
                 disableTooltip: true,
                 address: item.account.address,
               },
@@ -246,12 +310,14 @@
               props: {
                 disableLink: true,
                 disableTooltip: true,
-                tag:
+                tag: supporterTag(
+                  item.stream.sender.account.address,
                   stream.sender.account.accountId === $walletStore.dripsAccountId
                     ? 'You'
                     : stream.sender.account.accountId === ownerAccountId
                       ? 'Owner'
                       : undefined,
+                ),
                 address: item.stream.sender.account.address,
               },
             }}
@@ -356,6 +422,23 @@
 </section>
 
 <style>
+  .supporters-you-follow {
+    margin-bottom: 0.75rem;
+  }
+
+  .supporters-you-follow button {
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .supporters-you-follow button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
   .items {
     border: 1px solid var(--color-foreground-level-3);
     border-radius: 1rem 0 1rem 1rem;

@@ -16,6 +16,7 @@ import { extractDriverNameFromAccountId } from '$lib/utils/sdk/utils/extract-dri
 import { getMainnetProvider, safeReverseLookup } from '$lib/stores/ens/ens';
 import { JsonRpcProvider } from 'ethers';
 import { LINKED_IDENTITIES_CARD_FRAGMENT } from './components/linked-identities-card.svelte';
+import { getEfpStats } from '$lib/utils/efp';
 
 const currentNetworkProvider = new JsonRpcProvider(network.rpcUrl);
 
@@ -137,7 +138,7 @@ export const load = async ({ params, fetch }) => {
     error(404, 'Not Found');
   }
 
-  const [votingRounds, userRes, ensData] = await Promise.all([
+  const [votingRounds, userRes, ensData, efp] = await Promise.all([
     await getVotingRounds({ publisherAddress: address }, fetch),
     query<ProfilePageQuery, ProfilePageQueryVariables>(
       PROFILE_PAGE_QUERY,
@@ -145,6 +146,7 @@ export const load = async ({ params, fetch }) => {
       fetch,
     ),
     resolveEnsFields(address),
+    network.enableEfp ? getEfpStats(address, fetch) : Promise.resolve(null),
   ]);
 
   const votingRoundsWithResults = votingRounds.filter((v) => v.result);
@@ -162,6 +164,7 @@ export const load = async ({ params, fetch }) => {
     blockWhileInitializing: false,
     error: false,
     ensData,
+    efp,
     profileData: {
       ...userRes.userByAddress,
       votingRounds: votingRoundsWithSplits,

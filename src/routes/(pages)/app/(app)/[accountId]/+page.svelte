@@ -18,8 +18,51 @@
   import SupportCard from '$lib/components/support-card/support-card.svelte';
   import LinkedIdentitiesCard from './components/linked-identities-card.svelte';
   import network from '$lib/stores/wallet/network';
+  import { onDestroy } from 'svelte';
+  import EfpStats from '$lib/components/efp-stats/efp-stats.svelte';
+  import efpStore, { commonFollowersKey } from '$lib/stores/efp';
+  import type { EfpCommonFollower } from '$lib/utils/efp';
 
   export let data;
+
+  let commonFollowersCache: Record<string, EfpCommonFollower[] | undefined> = {};
+  const unsubscribeCommonFollowers = efpStore.subscribeCommonFollowers((state) => {
+    commonFollowersCache = state;
+  });
+  onDestroy(unsubscribeCommonFollowers);
+
+  $: profileAddress = data.profileData?.account.address;
+
+  $: if (profileAddress && data.efp) {
+    efpStore.hydrateStats(profileAddress, data.efp);
+  }
+
+  $: profileEfpStats = profileAddress
+    ? ($efpStore[profileAddress.toLowerCase()]?.stats ?? data.efp)
+    : data.efp;
+
+  $: commonFollowersLookupParams =
+    network.enableEfp && profileAddress && $walletStore.address
+      ? { profile: profileAddress, viewer: $walletStore.address }
+      : null;
+
+  $: commonFollowers = (() => {
+    if (!commonFollowersLookupParams) return [];
+    const { profile, viewer } = commonFollowersLookupParams;
+    if (viewer.toLowerCase() === profile.toLowerCase()) return [];
+    return commonFollowersCache[commonFollowersKey(profile, viewer)] ?? [];
+  })();
+
+  function refreshCommonFollowers(params: { profile: string; viewer: string } | null) {
+    if (!params) return;
+
+    const { profile, viewer } = params;
+    if (viewer.toLowerCase() === profile.toLowerCase()) return;
+
+    void efpStore.lookupCommonFollowers(profile, viewer);
+  }
+
+  $: refreshCommonFollowers(commonFollowersLookupParams);
 
   $: socialLinkValues = {
     'com.twitter': data.ensData?.records['com.twitter'],
@@ -78,13 +121,23 @@
                 <div in:fade>
                   <SocialLink network="ethereum" value={data.profileData.account.address} />
                 </div>
-                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value] (network)}
                   {#if value}<li in:fade>
                       <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                     </li>{/if}
                 {/each}
               </ul>
               {#if description}<p in:fade>{description}</p>{/if}
+              {#if network.enableEfp}
+                <div in:fade>
+                  <EfpStats
+                    address={data.profileData.account.address}
+                    stats={profileEfpStats}
+                    {commonFollowers}
+                    showCommonFollowers={commonFollowers.length > 0}
+                  />
+                </div>
+              {/if}
             </div>
           </div>
         </header>
