@@ -41,7 +41,7 @@
 
   onMount(() => {
     // if ?unsubscribe=true is present in the URL, unsubscribe the user from the newsletter
-    if (page.url.searchParams.get('unsubscribe') === 'true' && newsletterStatus.isSubscribed) {
+    if (page.url.searchParams.get('unsubscribe') === 'true' && newsletterStatus?.isSubscribed) {
       handleNewsletterToggle(false);
     }
   });
@@ -54,19 +54,23 @@
 >
   <div class="toggle">
     <Toggle
-      disabled={loading}
-      checked={newsletterStatus.isSubscribed}
+      disabled={loading || !newsletterStatus}
+      checked={newsletterStatus?.isSubscribed ?? false}
       onchange={handleNewsletterToggle}
       label="Receive the Drips Wave newsletter"
     />
   </div>
 
-  <p class="typo-text-small">
-    As long as the toggle is enabled, you'll occasionally receive the Drips Wave newsletter at your
-    verified email address ({data.user.email}). You can unsubscribe at any time in your Notification
-    settings. For more information, please review our
-    <a href="/legal/privacy" class="typo-link" target="_blank">Privacy Policy</a>.
-  </p>
+  {#if newsletterStatus}
+    <p class="typo-text-small">
+      As long as the toggle is enabled, you'll occasionally receive the Drips Wave newsletter at
+      your verified email address ({data.user.email}). You can unsubscribe at any time in your
+      Notification settings. For more information, please review our
+      <a href="/legal/privacy" class="typo-link" target="_blank">Privacy Policy</a>.
+    </p>
+  {:else}
+    <p class="typo-text-small error">Unable to check newsletter status, please try again later.</p>
+  {/if}
 
   {#snippet actions()}
     <Button href="/wave/settings/notifications" icon={Settings}>Review notification settings</Button
@@ -79,5 +83,10 @@
   .toggle {
     max-width: 400px;
     margin: 0 auto;
+  }
+
+  .error {
+    color: var(--color-negative);
+    text-align: center;
   }
 </style>

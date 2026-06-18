@@ -55,7 +55,6 @@
     noOfPreappliedFilters,
     filtersMode,
     availableSortByOptions,
-    isViewingIssue,
     headMetaTitle,
     currentWaveProgram,
     emptyStateAnnotation,
@@ -91,7 +90,6 @@
     filtersMode: 'maintainer' | 'contributor' | 'wave';
 
     availableSortByOptions: IssueSortByOption[];
-    isViewingIssue: boolean;
 
     headMetaTitle: string;
 
@@ -102,17 +100,43 @@
     emptyStateAnnotation?: string;
   } = $props();
 
+  // Derived from the route rather than passed through the layout load — otherwise the load
+  // function would track the issueId param and refetch the whole issues list on every
+  // navigation to (or hover-preload of) a single issue.
+  let isViewingIssue = $derived(page.params.issueId !== undefined);
+
   async function getMoreIssues(
     pagination: Pagination,
     filters: IssueFilters,
     sort: IssueSortByOption,
   ) {
-    const nextPage = pagination.page + 1;
+    // Prefer keyset/cursor pagination when the backend provides a cursor —
+    // it's O(limit) regardless of depth and stable across inserts. Fall back to
+    // page-based for sorts the backend doesn't cursor-paginate (e.g. points)
+    // and for older backends that don't return nextCursor.
+    if (pagination.nextCursor) {
+      return await getIssues(
+        undefined,
+        { cursor: pagination.nextCursor, limit: pagination.limit },
+        filters,
+        sort,
+      );
+    }
 
-    if (!nextPage) return null;
-
-    return await getIssues(undefined, { page: nextPage, limit: pagination.limit }, filters, sort);
+    return await getIssues(
+      undefined,
+      { page: pagination.page + 1, limit: pagination.limit },
+      filters,
+      sort,
+    );
   }
+
+  // Identity of the current issues query. When it changes (sort or filters,
+  // including via browser back/forward), IssuesList must be recreated so it
+  // drops its accumulated pages and the cursor minted for the previous sort —
+  // otherwise infinite-scroll sends a stale cursor and the backend 400s with
+  // "Pagination cursor does not match the requested sort".
+  let listKey = $derived(`${appliedSort}|${JSON.stringify(appliedFilters)}`);
 
   let filtersOpen = $state<boolean>(false);
 
@@ -420,18 +444,20 @@
           {/if}
         </div>
       {:else}
-        <IssuesList
-          {ownUserId}
-          {pathPrefix}
-          {showNewApplicationsBadge}
-          {wavePrograms}
-          bind:this={listInstance}
-          multiselectMode={allowAddToWaveProgram}
-          issuesWithPagination={issues}
-          getMoreIssues={(currentPagination) =>
-            getMoreIssues(currentPagination, appliedFilters, appliedSort)}
-          onselectchange={(selected) => (selectedIssues = selected)}
-        />
+        {#key listKey}
+          <IssuesList
+            {ownUserId}
+            {pathPrefix}
+            {showNewApplicationsBadge}
+            {wavePrograms}
+            bind:this={listInstance}
+            multiselectMode={allowAddToWaveProgram}
+            issuesWithPagination={issues}
+            getMoreIssues={(currentPagination) =>
+              getMoreIssues(currentPagination, appliedFilters, appliedSort)}
+            onselectchange={(selected) => (selectedIssues = selected)}
+          />
+        {/key}
       {/if}
     </Card>
   </div>

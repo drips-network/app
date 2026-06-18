@@ -17,7 +17,6 @@ export const issuesPageLayoutLoad = async (
     url,
     depends,
     parent,
-    params,
   }: {
     fetch: typeof global.fetch;
     url: URL;
@@ -27,7 +26,6 @@ export const issuesPageLayoutLoad = async (
       waveProgram?: { id: string; slug: string };
       waves?: { data: Array<{ status: 'upcoming' | 'active' | 'ended' }> };
     }>;
-    params: { issueId?: string };
   },
   config: (user: WaveLoggedInUser | null) => {
     requireLogin?: boolean;
@@ -121,8 +119,6 @@ export const issuesPageLayoutLoad = async (
     (await getWavePrograms(fetch, { limit: 100 })).data,
   ]);
 
-  const isViewingIssue = params.issueId !== undefined;
-
   return {
     issues,
     appliedFilters: filters,
@@ -138,7 +134,6 @@ export const issuesPageLayoutLoad = async (
     viewKey,
     availableSortByOptions: availableSortByOptions ?? ['updatedAt', 'createdAt'],
     allowAddToWaveProgram: allowAddToWaveProgram ?? false,
-    isViewingIssue,
     headMetaTitle,
     showNewApplicationsBadge,
     currentWaveProgram: waveProgram,

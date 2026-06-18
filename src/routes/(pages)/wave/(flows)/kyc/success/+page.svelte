@@ -15,18 +15,13 @@
 >
   <AnnotationBox type="info">
     We will notify you via email once your KYC has been approved. This is usually fast, but may take
-    1-3 business days. You can check on the status of your identity verification anytime in
+    1-3 business days. You can check on the status of your identity verification anytime in Profile
     Settings.
-
-    <p style:margin-top="1rem" class="typo-text-small-bold">
-      If you haven't already, please ensure you have any relevant payout addresses configured in
-      order to be eligible for Wave rewards.
-    </p>
   </AnnotationBox>
 
   {#snippet actions()}
     <Button variant="primary" icon={ArrowRight} href="/wave/settings/identity-and-payments">
-      Review payout settings
+      Profile settings
     </Button>
   {/snippet}
 </FlowStepWrapper>

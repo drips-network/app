@@ -1,5 +1,6 @@
 <script lang="ts">
   import { beforeNavigate, goto } from '$app/navigation';
+  import { page } from '$app/state';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
@@ -37,7 +38,7 @@
     }
 
     if (repoIds.length === 0) {
-      goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}`);
+      goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}/select`);
     }
   });
 
@@ -120,11 +121,43 @@
       (forkJustification.trim().length >= 1 && forkJustification.length <= 5000),
   );
 
+  // Defense-in-depth: selection is already capped on the previous step, but
+  // re-check the configured application limits here so a stale/tampered
+  // sessionStorage selection surfaces a clear message instead of a raw 400.
+  let limitViolation = $derived.by<string | null>(() => {
+    const { perUser, perOrg } = data.applicationLimits;
+
+    if (perUser.limit !== null && (perUser.remaining ?? 0) < repoIds.length) {
+      return `You can only apply ${Math.max(perUser.remaining ?? 0, 0)} more ${
+        (perUser.remaining ?? 0) === 1 ? 'repo' : 'repos'
+      } this Wave cycle. Remove some repos to continue.`;
+    }
+
+    const countByOrg: Record<string, number> = {};
+    for (const repo of selectedRepos) {
+      countByOrg[repo.orgId] = (countByOrg[repo.orgId] ?? 0) + 1;
+    }
+    for (const [orgId, count] of Object.entries(countByOrg)) {
+      const status = perOrg.find((o) => o.orgId === orgId);
+      if (status && status.limit !== null && (status.remaining ?? 0) < count) {
+        return `One of your organizations has only ${Math.max(
+          status.remaining ?? 0,
+          0,
+        )} application ${
+          (status.remaining ?? 0) === 1 ? 'slot' : 'slots'
+        } left this Wave cycle. Remove some of its repos to continue.`;
+      }
+    }
+
+    return null;
+  });
+
   let formValid = $derived(
     plannedIssuesValid &&
       repoRelationshipValid &&
       upstreamRelationshipValid &&
-      forkJustificationValid,
+      forkJustificationValid &&
+      !limitViolation,
   );
 
   let previousParticipationItems: Items = {
@@ -214,15 +247,31 @@
       {/snippet}
     </AnnotationBox>
   {:else}
+    {#if !data.isKycVerified}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">Identity verification (KYC) required</span><br />
+        A verified identity is required to apply repositories to a Wave Program to protect program integrity.
+        After your identity has been verified, return here to continue.
+        {#snippet actions()}
+          <Button
+            href={`/wave/kyc?backTo=${encodeURIComponent(page.url.pathname + page.url.search)}`}
+          >
+            Verify identity
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
     <FormField
       title="Previous participation"
       description="Have you previously participated in any of the following programs? Select all that apply."
       type="div"
+      disabled={!data.isKycVerified}
     >
       <Card style="padding: 0; text-align: left; width: 100%;">
         <ListSelect
           multiselect
           searchable={false}
+          blockInteraction={!data.isKycVerified}
           items={previousParticipationItems}
           bind:selected={previousParticipation}
         />
@@ -235,6 +284,7 @@
 
 Describe the types of work you'd post — bug fixes, new features, documentation, testing, etc.`}
       type="div"
+      disabled={!data.isKycVerified}
       validationState={touched['plannedIssues'] && !plannedIssuesValid
         ? {
             type: 'invalid',
@@ -248,6 +298,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
       <TextArea
         bind:value={plannedIssuesDescription}
         placeholder="We plan to add issues related to..."
+        disabled={!data.isKycVerified}
         onblur={() => touch('plannedIssues')}
       />
       <div class="char-count">
@@ -262,6 +313,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         title="Repo relationship*"
         description="You selected multiple repos. Please describe how they are related to each other."
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['repoRelationship'] && !repoRelationshipValid
           ? {
               type: 'invalid',
@@ -275,6 +327,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         <TextArea
           bind:value={repoRelationshipDescription}
           placeholder="These repos are related because..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('repoRelationship')}
         />
         <div class="char-count">
@@ -295,6 +348,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         title="Upstream relationship*"
         description="Describe the relationship between your fork(s) and the upstream repo(s)."
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['upstreamRelationship'] && !upstreamRelationshipValid
           ? {
               type: 'invalid',
@@ -308,6 +362,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
         <TextArea
           bind:value={upstreamRelationshipDescription}
           placeholder="The relationship to the upstream repo is..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('upstreamRelationship')}
         />
         <div class="char-count">
@@ -325,6 +380,7 @@ Describe the types of work you'd post — bug fixes, new features, documentation
 
 There's no wrong answer. We need this context to review forks accurately.`}
         type="div"
+        disabled={!data.isKycVerified}
         validationState={touched['forkJustification'] && !forkJustificationValid
           ? {
               type: 'invalid',
@@ -338,6 +394,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <TextArea
           bind:value={forkJustification}
           placeholder="We are applying with this fork because..."
+          disabled={!data.isKycVerified}
           onblur={() => touch('forkJustification')}
         />
         <div class="char-count">
@@ -352,13 +409,19 @@ There's no wrong answer. We need this context to review forks accurately.`}
       title="Supporting links"
       description="Provide links to resources relevant to your project (e.g. website, documentation, social media, deployed contracts). Up to 10 links."
       type="div"
+      disabled={!data.isKycVerified}
     >
       {#if supportingLinks.length > 0}
         <ul class="links-list">
           {#each supportingLinks as link, i (link)}
             <li>
               <span class="typo-text link-url">{link}</span>
-              <Button size="small" icon={Trash} onclick={() => removeLink(i)}>Remove</Button>
+              <Button
+                size="small"
+                icon={Trash}
+                disabled={!data.isKycVerified}
+                onclick={() => removeLink(i)}>Remove</Button
+              >
             </li>
           {/each}
         </ul>
@@ -367,7 +430,7 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <TextInput
           bind:value={newLink}
           placeholder={supportingLinks.length >= 10 ? 'Link limit reached' : 'https://...'}
-          disabled={supportingLinks.length >= 10}
+          disabled={supportingLinks.length >= 10 || !data.isKycVerified}
           onkeydown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -378,11 +441,17 @@ There's no wrong answer. We need this context to review forks accurately.`}
         <Button
           size="large"
           icon={Plus}
-          disabled={!newLinkIsValid || supportingLinks.length >= 10}
+          disabled={!newLinkIsValid || supportingLinks.length >= 10 || !data.isKycVerified}
           onclick={addLink}>Add link</Button
         >
       </div>
     </FormField>
+
+    {#if limitViolation}
+      <AnnotationBox type="error">
+        {limitViolation}
+      </AnnotationBox>
+    {/if}
 
     <AnnotationBox>
       By submitting this application, you confirm that all provided information is accurate.
@@ -394,20 +463,32 @@ There's no wrong answer. We need this context to review forks accurately.`}
   {#snippet leftActions()}
     <Button
       icon={ArrowLeft}
-      href="/wave/maintainer-onboarding/apply-to-wave-program/{data.waveProgram.id}"
+      href="/wave/maintainer-onboarding/apply-to-wave-program/{data.waveProgram.id}/select"
       >Back to repo selection</Button
     >
   {/snippet}
 
   {#snippet actions()}
     {#if !data.user?.restricted}
-      <Button
-        variant="primary"
-        disabled={!formValid}
-        icon={CheckCircle}
-        loading={applying}
-        onclick={handleApply}>Apply selected repos</Button
+      <div
+        style:display="flex"
+        style:flex-direction="column"
+        style:align-items="flex-end"
+        style:gap="0.5rem"
       >
+        <Button
+          variant="primary"
+          disabled={!formValid || !data.isKycVerified}
+          icon={CheckCircle}
+          loading={applying}
+          onclick={handleApply}>Apply selected repos</Button
+        >
+        {#if !data.isKycVerified}
+          <span class="typo-text-small" style:color="var(--color-negative-level-6)">
+            You must complete identity verification (KYC) before applying.
+          </span>
+        {/if}
+      </div>
     {/if}
   {/snippet}
 </FlowStepWrapper>

@@ -48,6 +48,8 @@ export const waveProgramDtoSchema = z.object({
   presetBudgetUSD: z.string(),
   repoPointsBudget: z.number().int().nullable(),
   orgPointsBudget: z.number().int().nullable(),
+  repoApplicationsLimitPerUser: z.number().int().nullable(),
+  repoApplicationsLimitPerOrg: z.number().int().nullable(),
   avatarUrl: z.url().nullable(),
   slug: z.string(),
   longDescription: z.string().nullable(),
@@ -141,6 +143,12 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
   orgPointsUsed: z.number().int().optional(),
   orgPointsBudget: z.number().int().nullable().optional(),
   orgPointsRemaining: z.number().int().nullable().optional(),
+  userApplicationsUsed: z.number().int().optional(),
+  userApplicationsLimit: z.number().int().nullable().optional(),
+  userApplicationsRemaining: z.number().int().nullable().optional(),
+  orgApplicationsUsed: z.number().int().optional(),
+  orgApplicationsLimit: z.number().int().nullable().optional(),
+  orgApplicationsRemaining: z.number().int().nullable().optional(),
   pointsMultiplier: z.number().int().optional(),
   repo: z.object({
     stargazersCount: z.number().int().nullable().optional(),
@@ -249,6 +257,19 @@ export const waveProgramOrgDtoSchema = z.object({
 });
 export type WaveProgramOrgDto = z.infer<typeof waveProgramOrgDtoSchema>;
 
+export const waveProgramOrgFilterOptionDtoSchema = z.object({
+  id: z.uuid(),
+  gitHubOrgLogin: z.string(),
+  gitHubOrgName: z.string().nullable(),
+  gitHubOrgAvatarUrl: z.string().nullable(),
+  approvedRepoCount: z.number().int(),
+});
+export type WaveProgramOrgFilterOptionDto = z.infer<typeof waveProgramOrgFilterOptionDtoSchema>;
+
+export const waveProgramOrgFilterOptionsResponseDtoSchema = z.object({
+  data: z.array(waveProgramOrgFilterOptionDtoSchema),
+});
+
 export const waveProgramOrgsFiltersSchema = filterSchema(
   z.object({
     search: z.string().optional(),
@@ -314,3 +335,25 @@ export const waveDtoSchema = z.object({
   createdAt: z.coerce.date(),
 });
 export type WaveDto = z.infer<typeof waveDtoSchema>;
+
+// ===========================
+// Repo Application Limits
+// ===========================
+
+export const applicationLimitStatusSchema = z.object({
+  /** Applications counted toward the current wave cycle. */
+  used: z.number().int(),
+  /** Configured limit (null = unlimited). */
+  limit: z.number().int().nullable(),
+  /** Remaining slots (null = unlimited, can be negative if the limit was lowered). */
+  remaining: z.number().int().nullable(),
+});
+export type ApplicationLimitStatus = z.infer<typeof applicationLimitStatusSchema>;
+
+export const waveProgramApplicationLimitsDtoSchema = z.object({
+  /** Calling user's repo-application usage for the current wave cycle. */
+  perUser: applicationLimitStatusSchema,
+  /** Per-org usage for every org the calling user belongs to. */
+  perOrg: z.array(applicationLimitStatusSchema.extend({ orgId: z.uuid() })),
+});
+export type WaveProgramApplicationLimitsDto = z.infer<typeof waveProgramApplicationLimitsDtoSchema>;

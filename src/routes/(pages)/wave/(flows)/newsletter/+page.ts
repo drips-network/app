@@ -13,7 +13,7 @@ export const load = async ({ fetch, parent, url, depends }) => {
     );
   }
 
-  const [newsletterStatus] = await Promise.all([getNewsletterSubscriptionStatus(fetch)]);
+  const newsletterStatus = await getNewsletterSubscriptionStatus(fetch).catch(() => null);
 
   return {
     newsletterStatus,

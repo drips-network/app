@@ -7,11 +7,13 @@ import {
 } from './types/pagination';
 import {
   batchApplyResponseSchema,
+  waveProgramApplicationLimitsDtoSchema,
   waveDtoSchema,
   waveFiltersSchema,
   waveProgramDtoSchema,
   waveProgramIssueWithDetailsDtoSchema,
   waveProgramOrgDtoSchema,
+  waveProgramOrgFilterOptionsResponseDtoSchema,
   waveProgramOrgsFiltersSchema,
   waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
@@ -79,6 +81,13 @@ export async function batchApplyRepos(
   );
 }
 
+export async function getWaveProgramApplicationLimits(f = fetch, waveProgramId: string) {
+  return parseRes(
+    waveProgramApplicationLimitsDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/apply/limits`),
+  );
+}
+
 export async function getOwnWaveProgramRepos(
   f = fetch,
   pagination?: PaginationInput,
@@ -119,6 +128,13 @@ export async function getWaveProgramOrgs(
       f,
       `/api/wave-programs/${waveProgramId}/orgs?${toPaginationParams(pagination)}&${toFilterParams(waveProgramOrgsFiltersSchema, filters)}`,
     ),
+  );
+}
+
+export async function getWaveProgramOrgFilterOptions(f = fetch, waveProgramId: string) {
+  return parseRes(
+    waveProgramOrgFilterOptionsResponseDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/orgs/filter-options`),
   );
 }
 
