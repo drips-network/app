@@ -6,7 +6,6 @@
   import LpFooter from './components/lp-footer.svelte';
   import LpHiwEntrypoint from './components/lp-hiw-entrypoint.svelte';
   import LpSectionHeader from './components/lp-section-header.svelte';
-  import LpWaveFeatureCard from './components/lp-wave-feature-card.svelte';
   import UsecaseSection from './components/usecase-section.svelte';
   import TrustedBy from './components/trusted-by.svelte';
   import LpIllustrationFlyingCoins from '$lib/components/illustrations/lp-illustration-flying-coins.svelte';
@@ -36,10 +35,6 @@
         <TrustedBy />
       </div>
     </div>
-  </section>
-
-  <section class="wave-band">
-    <LpWaveFeatureCard />
   </section>
 
   <section>

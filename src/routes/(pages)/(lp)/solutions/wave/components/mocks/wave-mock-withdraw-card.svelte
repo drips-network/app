@@ -54,14 +54,16 @@
     </div>
   </div>
 
-  <div class="right">
-    {#if showAction}
+  {#if showAction}
+    <div class="right">
       <Button variant={status === 'withdrawable' ? 'primary' : 'normal'}>
         {status === 'complete' ? 'View receipt' : 'Withdraw'}
       </Button>
-    {/if}
-    <ChevronRight style="width: 1.25rem; height: 1.25rem; fill: var(--color-foreground-level-4);" />
-  </div>
+      <ChevronRight
+        style="width: 1.25rem; height: 1.25rem; fill: var(--color-foreground-level-4);"
+      />
+    </div>
+  {/if}
 </div>
 
 <style>

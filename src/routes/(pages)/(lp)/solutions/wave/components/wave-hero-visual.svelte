@@ -2,7 +2,6 @@
   import { MOCK_CONTRIBUTORS, MOCK_REPOS } from './mocks/mock-fixtures';
   import WaveMockApplicantCard from './mocks/wave-mock-applicant-card.svelte';
   import WaveMockIssueCard from './mocks/wave-mock-issue-card.svelte';
-  import WaveMockPointsPill from './mocks/wave-mock-points-pill.svelte';
   import WaveMockWithdrawCard from './mocks/wave-mock-withdraw-card.svelte';
   import WaveSceneBg from './wave-scene-bg.svelte';
 </script>
@@ -53,21 +52,11 @@
       <WaveMockWithdrawCard
         programName="Stellar"
         waveNumber={5}
-        amount={98.42}
+        amount={42}
         status="withdrawable"
         width="100%"
         showAction={false}
       />
-    </div>
-
-    <div class="float float-pill-1">
-      <WaveMockPointsPill points={150} bold />
-    </div>
-    <div class="float float-pill-2">
-      <WaveMockPointsPill points="Points earned" label="" variant="positive" bold />
-    </div>
-    <div class="float float-pill-3">
-      <WaveMockPointsPill points={200} multiplier={1.5} bold />
     </div>
   </div>
 </div>
@@ -128,7 +117,7 @@
 
   /* Right-side applicant — slightly overflows the RIGHT bg edge */
   .float-applicant {
-    top: 30%;
+    top: 38%;
     right: -1%;
     width: 320px;
     --rot: 3deg;
@@ -158,25 +147,6 @@
     z-index: 1;
   }
 
-  .float-pill-1 {
-    top: 30%;
-    right: 30%;
-    --rot: 9deg;
-    animation-delay: -1s;
-  }
-  .float-pill-2 {
-    top: 22%;
-    left: 38%;
-    --rot: -8deg;
-    animation-delay: -5s;
-  }
-  .float-pill-3 {
-    bottom: 14%;
-    right: 14%;
-    --rot: -8deg;
-    animation-delay: -3s;
-  }
-
   @media (max-width: 1100px) {
     .float-issue-1 {
       width: 260px;
@@ -197,28 +167,23 @@
       min-height: 380px;
     }
     .float-issue-1 {
-      top: 4%;
-      left: 2%;
+      top: 2%;
+      left: 0;
       width: 220px;
     }
     .float-applicant {
-      top: 36%;
-      right: 2%;
+      top: 24%;
+      right: 0;
       width: 220px;
     }
     .float-issue-2 {
       display: none;
     }
     .float-withdraw {
-      bottom: 6%;
-      left: 12%;
+      bottom: 4%;
+      left: 0;
       top: auto;
-      width: 220px;
-    }
-    .float-pill-1,
-    .float-pill-2,
-    .float-pill-3 {
-      display: none;
+      width: 260px;
     }
   }
 

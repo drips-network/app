@@ -3,8 +3,9 @@
   import { browser } from '$app/environment';
   import Button from '$lib/components/button/button.svelte';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
+  import Discord from '$lib/components/icons/Discord.svelte';
   import File from '$lib/components/icons/File.svelte';
-  import Ledger from '$lib/components/icons/Ledger.svelte';
+  import Wave from '$lib/components/icons/Wave.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
   import formatDate from '$lib/utils/format-date';
   import type { WaveDto, WaveProgramDto } from '$lib/utils/wave/types/waveProgram';
@@ -37,25 +38,6 @@
       loadingLive = false;
     }
   });
-
-  const faqItems = [
-    {
-      q: 'Who runs a Wave Program?',
-      a: 'An ecosystem foundation or organization commits a recurring reward budget and works with us to launch a program. Stellar Development Foundation runs the first Wave Program; we partner with one or two ecosystems at a time.',
-    },
-    {
-      q: 'How long is a Wave?',
-      a: 'A typical Wave runs for one week, on a monthly cadence — long enough for substantial work, short enough to keep contributors focused. The exact cycle can be tuned per program.',
-    },
-    {
-      q: 'How are contributors rewarded?',
-      a: "Each issue is worth Points based on complexity (100 / 150 / 200). At the end of a Wave, the pool is divided proportionally by each contributor's Points share. Payouts are sent on-chain.",
-    },
-    {
-      q: 'What does it cost?',
-      a: "For maintainers and contributors, participation is free. Ecosystems running a Wave Program pay for the platform — get in touch and we'll walk you through commercials.",
-    },
-  ];
 </script>
 
 <HeadMeta
@@ -66,18 +48,15 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-text">
-    <div class="kicker">
-      <span class="kicker-dot"></span>
-      Drips Wave
-    </div>
+    <div class="kicker">Drips Wave</div>
     <h1 class="pixelated">Fix. Merge. Earn — every month.</h1>
     <p class="lead">
-      Wave turns an ecosystem's funding into a recurring sprint of merged pull requests. Maintainers
-      clear their backlog. Contributors get paid for shipping. Ecosystems get measurable progress,
-      not promises.
+      Drips Wave turns an ecosystem's funding into a recurring sprint of merged pull requests.
+      Maintainers clear their backlog. Contributors get paid for shipping. Ecosystems get measurable
+      progress, not promises.
     </p>
     <div class="hero-actions">
-      <Button variant="primary" size="large" icon={Ledger} href="/wave">Browse active Waves</Button>
+      <Button variant="primary" size="large" icon={Wave} href="/wave">Browse active Waves</Button>
       <Button size="large" icon={File} href="https://docs.drips.network/wave" target="_blank"
         >Read the docs</Button
       >
@@ -103,7 +82,6 @@
             until {formatDate(liveWave.wave.endDate, 'standardWithoutYear')}
           </span>
         {:else}
-          <span class="dot" aria-hidden="true"></span>
           <span class="typo-text-bold"
             >{liveWave.program.name} Wave {liveWave.wave.waveNumber} starts {formatDate(
               liveWave.wave.startDate,
@@ -113,12 +91,14 @@
         {/if}
       </div>
       <div class="live-right">
-        <div class="stat">
-          <span class="stat-label typo-all-caps">Reward pool</span>
-          <span class="stat-value tnum"
-            >${liveWave.wave.budgetUSD?.toLocaleString?.() ?? liveWave.wave.budgetUSD}</span
-          >
-        </div>
+        {#if liveWave.wave.status !== 'active'}
+          <div class="stat">
+            <span class="stat-label typo-all-caps">Reward pool</span>
+            <span class="stat-value tnum"
+              >${liveWave.wave.budgetUSD?.toLocaleString?.() ?? liveWave.wave.budgetUSD}</span
+            >
+          </div>
+        {/if}
         <Button variant="primary" href="/wave/{liveWave.program.slug}">View Wave</Button>
       </div>
     {:else if loadingLive}
@@ -133,13 +113,12 @@
     {:else}
       <!-- No active or upcoming Wave at the moment (rare) -->
       <div class="live-left">
-        <span class="dot" aria-hidden="true"></span>
         <span class="typo-text" style:color="var(--color-foreground-level-6)"
-          >No active Waves right now — check back soon.</span
+          >No active Waves right now. Check back soon!</span
         >
       </div>
       <div class="live-right">
-        <Button href="/wave">Browse Wave Programs</Button>
+        <Button variant="primary" icon={Discord} href="/wave/link-discord">Join our Discord</Button>
       </div>
     {/if}
   </div>
@@ -182,7 +161,7 @@
 
     <div class="proof-stats">
       <div class="proof-stat">
-        <span class="proof-value pixelated">$250k+</span>
+        <span class="proof-value pixelated">$400k+</span>
         <span class="proof-label">Distributed to contributors</span>
       </div>
       <div class="proof-stat">
@@ -198,32 +177,6 @@
     <div class="proof-cta">
       <Button variant="primary" size="large" href="/wave/stellar">Explore the Stellar Wave</Button>
     </div>
-  </div>
-</section>
-
-<!-- MINI FAQ -->
-<section class="faq">
-  <div class="section-header">
-    <span class="kicker-pill">FAQ</span>
-    <h2 class="pixelated">Common questions</h2>
-  </div>
-
-  <div class="faq-list">
-    {#each faqItems as item (item.q)}
-      <details class="faq-item">
-        <summary>
-          <span class="typo-text-bold">{item.q}</span>
-          <span class="chev" aria-hidden="true">+</span>
-        </summary>
-        <p>{item.a}</p>
-      </details>
-    {/each}
-  </div>
-
-  <div class="faq-cta">
-    <Button href="https://docs.drips.network/wave" target="_blank" icon={File}
-      >Read the full docs</Button
-    >
   </div>
 </section>
 
@@ -294,13 +247,6 @@
     font-weight: 600;
   }
 
-  .kicker-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--color-primary);
-  }
-
   .hero h1 {
     font-size: clamp(2.5rem, 5vw, 4rem);
     line-height: 1.05;
@@ -340,7 +286,9 @@
     justify-content: space-between;
     gap: 1.5rem;
     flex-wrap: wrap;
-    min-height: 4.5rem;
+    /* Tall enough to match the loaded state (which includes a Button on the
+       right), so the strip doesn't grow when content hydrates over the skel. */
+    min-height: 5rem;
     box-sizing: border-box;
   }
 
@@ -349,13 +297,6 @@
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
-  }
-
-  .live-left .dot {
-    width: 0.625rem;
-    height: 0.625rem;
-    border-radius: 50%;
-    background: var(--color-primary-level-3);
   }
 
   .live-right {
@@ -487,63 +428,6 @@
     font-size: 0.875rem;
   }
 
-  /* ---------- FAQ ---------- */
-  .faq {
-    width: 100%;
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .faq-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .faq-item {
-    background: var(--color-background);
-    border: 1px solid var(--color-foreground-level-2);
-    border-radius: 1rem 0 1rem 1rem;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .faq-item summary {
-    list-style: none;
-    cursor: pointer;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq-item .chev {
-    color: var(--color-foreground-level-5);
-    font-size: 1.25rem;
-    transition: transform 0.2s;
-    line-height: 1;
-  }
-
-  .faq-item[open] .chev {
-    transform: rotate(45deg);
-  }
-
-  .faq-item p {
-    padding: 0 1.25rem 1.25rem;
-    color: var(--color-foreground-level-6);
-  }
-
-  .faq-cta {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-  }
-
   /* ---------- Responsive ---------- */
   @media (max-width: 882px) {
     .hero {
@@ -553,6 +437,8 @@
     }
     .hero-visual-wrap {
       height: 420px;
+      max-width: 480px;
+      margin: 0 auto;
     }
     .proof-inner {
       padding: 2rem 1.25rem;
@@ -564,6 +450,10 @@
     .live-strip-inner {
       flex-direction: column;
       align-items: flex-start;
+      /* Stacked layout: text row (~1.5rem) + gap (1.5rem) + button row (~2.5rem)
+         + padding (2.5rem) ≈ 8rem. Locks the strip so the skeleton doesn't grow
+         into the taller loaded state. */
+      min-height: 8rem;
     }
     .live-right {
       width: 100%;
