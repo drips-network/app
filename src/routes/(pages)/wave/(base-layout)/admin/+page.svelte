@@ -44,6 +44,15 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('manageWaves')
+      ? [
+          {
+            name: 'Waves',
+            description: 'Schedule new waves and edit existing waves for any wave program.',
+            href: '/wave/admin/waves',
+          },
+        ]
+      : []),
     ...(data.user.permissions?.includes('manageBans')
       ? [
           {
