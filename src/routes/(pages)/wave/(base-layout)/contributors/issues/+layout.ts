@@ -21,7 +21,7 @@ export const load = async (context) => {
       appliedToByUser: user?.id,
       appliedToByUserCurrentWave: true,
     },
-    defaultFilters: {},
+    defaultFilters: { state: 'open', assignment: 'mine-or-unassigned' },
     pathPrefix: '/wave/contributors/issues/',
     filtersMode: 'contributor',
     breadcrumbs: [{ label: 'Contributor Dashboard' }, { label: 'Issues' }],
