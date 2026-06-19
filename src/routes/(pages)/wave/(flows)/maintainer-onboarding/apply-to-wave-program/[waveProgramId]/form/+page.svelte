@@ -14,6 +14,7 @@
   import Plus from '$lib/components/icons/Plus.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
   import { batchApplyRepos } from '$lib/utils/wave/wavePrograms';
+  import Turnstile from '$lib/components/turnstile/turnstile.svelte';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
   import type { PreviousParticipation } from '$lib/utils/wave/types/waveProgram';
@@ -152,12 +153,15 @@
     return null;
   });
 
+  let turnstileToken = $state<string | undefined>(undefined);
+
   let formValid = $derived(
     plannedIssuesValid &&
       repoRelationshipValid &&
       upstreamRelationshipValid &&
       forkJustificationValid &&
-      !limitViolation,
+      !limitViolation &&
+      !!turnstileToken,
   );
 
   let previousParticipationItems: Items = {
@@ -206,13 +210,21 @@
 
     try {
       await doWithErrorModal(async () => {
-        await batchApplyRepos(undefined, data.waveProgram.id, repoIds, {
-          previousParticipation: previousParticipation as PreviousParticipation[],
-          plannedIssuesDescription,
-          ...(multipleReposSelected ? { repoRelationshipDescription } : {}),
-          ...(anySelectedRepoIsFork ? { upstreamRelationshipDescription, forkJustification } : {}),
-          supportingLinks: supportingLinks.length > 0 ? supportingLinks : undefined,
-        });
+        await batchApplyRepos(
+          undefined,
+          data.waveProgram.id,
+          repoIds,
+          {
+            previousParticipation: previousParticipation as PreviousParticipation[],
+            plannedIssuesDescription,
+            ...(multipleReposSelected ? { repoRelationshipDescription } : {}),
+            ...(anySelectedRepoIsFork
+              ? { upstreamRelationshipDescription, forkJustification }
+              : {}),
+            supportingLinks: supportingLinks.length > 0 ? supportingLinks : undefined,
+          },
+          turnstileToken,
+        );
       });
 
       submittedSuccessfully = true;
@@ -458,6 +470,19 @@ There's no wrong answer. We need this context to review forks accurately.`}
       Inaccurate information may result in your application being rejected and could lead to
       disqualification from the Drips Wave Program.
     </AnnotationBox>
+
+    <FormField
+      title="Verification*"
+      description="Confirm you're not a robot with a quick check."
+      type="div"
+      disabled={!data.isKycVerified}
+    >
+      {#if data.isKycVerified}
+        <div class="turnstile-wrapper">
+          <Turnstile ontoken={(t) => (turnstileToken = t)} />
+        </div>
+      {/if}
+    </FormField>
   {/if}
 
   {#snippet leftActions()}
@@ -535,5 +560,10 @@ There's no wrong answer. We need this context to review forks accurately.`}
     display: flex;
     gap: 0.5rem;
     align-items: flex-start;
+  }
+
+  .turnstile-wrapper {
+    display: flex;
+    justify-content: flex-start;
   }
 </style>
