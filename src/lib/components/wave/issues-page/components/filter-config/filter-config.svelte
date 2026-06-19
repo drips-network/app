@@ -21,17 +21,17 @@
         ],
       },
 
-      ...(ownUserId && mode === 'contributor'
+      ...(mode === 'contributor'
         ? {
-            assignedToUser: {
-              type: 'single-select',
+            assignment: {
+              type: 'dropdown',
               label: 'Assignment',
-              options: [
-                {
-                  label: 'Assigned to me',
-                  value: ownUserId,
-                },
-              ],
+              optionsPromise: Promise.resolve([
+                { label: 'Assigned to me or unassigned', value: 'mine-or-unassigned' },
+                { label: 'Assigned to me', value: 'mine' },
+                { label: 'Unassigned', value: 'unassigned' },
+                { label: 'Assigned to someone else', value: 'assigned-to-others' },
+              ]),
             },
           }
         : {}),
