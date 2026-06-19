@@ -57,14 +57,6 @@
                 <span class="dim"
                   >{program.waveCount} {program.waveCount === 1 ? 'wave' : 'waves'}</span
                 >
-                <span class="dim">·</span>
-                <span class="dim"
-                  >every {program.waveDurationDays}d on day {program.waveDayOfMonth}</span
-                >
-                {#if program.paused}
-                  <span class="dim">·</span>
-                  <span class="badge paused">paused</span>
-                {/if}
               </div>
             </div>
           </div>
