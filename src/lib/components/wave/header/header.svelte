@@ -128,7 +128,7 @@
           </Button>
           {#snippet tooltip_content()}
             <p class="typo-text-small">
-              Points earned in current waves. Resets when a new wave starts.
+              Points earned in current Waves. Resets when a new Wave starts.
             </p>
           {/snippet}
         </Tooltip>
