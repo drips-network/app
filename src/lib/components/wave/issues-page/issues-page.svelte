@@ -429,7 +429,13 @@
         <div class="spinner">
           <Spinner />
         </div>
-      {:else if issues.pagination.total === 0}
+        <!-- Gate the empty state on the actual returned rows, NOT pagination.total.
+           The total is cached server-side with a short TTL (decoupled from the
+           per-mutation list-cache invalidation), so during a wave it can briefly
+           read 0 while freshly-labeled issues already match the filter. Keying off
+           data.length keeps the empty state consistent with what we actually show;
+           total stays purely the "N matches" badge above. -->
+      {:else if issues.data.length === 0}
         <div style="padding: 1rem; ">
           <p style="padding: 1rem; text-align: center; color: var(--color-foreground-level-5);">
             No issues found matching the selected filters.
