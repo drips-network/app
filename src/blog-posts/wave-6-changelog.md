@@ -23,7 +23,7 @@ We want the contributor dashboard to surface the issues that actually matter to 
 
 Starting in Wave 6, the dashboard defaults to showing issues that you've **applied to in the current Wave** and that are **open and either assigned to you or unassigned**, alongside any issues that have **carried over from previous Wave(s)**. The result is a view focused on the work that's most relevant to you at this moment, rather than a long list you have to manually narrow down.
 
-![Screenshot of the new contributor dashboard assignment filter, showing the "Assigned to me or unassigned" option](/assets/blog-images/wave-6-changelog/contributor-dashboard-filter.png)
+![Screenshot of the new contributor dashboard assignment filter, showing the 'Assigned to me or unassigned' option](/assets/blog-images/wave-6-changelog/contributor-dashboard-filter.png)
 
 Of course, the filters remain fully customizable. If you'd rather browse all open issues, see only what's assigned to you, or build your own view, you can adjust the status and assignment filters at any time — the new behavior is just a smarter starting point.
 
