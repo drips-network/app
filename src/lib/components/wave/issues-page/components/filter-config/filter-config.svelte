@@ -21,17 +21,17 @@
         ],
       },
 
-      ...(ownUserId && mode === 'contributor'
+      ...(mode === 'contributor'
         ? {
-            assignedToUser: {
-              type: 'single-select',
+            assignment: {
+              type: 'dropdown',
               label: 'Assignment',
-              options: [
-                {
-                  label: 'Assigned to me',
-                  value: ownUserId,
-                },
-              ],
+              optionsPromise: Promise.resolve([
+                { label: 'Assigned to me or unassigned', value: 'mine-or-unassigned' },
+                { label: 'Assigned to me', value: 'mine' },
+                { label: 'Unassigned', value: 'unassigned' },
+                { label: 'Assigned to someone else', value: 'assigned-to-others' },
+              ]),
             },
           }
         : {}),
@@ -191,7 +191,10 @@
     currentWaveProgram?: Pick<WaveProgramDto, 'id' | 'slug'>;
   } = $props();
 
-  let filters = $state<IssueFilters>(appliedFilters);
+  // Clone props into local state: `filters` is mutated in place by
+  // handleSelectFilter, so referencing `appliedFilters`/`defaultFilters`
+  // directly would write through and corrupt the props.
+  let filters = $state<IssueFilters>({ ...appliedFilters });
 
   function handleSelectFilter<K extends keyof IssueFilters>(
     filterKey: K,
@@ -212,13 +215,13 @@
 
   function handleClear() {
     filterItems.forEach((item) => item.clear());
-    filters = defaultFilters;
+    filters = { ...defaultFilters };
 
     onapply(filters);
   }
 
   export function reset() {
-    filters = appliedFilters;
+    filters = { ...appliedFilters };
   }
 
   let availableFilters = $state<ReturnType<typeof AVAILABLE_FILTERS>>({});

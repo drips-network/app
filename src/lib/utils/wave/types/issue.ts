@@ -23,6 +23,9 @@ export const issueFilters = filterSchema(
     applicantAssigned: booleanString.optional(),
     isInWaveProgram: booleanString.optional(),
     assignedToUser: z.uuid().optional(),
+    assignment: z
+      .enum(['mine-or-unassigned', 'mine', 'unassigned', 'assigned-to-others'])
+      .optional(),
     appliedToByUser: z.uuid().optional(),
     appliedToByUserCurrentWave: booleanString.optional(),
     resolvedByUserId: z.uuid().optional(),

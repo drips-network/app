@@ -20,15 +20,13 @@
   let { data }: PageProps = $props();
   const { waveProgram, waves } = $derived(data);
 
-  let upcomingWave = $derived(waves.data.find((wave) => wave.status === 'upcoming') ?? null);
   let activeWave = $derived(waves.data.find((wave) => wave.status === 'active') ?? null);
-  let upcomingOrActiveWave = $derived(upcomingWave ?? activeWave);
-
-  let otherWaves = $derived(
-    waves.data.filter((wave) => wave.id !== (upcomingOrActiveWave?.id ?? '')),
+  let upcomingWaves = $derived(
+    waves.data
+      .filter((wave) => wave.status === 'upcoming')
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime()),
   );
-
-  let waveActive = $derived(activeWave !== null);
+  let pastWaves = $derived(waves.data.filter((wave) => wave.status === 'ended'));
 
   let shareImageUrl = $derived(`/api/share-images/wave-program/${waveProgram.id}.png`);
 </script>
@@ -103,14 +101,29 @@
     </div>
   {/if}
 
-  <section>
-    <div class="divider">
-      <OrDivider text={waveActive ? 'Current Wave' : 'Upcoming Wave'} />
-    </div>
+  {#if activeWave}
+    <section>
+      <div class="divider">
+        <OrDivider text="Current Wave" />
+      </div>
+      <WaveCard wave={activeWave} {waveProgram} />
+    </section>
+  {/if}
 
-    {#if upcomingOrActiveWave}
-      <WaveCard wave={upcomingOrActiveWave} {waveProgram} />
-    {:else}
+  {#if upcomingWaves.length > 0}
+    <section>
+      <div class="divider">
+        <OrDivider text="Upcoming Waves" />
+      </div>
+      {#each upcomingWaves as wave (wave.id)}
+        <WaveCard {wave} {waveProgram} />
+      {/each}
+    </section>
+  {:else if !activeWave}
+    <section>
+      <div class="divider">
+        <OrDivider text="Upcoming Waves" />
+      </div>
       <Card>
         <div class="empty typo-text">
           There are no active or upcoming Waves at the moment. Consider subscribing to our email
@@ -124,20 +137,20 @@
           </div>
         </div>
       </Card>
-    {/if}
-  </section>
+    </section>
+  {/if}
 
-  <section>
-    {#if otherWaves.length > 0}
+  {#if pastWaves.length > 0}
+    <section>
       <div class="divider">
         <OrDivider text="Explore past waves" />
       </div>
-    {/if}
 
-    {#each otherWaves as wave (wave.id)}
-      <WaveCard {wave} {waveProgram} />
-    {/each}
-  </section>
+      {#each pastWaves as wave (wave.id)}
+        <WaveCard {wave} {waveProgram} />
+      {/each}
+    </section>
+  {/if}
 </div>
 
 <style>

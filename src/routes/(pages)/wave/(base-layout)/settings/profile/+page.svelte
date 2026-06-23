@@ -41,7 +41,7 @@
 
 <Setting
   title="Identity Verification"
-  subtitle="Verify your identitiy to be able to withdraw earned rewards."
+  subtitle="Verify your identitiy to be able to participate in a Wave and withdraw earned rewards."
 >
   {#if kycStatus.status === 'applicantReviewed' && kycStatus.reviewAnswer === 'GREEN'}
     <div
