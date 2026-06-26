@@ -19,7 +19,7 @@
 <style>
   .wrapper {
     background-color: var(--color-foreground-level-1);
-    padding-top: 6rem;
+    padding-top: calc(6rem + var(--incident-banner-offset, 0px));
     padding-bottom: 2rem;
     width: 100vw;
     min-height: 100svh;

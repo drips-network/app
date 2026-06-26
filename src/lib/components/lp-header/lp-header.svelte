@@ -319,7 +319,7 @@
       box-shadow 0.3s,
       border-radius 0.3s;
     overflow: hidden;
-    top: 1rem;
+    top: calc(1rem + var(--incident-banner-offset, 0px));
     view-transition-name: header;
   }
 

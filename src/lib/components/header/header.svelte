@@ -248,7 +248,7 @@
 
   .search-bar {
     position: fixed;
-    top: 0.5rem;
+    top: calc(0.5rem + var(--incident-banner-offset, 0px));
     left: 50%;
     transform: translateX(-50%);
     width: 100%;

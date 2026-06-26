@@ -5,6 +5,22 @@
 @import 'elevation.css';
 @import 'typography.css';
 
+/* Global incident banner (status.drips.network). The banner is fixed at the very
+   top with a static height so each sub-app's header can offset itself below it
+   via --incident-banner-offset. Height: one line on desktop, two on mobile. */
+:root {
+  --incident-banner-height: 2.5rem;
+  --incident-banner-offset: 0px;
+}
+@media (max-width: 768px) {
+  :root {
+    --incident-banner-height: 3.75rem;
+  }
+}
+html.incident-banner-visible {
+  --incident-banner-offset: var(--incident-banner-height);
+}
+
 html.smoothscroll {
   scroll-behavior: smooth;
 }

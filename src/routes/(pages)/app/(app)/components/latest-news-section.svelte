@@ -68,7 +68,10 @@
   }
 
   .posts-grid.compact {
-    grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+    /* min(24rem, 100%) so a column never forces a track wider than its
+       container — otherwise narrow viewports overflow horizontally (the
+       max-width: 767px rule below can't override this due to specificity). */
+    grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
   }
 
   @media (max-width: 767px) {

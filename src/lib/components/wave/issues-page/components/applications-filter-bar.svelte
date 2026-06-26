@@ -75,15 +75,17 @@
     sortBy = { key: preset.key, direction: preset.direction };
   }
 
-  const STICKY_TOP_PX = 6.5 * 16; // 6.5rem in px
-
   let wrapperEl = $state<HTMLDivElement>();
   let isSticky = $state(false);
 
   function checkSticky() {
     if (!wrapperEl) return;
+    // Read the resolved sticky `top` (CSS: calc(6.5rem + --incident-banner-offset))
+    // rather than hardcoding 6.5rem, so the threshold stays correct when the
+    // global incident banner pushes everything down.
+    const stickyTopPx = parseFloat(getComputedStyle(wrapperEl).top) || 0;
     const rect = wrapperEl.getBoundingClientRect();
-    isSticky = rect.top <= STICKY_TOP_PX + 1;
+    isSticky = rect.top <= stickyTopPx + 1;
   }
 
   $effect(() => {
@@ -123,7 +125,7 @@
 <style>
   .sticky-wrapper {
     position: sticky;
-    top: 6.5rem;
+    top: calc(6.5rem + var(--incident-banner-offset, 0px));
     z-index: 1;
   }
 
