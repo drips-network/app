@@ -312,7 +312,7 @@
   .org-info {
     grid-area: org-info;
     position: sticky;
-    top: 5rem;
+    top: calc(5rem + var(--incident-banner-offset, 0px));
     align-self: start;
   }
 

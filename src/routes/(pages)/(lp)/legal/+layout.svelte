@@ -22,7 +22,7 @@
     width: 100vw;
     margin: 0 auto;
     padding: 1rem;
-    padding-top: 6rem;
+    padding-top: calc(6rem + var(--incident-banner-offset, 0px));
     display: flex;
     flex-direction: column;
     align-items: center;

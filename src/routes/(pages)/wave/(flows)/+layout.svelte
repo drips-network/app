@@ -67,6 +67,7 @@
     width: 100%;
     height: 100%;
     gap: 2rem;
+    padding-top: var(--incident-banner-offset, 0px);
     min-height: 100vh;
     max-width: 100vw;
   }

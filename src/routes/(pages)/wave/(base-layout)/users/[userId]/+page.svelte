@@ -196,7 +196,7 @@
   .profile-info {
     grid-area: profile-info;
     position: sticky;
-    top: 4.5rem;
+    top: calc(4.5rem + var(--incident-banner-offset, 0px));
     align-self: start;
   }
 

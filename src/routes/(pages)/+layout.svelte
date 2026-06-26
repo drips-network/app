@@ -3,6 +3,7 @@
 
   import '$lib/stores/theme/theme.store';
   import animationsStore from '$lib/stores/animations/animations.store';
+  import IncidentBanner from '$lib/components/incident-banner/incident-banner.svelte';
 
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
@@ -49,6 +50,7 @@
 </script>
 
 <div class="main" data-uifont="inter">
+  <IncidentBanner />
   <main class="page">
     {@render children?.()}
   </main>

@@ -493,9 +493,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 5.5rem);
+    height: calc(100dvh - 5.5rem - var(--incident-banner-offset, 0px));
     position: sticky;
-    top: 4.5rem;
+    top: calc(4.5rem + var(--incident-banner-offset, 0px));
   }
 
   .issue-list-configuration {

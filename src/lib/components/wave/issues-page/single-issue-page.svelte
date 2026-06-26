@@ -850,9 +850,9 @@
 
   .sidebar-wrapper {
     position: sticky;
-    top: 6.5rem;
+    top: calc(6.5rem + var(--incident-banner-offset, 0px));
     align-self: start;
-    max-height: calc(100dvh - 5.5rem);
+    max-height: calc(100dvh - 5.5rem - var(--incident-banner-offset, 0px));
     --fade-size: 1.5rem;
     mask-image: linear-gradient(
       to bottom,
@@ -883,7 +883,7 @@
 
   .sidebar {
     overflow-y: auto;
-    max-height: calc(100dvh - 7.5rem);
+    max-height: calc(100dvh - 7.5rem - var(--incident-banner-offset, 0px));
     display: flex;
     flex-direction: column;
     gap: 1rem;

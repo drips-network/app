@@ -173,7 +173,7 @@
 <style>
   .header-container {
     position: fixed;
-    top: 0;
+    top: var(--incident-banner-offset, 0px);
     left: 0;
     width: 100%;
     z-index: 5;
@@ -186,7 +186,7 @@
     width: 100%;
     margin: 0 auto;
     padding: 0.5rem 1rem 1rem 0;
-    min-height: calc(100dvh - 4rem);
+    min-height: calc(100dvh - 4rem - var(--incident-banner-offset, 0px));
     display: flex;
     height: fit-content;
     flex-direction: column;
@@ -213,14 +213,14 @@
   }
 
   .layout-container {
-    margin-top: 4rem;
+    margin-top: calc(4rem + var(--incident-banner-offset, 0px));
     display: grid;
     max-width: 100vw;
     grid-template-columns: 3rem 1fr;
     grid-template-areas: 'nav content';
     gap: 2rem;
     padding: 0rem 1rem 0 0;
-    min-height: calc(100dvh - 4rem);
+    min-height: calc(100dvh - 4rem - var(--incident-banner-offset, 0px));
   }
 
   .nav-wrapper {
@@ -228,9 +228,9 @@
     view-transition-name: sidenav;
     view-transition-class: element-handover;
     position: sticky;
-    top: 4.5rem;
+    top: calc(4.5rem + var(--incident-banner-offset, 0px));
     height: 100%;
-    max-height: calc(100vh - 4.5rem);
+    max-height: calc(100vh - 4.5rem - var(--incident-banner-offset, 0px));
   }
 
   :root::view-transition-group(sidenav) {

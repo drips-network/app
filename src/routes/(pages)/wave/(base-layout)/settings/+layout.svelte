@@ -67,7 +67,7 @@
 
   .tabs {
     position: sticky;
-    top: 3.5rem;
+    top: calc(3.5rem + var(--incident-banner-offset, 0px));
     width: 100%;
     background-color: var(--color-background);
     z-index: 2;
@@ -75,7 +75,7 @@
 
   @media (max-width: 1024px) {
     .tabs {
-      top: 2.5rem;
+      top: calc(2.5rem + var(--incident-banner-offset, 0px));
     }
   }
 </style>

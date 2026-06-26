@@ -165,18 +165,18 @@
 
   .header {
     position: fixed;
-    top: 0;
+    top: var(--incident-banner-offset, 0px);
     left: 0;
     width: 100%;
     z-index: 1;
   }
 
   .has-read-only-banner .sidenav {
-    padding-top: 8rem;
+    padding-top: calc(8rem + var(--incident-banner-offset, 0px));
   }
 
   .has-read-only-banner .page {
-    padding-top: 8rem;
+    padding-top: calc(8rem + var(--incident-banner-offset, 0px));
   }
 
   .page {
@@ -184,6 +184,7 @@
     min-height: 100vh;
     width: 100vw;
     padding: 6rem 2.5rem 1rem 2.5rem;
+    padding-top: calc(6rem + var(--incident-banner-offset, 0px));
     margin: 0 auto 0 16rem;
   }
 
@@ -214,7 +215,7 @@
     height: 100%;
     width: 16rem;
     padding: 1rem;
-    padding-top: 6rem;
+    padding-top: calc(6rem + var(--incident-banner-offset, 0px));
     z-index: 2;
   }
 
@@ -259,12 +260,13 @@
     .page,
     .sidenav-forced-collapsed .page {
       padding: 6rem 1rem 6rem 1rem;
+      padding-top: calc(6rem + var(--incident-banner-offset, 0px));
       margin-left: 0;
     }
 
     .has-read-only-banner .page,
     .has-read-only-banner.sidenav-forced-collapsed .page {
-      padding-top: 8rem;
+      padding-top: calc(8rem + var(--incident-banner-offset, 0px));
     }
 
     .bottom-nav {
