@@ -26,7 +26,6 @@
   import type { ADripListFragment } from '../drip-lists/components/__generated__/gql.generated';
   import FeatureCard from './feature-card.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import ArrowCounterClockwiseHeart from '$lib/components/icons/ArrowCounterClockwiseHeart.svelte';
   import PulsatingCircle from '$lib/components/pulsating-circle/pulsating-circle.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
 
@@ -91,10 +90,10 @@
     </div>
 
     <div>
-      <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
+      <h2 style:margin-bottom="0.25rem">Drips Wave: Live with Stellar</h2>
       <p>
-        With Drips Wave, open-source ecosystems run recurring one-week contribution sprints. During
-        these Waves, contributors receive Points, for which they earn rewards.
+        With Drips Wave, Stellar runs recurring one-week contribution sprints. During these Waves,
+        contributors receive Points, for which they earn rewards.
       </p>
     </div>
 
@@ -172,35 +171,6 @@
       </div>
     </Section>
   {/if}
-
-  <FeatureCard imageUrl="/assets/blog-images/rpgf/rpgf-filecoin-launch.png">
-    <div class="highlight-badge typo-header-5">
-      <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
-      LIVE NOW
-    </div>
-
-    <div>
-      <h2 style:margin-bottom="0.25rem">Filecoin RetroPGF-3 on Drips</h2>
-      <p>
-        Filecoin's largest RetroPGF round to date is now live on Drips' new end-to-end RetroPGF
-        platform.
-      </p>
-    </div>
-
-    {#snippet actions()}
-      <Button
-        variant="primary"
-        icon={ArrowBoxUpRight}
-        href="https://filecoin.drips.network/app/rpgf/rounds/fil-retropgf-3"
-        target="_blank">Check it out</Button
-      >
-      <Button
-        icon={ArrowCounterClockwiseHeart}
-        href="https://www.drips.network/solutions/retro-pgf"
-        target="_blank">About RetroPGF on Drips</Button
-      >
-    {/snippet}
-  </FeatureCard>
 
   {#if featuredDripLists?.length > 0}
     <Section
