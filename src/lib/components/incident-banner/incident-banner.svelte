@@ -25,6 +25,12 @@
 
   type Incident = z.infer<typeof incidentSchema>;
 
+  // Minor incidents don't warrant a global banner — only surface anything more
+  // severe (major, critical, …). Incidents without a severity are kept.
+  function warrantsBanner(incident: Incident): boolean {
+    return incident.severity?.toLowerCase() !== 'minor';
+  }
+
   let active = $state<Incident[]>([]);
 
   // A stable per-incident key so dismissing one incident doesn't dismiss future
@@ -55,7 +61,7 @@
       if (!res.ok) return;
       const parsed = statusSchema.safeParse(await res.json());
       if (!parsed.success) return;
-      active = parsed.data.incidents?.active ?? [];
+      active = (parsed.data.incidents?.active ?? []).filter(warrantsBanner);
     } catch {
       // Status page unreachable — fail silent; a banner is best-effort.
     }
