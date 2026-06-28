@@ -11,15 +11,15 @@
     unknown: 'Status unknown',
   };
 
-  // status.drips.network reports `overall` as operational / partial / down.
-  // Map its vocabulary (plus a few synonyms) onto our badge states.
+  // status.drips.network reports `overall` as one of operational / degraded /
+  // partial / down / unknown (see status-page build-status.mjs). `partial` (some
+  // but not all critical components down) maps onto our degraded state; an
+  // unrecognised value or `unknown` falls through to 'unknown' below.
   const OVERALL_MAP: Record<string, Status> = {
     operational: 'operational',
     degraded: 'degraded',
     partial: 'degraded',
     down: 'down',
-    major: 'down',
-    outage: 'down',
   };
 
   let status = $state<Status>('loading');
