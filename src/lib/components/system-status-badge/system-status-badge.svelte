@@ -11,6 +11,17 @@
     unknown: 'Status unknown',
   };
 
+  // status.drips.network reports `overall` as operational / partial / down.
+  // Map its vocabulary (plus a few synonyms) onto our badge states.
+  const OVERALL_MAP: Record<string, Status> = {
+    operational: 'operational',
+    degraded: 'degraded',
+    partial: 'degraded',
+    down: 'down',
+    major: 'down',
+    outage: 'down',
+  };
+
   let status = $state<Status>('loading');
 
   onMount(async () => {
@@ -18,9 +29,7 @@
       const res = await fetch('https://status.drips.network/status.json', { cache: 'no-store' });
       if (!res.ok) throw new Error(`status.json ${res.status}`);
       const { overall } = await res.json();
-      status = (['operational', 'degraded', 'down'] as const).includes(overall)
-        ? overall
-        : 'unknown';
+      status = OVERALL_MAP[overall] ?? 'unknown';
     } catch {
       status = 'unknown';
     }
