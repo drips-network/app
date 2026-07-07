@@ -7,7 +7,7 @@ export const load = async ({ fetch, depends }) => {
   depends('wave:maintainer-onboarding-apply-to-wave');
 
   const [ownRepos, ownOrgs, ownWaveProgramRepos] = await Promise.all([
-    getAllPaginated((page, limit) => getOwnRepos(fetch, { page, limit })),
+    getAllPaginated((page, limit, cursor) => getOwnRepos(fetch, { page, limit, cursor })),
     getOrgs(fetch, { limit: 100 }),
     getOwnWaveProgramRepos(fetch, { limit: 100 }),
   ]);

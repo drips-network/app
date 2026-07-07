@@ -9,7 +9,7 @@ export const load = async ({ params, fetch }) => {
   const [org, members, wavePrograms] = await Promise.all([
     getPublicOrg(fetch, orgId),
     getOrgMembers(fetch, orgId),
-    getAllPaginated((page, limit) => getWavePrograms(fetch, { page, limit })),
+    getAllPaginated((page, limit, cursor) => getWavePrograms(fetch, { page, limit, cursor })),
   ]);
 
   if (!org) {
