@@ -3,8 +3,12 @@ FROM node:24
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
+# Pin Chromium: the 150.0.7871.46 security update crashes on startup with SIGTRAP
+# (Debian bug #1141488). Pin to the last known-good bookworm build until fixed.
+ARG CHROMIUM_VERSION=147.0.7727.137-1~deb12u1
+
 RUN apt-get update \
- && apt-get install -y chromium \
+ && apt-get install -y chromium=${CHROMIUM_VERSION} chromium-common=${CHROMIUM_VERSION} \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends
 RUN apt-get install -y gosu

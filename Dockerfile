@@ -95,15 +95,22 @@ ARG KEYSTATIC_GITHUB_CLIENT_SECRET
 ARG KEYSTATIC_SECRET
 ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 
+# Pin Chromium: the 150.0.7871.46 security update (bookworm-security) crashes on
+# startup with SIGTRAP due to a Debian packaging regression — see Debian bug
+# #1141488 (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1141488). This
+# breaks the opengraph/screenshot rendering (and prerender). Pin to the last
+# known-good bookworm build until a fixed revision (~deb12u2) ships, then drop.
+ARG CHROMIUM_VERSION=147.0.7727.137-1~deb12u1
+
 RUN apt-get update \
-    && apt-get install -y chromium \
+    && apt-get install -y chromium=${CHROMIUM_VERSION} chromium-common=${CHROMIUM_VERSION} \
     fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends
 
 # Install necessary dependencies for Puppeteer's Chrome
 # These dependencies are required to run Puppeteer/Chrome in a headless environment
 # The contrib.list changes for ttf-mscorefonts-installer
-RUN apt-get install -y wget chromium
+RUN apt-get install -y wget chromium=${CHROMIUM_VERSION}
 # Set the Chrome repo.
 
 # Copies both package.json and package-lock.json
