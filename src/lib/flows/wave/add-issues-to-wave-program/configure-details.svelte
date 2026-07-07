@@ -20,6 +20,7 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
+  import extractApiErrorMessage from '$lib/utils/wave/utils/extract-api-error-message';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -38,9 +39,23 @@
 
   const pluralS = issues.length > 1 ? 's' : '';
 
+  // Open issues that aren't in a Wave yet but are already assigned to someone on
+  // GitHub outside of Wave. The backend rejects these (see
+  // `addIssueToWaveProgram` in wave-program-issue.service.ts), so we block them
+  // up-front from the issue payload and surface a clear reason instead of firing
+  // a request that's guaranteed to fail. (An in-Wave assignee is the
+  // Wave-assigned contributor, so we scope this to issues not yet in a Wave.)
+  let externallyAssignedIssues = $derived(
+    issues.filter(
+      (issue) => !issue.waveProgramId && issue.state === 'open' && issue.assignees.length > 0,
+    ),
+  );
+
   let eligibleIssues = $derived(
     issues
-      .filter((issue) => !issue.waveProgramId && issue.state === 'open')
+      .filter(
+        (issue) => !issue.waveProgramId && issue.state === 'open' && issue.assignees.length === 0,
+      )
       .filter((issue) => {
         const matchingWaveProgramRepo = waveProgramRepos.find(
           (waveProgramRepo) =>
@@ -49,7 +64,11 @@
         return Boolean(matchingWaveProgramRepo);
       }),
   );
-  let hasIneligibleIssues = $derived(eligibleIssues.length < issues.length);
+  // Issues that can't be added because they're already in a Wave or not open.
+  // Externally-assigned issues get their own dedicated message below.
+  let hasIneligibleIssues = $derived(
+    issues.some((issue) => issue.waveProgramId || issue.state !== 'open'),
+  );
 
   let activeComplexity: 'small' | 'medium' | 'large' = $state('small');
 
@@ -250,31 +269,65 @@
 
   let allBlocked = $derived(submittableIssues.length === 0 && eligibleIssues.length > 0);
 
+  // Builds a readable, per-issue breakdown of which adds failed and why. Rendered
+  // as-is on the stepper's error screen (newlines preserved), so keep it plain.
+  function formatAddIssueFailures(
+    failures: { issue: IssueDetailsDto; reason: unknown }[],
+    total: number,
+  ): string {
+    const header =
+      failures.length === total
+        ? total === 1
+          ? "The issue couldn't be added to the Wave Program:"
+          : `None of the ${total} issues could be added to the Wave Program:`
+        : `${failures.length} of ${total} ${total === 1 ? 'issue' : 'issues'} couldn't be added to the Wave Program:`;
+
+    const lines = failures.map(
+      ({ issue, reason }) =>
+        `• ${issue.repo.gitHubRepoFullName}#${issue.gitHubIssueNumber}: ${extractApiErrorMessage(
+          reason,
+        )}`,
+    );
+
+    return [header, '', ...lines].join('\n');
+  }
+
   async function handleSubmit() {
     dispatch('await', {
       message: `Adding issue${pluralS} to Wave Program…`,
       promise: async () => {
         const selectedWaveId = selectedWaveIds[0];
+        const issuesToAdd = submittableIssues;
 
         const results = await Promise.allSettled(
-          submittableIssues.map((issue) =>
+          issuesToAdd.map((issue) =>
             addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
           ),
         );
 
-        const failedResults = results.filter((result) => result.status === 'rejected');
+        // Refresh every issue that was added successfully — even on partial
+        // failure — so the list reflects reality regardless of the outcome.
+        const succeededIssues = issuesToAdd.filter((_, i) => results[i].status === 'fulfilled');
+        if (succeededIssues.length > 0) {
+          const updatedIssues = (
+            await Promise.all(succeededIssues.map((issue) => getIssue(undefined, issue.id)))
+          ).filter((issue): issue is IssueDetailsDto => issue !== null);
 
-        if (failedResults.length > 0) {
-          // todo(wave): Make this error nicer and list out which issues failed
-          throw new Error('Some issues could not be added to the Wave. Please try again.');
+          notifyIssuesUpdated(updatedIssues);
+          await invalidate('wave:issues');
         }
 
-        const updatedIssues = (
-          await Promise.all(submittableIssues.map((issue) => getIssue(undefined, issue.id)))
-        ).filter((issue): issue is IssueDetailsDto => issue !== null);
+        const failures = issuesToAdd
+          .map((issue, i) => ({ issue, result: results[i] }))
+          .filter(
+            (entry): entry is { issue: IssueDetailsDto; result: PromiseRejectedResult } =>
+              entry.result.status === 'rejected',
+          )
+          .map(({ issue, result }) => ({ issue, reason: result.reason }));
 
-        notifyIssuesUpdated(updatedIssues);
-        await invalidate('wave:issues');
+        if (failures.length > 0) {
+          throw new Error(formatAddIssueFailures(failures, issuesToAdd.length));
+        }
 
         onsuccess?.();
       },
@@ -298,7 +351,7 @@
     ),
   );
 
-  let valid = $derived(selectedWaveIds.length > 0 && !allBlocked);
+  let valid = $derived(selectedWaveIds.length > 0 && submittableIssues.length > 0);
 </script>
 
 <StandaloneFlowStepLayout
@@ -353,6 +406,25 @@
     <AnnotationBox>
       Some selected issues are already part of a Wave, or are not currently open. To add an issue to
       a different Wave, please remove it from its current Wave first.
+    </AnnotationBox>
+  {/if}
+
+  {#if externallyAssignedIssues.length > 0}
+    <AnnotationBox type="warning">
+      {externallyAssignedIssues.length} issue{externallyAssignedIssues.length > 1 ? 's' : ''} will be
+      skipped because {externallyAssignedIssues.length > 1 ? 'they are' : "it's"} already assigned to
+      someone outside the Wave. Unassign them on GitHub first, then try adding {externallyAssignedIssues.length >
+      1
+        ? 'them'
+        : 'it'} again.
+      <ul class="issue-list">
+        {#each externallyAssignedIssues as issue (issue.id)}
+          <li>
+            <strong>{issue.repo.gitHubRepoFullName}#{issue.gitHubIssueNumber}</strong>
+            {issue.title}
+          </li>
+        {/each}
+      </ul>
     </AnnotationBox>
   {/if}
 
@@ -513,6 +585,20 @@
   }
 
   .budget-warning-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .issue-list {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .issue-list li {
+    margin-bottom: 0.25rem;
+  }
+
+  .issue-list li:last-child {
     margin-bottom: 0;
   }
 </style>
