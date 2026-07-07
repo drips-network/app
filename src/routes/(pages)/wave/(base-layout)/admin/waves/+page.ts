@@ -11,8 +11,8 @@ export const load = async ({ parent, fetch, depends }) => {
     throw redirect(302, '/wave/admin');
   }
 
-  const wavePrograms = await getAllPaginated((page, limit) =>
-    getWavePrograms(fetch, { page, limit }),
+  const wavePrograms = await getAllPaginated((page, limit, cursor) =>
+    getWavePrograms(fetch, { page, limit, cursor }),
   );
 
   return {

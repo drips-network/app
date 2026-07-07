@@ -4,7 +4,7 @@ import { getKycStatus } from '$lib/utils/wave/kyc.js';
 
 export const load = async ({ fetch }) => {
   const [ownRepos, kycStatus] = await Promise.all([
-    getAllPaginated((page, limit) => getOwnRepos(fetch, { page, limit })),
+    getAllPaginated((page, limit, cursor) => getOwnRepos(fetch, { page, limit, cursor })),
     getKycStatus(fetch),
   ]);
 
