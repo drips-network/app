@@ -14,7 +14,12 @@ export type DropdownConfig<OT extends { label: string; value: string }[]> = {
   type: 'dropdown';
   label: string;
   link?: LinkConfig;
-  optionsPromise: Promise<OT>;
+  /**
+   * Lazily loads the dropdown options. Only invoked once the user opens the
+   * dropdown (or when a value is already selected and its label needs
+   * resolving), so heavy option fetches don't run on every page view.
+   */
+  getOptions: () => Promise<OT>;
 };
 
 export type MultiSelectConfig<OT extends { label: string; value: string }[]> = {

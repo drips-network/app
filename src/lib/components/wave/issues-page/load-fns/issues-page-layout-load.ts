@@ -111,13 +111,18 @@ export const issuesPageLayoutLoad = async (
 
   // fetch data
 
-  const [issues, waveProgramRepos, wavePrograms] = await Promise.all([
+  const [issues, ownWaveProgramReposResult, waveProgramsResult] = await Promise.all([
     getIssues(fetch, { limit: 10 }, filters, sortBy),
+    // Only needed for the "add to wave program" flow, which is gated behind
+    // `allowAddToWaveProgram` (maintainer view only). Skip the fetch elsewhere.
     // todo(wave): pagination
-    user ? (await getOwnWaveProgramRepos(fetch, { limit: 100 })).data : [],
+    user && allowAddToWaveProgram ? getOwnWaveProgramRepos(fetch, { limit: 100 }) : undefined,
     // todo(wave): Only fetch wave programs included in the issues list
-    (await getWavePrograms(fetch, { limit: 100 })).data,
+    getWavePrograms(fetch, { limit: 100 }),
   ]);
+
+  const waveProgramRepos = ownWaveProgramReposResult?.data ?? [];
+  const wavePrograms = waveProgramsResult.data;
 
   return {
     issues,

@@ -15,7 +15,19 @@
   }
 
   let { config, onchange, selectedOption = $bindable(undefined) }: Props = $props();
-  let { optionsPromise } = $derived(config);
+
+  // Options are loaded lazily: the fetch only fires once the user opens the
+  // dropdown, or immediately when a value is already selected and its label
+  // needs resolving. This keeps heavy option fetches off every page view.
+  let optionsPromise = $state<Promise<OT> | undefined>(undefined);
+
+  function ensureOptionsLoaded() {
+    optionsPromise ??= config.getOptions();
+  }
+
+  $effect(() => {
+    if (selectedOption) ensureOptionsLoaded();
+  });
 
   let triggerEl: HTMLButtonElement;
   let popoverEl: HTMLDivElement;
@@ -54,6 +66,7 @@
 
   function handlePopoverOpen() {
     popoverOpen = true;
+    ensureOptionsLoaded();
     positionPopover();
 
     scrollStore.lock();
@@ -87,7 +100,7 @@
   <span class="name">
     {#if !selectedOption}
       Any
-    {:else}
+    {:else if optionsPromise}
       {#await optionsPromise}
         Loading...
       {:then options}
@@ -97,7 +110,11 @@
         {:else}
           Unknown
         {/if}
+      {:catch}
+        Failed to load
       {/await}
+    {:else}
+      Loading...
     {/if}
   </span>
 
@@ -116,40 +133,52 @@
   }}
   popover
 >
-  {#await optionsPromise}
+  {#if !optionsPromise}
     <div class="spinner">
       <Spinner />
     </div>
-  {:then options}
-    <div class="dropdown-options">
-      <div class="search-bar">
-        <input bind:value={searchTerm} type="text" placeholder="Search..." />
-        {#if searchTerm}
-          <button aria-label="Clear search" onclick={() => (searchTerm = '')}>
-            <CrossCircle />
-          </button>
-        {/if}
+  {:else}
+    {#await optionsPromise}
+      <div class="spinner">
+        <Spinner />
       </div>
+    {:then options}
+      <div class="dropdown-options">
+        <div class="search-bar">
+          <input bind:value={searchTerm} type="text" placeholder="Search..." />
+          {#if searchTerm}
+            <button aria-label="Clear search" onclick={() => (searchTerm = '')}>
+              <CrossCircle />
+            </button>
+          {/if}
+        </div>
 
-      <div class="options-list">
-        <button class="option" class:selected={!selectedOption} onclick={() => handleSelect(null)}>
-          Any
-        </button>
-
-        {#each options.filter((option) => option.label
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())) as { label, value } (value)}
+        <div class="options-list">
           <button
             class="option"
-            class:selected={selectedOption === value}
-            onclick={() => handleSelect(value)}
+            class:selected={!selectedOption}
+            onclick={() => handleSelect(null)}
           >
-            {label}
+            Any
           </button>
-        {/each}
+
+          {#each options.filter((option) => option.label
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())) as { label, value } (value)}
+            <button
+              class="option"
+              class:selected={selectedOption === value}
+              onclick={() => handleSelect(value)}
+            >
+              {label}
+            </button>
+          {/each}
+        </div>
       </div>
-    </div>
-  {/await}
+    {:catch}
+      <div class="load-error typo-text-small">Failed to load options. Please try again.</div>
+    {/await}
+  {/if}
 </div>
 
 <style>
@@ -186,6 +215,12 @@
     padding: 1rem;
     display: flex;
     justify-content: center;
+  }
+
+  .load-error {
+    padding: 1rem;
+    text-align: center;
+    color: var(--color-foreground-level-5);
   }
 
   .dropdown-content {

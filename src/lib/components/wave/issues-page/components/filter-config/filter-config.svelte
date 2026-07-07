@@ -26,12 +26,13 @@
             assignment: {
               type: 'dropdown',
               label: 'Assignment',
-              optionsPromise: Promise.resolve([
-                { label: 'Assigned to me or unassigned', value: 'mine-or-unassigned' },
-                { label: 'Assigned to me', value: 'mine' },
-                { label: 'Unassigned', value: 'unassigned' },
-                { label: 'Assigned to someone else', value: 'assigned-to-others' },
-              ]),
+              getOptions: () =>
+                Promise.resolve([
+                  { label: 'Assigned to me or unassigned', value: 'mine-or-unassigned' },
+                  { label: 'Assigned to me', value: 'mine' },
+                  { label: 'Unassigned', value: 'unassigned' },
+                  { label: 'Assigned to someone else', value: 'assigned-to-others' },
+                ]),
             },
           }
         : {}),
@@ -101,7 +102,7 @@
                       href: `/wave/${currentWaveProgram?.slug}/repos`,
                     }
                   : undefined,
-              optionsPromise: (async () => {
+              getOptions: async () => {
                 if (mode === 'wave') {
                   if (!currentWaveProgram) {
                     throw new Error('currentWaveProgram is required for wave mode');
@@ -125,7 +126,7 @@
                     value: waveProgramRepo.repo.id,
                   }));
                 }
-              })(),
+              },
             },
           }
         : {}),
