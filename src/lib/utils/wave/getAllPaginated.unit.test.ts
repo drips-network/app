@@ -33,7 +33,13 @@ describe('getAllPaginated', () => {
 
   it('falls back to page-number pagination when no nextCursor is returned', async () => {
     const fetchPage = vi
-      .fn<(page: number, limit: number, cursor?: string) => Promise<PaginatedResponse<number>>>()
+      .fn<
+        (
+          page: number | undefined,
+          limit: number,
+          cursor?: string,
+        ) => Promise<PaginatedResponse<number>>
+      >()
       .mockResolvedValueOnce(response([1, 2], { hasNextPage: true, page: 1 }))
       .mockResolvedValueOnce(response([3, 4], { hasNextPage: true, page: 2 }))
       .mockResolvedValueOnce(response([5], { hasNextPage: false, page: 3 }));
@@ -50,7 +56,13 @@ describe('getAllPaginated', () => {
 
   it('prefers the keyset cursor once the endpoint mints one', async () => {
     const fetchPage = vi
-      .fn<(page: number, limit: number, cursor?: string) => Promise<PaginatedResponse<number>>>()
+      .fn<
+        (
+          page: number | undefined,
+          limit: number,
+          cursor?: string,
+        ) => Promise<PaginatedResponse<number>>
+      >()
       // First request has no cursor (offset mode) but mints one.
       .mockResolvedValueOnce(response([1, 2], { hasNextPage: true, nextCursor: 'cursor-1' }))
       .mockResolvedValueOnce(response([3, 4], { hasNextPage: true, nextCursor: 'cursor-2' }))
@@ -60,11 +72,12 @@ describe('getAllPaginated', () => {
     const all = await getAllPaginated(fetchPage);
 
     expect(all).toEqual([1, 2, 3, 4, 5]);
-    // The prior response's nextCursor is forwarded as the cursor arg each time.
+    // First request pages by number; once a cursor is minted it drives paging
+    // and `page` is dropped (undefined), so only `{ cursor, limit }` is sent.
     expect(fetchPage.mock.calls).toEqual([
       [1, 100, undefined],
-      [2, 100, 'cursor-1'],
-      [3, 100, 'cursor-2'],
+      [undefined, 100, 'cursor-1'],
+      [undefined, 100, 'cursor-2'],
     ]);
   });
 

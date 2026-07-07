@@ -5,15 +5,21 @@ import type { PaginatedResponse } from './types/pagination';
  *
  * Prefers keyset/cursor pagination when the endpoint returns a `nextCursor`
  * (O(limit) and exempt from the deep-offset 400 clamp), falling back to
- * page-number pagination otherwise. The `cursor` arg is only populated once the
- * first response mints one, so cursor-aware callers should forward it.
- * @param fetchPage - A function that fetches a single page given a page number,
- *   limit, and (for cursor-aware endpoints) the previous page's `nextCursor`
+ * page-number pagination otherwise. Once a cursor is in play `page` is passed as
+ * `undefined` so callers send only `{ cursor, limit }`, mirroring the issues
+ * page; endpoints that never return a cursor keep paging by number.
+ * @param fetchPage - A function that fetches a single page given the page number
+ *   (undefined once a cursor drives paging), limit, and the previous page's
+ *   `nextCursor` (for cursor-aware endpoints)
  * @param limit - The number of items per page (default: 100)
  * @returns All items from all pages combined
  */
 export async function getAllPaginated<T>(
-  fetchPage: (page: number, limit: number, cursor?: string) => Promise<PaginatedResponse<T>>,
+  fetchPage: (
+    page: number | undefined,
+    limit: number,
+    cursor?: string,
+  ) => Promise<PaginatedResponse<T>>,
   limit = 100,
 ): Promise<T[]> {
   const allItems: T[] = [];
@@ -22,13 +28,12 @@ export async function getAllPaginated<T>(
   let hasNextPage = true;
 
   while (hasNextPage) {
-    const response = await fetchPage(page, limit, cursor);
+    // Once the endpoint mints a cursor, drop `page` and page by cursor only.
+    const response = await fetchPage(cursor ? undefined : page, limit, cursor);
     allItems.push(...response.data);
     hasNextPage = response.pagination.hasNextPage;
-    // Prefer the keyset cursor when the endpoint provides one; it's O(limit) and
-    // exempt from the deep-offset 400 clamp. Falls back to page++ otherwise.
     cursor = response.pagination.nextCursor ?? undefined;
-    page++;
+    if (!cursor) page++;
   }
 
   return allItems;
