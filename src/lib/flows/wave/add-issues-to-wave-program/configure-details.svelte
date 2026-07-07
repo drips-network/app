@@ -277,8 +277,10 @@
   ): string {
     const header =
       failures.length === total
-        ? `None of the ${total} issue${total > 1 ? 's' : ''} could be added to the Wave Program:`
-        : `${failures.length} of ${total} issues couldn't be added to the Wave Program:`;
+        ? total === 1
+          ? "The issue couldn't be added to the Wave Program:"
+          : `None of the ${total} issues could be added to the Wave Program:`
+        : `${failures.length} of ${total} ${total === 1 ? 'issue' : 'issues'} couldn't be added to the Wave Program:`;
 
     const lines = failures.map(
       ({ issue, reason }) =>
