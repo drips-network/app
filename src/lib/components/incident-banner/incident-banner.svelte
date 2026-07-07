@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { page } from '$app/state';
   import { z } from 'zod';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
   import CrossSmall from '$lib/components/icons/CrossSmall.svelte';
@@ -7,12 +8,18 @@
 
   const STATUS_URL = 'https://status.drips.network/status.json';
 
+  // The status page groups its components; this is the group holding the Wave
+  // components (Wave App, Wave API, …). Incidents affecting anything in it are
+  // treated as Wave-affecting.
+  const WAVE_GROUP = 'Drips Wave';
+
   const incidentSchema = z.object({
     id: z.string().nullable().optional(),
     title: z.string(),
     severity: z.string().optional(),
     status: z.string().optional(),
     startedAt: z.string().optional(),
+    affected: z.array(z.string()).optional(),
   });
 
   const statusSchema = z.object({
@@ -21,17 +28,37 @@
         active: z.array(incidentSchema).optional(),
       })
       .optional(),
+    groups: z
+      .array(
+        z.object({
+          name: z.string(),
+          components: z.array(z.object({ name: z.string() })).optional(),
+        }),
+      )
+      .optional(),
   });
 
   type Incident = z.infer<typeof incidentSchema>;
 
-  // Minor incidents don't warrant a global banner — only surface anything more
-  // severe (major, critical, …). Incidents without a severity are kept.
-  function warrantsBanner(incident: Incident): boolean {
-    return incident.severity?.toLowerCase() !== 'minor';
+  let active = $state<Incident[]>([]);
+  // Names of the components in the Wave group, sourced from the status feed so
+  // it can't drift out of sync as components are renamed/added.
+  let waveComponents = $state<Set<string>>(new Set());
+
+  let onWaveRoute = $derived(page.url.pathname.startsWith('/wave'));
+
+  function isWaveIncident(incident: Incident): boolean {
+    return incident.affected?.some((c) => waveComponents.has(c)) ?? false;
   }
 
-  let active = $state<Incident[]>([]);
+  // Non-minor incidents warrant a banner site-wide. Minor incidents are normally
+  // noise, but a minor incident affecting a Wave component still warrants one
+  // while the user is in the Wave app, where that disruption is directly
+  // relevant. Incidents without a severity are treated as non-minor.
+  function warrantsBanner(incident: Incident): boolean {
+    if (incident.severity?.toLowerCase() !== 'minor') return true;
+    return onWaveRoute && isWaveIncident(incident);
+  }
 
   // A stable per-incident key so dismissing one incident doesn't dismiss future
   // ones. Falls back to title + start time when the incident has no id.
@@ -42,7 +69,8 @@
   // Show a single banner at a time so its height stays predictable (sub-app
   // headers offset themselves by a fixed --incident-banner-height).
   let current = $derived(
-    active.filter((i) => !$dismissablesStore.includes(dismissId(i)))[0] ?? null,
+    active.filter((i) => warrantsBanner(i) && !$dismissablesStore.includes(dismissId(i)))[0] ??
+      null,
   );
 
   // Toggle a root class so headers/content can offset below the fixed banner.
@@ -61,7 +89,13 @@
       if (!res.ok) return;
       const parsed = statusSchema.safeParse(await res.json());
       if (!parsed.success) return;
-      active = (parsed.data.incidents?.active ?? []).filter(warrantsBanner);
+      waveComponents = new Set(
+        (parsed.data.groups ?? [])
+          .filter((g) => g.name === WAVE_GROUP)
+          .flatMap((g) => g.components ?? [])
+          .map((c) => c.name),
+      );
+      active = parsed.data.incidents?.active ?? [];
     } catch {
       // Status page unreachable — fail silent; a banner is best-effort.
     }
