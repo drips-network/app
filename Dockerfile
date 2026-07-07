@@ -127,6 +127,12 @@ RUN npm run gql:generate-schema
 # This relies on schema.graphql file being present in the root dir.
 RUN npm run gql:build-types
 
+# The build spawns headless Chromium (Puppeteer). Fresh Chromium builds try to
+# connect to a dbus session bus that doesn't exist in the Docker build
+# environment, which crashes the launch. Point it at /dev/null so Chromium skips
+# the session bus instead of failing.
+ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
+
 # While building the app, we set dummy values for GQL_URL so that the build passes. When running the image these need to be set in env
 RUN npm run build:app
 
