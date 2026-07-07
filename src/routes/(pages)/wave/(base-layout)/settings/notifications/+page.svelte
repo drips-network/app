@@ -22,11 +22,6 @@
   } = {
     //contributor
 
-    [WORKFLOW_ID.ISSUE_APPLICATION_RECEIVED]: {
-      title: 'Issue application received',
-      description: 'You successfully applied to work on an issue in a Wave.',
-      category: 'contributor',
-    },
     [WORKFLOW_ID.ISSUE_APPLICATION_APPROVED]: {
       title: 'Issue application approved',
       description:
