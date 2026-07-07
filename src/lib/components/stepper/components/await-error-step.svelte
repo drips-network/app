@@ -46,7 +46,12 @@
     max-width: 32rem;
     background-color: var(--color-foreground-level-2);
     text-align: left;
-    overflow: scroll;
+    overflow: auto;
+    /* Preserve line breaks so multi-line messages (e.g. a per-item failure list)
+       render as a list rather than collapsing onto one line, while still wrapping
+       long lines instead of overflowing horizontally. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 
   p {

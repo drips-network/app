@@ -163,7 +163,10 @@
       reviewDeadlineMs !== null &&
       Date.now() <= reviewDeadlineMs,
   );
-  let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open');
+  // Issues already assigned to someone on GitHub outside of Wave are rejected by
+  // the backend, so block adding them up-front straight from the issue payload.
+  let isExternallyAssigned = $derived(!issue.waveProgramId && issue.assignees.length > 0);
+  let canBeAddedToAWave = $derived(isMaintainer && issue.state === 'open' && !isExternallyAssigned);
   let canUpdateComplexity = $derived(
     Boolean(
       partOfWaveProgram && allowAddingOrRemovingWave && isMaintainer && issue.state === 'open',
@@ -690,6 +693,12 @@
               >
                 Add to Wave Program
               </SidebarButton>
+              {#if isExternallyAssigned && issue.state === 'open' && isMaintainer}
+                <p class="typo-text-small" style:color="var(--color-foreground-level-5)">
+                  This issue is already assigned to someone outside the Wave. Unassign them on
+                  GitHub first to add it.
+                </p>
+              {/if}
             {/if}
           {/if}
         </div>
