@@ -110,6 +110,8 @@
         {:else}
           Unknown
         {/if}
+      {:catch}
+        Failed to load
       {/await}
     {:else}
       Loading...
@@ -173,6 +175,8 @@
           {/each}
         </div>
       </div>
+    {:catch}
+      <div class="load-error typo-text-small">Failed to load options. Please try again.</div>
     {/await}
   {/if}
 </div>
@@ -211,6 +215,12 @@
     padding: 1rem;
     display: flex;
     justify-content: center;
+  }
+
+  .load-error {
+    padding: 1rem;
+    text-align: center;
+    color: var(--color-foreground-level-5);
   }
 
   .dropdown-content {

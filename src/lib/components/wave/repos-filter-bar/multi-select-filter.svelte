@@ -81,13 +81,18 @@
   });
 
   let resolvedOptions = $state<OT | undefined>(undefined);
+  let optionsError = $state(false);
   $effect(() => {
-    optionsPromise.then((opts) => (resolvedOptions = opts));
+    optionsPromise.then(
+      (opts) => (resolvedOptions = opts),
+      () => (optionsError = true),
+    );
   });
 
   let displayText = $derived.by(() => {
     if (selectedValues.length === 0) return placeholder;
     if (selectedValues.length === 1) {
+      if (optionsError) return selectedValues[0];
       const match = resolvedOptions?.find((o) => o.value === selectedValues[0]);
       return match?.label ?? (resolvedOptions ? selectedValues[0] : 'Loading...');
     }
@@ -155,6 +160,8 @@
         {/each}
       </div>
     </div>
+  {:catch}
+    <div class="load-error typo-text-small">Failed to load options. Please try again.</div>
   {/await}
 </div>
 
@@ -193,6 +200,12 @@
     padding: 1rem;
     display: flex;
     justify-content: center;
+  }
+
+  .load-error {
+    padding: 1rem;
+    text-align: center;
+    color: var(--color-foreground-level-5);
   }
 
   .dropdown-content {
