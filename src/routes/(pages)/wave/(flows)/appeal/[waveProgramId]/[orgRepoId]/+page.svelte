@@ -107,6 +107,12 @@
       review. If nothing material has changed, the decision won't change, and you'll use up one of
       your limited appeals.
     </AnnotationBox>
+    <AnnotationBox type="info">
+      You have <strong
+        >{appeal.appealsRemaining} appeal{appeal.appealsRemaining === 1 ? '' : 's'} remaining</strong
+      > for this repository. If this appeal is dismissed, you'll need to wait 1 month before you can
+      appeal again.
+    </AnnotationBox>
     <FormField
       title="What development work / improvements have you made since the repo was initially rejected?*"
       type="div"
