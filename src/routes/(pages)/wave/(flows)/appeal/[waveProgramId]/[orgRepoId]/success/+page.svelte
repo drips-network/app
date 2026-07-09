@@ -4,7 +4,13 @@
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 </script>
+
+<HeadMeta
+  title="Appeal submitted | Wave"
+  description="Your repo rejection appeal is now pending review."
+/>
 
 <FlowStepWrapper
   headline="Appeal submitted"

@@ -9,6 +9,7 @@
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import { appealWaveProgramRepo } from '$lib/utils/wave/wavePrograms';
   import FlowStepWrapper from '../../../shared/flow-step-wrapper.svelte';
+  import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
 
   let { data } = $props();
 
@@ -82,6 +83,11 @@
     }
   }
 </script>
+
+<HeadMeta
+  title="Appeal rejection | Wave"
+  description="Appeal the rejection of your repo application."
+/>
 
 <FlowStepWrapper
   headline="Appeal rejection"
