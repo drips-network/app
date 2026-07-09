@@ -6,20 +6,18 @@ import { error } from '@sveltejs/kit';
 export const load = async ({ params, fetch }) => {
   const { userId } = params;
 
-  // Fetch the user first and 404 early. When the user isn't available the
-  // backend returns 404 here, so we must not surface data from the sibling
-  // endpoints (points, issues, orgs) for them.
-  const profileUserData = await getUser(fetch, userId);
-  if (!profileUserData) {
-    throw error(404, 'User not found');
-  }
-
-  const [pointsBalance, resolvedIssues, orgs] = await Promise.all([
+  // Fetch everything in parallel. When the backend won't expose a user it 404s
+  // the user-scoped endpoints, so we keep the orgs lookup from rejecting the
+  // whole batch and let the user lookup decide the outcome below: no user -> 404
+  // (a genuine failure for an existing user still surfaces as an error).
+  const [profileUserData, pointsBalance, resolvedIssues, orgs] = await Promise.all([
+    getUser(fetch, userId),
     getPointsBalanceForUser(fetch, userId),
     getIssues(fetch, { limit: 50 }, { assignedToUser: userId, state: 'closed' }),
-    getUserOrgs(fetch, userId),
+    getUserOrgs(fetch, userId).catch(() => []),
   ]);
-  if (!pointsBalance) {
+
+  if (!profileUserData || !pointsBalance) {
     throw error(404, 'User not found');
   }
 
