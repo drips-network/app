@@ -3,7 +3,7 @@ import { getPointsBalanceForUser } from '$lib/utils/wave/points.js';
 import { getUser, getUserOrgs } from '$lib/utils/wave/users.js';
 import { error } from '@sveltejs/kit';
 
-export const load = async ({ params }) => {
+export const load = async ({ params, fetch }) => {
   const { userId } = params;
 
   // Fetch the user first and 404 early. Restricted / banned users are hidden by
