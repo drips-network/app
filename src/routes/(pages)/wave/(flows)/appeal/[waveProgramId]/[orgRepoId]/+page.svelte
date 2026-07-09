@@ -109,9 +109,9 @@
   {:else}
     <AnnotationBox type="warning">
       Appeals are only reconsidered when there's been substantive work since the rejection —
-      meaningful improvements to the code, project quality, activity, or the concerns raised in the
-      review. If nothing material has changed, the decision won't change, and you'll use up one of
-      your limited appeals.
+      meaningful improvements to the code, project quality, and relevance to the ecosystem. If
+      nothing material has changed, the decision won't change, and you'll use up one of your limited
+      appeals.
     </AnnotationBox>
     <AnnotationBox type="info">
       You have <strong
