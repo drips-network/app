@@ -12,8 +12,12 @@
   import MultiSelectFilter from '$lib/components/wave/repos-filter-bar/multi-select-filter.svelte';
   import Tooltip from '$lib/components/tooltip/tooltip.svelte';
   import InfoCircle from '$lib/components/icons/InfoCircle.svelte';
+  import ArrowReply from '$lib/components/icons/ArrowReply.svelte';
   import formatDate from '$lib/utils/format-date';
-  import type { WaveProgramRepoWithDetailsDto } from '$lib/utils/wave/types/waveProgram.js';
+  import type {
+    RepoAppealEligibility,
+    WaveProgramRepoWithDetailsDto,
+  } from '$lib/utils/wave/types/waveProgram.js';
   import { goto } from '$app/navigation';
 
   let { data } = $props();
@@ -105,6 +109,31 @@
     }
     goto(url.pathname + url.search, { replaceState: true });
   }
+
+  // Whole days from now until `date`, rounded up (never negative).
+  function daysUntil(date: Date): number {
+    const ms = date.getTime() - Date.now();
+    return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+  }
+
+  // Explanation shown in the Appeal button's tooltip when it's disabled. Returns
+  // null when the user can appeal (button enabled, no tooltip needed).
+  function appealDisabledReason(appeal: RepoAppealEligibility): string | null {
+    if (appeal.canAppeal) return null;
+    if (appeal.latestAppealStatus === 'pending') {
+      return 'Your appeal is currently pending review.';
+    }
+    if (appeal.appealsRemaining <= 0) {
+      return 'You’ve used all appeals available for this repository.';
+    }
+    if (appeal.nextAppealAllowedAt) {
+      const days = daysUntil(appeal.nextAppealAllowedAt);
+      if (days > 0) {
+        return `You can submit an appeal in ${days} day${days === 1 ? '' : 's'}.`;
+      }
+    }
+    return 'You can’t appeal this rejection right now.';
+  }
 </script>
 
 {#snippet waveProgramRepo(d: WaveProgramRepoWithDetailsDto)}
@@ -146,9 +175,34 @@
             Approved
           </span>
         {:else if d.status === 'rejected'}
-          <span class="typo-text-small-bold" style:color="var(--color-negative-level-6)">
-            Rejected
-          </span>
+          {#if d.appeal?.latestAppealStatus === 'pending'}
+            <span class="typo-text-small-bold" style:color="var(--color-caution-level-6)">
+              Appeal pending
+            </span>
+          {:else}
+            <span class="typo-text-small-bold" style:color="var(--color-negative-level-6)">
+              Rejected
+            </span>
+          {/if}
+          {#if d.appeal}
+            {@const disabledReason = appealDisabledReason(d.appeal)}
+            <Tooltip disabled={!disabledReason}>
+              <Button
+                variant="normal"
+                size="small"
+                icon={ArrowReply}
+                disabled={!d.appeal.canAppeal}
+                href={d.appeal.canAppeal
+                  ? `/wave/appeal/${d.waveProgramId}/${d.repo.id}`
+                  : undefined}
+              >
+                Appeal
+              </Button>
+              {#snippet tooltip_content()}
+                <span class="typo-text-small">{disabledReason}</span>
+              {/snippet}
+            </Tooltip>
+          {/if}
         {/if}
       </div>
     </div>
@@ -460,7 +514,7 @@
   }
 
   .header-status {
-    width: 6rem;
+    width: 9rem;
     text-align: right;
   }
 
@@ -486,7 +540,12 @@
   }
 
   .status {
-    width: 6rem;
+    width: 9rem;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
     text-align: right;
     white-space: nowrap;
   }

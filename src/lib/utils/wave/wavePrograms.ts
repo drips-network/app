@@ -7,6 +7,8 @@ import {
 } from './types/pagination';
 import {
   batchApplyResponseSchema,
+  repoAppealContextDtoSchema,
+  repoRejectionAppealDtoSchema,
   waveProgramApplicationLimitsDtoSchema,
   waveDtoSchema,
   waveFiltersSchema,
@@ -17,6 +19,7 @@ import {
   waveProgramOrgsFiltersSchema,
   waveProgramReposFiltersSchema,
   waveProgramRepoWithDetailsDtoSchema,
+  type AppealWaveProgramRepoFormData,
   type BatchApplyFormData,
   type Complexity,
   type WaveFilters,
@@ -174,6 +177,36 @@ export async function rejectWaveProgramRepo(
       body: JSON.stringify({
         rejectionReason,
       }),
+    }),
+  );
+}
+
+export async function getRepoAppealEligibility(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+) {
+  return parseRes(
+    repoAppealContextDtoSchema,
+    await authenticatedCall(
+      f,
+      `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/appeal-eligibility`,
+    ),
+    { expect404: true },
+  );
+}
+
+export async function appealWaveProgramRepo(
+  f = fetch,
+  waveProgramId: string,
+  orgRepoId: string,
+  formData: AppealWaveProgramRepoFormData,
+) {
+  return parseRes(
+    repoRejectionAppealDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/${orgRepoId}/appeal`, {
+      method: 'POST',
+      body: JSON.stringify({ formData }),
     }),
   );
 }

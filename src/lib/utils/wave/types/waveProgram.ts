@@ -109,6 +109,28 @@ export type Tag = z.infer<typeof tagSchema>;
 export const waveProgramRepoStatusSchema = z.enum(['pending', 'approved', 'rejected']);
 export type WaveProgramRepoStatus = z.infer<typeof waveProgramRepoStatusSchema>;
 
+export const repoRejectionAppealStatusSchema = z.enum(['pending', 'dismissed']);
+export type RepoRejectionAppealStatus = z.infer<typeof repoRejectionAppealStatusSchema>;
+
+export const repoRejectionAppealResolutionSchema = z.enum([
+  'admin_dismissed',
+  'auto_repo_approved',
+  'auto_repo_reapplied',
+]);
+export type RepoRejectionAppealResolution = z.infer<typeof repoRejectionAppealResolutionSchema>;
+
+// Appeal eligibility for a rejected repo application, surfaced on the maintainer
+// dashboard so it can render the "Appeal" button state without extra calls.
+export const repoAppealEligibilitySchema = z.object({
+  canAppeal: z.boolean(),
+  latestAppealStatus: repoRejectionAppealStatusSchema.nullable(),
+  latestAppealAt: z.coerce.date().nullable(),
+  nextAppealAllowedAt: z.coerce.date().nullable(),
+  appealCount: z.number().int(),
+  appealsRemaining: z.number().int(),
+});
+export type RepoAppealEligibility = z.infer<typeof repoAppealEligibilitySchema>;
+
 export const waveProgramRepoDtoSchema = z.object({
   id: z.uuid(),
   waveProgramId: z.uuid(),
@@ -127,6 +149,38 @@ export const rejectWaveProgramRepoDtoSchema = z.object({
   rejectionReason: z.string().min(1).max(5000).optional(),
 });
 export type RejectWaveProgramRepoDto = z.infer<typeof rejectWaveProgramRepoDtoSchema>;
+
+// Appeal questionnaire. Mirrors the backend's extensible jsonb form_data — add
+// fields here as the appeal form grows.
+export const appealWaveProgramRepoFormDataSchema = z.object({
+  developmentWorkSinceRejection: z.string().min(1).max(10000),
+});
+export type AppealWaveProgramRepoFormData = z.infer<typeof appealWaveProgramRepoFormDataSchema>;
+
+export const repoRejectionAppealDtoSchema = z.object({
+  id: z.uuid(),
+  waveProgramRepoId: z.uuid(),
+  formData: appealWaveProgramRepoFormDataSchema,
+  status: repoRejectionAppealStatusSchema,
+  resolution: repoRejectionAppealResolutionSchema.nullable(),
+  createdAt: z.coerce.date(),
+  resolvedAt: z.coerce.date().nullable(),
+});
+export type RepoRejectionAppealDto = z.infer<typeof repoRejectionAppealDtoSchema>;
+
+// Context for the standalone appeal flow's entrypoint (single application).
+export const repoAppealContextDtoSchema = z.object({
+  waveProgramId: z.uuid(),
+  orgRepoId: z.uuid(),
+  status: waveProgramRepoStatusSchema,
+  repo: z.object({
+    id: z.uuid(),
+    gitHubRepoFullName: z.string(),
+    gitHubRepoUrl: z.string(),
+  }),
+  appeal: repoAppealEligibilitySchema,
+});
+export type RepoAppealContextDto = z.infer<typeof repoAppealContextDtoSchema>;
 
 export const waveProgramRepoWithDetailsDtoSchema = z.object({
   id: z.uuid(),
@@ -168,6 +222,8 @@ export const waveProgramRepoWithDetailsDtoSchema = z.object({
     accountType: z.enum(['User', 'Organization']),
   }),
   appliedBy: waveUserDtoSchema,
+  // Present only on the maintainer's own repo listing (/api/wave-program-repos).
+  appeal: repoAppealEligibilitySchema.optional(),
 });
 export type WaveProgramRepoWithDetailsDto = z.infer<typeof waveProgramRepoWithDetailsDtoSchema>;
 
