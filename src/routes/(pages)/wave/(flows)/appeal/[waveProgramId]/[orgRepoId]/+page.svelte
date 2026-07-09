@@ -101,6 +101,12 @@
       {ineligibleReason}
     </AnnotationBox>
   {:else}
+    <AnnotationBox type="warning">
+      Appeals are only reconsidered when there's been substantive work since the rejection —
+      meaningful improvements to the code, project quality, activity, or the concerns raised in the
+      review. If nothing material has changed, the decision won't change, and you'll use up one of
+      your limited appeals.
+    </AnnotationBox>
     <FormField
       title="What development work / improvements have you made since the repo was initially rejected?*"
       type="div"
