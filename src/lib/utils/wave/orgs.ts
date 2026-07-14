@@ -6,6 +6,7 @@ import {
   orgRepoDtoSchema,
   publicOrgDtoSchema,
   publicOrgsFiltersSchema,
+  untrackedReposResponseSchema,
   userOrgDtoSchema,
   type OrgFilters,
   type PublicOrgsFilters,
@@ -31,6 +32,16 @@ export async function getOwnRepos(f = fetch, pagination?: PaginationInput) {
   const res = await authenticatedCall(f, `/api/repos?${toPaginationParams(pagination)}`);
 
   return parseRes(paginatedResponseSchema(orgRepoDtoSchema), res);
+}
+
+/**
+ * Private repos the user's installations can access but Wave doesn't sync
+ * (Wave only tracks public repos). Fetched live from GitHub by the backend.
+ */
+export async function getUntrackedRepos(f = fetch) {
+  const res = await authenticatedCall(f, '/api/repos/untracked');
+
+  return parseRes(untrackedReposResponseSchema, res);
 }
 
 export async function getPublicOrg(f = fetch, orgId: string) {

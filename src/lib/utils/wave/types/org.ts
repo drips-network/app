@@ -66,6 +66,19 @@ export const orgMemberDtoSchema = z.object({
 });
 export type OrgMemberDto = z.infer<typeof orgMemberDtoSchema>;
 
+export const untrackedRepoDtoSchema = z.object({
+  orgId: z.uuid(),
+  gitHubRepoId: z.number(),
+  gitHubRepoName: z.string(),
+  gitHubRepoFullName: z.string(),
+  gitHubRepoUrl: z.string(),
+});
+export type UntrackedRepoDto = z.infer<typeof untrackedRepoDtoSchema>;
+
+export const untrackedReposResponseSchema = z.object({
+  data: z.array(untrackedRepoDtoSchema),
+});
+
 export const orgRepoDtoSchema = z.object({
   id: z.uuid(),
   orgId: z.uuid(),
