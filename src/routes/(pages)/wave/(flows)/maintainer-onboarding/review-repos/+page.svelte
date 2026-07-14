@@ -61,12 +61,12 @@
             {#if org.repos.length > 0 || org.privateRepos.length > 0}
               <ul>
                 {#each org.repos as repo (repo.id)}
-                  <div class="repo">
+                  <li class="repo">
                     <RepoBadge repo={{ ...repo }} />
-                  </div>
+                  </li>
                 {/each}
                 {#each org.privateRepos as repo (repo.gitHubRepoId)}
-                  <div class="repo private">
+                  <li class="repo private">
                     <div class="dimmed">
                       <RepoBadge repo={{ ...repo }} />
                     </div>
@@ -74,7 +74,7 @@
                       <Lock style="height: 1rem; width: 1rem; fill: currentColor" />
                       Private · won’t sync
                     </div>
-                  </div>
+                  </li>
                 {/each}
               </ul>
             {:else}
