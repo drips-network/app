@@ -1,5 +1,6 @@
 <script lang="ts">
   import { invalidate } from '$app/navigation';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
@@ -21,12 +22,15 @@
   }
 
   let orgsAndRepos = $derived.by(() => {
-    const { userOrgs, ownRepos } = data;
+    const { userOrgs, ownRepos, untrackedRepoFlags } = data;
 
     return userOrgs.data.map((org) => {
       return {
         ...org,
         repos: ownRepos.data.filter((repo) => repo.orgId === org.orgId),
+        hasUntrackedPrivateRepos:
+          untrackedRepoFlags.data.find((flag) => flag.orgId === org.orgId)
+            ?.hasUntrackedPrivateRepos ?? false,
       };
     });
   });
@@ -56,13 +60,24 @@
             {#if org.repos.length > 0}
               <ul>
                 {#each org.repos as repo (repo.id)}
-                  <div class="repo">
+                  <li class="repo">
                     <RepoBadge repo={{ ...repo }} />
-                  </div>
+                  </li>
                 {/each}
               </ul>
             {:else}
               <p>No accessible repositories found for this organization.</p>
+            {/if}
+            {#if org.hasUntrackedPrivateRepos}
+              <div style:margin-top="0.5rem">
+                <AnnotationBox type="warning" size="small">
+                  <span class="typo-text-small-bold"
+                    >Some repos selected for this installation are private.</span
+                  >
+                  Drips Wave only supports public repositories. Make a repo public on GitHub and it’ll
+                  appear here automatically.
+                </AnnotationBox>
+              </div>
             {/if}
           </div>
         {/each}

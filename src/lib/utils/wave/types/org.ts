@@ -66,6 +66,16 @@ export const orgMemberDtoSchema = z.object({
 });
 export type OrgMemberDto = z.infer<typeof orgMemberDtoSchema>;
 
+export const orgUntrackedReposFlagDtoSchema = z.object({
+  orgId: z.uuid(),
+  hasUntrackedPrivateRepos: z.boolean(),
+});
+export type OrgUntrackedReposFlagDto = z.infer<typeof orgUntrackedReposFlagDtoSchema>;
+
+export const untrackedReposFlagsResponseSchema = z.object({
+  data: z.array(orgUntrackedReposFlagDtoSchema),
+});
+
 export const orgRepoDtoSchema = z.object({
   id: z.uuid(),
   orgId: z.uuid(),

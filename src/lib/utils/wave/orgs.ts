@@ -6,6 +6,7 @@ import {
   orgRepoDtoSchema,
   publicOrgDtoSchema,
   publicOrgsFiltersSchema,
+  untrackedReposFlagsResponseSchema,
   userOrgDtoSchema,
   type OrgFilters,
   type PublicOrgsFilters,
@@ -31,6 +32,17 @@ export async function getOwnRepos(f = fetch, pagination?: PaginationInput) {
   const res = await authenticatedCall(f, `/api/repos?${toPaginationParams(pagination)}`);
 
   return parseRes(paginatedResponseSchema(orgRepoDtoSchema), res);
+}
+
+/**
+ * Per-org flags for whether the installation can access private repos that
+ * Wave doesn't sync (Wave only tracks public repos). Served live from
+ * GitHub by the backend.
+ */
+export async function getUntrackedRepoFlags(f = fetch) {
+  const res = await authenticatedCall(f, '/api/orgs/untracked-repo-flags');
+
+  return parseRes(untrackedReposFlagsResponseSchema, res);
 }
 
 export async function getPublicOrg(f = fetch, orgId: string) {
