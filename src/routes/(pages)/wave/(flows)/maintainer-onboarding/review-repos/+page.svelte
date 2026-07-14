@@ -69,11 +69,15 @@
               <p>No accessible repositories found for this organization.</p>
             {/if}
             {#if org.hasUntrackedPrivateRepos}
-              <AnnotationBox type="warning" size="small">
-                Some repos selected for this installation are private, so they won’t be synced —
-                Drips Wave only supports public repositories. Make a repo public on GitHub and it’ll
-                appear here automatically.
-              </AnnotationBox>
+              <div style:margin-top="0.5rem">
+                <AnnotationBox type="warning" size="small">
+                  <span class="typo-text-small-bold"
+                    >Some repos selected for this installation are private.</span
+                  >
+                  Drips Wave only supports public repositories. Make a repo public on GitHub and it’ll
+                  appear here automatically.
+                </AnnotationBox>
+              </div>
             {/if}
           </div>
         {/each}
