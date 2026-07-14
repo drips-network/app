@@ -41,7 +41,7 @@
 
 <StandaloneFlowStepLayout
   headline="Request test transaction"
-  description="We'll send $1 to verify your wallet can receive USDC on Stellar. Test transactions will usually be processed within a few minutes, but may take up to 3 days in rare cases."
+  description="We'll send $1 to verify your wallet can receive USDC on Stellar. Test transactions will usually be processed within a few minutes, but may take up to 5 hours at peak times."
 >
   {#if kyb}
     <AnnotationBox type="info">
