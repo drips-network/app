@@ -4,7 +4,6 @@
   import Button from '$lib/components/button/button.svelte';
   import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  import Lock from '$lib/components/icons/Lock.svelte';
   import Refresh from '$lib/components/icons/Refresh.svelte';
   import PaddedHorizontalScroll from '$lib/components/padded-horizontal-scroll/padded-horizontal-scroll.svelte';
   import Card from '$lib/components/wave/card/card.svelte';
@@ -23,18 +22,18 @@
   }
 
   let orgsAndRepos = $derived.by(() => {
-    const { userOrgs, ownRepos, untrackedRepos } = data;
+    const { userOrgs, ownRepos, untrackedRepoFlags } = data;
 
     return userOrgs.data.map((org) => {
       return {
         ...org,
         repos: ownRepos.data.filter((repo) => repo.orgId === org.orgId),
-        privateRepos: untrackedRepos.data.filter((repo) => repo.orgId === org.orgId),
+        hasUntrackedPrivateRepos:
+          untrackedRepoFlags.data.find((flag) => flag.orgId === org.orgId)
+            ?.hasUntrackedPrivateRepos ?? false,
       };
     });
   });
-
-  let hasPrivateRepos = $derived(data.untrackedRepos.data.length > 0);
 </script>
 
 <FlowStepWrapper
@@ -58,41 +57,29 @@
                 size="small">Edit settings</Button
               >
             </div>
-            {#if org.repos.length > 0 || org.privateRepos.length > 0}
+            {#if org.repos.length > 0}
               <ul>
                 {#each org.repos as repo (repo.id)}
                   <li class="repo">
                     <RepoBadge repo={{ ...repo }} />
                   </li>
                 {/each}
-                {#each org.privateRepos as repo (repo.gitHubRepoId)}
-                  <li class="repo private">
-                    <div class="dimmed">
-                      <RepoBadge repo={{ ...repo }} />
-                    </div>
-                    <div class="private-tag typo-text-small">
-                      <Lock style="height: 1rem; width: 1rem; fill: currentColor" />
-                      Private · won’t sync
-                    </div>
-                  </li>
-                {/each}
               </ul>
             {:else}
               <p>No accessible repositories found for this organization.</p>
+            {/if}
+            {#if org.hasUntrackedPrivateRepos}
+              <AnnotationBox type="warning" size="small">
+                Some repos selected for this installation are private, so they won’t be synced —
+                Drips Wave only supports public repositories. Make a repo public on GitHub and it’ll
+                appear here automatically.
+              </AnnotationBox>
             {/if}
           </div>
         {/each}
       </div>
     </Card>
   </PaddedHorizontalScroll>
-
-  {#if hasPrivateRepos}
-    <AnnotationBox type="warning">
-      Repos marked “Private” are selected in your GitHub App settings, but Drips Wave only supports
-      public repositories, so they won’t be synced. Make a repo public on GitHub and it’ll appear
-      here automatically.
-    </AnnotationBox>
-  {/if}
 
   <div class="notice">
     Don’t see your organization or repository?
@@ -116,30 +103,6 @@
 <style>
   .repo {
     margin-left: 1rem;
-  }
-
-  .repo.private {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    min-width: 0;
-  }
-
-  .repo.private .dimmed {
-    opacity: 0.5;
-    min-width: 0;
-  }
-
-  .private-tag {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--color-caution-level-6);
-    background-color: var(--color-caution-level-1);
-    border-radius: 1rem 0 1rem 1rem;
-    padding: 0.125rem 0.5rem;
-    white-space: nowrap;
   }
 
   .org-line {

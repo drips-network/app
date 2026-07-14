@@ -66,17 +66,14 @@ export const orgMemberDtoSchema = z.object({
 });
 export type OrgMemberDto = z.infer<typeof orgMemberDtoSchema>;
 
-export const untrackedRepoDtoSchema = z.object({
+export const orgUntrackedReposFlagDtoSchema = z.object({
   orgId: z.uuid(),
-  gitHubRepoId: z.number(),
-  gitHubRepoName: z.string(),
-  gitHubRepoFullName: z.string(),
-  gitHubRepoUrl: z.string(),
+  hasUntrackedPrivateRepos: z.boolean(),
 });
-export type UntrackedRepoDto = z.infer<typeof untrackedRepoDtoSchema>;
+export type OrgUntrackedReposFlagDto = z.infer<typeof orgUntrackedReposFlagDtoSchema>;
 
-export const untrackedReposResponseSchema = z.object({
-  data: z.array(untrackedRepoDtoSchema),
+export const untrackedReposFlagsResponseSchema = z.object({
+  data: z.array(orgUntrackedReposFlagDtoSchema),
 });
 
 export const orgRepoDtoSchema = z.object({
