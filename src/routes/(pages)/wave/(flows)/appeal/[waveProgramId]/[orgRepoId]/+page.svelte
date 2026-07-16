@@ -135,7 +135,7 @@
     >
       <TextArea
         bind:value={developmentWork}
-        placeholder="Describe the changes and improvements you've made to address the reasons for the rejection…"
+        placeholder="Describe the changes and improvements you've made since the rejection…"
         onblur={() => (developmentWorkFocussed = true)}
       />
       <div class="char-count">
