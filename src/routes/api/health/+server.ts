@@ -43,7 +43,8 @@ export const GET = async ({ fetch }) => {
 
   const checks = [
     { name: 'GraphQL API', fn: checkGqlApi },
-    { name: 'RPC', fn: checkRpc },
+    // Skip RPC check in read-only mode, where no functionality depends on the RPC
+    ...(network.readOnlyMode ? [] : [{ name: 'RPC', fn: checkRpc }]),
     // Skip LP check if in alternative chain mode (redirects to /app)
     ...(network.alternativeChainMode ? [] : [{ name: 'Landing Page', fn: () => checkLp(fetch) }]),
     { name: 'Explore', fn: () => checkExplore(fetch) },
