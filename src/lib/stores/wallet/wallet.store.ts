@@ -73,7 +73,11 @@ function getOnboard(): Promise<OnboardAPI> {
 
     onboardInstance = onboard;
     return onboard;
-  })());
+  })().catch((e) => {
+    // Don't cache a failed load (e.g. flaky connection) — let the next call retry.
+    onboardPromise = undefined;
+    throw e;
+  }));
 }
 
 async function getSafeAppsSdk(): Promise<SafeAppsSDK> {
@@ -376,6 +380,16 @@ const walletStore = () => {
     });
   }
 
+  /**
+   * Best-effort prefetch of the lazily-loaded wallet libraries (web3-onboard etc.),
+   * so that a later `connect()` doesn't have to download them first. Intended to be
+   * called during browser idle time after hydration.
+   */
+  function warmUp(): void {
+    if (!browser || network.readOnlyMode || isRunningInSafe()) return;
+    getOnboard().catch(() => undefined);
+  }
+
   return {
     subscribe: state.subscribe,
     initialized: { subscribe: initialized.subscribe },
@@ -383,6 +397,7 @@ const walletStore = () => {
     initialize,
     connect,
     disconnect,
+    warmUp,
     setOnboardTheme: (theme: Theme) => {
       onboardTheme = theme;
       onboardInstance?.state.actions.updateTheme(theme);
@@ -460,6 +475,7 @@ const localTestnetWalletStore = () => {
     initialize,
     connect,
     disconnect,
+    warmUp: () => undefined,
     setOnboardTheme: () => undefined,
   };
 };
