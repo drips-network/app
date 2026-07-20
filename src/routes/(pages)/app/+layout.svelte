@@ -95,6 +95,14 @@
   onMount(async () => {
     await initializeStores();
 
+    // Prefetch the lazily-loaded wallet libraries during idle time, so the
+    // connect flow opens instantly when the user clicks "Connect".
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => wallet.warmUp());
+    } else {
+      setTimeout(() => wallet.warmUp(), 2000);
+    }
+
     wallet.subscribe((s) => {
       if ($initializing) return;
 

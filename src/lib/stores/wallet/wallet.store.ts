@@ -1,14 +1,11 @@
 import { JsonRpcProvider, JsonRpcSigner } from 'ethers';
 import { get, writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import Onboard, { type EIP1193Provider } from '@web3-onboard/core';
-import injectedWallets from '@web3-onboard/injected-wallets';
-import walletConnectModule from '@web3-onboard/walletconnect';
+import type { EIP1193Provider, OnboardAPI, Theme } from '@web3-onboard/core';
 
 import globalAdvisoryStore from '../global-advisory/global-advisory.store';
 
-import SafeAppsSDK from '@safe-global/safe-apps-sdk';
-import { SafeAppProvider } from '@safe-global/safe-apps-provider';
+import type SafeAppsSDK from '@safe-global/safe-apps-sdk';
 import isRunningInSafe from '$lib/utils/is-running-in-safe';
 import storedWritable from '@efstajas/svelte-stored-writable';
 import { z } from 'zod';
@@ -22,43 +19,71 @@ import assert from '$lib/utils/assert';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/public';
 import { logOut } from '$lib/utils/rpgf/siwe';
 
-const appsSdk = new SafeAppsSDK();
-
 const DEFAULT_NETWORK: Network = network;
 
-const injected = injectedWallets();
+// web3-onboard, WalletConnect and the Safe SDKs together weigh several hundred KB,
+// and this store is imported by components all over the app just to read wallet
+// state. They must only ever be imported dynamically, on first actual use.
+let onboardInstance: OnboardAPI | undefined;
+let onboardPromise: Promise<OnboardAPI> | undefined;
+let onboardTheme: Theme | undefined;
 
-const onboard = Onboard({
-  wallets: [
-    injected,
-    walletConnectModule({
-      version: 2,
-      projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
-      requiredChains: [network.chainId],
-      dappUrl: 'https://drips.network',
-    }),
-  ],
-  chains: [
-    {
-      id: network.id,
-      token: network.token,
-      label: network.label,
-      rpcUrl: network.rpcUrl,
-    },
-  ],
-  accountCenter: {
-    mobile: { enabled: false },
-    desktop: { enabled: false },
-  },
-  notify: {
-    enabled: false,
-  },
-  appMetadata: {
-    name: 'Drips',
-    description: 'Please select a wallet to connect to Drips',
-    icon: '<svg height="100%"><image href="/assets/onboard-logo.png" height="100%" /></svg>',
-  },
-});
+function getOnboard(): Promise<OnboardAPI> {
+  return (onboardPromise ??= (async () => {
+    const [{ default: Onboard }, { default: injectedWallets }, { default: walletConnectModule }] =
+      await Promise.all([
+        import('@web3-onboard/core'),
+        import('@web3-onboard/injected-wallets'),
+        import('@web3-onboard/walletconnect'),
+      ]);
+
+    const onboard = Onboard({
+      wallets: [
+        injectedWallets(),
+        walletConnectModule({
+          version: 2,
+          projectId: 'c09f5d8545d67c604ccf454219fd8f4d',
+          requiredChains: [network.chainId],
+          dappUrl: 'https://drips.network',
+        }),
+      ],
+      chains: [
+        {
+          id: network.id,
+          token: network.token,
+          label: network.label,
+          rpcUrl: network.rpcUrl,
+        },
+      ],
+      accountCenter: {
+        mobile: { enabled: false },
+        desktop: { enabled: false },
+      },
+      notify: {
+        enabled: false,
+      },
+      appMetadata: {
+        name: 'Drips',
+        description: 'Please select a wallet to connect to Drips',
+        icon: '<svg height="100%"><image href="/assets/onboard-logo.png" height="100%" /></svg>',
+      },
+    });
+
+    if (onboardTheme) onboard.state.actions.updateTheme(onboardTheme);
+
+    onboardInstance = onboard;
+    return onboard;
+  })().catch((e) => {
+    // Don't cache a failed load (e.g. flaky connection) — let the next call retry.
+    onboardPromise = undefined;
+    throw e;
+  }));
+}
+
+async function getSafeAppsSdk(): Promise<SafeAppsSDK> {
+  const { default: SafeAppsSdkClass } = await import('@safe-global/safe-apps-sdk');
+  return new SafeAppsSdkClass();
+}
 
 const lastConnectedWallet = storedWritable<string | undefined>(
   'last-connected-wallet',
@@ -67,7 +92,7 @@ const lastConnectedWallet = storedWritable<string | undefined>(
   !browser,
 );
 
-type SafeInfo = Awaited<ReturnType<typeof appsSdk.safe.getInfo>>;
+type SafeInfo = Awaited<ReturnType<SafeAppsSDK['safe']['getInfo']>>;
 
 export interface ConnectedWalletStoreState {
   connected: true;
@@ -114,7 +139,7 @@ const walletStore = () => {
     if (isSafeApp) {
       await connect(true, isSafeApp);
     } else {
-      if (onboard.state.get().wallets.length > 0) return;
+      if (onboardInstance && onboardInstance.state.get().wallets.length > 0) return;
 
       const label = get(lastConnectedWallet);
       if (!label) {
@@ -139,7 +164,7 @@ const walletStore = () => {
   async function connect(
     initializing = false,
     isSafeApp = false,
-    onboardOptions?: Parameters<typeof onboard.connectWallet>[0],
+    onboardOptions?: Parameters<OnboardAPI['connectWallet']>[0],
   ): Promise<WalletStoreState | undefined> {
     if (!browser) throw new Error('Can only connect client-side');
 
@@ -170,9 +195,14 @@ const walletStore = () => {
     let safeInfo: SafeInfo | undefined;
 
     if (isSafeApp) {
+      const [appsSdk, { SafeAppProvider }] = await Promise.all([
+        getSafeAppsSdk(),
+        import('@safe-global/safe-apps-provider'),
+      ]);
       safeInfo = await appsSdk.safe.getInfo();
       provider = new BrowserProvider(new SafeAppProvider(safeInfo, appsSdk));
     } else {
+      const onboard = await getOnboard();
       waitingForOnboard.set(true);
       const wallets = await onboard.connectWallet(onboardOptions);
       waitingForOnboard.set(false);
@@ -202,7 +232,7 @@ const walletStore = () => {
         ]);
 
         // Recreate provider to avoid network change issue with MetaMask
-        const wallets = onboard.state.get().wallets;
+        const wallets = (await getOnboard()).state.get().wallets;
         const newProvider = new BrowserProvider(wallets[0].provider);
 
         // Network is already added, we can proceed.
@@ -272,8 +302,8 @@ const walletStore = () => {
    * Completely clear the store and drop any connected wallets.
    */
   function disconnect(): void {
-    onboard.state.get().wallets.forEach((w) => {
-      onboard.disconnectWallet({ label: w.label });
+    onboardInstance?.state.get().wallets.forEach((w) => {
+      onboardInstance?.disconnectWallet({ label: w.label });
     });
 
     if (browser) invalidateAll();
@@ -350,6 +380,16 @@ const walletStore = () => {
     });
   }
 
+  /**
+   * Best-effort prefetch of the lazily-loaded wallet libraries (web3-onboard etc.),
+   * so that a later `connect()` doesn't have to download them first. Intended to be
+   * called during browser idle time after hydration.
+   */
+  function warmUp(): void {
+    if (!browser || network.readOnlyMode || isRunningInSafe()) return;
+    getOnboard().catch(() => undefined);
+  }
+
   return {
     subscribe: state.subscribe,
     initialized: { subscribe: initialized.subscribe },
@@ -357,7 +397,11 @@ const walletStore = () => {
     initialize,
     connect,
     disconnect,
-    setOnboardTheme: onboard.state.actions.updateTheme,
+    warmUp,
+    setOnboardTheme: (theme: Theme) => {
+      onboardTheme = theme;
+      onboardInstance?.state.actions.updateTheme(theme);
+    },
   };
 };
 
@@ -431,6 +475,7 @@ const localTestnetWalletStore = () => {
     initialize,
     connect,
     disconnect,
+    warmUp: () => undefined,
     setOnboardTheme: () => undefined,
   };
 };

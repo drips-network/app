@@ -5,9 +5,11 @@
   import Button from '../button/button.svelte';
   import { type ComponentProps } from 'svelte';
   import modal from '$lib/stores/modal';
-  import shareSteps from '$lib/flows/share/share-steps';
-  import Stepper from '$lib/components/stepper/stepper.svelte';
   import { browser } from '$app/environment';
+
+  // The share flow transitively imports the stepper machinery and wallet stack,
+  // so it must only ever be imported lazily when the modal actually opens.
+  type ShareSteps = typeof import('$lib/flows/share/share-steps').default;
 
   interface Props {
     text?: string | undefined;
@@ -16,7 +18,7 @@
     downloadableImageUrl?: string;
     shareModalText?: string | undefined;
     buttonVariant?: ComponentProps<typeof Button>['variant'];
-    supportButtonOptions?: Parameters<typeof shareSteps>[0]['supportButtonOptions'] | undefined;
+    supportButtonOptions?: Parameters<ShareSteps>[0]['supportButtonOptions'] | undefined;
     shareLabel?: string;
   }
 
@@ -47,7 +49,12 @@
     browser && downloadableImageUrl && preloadImage(downloadableImageUrl);
   });
 
-  function handleClick() {
+  async function handleClick() {
+    const [{ default: Stepper }, { default: shareSteps }] = await Promise.all([
+      import('$lib/components/stepper/stepper.svelte'),
+      import('$lib/flows/share/share-steps'),
+    ]);
+
     modal.show(
       Stepper,
       undefined,
