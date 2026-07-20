@@ -1,7 +1,6 @@
 <script lang="ts">
   import Emoji from '$lib/components/emoji/emoji.svelte';
   import Button from '../button/button.svelte';
-  import RpgfSiweButton from '../rpgf-siwe-button/rpgf-siwe-button.svelte';
 
   interface Props {
     emoji: string;
@@ -47,7 +46,11 @@
           >{button.label}</Button
         >{/if}
       {#if showSiweButton}
-        <RpgfSiweButton on:signIn></RpgfSiweButton>
+        <!-- Imported lazily: the SIWE button pulls in the wallet stack, and this
+             component is part of the error page preloaded with every route. -->
+        {#await import('../rpgf-siwe-button/rpgf-siwe-button.svelte') then { default: RpgfSiweButton }}
+          <RpgfSiweButton />
+        {/await}
       {/if}
     </div>
   </div>

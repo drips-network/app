@@ -1,9 +1,5 @@
 <script lang="ts">
-  import wallet from '$lib/stores/wallet/wallet.store';
   import ActionableEmptyState from './actionable-empty-state.svelte';
-  import Wallet from '$lib/components/icons/Wallet.svelte';
-  import Button from '../button/button.svelte';
-  import RpgfSiweButton from '../rpgf-siwe-button/rpgf-siwe-button.svelte';
 
   interface Props {
     emoji?: string;
@@ -22,12 +18,10 @@
 
 <ActionableEmptyState {emoji} {headline} description={text}>
   {#snippet actions()}
-    {#if requireRpgfSignIn && $wallet.signer}
-      <RpgfSiweButton />
-    {:else}
-      <Button icon={Wallet} variant="primary" onclick={() => wallet.connect()}>
-        Connect wallet
-      </Button>
-    {/if}
+    <!-- Imported lazily: the actions need the wallet store, which must stay out
+         of the static import graph of every page that renders a Section. -->
+    {#await import('./disconnected-state-actions.svelte') then { default: Actions }}
+      <Actions {requireRpgfSignIn} />
+    {/await}
   {/snippet}
 </ActionableEmptyState>
