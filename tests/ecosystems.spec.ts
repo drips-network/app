@@ -1,5 +1,5 @@
 import { test as base, expect } from '@playwright/test';
-import createEcosystemPayload from './create-ecosystem-payload.json' with { type: 'json' };
+import createEcosystemPayload from './payloads/create-ecosystem-payload.json' with { type: 'json' };
 import { ConnectedSession, TEST_ADDRESSES } from './fixtures/ConnectedSession';
 import workerUniqueString from './utils/worker-unique-string';
 

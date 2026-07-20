@@ -17,6 +17,7 @@
   } from '$lib/flows/import-from-csv/csv-import-helpers';
   import importFromCSVSteps from '$lib/flows/import-from-csv/import-from-csv-steps';
   import CustodialWarning from '$lib/components/annotation-box/custodial-warning.svelte';
+  import type { AccountId } from '$lib/utils/common-types';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
 
