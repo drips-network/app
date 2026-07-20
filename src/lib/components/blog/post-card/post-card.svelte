@@ -74,7 +74,6 @@
     height={BLOG_COVER_IMAGE_VARIANTS[coverVariant].height}
     loading={first ? undefined : 'lazy'}
     fetchpriority={first ? 'high' : undefined}
-    style:view-transition-name="blog-cover-{slug}"
   />
   <div class="content">
     <div>
