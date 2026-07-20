@@ -7,13 +7,13 @@
     type authorSchema,
     type BLOG_CATEGORIES,
   } from '../../../../routes/api/blog/posts/schema';
+  import { BLOG_COVER_IMAGE_VARIANTS, blogCoverImageUrl } from '$lib/utils/blog-cover-images';
 
   interface Props {
     title: string;
     excerpt: string;
     date: string;
     slug: string;
-    coverImage: string;
     coverImageAlt: string;
     categories?: (typeof BLOG_CATEGORIES)[number][] | undefined;
     imageUrl?: string | undefined;
@@ -31,7 +31,6 @@
     excerpt,
     date,
     slug,
-    coverImage,
     coverImageAlt,
     categories = undefined,
     imageUrl = undefined,
@@ -53,6 +52,8 @@
   );
 
   let authorNames = $derived(authors?.map((a) => a.name.split(' ')[0]).join(' & '));
+
+  let coverVariant = $derived(compact ? ('compact' as const) : ('card' as const));
 </script>
 
 <svelte:element
@@ -65,7 +66,15 @@
   href="/blog/posts/{slug}"
   target={newTab ? '_blank' : undefined}
 >
-  <img class="cover-image" src={coverImage} alt={coverImageAlt} />
+  <img
+    class="cover-image"
+    src={blogCoverImageUrl(slug, coverVariant)}
+    alt={coverImageAlt}
+    width={BLOG_COVER_IMAGE_VARIANTS[coverVariant].width}
+    height={BLOG_COVER_IMAGE_VARIANTS[coverVariant].height}
+    loading={first ? undefined : 'lazy'}
+    fetchpriority={first ? 'high' : undefined}
+  />
   <div class="content">
     <div>
       {#if first}
@@ -88,7 +97,14 @@
         {#if authors?.length}
           <span class="author-pile">
             {#each authors as author (author.name)}
-              <img class="author-avatar" src={author.avatarUrl} alt={author.name} />
+              <img
+                class="author-avatar"
+                src={author.avatarUrl}
+                alt={author.name}
+                width="24"
+                height="24"
+                loading="lazy"
+              />
             {/each}
           </span>
           <span>{authorNames}</span>

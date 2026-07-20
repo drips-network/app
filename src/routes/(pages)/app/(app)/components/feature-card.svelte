@@ -1,11 +1,14 @@
 <script lang="ts">
   interface Props {
     imageUrl?: string;
+    /** Set for above-the-fold usage so the browser fetches the image with high priority. */
+    priorityImage?: boolean;
+    imageDimensions?: { width: number; height: number };
     children?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
   }
 
-  let { imageUrl, children, actions }: Props = $props();
+  let { imageUrl, priorityImage = false, imageDimensions, children, actions }: Props = $props();
 
   let imageEl: HTMLImageElement | undefined = $state();
   let imageLoaded = $state(false);
@@ -23,6 +26,9 @@
       bind:this={imageEl}
       class:loaded={imageLoaded}
       src={imageUrl}
+      fetchpriority={priorityImage ? 'high' : undefined}
+      width={imageDimensions?.width}
+      height={imageDimensions?.height}
       onload={() => {
         imageLoaded = true;
       }}
