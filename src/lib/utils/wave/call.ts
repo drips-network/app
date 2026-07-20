@@ -50,7 +50,7 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const PUBLIC_WAVE_API_URL = getOptionalEnvVarPublic(
+export const PUBLIC_WAVE_API_URL = getOptionalEnvVarPublic(
   'PUBLIC_WAVE_API_URL',
   true,
   'Wave functionality will not work.',
