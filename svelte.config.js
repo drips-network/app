@@ -35,6 +35,10 @@ const config = {
 
   kit: {
     adapter: adapter(),
+    // Inline all stylesheets into the SSR'd HTML (largest is currently ~32KB).
+    // Serving them as separate files means 40+ render-blocking requests per page,
+    // which dominates first paint for users on high-latency connections.
+    inlineStyleThreshold: 48 * 1024,
     prerender: {
       origin: process.env.PUBLIC_BASE_URL,
     },
