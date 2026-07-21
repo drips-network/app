@@ -24,7 +24,11 @@
 <HeadMeta title="Explore Wave Programs | Wave" canonical="https://www.drips.network/wave" />
 
 <div class="page">
-  <FeatureCard imageUrl="/assets/wave/wave-hp.png">
+  <FeatureCard
+    imageUrl="/assets/wave/wave-hp.png"
+    priorityImage
+    imageDimensions={{ width: 1560, height: 760 }}
+  >
     <div>
       <h2 style:margin-bottom="0.25rem">Introducing Drips Wave</h2>
       <p>

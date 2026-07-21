@@ -83,7 +83,7 @@
     dismissablesStore.dismiss(dismissId(incident));
   }
 
-  onMount(async () => {
+  async function checkStatus() {
     try {
       const res = await fetch(STATUS_URL, { cache: 'no-store' });
       if (!res.ok) return;
@@ -98,6 +98,17 @@
       active = parsed.data.incidents?.active ?? [];
     } catch {
       // Status page unreachable — fail silent; a banner is best-effort.
+    }
+  }
+
+  onMount(() => {
+    // Deferred to idle time so the status request doesn't compete with
+    // render-critical work during page load. The banner is position: fixed,
+    // so appearing late causes no layout shift.
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => void checkStatus());
+    } else {
+      setTimeout(() => void checkStatus(), 2000);
     }
   });
 </script>

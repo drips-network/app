@@ -8,6 +8,7 @@
   import fiatEstimates from '$lib/utils/fiat-estimates/fiat-estimates';
   import CoinAnimation from '$lib/components/coin-animation/coin-animation.svelte';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
+  import { BLOG_COVER_IMAGE_VARIANTS, blogCoverImageUrl } from '$lib/utils/blog-cover-images';
 
   interface Props {
     blogPost:
@@ -50,7 +51,13 @@
     {#if blogPost}
       <a class="typo-text-small" href={`/blog/posts/${blogPost.slug}`} target="_blank">
         <div>
-          <img src={blogPost.coverImage} alt={blogPost.coverImageAlt} loading="lazy" />
+          <img
+            src={blogCoverImageUrl(blogPost.slug, 'compact')}
+            alt={blogPost.coverImageAlt}
+            width={BLOG_COVER_IMAGE_VARIANTS.compact.width}
+            height={BLOG_COVER_IMAGE_VARIANTS.compact.height}
+            loading="lazy"
+          />
           {blogPost.title}
         </div>
         <ChevronRight style="fill: var(--color-foreground)" />

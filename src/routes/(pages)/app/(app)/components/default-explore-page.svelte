@@ -83,7 +83,11 @@
 </script>
 
 <div class="explore">
-  <FeatureCard imageUrl="/assets/wave/wave-hp.png">
+  <FeatureCard
+    imageUrl="/assets/wave/wave-hp.png"
+    priorityImage
+    imageDimensions={{ width: 1560, height: 760 }}
+  >
     <div class="highlight-badge typo-header-5">
       <PulsatingCircle pulseColor="rgba(255,255,255,0.5)" />
       NEW
