@@ -18,6 +18,28 @@ export class LoginRestartRequiredError extends Error {
 const ATTEMPTED_CODE_KEY = 'wave-oauth-attempted-code';
 
 /**
+ * sessionStorage access throws when storage is blocked entirely (e.g. Safari's
+ * "block all cookies", some embedded webviews). The reload guard is
+ * best-effort — without storage we just lose reload protection, which must
+ * never prevent the login attempt itself.
+ */
+function getAttemptedCode(): string | null {
+  try {
+    return sessionStorage.getItem(ATTEMPTED_CODE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function markCodeAttempted(code: string): void {
+  try {
+    sessionStorage.setItem(ATTEMPTED_CODE_KEY, code);
+  } catch {
+    // See getAttemptedCode.
+  }
+}
+
+/**
  * The backend responds with `{"error": "..."}` bodies that `call()` embeds in
  * its thrown Error message. Surface that message instead of a generic one —
  * "OAuth session expired. Please try again." is a lot more actionable than
@@ -56,10 +78,10 @@ export default async function performLogin(url: URL) {
   // server-side with its response lost (e.g. reload while the ~1.5s exchange
   // was in flight). Mark the code as attempted *before* redeeming so any
   // later load can tell, and restart the login instead of burning a request.
-  if (browser && sessionStorage.getItem(ATTEMPTED_CODE_KEY) === code) {
+  if (browser && getAttemptedCode() === code) {
     throw new LoginRestartRequiredError();
   }
-  if (browser) sessionStorage.setItem(ATTEMPTED_CODE_KEY, code);
+  if (browser) markCodeAttempted(code);
 
   try {
     // exchange for wave login
