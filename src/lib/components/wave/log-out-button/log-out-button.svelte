@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
   import Button from '$lib/components/button/button.svelte';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import { logOut } from '$lib/utils/wave/auth';
 
   let loggingOut = $state(false);
@@ -10,6 +11,7 @@
     await logOut();
     await invalidateAll();
     loggingOut = false;
+    cupertinoPaneStore.closeSheet();
   }
 </script>
 
