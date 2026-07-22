@@ -43,9 +43,7 @@ Important to know: appeals are only reconsidered when there has been **substanti
 
 A large share of the Wave community contributes over mobile and other connections where every round trip and every kilobyte is felt. We spent a big chunk of this cycle on exactly that, and it's the change we think you'll notice most immediately.
 
-**We've enabled HTTP/3 with QUIC across Drips.** On networks with packet loss or high latency — which describes a lot of mobile connections — QUIC establishes connections faster and recovers from dropped packets far more gracefully than the older protocol. If the app has felt sluggish to load for you, this alone should make a visible difference.
-
-On top of that, we went hunting for waste in the frontend:
+Most of that work went into cutting out waste in the frontend — code and data the app was downloading whether you needed it or not:
 
 - 📦 **The repo filter on the issues pages was loading roughly 250KB on every single page view** — even when the filter panel was collapsed and you never opened it. It now loads only when you actually open the dropdown.
 - 👛 **Wallet libraries, the share flow, and the sign-in button** no longer load upfront on every page. They load when you need them.
