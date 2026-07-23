@@ -21,6 +21,7 @@
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import extractApiErrorMessage from '$lib/utils/wave/utils/extract-api-error-message';
+  import mapWithConcurrency from '$lib/utils/map-with-concurrency';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -299,10 +300,12 @@
         const selectedWaveId = selectedWaveIds[0];
         const issuesToAdd = submittableIssues;
 
-        const results = await Promise.allSettled(
-          issuesToAdd.map((issue) =>
-            addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
-          ),
+        // Adds sequentialize on an org-wide lock on the backend, so firing them
+        // all at once just piles up lock waiters. Keep concurrency low.
+        const results = await mapWithConcurrency(
+          issuesToAdd,
+          (issue) => addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
+          2,
         );
 
         // Refresh every issue that was added successfully — even on partial
