@@ -14,14 +14,13 @@
   import Card from '$lib/components/wave/card/card.svelte';
   import ListSelect from '$lib/components/list-select/list-select.svelte';
   import type { Items } from '$lib/components/list-select/list-select.types';
-  import { addIssueToWaveProgram } from '$lib/utils/wave/wavePrograms';
+  import { addIssuesToWaveProgram, BULK_ADD_MAX_ISSUES } from '$lib/utils/wave/wavePrograms';
   import { invalidate } from '$app/navigation';
   import { notifyIssuesUpdated } from '$lib/components/wave/issues-page/issue-update-coordinator';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import { getIssue } from '$lib/utils/wave/issues';
   import { getPointsForComplexity } from '$lib/utils/wave/get-points-for-complexity';
   import extractApiErrorMessage from '$lib/utils/wave/utils/extract-api-error-message';
-  import mapWithConcurrency from '$lib/utils/map-with-concurrency';
   import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
   const dispatch = createEventDispatcher<StepComponentEvents>();
@@ -300,17 +299,40 @@
         const selectedWaveId = selectedWaveIds[0];
         const issuesToAdd = submittableIssues;
 
-        // Adds sequentialize on an org-wide lock on the backend, so firing them
-        // all at once just piles up lock waiters. Keep concurrency low.
-        const results = await mapWithConcurrency(
-          issuesToAdd,
-          (issue) => addIssueToWaveProgram(undefined, selectedWaveId, issue.id, activeComplexity),
-          2,
-        );
+        // One bulk request per chunk of BULK_ADD_MAX_ISSUES, sequentially. The
+        // backend adds each chunk in a single transaction with one org-lock
+        // acquisition, reporting per-issue outcomes — unlike parallel single
+        // adds, which serialize on that lock and can time out (wave#735).
+        const resultByIssueId = new SvelteMap<string, { success: boolean; error: string | null }>();
+        for (let i = 0; i < issuesToAdd.length; i += BULK_ADD_MAX_ISSUES) {
+          const chunk = issuesToAdd.slice(i, i + BULK_ADD_MAX_ISSUES);
+          try {
+            const response = await addIssuesToWaveProgram(
+              undefined,
+              selectedWaveId,
+              chunk.map((issue) => ({ issueId: issue.id, complexity: activeComplexity })),
+            );
+            for (const result of response.results) {
+              resultByIssueId.set(result.issueId, result);
+            }
+          } catch (error) {
+            // Whole-chunk failure (network, 5xx, batch-level 4xx): report every
+            // issue in the chunk as failed but keep going — later chunks may
+            // succeed, and earlier ones already have.
+            for (const issue of chunk) {
+              resultByIssueId.set(issue.id, {
+                success: false,
+                error: extractApiErrorMessage(error),
+              });
+            }
+          }
+        }
 
         // Refresh every issue that was added successfully — even on partial
         // failure — so the list reflects reality regardless of the outcome.
-        const succeededIssues = issuesToAdd.filter((_, i) => results[i].status === 'fulfilled');
+        const succeededIssues = issuesToAdd.filter(
+          (issue) => resultByIssueId.get(issue.id)?.success,
+        );
         if (succeededIssues.length > 0) {
           const updatedIssues = (
             await Promise.all(succeededIssues.map((issue) => getIssue(undefined, issue.id)))
@@ -321,12 +343,11 @@
         }
 
         const failures = issuesToAdd
-          .map((issue, i) => ({ issue, result: results[i] }))
-          .filter(
-            (entry): entry is { issue: IssueDetailsDto; result: PromiseRejectedResult } =>
-              entry.result.status === 'rejected',
-          )
-          .map(({ issue, result }) => ({ issue, reason: result.reason }));
+          .filter((issue) => !resultByIssueId.get(issue.id)?.success)
+          .map((issue) => ({
+            issue,
+            reason: resultByIssueId.get(issue.id)?.error ?? 'Unknown error',
+          }));
 
         if (failures.length > 0) {
           throw new Error(formatAddIssueFailures(failures, issuesToAdd.length));
