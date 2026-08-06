@@ -22,12 +22,33 @@ export class AccountRestrictedError extends Error {
   }
 }
 
+/**
+ * Thrown for 403 responses where the API is holding the request until the user
+ * completes a short identity check.
+ *
+ * Route guards normally catch this before the request is made, so seeing it
+ * means a check fell due mid-session. Callers should send the user to
+ * /wave/checkpoint rather than surfacing a generic error.
+ */
+export class LivenessCheckpointRequiredError extends Error {
+  constructor() {
+    super('A quick identity check is needed before you can continue.');
+    this.name = 'LivenessCheckpointRequiredError';
+  }
+}
+
 function isAccountSuspendedResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('suspended');
 }
 
 function isAccountRestrictedResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('restricted');
+}
+
+// Matched on the machine-readable `code` the backend sets rather than the
+// prose, which is free to change.
+function isCheckpointRequiredResponse(status: number, body: string): boolean {
+  return status === 403 && body.includes('liveness_checkpoint_required');
 }
 
 const MAX_RETRIES = 3;
@@ -151,6 +172,10 @@ export async function authenticatedCall(
 
       if (isAccountRestrictedResponse(res.status, errorText)) {
         throw new AccountRestrictedError();
+      }
+
+      if (isCheckpointRequiredResponse(res.status, errorText)) {
+        throw new LivenessCheckpointRequiredError();
       }
 
       if (res.status === 401) {
