@@ -30,9 +30,9 @@
    *
    * The backend is the only authority here: it resolves the challenge from
    * SumSub's webhook, and falls back to asking SumSub directly if that webhook
-   * is slow or lost. Polling starts as soon as the SDK mounts rather than
-   * waiting for an SDK event, so an event we don't recognise can never leave
-   * the user stuck on a spinner.
+   * is slow or lost. The loop runs on a fixed interval from the moment the SDK
+   * mounts rather than being kicked off by an SDK event, so an event we don't
+   * recognise can never leave the user stuck on a spinner.
    */
   async function poll() {
     if (stopped) return;
@@ -47,7 +47,14 @@
         return;
       }
 
-      if (status.challengeStatus === 'rejected' || status.locked) {
+      // 'expired' means this attempt was superseded (another tab started a new
+      // one), so nothing will ever resolve it. Terminal here too, otherwise the
+      // loop would spin indefinitely.
+      if (
+        status.challengeStatus === 'rejected' ||
+        status.challengeStatus === 'expired' ||
+        status.locked
+      ) {
         stopped = true;
         await invalidate('wave:liveness-checkpoint');
         await goto(`/wave/checkpoint?backTo=${encodeURIComponent(backTo)}`);

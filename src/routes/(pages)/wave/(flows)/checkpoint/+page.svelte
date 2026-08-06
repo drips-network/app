@@ -9,6 +9,9 @@
   let { data } = $props();
   let { checkpoint, backTo } = $derived(data);
 
+  // Only 'rejected' is a failure. An 'expired' attempt was abandoned or
+  // superseded by a newer one rather than failed, so telling that user "that
+  // check didn't go through" would be wrong — they get the first-time copy.
   let previousAttemptFailed = $derived(checkpoint.challengeStatus === 'rejected');
 
   let description = $derived(
