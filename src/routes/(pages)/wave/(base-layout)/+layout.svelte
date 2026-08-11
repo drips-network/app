@@ -17,6 +17,7 @@
   import Wallet from '$lib/components/icons/Wallet.svelte';
   import Shield from '$lib/components/icons/Shield.svelte';
   import Speedometer from '$lib/components/icons/Speedometer.svelte';
+  import Graph from '$lib/components/icons/Graph.svelte';
 
   let {
     data,
@@ -112,6 +113,12 @@
                 },
               ]
             : []),
+          {
+            type: 'target' as const,
+            name: 'Reports',
+            href: '/wave/reports',
+            icon: Graph,
+          },
           {
             type: 'target' as const,
             name: 'Reward Grants',
