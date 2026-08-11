@@ -7,6 +7,7 @@ import {
 } from './types/pagination';
 import {
   batchApplyResponseSchema,
+  bulkAddIssuesToWaveProgramResponseDtoSchema,
   repoAppealContextDtoSchema,
   repoRejectionAppealDtoSchema,
   waveProgramApplicationLimitsDtoSchema,
@@ -247,6 +248,37 @@ export async function addIssueToWaveProgram(
         issueId,
         complexity,
       }),
+    }),
+  );
+}
+
+/**
+ * Server-side cap on issues per bulk-add request (mirrors `BULK_ADD_MAX_ISSUES`
+ * in the Wave API). Larger selections must be chunked by the caller.
+ */
+export const BULK_ADD_MAX_ISSUES = 50;
+
+/**
+ * Adds up to `BULK_ADD_MAX_ISSUES` issues to a wave program in a single request
+ * (and a single backend transaction). Per-issue failures are reported in the
+ * response's `results` without failing the batch. Prefer this over parallel
+ * `addIssueToWaveProgram` calls: those serialize on a per-org lock server-side
+ * and can time out in bulk (see wave#735).
+ */
+export async function addIssuesToWaveProgram(
+  f = fetch,
+  waveProgramId: string,
+  issues: { issueId: string; complexity?: Complexity }[],
+) {
+  if (issues.length > BULK_ADD_MAX_ISSUES) {
+    throw new Error(`Cannot add more than ${BULK_ADD_MAX_ISSUES} issues per request`);
+  }
+
+  return parseRes(
+    bulkAddIssuesToWaveProgramResponseDtoSchema,
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/issues/bulk`, {
+      method: 'POST',
+      body: JSON.stringify({ issues }),
     }),
   );
 }
