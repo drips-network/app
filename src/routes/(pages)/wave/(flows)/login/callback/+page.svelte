@@ -1,17 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import performLogin from './perform-login';
+  import performLogin, { LoginRestartRequiredError } from './perform-login';
   import { page } from '$app/state';
   import { goto, invalidateAll } from '$app/navigation';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Button from '$lib/components/button/button.svelte';
   import { AccountSuspendedError } from '$lib/utils/wave/call';
   import { getKycStatus } from '$lib/utils/wave/kyc';
+  import { isHttpError } from '@sveltejs/kit';
 
   let { data } = $props();
   let { backTo, skipWelcome } = $derived(data);
 
   let error = $state<boolean>(false);
+  let errorMessage = $state<string | null>(null);
+
+  let loginHref = $derived(`/wave/login${backTo ? `?backTo=${encodeURIComponent(backTo)}` : ''}`);
 
   // If backTo already points at /wave/kyc-required (e.g. the user was bounced
   // through login from that page), unwrap the inner backTo so we don't nest
@@ -73,8 +77,17 @@
         return goto('/wave/suspended');
       }
 
+      // This code was already redeemed by an earlier load of this page (e.g.
+      // a reload mid-exchange). If that attempt actually established a
+      // session, the login page bounces straight to backTo; otherwise it's a
+      // single tap to restart, which GitHub re-authorizes instantly.
+      if (err instanceof LoginRestartRequiredError) {
+        return goto(loginHref);
+      }
+
       // eslint-disable-next-line no-console
-      console.error('Login callback error:', err);
+      console.error('Login callback error:', isHttpError(err) ? err.body : err);
+      errorMessage = isHttpError(err) ? err.body.message : null;
       error = true;
     }
   });
@@ -89,11 +102,15 @@
 >
   {#if error}
     <div class="typo-heading-3" style:text-align="center" style:color="var(--color-error)">
-      Something went wrong. Please try again, and if this problem persists, contact us at
-      support@drips.network.
+      {#if errorMessage}
+        {errorMessage} If this problem persists, contact us at support@drips.network.
+      {:else}
+        Something went wrong. Please try again, and if this problem persists, contact us at
+        support@drips.network.
+      {/if}
     </div>
 
-    <Button href="/wave/login">Try again</Button>
+    <Button href={loginHref}>Try again</Button>
   {:else}
     <Spinner />
     One moment please, you're being logged in...
