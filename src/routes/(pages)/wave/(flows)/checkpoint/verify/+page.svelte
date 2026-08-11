@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
+  import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import themeStore from '$lib/stores/theme/theme.store.js';
   import {
@@ -19,11 +20,36 @@
    */
   let phase = $state<'capturing' | 'checking'>('capturing');
 
+  /** Set once we've been waiting on a verdict for longer than we'd expect. */
+  let verdictSlow = $state(false);
+
   let snsWebSdkInstance: SnsWebSdk | null = null;
   let pollTimer: ReturnType<typeof setTimeout> | null = null;
   let stopped = false;
+  let checkingSince: number | null = null;
 
   const POLL_INTERVAL_MS = 2000;
+
+  /**
+   * How long we hide the SDK waiting for a verdict before showing it again.
+   *
+   * The SDK re-presents its own retry UI in place (bad lighting, no face
+   * detected, ...), and it does so without an event we can reliably hook, so
+   * an unconditional spinner can bury a prompt the user needs to answer.
+   */
+  const VERDICT_TIMEOUT_MS = 60000;
+
+  function startChecking() {
+    phase = 'checking';
+    verdictSlow = false;
+    checkingSince = Date.now();
+  }
+
+  /** Puts the SDK back on screen — it needs the user again. */
+  function backToCapturing() {
+    phase = 'capturing';
+    checkingSince = null;
+  }
 
   /**
    * Polls the backend until the checkpoint resolves.
@@ -40,10 +66,14 @@
     try {
       const status = await getLivenessCheckpointStatus(undefined, 'grant_access');
 
+      // `invalidateAll` rather than a separate `invalidate` call: invalidating
+      // before navigating re-runs *this* route's loads, which would start a
+      // second challenge and redirect us somewhere we don't want to go.
       if (status.satisfied) {
         stopped = true;
-        await invalidate('wave:liveness-checkpoint');
-        await goto(`/wave/checkpoint/success?backTo=${encodeURIComponent(backTo)}`);
+        await goto(`/wave/checkpoint/success?backTo=${encodeURIComponent(backTo)}`, {
+          invalidateAll: true,
+        });
         return;
       }
 
@@ -56,12 +86,22 @@
         status.locked
       ) {
         stopped = true;
-        await invalidate('wave:liveness-checkpoint');
-        await goto(`/wave/checkpoint?backTo=${encodeURIComponent(backTo)}`);
+        await goto(`/wave/checkpoint?backTo=${encodeURIComponent(backTo)}`, {
+          invalidateAll: true,
+        });
         return;
       }
     } catch {
       // A blip shouldn't end the flow — the next tick will try again.
+    }
+
+    if (
+      phase === 'checking' &&
+      checkingSince !== null &&
+      Date.now() - checkingSince > VERDICT_TIMEOUT_MS
+    ) {
+      verdictSlow = true;
+      backToCapturing();
     }
 
     pollTimer = setTimeout(poll, POLL_INTERVAL_MS);
@@ -79,10 +119,17 @@
       })
       .withOptions({ addViewportTag: false, adaptIframeHeight: true })
       .on('idCheck.onActionSubmitted', () => {
-        phase = 'checking';
+        startChecking();
       })
       .on('idCheck.onActionCompleted', () => {
-        phase = 'checking';
+        startChecking();
+      })
+      // Both mean the SDK is showing the user something they have to act on.
+      .on('idCheck.onError', () => {
+        backToCapturing();
+      })
+      .on('idCheck.onUploadError', () => {
+        backToCapturing();
       })
       .build();
 
@@ -113,6 +160,14 @@
 {/if}
 
 <div class="wrapper" class:hidden={phase === 'checking'}>
+  {#if verdictSlow}
+    <div class="slow-note">
+      <AnnotationBox type="info">
+        This is taking longer than usual. If the check is asking you to try again, follow the
+        prompts — otherwise hang tight, we're still waiting on the result.
+      </AnnotationBox>
+    </div>
+  {/if}
   <div id="sumsub-target"></div>
 </div>
 
@@ -122,8 +177,15 @@
     width: 100%;
     flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+
+  .slow-note {
+    width: 100%;
+    max-width: 38rem;
+    padding: 0 2rem;
   }
 
   /* Kept mounted rather than destroyed — tearing the SDK down mid-review can

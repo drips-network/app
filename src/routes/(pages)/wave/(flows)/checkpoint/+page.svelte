@@ -56,9 +56,12 @@
 
   {#snippet actions()}
     {#if !checkpoint.locked}
+      <!-- `noPreload` because the verify load starts a checkpoint challenge —
+           hover-preloading it would burn an attempt without a click. -->
       <Button
         variant="primary"
         icon={ArrowRight}
+        noPreload
         href={`/wave/checkpoint/verify?backTo=${encodeURIComponent(backTo)}`}
       >
         {previousAttemptFailed ? 'Try again' : 'Start check'}
