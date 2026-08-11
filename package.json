@@ -50,7 +50,7 @@
     "@types/sanitize-html": "^2.11.0",
     "@types/set-cookie-parser": "^2.4.10",
     "autoprefixer": "^10.4.19",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.0",
