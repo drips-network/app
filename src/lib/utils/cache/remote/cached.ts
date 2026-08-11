@@ -3,6 +3,12 @@ import type { RedisClientType } from '../../../../routes/api/redis';
 
 const ENABLE_CACHE_LOGS = true;
 
+// A cache read should take single-digit milliseconds. If it takes longer the
+// connection is likely degraded (e.g. a half-open socket after an idle drop), so
+// we give up and serve fresh data rather than block the request. A stalled read
+// once hung explore + project SSR for over a minute and took a deployment down.
+const READ_TIMEOUT_MS = 1000;
+
 function log(...content: unknown[]) {
   if (ENABLE_CACHE_LOGS) {
     // eslint-disable-next-line no-console
@@ -10,8 +16,29 @@ function log(...content: unknown[]) {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`redis read timed out after ${ms}ms`)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
 /**
  * Caches the result of a fetcher function using Redis.
+ *
+ * The cache read is bounded by a short timeout and never throws: if Redis is
+ * slow or unreachable the fetcher runs instead, so a degraded cache slows
+ * requests down rather than breaking them.
+ *
  * @param redis - The Redis instance. If undefined, caching is disabled.
  * @param key - The cache key.
  * @param EX - The expiration time in seconds.
@@ -27,7 +54,15 @@ export default async function cached<T extends Record<string, any>>(
 ) {
   const keyWithNetwork = `${network.name}-${key}`;
 
-  const cachedResponse = redis && (await redis.get(keyWithNetwork));
+  let cachedResponse: string | null = null;
+  if (redis) {
+    try {
+      cachedResponse = await withTimeout(redis.get(keyWithNetwork), READ_TIMEOUT_MS);
+    } catch (err) {
+      // Degraded cache — fall through to the fetcher rather than blocking.
+      log('CACHE READ FAILED', { keyWithNetwork, error: (err as Error).message });
+    }
+  }
 
   if (cachedResponse) {
     log('CACHE HIT', { keyWithNetwork });
@@ -38,8 +73,8 @@ export default async function cached<T extends Record<string, any>>(
 
     const data = await fetcher();
 
-    redis?.set(keyWithNetwork, JSON.stringify(data), {
-      EX,
+    redis?.set(keyWithNetwork, JSON.stringify(data), { EX })?.catch((err) => {
+      log('CACHE WRITE FAILED', { keyWithNetwork, error: (err as Error).message });
     });
 
     return data;
