@@ -118,6 +118,17 @@
         theme: $themeStore.currentTheme === 'light' ? 'light' : 'dark',
       })
       .withOptions({ addViewportTag: false, adaptIframeHeight: true })
+      // What this flow emits once the selfie is uploaded, confirmed against the
+      // SDK's event stream — the unprefixed names below never fire for it.
+      .on('idCheck.onApplicantActionSubmitted', () => {
+        startChecking();
+      })
+      .on('idCheck.onApplicantActionResubmitted', () => {
+        startChecking();
+      })
+      // Sumsub's typings carry a second, unprefixed family of the same events,
+      // and nothing guarantees which one a given level emits. Handling both is
+      // free — the spinner is idempotent, and the poll owns the navigation.
       .on('idCheck.onActionSubmitted', () => {
         startChecking();
       })
@@ -150,6 +161,7 @@
 
 {#if phase === 'checking'}
   <FlowStepWrapper
+    centered
     headline="Checking..."
     description="Hang tight, this usually takes a few seconds. Don't close this page."
   >

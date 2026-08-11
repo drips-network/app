@@ -10,7 +10,7 @@
 <FlowStepWrapper
   confetti
   headline="You're all set"
-  description="Thanks — that's you verified. Your rewards are unlocked and you can withdraw right away."
+  description="Your rewards are unlocked and you can withdraw right away."
 >
   {#snippet actions()}
     <Button variant="primary" icon={ArrowRight} href={backTo}>Continue</Button>

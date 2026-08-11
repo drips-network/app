@@ -2,7 +2,6 @@
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import Button from '$lib/components/button/button.svelte';
   import ArrowRight from '$lib/components/icons/ArrowRight.svelte';
-  import ArrowBoxUpRight from '$lib/components/icons/ArrowBoxUpRight.svelte';
   import LockAndKeyEmoji from '$lib/components/icons/🔐.svelte';
   import FlowStepWrapper from '../shared/flow-step-wrapper.svelte';
 
@@ -36,17 +35,8 @@
   {:else}
     <AnnotationBox type="info">
       It usually takes less than a minute, and you'll be able to withdraw your rewards immediately
-      afterwards.
-
-      {#snippet actions()}
-        <Button
-          href="https://docs.drips.network/wave/contributors/solving-issues-and-earning-rewards#verifying-your-identity"
-          target="_blank"
-          icon={ArrowBoxUpRight}
-        >
-          Learn more
-        </Button>
-      {/snippet}
+      afterwards. <span class="typo-text-small-bold">If your device does not have a webcam,</span>
+      come back here from a mobile device or a laptop with a camera to complete the check.
     </AnnotationBox>
   {/if}
 
