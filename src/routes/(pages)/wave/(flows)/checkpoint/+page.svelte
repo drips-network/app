@@ -16,7 +16,7 @@
   let description = $derived(
     previousAttemptFailed
       ? "That check didn't go through. Take a new selfie in good light with nothing covering your face."
-      : "Before you continue, we need to verify it's really you with a quick selfie.",
+      : "Before you can view and manage your reward grants, we need to verify it's really you with a quick selfie.",
   );
 </script>
 
