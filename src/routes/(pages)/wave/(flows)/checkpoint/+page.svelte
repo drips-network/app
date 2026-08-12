@@ -16,7 +16,7 @@
   let description = $derived(
     previousAttemptFailed
       ? "That check didn't go through. Take a new selfie in good light with nothing covering your face."
-      : "Before you can view and manage your reward grants, we need to verify it's really you with a quick selfie.",
+      : "Before you can view and manage your reward grants on this device, we need to verify it's really you with a quick selfie.",
   );
 </script>
 
@@ -34,9 +34,8 @@
     </AnnotationBox>
   {:else}
     <AnnotationBox type="info">
-      It usually takes less than a minute, and you'll be able to withdraw your rewards immediately
-      afterwards. <span class="typo-text-small-bold">If your device does not have a webcam,</span>
-      come back here from a mobile device or a laptop with a camera to complete the check.
+      It usually takes less than a minute, and you'll be able to access your grants dashboard on
+      this device immediately afterwards.
     </AnnotationBox>
   {/if}
 
