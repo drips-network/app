@@ -159,6 +159,12 @@
               <span class="badge neutral typo-text-small">Not enabled here</span>
             {:else if purposeState.failedAttempts.exhausted}
               <span class="badge locked typo-text-small">Locked out</span>
+            {:else if purposeState.starts.exhausted}
+              <!-- A separate block, and a separate badge: this one also stops the
+                   user starting a check, but it lifts by itself in hours rather
+                   than needing anyone. Folding it into "Locked out" would send
+                   support chasing resets that were about to be unnecessary. -->
+              <span class="badge throttled typo-text-small">Throttled</span>
             {:else}
               <span class="badge ok typo-text-small">Not locked</span>
             {/if}
@@ -204,6 +210,15 @@
               </dd>
             </div>
           </dl>
+
+          {#if purposeState.starts.exhausted && !purposeState.failedAttempts.exhausted}
+            <AnnotationBox type="warning" size="small">
+              This user can't start a check right now — they've hit the ceiling on how many can be
+              started in a short window. That's a separate limit from the failed attempts above, and
+              it clears by itself within a few hours. A reset here clears it too, if they can't
+              wait.
+            </AnnotationBox>
+          {/if}
 
           {#if purposeState.hasApprovalOnSomeDevice}
             <AnnotationBox type="info" size="small">
@@ -339,6 +354,11 @@
   .badge.locked {
     background-color: var(--color-negative-level-1);
     color: var(--color-negative-level-6);
+  }
+
+  .badge.throttled {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
   }
 
   .badge.neutral {
