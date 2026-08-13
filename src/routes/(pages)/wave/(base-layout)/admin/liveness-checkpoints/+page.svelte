@@ -24,6 +24,13 @@
 
   type LookedUpUser = { id: string; gitHubUsername: string; gitHubAvatarUrl: string | null };
 
+  /**
+   * Device IDs are only ever compared against each other here — "is this the
+   * device that passed?" — so the first block is enough to eyeball. The full
+   * value stays available on hover.
+   */
+  const shortDeviceId = (id: string) => id.split('-')[0];
+
   let gitHubUsername = $state('');
   let lookupUser = $state<LookedUpUser | null>(null);
   let status = $state<CheckpointStatus | null>(null);
@@ -169,13 +176,18 @@
               <dd class="tnum">{purposeState.starts.used} / {purposeState.starts.max}</dd>
             </div>
             <div>
-              <dt>Currently passed</dt>
+              <dt>Passed on a device</dt>
               <dd>
-                {#if purposeState.hasValidApprovedCheckpoint}
+                {#if purposeState.hasApprovalOnSomeDevice}
                   Yes{#if purposeState.validUntil}, until {formatDate(
                       purposeState.validUntil,
                       'dayAndYear',
                     )}{/if}
+                  {#if purposeState.approvedDeviceId}
+                    <span class="subtle device" title={purposeState.approvedDeviceId}
+                      >on {shortDeviceId(purposeState.approvedDeviceId)}</span
+                    >
+                  {/if}
                 {:else}
                   No
                 {/if}
@@ -193,6 +205,14 @@
             </div>
           </dl>
 
+          {#if purposeState.hasApprovalOnSomeDevice}
+            <AnnotationBox type="info" size="small">
+              A pass only counts on the device that earned it. If this user has since switched phone
+              or browser, they're still being asked to pass again — compare the device above with
+              the ones on their recent attempts.
+            </AnnotationBox>
+          {/if}
+
           {#if purposeState.lastReset}
             <AnnotationBox type="info" size="small">
               Last reset {formatDate(purposeState.lastReset.at, 'dayAndYear')} — "{purposeState
@@ -207,6 +227,9 @@
                 <div class="attempt typo-text-small">
                   <span class="status {attempt.status}">{attempt.status}</span>
                   <span class="subtle">{formatDate(attempt.createdAt, 'dayAndYear')}</span>
+                  <span class="subtle device" title={attempt.deviceId}
+                    >{shortDeviceId(attempt.deviceId)}</span
+                  >
                   {#if attempt.rejectLabels?.length}
                     <span class="subtle">{attempt.rejectLabels.join(', ')}</span>
                   {/if}
@@ -282,6 +305,10 @@
 
   .subtle {
     color: var(--color-foreground-level-5);
+  }
+
+  .device {
+    font-family: var(--typeface-mono-regular);
   }
 
   .purpose {

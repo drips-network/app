@@ -10,6 +10,10 @@ export type CheckpointPurpose = z.infer<typeof checkpointPurposeEnum>;
 const checkpointAttemptSchema = z.object({
   id: z.uuid(),
   status: z.enum(['pending', 'approved', 'rejected', 'expired']),
+  // Rendered because a pass is only honoured on the device that earned it, so
+  // "which device was this from" is often the answer to why a user who looks
+  // like they passed is still being asked to pass again.
+  deviceId: z.uuid(),
   rejectLabels: z.array(z.string()).nullable(),
   createdAt: z.coerce.date(),
   reviewedAt: z.coerce.date().nullable(),
@@ -19,7 +23,8 @@ export type CheckpointAttempt = z.infer<typeof checkpointAttemptSchema>;
 const checkpointPurposeStateSchema = z.object({
   purpose: checkpointPurposeEnum,
   enabled: z.boolean(),
-  hasValidApprovedCheckpoint: z.boolean(),
+  hasApprovalOnSomeDevice: z.boolean(),
+  approvedDeviceId: z.uuid().nullable(),
   validUntil: z.coerce.date().nullable(),
   failedAttempts: z.object({
     used: z.number().int(),
