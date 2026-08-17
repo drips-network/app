@@ -1,5 +1,6 @@
 import z from 'zod';
-import { authenticatedCall } from './call';
+import { redirect } from '@sveltejs/kit';
+import { authenticatedCall, LivenessCheckpointRequiredError } from './call';
 import parseRes from './utils/parse-res';
 
 /** Areas that a checkpoint can be required for. */
@@ -27,6 +28,26 @@ export async function getLivenessCheckpointStatus(f = fetch, purpose: LivenessCh
       method: 'GET',
     }),
   );
+}
+
+/**
+ * Re-throws anything that isn't the API refusing on a due checkpoint; for that
+ * one, redirects into the challenge flow instead.
+ *
+ * Whether a check is due is a question only the API can answer, and only per
+ * *grant*: grants belonging to a KYB'd org are exempt, because their withdrawers
+ * are vouched for by the company record rather than by a personal identity
+ * check. None of that is visible from a user-level status call, so the client
+ * finds out by making the request it actually wants and reacting to the refusal.
+ *
+ * Pre-gating on `getLivenessCheckpointStatus` instead is what sent KYB
+ * withdrawers — who have no personal KYC by design — into the `kyc-required`
+ * dead end.
+ */
+export function handleCheckpointRequired(err: unknown, backTo: string): never {
+  if (!(err instanceof LivenessCheckpointRequiredError)) throw err;
+
+  throw redirect(302, `/wave/checkpoint?backTo=${encodeURIComponent(backTo)}`);
 }
 
 /**
