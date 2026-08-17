@@ -72,6 +72,16 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('manageLivenessCheckpoints')
+      ? [
+          {
+            name: 'Identity check limits',
+            description:
+              "Review a user's selfie check attempts and reset the limit if they're locked out.",
+            href: '/wave/admin/liveness-checkpoints',
+          },
+        ]
+      : []),
     ...(data.user.permissions?.includes('pushIntercomSegments')
       ? [
           {
