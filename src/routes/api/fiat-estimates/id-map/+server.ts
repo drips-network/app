@@ -33,8 +33,10 @@ const cmcResponseSchema = z.object({
 // but only the ones currently needed for estimates.
 
 /**
- * For alt L1/L2 tokens that don't have an equivalent value token on Eth Mainnet.
- * Keys are token contract addresses on the L1/L2, values are coinmarket cap unique asset IDs to map to.
+ * Manual overrides for tokens the CMC ID map doesn't cover. CMC lists only one canonical
+ * platform per asset, so any other deployment of that asset (and occasionally the mainnet
+ * one, if CMC picks a different chain as canonical) is missing from the response.
+ * Keys are token contract addresses, values are coinmarket cap unique asset IDs to map to.
  * */
 const MANUAL_IDS: Record<string, string> = {
   /* Map Wrapped Filecoin to Filecoin */
@@ -45,6 +47,11 @@ const MANUAL_IDS: Record<string, string> = {
   '0x31c8eacbffdd875c74b94b077895bd78cf1e64a3': '6843',
   /* Map Optimism USDC to USDC */
   '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85': '3408',
+  /* Mainnet USDC. CMC lists a non-mainnet platform as USDC's canonical one, so
+     the mainnet address is missing from the ID map response. */
+  '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': '3408',
+  /* Map Optimism USDC.e (bridged) to USDC */
+  '0x7f5c764cBc14f9669B88837ca1490cCa17c31607': '3408',
   /* Optimism DAI to DAI */
   '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '4943',
   /* Optimism Tether USD to Tether USD */
