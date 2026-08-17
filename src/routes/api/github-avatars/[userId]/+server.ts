@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import Jimp from 'jimp';
+import { Jimp, JimpMime } from 'jimp';
 
 const ALLOWED_SIZES = [412, 100] as const;
 const DEFAULT_SIZE = 412;
@@ -23,9 +23,9 @@ export const GET = async ({ params, fetch, url }) => {
   const blob = await response.arrayBuffer();
   const image = await Jimp.read(Buffer.from(blob));
 
-  const resized = image.cover(size, size);
+  const resized = image.cover({ w: size, h: size });
 
-  return new Response((await resized.getBufferAsync(Jimp.MIME_PNG)) as BodyInit, {
+  return new Response((await resized.getBuffer(JimpMime.png)) as BodyInit, {
     headers: {
       'content-type': 'image/png',
     },

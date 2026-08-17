@@ -1,4 +1,4 @@
-import pinataSdk from '@pinata/sdk';
+import { pinJSONToIPFS } from '$lib/utils/pinata';
 import { error, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private';
@@ -8,8 +8,6 @@ const missingEnvVarError =
 
 const PINATA_SDK_KEY = getOptionalEnvVar('PINATA_SDK_KEY', true, missingEnvVarError);
 const PINATA_SDK_SECRET = getOptionalEnvVar('PINATA_SDK_SECRET', true, missingEnvVarError);
-
-const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
 
 export const POST: RequestHandler = async ({ request }: RequestEvent) => {
   if (!PINATA_SDK_KEY || !PINATA_SDK_SECRET) {
@@ -38,11 +36,11 @@ export const POST: RequestHandler = async ({ request }: RequestEvent) => {
 
       return new Response(resBody.IpfsHash);
     } else {
-      const res = await pinata.pinJSONToIPFS(json, {
-        pinataOptions: {
-          cidVersion: 0,
-        },
-      });
+      const res = await pinJSONToIPFS(
+        { apiKey: PINATA_SDK_KEY, secretApiKey: PINATA_SDK_SECRET },
+        json,
+        { cidVersion: 0 },
+      );
 
       return new Response(res.IpfsHash);
     }

@@ -1,7 +1,7 @@
-import Jimp from 'jimp';
-import { Readable } from 'stream';
+import { Jimp, JimpMime } from 'jimp';
+import { error } from '@sveltejs/kit';
 
-import pinataSdk from '@pinata/sdk';
+import { pinFileToIPFS } from '$lib/utils/pinata';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
 
 const missingEnvVarError = 'Uploading custom avatars will not work.';
@@ -9,26 +9,26 @@ const missingEnvVarError = 'Uploading custom avatars will not work.';
 const PINATA_SDK_KEY = getOptionalEnvVar('PINATA_SDK_KEY', true, missingEnvVarError);
 const PINATA_SDK_SECRET = getOptionalEnvVar('PINATA_SDK_SECRET', true, missingEnvVarError);
 
-const pinata = new pinataSdk(PINATA_SDK_KEY, PINATA_SDK_SECRET);
-
 export const POST = async ({ request }) => {
+  if (!PINATA_SDK_KEY || !PINATA_SDK_SECRET) {
+    return error(500, 'PINATA_SDK_KEY and PINATA_SDK_SECRET env vars are required.');
+  }
+
   const blob = await request.arrayBuffer();
 
   const image = await Jimp.read(Buffer.from(blob));
 
-  if ([Jimp.MIME_JPEG as string, Jimp.MIME_PNG as string].includes(image.getMIME()) === false) {
+  if ([JimpMime.jpeg as string, JimpMime.png as string].includes(image.mime ?? '') === false) {
     throw new Error('Invalid image format');
   }
 
-  const resized = image.cover(1000, 1000);
+  const resized = image.cover({ w: 1000, h: 1000 });
 
-  const stream = Readable.from(await resized.getBufferAsync(Jimp.MIME_PNG));
-
-  // https://github.com/PinataCloud/Pinata-SDK/issues/28 🤨
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (stream as any)['path'] = 'avatar.png';
-
-  const pin = await pinata.pinFileToIPFS(stream, { pinataMetadata: { name: 'avatar' } });
+  const pin = await pinFileToIPFS(
+    { apiKey: PINATA_SDK_KEY, secretApiKey: PINATA_SDK_SECRET },
+    new Blob([await resized.getBuffer(JimpMime.png)], { type: JimpMime.png }),
+    { name: 'avatar' },
+  );
 
   return new Response(JSON.stringify(pin));
 };
