@@ -1,10 +1,11 @@
 import type { Attributes } from 'graphology-types';
 import type { NodeDisplayData, PartialButFor, EdgeDisplayData } from 'sigma/types';
 import type { Settings } from 'sigma/settings';
-import type { Project, Source } from '$lib/graphql/__generated__/base-types';
+import type { Source } from '$lib/graphql/__generated__/base-types';
 import type Sigma from 'sigma';
 import type { EdgeLabelDrawingFunction } from 'sigma/rendering';
 import { ensureResponseOk } from '$lib/utils/fetch';
+import type { ProjectProfileFragment } from '../../../projects/(forges)/components/project-profile/__generated__/gql.generated';
 
 export type LayoutMapping = { [key: string]: { x: number; y: number } };
 export type NodeSelectionChangedPayload = { nodeId?: string };
@@ -16,14 +17,14 @@ export type CustomSource = Omit<Source, 'forge' | '__typename'>;
  * @param {String} ownerName  The owner name of the project
  * @param {String} repoName The name of the project's repository
  * @param {String} forge  The location of the repository
- * @returns {Promise<{ project: Project, description: string }>} Details of the specified project.
+ * @returns {Promise<{ project: ProjectProfileFragment, description: string }>} Details of the specified project.
  */
 export async function fetchProject(
   ownerName: string,
   repoName: string,
   forge: string = 'github',
 ): Promise<{
-  project: Project;
+  project: ProjectProfileFragment;
   description: string;
   newRepo: CustomSource;
   correctCasingRepo: CustomSource;
