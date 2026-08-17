@@ -6,6 +6,9 @@ const config: CodegenConfig = {
   config: {
     nonOptionalTypename: true,
     dedupeFragments: true,
+    // Codegen v7 defaults unmapped scalars (i.e. Date) to `unknown` rather than
+    // `any`. Keep the old behaviour so the generated types stay compatible.
+    defaultScalarType: 'any',
   },
   schema: './schema.graphql',
   generates: {

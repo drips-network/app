@@ -1,6 +1,6 @@
 import { fetchIpfs } from '$lib/utils/ipfs.js';
 import { error } from '@sveltejs/kit';
-import Jimp from 'jimp';
+import { Jimp, JimpMime } from 'jimp';
 
 export const GET = async ({ params, fetch, url }) => {
   const { cid } = params;
@@ -23,13 +23,13 @@ export const GET = async ({ params, fetch, url }) => {
 
   const image = await Jimp.read(Buffer.from(blob));
 
-  if ([Jimp.MIME_JPEG as string, Jimp.MIME_PNG as string].includes(image.getMIME()) === false) {
+  if ([JimpMime.jpeg as string, JimpMime.png as string].includes(image.mime ?? '') === false) {
     throw new Error('Invalid image format');
   }
 
-  const resized = image.cover(size, size);
+  const resized = image.cover({ w: size, h: size });
 
-  return new Response((await resized.getBufferAsync(Jimp.MIME_PNG)) as BodyInit, {
+  return new Response((await resized.getBuffer(JimpMime.png)) as BodyInit, {
     headers: {
       'content-type': 'image/png',
       'cache-control': 'public, max-age=31536000',

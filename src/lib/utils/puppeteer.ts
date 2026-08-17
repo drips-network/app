@@ -1,4 +1,4 @@
-import puppeteer, { type Browser, type PuppeteerNodeLaunchOptions } from 'puppeteer';
+import puppeteer, { type Browser, type LaunchOptions } from 'puppeteer';
 
 /**
  * Manages a singleton instance of a Puppeteer Browser, preserving
@@ -6,7 +6,7 @@ import puppeteer, { type Browser, type PuppeteerNodeLaunchOptions } from 'puppet
  */
 export class PuppeteerManager {
   static browser: Browser | undefined;
-  static browserConfig: PuppeteerNodeLaunchOptions | undefined;
+  static browserConfig: LaunchOptions | undefined;
 
   static #onBrowserExit = () => {
     // eslint-disable-next-line no-console
@@ -23,10 +23,10 @@ export class PuppeteerManager {
    * any existing browser instance will be closed and a new one created. Existing instances will
    * be relaunched with the same configuration if their underlying process dies.
    *
-   * @param browserConfig {PuppeteerNodeLaunchOptions} Puppeteer browser configuration.
+   * @param browserConfig {LaunchOptions} Puppeteer browser configuration.
    * @returns {Promise<Browser>} A browser instance.
    */
-  static async launch(browserConfig?: PuppeteerNodeLaunchOptions): Promise<Browser> {
+  static async launch(browserConfig?: LaunchOptions): Promise<Browser> {
     if (browserConfig && this.browser) {
       await this.browser.close();
     }

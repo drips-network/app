@@ -2,7 +2,7 @@ import assert from '$lib/utils/assert';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { EntryGenerator } from './$types.js';
-import Jimp from 'jimp';
+import { Jimp, JimpMime } from 'jimp';
 import { getSlug } from '$lib/utils/blog-posts.js';
 
 export const GET = async ({ params }) => {
@@ -34,9 +34,9 @@ export const GET = async ({ params }) => {
 
   const height = target === 'twitter' ? 600 : 675;
 
-  const jimp = (await Jimp.read(`static${metadata.coverImage}`)).cover(1200, height);
+  const jimp = (await Jimp.read(`static${metadata.coverImage}`)).cover({ w: 1200, h: height });
 
-  return new Response((await jimp.getBufferAsync(Jimp.MIME_PNG)) as BodyInit, {
+  return new Response((await jimp.getBuffer(JimpMime.png)) as BodyInit, {
     headers: {
       'content-type': 'image/png',
     },
