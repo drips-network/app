@@ -14,6 +14,12 @@
     leftActions?: import('svelte').Snippet;
     actions?: import('svelte').Snippet;
     confetti?: boolean;
+    /**
+     * Centres the whole step vertically instead of anchoring the header to the
+     * top. For steps that are only a header and one element, where the default
+     * "header top, actions bottom" spread leaves a hole in the middle.
+     */
+    centered?: boolean;
   }
 
   let {
@@ -21,13 +27,14 @@
     description = undefined,
     icon = undefined,
     confetti = false,
+    centered = false,
     children,
     leftActions,
     actions,
   }: Props = $props();
 </script>
 
-<div class="step-layout">
+<div class="step-layout" class:centered>
   <div class="top">
     {#if confetti}
       <ConfettiOnClick alsoOnMount>
@@ -92,6 +99,10 @@
     min-height: 8rem;
     width: 100%;
     flex: 1;
+  }
+
+  .step-layout.centered {
+    justify-content: center;
   }
 
   .top {

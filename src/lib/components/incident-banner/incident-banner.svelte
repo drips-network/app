@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import { z } from 'zod';
   import ExclamationCircle from '$lib/components/icons/ExclamationCircle.svelte';
+  import Calendar from '$lib/components/icons/Calendar.svelte';
   import CrossSmall from '$lib/components/icons/CrossSmall.svelte';
   import dismissablesStore from '$lib/stores/dismissables/dismissables.store';
 
@@ -13,6 +14,10 @@
   // treated as Wave-affecting.
   const WAVE_GROUP = 'Drips Wave';
 
+  // How far ahead of a maintenance window we start announcing it. Earlier than
+  // this and the banner is just noise the user can't act on yet.
+  const MAINTENANCE_LEAD_MS = 48 * 60 * 60 * 1000;
+
   const incidentSchema = z.object({
     id: z.string().nullable().optional(),
     title: z.string(),
@@ -22,10 +27,22 @@
     affected: z.array(z.string()).optional(),
   });
 
+  // Scheduled maintenance. `status` is the window's phase, derived from the
+  // clock by the status page: scheduled (upcoming) | in_progress | completed.
+  // Only the first two ever appear in `maintenance.active`.
+  const maintenanceSchema = incidentSchema.extend({
+    scheduled: z.object({ start: z.string(), end: z.string() }),
+  });
+
   const statusSchema = z.object({
     incidents: z
       .object({
         active: z.array(incidentSchema).optional(),
+      })
+      .optional(),
+    maintenance: z
+      .object({
+        active: z.array(maintenanceSchema).optional(),
       })
       .optional(),
     groups: z
@@ -39,8 +56,10 @@
   });
 
   type Incident = z.infer<typeof incidentSchema>;
+  type Maintenance = z.infer<typeof maintenanceSchema>;
 
   let active = $state<Incident[]>([]);
+  let maintenance = $state<Maintenance[]>([]);
   // Names of the components in the Wave group, sourced from the status feed so
   // it can't drift out of sync as components are renamed/added.
   let waveComponents = $state<Set<string>>(new Set());
@@ -60,18 +79,69 @@
     return onWaveRoute && isWaveIncident(incident);
   }
 
-  // A stable per-incident key so dismissing one incident doesn't dismiss future
-  // ones. Falls back to title + start time when the incident has no id.
-  function dismissId(incident: Incident): string {
-    return `incident-banner-${incident.id ?? `${incident.title}-${incident.startedAt ?? ''}`}`;
+  // Maintenance is worth a banner while it runs, and from MAINTENANCE_LEAD_MS
+  // before it opens. A window touching only Wave is only shown inside Wave —
+  // elsewhere it's about a service the user isn't currently on.
+  function warrantsMaintenanceBanner(m: Maintenance): boolean {
+    const start = new Date(m.scheduled.start).getTime();
+    if (!Number.isFinite(start)) return false;
+    if (m.status !== 'in_progress' && start - Date.now() > MAINTENANCE_LEAD_MS) return false;
+    const affected = m.affected ?? [];
+    const waveOnly = affected.length > 0 && affected.every((c) => waveComponents.has(c));
+    return !waveOnly || onWaveRoute;
+  }
+
+  // A stable per-entry key so dismissing one doesn't dismiss future ones. For
+  // maintenance the phase is part of the key, so dismissing the heads-up doesn't
+  // also suppress the banner once the window actually opens. Falls back to
+  // title + start time when the entry has no id.
+  function dismissId(entry: Incident): string {
+    const base = entry.id ?? `${entry.title}-${entry.startedAt ?? ''}`;
+    return `incident-banner-${base}${isMaintenance(entry) ? `-${entry.status}` : ''}`;
+  }
+
+  function isMaintenance(entry: Incident): entry is Maintenance {
+    return 'scheduled' in entry;
   }
 
   // Show a single banner at a time so its height stays predictable (sub-app
-  // headers offset themselves by a fixed --incident-banner-height).
+  // headers offset themselves by a fixed --incident-banner-height). An actual
+  // incident always outranks a maintenance notice.
   let current = $derived(
     active.filter((i) => warrantsBanner(i) && !$dismissablesStore.includes(dismissId(i)))[0] ??
+      maintenance.filter(
+        (m) => warrantsMaintenanceBanner(m) && !$dismissablesStore.includes(dismissId(m)),
+      )[0] ??
       null,
   );
+
+  // "Aug 20, 02:00–04:00 UTC" — the same UTC framing the status page uses, so
+  // the two never disagree about which window is meant.
+  function fmtWindow(startIso: string, endIso: string): string {
+    const s = new Date(startIso);
+    const e = new Date(endIso);
+    if (!Number.isFinite(s.getTime()) || !Number.isFinite(e.getTime())) return '';
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const hhmm = (d: Date) =>
+      `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+    const day = (d: Date) => `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
+    return s.toISOString().slice(0, 10) === e.toISOString().slice(0, 10)
+      ? `${day(s)}, ${hhmm(s)}–${hhmm(e)} UTC`
+      : `${day(s)}, ${hhmm(s)} – ${day(e)}, ${hhmm(e)} UTC`;
+  }
 
   // Toggle a root class so headers/content can offset below the fixed banner.
   $effect(() => {
@@ -96,6 +166,7 @@
           .map((c) => c.name),
       );
       active = parsed.data.incidents?.active ?? [];
+      maintenance = parsed.data.maintenance?.active ?? [];
     } catch {
       // Status page unreachable — fail silent; a banner is best-effort.
     }
@@ -115,11 +186,29 @@
 
 {#if current}
   {@const incident = current}
-  <div class="incident-banner typo-text-small" role="alert">
+  {@const maint = isMaintenance(incident)}
+  <div
+    class="incident-banner typo-text-small"
+    class:maintenance={maint}
+    role={maint ? 'status' : 'alert'}
+  >
     <div class="content">
       <div class="message">
-        <ExclamationCircle style="height: 1rem; width: 1rem; fill: currentColor; flex-shrink: 0;" />
-        <span class="title">{incident.title}</span>
+        {#if maint}
+          <Calendar style="height: 1rem; width: 1rem; fill: currentColor; flex-shrink: 0;" />
+          <span class="title">
+            {incident.status === 'in_progress'
+              ? 'Maintenance in progress'
+              : 'Scheduled maintenance'}:
+            {incident.title}
+          </span>
+          <span class="when">{fmtWindow(incident.scheduled.start, incident.scheduled.end)}</span>
+        {:else}
+          <ExclamationCircle
+            style="height: 1rem; width: 1rem; fill: currentColor; flex-shrink: 0;"
+          />
+          <span class="title">{incident.title}</span>
+        {/if}
       </div>
       <a
         class="status-link"
@@ -152,6 +241,25 @@
     gap: 0.5rem;
     overflow: hidden;
     view-transition-name: incident-banner;
+  }
+
+  /* Planned work is neither an outage nor "all good", so it drops the red and
+     reads neutral — matching how status.drips.network renders maintenance. */
+  .incident-banner.maintenance {
+    background-color: var(--color-foreground-level-2);
+    color: var(--color-foreground-level-6);
+  }
+
+  .incident-banner.maintenance .dismiss:hover {
+    background-color: var(--color-foreground-level-3);
+  }
+
+  /* The scheduled window, secondary to the title — dropped on narrow screens
+     where the two-line layout has no room for it. */
+  .when {
+    flex-shrink: 0;
+    white-space: nowrap;
+    opacity: 0.75;
   }
 
   /* Fills the space left of the dismiss button and centres its children. */
@@ -215,6 +323,10 @@
     .content {
       flex-direction: column;
       gap: 0.125rem;
+    }
+
+    .when {
+      display: none;
     }
   }
 </style>

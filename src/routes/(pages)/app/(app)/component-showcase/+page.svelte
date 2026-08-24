@@ -165,13 +165,16 @@
     },
   };
 
-  const MOCK_PROJECT_2: Project = {
+  // `satisfies` rather than an annotation, so the inferred type keeps the
+  // nullable fields the generated fragment types require.
+  const MOCK_PROJECT_2 = {
     __typename: 'Project',
     isVisible: true,
     chainData: [
       {
         __typename: 'ClaimedProjectData',
         chain: network.gqlName,
+        description: null,
         latestMetadataIpfsHash: '',
         totalEarned: [],
         withdrawableBalances: [],
@@ -207,7 +210,7 @@
       ownerName: 'efstajas',
       url: 'https://github.com/efstajas/svelte-stepper.git',
     },
-  };
+  } satisfies Project;
 
   const mockSplits: Splits = [
     {

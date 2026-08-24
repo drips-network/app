@@ -95,6 +95,13 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql
           accountId
         }
         orcid
+        owner {
+          address
+        }
+        orcidMetadata {
+          givenName
+          familyName
+        }
       }
     }
   }

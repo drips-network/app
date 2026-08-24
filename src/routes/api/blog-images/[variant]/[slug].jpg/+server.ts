@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { EntryGenerator } from './$types.js';
-import Jimp from 'jimp';
+import { Jimp, JimpMime } from 'jimp';
 import { getSlug } from '$lib/utils/blog-posts.js';
 import { BLOG_COVER_IMAGE_VARIANTS } from '$lib/utils/blog-cover-images';
 
@@ -22,11 +22,12 @@ export const GET = async ({ params }) => {
 
   const { coverImage } = z.object({ coverImage: z.string() }).parse(post.metadata);
 
-  const jimp = (await Jimp.read(`static${coverImage}`))
-    .cover(dimensions.width, dimensions.height)
-    .quality(80);
+  const jimp = (await Jimp.read(`static${coverImage}`)).cover({
+    w: dimensions.width,
+    h: dimensions.height,
+  });
 
-  return new Response((await jimp.getBufferAsync(Jimp.MIME_JPEG)) as BodyInit, {
+  return new Response((await jimp.getBuffer(JimpMime.jpeg, { quality: 80 })) as BodyInit, {
     headers: {
       'content-type': 'image/jpeg',
     },

@@ -148,16 +148,34 @@ export const handleFetch = async ({ event, request, fetch }) => {
       request.headers.set('Authorization', `Bearer ${accessToken}`);
     }
 
-    // Also set cookies (needed for refresh endpoint and as backup)
-    const cookies = [
-      refreshToken && `wave_refresh_token=${refreshToken}`,
-      accessToken && `wave_access_token=${accessToken}`,
-    ]
-      .filter(Boolean)
-      .join('; ');
+    // Pass the browser's own cookies along, with our tokens taking precedence
+    // (they're needed for the refresh endpoint, and as a backup to the header
+    // above — and `event.locals` may hold fresher ones than the request does).
+    //
+    // SvelteKit only merges the incoming cookies in by itself when the target
+    // is the app's host or a subdomain of it, and the internal Wave URL is
+    // neither in deployed environments. Without this, anything the API reads
+    // from a cookie is silently absent during SSR while working fine in the
+    // browser — including the device ID the liveness checkpoint is bound to,
+    // which makes every server-rendered request look like a brand new device.
+    const cookies = new Map<string, string>();
 
-    if (cookies) {
-      request.headers.set('Cookie', cookies);
+    // Parsed off the raw header rather than `event.cookies.getAll()` to avoid
+    // a decode/re-encode round trip on values we're only passing through.
+    for (const pair of event.request.headers.get('cookie')?.split(';') ?? []) {
+      const separator = pair.indexOf('=');
+      if (separator === -1) continue;
+      cookies.set(pair.slice(0, separator).trim(), pair.slice(separator + 1).trim());
+    }
+
+    if (refreshToken) cookies.set('wave_refresh_token', refreshToken);
+    if (accessToken) cookies.set('wave_access_token', accessToken);
+
+    if (cookies.size > 0) {
+      request.headers.set(
+        'Cookie',
+        [...cookies].map(([name, value]) => `${name}=${value}`).join('; '),
+      );
     }
   }
 
