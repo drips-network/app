@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { lookupGitHubUserById, type GitHubUser } from '$lib/utils/github/lookup-user';
+  import { lookUpUser, type AdminUserLookupResult } from '$lib/utils/wave/admin/user-lookup';
 
   interface Props {
     gitHubUserId: number;
     /**
      * Pre-resolved GitHub username, when wave already knew it (i.e. the
-     * banned user has a Wave account). When provided, no GitHub API
-     * lookup happens. Null means wave looked but found no Wave user
-     * (pre-emptive ban) — fall back to the unauthenticated GitHub API.
+     * banned user has a Wave account). When provided, no lookup happens.
+     * Null means wave looked but found no Wave user (pre-emptive ban) —
+     * resolve the username through the admin lookup endpoint instead.
      */
     gitHubUsername?: string | null;
   }
 
   let { gitHubUserId, gitHubUsername = null }: Props = $props();
 
-  let user = $state<GitHubUser | null | undefined>(undefined);
+  let user = $state<AdminUserLookupResult | null | undefined>(undefined);
   let error = $state<string | null>(null);
 
   $effect(() => {
@@ -27,7 +27,7 @@
     let cancelled = false;
     user = undefined;
     error = null;
-    lookupGitHubUserById(gitHubUserId)
+    lookUpUser(fetch, String(gitHubUserId))
       .then((u) => {
         if (!cancelled) user = u;
       })
@@ -42,13 +42,11 @@
     };
   });
 
+  const displayLogin = $derived(gitHubUsername ?? user?.gitHubUsername ?? null);
   const avatarUrl = $derived(
-    user?.avatarUrl ?? `https://avatars.githubusercontent.com/u/${gitHubUserId}?s=64`,
+    user?.gitHubAvatarUrl ?? `https://avatars.githubusercontent.com/u/${gitHubUserId}?s=64`,
   );
-  const profileUrl = $derived(
-    user?.htmlUrl ?? (gitHubUsername ? `https://github.com/${gitHubUsername}` : null),
-  );
-  const displayLogin = $derived(gitHubUsername ?? user?.login ?? null);
+  const profileUrl = $derived(displayLogin ? `https://github.com/${displayLogin}` : null);
 </script>
 
 <div class="user">
