@@ -13,7 +13,9 @@
   import { getUser } from '$lib/utils/wave/users';
   import {
     getLivenessCheckpointStatus,
+    grantLivenessCheckpointExemption,
     resetLivenessCheckpoint,
+    revokeLivenessCheckpointExemption,
     type CheckpointPurpose,
     type CheckpointStatus,
   } from '$lib/utils/wave/admin/liveness-checkpoints';
@@ -38,7 +40,9 @@
   let loadingLookup = $state(false);
 
   let reasons = $state<Record<string, string>>({});
+  let exemptionReasons = $state<Record<string, string>>({});
   let busyPurpose = $state<string | null>(null);
+  let busyExemptionPurpose = $state<string | null>(null);
 
   async function handleLookup() {
     if (!gitHubUsername.trim() || loadingLookup) return;
@@ -48,6 +52,7 @@
     status = null;
     lookupUser = null;
     reasons = {};
+    exemptionReasons = {};
 
     try {
       const user = await getUser(fetch, gitHubUsername.trim());
@@ -104,6 +109,61 @@
       }
     });
   }
+
+  async function handleGrantExemption(purpose: CheckpointPurpose) {
+    if (!lookupUser) return;
+
+    const reason = (exemptionReasons[purpose] ?? '').trim();
+    if (!reason) return;
+
+    const message =
+      `You are about to turn the identity check off for ${lookupUser.gitHubUsername} on ` +
+      `"${PURPOSE_LABELS[purpose]}". They will not be asked to pass it again until someone ` +
+      `turns it back on. Only do this once you've confirmed who they are by other means. ` +
+      `This is recorded against your account along with the reason. Continue?`;
+
+    await doWithConfirmationModal(message, async () => {
+      busyExemptionPurpose = purpose;
+      try {
+        await doWithErrorModal(
+          () => grantLivenessCheckpointExemption(fetch, lookupUser!.id, purpose, reason),
+          undefined,
+          { message: 'Identity check turned off for this account.', confetti: false },
+        );
+        exemptionReasons = { ...exemptionReasons, [purpose]: '' };
+        await refreshStatus();
+      } finally {
+        busyExemptionPurpose = null;
+      }
+    });
+  }
+
+  async function handleRevokeExemption(purpose: CheckpointPurpose) {
+    if (!lookupUser) return;
+
+    const reason = (exemptionReasons[purpose] ?? '').trim();
+
+    const message =
+      `You are about to turn the identity check back on for ${lookupUser.gitHubUsername} on ` +
+      `"${PURPOSE_LABELS[purpose]}". They'll be asked to pass it again the next time they ` +
+      `need it. Continue?`;
+
+    await doWithConfirmationModal(message, async () => {
+      busyExemptionPurpose = purpose;
+      try {
+        await doWithErrorModal(
+          () =>
+            revokeLivenessCheckpointExemption(fetch, lookupUser!.id, purpose, reason || undefined),
+          undefined,
+          { message: 'Identity check turned back on.', confetti: false },
+        );
+        exemptionReasons = { ...exemptionReasons, [purpose]: '' };
+        await refreshStatus();
+      } finally {
+        busyExemptionPurpose = null;
+      }
+    });
+  }
 </script>
 
 <HeadMeta title="Identity Check Limits | Admin | Wave" />
@@ -119,6 +179,12 @@
       attempts are capped, and a user who runs out is told to contact support. Reset the allowance
       here once you're satisfied the failures were genuine — a dropped connection, a broken camera,
       poor lighting.
+    </p>
+    <p class="intro typo-text">
+      If the check itself is the problem — it keeps failing for someone you've already confirmed is
+      who they say they are — you can turn it off for their account instead. More attempts won't
+      help there. Confirm who they are first: once it's off, they're not asked again until someone
+      turns it back on.
     </p>
 
     <div class="form-row">
@@ -157,6 +223,11 @@
             <span class="typo-text-bold">{PURPOSE_LABELS[purposeState.purpose]}</span>
             {#if !purposeState.enabled}
               <span class="badge neutral typo-text-small">Not enabled here</span>
+            {:else if purposeState.exemption}
+              <!-- Takes precedence over every other state: while this stands the
+                   counts below are real but inert, and reading "Locked out" here
+                   would send support chasing a reset that changes nothing. -->
+              <span class="badge exempt typo-text-small">Check turned off</span>
             {:else if purposeState.failedAttempts.exhausted}
               <span class="badge locked typo-text-small">Locked out</span>
             {:else if purposeState.starts.exhausted}
@@ -211,7 +282,9 @@
             </div>
           </dl>
 
-          {#if purposeState.starts.exhausted && !purposeState.failedAttempts.exhausted}
+          <!-- Both of these explain why a user is being asked to pass again.
+               Neither applies while the check is off for them. -->
+          {#if purposeState.starts.exhausted && !purposeState.failedAttempts.exhausted && !purposeState.exemption}
             <AnnotationBox type="warning" size="small">
               This user can't start a check right now — they've hit the ceiling on how many can be
               started in a short window. That's a separate limit from the failed attempts above, and
@@ -220,11 +293,20 @@
             </AnnotationBox>
           {/if}
 
-          {#if purposeState.hasApprovalOnSomeDevice}
+          {#if purposeState.hasApprovalOnSomeDevice && !purposeState.exemption}
             <AnnotationBox type="info" size="small">
               A pass only counts on the device that earned it. If this user has since switched phone
               or browser, they're still being asked to pass again — compare the device above with
               the ones on their recent attempts.
+            </AnnotationBox>
+          {/if}
+
+          {#if purposeState.exemption}
+            <AnnotationBox type="warning" size="small">
+              The identity check is turned off for this account. Turned off {formatDate(
+                purposeState.exemption.grantedAt,
+                'dayAndYear',
+              )} — "{purposeState.exemption.reason}"
             </AnnotationBox>
           {/if}
 
@@ -255,25 +337,72 @@
             <p class="subtle typo-text-small">No attempts on record.</p>
           {/if}
 
-          <div class="reset">
-            <FormField
-              title="Reason for reset"
-              description="Recorded against your account. Required."
-            >
-              <TextArea
-                bind:value={reasons[purposeState.purpose]}
-                placeholder="e.g. Confirmed over support call — user's webcam kept failing."
-              />
-            </FormField>
-            <Button
-              variant="destructive"
-              disabled={!(reasons[purposeState.purpose] ?? '').trim() ||
-                busyPurpose === purposeState.purpose}
-              onclick={() => handleReset(purposeState.purpose)}
-            >
-              {busyPurpose === purposeState.purpose ? 'Resetting…' : 'Reset allowance'}
-            </Button>
-          </div>
+          {#if purposeState.exemption}
+            <!-- The reset form is deliberately gone while the check is off. It
+                 would return attempts at something this user is no longer being
+                 asked to do, which reads as if it were doing something. -->
+            <div class="action">
+              <FormField
+                title="Reason for turning the check back on"
+                description="Recorded against your account. Optional."
+              >
+                <TextArea
+                  bind:value={exemptionReasons[purposeState.purpose]}
+                  placeholder="e.g. User replaced their webcam and passed a check unaided."
+                />
+              </FormField>
+              <Button
+                disabled={busyExemptionPurpose === purposeState.purpose}
+                onclick={() => handleRevokeExemption(purposeState.purpose)}
+              >
+                {busyExemptionPurpose === purposeState.purpose
+                  ? 'Turning back on…'
+                  : 'Turn the check back on'}
+              </Button>
+            </div>
+          {:else}
+            <div class="action">
+              <FormField
+                title="Reason for reset"
+                description="Recorded against your account. Required."
+              >
+                <TextArea
+                  bind:value={reasons[purposeState.purpose]}
+                  placeholder="e.g. Confirmed over support call — user's webcam kept failing."
+                />
+              </FormField>
+              <Button
+                variant="destructive"
+                disabled={!(reasons[purposeState.purpose] ?? '').trim() ||
+                  busyPurpose === purposeState.purpose}
+                onclick={() => handleReset(purposeState.purpose)}
+              >
+                {busyPurpose === purposeState.purpose ? 'Resetting…' : 'Reset allowance'}
+              </Button>
+            </div>
+
+            <div class="action">
+              <FormField
+                title="Reason for turning off the identity check"
+                description="How you confirmed who this person is, and why the check can't be passed. Recorded against your account. Required."
+              >
+                <TextArea
+                  bind:value={exemptionReasons[purposeState.purpose]}
+                  placeholder="e.g. Matched their passport and a video call against the photo on file — the check rejects every attempt."
+                />
+              </FormField>
+              <Button
+                variant="destructive"
+                disabled={!(exemptionReasons[purposeState.purpose] ?? '').trim() ||
+                  busyExemptionPurpose === purposeState.purpose}
+                onclick={() => handleGrantExemption(purposeState.purpose)}
+              >
+                {busyExemptionPurpose === purposeState.purpose
+                  ? 'Turning off…'
+                  : 'Turn off the identity check'}
+              </Button>
+            </div>
+          {/if}
         </div>
       {/each}
     {/if}
@@ -361,6 +490,11 @@
     color: var(--color-caution-level-6);
   }
 
+  .badge.exempt {
+    background-color: var(--color-caution-level-1);
+    color: var(--color-caution-level-6);
+  }
+
   .badge.neutral {
     background-color: var(--color-foreground-level-1);
     color: var(--color-foreground-level-5);
@@ -410,7 +544,7 @@
     color: var(--color-positive-level-6);
   }
 
-  .reset {
+  .action {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;

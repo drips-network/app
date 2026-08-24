@@ -44,6 +44,14 @@ const checkpointPurposeStateSchema = z.object({
       resetByUserId: z.uuid().nullable(),
     })
     .nullable(),
+  exemption: z
+    .object({
+      id: z.uuid(),
+      grantedAt: z.coerce.date(),
+      reason: z.string(),
+      grantedByUserId: z.uuid().nullable(),
+    })
+    .nullable(),
   recentAttempts: z.array(checkpointAttemptSchema),
 });
 export type CheckpointPurposeState = z.infer<typeof checkpointPurposeStateSchema>;
@@ -73,6 +81,16 @@ export async function getLivenessCheckpointStatus(
   );
 }
 
+const exemptionSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
+  purpose: checkpointPurposeEnum,
+  reason: z.string(),
+  grantedAt: z.coerce.date(),
+  revokedAt: z.coerce.date().nullable(),
+});
+export type CheckpointExemption = z.infer<typeof exemptionSchema>;
+
 export async function resetLivenessCheckpoint(
   f = fetch,
   userId: string,
@@ -84,6 +102,36 @@ export async function resetLivenessCheckpoint(
     await authenticatedCall(f, `/api/admin/liveness-checkpoints/${userId}/reset`, {
       method: 'POST',
       body: JSON.stringify({ purpose, reason }),
+    }),
+  );
+}
+
+export async function grantLivenessCheckpointExemption(
+  f = fetch,
+  userId: string,
+  purpose: CheckpointPurpose,
+  reason: string,
+): Promise<CheckpointExemption> {
+  return parseRes(
+    exemptionSchema,
+    await authenticatedCall(f, `/api/admin/liveness-checkpoints/${userId}/exemption`, {
+      method: 'POST',
+      body: JSON.stringify({ purpose, reason }),
+    }),
+  );
+}
+
+export async function revokeLivenessCheckpointExemption(
+  f = fetch,
+  userId: string,
+  purpose: CheckpointPurpose,
+  reason?: string,
+): Promise<CheckpointExemption> {
+  return parseRes(
+    exemptionSchema,
+    await authenticatedCall(f, `/api/admin/liveness-checkpoints/${userId}/exemption/revoke`, {
+      method: 'POST',
+      body: JSON.stringify({ purpose, ...(reason ? { reason } : {}) }),
     }),
   );
 }
