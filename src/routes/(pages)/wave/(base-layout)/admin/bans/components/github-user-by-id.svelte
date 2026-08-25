@@ -1,73 +1,38 @@
 <script lang="ts">
-  import { lookUpUser, type AdminUserLookupResult } from '$lib/utils/wave/admin/user-lookup';
-
   interface Props {
     gitHubUserId: number;
     /**
-     * Pre-resolved GitHub username, when wave already knew it (i.e. the
-     * banned user has a Wave account). When provided, no lookup happens.
-     * Null means wave looked but found no Wave user (pre-emptive ban) —
-     * resolve the username through the admin lookup endpoint instead.
+     * GitHub username as wave resolved it from our own records. Null when the
+     * banned account has never signed up to Wave (i.e. a pre-emptive ban), in
+     * which case we only know the numeric ID. We deliberately don't resolve
+     * the username through the admin lookup endpoint here: that falls back to
+     * the GitHub API, and one call per row burns through the admin's rate
+     * limit for a list that can be hundreds of entries long.
      */
     gitHubUsername?: string | null;
   }
 
   let { gitHubUserId, gitHubUsername = null }: Props = $props();
 
-  let user = $state<AdminUserLookupResult | null | undefined>(undefined);
-  let error = $state<string | null>(null);
-
-  $effect(() => {
-    if (gitHubUsername) {
-      user = null;
-      error = null;
-      return;
-    }
-
-    let cancelled = false;
-    user = undefined;
-    error = null;
-    lookUpUser(fetch, String(gitHubUserId))
-      .then((u) => {
-        if (!cancelled) user = u;
-      })
-      .catch((e: unknown) => {
-        if (!cancelled) {
-          user = null;
-          error = e instanceof Error ? e.message : 'Lookup failed.';
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  });
-
-  const displayLogin = $derived(gitHubUsername ?? user?.gitHubUsername ?? null);
-  const avatarUrl = $derived(
-    user?.gitHubAvatarUrl ?? `https://avatars.githubusercontent.com/u/${gitHubUserId}?s=64`,
-  );
-  const profileUrl = $derived(displayLogin ? `https://github.com/${displayLogin}` : null);
+  // The avatar CDN resolves by user ID and isn't rate-limited, so it works
+  // even for users we only know the ID of.
+  const avatarUrl = $derived(`https://avatars.githubusercontent.com/u/${gitHubUserId}?s=64`);
+  const profileUrl = $derived(gitHubUsername ? `https://github.com/${gitHubUsername}` : null);
 </script>
 
 <div class="user">
   <img class="avatar" src={avatarUrl} alt="" referrerpolicy="no-referrer" />
   <div class="info">
-    {#if displayLogin}
-      {#if profileUrl}
-        <a class="login typo-text-bold" href={profileUrl} target="_blank" rel="noreferrer">
-          {displayLogin}
-        </a>
-      {:else}
-        <span class="login typo-text-bold">{displayLogin}</span>
-      {/if}
-      <span class="id typo-text-small dim">#{gitHubUserId}</span>
-    {:else if user === undefined}
-      <span class="login typo-text-bold">…</span>
-      <span class="id typo-text-small dim">#{gitHubUserId}</span>
+    {#if gitHubUsername && profileUrl}
+      <a class="login typo-text-bold" href={profileUrl} target="_blank" rel="noreferrer">
+        {gitHubUsername}
+      </a>
     {:else}
-      <span class="login typo-text-bold">Unknown</span>
-      <span class="id typo-text-small dim" title={error ?? undefined}>#{gitHubUserId}</span>
+      <span class="login typo-text-bold" title="This account has never signed up to Wave.">
+        Unknown
+      </span>
     {/if}
+    <span class="id typo-text-small dim">#{gitHubUserId}</span>
   </div>
 </div>
 
