@@ -125,6 +125,8 @@
           areSplitsValid: false,
           chain: network.gqlName,
           withdrawableBalances: [],
+          owner: null,
+          orcidMetadata: null,
         };
       }
 

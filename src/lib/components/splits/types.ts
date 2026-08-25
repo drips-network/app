@@ -111,6 +111,9 @@ export const SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT = gql`
           accountId
         }
         orcid
+        owner {
+          address
+        }
         orcidMetadata {
           givenName
           familyName

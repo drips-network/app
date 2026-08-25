@@ -14,6 +14,8 @@
   import modal from '$lib/stores/modal';
   import type { GrantDetailDto, GrantDto, GrantStatus } from '$lib/utils/wave/types/grant.js';
   import { getGrant } from '$lib/utils/wave/grants.js';
+  import { LivenessCheckpointRequiredError } from '$lib/utils/wave/call.js';
+  import { goto } from '$app/navigation';
 
   let { data } = $props();
 
@@ -74,6 +76,15 @@
           ? { stellarAddress: lastTest.stellarAddress, memo: lastTest.memoValue ?? undefined }
           : undefined;
       modal.show(Stepper, undefined, withdrawalFlow(grant, prefill, kybData));
+    } catch (err) {
+      // A check can fall due mid-session, between this page loading and the
+      // user opening the flow. Send them through it rather than failing the
+      // click silently.
+      if (err instanceof LivenessCheckpointRequiredError) {
+        await goto(`/wave/checkpoint?backTo=${encodeURIComponent('/wave/rewards')}`);
+        return;
+      }
+      throw err;
     } finally {
       loadingWithdrawalGrantId = null;
     }

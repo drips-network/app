@@ -10,6 +10,9 @@
         chain
         isClaimed
         areSplitsValid
+        owner {
+          address
+        }
         orcidMetadata {
           givenName
           familyName
@@ -38,7 +41,7 @@
   {#if linkedIdentities.length}
     <h5>Linked Identities</h5>
     <ul>
-      {#each linkedIdentities as linkedIdentity}
+      {#each linkedIdentities as linkedIdentity (`${linkedIdentity.chain}-${linkedIdentity.orcid}`)}
         <li>
           {#if linkedIdentity.__typename === 'OrcidLinkedIdentity'}
             <OrcidBadge orcid={linkedIdentity} hideType={false} />
