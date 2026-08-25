@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { isHttpError } from '@sveltejs/kit';
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
   import Breadcrumbs from '$lib/components/breadcrumbs/breadcrumbs.svelte';
   import Section from '$lib/components/section/section.svelte';
@@ -19,10 +20,25 @@
     type CheckpointPurpose,
     type CheckpointStatus,
   } from '$lib/utils/wave/admin/liveness-checkpoints';
+  import type { TextInputValidationState } from '$lib/components/text-input/text-input';
 
   const PURPOSE_LABELS: Record<CheckpointPurpose, string> = {
     grant_access: 'Grant access',
   };
+
+  /**
+   * The API caps every reason at this. It only says so once the destructive
+   * confirmation has already been through, so it's caught here first.
+   */
+  const MAX_REASON_LENGTH = 500;
+
+  const reasonTooLong = (reason: string | undefined) => (reason ?? '').length > MAX_REASON_LENGTH;
+
+  function reasonValidationState(reason: string | undefined): TextInputValidationState {
+    return reasonTooLong(reason)
+      ? { type: 'invalid', message: `Keep this under ${MAX_REASON_LENGTH} characters.` }
+      : { type: 'unvalidated' };
+  }
 
   type LookedUpUser = { id: string; gitHubUsername: string; gitHubAvatarUrl: string | null };
 
@@ -43,6 +59,22 @@
   let exemptionReasons = $state<Record<string, string>>({});
   let busyPurpose = $state<string | null>(null);
   let busyExemptionPurpose = $state<string | null>(null);
+
+  /**
+   * `authenticatedCall` throws SvelteKit's `error()` for 401 and 403, which is
+   * an `HttpError` rather than an `Error` — so a missing permission would
+   * otherwise fall through to the generic message and read like a mistyped
+   * username or an outage.
+   */
+  function describeLookupError(e: unknown): string {
+    if (isHttpError(e)) {
+      return e.status === 401 || e.status === 403
+        ? 'Your account is not allowed to view identity check limits — it needs the manageLivenessCheckpoints permission.'
+        : e.body.message;
+    }
+
+    return e instanceof Error ? e.message : 'Lookup failed';
+  }
 
   async function handleLookup() {
     if (!gitHubUsername.trim() || loadingLookup) return;
@@ -69,7 +101,7 @@
       };
       status = await getLivenessCheckpointStatus(fetch, user.id);
     } catch (e) {
-      lookupError = e instanceof Error ? e.message : 'Lookup failed';
+      lookupError = describeLookupError(e);
     } finally {
       loadingLookup = false;
     }
@@ -86,35 +118,42 @@
   async function handleReset(purpose: CheckpointPurpose) {
     if (!lookupUser) return;
 
+    const userId = lookupUser.id;
     const reason = (reasons[purpose] ?? '').trim();
-    if (!reason) return;
+    if (!reason || reasonTooLong(reasons[purpose])) return;
 
     const message =
       `You are about to clear ${lookupUser.gitHubUsername}'s identity check allowance for ` +
       `"${PURPOSE_LABELS[purpose]}". They will be able to attempt the check again immediately. ` +
       `This is recorded against your account along with the reason. Continue?`;
 
-    await doWithConfirmationModal(message, async () => {
-      busyPurpose = purpose;
-      try {
-        await doWithErrorModal(
-          () => resetLivenessCheckpoint(fetch, lookupUser!.id, purpose, reason),
-          undefined,
-          { message: 'Allowance reset. The user can attempt the check again.', confetti: false },
-        );
-        reasons = { ...reasons, [purpose]: '' };
-        await refreshStatus();
-      } finally {
-        busyPurpose = null;
-      }
-    });
+    // The work runs after the confirmation has closed rather than inside its
+    // callback. ConfirmModal hides whatever is on screen once the callback
+    // returns, which would take the success step down with it.
+    if (!(await doWithConfirmationModal(message, async () => true))) return;
+
+    busyPurpose = purpose;
+    try {
+      await doWithErrorModal(
+        () => resetLivenessCheckpoint(fetch, userId, purpose, reason),
+        undefined,
+        { message: 'Allowance reset. The user can attempt the check again.', confetti: false },
+      );
+      reasons = { ...reasons, [purpose]: '' };
+      await refreshStatus();
+    } catch {
+      // Already surfaced by doWithErrorModal.
+    } finally {
+      busyPurpose = null;
+    }
   }
 
   async function handleGrantExemption(purpose: CheckpointPurpose) {
     if (!lookupUser) return;
 
+    const userId = lookupUser.id;
     const reason = (exemptionReasons[purpose] ?? '').trim();
-    if (!reason) return;
+    if (!reason || reasonTooLong(exemptionReasons[purpose])) return;
 
     const message =
       `You are about to turn the identity check off for ${lookupUser.gitHubUsername} on ` +
@@ -122,47 +161,52 @@
       `turns it back on. Only do this once you've confirmed who they are by other means. ` +
       `This is recorded against your account along with the reason. Continue?`;
 
-    await doWithConfirmationModal(message, async () => {
-      busyExemptionPurpose = purpose;
-      try {
-        await doWithErrorModal(
-          () => grantLivenessCheckpointExemption(fetch, lookupUser!.id, purpose, reason),
-          undefined,
-          { message: 'Identity check turned off for this account.', confetti: false },
-        );
-        exemptionReasons = { ...exemptionReasons, [purpose]: '' };
-        await refreshStatus();
-      } finally {
-        busyExemptionPurpose = null;
-      }
-    });
+    if (!(await doWithConfirmationModal(message, async () => true))) return;
+
+    busyExemptionPurpose = purpose;
+    try {
+      await doWithErrorModal(
+        () => grantLivenessCheckpointExemption(fetch, userId, purpose, reason),
+        undefined,
+        { message: 'Identity check turned off for this account.', confetti: false },
+      );
+      exemptionReasons = { ...exemptionReasons, [purpose]: '' };
+      await refreshStatus();
+    } catch {
+      // Already surfaced by doWithErrorModal.
+    } finally {
+      busyExemptionPurpose = null;
+    }
   }
 
   async function handleRevokeExemption(purpose: CheckpointPurpose) {
     if (!lookupUser) return;
 
+    const userId = lookupUser.id;
     const reason = (exemptionReasons[purpose] ?? '').trim();
+    if (reasonTooLong(exemptionReasons[purpose])) return;
 
     const message =
       `You are about to turn the identity check back on for ${lookupUser.gitHubUsername} on ` +
       `"${PURPOSE_LABELS[purpose]}". They'll be asked to pass it again the next time they ` +
       `need it. Continue?`;
 
-    await doWithConfirmationModal(message, async () => {
-      busyExemptionPurpose = purpose;
-      try {
-        await doWithErrorModal(
-          () =>
-            revokeLivenessCheckpointExemption(fetch, lookupUser!.id, purpose, reason || undefined),
-          undefined,
-          { message: 'Identity check turned back on.', confetti: false },
-        );
-        exemptionReasons = { ...exemptionReasons, [purpose]: '' };
-        await refreshStatus();
-      } finally {
-        busyExemptionPurpose = null;
-      }
-    });
+    if (!(await doWithConfirmationModal(message, async () => true))) return;
+
+    busyExemptionPurpose = purpose;
+    try {
+      await doWithErrorModal(
+        () => revokeLivenessCheckpointExemption(fetch, userId, purpose, reason || undefined),
+        undefined,
+        { message: 'Identity check turned back on.', confetti: false },
+      );
+      exemptionReasons = { ...exemptionReasons, [purpose]: '' };
+      await refreshStatus();
+    } catch {
+      // Already surfaced by doWithErrorModal.
+    } finally {
+      busyExemptionPurpose = null;
+    }
   }
 </script>
 
@@ -258,7 +302,7 @@
                 {#if purposeState.hasApprovalOnSomeDevice}
                   Yes{#if purposeState.validUntil}, until {formatDate(
                       purposeState.validUntil,
-                      'dayAndYear',
+                      'standard',
                     )}{/if}
                   {#if purposeState.approvedDeviceId}
                     <span class="subtle device" title={purposeState.approvedDeviceId}
@@ -273,8 +317,12 @@
             <div>
               <dt>Frees up on its own</dt>
               <dd>
-                {#if purposeState.failedAttempts.naturalResetAt}
-                  {formatDate(purposeState.failedAttempts.naturalResetAt, 'dayAndYear')}
+                <!-- The API sets this whenever a rejection is still inside the
+                     window, not only once the allowance is spent. Shown to a
+                     user who isn't locked out, it reads as if they were stuck
+                     until then. -->
+                {#if purposeState.failedAttempts.exhausted && purposeState.failedAttempts.naturalResetAt}
+                  {formatDate(purposeState.failedAttempts.naturalResetAt, 'standard')}
                 {:else}
                   —
                 {/if}
@@ -288,8 +336,8 @@
             <AnnotationBox type="warning" size="small">
               This user can't start a check right now — they've hit the ceiling on how many can be
               started in a short window. That's a separate limit from the failed attempts above, and
-              it clears by itself within a few hours. A reset here clears it too, if they can't
-              wait.
+              it clears by itself as their earlier starts age out, which can take up to a day. A
+              reset here clears it immediately, if they can't wait.
             </AnnotationBox>
           {/if}
 
@@ -305,14 +353,14 @@
             <AnnotationBox type="warning" size="small">
               The identity check is turned off for this account. Turned off {formatDate(
                 purposeState.exemption.grantedAt,
-                'dayAndYear',
+                'standard',
               )} — "{purposeState.exemption.reason}"
             </AnnotationBox>
           {/if}
 
           {#if purposeState.lastReset}
             <AnnotationBox type="info" size="small">
-              Last reset {formatDate(purposeState.lastReset.at, 'dayAndYear')} — "{purposeState
+              Last reset {formatDate(purposeState.lastReset.at, 'standard')} — "{purposeState
                 .lastReset.reason}"
             </AnnotationBox>
           {/if}
@@ -323,7 +371,7 @@
               {#each purposeState.recentAttempts as attempt (attempt.id)}
                 <div class="attempt typo-text-small">
                   <span class="status {attempt.status}">{attempt.status}</span>
-                  <span class="subtle">{formatDate(attempt.createdAt, 'dayAndYear')}</span>
+                  <span class="subtle">{formatDate(attempt.createdAt, 'standard')}</span>
                   <span class="subtle device" title={attempt.deviceId}
                     >{shortDeviceId(attempt.deviceId)}</span
                   >
@@ -345,14 +393,24 @@
               <FormField
                 title="Reason for turning the check back on"
                 description="Recorded against your account. Optional."
+                type="div"
               >
                 <TextArea
                   bind:value={exemptionReasons[purposeState.purpose]}
                   placeholder="e.g. User replaced their webcam and passed a check unaided."
+                  validationState={reasonValidationState(exemptionReasons[purposeState.purpose])}
                 />
+                <div class="char-count typo-text-small">
+                  <span
+                    class="tnum"
+                    class:too-long={reasonTooLong(exemptionReasons[purposeState.purpose])}
+                    >{(exemptionReasons[purposeState.purpose] ?? '').length} / {MAX_REASON_LENGTH}</span
+                  >
+                </div>
               </FormField>
               <Button
-                disabled={busyExemptionPurpose === purposeState.purpose}
+                disabled={busyExemptionPurpose === purposeState.purpose ||
+                  reasonTooLong(exemptionReasons[purposeState.purpose])}
                 onclick={() => handleRevokeExemption(purposeState.purpose)}
               >
                 {busyExemptionPurpose === purposeState.purpose
@@ -365,15 +423,23 @@
               <FormField
                 title="Reason for reset"
                 description="Recorded against your account. Required."
+                type="div"
               >
                 <TextArea
                   bind:value={reasons[purposeState.purpose]}
                   placeholder="e.g. Confirmed over support call — user's webcam kept failing."
+                  validationState={reasonValidationState(reasons[purposeState.purpose])}
                 />
+                <div class="char-count typo-text-small">
+                  <span class="tnum" class:too-long={reasonTooLong(reasons[purposeState.purpose])}
+                    >{(reasons[purposeState.purpose] ?? '').length} / {MAX_REASON_LENGTH}</span
+                  >
+                </div>
               </FormField>
               <Button
                 variant="destructive"
                 disabled={!(reasons[purposeState.purpose] ?? '').trim() ||
+                  reasonTooLong(reasons[purposeState.purpose]) ||
                   busyPurpose === purposeState.purpose}
                 onclick={() => handleReset(purposeState.purpose)}
               >
@@ -385,15 +451,25 @@
               <FormField
                 title="Reason for turning off the identity check"
                 description="How you confirmed who this person is, and why the check can't be passed. Recorded against your account. Required."
+                type="div"
               >
                 <TextArea
                   bind:value={exemptionReasons[purposeState.purpose]}
                   placeholder="e.g. Matched their passport and a video call against the photo on file — the check rejects every attempt."
+                  validationState={reasonValidationState(exemptionReasons[purposeState.purpose])}
                 />
+                <div class="char-count typo-text-small">
+                  <span
+                    class="tnum"
+                    class:too-long={reasonTooLong(exemptionReasons[purposeState.purpose])}
+                    >{(exemptionReasons[purposeState.purpose] ?? '').length} / {MAX_REASON_LENGTH}</span
+                  >
+                </div>
               </FormField>
               <Button
                 variant="destructive"
                 disabled={!(exemptionReasons[purposeState.purpose] ?? '').trim() ||
+                  reasonTooLong(exemptionReasons[purposeState.purpose]) ||
                   busyExemptionPurpose === purposeState.purpose}
                 onclick={() => handleGrantExemption(purposeState.purpose)}
               >
@@ -550,5 +626,15 @@
     gap: 0.75rem;
     padding-top: 0.5rem;
     border-top: 1px solid var(--color-foreground-level-2);
+  }
+
+  .char-count {
+    color: var(--color-foreground-level-5);
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .too-long {
+    color: var(--color-negative);
   }
 </style>

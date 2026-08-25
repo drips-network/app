@@ -2,8 +2,12 @@ import { z } from 'zod';
 import { authenticatedCall } from '../call';
 import parseRes from '../utils/parse-res';
 
-const checkpointPurposeEnum = z.enum(['grant_access']);
+const CHECKPOINT_PURPOSES = ['grant_access'] as const;
+const checkpointPurposeEnum = z.enum(CHECKPOINT_PURPOSES);
 export type CheckpointPurpose = z.infer<typeof checkpointPurposeEnum>;
+
+const isKnownPurpose = (value: unknown): value is CheckpointPurpose =>
+  typeof value === 'string' && (CHECKPOINT_PURPOSES as readonly string[]).includes(value);
 
 // Deliberately narrower than the API response: this client parses only what the
 // screen renders, so fields the UI has no use for don't end up mirrored here.
@@ -58,7 +62,18 @@ export type CheckpointPurposeState = z.infer<typeof checkpointPurposeStateSchema
 
 const checkpointStatusSchema = z.object({
   userId: z.uuid(),
-  purposes: z.array(checkpointPurposeStateSchema),
+  // Wave deploys ahead of the app, so the API can start returning a purpose
+  // this build has never heard of. Those entries are dropped rather than
+  // failing the whole response, which would take the screen down for every
+  // purpose — including the ones it does understand — until the app catches
+  // up. An entry with a known purpose that doesn't parse still throws.
+  purposes: z
+    .array(z.unknown())
+    .transform((entries) =>
+      entries
+        .filter((entry) => isKnownPurpose((entry as { purpose?: unknown } | null)?.purpose))
+        .map((entry) => checkpointPurposeStateSchema.parse(entry)),
+    ),
 });
 export type CheckpointStatus = z.infer<typeof checkpointStatusSchema>;
 
