@@ -8,7 +8,7 @@
   import StandaloneFlowStepLayout from '$lib/components/standalone-flow-step-layout/standalone-flow-step-layout.svelte';
   import AnnotationBox from '$lib/components/annotation-box/annotation-box.svelte';
   import modal from '$lib/stores/modal';
-  import { lookupGitHubUserByLogin, type GitHubUser } from '$lib/utils/github/lookup-user';
+  import { lookUpUser, type AdminUserLookupResult } from '$lib/utils/wave/admin/user-lookup';
   import {
     banGitHubUser,
     getBanTargetDiscordAccount,
@@ -30,12 +30,14 @@
     },
   ];
 
-  let username = $state('');
+  let query = $state('');
   let type = $state<string>('ban');
   let reason = $state('');
   let skipNotification = $state(false);
 
-  let resolvedUser = $state<GitHubUser | null | undefined>(undefined);
+  let resolvedUser = $state<AdminUserLookupResult | null | undefined>(undefined);
+  /** The query `resolvedUser` was resolved from, so we don't look it up twice. */
+  let resolvedQuery = $state<string | null>(null);
   let lookupError = $state<string | null>(null);
   let lookingUp = $state(false);
   let lookupToken = 0;
@@ -47,18 +49,25 @@
   let submitError = $state<string | null>(null);
   let discordBanWarning = $state<string | null>(null);
 
-  const trimmedUsername = $derived(username.trim());
+  const trimmedQuery = $derived(query.trim());
   const canSubmit = $derived(!!resolvedUser && !submitting && !lookingUp && reason.length <= 500);
+  // Wave stores no avatar for accounts it only knows by ID, so fall back to
+  // GitHub's ID-keyed avatar URL, which needs no API call.
+  const avatarUrl = $derived(
+    resolvedUser?.gitHubAvatarUrl ??
+      `https://avatars.githubusercontent.com/u/${resolvedUser?.gitHubUserId}?s=64`,
+  );
 
   async function lookup() {
-    const value = trimmedUsername;
+    const value = trimmedQuery;
     if (value.length === 0) {
       resolvedUser = undefined;
+      resolvedQuery = null;
       lookupError = null;
       return;
     }
 
-    if (resolvedUser && resolvedUser.login.toLowerCase() === value.toLowerCase()) {
+    if (resolvedUser && resolvedQuery?.toLowerCase() === value.toLowerCase()) {
       return;
     }
 
@@ -66,16 +75,18 @@
     lookingUp = true;
     lookupError = null;
     resolvedUser = undefined;
+    resolvedQuery = null;
 
     try {
-      const user = await lookupGitHubUserByLogin(value);
+      const user = await lookUpUser(fetch, value);
       if (token !== lookupToken) return;
       if (!user) {
-        lookupError = `No GitHub user found with username "${value}".`;
+        lookupError = `No user found for "${value}".`;
         resolvedUser = null;
       } else {
         resolvedUser = user;
-        await lookupDiscordAccount(user.id, token);
+        resolvedQuery = value;
+        await lookupDiscordAccount(user.gitHubUserId, token);
       }
     } catch (e) {
       if (token !== lookupToken) return;
@@ -98,9 +109,10 @@
     }
   }
 
-  function onUsernameInput() {
+  function onQueryInput() {
     // Invalidate any previous resolution as the user edits.
     resolvedUser = undefined;
+    resolvedQuery = null;
     lookupError = null;
     discordAccount = null;
   }
@@ -113,7 +125,7 @@
 
     try {
       const result = await banGitHubUser(fetch, {
-        gitHubUserId: resolvedUser.id,
+        gitHubUserId: resolvedUser.gitHubUserId,
         type: type as RestrictionType,
         reason: reason.trim() ? reason.trim() : undefined,
         skipNotification,
@@ -125,7 +137,7 @@
       if (result.discordBanResult === 'failed') {
         // The Wave restriction was applied, but the Discord ban didn't go
         // through — keep the modal open so the admin knows to ban manually.
-        discordBanWarning = `${resolvedUser.login} was ${
+        discordBanWarning = `${resolvedUser.gitHubUsername} was ${
           type === 'ban' ? 'banned' : 'restricted'
         }, but banning their Discord account failed. Please ban them from the Discord server manually.`;
         return;
@@ -135,7 +147,7 @@
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'An unexpected error occurred.';
       if (msg.includes('409')) {
-        submitError = `${resolvedUser.login} is already banned or restricted.`;
+        submitError = `${resolvedUser.gitHubUsername} is already banned or restricted.`;
       } else if (msg.includes('400')) {
         submitError = 'Bad request. The backend rejected this ban.';
       } else {
@@ -154,30 +166,35 @@
   >
     <div class="fields">
       <FormField
-        title="GitHub Username"
-        description="Looked up against the public GitHub API to resolve the numeric user ID."
+        title="User"
+        description="A GitHub username, a numeric GitHub user ID, or a Wave user ID. Resolved against Wave's own records, falling back to GitHub for accounts that never signed up."
       >
         <TextInput
-          bind:value={username}
+          bind:value={query}
           placeholder="e.g. octocat"
-          oninput={onUsernameInput}
+          oninput={onQueryInput}
           onblur={lookup}
         />
       </FormField>
 
       {#if lookingUp}
-        <p class="hint typo-text-small">Looking up GitHub user…</p>
+        <p class="hint typo-text-small">Looking up user…</p>
       {:else if resolvedUser}
         <div class="preview">
-          <img class="avatar" src={resolvedUser.avatarUrl} alt="" referrerpolicy="no-referrer" />
+          <img class="avatar" src={avatarUrl} alt="" referrerpolicy="no-referrer" />
           <div class="info">
-            <span class="login typo-text-bold">{resolvedUser.login}</span>
-            {#if resolvedUser.name}
-              <span class="name typo-text-small dim">{resolvedUser.name}</span>
+            <span class="login typo-text-bold">{resolvedUser.gitHubUsername}</span>
+            {#if resolvedUser.gitHubName}
+              <span class="name typo-text-small dim">{resolvedUser.gitHubName}</span>
             {/if}
-            <span class="id typo-text-small dim">GitHub ID #{resolvedUser.id}</span>
+            <span class="id typo-text-small dim">GitHub ID #{resolvedUser.gitHubUserId}</span>
           </div>
         </div>
+        {#if resolvedUser.source === 'github'}
+          <p class="hint typo-text-small">
+            No Wave account yet — the restriction will apply if they sign up later.
+          </p>
+        {/if}
       {:else if lookupError}
         <AnnotationBox type="warning">{lookupError}</AnnotationBox>
       {/if}
@@ -238,7 +255,7 @@
         <Button variant="primary" onclick={modal.hide}>Close</Button>
       {:else}
         <Button variant="normal" disabled={submitting} onclick={modal.hide}>Cancel</Button>
-        {#if !resolvedUser && trimmedUsername.length > 0 && !lookingUp}
+        {#if !resolvedUser && trimmedQuery.length > 0 && !lookingUp}
           <Button variant="primary" loading={lookingUp} onclick={lookup}>Look up</Button>
         {:else}
           <Button
