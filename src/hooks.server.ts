@@ -46,6 +46,13 @@ const waveHandle: Handle = async ({ event, resolve }) => {
           if (!res.ok) {
             if (res.status === 403) {
               const body = await res.text();
+              // The machine-readable `code` match runs before the bare-word
+              // 'suspended' one so prose can't shadow it.
+              if (body.includes('unverified_email')) {
+                event.cookies.delete('wave_refresh_token', { path: '/' });
+                event.cookies.delete('wave_access_token', { path: '/' });
+                throw redirect(302, '/wave/unverified-email');
+              }
               if (body.includes('suspended')) {
                 event.cookies.delete('wave_refresh_token', { path: '/' });
                 event.cookies.delete('wave_access_token', { path: '/' });

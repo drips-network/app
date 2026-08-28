@@ -1,5 +1,5 @@
 import z from 'zod';
-import { authenticatedCall, call, AccountSuspendedError } from './call';
+import { authenticatedCall, call, AccountSuspendedError, UnverifiedEmailError } from './call';
 import { jwtDecode } from 'jwt-decode';
 import type { WaveUser } from './types/user';
 import parseRes from './utils/parse-res';
@@ -115,6 +115,11 @@ export async function getRefreshedAuthToken(manualCookie?: string) {
 
       if (e instanceof AccountSuspendedError) {
         await goto('/wave/suspended');
+        return null;
+      }
+
+      if (e instanceof UnverifiedEmailError) {
+        await goto('/wave/unverified-email');
         return null;
       }
 
