@@ -23,6 +23,23 @@ export class AccountRestrictedError extends Error {
 }
 
 /**
+ * Thrown for the 409 the API returns when the GitHub account's primary email is
+ * already linked to a *different* Wave account.
+ *
+ * Terminal by nature: `users.email` is unique, so the same login will fail the
+ * same way forever. Callers must surface recovery copy rather than the generic
+ * "something went wrong, try again" — a retry can never succeed.
+ */
+export class EmailAlreadyLinkedError extends Error {
+  constructor(message?: string) {
+    super(
+      message ?? 'The email on this GitHub account is already linked to a different Wave account.',
+    );
+    this.name = 'EmailAlreadyLinkedError';
+  }
+}
+
+/**
  * Thrown for 403 responses where the API is holding the request until the user
  * completes a short identity check.
  *
@@ -49,6 +66,25 @@ function isAccountRestrictedResponse(status: number, body: string): boolean {
 // prose, which is free to change.
 function isCheckpointRequiredResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('liveness_checkpoint_required');
+}
+
+// Ditto — matched on the backend's `code`, not the prose.
+function isEmailAlreadyLinkedResponse(status: number, body: string): boolean {
+  return status === 409 && body.includes('email_already_linked');
+}
+
+/**
+ * Pulls the human-readable `error` out of an API error body so we can show the
+ * backend's specific copy (which names the address) instead of a generic
+ * fallback. Returns undefined if the body isn't the shape we expect.
+ */
+function extractErrorMessage(body: string): string | undefined {
+  try {
+    const parsed = JSON.parse(body);
+    return typeof parsed?.error === 'string' ? parsed.error : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 const MAX_RETRIES = 3;
@@ -101,6 +137,10 @@ export async function call(path: string, options: RequestInit = {}) {
 
     if (isAccountRestrictedResponse(response.status, errorText)) {
       throw new AccountRestrictedError();
+    }
+
+    if (isEmailAlreadyLinkedResponse(response.status, errorText)) {
+      throw new EmailAlreadyLinkedError(extractErrorMessage(errorText));
     }
 
     throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);

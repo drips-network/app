@@ -5,13 +5,20 @@
   import { goto, invalidateAll } from '$app/navigation';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import { AccountSuspendedError } from '$lib/utils/wave/call';
+  import { AccountSuspendedError, EmailAlreadyLinkedError } from '$lib/utils/wave/call';
+  import LargeEmptyState from '$lib/components/large-empty-state/large-empty-state.svelte';
   import { getKycStatus } from '$lib/utils/wave/kyc';
 
   let { data } = $props();
   let { backTo, skipWelcome } = $derived(data);
 
   let error = $state<boolean>(false);
+
+  // Set instead of `error` when the GitHub account's primary email already
+  // belongs to another Wave account. Holds the backend's copy, which names the
+  // address. Distinct state because this one is terminal: the generic branch
+  // offers "Try again", which for this failure can never work.
+  let emailAlreadyLinkedMessage = $state<string | null>(null);
 
   // If backTo already points at /wave/kyc-required (e.g. the user was bounced
   // through login from that page), unwrap the inner backTo so we don't nest
@@ -73,6 +80,11 @@
         return goto('/wave/suspended');
       }
 
+      if (err instanceof EmailAlreadyLinkedError) {
+        emailAlreadyLinkedMessage = err.message;
+        return;
+      }
+
       // eslint-disable-next-line no-console
       console.error('Login callback error:', err);
       error = true;
@@ -87,7 +99,27 @@
   style:align-items="center"
   style:gap="1rem"
 >
-  {#if error}
+  {#if emailAlreadyLinkedMessage}
+    <LargeEmptyState
+      emoji="✉️"
+      headline="That email is already linked to another account"
+      description={emailAlreadyLinkedMessage}
+      secondaryButton={{
+        label: 'Use a different account',
+        handler: () => {
+          window.location.href = '/wave/login';
+        },
+      }}
+      button={{
+        label: 'Contact support',
+        handler: () => {
+          window.location.href =
+            'mailto:support@drips.network?subject=' +
+            encodeURIComponent('Wave login: email already linked to another account');
+        },
+      }}
+    />
+  {:else if error}
     <div class="typo-heading-3" style:text-align="center" style:color="var(--color-error)">
       Something went wrong. Please try again, and if this problem persists, contact us at
       support@drips.network.

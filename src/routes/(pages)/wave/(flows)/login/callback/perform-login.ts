@@ -1,5 +1,5 @@
 import { redeemGitHubOAuthCode } from '$lib/utils/wave/auth';
-import { AccountSuspendedError } from '$lib/utils/wave/call';
+import { AccountSuspendedError, EmailAlreadyLinkedError } from '$lib/utils/wave/call';
 import { error } from '@sveltejs/kit';
 
 export default async function performLogin(url: URL) {
@@ -23,6 +23,9 @@ export default async function performLogin(url: URL) {
     return { accessToken, newUser };
   } catch (e) {
     if (e instanceof AccountSuspendedError) throw e;
+    // Terminal and actionable — the caller renders specific recovery copy, so
+    // it must not be flattened into the generic "GitHub may be having issues".
+    if (e instanceof EmailAlreadyLinkedError) throw e;
     throw error(500, 'GitHub OAuth exchange failed. GitHub may be experiencing issues.');
   }
 }
