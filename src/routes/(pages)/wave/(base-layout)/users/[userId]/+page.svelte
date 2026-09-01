@@ -96,12 +96,14 @@
         </Card>
 
         <div class="actions">
-          <Button
-            variant="primary"
-            icon={ArrowBoxUpRight}
-            href="https://github.com/{gitHubUsername}"
-            target="_blank">View user on GitHub</Button
-          >
+          {#if !profileUserData.deleted}
+            <Button
+              variant="primary"
+              icon={ArrowBoxUpRight}
+              href="https://github.com/{gitHubUsername}"
+              target="_blank">View user on GitHub</Button
+            >
+          {/if}
           <ShareButton buttonVariant="normal" url={page.url.href} />
         </div>
 
