@@ -37,7 +37,7 @@ const sessionGrantSchema = z.object({
   expiresAt: z.coerce.date(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  recipientGitHubUsername: z.string(),
+  recipientGitHubUsername: z.string().nullable(),
   transactions: z.array(
     z.object({
       id: z.uuid(),

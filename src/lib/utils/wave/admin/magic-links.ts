@@ -43,6 +43,8 @@ const withdrawableGrantSummarySchema = z.object({
   waveProgramSlug: z.string(),
   waveProgramName: z.string(),
   waveNumber: z.number().int(),
+  isOrgGrant: z.boolean(),
+  orgLogin: z.string().nullable(),
   activeMagicLink: magicLinkSchema.nullable(),
 });
 export type WithdrawableGrantSummary = z.infer<typeof withdrawableGrantSummarySchema>;
