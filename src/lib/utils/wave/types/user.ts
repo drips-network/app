@@ -12,12 +12,20 @@ export type LinkedAccount = z.infer<typeof linkedAccountSchema>;
 export const waveUserDtoSchema = z.object({
   id: z.uuid(),
   gitHubUsername: z.string(),
-  gitHubAvatarUrl: z.url(),
+  // Null for accounts erased on request, which have no avatar and no GitHub
+  // profile behind them any more.
+  gitHubAvatarUrl: z.url().nullable(),
 });
 
 export const waveUserDetailDtoSchema = waveUserDtoSchema.extend({
   linkedAccounts: z.array(linkedAccountSchema),
   verifiedIdentity: z.boolean(),
+  /**
+   * The account was erased at the user's request. Their records are still here
+   * — points, issue history, payments — but they name nobody, so there is no
+   * GitHub profile to link to.
+   */
+  deleted: z.boolean(),
 });
 export type WaveUserDetail = z.infer<typeof waveUserDetailDtoSchema>;
 export type WaveUser = z.infer<typeof waveUserDtoSchema>;

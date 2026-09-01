@@ -82,6 +82,16 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('eraseUsers')
+      ? [
+          {
+            name: 'Erase User',
+            description:
+              "Answer a deletion request: erase a user's personal data while keeping the payment record, points ledger and issue history intact.",
+            href: '/wave/admin/erase-user',
+          },
+        ]
+      : []),
     ...(data.user.permissions?.includes('pushIntercomSegments')
       ? [
           {
