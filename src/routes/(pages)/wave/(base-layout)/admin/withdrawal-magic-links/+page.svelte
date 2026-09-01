@@ -102,8 +102,10 @@
     <p class="intro typo-text">
       Issue a one-time withdrawal link for a user who can no longer sign in to Wave via GitHub. Send
       the URL to the user out-of-band — they can use it to initiate test transactions and
-      withdrawals on their personal grants without an authenticated session. Links last 7 days and
-      can be revoked at any time.
+      withdrawals without an authenticated session. Covers their personal grants and grants issued
+      to an installation on their own GitHub account. Grants issued to a GitHub organization are not
+      listed: those are recoverable by adding another member to the organization. Links last 7 days
+      and can be revoked at any time.
     </p>
 
     <div class="form-row">
@@ -166,7 +168,7 @@
 
       {#if lookupResult.grants.length === 0}
         <AnnotationBox type="info">
-          This user has no personal grants that are currently withdrawable.
+          This user has no eligible grants that are currently withdrawable.
         </AnnotationBox>
       {:else}
         <div class="grants-table">
@@ -182,6 +184,12 @@
                   <span>{grant.type}</span>
                   <span class="tnum">${grant.currentAmountUSD.toLocaleString()} USD</span>
                   <span>expires {formatDate(grant.expiresAt, 'dayAndYear')}</span>
+                  {#if grant.isOrgGrant}
+                    <span
+                      title="Issued to the GitHub App installation on this person's own account, so it resolves to the same user."
+                      >account grant{grant.orgLogin ? ` · ${grant.orgLogin}` : ''}</span
+                    >
+                  {/if}
                 </div>
                 {#if grant.activeMagicLink}
                   <div class="grant-line subtle typo-text-small">
