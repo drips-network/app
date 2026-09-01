@@ -5,7 +5,7 @@
   import { goto, invalidateAll } from '$app/navigation';
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import Button from '$lib/components/button/button.svelte';
-  import { AccountSuspendedError } from '$lib/utils/wave/call';
+  import { AccountSuspendedError, UnverifiedEmailError } from '$lib/utils/wave/call';
   import { getKycStatus } from '$lib/utils/wave/kyc';
 
   let { data } = $props();
@@ -71,6 +71,10 @@
     } catch (err) {
       if (err instanceof AccountSuspendedError) {
         return goto('/wave/suspended');
+      }
+
+      if (err instanceof UnverifiedEmailError) {
+        return goto('/wave/unverified-email');
       }
 
       // eslint-disable-next-line no-console

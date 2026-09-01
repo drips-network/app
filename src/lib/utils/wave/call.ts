@@ -37,6 +37,19 @@ export class LivenessCheckpointRequiredError extends Error {
   }
 }
 
+/**
+ * Thrown for 403 responses where the backend rejects a login or token refresh
+ * because the user's GitHub primary email address is unverified. Callers
+ * should send the user to /wave/unverified-email, which explains how to
+ * verify the address on GitHub.
+ */
+export class UnverifiedEmailError extends Error {
+  constructor() {
+    super("Your GitHub account's primary email address is not verified.");
+    this.name = 'UnverifiedEmailError';
+  }
+}
+
 function isAccountSuspendedResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('suspended');
 }
@@ -49,6 +62,12 @@ function isAccountRestrictedResponse(status: number, body: string): boolean {
 // prose, which is free to change.
 function isCheckpointRequiredResponse(status: number, body: string): boolean {
   return status === 403 && body.includes('liveness_checkpoint_required');
+}
+
+// Matched on the machine-readable `code` the backend sets rather than the
+// prose, which is free to change.
+function isUnverifiedEmailResponse(status: number, body: string): boolean {
+  return status === 403 && body.includes('unverified_email');
 }
 
 const MAX_RETRIES = 3;
@@ -94,6 +113,12 @@ export async function call(path: string, options: RequestInit = {}) {
 
   if (!response.ok) {
     const errorText = await response.text();
+
+    // The machine-readable code match runs before the bare-word ones so prose
+    // containing "suspended"/"restricted" can't shadow it.
+    if (isUnverifiedEmailResponse(response.status, errorText)) {
+      throw new UnverifiedEmailError();
+    }
 
     if (isAccountSuspendedResponse(response.status, errorText)) {
       throw new AccountSuspendedError();
@@ -166,16 +191,22 @@ export async function authenticatedCall(
     } else if ((!res.ok && res.status !== 404) || res.status === 403) {
       const errorText = await res.text();
 
+      // The machine-readable code match runs before the bare-word ones so
+      // prose containing "suspended"/"restricted" can't shadow it. The
+      // unverified-email code is only set on login and token refresh, which go
+      // through call() and the server hook, so it is not matched here — an
+      // unhandled UnverifiedEmailError in an SSR load would surface as a 500
+      // instead of the 403 page.
+      if (isCheckpointRequiredResponse(res.status, errorText)) {
+        throw new LivenessCheckpointRequiredError();
+      }
+
       if (isAccountSuspendedResponse(res.status, errorText)) {
         throw new AccountSuspendedError();
       }
 
       if (isAccountRestrictedResponse(res.status, errorText)) {
         throw new AccountRestrictedError();
-      }
-
-      if (isCheckpointRequiredResponse(res.status, errorText)) {
-        throw new LivenessCheckpointRequiredError();
       }
 
       if (res.status === 401) {
