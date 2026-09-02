@@ -20,12 +20,19 @@
 
   let bans = $derived(data.bans);
   let typeFilter = $state<string>(data.type ?? 'all');
+  let categoryFilter = $state<string>(data.category ?? 'all');
   let refreshing = $state(false);
 
   const typeOptions = [
     { value: 'all', title: 'All' },
     { value: 'ban', title: 'Bans' },
     { value: 'restriction', title: 'Restrictions' },
+  ];
+
+  const categoryOptions = [
+    { value: 'all', title: 'All' },
+    { value: 'offense', title: 'Offenses' },
+    { value: 'account_migration', title: 'Account migrations' },
   ];
 
   async function refresh() {
@@ -40,6 +47,11 @@
       url.searchParams.delete('type');
     } else {
       url.searchParams.set('type', typeFilter);
+    }
+    if (categoryFilter === 'all') {
+      url.searchParams.delete('category');
+    } else {
+      url.searchParams.set('category', categoryFilter);
     }
     await goto(url.pathname + url.search, { keepFocus: true, noScroll: true });
   }
@@ -106,12 +118,18 @@
           : typeFilter === 'ban'
             ? 'No active bans'
             : 'No active restrictions',
-      emptyStateText: 'Use the button above to ban or restrict a GitHub user.',
+      emptyStateText:
+        categoryFilter === 'all'
+          ? 'Use the button above to ban or restrict a GitHub user.'
+          : 'Nothing matches the current category filter.',
     }}
   >
-    <div class="filter">
+    <div class="filters">
       <FormField title="Type">
         <Dropdown options={typeOptions} bind:value={typeFilter} onchange={applyFilter} />
+      </FormField>
+      <FormField title="Category">
+        <Dropdown options={categoryOptions} bind:value={categoryFilter} onchange={applyFilter} />
       </FormField>
     </div>
 
@@ -129,6 +147,14 @@
                 >
                   {ban.type}
                 </span>
+                {#if ban.category === 'account_migration'}
+                  <span
+                    class="badge migration"
+                    title="Administrative — the user moved to a new account"
+                  >
+                    account migration
+                  </span>
+                {/if}
                 <span class="dim">·</span>
                 <span class="dim">{formatDate(ban.bannedAt)}</span>
                 {#if ban.bannedBy}
@@ -163,9 +189,15 @@
     gap: 1.5rem;
   }
 
-  .filter {
-    max-width: 16rem;
+  .filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
     margin-bottom: 1.5rem;
+  }
+
+  .filters > :global(*) {
+    width: 16rem;
   }
 
   .list {
@@ -221,6 +253,11 @@
   .badge.restriction {
     background: var(--color-caution-level-1);
     color: var(--color-caution-level-6);
+  }
+
+  .badge.migration {
+    background: var(--color-foreground-level-2);
+    color: var(--color-foreground-level-6);
   }
 
   .dim {
