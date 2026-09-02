@@ -10,11 +10,22 @@ import {
 export const restrictionTypeSchema = z.enum(['ban', 'restriction']);
 export type RestrictionType = z.infer<typeof restrictionTypeSchema>;
 
+/**
+ * Why a restriction was applied. `offense` is conduct (T&C violation, evasion,
+ * sybil, …) and counts as a negative signal in integrity analysis;
+ * `account_migration` retires an old account the user moved away from (KYC
+ * transfer, GitHub suspension, duplicate consolidation) and is administrative.
+ * Only bans can be account migrations.
+ */
+export const restrictionCategorySchema = z.enum(['offense', 'account_migration']);
+export type RestrictionCategory = z.infer<typeof restrictionCategorySchema>;
+
 export const bannedUserSchema = z.object({
   id: z.uuid(),
   gitHubUserId: z.number().int(),
   gitHubUsername: z.string().nullable(),
   type: restrictionTypeSchema,
+  category: restrictionCategorySchema,
   reason: z.string().nullable(),
   bannedAt: z.coerce.date(),
   bannedBy: z
@@ -29,10 +40,14 @@ export type BannedUser = z.infer<typeof bannedUserSchema>;
 export const discordBanResultSchema = z.enum(['banned', 'no_linked_account', 'failed']);
 export type DiscordBanResult = z.infer<typeof discordBanResultSchema>;
 
+export const discordUnlinkResultSchema = z.enum(['unlinked', 'no_linked_account']);
+export type DiscordUnlinkResult = z.infer<typeof discordUnlinkResultSchema>;
+
 export const banGitHubUserResponseSchema = z.object({
   success: z.boolean(),
   revokedTokenCount: z.number().int().nonnegative(),
   discordBanResult: discordBanResultSchema.nullable().optional(),
+  discordUnlinkResult: discordUnlinkResultSchema.nullable().optional(),
 });
 export type BanGitHubUserResponse = z.infer<typeof banGitHubUserResponseSchema>;
 
@@ -51,11 +66,18 @@ export type BanTargetDiscordAccount = z.infer<
 
 export async function listBans(
   f = fetch,
-  options: { pagination?: PaginationInput; type?: RestrictionType } = {},
+  options: {
+    pagination?: PaginationInput;
+    type?: RestrictionType;
+    category?: RestrictionCategory;
+  } = {},
 ) {
   const params = new URLSearchParams(toPaginationParams(options.pagination));
   if (options.type) {
     params.append('type', options.type);
+  }
+  if (options.category) {
+    params.append('category', options.category);
   }
 
   const queryString = params.toString();
@@ -70,9 +92,14 @@ export async function banGitHubUser(
   data: {
     gitHubUserId: number;
     type: RestrictionType;
+    /** Defaults to `offense` on the backend. `account_migration` requires type `ban`. */
+    category?: RestrictionCategory;
     reason?: string;
     skipNotification?: boolean;
+    /** Ban the linked Discord account from the server. Mutually exclusive with `unlinkDiscord`. */
     banFromDiscord?: boolean;
+    /** Unlink the Discord account from this Wave account so it can be re-linked to a new one. */
+    unlinkDiscord?: boolean;
   },
 ) {
   const res = await authenticatedCall(f, '/api/admin/bans', {

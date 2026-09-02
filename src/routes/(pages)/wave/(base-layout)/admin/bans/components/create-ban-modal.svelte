@@ -13,6 +13,7 @@
     banGitHubUser,
     getBanTargetDiscordAccount,
     type BanTargetDiscordAccount,
+    type RestrictionCategory,
     type RestrictionType,
   } from '$lib/utils/wave/bans';
 
@@ -30,8 +31,26 @@
     },
   ];
 
+  const categoryOptions = [
+    { value: 'offense', title: 'Offense — T&C violation, evasion, sybil, harassment, …' },
+    {
+      value: 'account_migration',
+      title: 'Account migration — retiring an old account the user has moved away from',
+    },
+  ];
+
+  const discordActionOptions = [
+    { value: 'ban', title: 'Ban from the Discord server' },
+    {
+      value: 'unlink',
+      title: 'Unlink from this Wave account — lets them link it to their new account',
+    },
+    { value: 'none', title: 'Leave as is' },
+  ];
+
   let query = $state('');
   let type = $state<string>('ban');
+  let category = $state<string>('offense');
   let reason = $state('');
   let skipNotification = $state(false);
 
@@ -43,7 +62,7 @@
   let lookupToken = 0;
 
   let discordAccount = $state<BanTargetDiscordAccount>(null);
-  let banFromDiscord = $state(true);
+  let discordAction = $state<string>('ban');
 
   let submitting = $state(false);
   let submitError = $state<string | null>(null);
@@ -51,6 +70,29 @@
 
   const trimmedQuery = $derived(query.trim());
   const canSubmit = $derived(!!resolvedUser && !submitting && !lookingUp && reason.length <= 500);
+  // Restrictions are always offenses; only bans can be account migrations.
+  const effectiveCategory = $derived<RestrictionCategory>(
+    type === 'ban' && category === 'account_migration' ? 'account_migration' : 'offense',
+  );
+
+  /**
+   * The category decides what the rest of the form should default to: an
+   * account migration is not punitive, so the user shouldn't get the "you've
+   * been banned" email, and their Discord account should follow them to the
+   * new Wave account rather than get banned from the server.
+   */
+  function applyCategoryDefaults(value: string) {
+    const migration = value === 'account_migration';
+    skipNotification = migration;
+    discordAction = migration ? 'unlink' : 'ban';
+  }
+
+  function onTypeChange(value: string) {
+    if (value === 'restriction' && category === 'account_migration') {
+      category = 'offense';
+      applyCategoryDefaults('offense');
+    }
+  }
   // Wave stores no avatar for accounts it only knows by ID, so fall back to
   // GitHub's ID-keyed avatar URL, which needs no API call.
   const avatarUrl = $derived(
@@ -102,7 +144,7 @@
       const { discordAccount: account } = await getBanTargetDiscordAccount(fetch, gitHubUserId);
       if (token !== lookupToken) return;
       discordAccount = account;
-      banFromDiscord = true;
+      discordAction = effectiveCategory === 'account_migration' ? 'unlink' : 'ban';
     } catch {
       // Non-fatal — the admin just won't see the Discord ban option.
       if (token === lookupToken) discordAccount = null;
@@ -127,9 +169,11 @@
       const result = await banGitHubUser(fetch, {
         gitHubUserId: resolvedUser.gitHubUserId,
         type: type as RestrictionType,
+        category: effectiveCategory,
         reason: reason.trim() ? reason.trim() : undefined,
         skipNotification,
-        banFromDiscord: discordAccount ? banFromDiscord : undefined,
+        banFromDiscord: discordAccount ? discordAction === 'ban' : undefined,
+        unlinkDiscord: discordAccount ? discordAction === 'unlink' : undefined,
       });
 
       onCreated();
@@ -200,8 +244,21 @@
       {/if}
 
       <FormField title="Type">
-        <Dropdown options={typeOptions} bind:value={type} />
+        <Dropdown options={typeOptions} bind:value={type} onchange={onTypeChange} />
       </FormField>
+
+      {#if type === 'ban'}
+        <FormField
+          title="Category"
+          description="Account migrations are administrative, not punitive: picking one defaults the notification and Discord options below accordingly."
+        >
+          <Dropdown
+            options={categoryOptions}
+            bind:value={category}
+            onchange={applyCategoryDefaults}
+          />
+        </FormField>
+      {/if}
 
       <FormField title="Reason" description="Optional. Up to 500 characters.">
         <TextArea bind:value={reason} placeholder="Why is this user being banned or restricted?" />
@@ -217,7 +274,7 @@
       {#if discordAccount}
         <FormField
           title="Discord"
-          description="This user has a linked Discord account. You can ban it from the Discord server at the same time."
+          description="This user has a linked Discord account. You can ban it from the Discord server, or unlink it from this Wave account so they can link it to a new one once they no longer have access to this one."
         >
           <div class="discord-section">
             <div class="preview">
@@ -236,7 +293,7 @@
                 {/if}
               </div>
             </div>
-            <Checkbox bind:checked={banFromDiscord} label="Also ban from the Discord server" />
+            <Dropdown options={discordActionOptions} bind:value={discordAction} />
           </div>
         </FormField>
       {/if}

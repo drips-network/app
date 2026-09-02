@@ -1,4 +1,4 @@
-import { listBans, type RestrictionType } from '$lib/utils/wave/bans.js';
+import { listBans, type RestrictionCategory, type RestrictionType } from '$lib/utils/wave/bans.js';
 import { getAllPaginated } from '$lib/utils/wave/getAllPaginated.js';
 import { redirect } from '@sveltejs/kit';
 
@@ -15,12 +15,19 @@ export const load = async ({ parent, fetch, depends, url }) => {
   const type: RestrictionType | undefined =
     typeParam === 'ban' || typeParam === 'restriction' ? typeParam : undefined;
 
+  const categoryParam = url.searchParams.get('category');
+  const category: RestrictionCategory | undefined =
+    categoryParam === 'offense' || categoryParam === 'account_migration'
+      ? categoryParam
+      : undefined;
+
   const bans = await getAllPaginated((page, limit) =>
-    listBans(fetch, { pagination: { page, limit }, type }),
+    listBans(fetch, { pagination: { page, limit }, type, category }),
   );
 
   return {
     bans,
     type,
+    category,
   };
 };
