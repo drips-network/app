@@ -10,7 +10,17 @@ const connectionString = getOptionalEnvVar(
 );
 
 export const redis =
-  connectionString && !building ? redisSdk.createClient({ url: connectionString }) : undefined;
+  connectionString && !building
+    ? redisSdk.createClient({
+        url: connectionString,
+        // Proactively PING on an idle interval so a dropped or half-open socket
+        // is detected and reconnected. Railway closes idle internal TCP
+        // connections; without this, a low-traffic instance can keep sending
+        // commands into a dead socket that never replies, hanging every cache
+        // read for tens of seconds (the 2026-06-28 Filecoin app outage).
+        pingInterval: 10000,
+      })
+    : undefined;
 export type RedisClientType = typeof redis;
 
 redis?.on('error', (err) => {
