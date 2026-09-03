@@ -9,6 +9,7 @@ export default function launchCreateDripList() {
     modal.show(CreateDripListStepper, undefined, {
       skipWalletConnect: true,
       isModal: true,
+      blueprintOrBlueprintError: undefined,
     });
     return;
   }
