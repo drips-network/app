@@ -27,7 +27,9 @@
   let activeIndex: number | null = $state(null);
 
   run(() => {
-    activeIndex = tabs.findIndex((tab) => tab.href === page.url.pathname);
+    // Ignore any query string on tab hrefs so tabs can carry the current
+    // page's search params (e.g. selection state) without breaking matching.
+    activeIndex = tabs.findIndex((tab) => tab.href.split('?')[0] === page.url.pathname);
   });
 
   const highlightBarWidth = tweened(0);
