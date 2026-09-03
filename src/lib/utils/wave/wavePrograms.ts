@@ -71,6 +71,7 @@ export async function batchApplyRepos(
   waveProgramId: string,
   orgRepoIds: string[],
   formData: BatchApplyFormData,
+  turnstileToken?: string,
 ) {
   return parseRes(
     batchApplyResponseSchema,
@@ -80,6 +81,7 @@ export async function batchApplyRepos(
         orgRepoIds,
         formData,
       }),
+      headers: turnstileToken ? { 'x-turnstile-token': turnstileToken } : {},
     }),
   );
 }
