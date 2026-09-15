@@ -6,6 +6,7 @@ import {
   orgRepoDtoSchema,
   publicOrgDtoSchema,
   publicOrgsFiltersSchema,
+  reposIssuesEnabledResponseSchema,
   untrackedReposFlagsResponseSchema,
   userOrgDtoSchema,
   type OrgFilters,
@@ -43,6 +44,22 @@ export async function getUntrackedRepoFlags(f = fetch) {
   const res = await authenticatedCall(f, '/api/orgs/untracked-repo-flags');
 
   return parseRes(untrackedReposFlagsResponseSchema, res);
+}
+
+/**
+ * Asks the backend whether the GitHub Issues tab is enabled on each of the
+ * given repos. The check runs live on GitHub with the user's own token, so
+ * it reflects a setting the maintainer may just have toggled — which is what
+ * makes re-checking worthwhile. A null `issuesEnabled` means GitHub could not
+ * be asked; callers must not treat that as "disabled".
+ */
+export async function checkReposIssuesEnabled(f = fetch, orgRepoIds: string[]) {
+  const res = await authenticatedCall(f, '/api/repos/issues-enabled', {
+    method: 'POST',
+    body: JSON.stringify({ orgRepoIds }),
+  });
+
+  return parseRes(reposIssuesEnabledResponseSchema, res);
 }
 
 export async function getPublicOrg(f = fetch, orgId: string) {

@@ -13,7 +13,9 @@
   import TextInput from '$lib/components/text-input/text-input.svelte';
   import Plus from '$lib/components/icons/Plus.svelte';
   import Trash from '$lib/components/icons/Trash.svelte';
+  import Refresh from '$lib/components/icons/Refresh.svelte';
   import { batchApplyRepos } from '$lib/utils/wave/wavePrograms';
+  import { checkReposIssuesEnabled } from '$lib/utils/wave/orgs';
   import doWithErrorModal from '$lib/utils/do-with-error-modal';
   import FlowStepWrapper from '../../../../shared/flow-step-wrapper.svelte';
   import type { PreviousParticipation } from '$lib/utils/wave/types/waveProgram';
@@ -39,8 +41,45 @@
 
     if (repoIds.length === 0) {
       goto(`/wave/maintainer-onboarding/apply-to-wave-program/${data.waveProgram.id}/select`);
+      return;
     }
+
+    runIssuesCheck();
   });
+
+  // A repo with the GitHub Issues tab switched off cannot take part at all —
+  // Wave repos publish issues for contributors to complete — and the intake
+  // pipeline rejects it at the very end of review. Check here instead, so it
+  // is a one-click settings fix rather than a rejection weeks later.
+  //
+  // The backend proxies the check to GitHub with the user's own token, so it
+  // reflects the setting as of right now; that is why re-checking works
+  // without leaving the form.
+  let issuesCheckRunning = $state(false);
+  // Repo full names GitHub reported Issues as disabled for.
+  let reposWithIssuesDisabled = $state<string[]>([]);
+  // True when GitHub could not be asked about at least one repo. Deliberately
+  // does not block submission: the approval-time gate still catches it.
+  let issuesCheckInconclusive = $state(false);
+
+  async function runIssuesCheck() {
+    if (repoIds.length === 0) return;
+
+    issuesCheckRunning = true;
+    try {
+      const { data: statuses } = await checkReposIssuesEnabled(undefined, repoIds);
+      reposWithIssuesDisabled = statuses
+        .filter((s) => s.issuesEnabled === false)
+        .map((s) => s.gitHubRepoFullName);
+      issuesCheckInconclusive = statuses.some((s) => s.issuesEnabled === null);
+    } catch {
+      // Fail open: never let a failing check stop someone from applying.
+      reposWithIssuesDisabled = [];
+      issuesCheckInconclusive = true;
+    } finally {
+      issuesCheckRunning = false;
+    }
+  }
 
   // Form state
   let previousParticipation = $state<string[]>([]);
@@ -157,7 +196,9 @@
       repoRelationshipValid &&
       upstreamRelationshipValid &&
       forkJustificationValid &&
-      !limitViolation,
+      !limitViolation &&
+      reposWithIssuesDisabled.length === 0 &&
+      !issuesCheckRunning,
   );
 
   let previousParticipationItems: Items = {
@@ -447,6 +488,41 @@ There's no wrong answer. We need this context to review forks accurately.`}
       </div>
     </FormField>
 
+    {#if reposWithIssuesDisabled.length > 0}
+      <AnnotationBox type="error">
+        <span class="typo-text-small-bold">
+          GitHub Issues must be enabled on {reposWithIssuesDisabled.length === 1
+            ? 'this repo'
+            : 'these repos'}
+        </span><br />
+        Wave projects publish issues for contributors to complete, so a repo with the Issues tab switched
+        off can't take part.
+        <ul class="issues-disabled-list">
+          {#each reposWithIssuesDisabled as fullName (fullName)}
+            <li class="typo-text-small">{fullName}</li>
+          {/each}
+        </ul>
+        Enable Issues under Settings → General → Features on GitHub, then re-check.
+        {#snippet actions()}
+          <Button icon={Refresh} loading={issuesCheckRunning} onclick={runIssuesCheck}>
+            Re-check
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {:else if issuesCheckInconclusive}
+      <AnnotationBox type="info">
+        We couldn't confirm with GitHub whether Issues are enabled on your {repoIds.length === 1
+          ? 'repo'
+          : 'repos'}. You can still apply, but make sure the Issues tab is enabled — Wave projects
+        publish issues for contributors to complete.
+        {#snippet actions()}
+          <Button icon={Refresh} loading={issuesCheckRunning} onclick={runIssuesCheck}>
+            Re-check
+          </Button>
+        {/snippet}
+      </AnnotationBox>
+    {/if}
+
     {#if limitViolation}
       <AnnotationBox type="error">
         {limitViolation}
@@ -487,6 +563,11 @@ There's no wrong answer. We need this context to review forks accurately.`}
           <span class="typo-text-small" style:color="var(--color-negative-level-6)">
             You must complete identity verification (KYC) before applying.
           </span>
+        {:else if reposWithIssuesDisabled.length > 0}
+          <span class="typo-text-small" style:color="var(--color-negative-level-6)">
+            Enable GitHub Issues on the {reposWithIssuesDisabled.length === 1 ? 'repo' : 'repos'}
+            listed above, then re-check.
+          </span>
         {/if}
       </div>
     {/if}
@@ -503,6 +584,17 @@ There's no wrong answer. We need this context to review forks accurately.`}
 
   .char-count .too-long {
     color: var(--color-negative);
+  }
+
+  .issues-disabled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-variant-numeric: tabular-nums;
+    word-break: break-all;
   }
 
   .links-list {
