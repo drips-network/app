@@ -12,7 +12,12 @@ const accessClaimJwtSchema = z.object({
   iat: z.number().int(),
   exp: z.number().int(),
   name: z.string(),
-  email: z.email(),
+  // Must accept everything the backend is willing to put in a token. The
+  // backend validates stored addresses with zod's permissive unicode pattern
+  // (GitHub verified them, and a stricter rule here would reject the token
+  // and log the person out on every page), so mirror that instead of the
+  // strict default.
+  email: z.email({ pattern: z.regexes.unicodeEmail }),
   picture: z.url(),
   signUpDate: z.coerce.date(),
   payoutAddresses: z
