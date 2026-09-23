@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { getAccessTokenCookieClientSide, getUserData } from '$lib/utils/wave/auth.js';
+import { correctedNow } from '$lib/utils/wave/server-clock';
 
 export const load = async ({ depends, data }) => {
   depends('wave:user');
@@ -18,7 +19,9 @@ export const load = async ({ depends, data }) => {
   // parse out the token
   const accessToken = accessTokenCookieValue ? decodeURIComponent(accessTokenCookieValue) : null;
 
-  const userData = getUserData(accessToken);
+  const userData = browser
+    ? getUserData(accessToken, correctedNow(data.serverTime))
+    : getUserData(accessToken);
 
   return {
     user: userData,
