@@ -58,7 +58,15 @@ let loggingOut = false;
 // parallel calls would otherwise race and the losers would trigger logout.
 let refreshInFlight: Promise<string | null> | null = null;
 
-export function getUserData(jwt: string | null): WaveLoggedInUser | null {
+// The browser clock cannot be trusted for the expiry check: a device clock
+// running 15+ minutes fast makes a freshly issued token look expired, so the
+// client treats the user as logged out while the server still sees them as
+// logged in and guarded pages bounce them into a login loop. Browser callers
+// therefore pass a clock corrected against server time via `nowMs`.
+export function getUserData(
+  jwt: string | null,
+  nowMs: number = Date.now(),
+): WaveLoggedInUser | null {
   if (!jwt) {
     return null;
   }
@@ -73,7 +81,7 @@ export function getUserData(jwt: string | null): WaveLoggedInUser | null {
 
   const { data: content } = parsed;
 
-  const now = Math.floor(Date.now() / 1000);
+  const now = Math.floor(nowMs / 1000);
   if (content.exp < now + EXPIRY_BUFFER_SECONDS) {
     return null;
   }

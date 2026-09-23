@@ -9,5 +9,7 @@ export const load = async ({ locals }) => {
 
   return {
     waveAccessToken: locals.waveAccessToken ?? null,
+    // Lets the browser correct for a skewed device clock when checking token expiry.
+    serverTime: Date.now(),
   };
 };
