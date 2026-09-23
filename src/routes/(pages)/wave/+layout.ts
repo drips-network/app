@@ -1,23 +1,6 @@
 import { browser } from '$app/environment';
 import { getAccessTokenCookieClientSide, getUserData } from '$lib/utils/wave/auth.js';
-
-// Offset between the server clock and this device's clock, so token expiry is
-// judged against server time rather than a possibly skewed `Date.now()`. The
-// universal load re-runs on client navigations while `data.serverTime` may
-// not, so only recompute the offset when a new server time arrives.
-let lastServerTime: number | undefined;
-let clockOffsetMs = 0;
-
-function correctedNow(serverTime: number | undefined): number {
-  if (serverTime === undefined) return Date.now();
-
-  if (serverTime !== lastServerTime) {
-    lastServerTime = serverTime;
-    clockOffsetMs = serverTime - Date.now();
-  }
-
-  return Date.now() + clockOffsetMs;
-}
+import { correctedNow } from '$lib/utils/wave/server-clock';
 
 export const load = async ({ depends, data }) => {
   depends('wave:user');
