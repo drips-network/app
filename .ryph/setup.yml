@@ -1,0 +1,16 @@
+# Runs before the agent starts. The OS-level libraries Playwright's browsers
+# need come from the workspace image (see wave/.ryph/Dockerfile, which is the
+# only Dockerfile for this workspace); this file only installs what belongs
+# per-checkout.
+steps:
+  - name: install npm dependencies
+    # --prefer-offline (not `npm ci`): this runs on every run, not just once
+    # at image build, and must be cheap when the lockfile hasn't moved.
+    run: npm install --prefer-offline --no-audit --no-fund
+
+  - name: install Playwright's browser binaries
+    # The matching OS-level shared libraries are already in the image
+    # (wave/.ryph/Dockerfile); this only fetches the browser binaries
+    # themselves, which npm cannot do. Cached under ~/.cache/ms-playwright,
+    # outside the repo, so this is a no-op once already installed.
+    run: npx playwright install chromium firefox
