@@ -99,7 +99,7 @@
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.79.0",
     "@opentelemetry/sdk-metrics": "^2.0.0",
-    "@opentelemetry/sdk-node": "^0.221.0",
+    "@opentelemetry/sdk-node": "^0.222.0",
     "@opentelemetry/sdk-trace-node": "^2.0.1",
     "@prelude.so/js-sdk": "^0.6.0",
     "@resvg/resvg-js": "^2.6.2",
