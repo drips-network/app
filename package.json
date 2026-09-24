@@ -61,7 +61,7 @@
     "mime-types": "^2.1.35",
     "node-fetch": "^3.3.2",
     "playwright": "^1.56.1",
-    "postcss": "^8.4.38",
+    "postcss": "^8.5.28",
     "prettier": "^3.3.3",
     "prettier-plugin-svelte": "^3.4.0",
     "proper-lockfile": "^4.1.2",
