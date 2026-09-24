@@ -76,6 +76,22 @@ export const untrackedReposFlagsResponseSchema = z.object({
   data: z.array(orgUntrackedReposFlagDtoSchema),
 });
 
+/**
+ * Live GitHub Issues availability for one repo, as reported by the Wave
+ * backend using the caller's own GitHub token. `issuesEnabled` is null when
+ * GitHub could not answer — inconclusive, not disabled.
+ */
+export const repoIssuesEnabledDtoSchema = z.object({
+  orgRepoId: z.uuid(),
+  gitHubRepoFullName: z.string(),
+  issuesEnabled: z.boolean().nullable(),
+});
+export type RepoIssuesEnabledDto = z.infer<typeof repoIssuesEnabledDtoSchema>;
+
+export const reposIssuesEnabledResponseSchema = z.object({
+  data: z.array(repoIssuesEnabledDtoSchema),
+});
+
 export const orgRepoDtoSchema = z.object({
   id: z.uuid(),
   orgId: z.uuid(),
