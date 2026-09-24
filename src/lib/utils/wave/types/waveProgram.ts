@@ -367,6 +367,23 @@ export const waveProgramIssueWithDetailsDtoSchema = z.object({
   removedBy: waveUserDtoSchema.nullable(),
 });
 
+export const bulkAddIssueResultDtoSchema = z.object({
+  issueId: z.uuid(),
+  success: z.boolean(),
+  waveProgramIssue: waveProgramIssueWithDetailsDtoSchema.nullable(),
+  error: z.string().nullable(),
+});
+export type BulkAddIssueResultDto = z.infer<typeof bulkAddIssueResultDtoSchema>;
+
+export const bulkAddIssuesToWaveProgramResponseDtoSchema = z.object({
+  results: z.array(bulkAddIssueResultDtoSchema),
+  addedCount: z.number().int(),
+  failedCount: z.number().int(),
+});
+export type BulkAddIssuesToWaveProgramResponseDto = z.infer<
+  typeof bulkAddIssuesToWaveProgramResponseDtoSchema
+>;
+
 // ===========================
 // Wave Types
 // ===========================
