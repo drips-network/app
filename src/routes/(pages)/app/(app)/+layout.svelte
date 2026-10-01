@@ -41,7 +41,7 @@
           label: 'Explore',
           href: '/app',
           icon: ExploreIcon,
-          description: 'Discover projects and stats across Drips.',
+          description: 'Discover projects across Drips.',
         },
         !network.readOnlyMode
           ? {

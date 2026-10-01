@@ -1,10 +1,6 @@
-import cached from './cache/remote/cached';
-import type { RedisClientType } from '../../routes/api/redis';
 import { getCmcPrices } from './cmc';
 import mergeAmounts from './amounts/merge-amounts';
 import contractConstants from './sdk/utils/contract-constants';
-import network from '$lib/stores/wallet/network';
-import cacheKey from './cache/remote/cache-key';
 
 const STREAMS: {
   token: { address: string };
@@ -143,20 +139,4 @@ export default function totalDrippedApproximation() {
 export const totalDrippedPrices = (fetch = window.fetch) => {
   const tokenAddresses = totalDrippedApproximation().map((a) => a.tokenAddress.toLowerCase());
   return getCmcPrices(tokenAddresses, fetch);
-};
-
-export const cachedTotalDrippedPrices = (
-  redis: RedisClientType | undefined,
-  fetch = window.fetch,
-) => {
-  const TOTAL_DRIPPED_PRICES_CACHE_KEY = cacheKey(
-    JSON.stringify(STREAMS) + JSON.stringify(GIVES),
-    `${network.name}:total-dripped-prices`,
-  );
-
-  return cached(redis, TOTAL_DRIPPED_PRICES_CACHE_KEY, 60 * 60 * 6, async () => {
-    // if the underlying getCmcPrices function fails, {} is returned
-    // and will become cached
-    return totalDrippedPrices(fetch);
-  });
 };

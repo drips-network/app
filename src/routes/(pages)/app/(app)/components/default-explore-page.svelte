@@ -2,16 +2,9 @@
   import { run } from 'svelte/legacy';
 
   import BoxIcon from '$lib/components/icons/Box.svelte';
-  import TrophyIcon from '$lib/components/icons/Trophy.svelte';
   import DripListIcon from '$lib/components/icons/DripList.svelte';
   import Section from '$lib/components/section/section.svelte';
   import walletStore from '$lib/stores/wallet/wallet.store';
-  import AggregateFiatEstimate from '$lib/components/aggregate-fiat-estimate/aggregate-fiat-estimate.svelte';
-  import totalDrippedApproximation, {
-    cachedTotalDrippedPrices,
-  } from '$lib/utils/total-dripped-approx';
-  import { onDestroy, onMount } from 'svelte';
-  import tickStore from '$lib/stores/tick/tick.store';
   import Box from '$lib/components/icons/Box.svelte';
   import DripList from '$lib/components/icons/DripList.svelte';
   import type { DefaultExplorePageFeaturedProjectFragment } from './__generated__/gql.generated';
@@ -21,7 +14,6 @@
   import ConnectWalletPrompt from './connect-wallet-prompt.svelte';
   import RecentlyClaimedProjects from './recently-claimed-projects.svelte';
   import ProjectsGrid from './projects-grid.svelte';
-  import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import DripListsGrid from './drip-lists-grid.svelte';
   import type { ADripListFragment } from '../drip-lists/components/__generated__/gql.generated';
   import FeatureCard from './feature-card.svelte';
@@ -35,8 +27,6 @@
     featuredWeb3Projects: DefaultExplorePageFeaturedProjectFragment[];
     blogPosts: z.infer<typeof postsListingSchema>;
     featuredDripLists: ADripListFragment[];
-    totalDrippedPrices: Awaited<ReturnType<typeof cachedTotalDrippedPrices>>;
-    tlv: number;
   }
 
   let {
@@ -45,8 +35,6 @@
     featuredWeb3Projects,
     blogPosts = $bindable(),
     featuredDripLists,
-    totalDrippedPrices,
-    tlv,
   }: Props = $props();
 
   // 2 latest posts. Sort by date
@@ -55,31 +43,6 @@
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 2);
   });
-
-  let totalDrippedAmounts = $state<ReturnType<typeof totalDrippedApproximation>>();
-  function update() {
-    totalDrippedAmounts = totalDrippedApproximation();
-  }
-  update();
-
-  let formattedTlv = $derived(
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(Math.round(tlv)),
-  );
-
-  let tickHandle: number;
-  onMount(async () => {
-    tickHandle = tickStore.register(update);
-  });
-  onDestroy(() => {
-    tickStore.deregister(tickHandle);
-  });
-
-  let enabledNetworks = Object.values(NETWORK_CONFIG).filter((v) => !v.isTestnet);
 </script>
 
 <div class="explore">
@@ -110,48 +73,6 @@
       >
     {/snippet}
   </FeatureCard>
-
-  <Section
-    header={{
-      icon: TrophyIcon,
-      label: 'Stats',
-    }}
-    skeleton={{
-      loaded: true,
-      horizontalScroll: false,
-    }}
-  >
-    <div class="stats">
-      <div class="value-wrapper">
-        <div class="header">
-          <h5>Total dripped</h5>
-        </div>
-        <span class="large-number pixelated"
-          ><AggregateFiatEstimate amounts={totalDrippedAmounts} prices={totalDrippedPrices} /></span
-        >
-      </div>
-      {#if typeof tlv === 'number'}
-        <div class="value-wrapper">
-          <div class="header">
-            <h5>Current value on Drips</h5>
-            <div class="explorer-icons">
-              {#each enabledNetworks as network (network.id)}
-                <a
-                  href="{network.explorer.base}/address/{network.contracts.DRIPS}"
-                  target="_blank"
-                  rel="noreferrer"
-                  class="header"
-                >
-                  <network.icon />
-                </a>
-              {/each}
-            </div>
-          </div>
-          <span class="large-number pixelated">{formattedTlv}</span>
-        </div>
-      {/if}
-    </div>
-  </Section>
 
   {#if featuredProjects?.length > 0}
     <Section
@@ -236,36 +157,6 @@
     flex-direction: column;
   }
 
-  .stats {
-    display: flex;
-    gap: 1rem;
-  }
-
-  .stats .value-wrapper {
-    border: 1px solid var(--color-foreground-level-3);
-    padding: 1rem;
-    border-radius: 1rem 0 1rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
-  }
-
-  .stats .value-wrapper .header .explorer-icons {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .stats .value-wrapper .header .explorer-icons a {
-    opacity: 0.5;
-    transition: 0.3s;
-  }
-
-  .stats .value-wrapper .header .explorer-icons a:focus-visible,
-  .stats .value-wrapper .header .explorer-icons a:hover {
-    opacity: 1;
-  }
-
   .highlight-badge {
     background-color: var(--color-primary-level-2);
     color: var(--color-primary-level-6);
@@ -275,27 +166,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-
-  @media (max-width: 1070px) {
-    .stats {
-      flex-direction: column;
-    }
-
-    .stats .value-wrapper {
-      width: 100%;
-    }
-  }
-
-  .stats .value-wrapper .header {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .large-number {
-    font-size: min(11vw, 70px);
-    line-height: min(12vw, 80px);
-    color: var(--color-primary);
   }
 
   .horizontal-scroll {
