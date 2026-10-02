@@ -9,7 +9,7 @@ import type {
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { getApplications } from '$lib/utils/rpgf/rpgf';
 
-const APPLICATIONS_PREVIEW_TIMEOUT_MS = 10_000;
+const APPLICATIONS_PREVIEW_TIMEOUT_MS = 30_000;
 
 export const load = async ({ parent, depends, fetch }) => {
   depends('rpgf:round:linkedDripLists');
@@ -45,9 +45,11 @@ export const load = async ({ parent, depends, fetch }) => {
     );
   }
 
-  // The applications preview is non-essential. If the RPGF API is slow or failing, render the
-  // round page without it instead of hanging the whole SSR load (undici waits up to 300s for
-  // headers by default) and ultimately failing the page.
+  // The applications preview is non-essential, so it's streamed: the page renders right away
+  // with a loading state for this section instead of blocking on the RPGF API. The timeout
+  // bounds how long a slow / hanging API can keep the section (and the streamed SSR
+  // response) pending before it switches to the error state — without it, undici waits up
+  // to 300s for headers.
   async function fetchFiveApplications() {
     const fetchWithTimeout: typeof fetch = (input, init) =>
       fetch(input, { ...init, signal: AbortSignal.timeout(APPLICATIONS_PREVIEW_TIMEOUT_MS) });
@@ -63,14 +65,15 @@ export const load = async ({ parent, depends, fetch }) => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('Failed to load applications preview for RPGF round', round.id, e);
-      return null;
+      throw e;
     }
   }
 
-  const [linkedDripLists, fiveApplications] = await Promise.all([
-    fetchLists(linkedDripListsIds ?? []),
-    fetchFiveApplications(),
-  ]);
+  const fiveApplications = fetchFiveApplications();
+  // Avoid an unhandled rejection; the page renders the error state from the promise itself.
+  fiveApplications.catch(() => {});
+
+  const linkedDripLists = await fetchLists(linkedDripListsIds ?? []);
 
   return { fiveApplications, linkedDripLists, blockWhileInitializing: false };
 };

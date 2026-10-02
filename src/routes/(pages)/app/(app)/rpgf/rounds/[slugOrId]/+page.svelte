@@ -24,9 +24,10 @@
   import RpgfDraftTodoCard from '$lib/components/rpgf-draft-todo-card/rpgf-draft-todo-card.svelte';
   import SectionSkeleton from '$lib/components/section-skeleton/section-skeleton.svelte';
 
+  import type { ListingApplication } from '$lib/utils/rpgf/types/application';
+
   let { data } = $props();
   let round = $derived(data.round);
-  let fiveApplications = $derived(data.fiveApplications ?? []);
 
   let imageBaseUrl = $derived(`/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`);
 
@@ -39,6 +40,55 @@
   image="{imageBaseUrl}?target=og"
   twitterImage="{imageBaseUrl}?target=twitter"
 />
+
+{#snippet applicationsSection(
+  fiveApplications: ListingApplication[],
+  loaded: boolean,
+  error: boolean,
+)}
+  <Section
+    header={{
+      label: 'Applications',
+      icon: Ledger,
+      actions:
+        loaded && fiveApplications.length < 5
+          ? [
+              {
+                label: 'View all',
+                href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+                icon: ArrowRight,
+                disabled: !round.published,
+              },
+            ]
+          : [],
+    }}
+    skeleton={{
+      empty: loaded && fiveApplications.length === 0,
+      error,
+      loaded: loaded || error,
+      horizontalScroll: false,
+      emptyStateEmoji: '🫙',
+      emptyStateHeadline: 'No approved applications',
+      emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
+      overflowAction:
+        loaded && fiveApplications.length >= 5
+          ? {
+              label: 'View all',
+              href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
+              icon: ArrowRight,
+              disabled: !round.published,
+            }
+          : undefined,
+    }}
+  >
+    <RpgfApplicationsTable
+      searchable={false}
+      {round}
+      applications={fiveApplications}
+      signedIn={data.rpgfUserData !== undefined}
+    />
+  </Section>
+{/snippet}
 
 <RpgfBaseLayout>
   {#snippet sidebar()}
@@ -82,48 +132,13 @@
     </div>
   {/if}
 
-  <Section
-    header={{
-      label: 'Applications',
-      icon: Ledger,
-      actions:
-        fiveApplications.length < 5
-          ? [
-              {
-                label: 'View all',
-                href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
-                icon: ArrowRight,
-                disabled: !round.published,
-              },
-            ]
-          : [],
-    }}
-    skeleton={{
-      empty: fiveApplications.length === 0,
-      error: data.fiveApplications === null,
-      loaded: true,
-      horizontalScroll: false,
-      emptyStateEmoji: '🫙',
-      emptyStateHeadline: 'No approved applications',
-      emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
-      overflowAction:
-        fiveApplications.length >= 5
-          ? {
-              label: 'View all',
-              href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
-              icon: ArrowRight,
-              disabled: !round.published,
-            }
-          : undefined,
-    }}
-  >
-    <RpgfApplicationsTable
-      searchable={false}
-      {round}
-      applications={fiveApplications}
-      signedIn={data.rpgfUserData !== undefined}
-    />
-  </Section>
+  {#await data.fiveApplications}
+    {@render applicationsSection([], false, false)}
+  {:then fiveApplications}
+    {@render applicationsSection(fiveApplications, true, false)}
+  {:catch}
+    {@render applicationsSection([], false, true)}
+  {/await}
 
   {#if round.isAdmin}
     <Section
