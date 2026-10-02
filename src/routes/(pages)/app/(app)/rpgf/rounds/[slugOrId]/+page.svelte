@@ -26,6 +26,7 @@
 
   let { data } = $props();
   let round = $derived(data.round);
+  let fiveApplications = $derived(data.fiveApplications ?? []);
 
   let imageBaseUrl = $derived(`/api/share-images/rpgf-round/${encodeURIComponent(round.id)}.png`);
 
@@ -86,7 +87,7 @@
       label: 'Applications',
       icon: Ledger,
       actions:
-        data.fiveApplications.length < 5
+        fiveApplications.length < 5
           ? [
               {
                 label: 'View all',
@@ -98,14 +99,15 @@
           : [],
     }}
     skeleton={{
-      empty: data.fiveApplications.length === 0,
+      empty: fiveApplications.length === 0,
+      error: data.fiveApplications === null,
       loaded: true,
       horizontalScroll: false,
       emptyStateEmoji: '🫙',
       emptyStateHeadline: 'No approved applications',
       emptyStateText: `There are currently no ${!round.isAdmin ? 'approved ' : ''}applications for this round.`,
       overflowAction:
-        data.fiveApplications.length >= 5
+        fiveApplications.length >= 5
           ? {
               label: 'View all',
               href: `/app/rpgf/rounds/${round.urlSlug}/applications`,
@@ -118,7 +120,7 @@
     <RpgfApplicationsTable
       searchable={false}
       {round}
-      applications={data.fiveApplications}
+      applications={fiveApplications}
       signedIn={data.rpgfUserData !== undefined}
     />
   </Section>

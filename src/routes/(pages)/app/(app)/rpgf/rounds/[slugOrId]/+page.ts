@@ -9,6 +9,8 @@ import type {
 import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 import { getApplications } from '$lib/utils/rpgf/rpgf';
 
+const APPLICATIONS_PREVIEW_TIMEOUT_MS = 10_000;
+
 export const load = async ({ parent, depends, fetch }) => {
   depends('rpgf:round:linkedDripLists');
   depends('rpgf:round:applications');
@@ -43,15 +45,31 @@ export const load = async ({ parent, depends, fetch }) => {
     );
   }
 
+  // The applications preview is non-essential. If the RPGF API is slow or failing, render the
+  // round page without it instead of hanging the whole SSR load (undici waits up to 300s for
+  // headers by default) and ultimately failing the page.
+  async function fetchFiveApplications() {
+    const fetchWithTimeout: typeof fetch = (input, init) =>
+      fetch(input, { ...init, signal: AbortSignal.timeout(APPLICATIONS_PREVIEW_TIMEOUT_MS) });
+
+    try {
+      return await getApplications(
+        fetchWithTimeout,
+        round.id,
+        5,
+        0,
+        round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
+      );
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load applications preview for RPGF round', round.id, e);
+      return null;
+    }
+  }
+
   const [linkedDripLists, fiveApplications] = await Promise.all([
     fetchLists(linkedDripListsIds ?? []),
-    getApplications(
-      fetch,
-      round.id,
-      5,
-      0,
-      round.resultsPublished ? 'allocation:desc' : 'createdAt:desc',
-    ),
+    fetchFiveApplications(),
   ]);
 
   return { fiveApplications, linkedDripLists, blockWhileInitializing: false };
