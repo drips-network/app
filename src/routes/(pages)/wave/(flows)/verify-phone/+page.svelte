@@ -73,7 +73,18 @@
           throw new Error('Invalid phone number');
         }
 
-        const dispatchId = await dispatchSignals(PRELUDE_SDK_KEY!);
+        let dispatchId: string;
+        try {
+          dispatchId = await dispatchSignals(PRELUDE_SDK_KEY!);
+        } catch (e) {
+          // The Prelude SDK runs WASM in a Web Worker, which privacy extensions and
+          // hardened browsers commonly block. Its raw errors (e.g. "Error while
+          // executing get_default_endpoint in worker") mean nothing to users.
+          console.error('Prelude dispatchSignals failed:', e); // eslint-disable-line no-console
+          throw new Error(
+            'Your browser appears to be blocking WebAssembly, which phone verification requires. Please try a different browser, or disable any extensions that may be interfering.',
+          );
+        }
 
         await requestPhoneVerification(undefined, parsedNumber.number.number, dispatchId);
 
