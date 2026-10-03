@@ -4,6 +4,12 @@
   import type { TextInputValidationState } from '$lib/components/text-input/text-input';
   import InputStreamReceiver from '../input-stream-receiver.svelte';
 
+  type Props = {
+    exclude?: { addresses: (string | undefined)[]; msg: string }[];
+  };
+
+  let { exclude = undefined }: Props = $props();
+
   // Mirrors how the Create Stream flow binds the receiver input to a store,
   // alongside other fields living in the same store.
   const context = writable<{
@@ -23,8 +29,12 @@
 <InputStreamReceiver
   bind:value={$context.recipientInputValue}
   bind:validatedValue={$context.recipientValidatedValue}
+  {exclude}
   on:validationChange={(e) => (validationState = e.detail)}
 />
 <div data-testid="validation-state">{validationState.type}</div>
+<div data-testid="validation-message">
+  {validationState.type === 'invalid' ? validationState.message : ''}
+</div>
 <div data-testid="input-value">{$context.recipientInputValue}</div>
 <div data-testid="validated-value">{$context.recipientValidatedValue}</div>

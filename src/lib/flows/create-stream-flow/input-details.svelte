@@ -77,7 +77,7 @@
   import assert from '$lib/utils/assert';
   import { waitForAccountMetadata } from '$lib/utils/ipfs';
   import { invalidateAll } from '$app/navigation';
-  import { isAddress } from 'ethers';
+  import getManualRecipient from './methods/get-manual-recipient';
   import type { OxString } from '$lib/utils/sdk/sdk-types';
   import { executeAddressDriverReadMethod } from '$lib/utils/sdk/address-driver/address-driver';
   import txToCallerCall from '$lib/utils/sdk/utils/tx-to-caller-call';
@@ -225,10 +225,11 @@
         combinedStartDate?.getTime() < combinedEndDate?.getTime()),
   );
 
+  let manualRecipient = $derived(getManualRecipient($context, recipientInputValidationState));
+
   let formValid = $derived(
     streamEndDateValidationState.type !== 'invalid' &&
-      ($context.receiver ||
-        (recipientInputValidationState.type === 'valid' && $context.recipientValidatedValue)) &&
+      ($context.receiver || manualRecipient) &&
       amountValidationState?.type === 'valid' &&
       (nameInputHidden || $context.streamNameValue) &&
       timeRangeValid,
@@ -241,6 +242,7 @@
       amountPerSecond,
       combinedStartDate,
       combinedEndDate,
+      manualRecipient,
     };
 
     dispatch(
@@ -258,16 +260,17 @@
                 ? $context.receiver.accountId
                 : $context.receiver.account?.accountId;
           } else {
-            const recipient = $context.recipientValidatedValue ?? unreachable();
+            const recipient = snap.manualRecipient ?? unreachable();
 
-            recipientAccountId = isAddress(recipient)
-              ? (
-                  await executeAddressDriverReadMethod({
-                    functionName: 'calcAccountId',
-                    args: [recipient as OxString],
-                  })
-                ).toString()
-              : recipient;
+            recipientAccountId =
+              recipient.type === 'address'
+                ? (
+                    await executeAddressDriverReadMethod({
+                      functionName: 'calcAccountId',
+                      args: [recipient.address as OxString],
+                    })
+                  ).toString()
+                : recipient.accountId;
           }
 
           const shouldSchedule = $context.setStartAndEndDate;
@@ -328,17 +331,17 @@
       : undefined}
     to={$context.receiver
       ? $context.receiver
-      : recipientInputValidationState.type === 'valid' && $context.recipientValidatedValue
-        ? isAddress($context.recipientValidatedValue) // TODO: Extract to function when project receiver is supported.
+      : manualRecipient
+        ? manualRecipient.type === 'address'
           ? {
               __typename: 'AddressDriverAccount',
               driver: Driver.Address,
-              address: $context.recipientValidatedValue,
+              address: manualRecipient.address,
             }
           : {
               __typename: 'NftDriverAccount',
               driver: Driver.Nft,
-              accountId: $context.recipientValidatedValue,
+              accountId: manualRecipient.accountId,
             }
         : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
