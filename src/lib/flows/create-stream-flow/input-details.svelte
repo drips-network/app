@@ -227,7 +227,8 @@
 
   let formValid = $derived(
     streamEndDateValidationState.type !== 'invalid' &&
-      ($context.receiver || recipientInputValidationState.type === 'valid') &&
+      ($context.receiver ||
+        (recipientInputValidationState.type === 'valid' && $context.recipientValidatedValue)) &&
       amountValidationState?.type === 'valid' &&
       (nameInputHidden || $context.streamNameValue) &&
       timeRangeValid,
@@ -257,16 +258,16 @@
                 ? $context.receiver.accountId
                 : $context.receiver.account?.accountId;
           } else {
-            const recipientInputValue = $context.recipientInputValue ?? unreachable();
+            const recipient = $context.recipientValidatedValue ?? unreachable();
 
-            recipientAccountId = isAddress(recipientInputValue)
+            recipientAccountId = isAddress(recipient)
               ? (
                   await executeAddressDriverReadMethod({
                     functionName: 'calcAccountId',
-                    args: [recipientInputValue as OxString],
+                    args: [recipient as OxString],
                   })
                 ).toString()
-              : recipientInputValue;
+              : recipient;
           }
 
           const shouldSchedule = $context.setStartAndEndDate;
@@ -327,17 +328,17 @@
       : undefined}
     to={$context.receiver
       ? $context.receiver
-      : recipientInputValidationState.type === 'valid' && $context.recipientInputValue
-        ? isAddress($context.recipientInputValue) // TODO: Extract to function when project receiver is supported.
+      : recipientInputValidationState.type === 'valid' && $context.recipientValidatedValue
+        ? isAddress($context.recipientValidatedValue) // TODO: Extract to function when project receiver is supported.
           ? {
               __typename: 'AddressDriverAccount',
               driver: Driver.Address,
-              address: $context.recipientInputValue,
+              address: $context.recipientValidatedValue,
             }
           : {
               __typename: 'NftDriverAccount',
               driver: Driver.Nft,
-              accountId: $context.recipientInputValue,
+              accountId: $context.recipientValidatedValue,
             }
         : undefined}
     amountPerSecond={amountValidationState?.type === 'valid' ? amountPerSecond : undefined}
@@ -353,6 +354,7 @@
     <FormField title="Stream to*">
       <InputStreamReceiver
         bind:value={$context.recipientInputValue}
+        bind:validatedValue={$context.recipientValidatedValue}
         on:validationChange={onRecipientInputValidationChange}
       />
     </FormField>
