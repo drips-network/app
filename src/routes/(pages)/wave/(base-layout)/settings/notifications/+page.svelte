@@ -29,10 +29,9 @@
       category: 'contributor',
     },
     [WORKFLOW_ID.COMPLIMENT_RECEIVED]: null,
-    [WORKFLOW_ID.ISSUE_POINTS_RECEIVED]: {
-      title: 'Issue points received',
-      description:
-        'You have received points for successfully resolving an issue as part of a Wave.',
+    [WORKFLOW_ID.WAVE_POINTS_SUMMARY]: {
+      title: 'Wave points summary',
+      description: 'A summary of the points you earned once a Wave wraps up.',
       category: 'contributor',
     },
     [WORKFLOW_ID.CONTRIBUTOR_UNASSIGNED]: {
@@ -43,7 +42,7 @@
     [WORKFLOW_ID.OPEN_ISSUE_REMINDER_CONTRIBUTORS]: {
       title: 'Open issue reminder',
       description:
-        'Receive a reminder shortly before a Wave ends if you still any open issues assigned to you through Wave.',
+        'Receive a reminder shortly before a Wave ends if you still have any open issues assigned to you through Wave.',
       category: 'contributor',
     },
 
@@ -65,10 +64,9 @@
       description: 'Your application for a repository to join a Wave Program has been rejected.',
       category: 'maintainer',
     },
-    [WORKFLOW_ID.ORG_ISSUE_APPLICATION_RECEIVED]: {
-      title: 'Issue application received',
-      description:
-        'A contributor has applied to work on an issue belonging to one of your repos in a Wave.',
+    [WORKFLOW_ID.MAINTAINER_APPLICATIONS_DIGEST]: {
+      title: 'Daily applications digest',
+      description: 'A daily summary of new applications to issues in your repos.',
       category: 'maintainer',
     },
     [WORKFLOW_ID.CONTRIBUTOR_WITHDREW]: {
@@ -96,11 +94,9 @@
     preferences: (typeof data)['preferences'],
     workflowId: WORKFLOW_ID,
   ) {
-    const res = preferences.find((pref) => pref.workflowId === workflowId)?.channels;
-
-    if (!res) throw new Error(`No preferences found for workflow ID: ${workflowId}`);
-
-    return res;
+    // Undefined when the API doesn't (yet) know this workflow, e.g. while the
+    // frontend and backend are deployed at different times. Such rows are hidden.
+    return preferences.find((pref) => pref.workflowId === workflowId)?.channels;
   }
 
   let updatingWorkflowChannels = new SvelteMap<`${WORKFLOW_ID}-${'email' | 'inApp'}`, boolean>();
@@ -112,7 +108,7 @@
   ) {
     updatingWorkflowChannels.set(`${workflowId}-${channel}`, true);
     try {
-      doWithErrorModal(() =>
+      await doWithErrorModal(() =>
         patchNotificationPreference(undefined, workflowId, {
           [channel]: enabled,
         }),
@@ -204,12 +200,12 @@
         </div>
       </div>
       {#each Object.entries(NOTIFICATION_FRIENDLY_MAP).filter(([_, channel]) => channel?.category === category) as [workflowId, channel] (workflowId)}
-        {#if channel}
-          {@render setting(
-            channel,
-            workflowId as WORKFLOW_ID,
-            getPreferencesForWorkflow(data.preferences, workflowId as WORKFLOW_ID),
-          )}
+        {@const preferences = getPreferencesForWorkflow(
+          data.preferences,
+          workflowId as WORKFLOW_ID,
+        )}
+        {#if channel && preferences}
+          {@render setting(channel, workflowId as WORKFLOW_ID, preferences)}
         {/if}
       {/each}
     </div>

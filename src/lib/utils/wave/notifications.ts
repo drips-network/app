@@ -11,8 +11,8 @@ export enum WORKFLOW_ID {
   COMPLIMENT_RECEIVED = 'compliment-received',
   CONTRIBUTOR_UNASSIGNED = 'contributor-unassigned',
   CONTRIBUTOR_WITHDREW = 'contributor-withdrew',
-  ORG_ISSUE_APPLICATION_RECEIVED = 'org-issue-application-received',
-  ISSUE_POINTS_RECEIVED = 'issue-points-received',
+  MAINTAINER_APPLICATIONS_DIGEST = 'maintainer-applications-digest',
+  WAVE_POINTS_SUMMARY = 'wave-points-summary',
   OPEN_ISSUE_REMINDER_CONTRIBUTORS = 'open-issue-reminder-contributors',
   OPEN_ISSUE_REMINDER_MAINTAINERS = 'open-issue-reminder-maintainers',
 }
