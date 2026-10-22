@@ -74,14 +74,14 @@
     "svelte-check": "^4.3.4",
     "svelte-tiny-virtual-list": "v4.0.0-rc.2",
     "svelte2tsx": "^0.7.45",
-    "tailwindcss": "^3.4.13",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.48.1",
     "typescript-svelte-plugin": "^0.3.50",
     "viem": "^2.38.3",
-    "vite": "^7.1.12",
+    "vite": "^7.3.7",
     "vite-plugin-devtools-json": "^1.0.0",
-    "vitest": "^4.0.6"
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
@@ -107,7 +107,7 @@
     "@safe-global/safe-apps-sdk": "^9.1.0",
     "@sigma/node-border": "^3.0.0",
     "@sigma/utils": "^3.0.0",
-    "@stellar/stellar-sdk": "^14.5.0",
+    "@stellar/stellar-sdk": "^17.3.0",
     "@sumsub/websdk": "^2.5.0",
     "@sveltejs/adapter-node": "^5.4.0",
     "@tanstack/svelte-table": "npm:tanstack-table-8-svelte-5@^0.1",
