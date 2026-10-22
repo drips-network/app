@@ -172,6 +172,12 @@
             );
           }
 
+          if (!$walletStore.network.gelatoRelayAvailable) {
+            // Without Gelato Relay, the user submits the owner update via their wallet
+            $context.litOwnerUpdateSignature = litSignature;
+            return;
+          }
+
           // Submit the Lit owner update gaslessly in the background via Gelato
           const relayRes = await fetch('/api/gasless/call/lit-owner-update', {
             method: 'POST',
