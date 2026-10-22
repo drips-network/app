@@ -20,6 +20,7 @@
     SelectDripListStepListsFragment,
   } from '../../__generated__/gql.generated';
   import type { Items, Weights } from '$lib/components/list-editor/types';
+  import { isSupportedSplitsReceiver } from '$lib/components/splits/types';
   import {
     mapSplitReceiversToEditorConfig,
     type SplitReceiver,
@@ -56,7 +57,7 @@
   function isAlreadyInList(listSplits: SelectDripListStepListsFragment['splits']) {
     const accountIdToAdd = projectOrDripListToAdd.account.accountId;
 
-    return listSplits.some((s) => s.account.accountId === accountIdToAdd);
+    return listSplits.some((s) => 'account' in s && s.account.accountId === accountIdToAdd);
   }
 
   function submit() {
@@ -64,7 +65,9 @@
       dripLists.find((dl) => dl.account.accountId === selected[0]) ?? unreachable();
 
     $context = {
-      listEditorConfig: mapSplitReceiversToEditorConfig(selectedDripList.splits as SplitReceiver[]),
+      listEditorConfig: mapSplitReceiversToEditorConfig(
+        selectedDripList.splits.filter(isSupportedSplitsReceiver) as SplitReceiver[],
+      ),
       name: selectedDripList.name,
       description: selectedDripList.description || undefined,
       dripListAccountId: selectedDripList.account.accountId,

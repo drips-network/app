@@ -12,7 +12,6 @@ export enum ShareImageType {
   WAVE_PROGRAM = 'wave-program',
   PROJECT = 'project',
   DRIP_LIST = 'drip-list',
-  ECOSYSTEM = 'ecosystem',
   ORCID = 'orcid',
   RPGF_ROUND = 'rpgf-round',
 }

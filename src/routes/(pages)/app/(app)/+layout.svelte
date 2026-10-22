@@ -14,7 +14,6 @@
   import Box from '$lib/components/icons/Box.svelte';
   import TokenStreams from '$lib/components/icons/TokenStreams.svelte';
   import ExploreIcon from '$lib/components/icons/ExploreIcon.svelte';
-  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import type { LayoutData } from './$types';
   import network from '$lib/stores/wallet/network';
   import Settings from '$lib/components/icons/Settings.svelte';
@@ -69,14 +68,6 @@
               href: '/app/rpgf',
               icon: ArrowCounterClockwiseHeart,
               description: 'Run or participate in a RetroPGF round.',
-            }
-          : undefined,
-        network.ecosystems
-          ? {
-              label: 'Ecosystems',
-              href: '/app/ecosystems',
-              icon: EcosystemIcon,
-              description: 'Fund huge numbers of projects in one place',
             }
           : undefined,
         !network.readOnlyMode

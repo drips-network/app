@@ -40,13 +40,6 @@
     }
   `;
 
-  export const DRIP_VISUAL_ECOSYSTEM_FRAGMENT = gql`
-    ${IDENTITY_CARD_ECOSYSTEM_FRAGMENT}
-    fragment DripVisualEcosystem on EcosystemMainAccount {
-      ...IdentityCardEcosystem
-    }
-  `;
-
   export const DRIP_VISUAL_ORCID_FRAGMENT = gql`
     ${IDENTITY_CARD_ORCID_FRAGMENT}
     fragment DripVisualOrcid on OrcidLinkedIdentity {
@@ -65,7 +58,6 @@
   import FormattedAmount from '../formatted-amount/formatted-amount.svelte';
   import IdentityCard, {
     IDENTITY_CARD_DRIP_LIST_FRAGMENT,
-    IDENTITY_CARD_ECOSYSTEM_FRAGMENT,
     IDENTITY_CARD_PROJECT_FRAGMENT,
     IDENTITY_CARD_ORCID_FRAGMENT,
   } from '../identity-card/identity-card.svelte';
@@ -79,7 +71,6 @@
     DripVisualNftDriverAccountFragment,
     DripVisualProjectFragment,
     DripVisualUserFragment,
-    DripVisualEcosystemFragment,
     DripVisualOrcidFragment,
   } from './__generated__/gql.generated';
   import { browser } from '$app/environment';
@@ -92,7 +83,6 @@
     | DripVisualProjectFragment
     | DripVisualDripListFragment
     | DripVisualUserFragment
-    | DripVisualEcosystemFragment
     | DripVisualOrcidFragment
     | undefined = undefined;
   export let visual: 'stream' | 'donation' = 'stream';
@@ -184,8 +174,6 @@
       <IdentityCard disableLink={disableLinks} dripList={to} title="To" />
     {:else if to && to.__typename === 'User'}
       <IdentityCard disableLink={disableLinks} address={to.account.address} title="To" />
-    {:else if to && to.__typename === 'EcosystemMainAccount'}
-      <IdentityCard disableLink={disableLinks} ecosystem={to} title="To" />
     {:else if to && to.__typename === 'OrcidLinkedIdentity'}
       <IdentityCard disableLink={disableLinks} orcid={to} title="To" />
     {:else}

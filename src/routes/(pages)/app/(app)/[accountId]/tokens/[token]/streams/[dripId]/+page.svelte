@@ -2,7 +2,6 @@
   export const STREAM_PAGE_STREAM_FRAGMENT = gql`
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     ${DRIP_VISUAL_DRIP_LIST_FRAGMENT}
-    ${DRIP_VISUAL_ECOSYSTEM_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     ${CURRENT_AMOUNTS_USER_BALANCE_TIMELINE_ITEM_FRAGMENT}
     ${DELETE_STREAM_CONFIRM_STEP_STREAM_FRAGMENT}
@@ -44,9 +43,6 @@
         ... on DripList {
           ...DripVisualDripList
         }
-        ... on EcosystemMainAccount {
-          ...DripVisualEcosystem
-        }
       }
       name
       createdAt
@@ -66,7 +62,6 @@
   import DripVisual, {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_DRIP_LIST_FRAGMENT,
-    DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
   } from '$lib/components/drip-visual/drip-visual.svelte';
 
   import HeadMeta from '$lib/components/head-meta/head-meta.svelte';
@@ -240,7 +235,7 @@
   </div>
   <DripVisual
     from={stream.sender.account}
-    to={stream.receiver}
+    to={'account' in stream.receiver ? stream.receiver : undefined}
     amountPerSecond={$currentStreamAmounts.currentDeltaPerSecond.amount}
     tokenInfo={token ? { symbol: token.info.symbol, decimals: token.info.decimals } : undefined}
     halted={false}

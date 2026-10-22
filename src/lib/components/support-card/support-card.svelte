@@ -36,19 +36,6 @@
     }
   `;
 
-  export const SUPPORT_CARD_ECOSYSTEM_FRAGEMENT = gql`
-    fragment SupportCardEcosystem on EcosystemMainAccount {
-      name
-      account {
-        accountId
-        driver
-      }
-      owner {
-        accountId
-      }
-    }
-  `;
-
   export const SUPPORT_CARD_ORCID_FRAGEMENT = gql`
     fragment SupportCardOrcid on OrcidLinkedIdentity {
       orcid
@@ -98,7 +85,6 @@
     OwnDripListsQueryVariables,
     SupportCardDripListFragment,
     SupportCardProjectFragment,
-    SupportCardEcosystemFragment,
     SupportCardOrcidFragment,
     SupportCardUserFragment,
   } from './__generated__/gql.generated';
@@ -119,25 +105,21 @@
 
   export let project: SupportCardProjectFragment | undefined = undefined;
   export let dripList: SupportCardDripListFragment | undefined = undefined;
-  export let ecosystem: SupportCardEcosystemFragment | undefined = undefined;
   export let orcid: SupportCardOrcidFragment | undefined = undefined;
   export let user: SupportCardUserFragment | undefined = undefined;
 
   export let disabled = false;
   $: {
-    if (!project && !dripList && !ecosystem && !orcid && !user) disabled = true;
+    if (!project && !dripList && !orcid && !user) disabled = true;
     if (network.readOnlyMode) disabled = true;
   }
 
-  let type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user' = 'dripList';
+  let type: 'dripList' | 'project' | 'orcid' | 'user' = 'dripList';
 
   $: {
     switch (true) {
       case !!project:
         type = 'project';
-        break;
-      case !!ecosystem:
-        type = 'ecosystem';
         break;
       case !!orcid:
         type = 'orcid';
@@ -160,9 +142,6 @@
         break;
       case !!dripList:
         supportUrl = `${BASE_URL}/app/drip-lists/${dripList?.account.accountId}`;
-        break;
-      case !!ecosystem:
-        supportUrl = `${BASE_URL}/app/ecosystems/${ecosystem?.account.accountId}`;
         break;
       case !!orcid:
         supportUrl = `${BASE_URL}${buildOrcidUrl(orcid.orcid)}`;
@@ -235,10 +214,6 @@
         hasAccountId = !!dripList.account.accountId;
         donationFlowStepsInput = dripList.account;
         break;
-      case !!ecosystem:
-        hasAccountId = !!ecosystem.account.accountId;
-        donationFlowStepsInput = ecosystem;
-        break;
     }
 
     return (
@@ -266,9 +241,6 @@
         break;
       case !!dripList:
         donationFlowStepsInput = dripList?.account;
-        break;
-      case !!ecosystem:
-        donationFlowStepsInput = ecosystem;
         break;
       case !!orcid:
         donationFlowStepsInput = orcid;
@@ -314,11 +286,7 @@
     </div>
   </div>
   <h2 class="pixelated">Become a supporter</h2>
-  {#if ecosystem}
-    <p>Donate once or continuously.</p>
-  {:else}
-    <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
-  {/if}
+  <p>Donate once, {dripList ? 'continuously, ' : ''}or add this to your Drip List.</p>
   <div class="support-buttons-wrapper">
     <div class="support-buttons">
       <SupportButtons

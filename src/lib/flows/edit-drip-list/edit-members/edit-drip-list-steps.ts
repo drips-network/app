@@ -8,10 +8,13 @@ import {
   type SplitReceiver,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 import type { EditDripListFlowDripListFragment } from '../__generated__/gql.generated';
+import { isSupportedSplitsReceiver } from '$lib/components/splits/types';
 
 export default (dripList: EditDripListFlowDripListFragment) => {
   const context = writable({
-    listEditorConfig: mapSplitReceiversToEditorConfig(dripList.splits as SplitReceiver[]),
+    listEditorConfig: mapSplitReceiversToEditorConfig(
+      dripList.splits.filter(isSupportedSplitsReceiver) as SplitReceiver[],
+    ),
     name: dripList.name,
     description: dripList.description || undefined,
     dripListAccountId: dripList.account.accountId,

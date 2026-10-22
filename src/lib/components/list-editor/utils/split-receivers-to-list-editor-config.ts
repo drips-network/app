@@ -1,17 +1,13 @@
 import { gql } from 'graphql-request';
 import {
   LIST_EDITOR_DRIP_LIST_FRAGMENT,
-  LIST_EDITOR_ECOSYSTEM_FRAGMENT,
   LIST_EDITOR_PROJECT_FRAGMENT,
-  LIST_EDITOR_SUB_LIST_FRAGMENT,
   type ListEditorItem,
 } from '../types';
 import type {
   SplitReceiversToListEditorConfigAddressReceiverFragment,
   SplitReceiversToListEditorConfigDripListReceiverFragment,
   SplitReceiversToListEditorConfigProjectReceiverFragment,
-  SplitReceiversToListEditorConfigEcosystemReceiverFragment,
-  SplitReceiversToListEditorConfigSubListReceiverFragment,
   SplitReceiversToListEditorConfigOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 
@@ -51,38 +47,6 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT = g
   }
 `;
 
-export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ECOSYSTEM_RECEIVER_FRAGMENT = gql`
-  ${LIST_EDITOR_ECOSYSTEM_FRAGMENT}
-  fragment SplitReceiversToListEditorConfigEcosystemReceiver on EcosystemMainAccountReceiver {
-    weight
-    account {
-      accountId
-    }
-    ecosystemMainAccount {
-      ...ListEditorEcosystem
-      account {
-        accountId
-      }
-    }
-  }
-`;
-
-export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT = gql`
-  ${LIST_EDITOR_SUB_LIST_FRAGMENT}
-  fragment SplitReceiversToListEditorConfigSubListReceiver on SubListReceiver {
-    weight
-    account {
-      accountId
-    }
-    subList {
-      ...ListEditorSubList
-      account {
-        accountId
-      }
-    }
-  }
-`;
-
 export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql`
   fragment SplitReceiversToListEditorConfigOrcidReceiver on LinkedIdentityReceiver {
     weight
@@ -107,13 +71,10 @@ export const SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT = gql
   }
 `;
 
-// cannot yet split to an ecosystem
 export type SplitReceiver =
   | SplitReceiversToListEditorConfigAddressReceiverFragment
   | SplitReceiversToListEditorConfigDripListReceiverFragment
   | SplitReceiversToListEditorConfigProjectReceiverFragment
-  | SplitReceiversToListEditorConfigEcosystemReceiverFragment
-  | SplitReceiversToListEditorConfigSubListReceiverFragment
   | SplitReceiversToListEditorConfigOrcidReceiverFragment;
 
 function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
@@ -124,10 +85,6 @@ function mapSplitReceiverToEditorItem(input: SplitReceiver): ListEditorItem {
       return { type: 'drip-list', dripList: input.dripList };
     case 'ProjectReceiver':
       return { type: 'project', project: input.project };
-    case 'EcosystemMainAccountReceiver':
-      return { type: 'ecosystem', ecosystem: input.ecosystemMainAccount };
-    case 'SubListReceiver':
-      return { type: 'subList', subList: input.subList };
     case 'LinkedIdentityReceiver':
       return {
         type: 'orcid',
@@ -144,10 +101,6 @@ function extractAccountId(input: SplitReceiver) {
       return input.dripList.account.accountId;
     case 'ProjectReceiver':
       return input.project.account.accountId;
-    case 'EcosystemMainAccountReceiver':
-      return input.ecosystemMainAccount.account.accountId;
-    case 'SubListReceiver':
-      return input.subList.account.accountId;
     case 'LinkedIdentityReceiver':
       return input.linkedIdentity.account.accountId;
   }

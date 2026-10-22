@@ -7,7 +7,6 @@ export const GET: RequestHandler = async ({ url }) => {
   const staticPages = [
     '',
     '/solutions/dependency-funding',
-    '/solutions/ecosystem-funding',
     '/solutions/hackathons',
     '/solutions/pro-pgf',
     '/solutions/programmable-cashflow',

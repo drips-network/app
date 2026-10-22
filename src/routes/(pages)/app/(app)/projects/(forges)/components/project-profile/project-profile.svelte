@@ -1,7 +1,10 @@
 <script lang="ts" module>
   import { DRIP_LIST_BADGE_FRAGMENT } from '$lib/components/drip-list-badge/drip-list-badge.svelte';
   import { PROJECT_PROFILE_HEADER_FRAGMENT } from '$lib/components/project-profile-header/project-profile-header.svelte';
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/types';
+  import {
+    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
+    isSupportedSplitsReceiver,
+  } from '$lib/components/splits/types';
   import { SUPPORT_CARD_PROJECT_FRAGMENT } from '$lib/components/support-card/support-card.svelte';
   import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
   import { UNCLAIMED_PROJECT_CARD_FRAGMENT } from '$lib/components/unclaimed-project-card/unclaimed-project-card.svelte';
@@ -9,9 +12,7 @@
   import {
     EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT,
-    EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT,
     EDIT_PROJECT_SPLITS_FLOW_ORCID_RECEIVER_FRAGMENT,
   } from '$lib/flows/edit-project-splits/edit-project-splits-steps';
 
@@ -23,8 +24,6 @@
     ${EDIT_PROJECT_SPLITS_FLOW_ADDRESS_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_PROJECT_RECEIVER_FRAGMENT}
-    ${EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT}
-    ${EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT}
     ${EDIT_PROJECT_SPLITS_FLOW_ORCID_RECEIVER_FRAGMENT}
     ${UNCLAIMED_PROJECT_CARD_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT}
@@ -81,12 +80,6 @@
               }
               ... on DripListReceiver {
                 ...EditProjectSplitsFlowDripListReceiver
-              }
-              ... on EcosystemMainAccountReceiver {
-                ...EditProjectSplitsFlowEcosystemReceiver
-              }
-              ... on SubListReceiver {
-                ...EditProjectSplitsFlowSubListReceiver
               }
               ... on LinkedIdentityReceiver {
                 ...EditProjectSplitsFlowOrcidReceiver
@@ -534,11 +527,11 @@
                         Stepper,
                         undefined,
                         isClaimed(chainData)
-                          ? editProjectSplitsSteps(
-                              project.account.accountId,
-                              project.source.url,
-                              chainData.splits,
-                            )
+                          ? editProjectSplitsSteps(project.account.accountId, project.source.url, {
+                              ...chainData.splits,
+                              dependencies:
+                                chainData.splits.dependencies.filter(isSupportedSplitsReceiver),
+                            })
                           : unreachable(),
                       ),
                     label: 'Edit',
@@ -572,7 +565,7 @@
                         {
                           __typename: 'SplitGroup',
                           name: 'Dependencies',
-                          list: chainData.splits.dependencies,
+                          list: chainData.splits.dependencies.filter(isSupportedSplitsReceiver),
                         },
                       ]}
                     />

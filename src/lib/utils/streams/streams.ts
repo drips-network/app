@@ -34,6 +34,20 @@ type NewStreamOptions = {
 const METADATA_PARSER = addressDriverAccountMetadataParser;
 const USER_METADATA_KEY = 'ipfs';
 
+/**
+ * The API may return stream receiver types the app no longer supports. Since `setStreams` replaces
+ * the full set of receivers, silently skipping one would end that stream, so we throw instead.
+ */
+function getStreamReceiverAccountId(
+  receiver: { __typename: string } | { account: { accountId: string } },
+) {
+  if (!('account' in receiver)) {
+    throw new Error(`Unsupported stream receiver type: ${receiver.__typename}`);
+  }
+
+  return receiver.account.accountId;
+}
+
 export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAddress: string) {
   const currentStreamsQueryRes = await query<CurrentStreamsQuery, CurrentStreamsQueryVariables>(
     gql`
@@ -69,11 +83,6 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
                       accountId
                     }
                   }
-                  ... on EcosystemMainAccount {
-                    account {
-                      accountId
-                    }
-                  }
                 }
               }
             }
@@ -98,7 +107,7 @@ export async function _getCurrentStreamsAndReceivers(accountId: string, tokenAdd
     )
     .filter((stream) => !stream.isPaused)
     .map((stream) => ({
-      accountId: stream.receiver.account.accountId,
+      accountId: getStreamReceiverAccountId(stream.receiver),
       config: stream.config.raw,
     }));
 
@@ -174,7 +183,9 @@ function _buildMetadata(
       return {
         tokenAddress,
         streams: streams.map((stream) => {
-          const recipientDriver = extractDriverNameFromAccountId(stream.receiver.account.accountId);
+          const recipientDriver = extractDriverNameFromAccountId(
+            getStreamReceiverAccountId(stream.receiver),
+          );
 
           let supportedDriver: 'address' | 'nft' | 'repo';
 
@@ -195,7 +206,7 @@ function _buildMetadata(
             },
             receiver: {
               driver: supportedDriver,
-              accountId: stream.receiver.account.accountId,
+              accountId: getStreamReceiverAccountId(stream.receiver),
             },
             archived: false,
             name: stream.name ?? undefined,
@@ -388,7 +399,7 @@ export async function buildUnpauseStreamPopulatedTx(streamId: string) {
   }
 
   const newReceivers = currentReceivers.concat({
-    accountId: toBigInt(streamToUnpause.receiver.account.accountId),
+    accountId: toBigInt(getStreamReceiverAccountId(streamToUnpause.receiver)),
     config: toBigInt(streamToUnpause.config.raw),
   });
 

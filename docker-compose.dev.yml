@@ -3,10 +3,6 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  postgres-ecosystems:
-    volumes:
-      - postgres-ecosystems-data:/var/lib/postgresql/data
-
   testnet:
     volumes:
       - anvil-data:/contracts/anvil-data
@@ -41,5 +37,4 @@ volumes:
   postgres-rpgf-data:
   anvil-data:
   fake-pinata-data:
-  postgres-ecosystems-data:
   postgres-wave-data:

@@ -2,7 +2,6 @@ import { writable } from 'svelte/store';
 import type {
   CreateStreamFlowAddressDriverAccountFragment,
   CreateStreamFlowDetailsNftDriverAccountFragment,
-  CreateStreamFlowEcosystemAccountFragment,
   CreateStreamFlowOrcidAccountFragment,
 } from './__generated__/gql.generated';
 import type { CurrentAmountsUserBalanceTimelineItemFragment } from '$lib/utils/__generated__/gql.generated';
@@ -27,7 +26,6 @@ export interface CreateStreamFlowState {
   receiver:
     | CreateStreamFlowAddressDriverAccountFragment
     | CreateStreamFlowDetailsNftDriverAccountFragment
-    | CreateStreamFlowEcosystemAccountFragment
     | CreateStreamFlowOrcidAccountFragment
     | undefined;
 }
@@ -36,7 +34,6 @@ export default (
   receiver:
     | CreateStreamFlowAddressDriverAccountFragment
     | CreateStreamFlowDetailsNftDriverAccountFragment
-    | CreateStreamFlowEcosystemAccountFragment
     | CreateStreamFlowOrcidAccountFragment
     | undefined,
   selectedTokenAddress: string | undefined,

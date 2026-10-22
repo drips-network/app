@@ -80,7 +80,6 @@ export type Network = {
       }
     | undefined;
   enableEns: boolean;
-  ecosystems: boolean;
   retroFunding: DripsRetroFundingConfig;
   orcids: boolean;
   readOnlyMode: boolean;
@@ -168,7 +167,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
@@ -214,7 +212,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    ecosystems: false,
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
@@ -260,7 +257,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    ecosystems: true,
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
@@ -307,7 +303,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     gaslessTransactions: false,
     addToWalletConfig: undefined,
     enableEns: true,
-    ecosystems: true,
     retroFunding: {
       enabled: true,
       attestationConfig: {
@@ -373,7 +368,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       rpcUrls: [`${BASE_URL}/api/rpc/anvil/localtestnet`],
     },
     enableEns: false,
-    ecosystems: true,
     retroFunding: {
       enabled: true,
       attestationConfig: {
@@ -425,7 +419,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     addToWalletConfig: undefined,
     enableEns: true,
     retroFunding: { enabled: false },
-    ecosystems: false,
     orcids: false,
     readOnlyMode: false,
   },
@@ -501,7 +494,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
           '0xabe47ff1d4447fadc354ef5b53f009274d619af17b518b7fbfdd7fb4f1705c74',
       },
     },
-    ecosystems: false,
     orcids: false,
     readOnlyMode: false,
   },
@@ -555,7 +547,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     enableEns: true,
     retroFunding: { enabled: false },
-    ecosystems: false,
     orcids: false,
     readOnlyMode: true,
   },
@@ -609,7 +600,6 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     enableEns: true,
     retroFunding: { enabled: false },
-    ecosystems: false,
     orcids: false,
     readOnlyMode: false,
   },

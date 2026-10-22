@@ -14,8 +14,6 @@ import type {
   ProjectOtDsQueryVariables,
   DripListOtDsQuery,
   DripListOtDsQueryVariables,
-  EcosystemOtDsQuery,
-  EcosystemOtDsQueryVariables,
   OrcidOtDsQuery,
   OrcidOtDsQueryVariables,
   AddressOtDsQuery,
@@ -23,7 +21,6 @@ import type {
 } from './__generated__/gql.generated';
 import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
-  CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
   CreateDonationDetailsStepOrcidFragment,
@@ -64,22 +61,6 @@ const projectSupportQuery = gql`
 const dripListSupportQuery = gql`
   query DripListOTDs($id: ID!, $chain: SupportedChain!) {
     dripList(id: $id, chain: $chain) {
-      chain
-      support {
-        ... on OneTimeDonationSupport {
-          account {
-            accountId
-          }
-          date
-        }
-      }
-    }
-  }
-`;
-
-const ecosystemSupportQuery = gql`
-  query EcosystemOTDs($accountId: ID!, $chain: SupportedChain!) {
-    ecosystemMainAccount(id: $accountId, chain: $chain) {
       chain
       support {
         ... on OneTimeDonationSupport {
@@ -143,7 +124,6 @@ export default function (
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment
     | CreateDonationDetailsStepOrcidFragment,
   tokenAddress: string,
   amountToGive: bigint,
@@ -198,32 +178,6 @@ export default function (
                   if (!projectData) return true;
 
                   return filterCurrentChainData(projectData.chainData).support.some((support) => {
-                    if (support.__typename !== 'OneTimeDonationSupport') return false;
-                    return checkDonation(
-                      ownAccountId,
-                      support.account.accountId,
-                      support.date,
-                      blockTimestamp,
-                    );
-                  });
-                },
-                30000,
-                1000,
-              );
-              break;
-            }
-            case 'EcosystemMainAccount': {
-              await expect(
-                () =>
-                  query<EcosystemOtDsQuery, EcosystemOtDsQueryVariables>(ecosystemSupportQuery, {
-                    accountId: recipientAccountId,
-                    chain: network.gqlName,
-                  }),
-                (res) => {
-                  const ecoystemData = res.ecosystemMainAccount;
-                  if (!ecoystemData) return true;
-
-                  return ecoystemData.support.some((support) => {
                     if (support.__typename !== 'OneTimeDonationSupport') return false;
                     return checkDonation(
                       ownAccountId,

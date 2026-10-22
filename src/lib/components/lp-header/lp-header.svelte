@@ -83,7 +83,6 @@
         { title: 'RetroPGF voting & distribution', href: '/solutions/retro-pgf' },
         { title: 'Proactive grants', href: '/solutions/pro-pgf' },
         { title: 'Dependency Funding', href: '/solutions/dependency-funding' },
-        { title: 'Ecosystem funding', href: '/solutions/ecosystem-funding' },
         { title: 'Programmable cashflow', href: '/solutions/programmable-cashflow' },
         { title: 'Hackathons', href: '/solutions/hackathons' },
       ],
