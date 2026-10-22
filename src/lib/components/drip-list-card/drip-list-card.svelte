@@ -69,9 +69,6 @@
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import '$lib/utils/multiplayer/multiplayer';
   import Pen from '$lib/components/icons/Pen.svelte';
   import Button from '../button/button.svelte';
   import Drip from '../illustrations/drip.svelte';
@@ -89,20 +86,7 @@
   import type { DripListCardFragment } from './__generated__/gql.generated';
   import getSupportersPile, { SUPPORTER_PILE_FRAGMENT } from './methods/get-supporters-pile';
   import IdentityBadge from '../identity-badge/identity-badge.svelte';
-  import TabbedBox from '../tabbed-box/tabbed-box.svelte';
-  import TransitionedHeight from '../transitioned-height/transitioned-height.svelte';
   import { fade } from 'svelte/transition';
-  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
-  import unreachable from '$lib/utils/unreachable';
-  import assert from '$lib/utils/assert';
-  import VotingRoundSplits from './components/voting-round-splits.svelte';
-  import Trash from '../icons/Trash.svelte';
-  import deleteVotingRoundSteps from '$lib/flows/delete-voting-round/delete-voting-round-steps';
-  import VotingRoundCollaborators from './components/voting-round-collaborators.svelte';
-  import VotingRoundNoticeCard from './components/voting-round-notice-card.svelte';
-  import VotingRoundCountdown from './components/voting-round-countdown.svelte';
-  import Wallet from '../icons/Wallet.svelte';
-  import publishVotingRoundListFlowSteps from '$lib/flows/publish-voting-round-list/publish-voting-round-list-flow-steps';
   import { BASE_URL } from '$lib/utils/base-url';
   import twemoji from '$lib/utils/twemoji';
   import {
@@ -113,23 +97,16 @@
   import mergeAmounts from '$lib/utils/amounts/merge-amounts';
   import { onMount } from 'svelte';
   import tickStore from '$lib/stores/tick/tick.store';
-  import StatusBadge from '../status-badge/status-badge.svelte';
-  import Proposals from '../icons/Proposals.svelte';
   import PaddedHorizontalScroll from '../padded-horizontal-scroll/padded-horizontal-scroll.svelte';
-  import ListEditor from '../list-editor/list-editor.svelte';
-  import type { Items } from '../list-editor/types';
-  import FormField from '../form-field/form-field.svelte';
   import contractConstants from '$lib/utils/sdk/utils/contract-constants';
   import {
     SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
-    type SplitsComponentSplitsReceiver,
     SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT,
   } from '../splits/types';
-  import { invalidateAll } from '$app/navigation';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
   import CoinFlying from '../icons/CoinFlying.svelte';
@@ -143,13 +120,7 @@
 
   interface Props {
     data: {
-      dripList?: DripListCardFragment | null;
-      votingRound?:
-        | (VotingRound & {
-            splits?: SplitsComponentSplitsReceiver[];
-            allowedReceiversListEditorItems?: Items;
-          })
-        | null;
+      dripList: DripListCardFragment;
     };
     //  total funded, and number of splits
     variant?: 'full' | 'partial' | 'minimal';
@@ -177,16 +148,11 @@
   }: Props = $props();
 
   function triggerEditModal() {
-    if (!dripList) return;
     modal.show(Stepper, undefined, editDripListSteps(dripList));
   }
 
-  let activeTab = $state<'tab1' | 'tab2'>('tab1');
-
   let incomingStreamsTotalStreamed = $state<{ tokenAddress: string; amount: bigint }[]>();
   function updateIncomingStreamsTotalStreamed() {
-    if (!dripList) return;
-
     const incomingStreams = mapFilterUndefined(dripList.support, (s) => {
       if (s.__typename === 'StreamSupport') {
         return s.stream;
@@ -212,63 +178,29 @@
     return () => tickStore.deregister(tick);
   });
 
-  run(() => {
-    assert(
-      data.dripList || data.votingRound,
-      'DripListCard requires either a dripList or a votingRound, or both',
-    );
-  });
   let dripList = $derived(data.dripList);
-  let votingRound = $derived(data.votingRound);
-  let listOwner = $derived(dripList?.owner);
-  let isOwnList = $derived(dripList && $walletStore && checkIsUser(dripList.owner.accountId));
-  let title = $derived((dripList?.name || votingRound?.name) ?? unreachable());
-  let description = $derived((dripList?.description || votingRound?.description) ?? '');
-  let supportersPile = $derived(dripList && getSupportersPile(dripList.support, 'tiny'));
+  let listOwner = $derived(dripList.owner);
+  let isOwnList = $derived($walletStore && checkIsUser(dripList.owner.accountId));
+  let title = $derived(dripList.name);
+  let description = $derived(dripList.description ?? '');
+  let supportersPile = $derived(getSupportersPile(dripList.support, 'tiny'));
   let isPartial = $derived(variant === 'partial');
   let isMinimal = $derived(variant === 'minimal');
   let clampTitleClass = $derived(!clampTitle ? '' : isMinimal ? 'line-clamp-2' : 'line-clamp-1');
-  run(() => {
-    if (dripList && votingRound) {
-      activeTab = 'tab1';
-    } else if (dripList) {
-      activeTab = 'tab1';
-    } else if (votingRound) {
-      activeTab = 'tab2';
-    }
-  });
-  let isOwnVotingRound = $derived(votingRound?.publisherAddress === $walletStore?.address);
   let totalEarned = $derived(
-    mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList?.totalEarned ?? []),
+    mergeAmounts(incomingStreamsTotalStreamed ?? [], dripList.totalEarned),
   );
   let urlBase = $derived(
     chainOverride
       ? `https://${Object.values(NETWORK_CONFIG).find((n) => n.gqlName === chainOverride)?.subdomain}`
       : '',
   );
-  let dripListUrl = $derived(
-    dripList
-      ? `${urlBase}/app/drip-lists/${dripList.account.accountId}`
-      : votingRound
-        ? `${urlBase}/app/drip-lists/${votingRound.id}`
-        : undefined,
-  );
+  let dripListUrl = $derived(`${urlBase}/app/drip-lists/${dripList.account.accountId}`);
   let downloadableImageUrl = $derived(
-    dripList
-      ? `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`
-      : votingRound
-        ? `${urlBase}/api/share-images/drip-list/${votingRound.id}.png?target=og`
-        : undefined,
-  );
-  let votingEnded = $derived(
-    votingRound ? new Date() >= new Date(votingRound.schedule.voting.endsAt) : undefined,
+    `${urlBase}/api/share-images/drip-list/${dripList.account.accountId}.png?target=og`,
   );
   let splitsFormatted = $derived(formatNumber(dripList?.splits?.length || 0));
 </script>
-
-{#if !isPartial && !isMinimal && votingRound}
-  <VotingRoundNoticeCard {votingRound} />
-{/if}
 
 <svelte:element
   this={isPartial || isMinimal ? 'a' : 'section'}
@@ -287,21 +219,16 @@
         >
           {@html twemoji(title)}
         </h1>
-        {#if isPartial && votingRound}
-          <StatusBadge icon={Proposals} size="small" color={votingEnded ? 'foreground' : 'primary'}>
-            {votingEnded ? 'Voting ended' : 'In voting'}
-          </StatusBadge>
-        {/if}
         {#if !isPartial && !isMinimal}
           <div class="flex items-center gap-2 -my-1">
             <ShareButton
               buttonVariant="normal"
               url="{BASE_URL}{dripListUrl}"
               {downloadableImageUrl}
-              disabled={!dripList?.isVisible}
+              disabled={!dripList.isVisible}
             />
             {#if isOwnList}
-              <Button disabled={!dripList?.isVisible} onclick={triggerEditModal} icon={Pen}
+              <Button disabled={!dripList.isVisible} onclick={triggerEditModal} icon={Pen}
                 >Edit list</Button
               >
             {/if}
@@ -324,7 +251,7 @@
           {/if}<IdentityBadge
             showAvatar={true}
             showIdentity={true}
-            address={listOwner?.address ?? votingRound?.publisherAddress ?? unreachable()}
+            address={listOwner.address}
             disableTooltip={true}
           />
         </div>
@@ -332,152 +259,43 @@
     </header>
 
     {#if !isMinimal}
-      <section>
-        {#if !isPartial && dripList && votingRound}
-          <div class="-mt-4 mb-10 sm:-mt-6 sm:mb-8">
-            <TabbedBox
-              bind:activeTab
-              tabs={{
-                1: 'Current',
-                2: 'In voting',
-              }}
-              ariaLabel="Toggle list versions"
-            />
-          </div>
-        {/if}
-
-        <TransitionedHeight transitionHeightChanges>
-          <div class="tabs">
-            <div class="list tab tab-1" class:active-tab={activeTab === 'tab1'}>
-              {#if dripList}
-                <div class="flex flex-col gap-1.5">
-                  <div class="totals">
-                    <div class="drip-icon">
-                      <Drip />
-                    </div>
-                    {#if !hideTotal}
-                      <div class="typo-text tabular-nums total-streamed-badge">
-                        {#if browser}
-                          <AggregateFiatEstimate
-                            supressUnknownAmountsWarning
-                            amounts={totalEarned}
-                          />
-                        {/if}
-                        <span class="muted">&nbsp;total</span>
-                      </div>
-                    {/if}
-                    {#if !hideSupporterPile && supportersPile && supportersPile.length > 0}
-                      <div
-                        in:fade={{ duration: 300 }}
-                        class="hide-on-mobile flex items-center gap-1.5 min-w-0"
-                      >
-                        <span class="typo-text-small truncate muted">Supported by</span>
-                        <Pile
-                          maxItems={3}
-                          components={supportersPile ?? []}
-                          itemsClickable={!isPartial}
-                        />
-                      </div>
-                    {/if}
-                  </div>
-                  <PaddedHorizontalScroll disableScroll={isPartial}>
-                    <div
-                      class="splits-component"
-                      style:pointer-events={isPartial ? 'none' : undefined}
-                    >
-                      <Splits
-                        disableLinks={isPartial}
-                        maxRows={maxSplitRows ??
-                          (isPartial
-                            ? dripList.description && !hideDescription
-                              ? 3
-                              : 4
-                            : undefined)}
-                        groupsExpandable={!isPartial}
-                        list={dripList.splits}
-                        {chainOverride}
-                      />
-                    </div>
-                  </PaddedHorizontalScroll>
-                </div>
-              {/if}
+      <section class="list">
+        <div class="flex flex-col gap-1.5">
+          <div class="totals">
+            <div class="drip-icon">
+              <Drip />
             </div>
-
-            <div
-              class="list tab tab-2"
-              class:active-tab={activeTab === 'tab2'}
-              class:-mt-6={!votingRound?.result}
-            >
-              {#if votingRound}
-                <div class="flex flex-col gap-1.5">
-                  <div class="splits">
-                    <div class="splits-component">
-                      <VotingRoundSplits
-                        listingMode={isPartial}
-                        maxRows={isPartial ? (votingRound.description ? 3 : 4) : undefined}
-                        {votingRound}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {#if !isPartial}
-                  {#if votingRound.allowedReceivers?.length && votingRound.status === 'Started'}
-                    <FormField title="Possible recipients" type="div">
-                      <ListEditor
-                        items={votingRound.allowedReceiversListEditorItems}
-                        weightsMode={false}
-                        isEditable={false}
-                      />
-                    </FormField>
-                  {/if}
-
-                  <VotingRoundCollaborators {votingRound} />
-
-                  <VotingRoundCountdown {votingRound} on:end={invalidateAll} />
-
-                  {#if isOwnVotingRound}
-                    <div class="actions">
-                      <div>
-                        <Button
-                          icon={Trash}
-                          onclick={() =>
-                            modal.show(
-                              Stepper,
-                              undefined,
-                              deleteVotingRoundSteps(votingRound?.id ?? unreachable()),
-                            )}>Delete voting round</Button
-                        >
-                      </div>
-
-                      {#if votingRound.status === 'Completed' || votingRound.status === 'PendingLinkCompletion'}
-                        <div>
-                          <Button
-                            variant="primary"
-                            icon={Wallet}
-                            disabled={!votingRound.result}
-                            onclick={() =>
-                              modal.show(
-                                Stepper,
-                                undefined,
-                                votingRound
-                                  ? publishVotingRoundListFlowSteps(
-                                      votingRound.id,
-                                      votingRound.name,
-                                      votingRound.description ?? undefined,
-                                    )
-                                  : unreachable(),
-                              )}>Publish Drip List</Button
-                          >
-                        </div>
-                      {/if}
-                    </div>
-                  {/if}
+            {#if !hideTotal}
+              <div class="typo-text tabular-nums total-streamed-badge">
+                {#if browser}
+                  <AggregateFiatEstimate supressUnknownAmountsWarning amounts={totalEarned} />
                 {/if}
-              {/if}
-            </div>
+                <span class="muted">&nbsp;total</span>
+              </div>
+            {/if}
+            {#if !hideSupporterPile && supportersPile.length > 0}
+              <div
+                in:fade={{ duration: 300 }}
+                class="hide-on-mobile flex items-center gap-1.5 min-w-0"
+              >
+                <span class="typo-text-small truncate muted">Supported by</span>
+                <Pile maxItems={3} components={supportersPile} itemsClickable={!isPartial} />
+              </div>
+            {/if}
           </div>
-        </TransitionedHeight>
+          <PaddedHorizontalScroll disableScroll={isPartial}>
+            <div class="splits-component" style:pointer-events={isPartial ? 'none' : undefined}>
+              <Splits
+                disableLinks={isPartial}
+                maxRows={maxSplitRows ??
+                  (isPartial ? (dripList.description && !hideDescription ? 3 : 4) : undefined)}
+                groupsExpandable={!isPartial}
+                list={dripList.splits}
+                {chainOverride}
+              />
+            </div>
+          </PaddedHorizontalScroll>
+        </div>
       </section>
     {/if}
 
@@ -553,52 +371,12 @@
     gap: 1.5rem;
   }
 
-  .splits {
-    overflow-x: scroll;
-  }
-
   .splits-component {
     margin-left: 10px;
   }
 
   .muted {
     color: var(--color-foreground-level-5);
-  }
-
-  .tabs {
-    position: relative;
-  }
-
-  .tab {
-    position: absolute;
-    top: 0;
-    transition:
-      opacity 0.3s,
-      transform 0.3s;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .tab-1 {
-    transform: translateX(-4rem);
-  }
-
-  .tab-2 {
-    transform: translateX(4rem);
-  }
-
-  .tab.active-tab {
-    position: relative;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
   }
 
   .cubbies {
@@ -647,10 +425,6 @@
   }
 
   @media (max-width: 768px) {
-    .actions {
-      flex-direction: column;
-    }
-
     .hide-on-mobile {
       display: none;
     }

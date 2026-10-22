@@ -123,8 +123,6 @@
   export let orcid: SupportCardOrcidFragment | undefined = undefined;
   export let user: SupportCardUserFragment | undefined = undefined;
 
-  export let draftListMode = false;
-
   export let disabled = false;
   $: {
     if (!project && !dripList && !ecosystem && !orcid && !user) disabled = true;
@@ -293,7 +291,7 @@
 </script>
 
 <div class="become-supporter-card" class:disabled>
-  {#if !draftListMode && (ownDripLists === undefined || updating)}
+  {#if ownDripLists === undefined || updating}
     <div transition:fade={{ duration: 300 }} class="loading-overlay">
       <Spinner />
     </div>

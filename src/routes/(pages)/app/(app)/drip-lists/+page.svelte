@@ -68,7 +68,6 @@
 
   {#if !network.readOnlyMode}
     <YourDripListsSection
-      votingRounds={data.votingRounds}
       dripLists={data.yourDripLists}
       showCreateNewListCard={true}
       withCreateButton={true}

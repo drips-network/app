@@ -37,11 +37,10 @@ Head to Settings within the app and enable "Developer mode" to display helpful "
 If you need to develop with unreleased features of one or more other services, you can set the tag to use for a particular service by passing an environment variable to the `dev:docker` command. Most services will build images for `main` and `staging` branches, by default the `main` tag is used.
 
 To switch to staging images, pass one or more of the following env vars:
-- `MULTIPLAYER_TAG=staging`
 - `EVENT_PROCESSOR_TAG=staging`
 - `GRAPHQL_API_TAG=staging`
 
-e.g. `MULTIPLAYER_TAG=staging EVENT_PROCESSOR_TAG=staging GRAPHQL_API_TAG=staging npm run dev:docker`
+e.g. `EVENT_PROCESSOR_TAG=staging GRAPHQL_API_TAG=staging npm run dev:docker`
 
 ### 🥸 Claiming a project using the fake oracle
 
@@ -62,7 +61,7 @@ On production networks, funds on Drips donated to projects and Drip Lists are au
 
 ## 🥸 Inspecting databases with PGAdmin
 
-The docker-compose file also spins up pgadmin for you, running at port 5050. Simply open http://localhost:5050 and open the database you're interested in (either the event-processor DB or multiplayer DB). When prompted for the password, enter `admin`.
+The docker-compose file also spins up pgadmin for you, running at port 5050. Simply open http://localhost:5050 and open the database you're interested in (e.g. the event-processor DB). When prompted for the password, enter `admin`.
 
 ## 😩 Running without Docker
 

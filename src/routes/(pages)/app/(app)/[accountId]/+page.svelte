@@ -78,7 +78,7 @@
                 <div in:fade>
                   <SocialLink network="ethereum" value={data.profileData.account.address} />
                 </div>
-                {#each Object.entries(socialLinkValues ?? {}) as [network, value]}
+                {#each Object.entries(socialLinkValues ?? {}) as [network, value] (network)}
                   {#if value}<li in:fade>
                       <SocialLink network={isNetwork(network) ? network : unreachable()} {value} />
                     </li>{/if}
@@ -104,11 +104,9 @@
       <YourDripListsSection
         label={isSelf ? 'Your Drip Lists' : 'Drip Lists'}
         collapsable
-        collapsed={[
-          ...data.profileData.votingRounds,
-          ...mapFilterUndefined(profileChainData.dripLists, (v) => (v === null ? undefined : v)),
-        ].length === 0}
-        votingRounds={data.profileData.votingRounds}
+        collapsed={mapFilterUndefined(profileChainData.dripLists, (v) =>
+          v === null ? undefined : v,
+        ).length === 0}
         dripLists={mapFilterUndefined(profileChainData.dripLists, (v) =>
           v === null ? undefined : v,
         )}

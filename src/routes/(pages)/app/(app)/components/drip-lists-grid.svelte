@@ -3,7 +3,7 @@
   import type { ComponentProps } from 'svelte';
 
   interface Props {
-    dripLists: ComponentProps<typeof DripListCard>['data']['dripList'][];
+    dripLists: (ComponentProps<typeof DripListCard>['data']['dripList'] | null)[];
     cardVariant?: ComponentProps<typeof DripListCard>['variant'];
   }
 
@@ -14,8 +14,10 @@
   {#if dripLists.length === 0}
     <p class="text-center text-muted">No Drip Lists found.</p>
   {/if}
-  {#each dripLists as dripList}
-    <DripListCard variant={cardVariant} data={{ dripList: dripList }} />
+  {#each dripLists as dripList, index (dripList?.account.accountId ?? index)}
+    {#if dripList}
+      <DripListCard variant={cardVariant} data={{ dripList }} />
+    {/if}
   {/each}
 </div>
 
