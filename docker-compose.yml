@@ -11,8 +11,6 @@ services:
       - PUBLIC_IPFS_GATEWAY_URL=http://localhost:3000
       - PUBLIC_GQL_URL=http://localhost:8080
       - PUBLIC_INTERNAL_GQL_URL=http://graphql-api:8080
-      - MULTIPLAYER_API_URL=http://multiplayer:5001
-      - MULTIPLAYER_API_ACCESS_TOKEN=123
       - PINATA_SDK_KEY=123
       - PINATA_SDK_SECRET=123
       - MEILISEARCH_HOST=http://meilisearch:7700
@@ -157,28 +155,6 @@ services:
     ports:
       - '3000:3000'
 
-  multiplayer:
-    image: 'j537/multiplayer:${MULTIPLAYER_TAG-main}'
-    pull_policy: always
-    environment:
-      - 'RPC_CONFIG={"localtestnet": { "url": "http://testnet:8545" }}'
-      - GRAPHQL_URL=http://graphql-api:8080
-      - GRAPHQL_ACCESS_TOKEN=123
-      - POSTGRES_CONNECTION_STRING=postgresql://user:admin@postgres-multiplayer:5432/dripsdb
-      - DB_SCHEMA_NAME=multiplayer
-      - AUTH_STRATEGY=dev
-      - API_KEY=123
-      - SHOULD_RUN_MIGRATIONS=true
-      - PORT=5001
-      - LOG_LEVEL=debug
-    ports:
-      - 5001:5001
-    depends_on:
-      postgres-multiplayer:
-        condition: service_healthy
-      graphql-api:
-        condition: service_healthy
-
   postgres:
     image: postgres:16
     restart: unless-stopped
@@ -189,23 +165,6 @@ services:
       POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
     ports:
       - 54320:5432
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'dripsdb']
-      interval: 30s
-      timeout: 60s
-      retries: 5
-      start_period: 80s
-
-  postgres-multiplayer:
-    image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: dripsdb
-      POSTGRES_INITDB_ARGS: -E UTF8 --locale=C
-    ports:
-      - 54321:5432
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready', '-d', 'dripsdb']
       interval: 30s

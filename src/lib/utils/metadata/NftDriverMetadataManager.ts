@@ -69,9 +69,8 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
     isVisible: boolean;
     name?: string;
     description?: string;
-    latestVotingRoundId?: string;
   }): Extract<LatestVersion<typeof nftDriverAccountMetadataParser>, { type: 'dripList' }> {
-    const { forAccountId, recipients, name, description, latestVotingRoundId, isVisible } = context;
+    const { forAccountId, recipients, name, description, isVisible } = context;
 
     return {
       type: 'dripList',
@@ -83,7 +82,6 @@ export default class NftDriverMetadataManager extends MetadataManagerBase<
       recipients,
       name,
       description,
-      latestVotingRoundId,
       isVisible,
     };
   }

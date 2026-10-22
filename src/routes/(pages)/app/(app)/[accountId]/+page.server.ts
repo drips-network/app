@@ -7,8 +7,6 @@ import { USER_BALANCES_FRAGMENT } from '../funds/sections/balances.section.svelt
 import network from '$lib/stores/wallet/network';
 import query from '$lib/graphql/dripsQL';
 import type { ProfilePageQuery, ProfilePageQueryVariables } from './__generated__/gql.generated';
-import { getVotingRounds } from '$lib/utils/multiplayer';
-import { mapSplitsFromMultiplayerResults } from '$lib/components/splits/utils';
 import { SUPPORTERS_SECTION_SUPPORT_ITEM_FRAGMENT } from '$lib/components/supporters-section/supporters.section.svelte';
 import { isAddress } from 'ethers';
 import extractAddressFromAccountId from '$lib/utils/sdk/utils/extract-address-from-accountId';
@@ -137,8 +135,7 @@ export const load = async ({ params, fetch }) => {
     error(404, 'Not Found');
   }
 
-  const [votingRounds, userRes, ensData] = await Promise.all([
-    await getVotingRounds({ publisherAddress: address }, fetch),
+  const [userRes, ensData] = await Promise.all([
     query<ProfilePageQuery, ProfilePageQueryVariables>(
       PROFILE_PAGE_QUERY,
       { address, chains: [network.gqlName] },
@@ -147,25 +144,11 @@ export const load = async ({ params, fetch }) => {
     resolveEnsFields(address),
   ]);
 
-  const votingRoundsWithResults = votingRounds.filter((v) => v.result);
-
-  const votingRoundsSplits = await Promise.all(
-    votingRoundsWithResults.map((v) => v.result && mapSplitsFromMultiplayerResults(v.result)),
-  );
-
-  const votingRoundsWithSplits = votingRounds.map((v) => ({
-    ...v,
-    splits: votingRoundsSplits[votingRoundsWithResults.findIndex((vR) => vR.id === v.id)] ?? [],
-  }));
-
   return {
     blockWhileInitializing: false,
     error: false,
     ensData,
-    profileData: {
-      ...userRes.userByAddress,
-      votingRounds: votingRoundsWithSplits,
-    },
+    profileData: userRes.userByAddress,
     preservePathOnNetworkChange: true,
   };
 };

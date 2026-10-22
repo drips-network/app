@@ -3,10 +3,6 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  postgres-multiplayer:
-    volumes:
-      - postgres-multiplayer-data:/var/lib/postgresql/data
-
   postgres-ecosystems:
     volumes:
       - postgres-ecosystems-data:/var/lib/postgresql/data
@@ -42,7 +38,6 @@ services:
 
 volumes:
   postgres-data:
-  postgres-multiplayer-data:
   postgres-rpgf-data:
   anvil-data:
   fake-pinata-data:

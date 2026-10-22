@@ -16,10 +16,8 @@
   import Section from '../section/section.svelte';
   import Button from '../button/button.svelte';
   import Illustration from '../icons/✏️.svelte';
-  import type { VotingRound } from '$lib/utils/multiplayer/schemas';
   import DripListCard from '../drip-list-card/drip-list-card.svelte';
   import type { DripListsSectionDripListFragment } from './__generated__/gql.generated';
-  import type { SplitsComponentSplitsReceiver } from '../splits/types';
   import VisibilityToggle from '../visibility-toggle/visibility-toggle.svelte';
   import checkIsUser from '$lib/utils/check-is-user';
   import walletStore from '$lib/stores/wallet/wallet.store';
@@ -27,7 +25,6 @@
   import network from '$lib/stores/wallet/network';
 
   export let dripLists: DripListsSectionDripListFragment[];
-  export let votingRounds: (VotingRound & { splits: SplitsComponentSplitsReceiver[] })[];
   export let withCreateButton = false;
   export let label = 'Your Drip Lists';
 
@@ -41,19 +38,9 @@
   let showHidden: boolean = false;
   $: hiddenListsCount = dripLists.filter((dl) => !dl.isVisible).length ?? 0;
 
-  $: items = [...dripLists, ...votingRounds];
+  $: visibleDripLists = dripLists.filter((dl) => dl.isVisible);
 
-  $: visibleDripListsAndVotingRounds = items
-    .filter((i) => ('isVisible' in i ? i.isVisible : true))
-    .map((i) =>
-      '__typename' in i
-        ? { ...i, type: 'drip-list' as const }
-        : { ...i, type: 'voting-round' as const },
-    );
-
-  $: hiddenDripListsAndVotingRounds = showHidden
-    ? dripLists.filter((dl) => !dl.isVisible).map((dl) => ({ ...dl, type: 'drip-list' as const }))
-    : [];
+  $: hiddenDripLists = showHidden ? dripLists.filter((dl) => !dl.isVisible) : [];
 
   $: isOwner = $walletStore.connected && checkIsUser(dripLists[0]?.owner?.accountId);
 </script>
@@ -78,7 +65,7 @@
   }}
   skeleton={{
     loaded: error || dripLists !== undefined,
-    empty: showVisibilityToggle ? items.length === 0 : visibleDripListsAndVotingRounds.length === 0,
+    empty: showVisibilityToggle ? dripLists.length === 0 : visibleDripLists.length === 0,
     error,
     emptyStateEmoji: '🫗',
     emptyStateHeadline: 'No Drip Lists',
@@ -92,28 +79,14 @@
     disconnectedStateText: 'Your Drip Lists will show up here when your wallet is connected.',
   }}
 >
-  {#if visibleDripListsAndVotingRounds}
+  {#if visibleDripLists}
     <div
-      class="grid gap-6 grid-cols-1 padding pt-px {visibleDripListsAndVotingRounds.length > 0
+      class="grid gap-6 grid-cols-1 padding pt-px {visibleDripLists.length > 0
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each visibleDripListsAndVotingRounds as list, index (index)}
-        {@const matchingVotingRound =
-          list.type === 'drip-list'
-            ? votingRounds.find((vr) => vr.dripListId === list.account.accountId)
-            : undefined}
-        {#if list.type === 'drip-list' && matchingVotingRound}
-          <DripListCard
-            isHidden={!list.isVisible}
-            variant="partial"
-            data={{ dripList: list, votingRound: matchingVotingRound }}
-          />
-        {:else if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
-        {:else if list.type === 'voting-round' && !dripLists.find((dl) => dl.account.accountId === list.dripListId)}
-          <DripListCard variant="partial" data={{ votingRound: list }} />
-        {/if}
+      {#each visibleDripLists as list, index (index)}
+        <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
       {/each}
       {#if showCreateNewListCard && !network.readOnlyMode}
         <div
@@ -139,14 +112,12 @@
     </div>
 
     <div
-      class="grid gap-6 grid-cols-1 padding pt-px {hiddenDripListsAndVotingRounds.length > 0
+      class="grid gap-6 grid-cols-1 padding pt-px {hiddenDripLists.length > 0
         ? 'lg:grid-cols-2'
         : ''}"
     >
-      {#each hiddenDripListsAndVotingRounds as list, index (index)}
-        {#if list.type === 'drip-list'}
-          <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
-        {/if}
+      {#each hiddenDripLists as list, index (index)}
+        <DripListCard isHidden={!list.isVisible} variant="partial" data={{ dripList: list }} />
       {/each}
     </div>
   {/if}

@@ -95,13 +95,11 @@ export default class DripListService {
           tokenAddress: string;
           donationAmount: bigint;
         };
-    latestVotingRoundId?: string;
     isVisible: boolean;
   }) {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
-    const { listTitle, listDescription, weights, items, support, latestVotingRoundId, isVisible } =
-      config;
+    const { listTitle, listDescription, weights, items, support, isVisible } = config;
 
     const { recipientsMetadata, receivers } = await this.getProjectsSplitMetadataAndReceivers(
       weights,
@@ -123,7 +121,6 @@ export default class DripListService {
       isVisible,
       listTitle,
       listDescription,
-      latestVotingRoundId,
     );
 
     const createDripListTx = await this._buildCreateDripListTx(salt, ipfsHash);
@@ -333,7 +330,6 @@ export default class DripListService {
     isVisible: boolean,
     name?: string,
     description?: string,
-    latestVotingRoundId?: string,
   ): Promise<IpfsHash> {
     assert(this._ownerAddress, `This function requires an active wallet connection.`);
 
@@ -342,7 +338,6 @@ export default class DripListService {
       recipients,
       name,
       description,
-      latestVotingRoundId,
       isVisible,
     });
 
