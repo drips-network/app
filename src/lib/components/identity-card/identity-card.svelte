@@ -27,15 +27,6 @@
       }
     }
   `;
-  export const IDENTITY_CARD_ECOSYSTEM_FRAGMENT = gql`
-    fragment IdentityCardEcosystem on EcosystemMainAccount {
-      account {
-        accountId
-      }
-      name
-    }
-  `;
-
   export const IDENTITY_CARD_ORCID_FRAGMENT = gql`
     fragment IdentityCardOrcid on OrcidLinkedIdentity {
       account {
@@ -55,7 +46,6 @@
   import type {
     IdentityCardDripListFragment,
     IdentityCardProjectFragment,
-    IdentityCardEcosystemFragment,
     IdentityCardOrcidFragment,
   } from './__generated__/gql.generated';
   import ProjectAvatar, {
@@ -65,15 +55,13 @@
   import Github from '$lib/components/icons/Github.svelte';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
   import WarningIcon from '$lib/components/icons/ExclamationCircle.svelte';
-  import EcosystemIcon from '$lib/components/icons/Ecosystem.svelte';
   import buildOrcidUrl from '$lib/utils/orcids/build-orcid-url';
   import OrcidIcon from '$lib/components/icons/Orcid.svelte';
 
-  // Either pass address, dripList, ecosystem, or project. Otherwise it will say "TBD" as a placeholder.
+  // Either pass address, dripList, project, or orcid. Otherwise it will say "TBD" as a placeholder.
   export let address: string | undefined = undefined;
   export let dripList: IdentityCardDripListFragment | undefined = undefined;
   export let project: IdentityCardProjectFragment | undefined = undefined;
-  export let ecosystem: IdentityCardEcosystemFragment | undefined = undefined;
   export let orcid: IdentityCardOrcidFragment | undefined = undefined;
   export let loading = false;
   export let title: string | undefined = undefined;
@@ -92,9 +80,6 @@
         break;
       case !!dripList:
         link = `/app/drip-lists/${dripList.account.accountId}`;
-        break;
-      case !!ecosystem:
-        link = `/app/ecosystems/${ecosystem.account.accountId}`;
         break;
       case !!orcid:
         link = buildOrcidUrl(orcid.orcid);
@@ -135,16 +120,6 @@
             style="height: 1.25rem; width: 1.25rem; fill: var(--color-caution-level-6); display: inline"
           />
         {/if}
-      </div>
-    </div>
-  {:else if ecosystem}
-    <div class="content-container" in:fade>
-      <div class="icon">
-        <EcosystemIcon style="fill: var(--color-primary); height: 3rem; width: 3rem;" />
-      </div>
-
-      <div>
-        <span class="typo-header-3 ellipsis">{ecosystem.name}</span>
       </div>
     </div>
   {:else if project}

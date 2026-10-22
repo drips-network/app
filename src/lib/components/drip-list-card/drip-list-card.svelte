@@ -6,9 +6,6 @@
     ${SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT}
-    ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
-    ${SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT}
-    ${SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT}
     ${SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT}
     ${PROJECT_AVATAR_FRAGMENT}
     ${SUPPORTER_PILE_FRAGMENT}
@@ -34,12 +31,6 @@
         }
         ... on DripListReceiver {
           ...SplitsComponentDripListReceiver
-        }
-        ... on EcosystemMainAccountReceiver {
-          ...SplitsComponentEcosystemReceiver
-        }
-        ... on SubListReceiver {
-          ...SplitsComponentSubListReceiver
         }
         ... on LinkedIdentityReceiver {
           ...SplitsComponentOrcidReceiver
@@ -103,9 +94,8 @@
     SPLITS_COMPONENT_ADDRESS_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_PROJECT_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_DRIP_LIST_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_ECOSYSTEM_RECEIVER_FRAGMENT,
-    SPLITS_COMPONENT_SUB_LIST_RECEIVER_FRAGMENT,
     SPLITS_COMPONENT_ORCID_RECEIVER_FRAGMENT,
+    isSupportedSplitsReceiver,
   } from '../splits/types';
   import type { SupportedChain } from '$lib/graphql/__generated__/base-types';
   import { NETWORK_CONFIG } from '$lib/stores/wallet/network';
@@ -290,7 +280,7 @@
                 maxRows={maxSplitRows ??
                   (isPartial ? (dripList.description && !hideDescription ? 3 : 4) : undefined)}
                 groupsExpandable={!isPartial}
-                list={dripList.splits}
+                list={dripList.splits.filter(isSupportedSplitsReceiver)}
                 {chainOverride}
               />
             </div>

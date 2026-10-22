@@ -1,7 +1,6 @@
 <script lang="ts" module>
   import {
     DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT,
-    DRIP_VISUAL_ECOSYSTEM_FRAGMENT,
     DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT,
     DRIP_VISUAL_PROJECT_FRAGMENT,
     DRIP_VISUAL_ORCID_FRAGMENT,
@@ -27,16 +26,6 @@
     ${DRIP_VISUAL_PROJECT_FRAGMENT}
     fragment CreateDonationDetailsStepProject on Project {
       ...DripVisualProject
-      account {
-        accountId
-      }
-    }
-  `;
-
-  export const CREATE_DONATION_DETAILS_STEP_ECOSYSTEM_FRAGMENT = gql`
-    ${DRIP_VISUAL_ECOSYSTEM_FRAGMENT}
-    fragment CreateDonationDetailsStepEcosystem on EcosystemMainAccount {
-      ...DripVisualEcosystem
       account {
         accountId
       }
@@ -83,7 +72,6 @@
     CreateDonationDetailsStepAddressDriverAccountFragment,
     CreateDonationDetailsStepNftDriverAccountFragment,
     CreateDonationDetailsStepProjectFragment,
-    CreateDonationDetailsStepEcosystemFragment,
     CreateDonationDetailsStepOrcidFragment,
   } from './__generated__/gql.generated';
   import OneTimeDonationEditor from '$lib/components/one-time-donation-editor/one-time-donation-editor.svelte';
@@ -108,7 +96,6 @@
       | CreateDonationDetailsStepAddressDriverAccountFragment
       | CreateDonationDetailsStepNftDriverAccountFragment
       | CreateDonationDetailsStepProjectFragment
-      | CreateDonationDetailsStepEcosystemFragment
       | CreateDonationDetailsStepOrcidFragment;
   }
 
@@ -131,9 +118,6 @@
       case 'Project':
         receiverTypeLabel = 'Drips project';
         break;
-      case 'EcosystemMainAccount':
-        receiverTypeLabel = 'Ecosystem';
-        break;
       case 'OrcidLinkedIdentity':
         receiverTypeLabel = 'ORCID';
         break;
@@ -151,7 +135,6 @@
         recipientAccountId = receiver.accountId;
         break;
       case 'Project':
-      case 'EcosystemMainAccount':
       case 'OrcidLinkedIdentity':
         recipientAccountId = receiver.account.accountId;
         break;

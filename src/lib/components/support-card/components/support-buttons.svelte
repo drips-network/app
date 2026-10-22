@@ -9,7 +9,7 @@
   import { fade } from 'svelte/transition';
 
   interface Props {
-    type: 'dripList' | 'project' | 'ecosystem' | 'orcid' | 'user';
+    type: 'dripList' | 'project' | 'orcid' | 'user';
     transitions?: boolean;
     onClickConnectWallet?: (() => void) | undefined;
     onClickNewStream?: (() => void) | undefined;
@@ -51,16 +51,13 @@
     in:fade={transitions ? { duration: 300, delay: 300 } : { duration: 0 }}
     class="button-container"
   >
-    {#if type === 'dripList' || type === 'ecosystem'}
+    {#if type === 'dripList'}
       <Button onclick={onClickNewStream} size="large" icon={TokenStreams}
         >Continuous donation</Button
       >
     {/if}
     <Button size="large" icon={Droplet} onclick={onClickNewDonation}>One-time donation</Button>
-    {#if type !== 'ecosystem'}
-      <Button onclick={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button
-      >
-    {/if}
+    <Button onclick={onClickAddToDripList} size="large" icon={DripList}>Add to a Drip List</Button>
   </div>
 {/if}
 

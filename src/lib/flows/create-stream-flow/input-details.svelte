@@ -7,17 +7,6 @@
     }
   `;
 
-  export const CREATE_STREAM_FLOW_ECOSYSTEM_ACCOUNT_FRAGMENT = gql`
-    ${DRIP_VISUAL_NFT_DRIVER_ACCOUNT_FRAGMENT}
-    fragment CreateStreamFlowEcosystemAccount on EcosystemMainAccount {
-      name
-      account {
-        ...DripVisualNftDriverAccount
-        accountId
-      }
-    }
-  `;
-
   export const CREATE_STREAM_FLOW_ADDRESS_DRIVER_ACCOUNT_FRAGMENT = gql`
     ${DRIP_VISUAL_ADDRESS_DRIVER_ACCOUNT_FRAGMENT}
     fragment CreateStreamFlowAddressDriverAccount on AddressDriverAccount {
@@ -99,10 +88,7 @@
 
   let { context }: Props = $props();
 
-  let nameInputHidden = $derived(
-    $context.receiver?.__typename === 'NftDriverAccount' ||
-      $context.receiver?.__typename === 'EcosystemMainAccount',
-  );
+  let nameInputHidden = $derived($context.receiver?.__typename === 'NftDriverAccount');
 
   // Recipient Address
 
@@ -461,7 +447,7 @@
   </Toggleable>
   <SafeAppDisclaimer disclaimerType="drips" />
 
-  {#if $context.receiver?.__typename === 'NftDriverAccount' || $context.receiver?.__typename === 'EcosystemMainAccount'}
+  {#if $context.receiver?.__typename === 'NftDriverAccount'}
     <WhatsNextSection>
       {@const nextSettlementDate = network.settlement.nextSettlementDate}
       <WhatsNextCard>
@@ -470,9 +456,7 @@
         {/snippet}
         {#snippet items()}
           <WhatsNextItem icon={TransactionsIcon}>
-            Funds sent to {$context.receiver?.__typename === 'EcosystemMainAccount'
-              ? 'Ecosystems'
-              : 'Drip Lists'} on {network.label} are distributed among its recipients
+            Funds sent to Drip Lists on {network.label} are distributed among its recipients
             <span class="typo-text-bold">{network.settlement.frequencyLabel}</span>.
           </WhatsNextItem>
           <WhatsNextItem icon={CalendarIcon}>

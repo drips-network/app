@@ -21,7 +21,10 @@
 
 <script lang="ts">
   import Splits from '../splits/splits.svelte';
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '../splits/types';
+  import {
+    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
+    isSupportedSplitsReceiver,
+  } from '../splits/types';
   import type { RpgfApplicationSplitsCardProjectFragment } from './__generated__/gql.generated';
   import isClaimed from '$lib/utils/project/is-claimed';
   import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
@@ -56,7 +59,7 @@
               {
                 __typename: 'SplitGroup',
                 name: 'Dependencies',
-                list: currentChainData.splits.dependencies,
+                list: currentChainData.splits.dependencies.filter(isSupportedSplitsReceiver),
               },
             ]}
           />

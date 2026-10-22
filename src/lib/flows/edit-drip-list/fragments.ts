@@ -58,16 +58,6 @@ export const SELECT_DRIP_LIST_STEP_LISTS_FRAGMENT = gql`
           accountId
         }
       }
-      ... on EcosystemMainAccountReceiver {
-        account {
-          accountId
-        }
-      }
-      ... on SubListReceiver {
-        account {
-          accountId
-        }
-      }
       ... on LinkedIdentityReceiver {
         account {
           accountId

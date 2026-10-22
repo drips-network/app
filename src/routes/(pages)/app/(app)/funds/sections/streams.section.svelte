@@ -6,7 +6,6 @@
     ${NAME_AND_BADGE_CELL_STREAM_FRAGMENT}
     ${USER_BADGE_CELL_USER_FRAGMENT}
     ${USER_BADGE_CELL_DRIP_LIST_FRAGMENT}
-    ${USER_BADGE_CELL_ECOSYSTEM_FRAGMENT}
     ${CURRENT_AMOUNTS_TIMELINE_ITEM_FRAGMENT}
     fragment StreamsSectionStream on Stream {
       ...NameAndBadgeCellStream
@@ -16,9 +15,6 @@
         }
         ... on DripList {
           ...UserBadgeCellDripList
-        }
-        ... on EcosystemMainAccount {
-          ...UserBadgeCellEcosystem
         }
       }
       sender {
@@ -55,7 +51,6 @@
   import UserBadgeCell, {
     USER_BADGE_CELL_DRIP_LIST_FRAGMENT,
     USER_BADGE_CELL_USER_FRAGMENT,
-    USER_BADGE_CELL_ECOSYSTEM_FRAGMENT,
   } from '$lib/components/table/cells/user-badge.cell.svelte';
   import type { ComponentProps } from 'svelte';
   import NameAndBadgeCell from '$lib/components/table/cells/name-and-badge-cell.svelte';
@@ -74,6 +69,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import { decodeStreamId } from '$lib/utils/streams/make-stream-id';
   import network from '$lib/stores/wallet/network';
+  import mapFilterUndefined from '$lib/utils/map-filter-undefined';
 
   interface Props {
     accountId: string | undefined;
@@ -142,12 +138,16 @@
   }
 
   let outgoingTableData: OutgoingStreamTableRow[] = $derived(
-    outgoing.map((s) => ({
+    mapFilterUndefined(outgoing, (s) => {
+      // The API may return receiver types the app no longer supports.
+      if (!('account' in s.receiver)) return undefined;
+      return { s, receiver: s.receiver };
+    }).map(({ s, receiver }) => ({
       name: {
         stream: s,
       },
       to: {
-        userOrDripListOrEcosystem: s.receiver,
+        userOrDripList: receiver,
       },
       token: {
         address: s.config.amountPerSecond.tokenAddress,
@@ -168,7 +168,7 @@
         stream: s,
       },
       from: {
-        userOrDripListOrEcosystem: s.sender,
+        userOrDripList: s.sender,
       },
       token: {
         address: s.config.amountPerSecond.tokenAddress,

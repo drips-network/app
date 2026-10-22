@@ -15,9 +15,6 @@
         ... on DripList {
           __typename
         }
-        ... on EcosystemMainAccount {
-          __typename
-        }
       }
     }
   `;

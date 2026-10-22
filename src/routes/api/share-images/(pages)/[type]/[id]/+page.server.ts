@@ -13,7 +13,6 @@ import type {
   OrcidQueryVariables,
 } from './__generated__/gql.generated.js';
 import filterCurrentChainData from '$lib/utils/filter-current-chain-data.js';
-import { fetchEcosystem } from '../../../../../(pages)/app/(app)/ecosystems/[ecosystemId]/fetch-ecosystem.js';
 import getOrcidDisplayName from '$lib/utils/orcids/display-name.js';
 import { getRound } from '$lib/utils/rpgf/rpgf.js';
 import { getWaveProgram } from '$lib/utils/wave/wavePrograms.js';
@@ -147,27 +146,6 @@ async function loadDripListData(f: typeof fetch, id: string) {
   };
 }
 
-async function loadEcosystemData(f: typeof fetch, id: string) {
-  const ecosystem = await fetchEcosystem(id, f);
-
-  if (!ecosystem) {
-    return null;
-  }
-
-  return {
-    bgColor: ecosystem.color,
-    type: 'Ecosystem',
-    headline: ecosystem.name,
-    avatarSrc: null,
-    stats: [
-      {
-        icon: 'DripList',
-        label: `${ecosystem.graph.nodes.length - 1} recipient${ecosystem.graph.nodes.length - 2 === 1 ? '' : 's'}`,
-      },
-    ],
-  };
-}
-
 async function loadOrcidData(f: typeof fetch, id: string) {
   const orcidQuery = gql`
     query Orcid($orcid: String!, $chain: SupportedChain!) {
@@ -234,7 +212,6 @@ const LOAD_FNS = {
   [ShareImageType.WAVE_PROGRAM]: loadWaveProgramData,
   [ShareImageType.PROJECT]: loadProjectData,
   [ShareImageType.DRIP_LIST]: loadDripListData,
-  [ShareImageType.ECOSYSTEM]: loadEcosystemData,
   [ShareImageType.ORCID]: loadOrcidData,
   [ShareImageType.RPGF_ROUND]: loadRpgfRoundData,
 } as const;

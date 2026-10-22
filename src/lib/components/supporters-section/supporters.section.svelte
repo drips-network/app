@@ -45,23 +45,6 @@
           amount
         }
       }
-      ... on EcosystemSupport {
-        date
-        weight
-        totalSplit {
-          tokenAddress
-          amount
-        }
-        ecosystemMainAccount {
-          name
-          owner {
-            address
-          }
-          account {
-            accountId
-          }
-        }
-      }
       ... on StreamSupport {
         stream {
           ...StreamStateStream
@@ -120,7 +103,6 @@
   import { fade } from 'svelte/transition';
   import AddUnknownTokenButton from './components/add-unknown-token-button.svelte';
   import Section from '../section/section.svelte';
-  import EcosystemBadge from '../ecosystem-badge/ecosystem-badge.svelte';
   import unreachable from '$lib/utils/unreachable';
 
   let emptyStateText: string | undefined = $state();
@@ -128,7 +110,7 @@
   interface Props {
     supportItems: SupportersSectionSupportItemFragment[];
     ownerAccountId?: string | undefined;
-    type: 'project' | 'dripList' | 'address' | 'ecosystem';
+    type: 'project' | 'dripList' | 'address' | 'orcid';
     headline?: string;
     emptyStateHeadline?: string;
     collapsed?: boolean;
@@ -160,8 +142,8 @@
       case 'address':
         emptyStateText = `This user doesnʼt have any supporters yet.`;
         break;
-      case 'ecosystem':
-        emptyStateText = `This ecosystem doesnʼt have any supporters yet.`;
+      case 'orcid':
+        emptyStateText = `This ORCID iD doesnʼt have any supporters yet.`;
         break;
     }
   });
@@ -186,7 +168,7 @@
     bind:skeletonInstance={sectionSkeleton}
   >
     <div class="items">
-      {#each supportItems as item}
+      {#each supportItems as item, index (index)}
         {#if item.__typename === 'OneTimeDonationSupport'}
           <SupportItem
             title={{
@@ -317,27 +299,6 @@
                 size: 'small',
                 project: item.project,
                 maxWidth: false,
-              },
-            }}
-            subtitle={formatDate(item.date)}
-          >
-            {#snippet amount_value()}
-              <AggregateFiatEstimate amounts={item.totalSplit} />
-            {/snippet}
-            {#snippet amount_sub()}
-              Splits {getSplitPercent(item.weight, 'pretty')} of funds
-            {/snippet}
-          </SupportItem>
-        {/if}
-        {#if item.__typename === 'EcosystemSupport'}
-          <SupportItem
-            href="/app/ecosystems/{item.ecosystemMainAccount.account.accountId}"
-            title={{
-              component: EcosystemBadge,
-              props: {
-                isLinked: false,
-                avatarSize: 'tiny',
-                ecosystem: item.ecosystemMainAccount,
               },
             }}
             subtitle={formatDate(item.date)}

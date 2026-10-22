@@ -9,9 +9,7 @@
     type UsecaseIllustrationConfig,
   } from './usecase-illustrations/usecase-illustration.svelte';
   import StreamUsecase from './usecase-illustrations/stream-usecase.svelte';
-  import EcosystemUsecase from './usecase-illustrations/ecosystem-usecase.svelte';
   import HackathonUsecase from './usecase-illustrations/hackathon-usecase.svelte';
-  import Ecosystem from '$lib/components/icons/Ecosystem.svelte';
   import Box from '$lib/components/icons/Box.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
 
@@ -68,18 +66,6 @@
       illustration: StreamUsecase,
     },
     {
-      headline: 'Fund entire ecosystems',
-      href: '/solutions/ecosystem-funding',
-      description: 'Support thousands of projects and people with a single stream or donation',
-      icon: Ecosystem,
-      sparkles: [],
-      illustration: EcosystemUsecase,
-      illustrationOffset: {
-        x: '-25px',
-        y: '-10px',
-      },
-    },
-    {
       headline: 'Launch Wave programs',
       href: '/solutions/wave',
       description: 'Run recurring Waves that convert merged pull requests into on-chain rewards.',
@@ -116,7 +102,7 @@
 </script>
 
 <div class="usecases">
-  {#each usecaseCards.reverse() as config, index}
+  {#each usecaseCards.reverse() as config, index (config.href)}
     <div class="card">
       <UsecaseCard
         href={config.href}

@@ -12,17 +12,13 @@ import type {
   EditProjectSplitsFlowAddressReceiverFragment,
   EditProjectSplitsFlowDripListReceiverFragment,
   EditProjectSplitsFlowProjectReceiverFragment,
-  EditProjectSplitsFlowEcosystemReceiverFragment,
-  EditProjectSplitsFlowSubListReceiverFragment,
   EditProjectSplitsFlowOrcidReceiverFragment,
 } from './__generated__/gql.generated';
 import {
   mapSplitReceiversToEditorConfig,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ADDRESS_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_DRIP_LIST_RECEIVER_FRAGMENT,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ECOSYSTEM_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_PROJECT_RECEIVER_FRAGMENT,
-  SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT,
   SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT,
 } from '$lib/components/list-editor/utils/split-receivers-to-list-editor-config';
 import type { AddItemError } from '$lib/components/list-editor/errors';
@@ -55,20 +51,6 @@ export const EDIT_PROJECT_SPLITS_FLOW_DRIP_LIST_RECEIVER_FRAGMENT = gql`
   }
 `;
 
-export const EDIT_PROJECT_SPLITS_FLOW_ECOSYSTEM_RECEIVER_FRAGMENT = gql`
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ECOSYSTEM_RECEIVER_FRAGMENT}
-  fragment EditProjectSplitsFlowEcosystemReceiver on EcosystemMainAccountReceiver {
-    ...SplitReceiversToListEditorConfigEcosystemReceiver
-  }
-`;
-
-export const EDIT_PROJECT_SPLITS_FLOW_SUB_LIST_RECEIVER_FRAGMENT = gql`
-  ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_SUB_LIST_RECEIVER_FRAGMENT}
-  fragment EditProjectSplitsFlowSubListReceiver on SubListReceiver {
-    ...SplitReceiversToListEditorConfigSubListReceiver
-  }
-`;
-
 export const EDIT_PROJECT_SPLITS_FLOW_ORCID_RECEIVER_FRAGMENT = gql`
   ${SPLIT_RECEIVERS_TO_LIST_EDITOR_CONFIG_ORCID_RECEIVER_FRAGMENT}
   fragment EditProjectSplitsFlowOrcidReceiver on LinkedIdentityReceiver {
@@ -80,8 +62,6 @@ type SplitReceiver =
   | EditProjectSplitsFlowAddressReceiverFragment
   | EditProjectSplitsFlowDripListReceiverFragment
   | EditProjectSplitsFlowProjectReceiverFragment
-  | EditProjectSplitsFlowEcosystemReceiverFragment
-  | EditProjectSplitsFlowSubListReceiverFragment
   | EditProjectSplitsFlowOrcidReceiverFragment;
 
 type Splits = {

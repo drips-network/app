@@ -146,7 +146,7 @@
       <section id="support">
         <SupportersSection
           bind:sectionSkeleton={supportersSectionSkeleton}
-          type="ecosystem"
+          type="orcid"
           supportItems={support}
         />
       </section>

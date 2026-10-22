@@ -7,7 +7,10 @@
   import Spinner from '$lib/components/spinner/spinner.svelte';
   import { fade } from 'svelte/transition';
   import network from '$lib/stores/wallet/network';
-  import { SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT } from '$lib/components/splits/types';
+  import {
+    SPLITS_COMPONENT_PROJECT_SPLITS_FRAGMENT,
+    isSupportedSplitsReceiver,
+  } from '$lib/components/splits/types';
   import ProjectBadge, {
     PROJECT_BADGE_FRAGMENT,
   } from '$lib/components/project-badge/project-badge.svelte';
@@ -83,7 +86,7 @@
                 {
                   __typename: 'SplitGroup',
                   name: 'Dependencies',
-                  list: projectChainData.splits.dependencies,
+                  list: projectChainData.splits.dependencies.filter(isSupportedSplitsReceiver),
                 },
               ]}
             />

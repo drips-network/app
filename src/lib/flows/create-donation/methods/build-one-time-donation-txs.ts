@@ -6,7 +6,6 @@ import type { OxString } from '$lib/utils/sdk/sdk-types';
 import type { TransactionWrapper } from '$lib/components/stepper/types';
 import { sdkManager } from '$lib/utils/sdk/sdk-manager';
 import type {
-  SdkEcosystemMainAccountReceiver,
   SdkReceiver,
   SdkProjectReceiver,
   SdkAddressReceiver,
@@ -17,7 +16,6 @@ import type {
   CreateDonationDetailsStepAddressDriverAccountFragment,
   CreateDonationDetailsStepNftDriverAccountFragment,
   CreateDonationDetailsStepProjectFragment,
-  CreateDonationDetailsStepEcosystemFragment,
   CreateDonationDetailsStepOrcidFragment,
 } from '../__generated__/gql.generated';
 
@@ -46,7 +44,6 @@ function transformReceiverToSdkReceiver(
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment
     | CreateDonationDetailsStepOrcidFragment,
 ): SdkReceiver {
   switch (receiver.__typename) {
@@ -68,12 +65,6 @@ function transformReceiverToSdkReceiver(
         url: receiver.source.url,
       } as SdkProjectReceiver;
 
-    case 'EcosystemMainAccount':
-      return {
-        type: 'ecosystem-main-account',
-        accountId: BigInt(receiver.account.accountId),
-      } as SdkEcosystemMainAccountReceiver;
-
     case 'OrcidLinkedIdentity':
       return {
         type: 'orcid',
@@ -94,7 +85,6 @@ export interface OneTimeDonationContext {
     | CreateDonationDetailsStepAddressDriverAccountFragment
     | CreateDonationDetailsStepNftDriverAccountFragment
     | CreateDonationDetailsStepProjectFragment
-    | CreateDonationDetailsStepEcosystemFragment
     | CreateDonationDetailsStepOrcidFragment;
 }
 

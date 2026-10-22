@@ -3,7 +3,6 @@ import query from '$lib/graphql/dripsQL';
 import isClaimed from '$lib/utils/project/is-claimed';
 import {
   dripListAssociatedAccountIdsQuery,
-  ecosystemAssociatedAccountIdsQuery,
   projectAssociatedAccountIdsQuery,
 } from './queries/associated-account-ids-queries';
 import { error } from '@sveltejs/kit';
@@ -11,8 +10,6 @@ import filterCurrentChainData from '$lib/utils/filter-current-chain-data';
 import type {
   DripListAssociatedAccountIdsQuery,
   DripListAssociatedAccountIdsQueryVariables,
-  EcosystemAssociatedAccountIdsQuery,
-  EcosystemAssociatedAccountIdsQueryVariables,
   ProjectAssociatedAccountIdsQuery,
   ProjectAssociatedAccountIdsQueryVariables,
 } from './queries/__generated__/gql.generated';
@@ -67,7 +64,9 @@ async function invalidateProjectCache(projectAccountId: string, client: RedisCli
 
     const accountIdsToClear = [
       projectAccountId,
-      ...chainData.support.map((support) => support.account.accountId),
+      ...chainData.support
+        .filter((support) => 'account' in support)
+        .map((support) => support.account.accountId),
       ...(isClaimed(chainData)
         ? chainData.splits.dependencies
             .filter((dependency) => 'account' in dependency)
@@ -104,7 +103,9 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
     const accountIdsToClear = [
       nftDriverAccountId,
       dripList.owner.accountId,
-      ...dripList.support.map((support) => support.account.accountId),
+      ...dripList.support
+        .filter((support) => 'account' in support)
+        .map((support) => support.account.accountId),
       ...dripList.splits
         .filter((split) => 'account' in split)
         .map((split) => split.account.accountId),
@@ -113,52 +114,6 @@ async function invalidateNftDriverCache(nftDriverAccountId: string, client: Redi
     return Promise.all(
       accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
     );
-  }
-
-  const associatedEcosystemAccountIds = await query<
-    EcosystemAssociatedAccountIdsQuery,
-    EcosystemAssociatedAccountIdsQueryVariables
-  >(
-    ecosystemAssociatedAccountIdsQuery,
-    { ecosystemAccountId: nftDriverAccountId, chain: network.gqlName },
-    fetch,
-  );
-  const { ecosystemMainAccount } = associatedEcosystemAccountIds;
-  if (ecosystemMainAccount) {
-    // Separate ProjectReceiver splits from other splits
-    const projectSplits = ecosystemMainAccount.splits.filter(
-      (split) => split.__typename === 'ProjectReceiver',
-    );
-    const nonProjectSplits = ecosystemMainAccount.splits.filter(
-      (split) => split.__typename !== 'ProjectReceiver',
-    );
-
-    // Invalidate the standard accounts (excluding ProjectReceiver splits)
-    const accountIdsToClear = [
-      nftDriverAccountId,
-      ecosystemMainAccount.owner.accountId,
-      ...ecosystemMainAccount.support.map((support) => support.account.accountId),
-      ...nonProjectSplits.map((split) => split.account.accountId),
-    ];
-
-    log('ECOSYSTEM cache invalidation', {
-      ecosystem: nftDriverAccountId,
-      nonProjectSplitAccountIds: nonProjectSplits.map((s) => s.account.accountId),
-      projectSplitAccountIds: projectSplits.map((s) => s.account.accountId),
-    });
-
-    await Promise.all(
-      accountIdsToClear.map((accountId) => invalidateAccountCache(accountId, client)),
-    );
-
-    // For ProjectReceiver splits, invalidate using invalidateProjectCache
-    if (projectSplits.length > 0) {
-      await Promise.all(
-        projectSplits.map((split) => invalidateProjectCache(split.account.accountId, client)),
-      );
-    }
-
-    return;
   }
 
   return invalidateAccountCache(nftDriverAccountId, client);
