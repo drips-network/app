@@ -45,6 +45,12 @@ declare namespace App {
   interface Locals {
     waveAccessToken?: string;
     waveRefreshToken?: string;
+    /**
+     * The Wave session refresh for this request, if one was attempted.
+     * Resolves to whether it succeeded. Shared so parallel loads refresh at
+     * most once, as the backend rotates refresh tokens.
+     */
+    waveSessionRefresh?: Promise<boolean>;
   }
 
   // interface PageError {}
