@@ -102,7 +102,7 @@ const updateCachedImageBuffer = async (
   }
 
   const imageBuffer = await captureScreenshot(imageUrl);
-  cacheImageBuffer(cacheKey, imageBuffer);
+  await cacheImageBuffer(cacheKey, imageBuffer);
 };
 
 export const GET: RequestHandler = async ({ url, params }) => {
@@ -119,7 +119,11 @@ export const GET: RequestHandler = async ({ url, params }) => {
   const cacheKey = getCacheKey(buttonOptions, params);
   const cachedImageBase64 = redis && (await redis.get(cacheKey));
   if (cachedImageBase64) {
-    updateCachedImageBuffer(cacheKey, buttonOptions, imageUrl);
+    // not awaited, so it must never reject, or the unhandled rejection kills the process
+    updateCachedImageBuffer(cacheKey, buttonOptions, imageUrl).catch((e) => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to refresh cached support button image:', e);
+    });
     const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
     return new Response(cachedImageBuffer, {
       status: 200,
@@ -130,7 +134,10 @@ export const GET: RequestHandler = async ({ url, params }) => {
   // Take a screenshot of the button
   const imageBuffer = await captureScreenshot(imageUrl);
   // Cache the result
-  cacheImageBuffer(cacheKey, imageBuffer);
+  cacheImageBuffer(cacheKey, imageBuffer).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed to cache support button image:', e);
+  });
 
   return new Response(imageBuffer as BodyInit, {
     status: 200,
