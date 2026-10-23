@@ -8,11 +8,7 @@ import {
   type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
 import network from '$lib/stores/wallet/network';
-import {
-  PuppeteerBusyError,
-  PuppeteerManager,
-  PuppeteerTimeoutError,
-} from '$lib/utils/puppeteer';
+import { PuppeteerBusyError, PuppeteerManager, PuppeteerTimeoutError } from '$lib/utils/puppeteer';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
 const CACHE_KEY_PREFIX = 'support-button-v3';

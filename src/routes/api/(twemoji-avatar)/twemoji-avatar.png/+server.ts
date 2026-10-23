@@ -5,7 +5,8 @@ export const GET = async ({ url }) => {
   const bgColor = decodeURIComponent(url.searchParams.get('bgColor') ?? '');
   const imageUrl = `${url.origin}/api/twemoji-avatar?emoji=${emoji}&bgColor=${bgColor}`;
 
-  const imageBuffer = await renderScreenshot(imageUrl);
+  // Leaf lane: share-image renders embed this avatar, so it must not queue behind them.
+  const imageBuffer = await renderScreenshot(imageUrl, 1, 'leaf');
 
   return new Response(imageBuffer as BodyInit, {
     headers: {
