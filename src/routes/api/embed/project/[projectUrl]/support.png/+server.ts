@@ -8,7 +8,11 @@ import {
   type SupportButtonOptions,
 } from '$lib/components/project-support-button/project-support-button';
 import network from '$lib/stores/wallet/network';
-import { PuppeteerManager } from '$lib/utils/puppeteer';
+import {
+  PuppeteerBusyError,
+  PuppeteerManager,
+  PuppeteerTimeoutError,
+} from '$lib/utils/puppeteer';
 
 const REPLACE_PNG_REGEX = /(\.png\/?)(\?.*|$)/;
 const CACHE_KEY_PREFIX = 'support-button-v3';
@@ -50,14 +54,9 @@ const cacheImageBuffer = (cacheKey: string, imageBuffer: Uint8Array) => {
   ]);
 };
 
-const captureScreenshot = async (imageUrl: string) => {
-  let page;
-  try {
-    // see hooks.server.ts for configuration details
-    const browser = await PuppeteerManager.launch();
-
-    // Set up the page
-    page = await browser.newPage();
+const captureScreenshot = (imageUrl: string) =>
+  // Runs serialized, with a hard timeout, killing Chromium if it hangs. See PuppeteerManager.
+  PuppeteerManager.withPage(async (page) => {
     await page.setViewport({
       width: 640,
       height: 480,
@@ -76,12 +75,10 @@ const captureScreenshot = async (imageUrl: string) => {
       return error(500);
     }
 
-    const imageBuffer = await element.screenshot({ omitBackground: true });
-    return imageBuffer;
-  } finally {
-    page?.close();
-  }
-};
+    return await element.screenshot({ omitBackground: true });
+  });
+
+const refreshesInFlight = new Set<string>();
 
 const updateCachedImageBuffer = async (
   cacheKey: string,
@@ -101,8 +98,18 @@ const updateCachedImageBuffer = async (
     return;
   }
 
-  const imageBuffer = await captureScreenshot(imageUrl);
-  cacheImageBuffer(cacheKey, imageBuffer);
+  // Background refreshes are best-effort: never stack them up behind other renders.
+  if (refreshesInFlight.has(cacheKey) || PuppeteerManager.pending > 0) {
+    return;
+  }
+
+  refreshesInFlight.add(cacheKey);
+  try {
+    const imageBuffer = await captureScreenshot(imageUrl);
+    await cacheImageBuffer(cacheKey, imageBuffer);
+  } finally {
+    refreshesInFlight.delete(cacheKey);
+  }
 };
 
 export const GET: RequestHandler = async ({ url, params }) => {
@@ -119,7 +126,10 @@ export const GET: RequestHandler = async ({ url, params }) => {
   const cacheKey = getCacheKey(buttonOptions, params);
   const cachedImageBase64 = redis && (await redis.get(cacheKey));
   if (cachedImageBase64) {
-    updateCachedImageBuffer(cacheKey, buttonOptions, imageUrl);
+    updateCachedImageBuffer(cacheKey, buttonOptions, imageUrl).catch((e) => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to refresh cached support button', e);
+    });
     const cachedImageBuffer = Buffer.from(cachedImageBase64, 'base64');
     return new Response(cachedImageBuffer, {
       status: 200,
@@ -128,9 +138,17 @@ export const GET: RequestHandler = async ({ url, params }) => {
   }
 
   // Take a screenshot of the button
-  const imageBuffer = await captureScreenshot(imageUrl);
+  let imageBuffer: Uint8Array;
+  try {
+    imageBuffer = await captureScreenshot(imageUrl);
+  } catch (e) {
+    if (e instanceof PuppeteerBusyError || e instanceof PuppeteerTimeoutError) {
+      return error(503);
+    }
+    throw e;
+  }
   // Cache the result
-  cacheImageBuffer(cacheKey, imageBuffer);
+  cacheImageBuffer(cacheKey, imageBuffer).catch(() => undefined);
 
   return new Response(imageBuffer as BodyInit, {
     status: 200,

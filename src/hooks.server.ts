@@ -8,8 +8,9 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { getUserData } from '$lib/utils/wave/auth';
 import network from '$lib/stores/wallet/network';
 
-PuppeteerManager.launch({
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+// Safe Chromium flags are applied by PuppeteerManager itself.
+PuppeteerManager.launch().catch((e) => {
+  console.error('Failed to launch Puppeteer browser', e);
 });
 
 const WAVE_API_URL = getOptionalEnvVar(
