@@ -7,13 +7,21 @@
   <div class="read-only-banner typo-text-small">
     <div class="content">
       <WarningIcon style="height: 1rem; width: 1rem; fill: currentColor; flex-shrink: 0;" />
-      <span>
-        The official Metis deployment of Drips is now read-only.
-        <a href="https://drips.network" target="_blank" rel="noopener noreferrer">
-          Visit drips.network
-        </a>
-        for active deployments.
-      </span>
+      {#if network.chainId === 314}
+        <span>
+          The Filecoin deployment of Drips is now read-only. Please reach out to
+          <a href="mailto:support@drips.network">support@drips.network</a>
+          if you came here to withdraw an unclaimed balance.
+        </span>
+      {:else}
+        <span>
+          The official Metis deployment of Drips is now read-only.
+          <a href="https://drips.network" target="_blank" rel="noopener noreferrer">
+            Visit drips.network
+          </a>
+          for active deployments.
+        </span>
+      {/if}
     </div>
   </div>
 {/if}

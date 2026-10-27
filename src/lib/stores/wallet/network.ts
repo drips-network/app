@@ -506,7 +506,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
       },
     },
     orcids: false,
-    readOnlyMode: false,
+    readOnlyMode: true,
     depositsDisabled: true,
   },
   [1088]: {
