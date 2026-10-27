@@ -36,6 +36,7 @@
   import Stepper from '$lib/components/stepper/stepper.svelte';
   import modal from '$lib/stores/modal';
   import wallet from '$lib/stores/wallet/wallet.store';
+  import network from '$lib/stores/wallet/network';
   import guardConnected from '$lib/utils/guard-connected';
   import checkIsUser from '$lib/utils/check-is-user';
   import decodeAccountId from '$lib/utils/decode-universal-account-id';
@@ -184,7 +185,9 @@
 
         {#snippet actions()}
           <div class="flex gap-2">
-            <Button icon={Plus} onclick={openAddFundsModal}>Add</Button>
+            {#if !network.depositsDisabled}
+              <Button icon={Plus} onclick={openAddFundsModal}>Add</Button>
+            {/if}
             <Button
               disabled={!$currentOutgoingAmountReadable.currentAmount.amount}
               icon={Minus}

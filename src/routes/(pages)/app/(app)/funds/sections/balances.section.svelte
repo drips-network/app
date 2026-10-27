@@ -145,7 +145,7 @@
       ? 'When you receive or top up tokens, they appear here. Add funds to begin streaming to Drip Lists.'
       : undefined,
     actions:
-      disableActions || !isSelf || network.readOnlyMode
+      disableActions || !isSelf || network.readOnlyMode || network.depositsDisabled
         ? []
         : [
             {

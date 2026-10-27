@@ -83,6 +83,11 @@ export type Network = {
   retroFunding: DripsRetroFundingConfig;
   orcids: boolean;
   readOnlyMode: boolean;
+  /**
+   * Hides all UI for moving funds into Drips (top-ups, streams, donations), while leaving
+   * collecting and withdrawing available.
+   */
+  depositsDisabled: boolean;
 };
 
 type DripsRetroFundingConfig =
@@ -170,6 +175,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [80002]: {
     chainId: 80002,
@@ -215,6 +221,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [11155420]: {
     chainId: 11155420,
@@ -260,6 +267,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [11155111]: {
     chainId: 11155111,
@@ -317,6 +325,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     orcids: true,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [31337]: {
     chainId: 31337,
@@ -376,6 +385,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     orcids: true,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [84532]: {
     chainId: 84532,
@@ -421,6 +431,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
   [314]: {
     chainId: 314,
@@ -496,6 +507,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: true,
   },
   [1088]: {
     chainId: 1088,
@@ -549,6 +561,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: true,
+    depositsDisabled: false,
   },
   [10]: {
     chainId: 10,
@@ -602,6 +615,7 @@ export const NETWORK_CONFIG: ValueForEachSupportedChain<Network> = {
     retroFunding: { enabled: false },
     orcids: false,
     readOnlyMode: false,
+    depositsDisabled: false,
   },
 };
 

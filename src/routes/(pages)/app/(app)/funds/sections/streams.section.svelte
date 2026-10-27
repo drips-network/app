@@ -296,7 +296,7 @@
     icon: TokenStreamIcon,
     label: onlyDripListStreams ? 'Streams to your Drip List' : 'Streams',
     actions:
-      disableActions || network.readOnlyMode
+      disableActions || network.readOnlyMode || network.depositsDisabled
         ? []
         : [
             {

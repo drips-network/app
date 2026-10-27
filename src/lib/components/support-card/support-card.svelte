@@ -111,7 +111,7 @@
   export let disabled = false;
   $: {
     if (!project && !dripList && !orcid && !user) disabled = true;
-    if (network.readOnlyMode) disabled = true;
+    if (network.readOnlyMode || network.depositsDisabled) disabled = true;
   }
 
   let type: 'dripList' | 'project' | 'orcid' | 'user' = 'dripList';
