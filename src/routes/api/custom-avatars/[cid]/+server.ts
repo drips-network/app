@@ -1,14 +1,15 @@
 import { fetchIpfs } from '$lib/utils/ipfs.js';
 import { error } from '@sveltejs/kit';
-import { Jimp, JimpMime } from 'jimp';
+import { JimpMime } from 'jimp';
+import readAvatarImage from '$lib/utils/read-avatar-image';
 
 export const GET = async ({ params, fetch, url }) => {
   const { cid } = params;
   const sizeParam = url.searchParams.get('size') || '64';
   const size = parseInt(sizeParam, 10);
 
-  if (size > 1000) {
-    throw error(400, 'Size too large');
+  if (!Number.isInteger(size) || size < 1 || size > 1000) {
+    throw error(400, 'Invalid size');
   }
 
   const file = await fetchIpfs(cid, fetch);
@@ -21,7 +22,7 @@ export const GET = async ({ params, fetch, url }) => {
   // IPFS CID with a massive image that didn't get uploaded through our endpoint could be
   // submitted. Better safe than sorry 🤷‍♂️
 
-  const image = await Jimp.read(Buffer.from(blob));
+  const image = await readAvatarImage(Buffer.from(blob));
 
   if ([JimpMime.jpeg as string, JimpMime.png as string].includes(image.mime ?? '') === false) {
     throw new Error('Invalid image format');
