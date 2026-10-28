@@ -88,6 +88,15 @@ describe('isAllowedMultiSearchBody', () => {
       expect(isAllowedMultiSearchBody(body)).toBe(false);
     }
   });
+
+  it('rejects huge query arrays without validating every element', () => {
+    // Without a length bound, zod collects an issue per invalid element, so a few MB of `{}`
+    // allocate gigabytes. With it, the array is rejected before its elements are looked at.
+    const start = Date.now();
+
+    expect(isAllowedMultiSearchBody({ queries: Array(1_000_000).fill({}) })).toBe(false);
+    expect(Date.now() - start).toBeLessThan(100);
+  });
 });
 
 describe('POST /api/search/[...path]', () => {
