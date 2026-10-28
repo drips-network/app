@@ -23,10 +23,13 @@ const multiSearchBodySchema = z.strictObject({
       z.looseObject({
         indexUid: indexUidSchema,
         // Remote federation would make Meilisearch query other instances on our behalf.
-        federationOptions: z.looseObject({ remote: z.undefined() }).optional(),
+        federationOptions: z.looseObject({ remote: z.never().optional() }).optional(),
       }),
     )
-    .min(1),
+    .min(1)
+    // The search bar sends one query per index. Bounding the length makes zod reject oversized
+    // arrays up front, instead of validating (and collecting an issue for) every element.
+    .max(10),
 });
 
 export function isAllowedPath(pathname: string): boolean {
