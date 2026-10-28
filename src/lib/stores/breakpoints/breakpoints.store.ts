@@ -27,7 +27,9 @@ interface State {
 export default (() => {
   const state = writable<State | undefined>(undefined);
 
-  let attached = false;
+  // Multiple layouts attach the store. Ref-count so that one layout's teardown
+  // during a client-side navigation doesn't detach it from the layout that's mounting.
+  let attachCount = 0;
 
   /**
    * Attach the store to the window resize event and populate state.
@@ -35,26 +37,29 @@ export default (() => {
   function attach() {
     if (!browser) return;
 
-    window.addEventListener('resize', _update);
-    attached = true;
+    attachCount++;
+    if (attachCount === 1) window.addEventListener('resize', _update);
 
     _update();
   }
 
   /**
-   * Detach the store from the window resize event and clear state.
+   * Detach the store from the window resize event and clear state once
+   * no consumers remain attached.
    */
   function detach() {
-    if (!browser) return;
+    if (!browser || attachCount === 0) return;
+
+    attachCount--;
+    if (attachCount > 0) return;
 
     window.removeEventListener('resize', _update);
-    attached = false;
 
     state.set(undefined);
   }
 
   function _update() {
-    if (!attached) return;
+    if (attachCount === 0) return;
 
     const currentWidth = window.innerWidth;
     const currentHeight = window.innerHeight;
