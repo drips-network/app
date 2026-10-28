@@ -149,7 +149,10 @@
         {/snippet}
       </Flyout>
     {:else if !page.route.id?.startsWith('/(pages)/wave/(flows)/login') && !page.route.id?.startsWith('/(pages)/wave/(flows)/withdraw/magic')}
-      <Button href="/wave/login?backTo={page.url.pathname + page.url.search}" icon={Github}>
+      <Button
+        href="/wave/login?backTo={encodeURIComponent(page.url.pathname + page.url.search)}"
+        icon={Github}
+      >
         Log in
       </Button>
     {/if}

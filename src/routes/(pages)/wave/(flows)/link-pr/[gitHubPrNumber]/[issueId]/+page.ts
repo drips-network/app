@@ -5,7 +5,10 @@ export const load = async ({ parent, fetch, params, url }) => {
   const { user } = await parent();
 
   if (!user) {
-    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}&skipWelcome=true`);
+    throw redirect(
+      302,
+      `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}&skipWelcome=true`,
+    );
   }
 
   const gitHubPrNumber = Number(params.gitHubPrNumber);

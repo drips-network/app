@@ -5,17 +5,15 @@ import { redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
 export const load = async ({ url }) => {
-  const backTo = url.searchParams.get('backTo');
+  // `searchParams.get` already decodes the value.
+  const backTo = url.searchParams.get('backTo') ?? '';
   const requireRpgfSignIn = url.searchParams.get('requireRpgfSignIn') === 'true';
-  const decoded = decodeURIComponent(backTo || '');
 
   const connectedAddress = getConnectedAddress();
 
   if (connectedAddress && (!requireRpgfSignIn || (requireRpgfSignIn && get(rpgfAccessJwtStore)))) {
     if (backTo) {
-      const isSafe = isSafePath(decoded);
-
-      if (isSafe) redirect(301, decoded);
+      if (isSafePath(backTo)) redirect(301, backTo);
     } else {
       redirect(301, '/app');
     }
@@ -23,7 +21,7 @@ export const load = async ({ url }) => {
 
   return {
     requireRpgfSignIn,
-    backTo: decoded,
+    backTo: isSafePath(backTo) ? backTo : '',
   };
 };
 

@@ -16,7 +16,10 @@ export const load = async ({ parent, fetch, params, url }) => {
   }
 
   if (!user) {
-    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}&skipWelcome=true`);
+    throw redirect(
+      302,
+      `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}&skipWelcome=true`,
+    );
   }
 
   const [issue, waveProgram, ownOrgs] = await Promise.all([

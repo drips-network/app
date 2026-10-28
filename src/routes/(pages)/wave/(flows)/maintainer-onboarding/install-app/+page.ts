@@ -11,11 +11,11 @@ export const load = async ({ parent, fetch, url }) => {
 
   const userOrgs = await getOrgs(fetch, { limit: 100 });
 
-  const onCancelGoto = url.searchParams.get('onCancelGoto');
-  const decoded = decodeURIComponent(onCancelGoto || '');
+  // `searchParams.get` already decodes the value.
+  const onCancelGoto = url.searchParams.get('onCancelGoto') ?? '';
 
   // Validate to prevent open redirect attacks
-  const safeOnCancelGoto = isSafePath(decoded) ? decoded : '';
+  const safeOnCancelGoto = isSafePath(onCancelGoto) ? onCancelGoto : '';
 
   return {
     userOrgs,
