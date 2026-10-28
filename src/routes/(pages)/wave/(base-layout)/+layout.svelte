@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, type Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
   import type { PageProps } from './$types';
   import Header from '$lib/components/wave/header/header.svelte';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
@@ -9,9 +9,6 @@
   import Orgs from '$lib/components/icons/Orgs.svelte';
   import Settings from '$lib/components/icons/Settings.svelte';
   import Trophy from '$lib/components/icons/Trophy.svelte';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
-  import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
   import Issue from '$lib/components/icons/Issue.svelte';
   import Wave from '$lib/components/icons/Wave.svelte';
   import Wallet from '$lib/components/icons/Wallet.svelte';
@@ -26,16 +23,6 @@
   } = $props();
 
   let sidenavExpanded = $state(false);
-
-  onMount(() => {
-    breakpointsStore.attach();
-    return () => breakpointsStore.detach();
-  });
-
-  onMount(() => {
-    cupertinoPaneStore.attach();
-    return () => cupertinoPaneStore.detach();
-  });
 
   const hasPermissions = $derived(Boolean(data.user?.permissions?.length));
 
@@ -144,8 +131,6 @@
 </script>
 
 <ModalLayout />
-
-<CupertinoPaneTarget />
 
 <div class="header-container">
   <Header

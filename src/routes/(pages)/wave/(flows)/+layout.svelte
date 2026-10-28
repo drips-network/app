@@ -1,12 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { page } from '$app/state';
   import ModalLayout from '$lib/components/modal-layout/modal-layout.svelte';
   import Header from '$lib/components/wave/header/header.svelte';
   import type { PageData } from '../(base-layout)/$types';
-  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
-  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
-  import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
 
   interface Props {
     children?: import('svelte').Snippet;
@@ -14,21 +10,9 @@
   }
 
   let { children, data }: Props = $props();
-
-  onMount(() => {
-    breakpointsStore.attach();
-    return () => breakpointsStore.detach();
-  });
-
-  onMount(() => {
-    cupertinoPaneStore.attach();
-    return () => cupertinoPaneStore.detach();
-  });
 </script>
 
 <ModalLayout />
-
-<CupertinoPaneTarget />
 
 <div class="flow-base-layout" class:fullscreen={page.data.waveFullscreenFlow}>
   <div class="header-container">

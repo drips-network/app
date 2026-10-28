@@ -3,9 +3,22 @@
   import CookieConsentBanner from '$lib/components/wave/cookie-consent-banner/cookie-consent-banner.svelte';
   import FaroInitializer from '$lib/utils/faro/faro-initializer.svelte';
   import { PUBLIC_WAVE_API_URL } from '$lib/utils/wave/call';
-  import type { Snippet } from 'svelte';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
+  import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
+  import CupertinoPaneTarget from '$lib/stores/cupertino-pane/cupertino-pane-target.svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   let { children }: { children?: Snippet } = $props();
+
+  onMount(() => {
+    breakpointsStore.attach();
+    return () => breakpointsStore.detach();
+  });
+
+  onMount(() => {
+    cupertinoPaneStore.attach();
+    return () => cupertinoPaneStore.detach();
+  });
 </script>
 
 <svelte:head>
@@ -23,6 +36,8 @@
 <FaroInitializer />
 
 <CookieConsentBanner />
+
+<CupertinoPaneTarget />
 
 {@render children?.()}
 
