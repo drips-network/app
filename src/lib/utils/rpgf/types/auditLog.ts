@@ -35,35 +35,35 @@ export const auditLogActionSchema = z.enum([
 export type AuditLogAction = z.infer<typeof auditLogActionSchema>;
 
 // Payload Schemas
-const roundCreatedPayloadSchema = z.any();
-const roundSettingsChangedPayloadSchema = z.any();
-const roundAdminsChangedPayloadSchema = z.any();
-const roundVotersChangedPayloadSchema = z.any();
+const roundCreatedPayloadSchema = z.any().optional();
+const roundSettingsChangedPayloadSchema = z.any().optional();
+const roundAdminsChangedPayloadSchema = z.any().optional();
+const roundVotersChangedPayloadSchema = z.any().optional();
 const roundPublishedPayloadSchema = z.null();
 const roundDeletedPayloadSchema = z.null();
-const applicationSubmittedPayloadSchema = z.any();
-const applicationsReviewedPayloadSchema = z.any();
-const applicationUpdatedPayloadSchema = z.any();
-const ballotSubmittedPayloadSchema = z.any();
-const ballotUpdatedPayloadSchema = z.any();
-const resultsCalculatedPayloadSchema = z.any();
+const applicationSubmittedPayloadSchema = z.any().optional();
+const applicationsReviewedPayloadSchema = z.any().optional();
+const applicationUpdatedPayloadSchema = z.any().optional();
+const ballotSubmittedPayloadSchema = z.any().optional();
+const ballotUpdatedPayloadSchema = z.any().optional();
+const resultsCalculatedPayloadSchema = z.any().optional();
 const resultPublishedPayloadSchema = z.null();
 const linkedDripListsEditedPayloadSchema = z.object({
   dripListAccountIds: z.array(z.string()),
 });
-const applicationCategoryCreatedPayloadSchema = z.any();
-const applicationCategoryUpdatedPayloadSchema = z.any();
-const applicationCategoryDeletedPayloadSchema = z.any();
-const applicationFormCreatedPayloadSchema = z.any();
-const applicationFormUpdatedPayloadSchema = z.any();
-const applicationFormDeletedPayloadSchema = z.any();
-const kycRequestCreatedPayloadSchema = z.any();
-const kycRequestLinkedToApplicationPayloadSchema = z.any();
-const kycRequestUpdatedPayloadSchema = z.any();
-const customDatasetCreatedPayloadSchema = z.any();
-const customDatasetUpdatedPayloadSchema = z.any();
-const customDatasetDeletedPayloadSchema = z.any();
-const customDatasetUploadedPayloadSchema = z.any();
+const applicationCategoryCreatedPayloadSchema = z.any().optional();
+const applicationCategoryUpdatedPayloadSchema = z.any().optional();
+const applicationCategoryDeletedPayloadSchema = z.any().optional();
+const applicationFormCreatedPayloadSchema = z.any().optional();
+const applicationFormUpdatedPayloadSchema = z.any().optional();
+const applicationFormDeletedPayloadSchema = z.any().optional();
+const kycRequestCreatedPayloadSchema = z.any().optional();
+const kycRequestLinkedToApplicationPayloadSchema = z.any().optional();
+const kycRequestUpdatedPayloadSchema = z.any().optional();
+const customDatasetCreatedPayloadSchema = z.any().optional();
+const customDatasetUpdatedPayloadSchema = z.any().optional();
+const customDatasetDeletedPayloadSchema = z.any().optional();
+const customDatasetUploadedPayloadSchema = z.any().optional();
 
 const userActorSchema = z.object({
   type: z.literal('user'),
