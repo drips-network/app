@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertAvatarImageHeader } from './read-avatar-image';
+import { assertAvatarImageHeader, readCappedBody } from './read-avatar-image';
 
 /** A PNG signature and IHDR chunk claiming the given dimensions, with no pixel data. */
 function pngHeader(width: number, height: number) {
@@ -64,5 +64,39 @@ describe('assertAvatarImageHeader', () => {
     expect(getMessage(() => assertAvatarImageHeader(Buffer.from('not an image')))).toBe(
       'Invalid image',
     );
+  });
+});
+
+function streamOf(chunkCount: number, chunkSize: number) {
+  let sent = 0;
+
+  return new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (sent === chunkCount) return controller.close();
+      sent++;
+      controller.enqueue(new Uint8Array(chunkSize));
+    },
+  });
+}
+
+describe('readCappedBody', () => {
+  it('returns bodies within the limit', async () => {
+    const buffer = await readCappedBody(new Response(streamOf(3, 10)), 100);
+
+    expect(buffer.byteLength).toBe(30);
+  });
+
+  it('rejects early based on content-length', async () => {
+    const res = new Response(streamOf(1, 10), { headers: { 'content-length': '1000' } });
+
+    await expect(readCappedBody(res, 100)).rejects.toMatchObject({ status: 400 });
+  });
+
+  it('stops reading once a streamed body exceeds the limit', async () => {
+    // Without a content-length the cap has to be enforced while streaming.
+    await expect(readCappedBody(new Response(streamOf(1000, 10)), 100)).rejects.toMatchObject({
+      status: 400,
+      body: { message: 'Image file too large' },
+    });
   });
 });
