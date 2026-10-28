@@ -1,8 +1,9 @@
-import { Jimp, JimpMime } from 'jimp';
+import { JimpMime } from 'jimp';
 import { error } from '@sveltejs/kit';
 
 import { pinFileToIPFS } from '$lib/utils/pinata';
 import getOptionalEnvVar from '$lib/utils/get-optional-env-var/private.js';
+import readAvatarImage from '$lib/utils/read-avatar-image';
 
 const missingEnvVarError = 'Uploading custom avatars will not work.';
 
@@ -16,7 +17,7 @@ export const POST = async ({ request }) => {
 
   const blob = await request.arrayBuffer();
 
-  const image = await Jimp.read(Buffer.from(blob));
+  const image = await readAvatarImage(Buffer.from(blob));
 
   if ([JimpMime.jpeg as string, JimpMime.png as string].includes(image.mime ?? '') === false) {
     throw new Error('Invalid image format');
