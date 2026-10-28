@@ -1,10 +1,7 @@
-import isSafePath from '$lib/utils/safe-path';
+import { safeParseBackToParam } from '$lib/utils/safe-path';
 
 export const load = async ({ url }) => {
-  const backTo = url.searchParams.get('backTo') || '/wave';
-  const decoded = decodeURIComponent(backTo || '');
-
-  const safeBackTo = isSafePath(decoded) ? decoded : '/wave';
+  const safeBackTo = safeParseBackToParam(url) || '/wave';
 
   return {
     backTo: safeBackTo,

@@ -13,7 +13,7 @@ export const load = async ({ parent, fetch, url, depends }) => {
   }
 
   if (!user) {
-    throw redirect(302, `/wave/login?backTo=${url.pathname}${url.search}`);
+    throw redirect(302, `/wave/login?backTo=${encodeURIComponent(url.pathname + url.search)}`);
   }
 
   const userOrgs = await getOrgs(fetch, { limit: 1 }, { gitHubInstallationId: installationId });

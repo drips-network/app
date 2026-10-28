@@ -75,3 +75,12 @@ body {
     transform: translateY(-30px);
   }
 }
+
+/* Inline code in Wave issue titles, injected via {@html renderIssueTitle(...)} */
+.issue-title-code {
+  font-family: var(--typeface-mono-regular);
+  color: var(--color-foreground-level-6);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem 0 0.4rem;
+  background-color: var(--color-foreground-level-2);
+}
