@@ -121,5 +121,8 @@ RUN npm run build:telemetry
 
 EXPOSE 8080
 
+# adapter-node defaults to 512K, which is below the 5 MB avatar uploads the UI allows.
+ENV BODY_SIZE_LIMIT=6M
+
 # Run the app (this is not a build command, it runs /build/index.js)
 CMD ["node", "--require", "./build/telemetry.cjs", "build"]
