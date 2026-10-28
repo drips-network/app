@@ -7,7 +7,7 @@
   import MiniButton from '../mini-button/mini-button.svelte';
   import Flyout from '../flyout/flyout.svelte';
   import NotificationsMenu from './components/notifications-menu.svelte';
-  import { MediaQuery } from 'svelte/reactivity';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
 
   const NOVU_APP_ID = getOptionalEnvVar(
@@ -104,8 +104,8 @@
     }
   }
 
-  const mobileQuery = new MediaQuery('max-width: 1024px');
-  const mobileMode = $derived(mobileQuery.current);
+  const viewWidth = $derived($breakpointsStore?.dimensions.width);
+  const mobileMode = $derived(viewWidth ? viewWidth <= 1024 : false);
 
   function handleMobileClick() {
     if (!mobileMode) return;

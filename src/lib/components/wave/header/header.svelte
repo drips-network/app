@@ -5,7 +5,7 @@
   import Drip from '$lib/components/illustrations/drip.svelte';
   import SupportButton from '$lib/components/intercom/support-button.svelte';
   import NotificationsButton from '$lib/components/notifications/notifications-button.svelte';
-  import { MediaQuery } from 'svelte/reactivity';
+  import breakpointsStore from '$lib/stores/breakpoints/breakpoints.store';
   import cupertinoPaneStore from '$lib/stores/cupertino-pane/cupertino-pane.store';
   import type { WaveLoggedInUser } from '$lib/utils/wave/auth';
   import type { ComponentProps } from 'svelte';
@@ -31,8 +31,8 @@
     hidePoints?: boolean;
   } = $props();
 
-  const mobileQuery = new MediaQuery('max-width: 1024px');
-  const mobileMode = $derived(mobileQuery.current);
+  const viewWidth = $derived($breakpointsStore?.dimensions.width);
+  const mobileMode = $derived(viewWidth ? viewWidth <= 1024 : false);
 
   function handleMobileUserMenuClick() {
     if (!mobileMode) return;
