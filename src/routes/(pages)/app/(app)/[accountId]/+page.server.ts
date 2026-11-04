@@ -74,9 +74,16 @@ async function resolveEnsFields(address: string) {
     if (ensName) {
       const resolver = await mainnetProvider.getResolver(ensName);
 
-      const promises = ['description', 'url', 'com.twitter', 'com.github'].map(
-        async (recordName) => [recordName, await resolver?.getText(recordName)],
-      );
+      const promises = [
+        'description',
+        'url',
+        'com.twitter',
+        'com.github',
+        'org.telegram',
+        'com.discord',
+        'com.instagram',
+        'email',
+      ].map(async (recordName) => [recordName, await resolver?.getText(recordName)]);
 
       return {
         ensName,

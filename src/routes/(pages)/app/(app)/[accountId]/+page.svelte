@@ -24,6 +24,10 @@
   $: socialLinkValues = {
     'com.twitter': data.ensData?.records['com.twitter'],
     'com.github': data.ensData?.records['com.github'],
+    'org.telegram': data.ensData?.records['org.telegram'],
+    'com.discord': data.ensData?.records['com.discord'],
+    'com.instagram': data.ensData?.records['com.instagram'],
+    email: data.ensData?.records.email,
     url: data.ensData?.records.url,
   };
 
