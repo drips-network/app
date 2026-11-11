@@ -55,6 +55,7 @@
       grant={state.grant}
       {actionContext}
       kycStatus={{ reviewAnswer: 'GREEN' }}
+      kybStatus={state.grant.kyb ? { hasKyb: true, ...state.grant.kyb } : undefined}
       hideIdentityLinks
     />
   {:else if state.state === 'grant_complete'}

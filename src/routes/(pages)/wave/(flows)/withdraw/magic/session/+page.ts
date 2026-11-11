@@ -38,6 +38,17 @@ const sessionGrantSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   recipientGitHubUsername: z.string().nullable(),
+  // Set when the owning org has a KYB record: withdrawals then go only to its
+  // locked address and memo. Defaulted so an older API without it parses.
+  kyb: z
+    .object({
+      authorized: z.boolean(),
+      stellarAddress: z.string(),
+      memoType: memoTypeEnum.nullable(),
+      memoValue: z.string().nullable(),
+    })
+    .nullable()
+    .default(null),
   transactions: z.array(
     z.object({
       id: z.uuid(),

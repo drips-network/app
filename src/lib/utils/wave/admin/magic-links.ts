@@ -23,6 +23,10 @@ const magicLinkSchema = z.object({
   id: z.uuid(),
   grantId: z.uuid(),
   createdByUserId: z.uuid(),
+  // The org member the link was issued to (always set for grants owned by a
+  // GitHub organization). Defaulted so an older API without the fields parses.
+  recipientUserId: z.uuid().nullable().default(null),
+  recipientGitHubUsername: z.string().nullable().default(null),
   createdAt: z.coerce.date(),
   expiresAt: z.coerce.date(),
   revokedAt: z.coerce.date().nullable(),
@@ -45,6 +49,16 @@ const withdrawableGrantSummarySchema = z.object({
   waveNumber: z.number().int(),
   isOrgGrant: z.boolean(),
   orgLogin: z.string().nullable(),
+  /** `User` for an installation on the person's own account, `Organization` for a real org. */
+  orgAccountType: z.enum(['User', 'Organization']).nullable().default(null),
+  /** The searched user's GitHub role in the org, for real-org grants. */
+  orgMemberRole: z.string().nullable().default(null),
+  /**
+   * True for grants owned by a real GitHub organization: the link is issued to
+   * a designated member (the searched user), and the active link may belong to
+   * another member.
+   */
+  requiresRecipient: z.boolean().default(false),
   activeMagicLink: magicLinkSchema.nullable(),
 });
 export type WithdrawableGrantSummary = z.infer<typeof withdrawableGrantSummarySchema>;
@@ -79,14 +93,22 @@ export async function getWithdrawableGrantsForUser(
   );
 }
 
+/**
+ * Issues a magic link for a grant. `recipientUserId` names the Wave user the
+ * link is for — required for grants owned by a GitHub organization (it must be
+ * a current member), and otherwise optional but checked against the grant's
+ * own recipient.
+ */
 export async function createMagicLink(
   f = fetch,
   grantId: string,
+  recipientUserId?: string,
 ): Promise<CreateMagicLinkResponse> {
   return parseRes(
     createResponseSchema,
     await authenticatedCall(f, `/api/admin/grants/${grantId}/magic-links`, {
       method: 'POST',
+      body: JSON.stringify(recipientUserId ? { recipientUserId } : {}),
     }),
   );
 }
