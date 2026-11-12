@@ -16,8 +16,19 @@
     getWithdrawableGrantsForUser,
     revokeMagicLink,
     type CreateMagicLinkResponse,
+    type WithdrawableGrantSummary,
     type WithdrawableGrantsResponse,
   } from '$lib/utils/wave/admin/magic-links';
+
+  function confirm(message: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      doWithConfirmationModal(
+        message,
+        () => resolve(true),
+        () => resolve(false),
+      );
+    });
+  }
 
   let gitHubUsername = $state('');
   let lookupResult = $state<WithdrawableGrantsResponse | null>(null);
@@ -52,22 +63,36 @@
     if (refreshed) lookupResult = refreshed;
   }
 
-  async function handleGenerate(grantId: string, hasActiveLink: boolean) {
-    const proceed = hasActiveLink
-      ? await new Promise<boolean>((resolve) => {
-          doWithConfirmationModal(
-            'A magic link is already active for this grant. Generating a new one will immediately revoke the old one. Continue?',
-            () => resolve(true),
-            () => resolve(false),
-          );
-        })
-      : true;
+  async function handleGenerate(grant: WithdrawableGrantSummary) {
+    if (!lookupResult) return;
+    const recipient = lookupResult.user;
+    const activeLink = grant.activeMagicLink;
 
-    if (!proceed) return;
+    if (grant.requiresRecipient) {
+      // A real GitHub organization has no single owner: the link is issued to
+      // the searched member, who will be able to withdraw the org's grant.
+      const replacing = activeLink
+        ? activeLink.recipientGitHubUsername &&
+          activeLink.recipientGitHubUsername !== recipient.gitHubUsername
+          ? ` This immediately revokes the active link issued to ${activeLink.recipientGitHubUsername}.`
+          : ' This immediately revokes the currently active link.'
+        : '';
+      const proceed = await confirm(
+        `This grant belongs to the GitHub organization ${grant.orgLogin ?? ''}. The link will let ${recipient.gitHubUsername} withdraw the full $${grant.currentAmountUSD.toLocaleString()} on the organization's behalf, so only continue once you have confirmed they are entitled to it.${replacing}`,
+      );
+      if (!proceed) return;
+    } else if (activeLink) {
+      const proceed = await confirm(
+        'A magic link is already active for this grant. Generating a new one will immediately revoke the old one. Continue?',
+      );
+      if (!proceed) return;
+    }
 
-    busyGrantId = grantId;
+    busyGrantId = grant.id;
     try {
-      const issued = await doWithErrorModal(() => createMagicLink(fetch, grantId));
+      const issued = await doWithErrorModal(() =>
+        createMagicLink(fetch, grant.id, grant.requiresRecipient ? recipient.id : undefined),
+      );
       if (issued) {
         lastIssued = issued;
         await refreshLookup();
@@ -102,10 +127,11 @@
     <p class="intro typo-text">
       Issue a one-time withdrawal link for a user who can no longer sign in to Wave via GitHub. Send
       the URL to the user out-of-band — they can use it to initiate test transactions and
-      withdrawals without an authenticated session. Covers their personal grants and grants issued
-      to an installation on their own GitHub account. Grants issued to a GitHub organization are not
-      listed: those are recoverable by adding another member to the organization. Links last 7 days
-      and can be revoked at any time.
+      withdrawals without an authenticated session. Covers their personal grants, grants issued to
+      an installation on their own GitHub account, and grants issued to any GitHub organization they
+      are a member of. An organization's grant has no single owner, so its link is issued to the
+      member you looked up and withdraws on the organization's behalf (KYB rules still apply). Links
+      last 7 days and can be revoked at any time.
     </p>
 
     <div class="form-row">
@@ -184,7 +210,15 @@
                   <span>{grant.type}</span>
                   <span class="tnum">${grant.currentAmountUSD.toLocaleString()} USD</span>
                   <span>expires {formatDate(grant.expiresAt, 'dayAndYear')}</span>
-                  {#if grant.isOrgGrant}
+                  {#if grant.requiresRecipient}
+                    <span
+                      class="org-badge"
+                      title="Issued to a GitHub organization. A link is issued to the member you looked up and withdraws on the organization's behalf."
+                      >org grant{grant.orgLogin ? ` · ${grant.orgLogin}` : ''}{grant.orgMemberRole
+                        ? ` (${grant.orgMemberRole})`
+                        : ''}</span
+                    >
+                  {:else if grant.isOrgGrant}
                     <span
                       title="Issued to the GitHub App installation on this person's own account, so it resolves to the same user."
                       >account grant{grant.orgLogin ? ` · ${grant.orgLogin}` : ''}</span
@@ -192,9 +226,17 @@
                   {/if}
                 </div>
                 {#if grant.activeMagicLink}
+                  {@const linkRecipient = grant.activeMagicLink.recipientGitHubUsername}
+                  {@const otherRecipient =
+                    linkRecipient !== null && linkRecipient !== lookupResult.user.gitHubUsername}
                   <div class="grant-line subtle typo-text-small">
-                    Active magic link issued {formatDate(grant.activeMagicLink.createdAt)} — expires
-                    {formatDate(grant.activeMagicLink.expiresAt, 'dayAndYear')}.
+                    <span>
+                      Active magic link issued {formatDate(grant.activeMagicLink.createdAt)}
+                      {#if grant.requiresRecipient && linkRecipient}
+                        to <span class:other-recipient={otherRecipient}>{linkRecipient}</span>
+                      {/if}
+                      — expires {formatDate(grant.activeMagicLink.expiresAt, 'dayAndYear')}.
+                    </span>
                   </div>
                 {/if}
               </div>
@@ -213,7 +255,7 @@
                   variant="primary"
                   size="small"
                   disabled={busyGrantId === grant.id}
-                  onclick={() => handleGenerate(grant.id, !!grant.activeMagicLink)}
+                  onclick={() => handleGenerate(grant)}
                 >
                   {grant.activeMagicLink ? 'Re-issue link' : 'Generate link'}
                 </Button>
@@ -321,6 +363,15 @@
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
+  }
+
+  .org-badge {
+    color: var(--color-primary-level-6);
+  }
+
+  .other-recipient {
+    color: var(--color-caution-level-6);
+    font-weight: 600;
   }
 
   .grant-actions {
