@@ -128,7 +128,7 @@
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-layout-noverlap": "^0.4.2",
     "graphql": "^16.8.2",
-    "graphql-request": "^7.1.0",
+    "graphql-request": "^7.4.0",
     "image-size": "^2.0.4",
     "isomorphic-fetch": "^3.0.0",
     "jimp": "^1.6.1",
