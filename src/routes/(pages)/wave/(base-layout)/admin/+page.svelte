@@ -35,6 +35,16 @@
           },
         ]
       : []),
+    ...(data.user.permissions?.includes('reviewWaveProgramRepos')
+      ? [
+          {
+            name: 'Repo decisions',
+            description:
+              'Approve or reject several repo applications at once, including re-approving rejected repos.',
+            href: '/wave/admin/repo-decisions',
+          },
+        ]
+      : []),
     ...(data.user.permissions?.includes('managePhoneVerifications')
       ? [
           {
