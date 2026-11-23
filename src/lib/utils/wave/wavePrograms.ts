@@ -155,6 +155,27 @@ export async function getPendingWaveProgramRepos(
   );
 }
 
+/**
+ * Looks up a program's applications for specific repos (`owner/repo`, case-insensitive) in one
+ * status. The backend caps a lookup at 100 names, so callers chunk longer lists.
+ */
+export async function findWaveProgramRepoApplications(
+  f = fetch,
+  waveProgramId: string,
+  status: WaveProgramRepoStatus,
+  repoFullNames: string[],
+) {
+  const params = new URLSearchParams({
+    status,
+    limit: '100',
+    repoFullNames: repoFullNames.join(','),
+  });
+  return parseRes(
+    paginatedResponseSchema(waveProgramRepoWithDetailsDtoSchema),
+    await authenticatedCall(f, `/api/wave-programs/${waveProgramId}/repos/pending?${params}`),
+  );
+}
+
 export async function approveWaveProgramRepo(f = fetch, waveProgramId: string, orgRepoId: string) {
   return parseRes(
     waveProgramRepoWithDetailsDtoSchema,
