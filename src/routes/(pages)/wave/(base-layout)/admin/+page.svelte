@@ -35,16 +35,13 @@
           },
         ]
       : []),
-    ...(data.user.permissions?.includes('reviewWaveProgramRepos')
-      ? [
-          {
-            name: 'Repo decisions',
-            description:
-              'Approve or reject several repo applications at once, including re-approving rejected repos.',
-            href: '/wave/admin/repo-decisions',
-          },
-        ]
-      : []),
+    // Not permission-gated: program admins can review their own programs, and the API enforces it.
+    {
+      name: 'Repo decisions',
+      description:
+        'Approve or reject several repo applications at once, including re-approving rejected repos.',
+      href: '/wave/admin/repo-decisions',
+    },
     ...(data.user.permissions?.includes('managePhoneVerifications')
       ? [
           {

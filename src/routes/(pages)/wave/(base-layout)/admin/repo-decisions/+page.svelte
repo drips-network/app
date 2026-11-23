@@ -20,6 +20,7 @@
     WaveProgramRepoStatus,
     WaveProgramRepoWithDetailsDto,
   } from '$lib/utils/wave/types/waveProgram';
+  import { isHttpError } from '@sveltejs/kit';
   import { parseRepoList } from './parse-repo-list';
 
   let { data } = $props();
@@ -51,6 +52,8 @@
 
   let rows = $state<Row[] | null>(null);
   let invalidEntries = $state<string[]>([]);
+  // Set when the API refuses the lookup (user isn't an admin of the chosen program).
+  let forbiddenProgramName = $state<string | null>(null);
   let lookedUpProgramId = $state<string | null>(null);
   let lookingUp = $state(false);
   let running = $state(false);
@@ -96,12 +99,34 @@
     return out;
   }
 
+  /**
+   * Access is decided by the API: program admins can review their own programs, users with
+   * `reviewWaveProgramRepos` can review all. A 403 means "not an admin of this program", which
+   * deserves a plain message rather than the generic error modal.
+   */
+  async function lookUpOrExplainForbidden(programId: string, fn: () => Promise<void>) {
+    try {
+      await fn();
+    } catch (e) {
+      if (isHttpError(e) && e.status === 403) {
+        rows = null;
+        forbiddenProgramName =
+          data.wavePrograms.data.find((wp) => wp.id === programId)?.name ?? 'this program';
+        return;
+      }
+      await doWithErrorModal(() => {
+        throw e;
+      });
+    }
+  }
+
   async function lookUp() {
     if (!waveProgramId) return;
     const programId = waveProgramId;
     const parsed = parseRepoList(input);
     invalidEntries = parsed.invalid;
     results = {};
+    forbiddenProgramName = null;
 
     if (parsed.repoFullNames.length === 0) {
       rows = [];
@@ -111,7 +136,7 @@
 
     lookingUp = true;
     try {
-      await doWithErrorModal(async () => {
+      await lookUpOrExplainForbidden(programId, async () => {
         const byName: Record<string, WaveProgramRepoWithDetailsDto> = {};
         const statuses: WaveProgramRepoStatus[] = ['pending', 'rejected', 'approved'];
         for (const names of chunk(parsed.repoFullNames, LOOKUP_CHUNK)) {
@@ -218,6 +243,7 @@
           onchange={(value) => {
             chosenProgramId = value;
             rows = null;
+            forbiddenProgramName = null;
             results = {};
           }}
         />
@@ -239,6 +265,13 @@
           onclick={lookUp}>Look up</Button
         >
       </div>
+
+      {#if forbiddenProgramName}
+        <AnnotationBox type="warning">
+          You're not an admin of {forbiddenProgramName}, so you can't approve or reject its repos.
+          Pick a program you administer, or ask for the <code>reviewWaveProgramRepos</code> permission.
+        </AnnotationBox>
+      {/if}
     </div>
   </Section>
 
