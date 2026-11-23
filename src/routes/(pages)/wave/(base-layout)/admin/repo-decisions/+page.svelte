@@ -22,6 +22,7 @@
   } from '$lib/utils/wave/types/waveProgram';
   import { isHttpError } from '@sveltejs/kit';
   import { parseRepoList } from './parse-repo-list';
+  import { describeDecisionError } from './describe-decision-error';
 
   let { data } = $props();
 
@@ -200,7 +201,7 @@
             } catch (e) {
               results[row.fullName] = {
                 state: 'failed',
-                message: e instanceof Error ? e.message : String(e),
+                message: describeDecisionError(e, action),
               };
             }
           }
